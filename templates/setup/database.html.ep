@@ -1,0 +1,61 @@
+<html>
+<head>
+    <!--
+    * Inprint Content 4.5
+    * Copyright(c) 2001-2009, Softing, LLC.
+    * licensing@softing.ru
+    *
+    * http://softing.ru/license
+    -->
+    <title>Inprint Content 4.5 - Setup Database</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
+    <meta HTTP-EQUIV="Pragma" CONTENT="no-cache"></meta>
+    <link type="text/css" rel="stylesheet" href="/simple-page.css">
+</head>
+<body>
+
+    <div class="background">
+        <div class="body">
+            <h1>Настройка БД</h1>
+            
+            <% if ($error) { %>
+                <div class="error">
+                    Произошла ошибка обработки формы!
+                    <br/><br/>
+                    <small><%= $error %></small>
+                </div>
+            <% } %>
+            
+            <form id="dbform" method="get">
+                <input type="hidden" name="action" value="submit">
+                <div>
+                    <label>Адрес</label>
+                    <input type="text" name="host" value="<%= $self->param('host') || "localhost" %>"/>
+                </div>
+                <div>
+                    <label>Порт</label>
+                    <input type="text" name="port" value="<%= $self->param('port') || 5432 %>"/>
+                </div>
+                <div>
+                    <label>БД</label>
+                    <input type="text" name="db" value="<%= $self->param('db') || "inprint-4.5" %>"/>
+                </div>
+                <div>
+                    <label>Логин</label>
+                    <input type="text" name="user" value="<%= $self->param('user') || "inprint" %>"/>
+                </div>
+                <div>
+                    <label>Пароль</label>
+                    <input type="text" name="password" value="<%= $self->param('password') || "inprint" %>"/>
+                </div>
+                <div>
+                    <button type="button" onclick="document.forms['dbform'].submit();">Настроить!</button>
+                </div>
+            </form>
+            
+        </div>
+    <div>
+
+    <div class="footer">inprint.content 4.5.0</div>
+</body>
+</html>

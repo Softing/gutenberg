@@ -1,0 +1,57 @@
+.x-menu-plain .x-date-picker {
+    border-style: none solid solid;
+    border-width: 0 1px 1px;
+}
+
+.x-menu-date-range-item-range-date-button {
+    margin-left: 82px;
+}
+
+.x-date-range-menu {
+    border: 1px solid !important;
+    padding: 0 !important;
+}
+
+.x-date-range-menu .x-menu-list {
+    padding: 0;
+}
+
+.x-menu-date-range-item .x-panel-btns {
+    padding: 0;
+}
+
+.x-menu-date-range-item .x-panel-btns .x-date-bottom {
+    padding: 0;
+}
+
+.ext-ie .x-menu-date-range-item .x-panel-btns .x-date-bottom {
+    margin: 0 0 -1px;
+}
+
+.x-menu-date-range-item .x-panel-tbar-noheader .x-toolbar, .x-panel-mc .x-panel-tbar .x-toolbar {
+    border-top: 0 none;
+}
+
+.x-menu-date-range-item .x-panel-bbar .x-toolbar, .x-panel-tbar .x-toolbar {
+    border-width: 0;
+}
+
+.x-menu-date-range-item .x-panel-body {
+    border-width: 1px 0 0;
+}
+
+.ext-ie .x-menu-date-range-item  .x-panel-fbar {
+    width: 100% !important;
+}
+
+.x-menu-date-range-item .x-panel-body {
+    background-color: #EFEFEF;
+}
+
+.x-menu-plain .x-date-picker {
+    border-color: #D0D0D0;
+}
+
+.x-date-range-menu {
+    border-color: #898989 !important;
+}

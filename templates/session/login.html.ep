@@ -1,0 +1,27 @@
+<html>
+<head>
+    <!--
+    * Inprint Content 4.5
+    * Copyright(c) 2001-2009, Softing, LLC.
+    * licensing@softing.ru
+    *
+    * http://softing.ru/license
+   -->
+    <title>Inprint Content 4.5</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
+    <meta HTTP-EQUIV="Pragma" CONTENT="no-cache"></meta>
+    <link type="text/css" rel="stylesheet" href="/login-page.css">
+    <link type="text/css" rel="stylesheet" href="/ext-3.2.1/resources/css/ext-all.css">
+    <link type="text/css" rel="stylesheet" href="/ext-3.2.1/resources/css/xtheme-gray.css">
+</head>
+<body>
+    <script type="text/javascript" src="/wallpaper.js"></script>
+    <div class="footer">inprint.content 4.5.0</div>
+</body>
+</html>
+<!-- Ext 3.2.1 -->
+<script type="text/javascript" src="/ext-3.2.1/adapter/ext/ext-base.js"></script>
+<script type="text/javascript" src="/ext-3.2.1/ext-all.js"></script>
+<!-- Locale support -->
+<script type="text/javascript" src="/locale/"></script>
+<script type="text/javascript" src="/login.js"></script>

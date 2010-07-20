@@ -1,0 +1,48 @@
+/*
+ * Inprint Content 3.1
+ * Copyright(c) 2001-2009, Softing, LLC.
+ * licensing@softing.ru
+ *
+ * http://softing.ru/license
+ */
+
+/* data view */
+
+.inprint-view-topic {
+    padding: 10px 0px 0px 8px;
+    font-weight:bold;
+    color:#3764A0;
+    clear:both;
+}
+
+/* standart */
+.inprint-view-item {
+    float: left;
+    border:1px solid white;
+    padding: 4px 4px 4px 16px;
+    margin-left:4px;
+    background: url(/data/im/ico/bullet_white.png) 1px 3px no-repeat;
+    cursor:pointer;
+}
+.inprint-view-item span, .inprint-view-item div span {
+    border-bottom:1px dotted silver;
+}
+
+.x-view-selected {
+    color:green;
+    padding: 4px 4px 4px 16px;
+    background: url(/data/im/ico/bullet_green.png) 1px 3px no-repeat;
+}
+
+.x-view-selected span {
+    border-bottom:1px dotted green;
+}
+
+.x-view-over {
+    border:1px solid #dddddd;
+    padding: 4px 4px 4px 16px;
+    background: #efefef url(/data/im/ico/bullet_green.png) 1px 3px no-repeat;
+}
+.x-view-over span {
+    border-bottom:0px dotted silver;
+}

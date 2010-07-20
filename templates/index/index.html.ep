@@ -1,0 +1,62 @@
+<html>
+<head>
+    <!--
+     * Inprint Content 4.5
+     * Copyright(c) 2001-2009, Softing, LLC.
+     * licensing@softing.ru
+     *
+     * http://softing.ru/license
+    -->
+    <title>Inprint Content 4.5</title>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
+    <meta HTTP-EQUIV="Pragma" CONTENT="no-cache"></meta>
+    
+    <link rel="icon" href="/favicon.gif" type="image/gif" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    
+    <link type="text/css" rel="stylesheet" href="/ext-3.2.1/resources/css/ext-all.css">
+    <link type="text/css" rel="stylesheet" href="/ext-3.2.1/resources/css/xtheme-gray.css">
+    
+    <% foreach (@$css) { %>
+    <link type="text/css" rel="stylesheet" href="<%= $_ %>"/><% } %>
+    
+</head>
+<body>
+    <script type="text/javascript" src="/wallpaper.js"></script>
+    <!-- Loading mask element -->
+    <div id="loading-mask" style=""></div>
+    <div id="loading">
+        <img  id="loading-indicator" src="/images/ajax-loader.gif"/>
+        Inprint Content 4.5
+    </div>
+    
+    <script>
+        //alert (document.getElementById("loading-mask"));
+    </script>
+    
+    <!-- Fields required for history management -->
+    <form id="history-form" class="x-hidden">
+        <input type="hidden" id="x-history-field" />
+        <iframe id="x-history-frame"></iframe>
+    </form>
+    
+    <div class="footer">inprint.content 4.5.0</div>
+</body>
+</html>
+
+<!-- Ext 3.2.1 -->
+<script type="text/javascript" src="/ext-3.2.1/adapter/ext/ext-base.js"></script>
+<script type="text/javascript" src="/ext-3.2.1/ext-all.js"></script>
+<script type="text/javascript" src="/ext-3.2.1/src/locale/ext-lang-ru.js"></script>
+
+<!-- Plugins -->
+<% foreach (@$cssplugins) { %>
+<link type="text/css" rel="stylesheet" href="<%= $_ %>"/><% } %>
+<% foreach (@$jsplugins) { %>
+<script type="text/javascript" src="<%= $_ %>"></script><% } %>
+
+<!-- WIdgets -->
+<script type="text/javascript" src="/locale/"></script>
+<% foreach (@$js) { %>
+<script type="text/javascript" src="<%= $_ %>"></script><% } %>

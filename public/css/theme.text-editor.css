@@ -1,0 +1,40 @@
+/*
+ * Inprint Content 3.1
+ * Copyright(c) 2001-2009, Softing, LLC.
+ * licensing@softing.ru
+ *
+ * http://softing.ru/license
+ */
+
+.text-margin-4  p { margin:4px;  }
+.text-margin-6  p { margin:6px;  }
+.text-margin-8  p { margin:8px;  }
+.text-margin-10 p { margin:10px; }
+.text-margin-12 p { margin:12px; }
+.text-margin-14 p { margin:14px; }
+.text-margin-16 p { margin:16px; }
+.text-margin-18 p { margin:18px; }
+.text-margin-20 p { margin:20px; }
+
+.font-family-times     { font-family:"Times New Roman", Times, serif; }
+.font-family-arial     { font-family:Arial, Helvetica, sans-serif; }
+.font-family-helvetica { font-family:Helvetica, sans-serif; }
+.font-family-verdana   { font-family:Verdana, Geneva, Arial, Helvetica, sans-serif; }
+
+.font-size-10 { font-size: 10px; }
+.font-size-12 { font-size: 12px; }
+.font-size-14 { font-size: 14px; }
+.font-size-16 { font-size: 16px; }
+.font-size-18 { font-size: 18px; }
+.font-size-20 { font-size: 20px; }
+.font-size-24 { font-size: 24px; }
+.font-size-26 { font-size: 26px; }
+.font-size-28 { font-size: 28px; }
+.font-size-30 { font-size: 30px; }
+
+/* Version Panel */
+
+.inprint-panel-article-version-body {
+   padding:0px 10px 20px 10px;
+   cursor:text;
+}

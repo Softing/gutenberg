@@ -1,0 +1,58 @@
+html, body {
+    font:normal 12px verdana;
+    margin:0;
+    padding:0;
+    border:0 none;
+    overflow:hidden;
+    height:100%;
+}
+.background {
+    width:80%;
+    margin:20px auto;
+    background:white;
+    padding:20px 40px;
+    -moz-border-radius:10px;
+    -webkit-border-radius: 10px;
+    filter: alpha(opacity=50);
+    opacity: 0.9;
+}
+.footer {
+    position:absolute;
+    bottom:0px;
+    right:10px;
+    padding:4px 0px;
+    text-align:right;
+    color:white;
+    font-size:10px;
+}
+
+div.error {
+    background:red;
+    padding:10px;
+    margin-top:20px;
+    color:white;
+    -moz-border-radius:10px;
+    -webkit-border-radius: 10px;
+}
+
+h1 {
+    font-size:16px;
+}
+
+form {
+    margin-top:20px;
+}
+
+form div {
+    padding:3px 10px;
+    clear:both;
+}
+form label {
+    width:60px;float:left;
+}
+form input {
+    width:180px;
+}
+form button {
+    margin:10px 60px;
+}

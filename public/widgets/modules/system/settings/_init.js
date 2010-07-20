@@ -1,0 +1,1 @@
+Ext.namespace("Inprint.system.settings");

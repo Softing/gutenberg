@@ -1,0 +1,45 @@
+/*
+ * Inprint Content 3.1
+ * Copyright(c) 2001-2009, Softing, LLC.
+ * licensing@softing.ru
+ *
+ * http://softing.ru/license
+ */
+
+/* Whitespaces */
+.x-grid3-cell-inner, .x-grid3-hd-inner {
+   white-space:normal;
+}
+
+/* Progresscolumn */
+.x-grid3-progresscol .x-grid3-cell-inner {
+   padding: 0px 2px 0px 2px !important;
+}
+
+.x-grid3-progresscol .x-progress-bar {
+   height: 18px;
+   padding: 0px !important;
+   border:0px !important;
+   background:#9CBFEE url( /data/im/theme/progress/progress-bg.gif ) repeat-x left center !important;
+}
+
+.x-grid3-progresscol .x-progress-inner {
+   height: 18px;
+   margin: 0px !important;
+}
+
+.x-grid3-progresscol .x-progress-text  {
+   font-weight:normal !important;
+   padding:1px 0px !important;
+   color: #666666 !important;
+}
+
+.x-grid3-progresscol .x-progress-text-front {
+   font-weight:normal !important;
+   padding:4px 0px !important;
+   color: #666666 !important;
+}
+
+.x-grid3-progresscol .x-progress-wrap {
+   border:0px !important;
+}

@@ -1,0 +1,64 @@
+/*  
+ * Inprint Content 4.5
+ * Copyright(c) 2001-2009, Softing, LLC.
+ * licensing@softing.ru
+ *
+ * http://softing.ru/license
+ */
+
+body {
+   font-family:'lucida grande',tahoma,arial,sans-serif;
+   font-size:11px;
+}
+
+.footer {
+    position:absolute;
+    bottom:28px;
+    right:10px;
+    padding:4px 0px;
+    text-align:right;
+    color:white;
+    font-size:12px;
+}
+
+.ext-mb-warning {
+    background-image: url(/icons-32/exclamation.png) !important;
+}
+
+/*a {*/
+/*   color:#15428B;*/
+/*}*/
+/**/
+/*a:link, a:visited {*/
+/*   text-decoration: none;*/
+/*}*/
+/**/
+/*a:hover {*/
+/*   text-decoration: underline;*/
+/*}*/
+/*.hover {*/
+/*   cursor:hand;*/
+/*   cursor:pointer;*/
+/*}*/
+
+/* Safari override fixes */
+.ext-safari .x-date-picker {
+    width: 185px;
+}
+
+.ext-safari .x-panel-tbar  .x-form-text {
+    height:20px !important;
+}
+
+/* Chrome override fixes */
+.ext-chrome .x-date-picker {
+    width: 185px;
+}
+
+.ext-chrome .x-panel-tbar  .x-form-text {
+    height:20px !important;
+}
+
+.x-mask-loading div {
+   background-image: url(/images/ajax-loader.gif) !important;
+}
