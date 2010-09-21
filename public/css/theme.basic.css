@@ -1,4 +1,4 @@
-/*  
+/*
  * Inprint Content 4.5
  * Copyright(c) 2001-2009, Softing, LLC.
  * licensing@softing.ru
@@ -21,9 +21,15 @@ body {
     font-size:12px;
 }
 
+
+.ext-mb-content {
+   max-height:100px !important;
+   overflow:auto !important;
+}
 .ext-mb-warning {
     background-image: url(/icons-32/exclamation.png) !important;
 }
+
 
 /*a {*/
 /*   color:#15428B;*/

@@ -5,22 +5,41 @@
  *
  * http://softing.ru/license
  */
-   
+
 Ext.onReady(function() {
-    Ext.BLANK_IMAGE_URL = '/ext-3.2.1/resources/images/default/s.gif'; 
+    Ext.BLANK_IMAGE_URL = '/ext-3.2.1/resources/images/default/s.gif';
+
+    Ext.data.Connection.prototype._handleFailure = Ext.data.Connection.prototype.handleFailure;
+    Ext.data.Connection.prototype.handleFailure = function(response, e) {
+	var jsonData = Ext.util.JSON.decode(response.responseText);
+        var errorText = jsonData.error;
+
+        errorText = errorText.replace(/%br%/g, "<br/>");
+
+	Ext.Msg.show({
+            title:_("Communication error"),
+            minWidth:900,
+            maxWidth:900,
+            msg: errorText,
+            //icon: Ext.MessageBox.ERROR,
+            buttons: Ext.Msg.OK
+        });
+	Ext.data.Connection.prototype._handleFailure.call(this, response, e);
+    };
+
     Passport();
 });
- 
+
 var Passport =  function ()
 {
-   
+
     var cookie = new Ext.state.CookieProvider({
         path: "/",
         expires: new Date(new Date().getTime()+(1000*60*60*24*30))
     });
-   
+
     var url_params = Ext.urlDecode(window.location.search.substring(1));
-   
+
     var params = {
         request: url_params.request,
         ajax:true
@@ -35,14 +54,14 @@ var Passport =  function ()
             hidden:true,
             cls: 'error-box'
         },
-      
+
         // Login and Password's boxes
         {
             name: 'login',
             fieldLabel: _("Login"),
             emptyText: _("Enter login"),
             listeners: {
-                scope:this, 
+                scope:this,
                 render: function( cmp ) {
                     if ( cookie.get('passport.login') ) {
                         cmp.setValue( cookie.get('passport.login') );
@@ -59,7 +78,7 @@ var Passport =  function ()
             fieldLabel: _("Password")
         }
     ];
-   
+
     // Creating form
     this.form = new Ext.FormPanel({
         url:'/login/',
@@ -76,17 +95,17 @@ var Passport =  function ()
 
     // creating window
     var win = new Ext.Window({
-        
+
         title : "Inprint Content 4.5",
-        
+
         width: 300,
         height:190,
-        
+
         layout: 'fit',
         closable:false,
-        
+
         items: this.form,
-        
+
         buttons: [{
             text: _("Enter"),
             scope:this,
@@ -102,40 +121,40 @@ var Passport =  function ()
             }
         }]
     });
-   
+
     this.form.on('beforeaction', function() {
         win.body.mask(_("Loading"));
     });
-   
+
     this.form.on('actionfailed', function() {
         win.body.unmask();
     });
-   
+
     this.form.on('actioncomplete', function(form, action) {
-        
+
         win.body.unmask();
-        
+
         var r = Ext.decode( action.response.responseText );
-        
+
         // Error handle
         if ( r.success == 'false' ) {
-            
+
             var errorBox = this.form.findById('error-box');
             errorBox.show();
-             
+
             Ext.each( r.errors , function (c) {
                 this.getEl().update( _(c.msg) || c.msg );
             }, errorBox);
-         
+
         }
-        
+
         // all fine, go to main page
         if ( r.success == 'true' )
         {
             window.location = url_params.request || '/workspace/';
         }
-        
+
     }, this);
-   
+
     win.show();
 };
