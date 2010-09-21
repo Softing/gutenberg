@@ -13,32 +13,33 @@ use base 'Inprint::BaseController';
 sub preinit
 {
     my $c = shift;
-    
+
     if ( $c->config->get("core.installed") ne 'yes' ) {
         $c->redirect_to('/setup/database/');
     }
-    
-    $c->app->log->warn("SELFTEST PREINIT");
+
+    #$c->app->log->warn("SELFTEST PREINIT");
+    return $c;
 }
 
 sub postinit
 {
     my $c = shift;
-    
-    my @pairs;
-    if ($ENV{'REQUEST_METHOD'} eq 'POST') {
-        read(STDIN, my ($buffer), $ENV{'CONTENT_LENGTH'});
-        @pairs = split(/&/, $buffer);
-    }
-    
-    foreach my $pair (@pairs) {
-        my ($name, $value) = split(/=/, $pair);
-        $value =~ tr/+/ /;
-        $value =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
-        $value =~ s/<!--(.|\n)*-->//g;
-        $c->stash->{params}->append( $name => $value );
-    }
-    
+
+    #my @pairs;
+    #if ($ENV{'REQUEST_METHOD'} eq 'POST') {
+    #    read(STDIN, my ($buffer), $ENV{'CONTENT_LENGTH'});
+    #    @pairs = split(/&/, $buffer);
+    #}
+    #
+    #foreach my $pair (@pairs) {
+    #    my ($name, $value) = split(/=/, $pair);
+    #    $value =~ tr/+/ /;
+    #    $value =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+    #    $value =~ s/<!--(.|\n)*-->//g;
+    #    $c->stash->{params}->append( $name => $value );
+    #}
+
     return $c;
 }
 

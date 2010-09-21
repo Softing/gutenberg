@@ -13,12 +13,12 @@ use File::Find;
 
 use base 'Inprint::BaseController';
 
-sub index   
+sub index
 {
     my $c = shift;
-    
+
     my $path = $c->app->home->to_string;
-    
+
     # Find css files
     my @cssfiles;
     find({ wanted => sub {
@@ -32,7 +32,7 @@ sub index
         }
     }}, "$path/public/css");
     @cssfiles = sort { $a cmp $b } @cssfiles;
-    
+
     # Find js files
     my @jsfiles;
     find({ wanted => sub {
@@ -44,7 +44,7 @@ sub index
         }
     }}, "$path/public/widgets");
     @jsfiles = sort { $a cmp $b } @jsfiles;
-    
+
     # Find plugins
     my @jsplugins;
     my @cssplugins;
@@ -59,7 +59,7 @@ sub index
     }}, "$path/public/plugins");
     @jsplugins = sort { $a cmp $b } @jsplugins;
     @cssplugins = sort { $a cmp $b } @cssplugins;
-    
+
     $c->render(
         js  => \@jsfiles,
         css =>\@cssfiles,
@@ -71,7 +71,7 @@ sub index
 sub menu
 {
     my $c = shift;
-    
+
     sub AddItem {
         my ($id, $icon, $text, $path, $type) = @_;
         my $result = {};
@@ -82,9 +82,9 @@ sub menu
         $result->{type} = $type if $type;
         return $result;
     }
-    
+
     my @result;
-    
+
     # About programm
     my $about = {
         id => "core",
@@ -94,18 +94,18 @@ sub menu
         ]
     };
     push @result, $about;
-    
+
     # Portal
     my $portal = {
         id   => "portal"
     };
     push @result, $portal;
-    
+
     # Documents menu items
     my $documents = {
         id => "documents"
     };
-    
+
     #if ( Inprint::Core::Check::rules_or( 'document.edition.view', 'document.department.view', 'document.owner.view' ) ) {
     push @{ $documents->{menu} }, { id => "documents-create" };
     push @{ $documents->{menu} }, { id => "documents-todo" };
@@ -113,110 +113,103 @@ sub menu
     push @{ $documents->{menu} }, { id => "documents-all" };
     push @{ $documents->{menu} }, { id => "documents-archive" };
     push @{ $documents->{menu} }, { id => "documents-briefcase" };
-    
+
     #if ( Inprint::Core::Check::rules_or( 'document.edition.restore', 'document.department.restore', 'document.owner.restore' ) ) {
     push @{ $documents->{menu} }, { id => "documents-recycle" };
-    
-    push @result, $documents;
-    
-    
-    
-    # Editions
-    #if ( &check_rule('edition.view') ) {
 
-    my $editions = $c->sql->Q(
-        "SELECT uuid, name as title, sname as stitle FROM edition.edition WHERE deleted=false ORDER BY sname"
-    )->Hashes;
-    
+    push @result, $documents;
     push @result, "-";
+
     
-    foreach my $item (@$editions) {
-        
-        my $edition = {
-            id => "edition",
-            text => $item->{title}
+    # Fascicles and Composition
+    
+    # Выбираем выпуски
+    my $fascicles = $c->sql->Q("
+        SELECT
+            t1.id, t1.shortcut, t2.shortcut as catalog_shortcut
+        FROM fascicles t1, catalog t2
+        WHERE
+            t1.issystem = false AND t1.enabled = true
+            AND t1.catalog = t2.id
+        ORDER BY t2.shortcut, t1.shortcut
+    ")->Hashes;
+    
+    my $composition  = {
+        id => "composition"
+    };
+    
+    if ($#$fascicles < 10) {
+        push @result, { id => 'composition-calendar' };
+        #push @result, { id => 'composition-archive'  };
+    } else {
+        push @{ $composition->{menu} }, { id => 'composition-calendar' };
+        #push @{ $composition->{menu} }, { id => 'composition-archive'  };
+        push @result, $composition;
+    }
+    
+    foreach my $fascicle (@$fascicles) {
+    
+        my $fascicle = {
+            id   => "fascicle",
+            text => $fascicle->{catalog_shortcut} . '/'. $fascicle->{shortcut}
         };
         
-        #if ( &check_rule('edition.manage') ) {
-        push @{ $edition->{menu} }, { id => 'edition-calendar', oid => $item->{uuid} };
-        push @{ $edition->{menu} }, { id => 'edition-archive',  oid => $item->{uuid} };
+        push @{ $fascicle->{menu} }, {
+            id   => "fascicle-plan",
+            oid  => $fascicle->{id},
+            description => $fascicle->{shortcut}
+        };
         
-        # Выбираем выпуски
-        my $fascicles = $c->sql->Q(
-            "SELECT id, title FROM edition.calendar WHERE dt_started < now() AND dt_closed > now() AND edition=? ORDER BY dt_closed, title",
-            [ $item->{uuid} ]
-        )->Hashes;
+        push @{ $fascicle->{menu} }, {
+            id   => "fascicle-planner",
+            oid  => $fascicle->{id},
+            description => $fascicle->{shortcut}
+        };
+        push @{ $fascicle->{menu} }, {
+            id  => "fascicle-advert",
+            oid => $fascicle->{id},
+            description => $fascicle->{shortcut}
+        };
+        push @{ $fascicle->{menu} }, {
+            id  => "fascicle-catchword",
+            oid => $fascicle->{id},
+            description => $fascicle->{shortcut}
+        };
         
-        if ($fascicles) {
-            push @{ $edition->{menu} }, "-";
-        }
-        
-        foreach my $item2 (@$fascicles) {
+        push @result, $fascicle;
 
-            my $fascicle = {
-                id   => "fascicle",
-                text => $item2->{title}
-            };
-
-            push @{ $fascicle->{menu} }, {
-                id   => "fascicle-plan",
-                oid  => $item2->{id},
-                description => $item2->{title}
-            };
-    
-            #if ( &check_rule('edition.manage') ) {
-            push @{ $fascicle->{menu} }, {
-                id   => "fascicle-planner",
-                oid  => $item2->{id},
-                description => $item2->{title}
-            };
-            push @{ $fascicle->{menu} }, {
-                id  => "fascicle-advert",
-                oid => $item2->{id},
-                description => $item2->{title}
-            };
-            push @{ $fascicle->{menu} }, {
-                id  => "fascicle-catchword",
-                oid => $item2->{id},
-                description => $item2->{title}
-            };
-            
-            push @{ $edition->{menu} }, $fascicle;
-            
-        }
-        
-        push @result, $edition;
     }
     
     push @result, '->';
-    
+
     # Settings
     my $settings = {
         id => "settings"
     };
-    
+
     #if ( &check_rule('settings.manage.edition') ) {
-    push @{ $settings->{menu} }, { id => "settings-editions" };
-    
+    push @{ $settings->{menu} }, { id => "settings-catalog" };
+    #push @{ $settings->{menu} }, { id => "settings-editions" };
+
     #if ( &check_rule('settings.manage.people') ) {
-    push @{ $settings->{menu} }, "-";
+    #push @{ $settings->{menu} }, "-";
     push @{ $settings->{menu} }, { id => "settings-roles" };
-    push @{ $settings->{menu} }, { id => "settings-departments" };
-    push @{ $settings->{menu} }, { id => "settings-members" };
-    
+    #push @{ $settings->{menu} }, { id => "settings-departments" };
+    #push @{ $settings->{menu} }, { id => "settings-members" };
+
     #if ( &check_rule('settings.manage.exchange') ) {
     push @{ $settings->{menu} }, "-";
     push @{ $settings->{menu} }, { id => "settings-exchange" };
-    
+
     #if ( &check_rule('settings.view') ) {
     push @result, $settings;
-    
+
     # Employee
     my $employee = {
         id => "employee",
         text => $c->session("stitle")
     };
-    
+
     push @{ $employee->{menu} }, { id => "employee-card" };
     push @{ $employee->{menu} }, { id => "employee-settings" };
     push @{ $employee->{menu} }, "-";
@@ -224,30 +217,30 @@ sub menu
     push @{ $employee->{menu} }, { id => "employee-logs" };
     push @{ $employee->{menu} }, "-";
     push @{ $employee->{menu} }, { id => "employee-logout" };
-    
+
     push @result, $employee;
-    
+
     $c->render_json({ data => \@result });
 }
 
 sub appsession
 {
     my $c = shift;
-    
+
     my $result = {
 #       access   => Inprint::Core::User::Access(),
 #       card     => Inprint::Core::User::Card(),
 #       session  => Inprint::Core::User::Session(),
 #       settings => Inprint::Core::User::Settings(),
     };
-    
+
     $c->render_json($result);
 }
 
 sub state
 {
     my $c = shift;
-    
+
 =cut
 my $cgi_action = Inprint::Core::CGI::param('action');
 my $cgi_name   = Inprint::Core::CGI::param('name');
@@ -293,27 +286,27 @@ if ( $cgi_action eq 'read' )
 	});
 }
 =cut
-    
+
     $c->render_json({});
 }
 
 sub online
-{   
+{
     my $c = shift;
 =cut
  $data = $rh_data->{SqlDrive}->Query({
 	type	=> 'array_hashref',
         query 	=> "
 	SELECT DISTINCT t1.uuid, t1.updated, t2.title, t2.stitle, t2.position ,
-	(extract( epoch FROM now() - t1.updated )/60)::integer as isonline 
+	(extract( epoch FROM now() - t1.updated )/60)::integer as isonline
 	FROM passport.session t1, passport.card t2
 	WHERE
 	    t1.uuid=t2.uuid  AND t1.edition=?
-		AND TO_CHAR ( t1.updated, 'mm/dd/yyyy') = TO_CHAR (now(), 'mm/dd/yyyy') 
+		AND TO_CHAR ( t1.updated, 'mm/dd/yyyy') = TO_CHAR (now(), 'mm/dd/yyyy')
 		AND t1.updated = ( SELECT max(updated) from passport.session WHERE uuid = t1.uuid AND edition=t1.edition )
-		
-		ORDER BY isonline ASC, t1.updated DESC 
-		
+
+		ORDER BY isonline ASC, t1.updated DESC
+
 	",
         value	=> [ $edition ]
     });

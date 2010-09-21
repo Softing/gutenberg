@@ -9,7 +9,9 @@ use utf8;
 use strict;
 use warnings;
 
-use base 'Inprint::BaseController';
+#use base 'Inprint::BaseController';
+
+use base 'Mojolicious::Controller';
 
 sub index {
 
@@ -17,9 +19,9 @@ sub index {
     
     my $json   = Mojo::JSON->new;
     
-    my $string = $c->stash->{i18n}->_handle->getAll;
+    my $string = $c->stash->{i18n}->{_handle}->getAll;
     
-    my $jsonString = $json->encode( $string );
+    my $jsonString = $json->encode($string);
     
     $jsonString = "
         var inprintLocalization = $jsonString;
@@ -27,12 +29,14 @@ sub index {
             return inprintLocalization[arg] || arg;
         }
     ";
-
+    
     $jsonString =~ s/\t//g;
+    $jsonString =~ s/\n//g;
+    $jsonString =~ s/\r//g;
     $jsonString =~ s/\s+/ /g;
 
     $c->tx->res->headers->header('Content-Type' => "text/javascript; charset=utf-8;"); 
-    $c->render_text($jsonString);
+    $c->render_data($jsonString);
 }
 
 1;

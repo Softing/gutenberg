@@ -41,13 +41,13 @@
         <iframe id="x-history-frame"></iframe>
     </form>
     
-    <div class="footer">inprint.content 4.5.0</div>
+    <!-- div class="footer">inprint.content 4.5.0</div -->
 </body>
 </html>
 
 <!-- Ext 3.2.1 -->
-<script type="text/javascript" src="/ext-3.2.1/adapter/ext/ext-base.js"></script>
-<script type="text/javascript" src="/ext-3.2.1/ext-all.js"></script>
+<script type="text/javascript" src="/ext-3.2.1/adapter/ext/ext-base-debug.js"></script>
+<script type="text/javascript" src="/ext-3.2.1/ext-all-debug.js"></script>
 <script type="text/javascript" src="/ext-3.2.1/src/locale/ext-lang-ru.js"></script>
 
 <!-- Plugins -->

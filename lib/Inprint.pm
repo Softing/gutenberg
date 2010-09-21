@@ -8,8 +8,8 @@ package Inprint;
 use strict;
 use warnings;
 
+use Devel::SimpleTrace;
 use DBIx::Connector;
-#use DBD::Pg;
 
 use base 'Mojolicious';
 
@@ -22,72 +22,67 @@ __PACKAGE__->attr('locale');
 __PACKAGE__->attr('sql');
 
 sub startup {
-    
+
     my $self = shift;
-    
+
     $self->log->level('warn');
     $self->secret('passw0rd');
 
     $self->session->cookie_name("inprint");
     $self->session->default_expiration(864000);
 
-    $self->types->type(json => 'application/json; charset=utf-8;'); 
+    $self->types->type(json => 'application/json; charset=utf-8;');
 
     # Load configuration
     my $config = new Inprint::Frameworks::Config(
         $self->home->to_string
     );
-    ref($self)->attr( 'config' => sub {
-        my $selft = shift;
-        return $config;
-    } );
+
+    $self->{config} = $config;
 
     my $name     = $config->get("db.name");
     my $host     = $config->get("db.host");
     my $port     = $config->get("db.port");
     my $username = $config->get("db.user");
     my $password = $config->get("db.user");
-    
+
     my $dsn = 'dbi:Pg:dbname='. $name .';host='. $host .';port='. $port .';';
-    my $atr = { AutoCommit=>1, RaiseError=>1, pg_enable_utf8=>1 };
-    
+    my $atr = { AutoCommit=>1, RaiseError=>1, PrintError=>1, pg_enable_utf8=>1 };
+
     # Create a connection.
     my $conn = DBIx::Connector->new($dsn, $username, $password, $atr );
-    
+
     # Create SQL mappings
     my $sql = new Inprint::Frameworks::SQL();
     $sql->SetConnection($conn);
-    
-    ref($self)->attr( 'sql' => sub {
-        my $selft = shift;
-        return $sql;
-    } );
-    
+
+    $self->{sql} = $sql;
+
     # Load Plugins
     $self->plugin('i18n');
-    
+
     # Create Routes
-    
+
     $self->routes->route('/setup/database/')->to('setup#database');
     $self->routes->route('/setup/import/')->to('setup#import');
     $self->routes->route('/setup/success/')->to('setup#success');
-    
+
     $self->routes->route('/errors/database/')->to('errors#database');
-    
+
     my $preinitBridge = $self->routes->bridge->to('selftest#preinit');
     #my $databaseBridge = $preinitBridge->bridge->to('filters#database');
     my $postinitBridge = $preinitBridge->bridge->to('selftest#postinit');
-    
+
     # Add routes
     $postinitBridge->route('/login/')->to('session#login');
     $postinitBridge->route('/logout/')->to('session#logout');
     $postinitBridge->route('/locale/')->to('locale#index');
-    
+
     $postinitBridge->route('/common/list/edition-all/')->to('common-list#editions', filter => 'all');
-    
+
     # Add sessionable routes
     my $sessionBridge  = $postinitBridge->bridge->to('filters#mysession');
-    
+
     # Workspace routes
     $sessionBridge->route('/workspace/')->to('index#index');
     $sessionBridge->route('/workspace/menu/')->to('index#menu');
@@ -95,14 +90,75 @@ sub startup {
     $sessionBridge->route('/workspace/online/')->to('index#online');
     $sessionBridge->route('/workspace/appsession/')->to('index#appsession');
     
-    # Settings route
-    $sessionBridge->route('/settings/editions/list/')->to( 'settings-editions#list' );
-    
-    # Index route
+    # Calendar routes
+    $sessionBridge->route('/calendar/list/')->to( 'calendar#list' );
+    $sessionBridge->route('/calendar/create/')->to( 'calendar#create' );
+    $sessionBridge->route('/calendar/read/')->to( 'calendar#read' );
+    $sessionBridge->route('/calendar/update/')->to( 'calendar#update' );
+    $sessionBridge->route('/calendar/delete/')->to( 'calendar#delete' );
+    $sessionBridge->route('/calendar/enable/')->to( 'calendar#enable' );
+    $sessionBridge->route('/calendar/disable/')->to( 'calendar#disable' );
+    $sessionBridge->route('/calendar/combo/groups/')->to( 'calendar#combogroups' );
+
+    # Documents routes
+    $sessionBridge->route('/documents/list/')->to( 'documents#list' );
+    $sessionBridge->route('/documents/create/')->to( 'documents#create' );
+    $sessionBridge->route('/documents/read/')->to( 'documents#read' );
+    $sessionBridge->route('/documents/update/')->to( 'documents#update' );
+    $sessionBridge->route('/documents/delete/')->to( 'documents#delete' );
+
+    # Catalog routes
+    $sessionBridge->route('/catalog/tree/')->to( 'catalog#tree' );
+    $sessionBridge->route('/catalog/combo/')->to( 'catalog#combo' );
+    $sessionBridge->route('/catalog/create/')->to( 'catalog#create' );
+    $sessionBridge->route('/catalog/delete/')->to( 'catalog#delete' );
+
+    # Rules routes
+    $sessionBridge->route('/rules/list/')->to( 'rules#list' );
+
+    # Roles routes
+    $sessionBridge->route('/roles/list/')->to( 'roles#list' );
+    $sessionBridge->route('/roles/create/')->to( 'roles#create' );
+    $sessionBridge->route('/roles/read/')->to( 'roles#read' );
+    $sessionBridge->route('/roles/update/')->to( 'roles#update' );
+    $sessionBridge->route('/roles/delete/')->to( 'roles#delete' );
+    $sessionBridge->route('/roles/map/')->to( 'roles#map' );
+    $sessionBridge->route('/roles/mapping/')->to( 'roles#mapping' );
+
+    # Principals routes
+    $sessionBridge->route('/principals/list/') ->to( 'principals#list' );
+    $sessionBridge->route('/principals/combo/')->to( 'principals#combo' );
+
+    # Members routes
+    $sessionBridge->route('/members/list/')   ->to( 'members#list' );
+    $sessionBridge->route('/members/combo/')  ->to( 'members#combo' );
+    $sessionBridge->route('/members/create/') ->to( 'members#create' );
+    $sessionBridge->route('/members/delete/') ->to( 'members#delete' );
+    $sessionBridge->route('/members/map/')    ->to( 'members#map' );
+    $sessionBridge->route('/members/mapping/')->to( 'members#mapping' );
+
+    # Profile routes
+    $sessionBridge->route('/profile/load/')->to( 'profile#load' );
+    $sessionBridge->route('/profile/image/:id')->to( 'profile#image' );
+    $sessionBridge->route('/profile/update/')->to( 'profile#update' );
+
+    # Chains route
+    $sessionBridge->route('/chains/create/')->to( 'chains#create' );
+    $sessionBridge->route('/chains/read/')->to( 'chains#read' );
+    $sessionBridge->route('/chains/update/')->to( 'chains#update' );
+    $sessionBridge->route('/chains/delete/')->to( 'chains#delete' );
+    $sessionBridge->route('/chains/combo/')->to( 'chains#combo' );
+
+    # Stages route
+    $sessionBridge->route('/stages/create/')->to( 'stages#create' );
+    $sessionBridge->route('/stages/read/')->to( 'stages#read' );
+    $sessionBridge->route('/stages/update/')->to( 'stages#update' );
+    $sessionBridge->route('/stages/delete/')->to( 'stages#delete' );
+    $sessionBridge->route('/stages/list/')->to( 'stages#list' );
+
+    # Main route
     $sessionBridge->route('/')->to('index#index');
-    
-    
-    
+
     return $self;
 }
 

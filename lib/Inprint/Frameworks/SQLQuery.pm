@@ -10,7 +10,7 @@ use utf8;
 
 sub new {
     my $class = shift;
-    
+
     my $self  = {};
     $self     = bless {}, $class;
 
@@ -22,16 +22,16 @@ sub new {
     $self->{conn}  = $DBH;
     $self->{query} = $query;
     $self->{value} = $value;
-    
+
     bless($self, $class);
     return $self;
 }
 
 sub Value  {
     my $c = shift;
-    
+
     my $result;
-    
+
     if ( $c->{value} ) {
         $result = $c->conn->run(fixup => sub {
             $_->selectrow_arrayref( $c->{query}, undef, @{ $c->{value} } );
@@ -41,15 +41,15 @@ sub Value  {
             $_->selectrow_arrayref( $c->{query}, undef );
         });
     }
-    
+
     return @$result[0];
 }
 
 sub Values  {
     my $c = shift;
-    
+
     my $result;
-    
+
     if ( $c->{value} ) {
         $result = $c->conn->run(fixup => sub {
             $_->selectcol_arrayref( $c->{query}, undef, @{ $c->{value} } );
@@ -59,15 +59,15 @@ sub Values  {
             $_->selectcol_arrayref( $c->{query}, undef );
         });
     }
-    
+
     return $result;
 }
 
 sub Array {
     my $c = shift;
-    
+
     my $result;
-    
+
     if ( $c->{value} ) {
         $result = $c->conn->run(fixup => sub {
             $_->selectrow_arrayref( $c->{query}, undef, @{ $c->{value} } );
@@ -77,15 +77,15 @@ sub Array {
             $_->selectrow_arrayref( $c->{query}, undef );
         });
     }
-    
+
     return $result;
 }
 
 sub Hash {
     my $c = shift;
-    
+
     my $result;
-    
+
     if ( $c->{value} ) {
         $result = $c->conn->run(fixup => sub {
             $_->selectrow_hashref( $c->{query}, undef, @{ $c->{value} } );
@@ -95,15 +95,15 @@ sub Hash {
             $_->selectrow_hashref( $c->{query}, undef);
         });
     }
-    
+
     return $result;
 }
 
 sub Arrays  {
     my $c = shift;
-    
+
     my $result;
-    
+
     if ( $c->{value} ) {
         $result = $c->conn->run(fixup => sub {
             $_->selectall_arrayref( $c->{query}, undef, @{ $c->{value} } );
@@ -113,25 +113,27 @@ sub Arrays  {
             $_->selectall_arrayref( $c->{query}, undef);
         });
     }
-    
+
     return $result;
 }
 
 sub Hashes  {
     my $c = shift;
-    
+
     my $result;
-    
+
     if ( $c->{value} ) {
+
         $result = $c->conn->run(fixup => sub {
             $_->selectall_arrayref( $c->{query}, { Slice => {} }, @{ $c->{value} } );
-        })
+        });
+
     } else {
         $result = $c->conn->run(fixup => sub {
             $_->selectall_arrayref( $c->{query}, { Slice => {} });
         });
     }
-    
+
     return $result;
 }
 

@@ -8,7 +8,11 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 use lib "$FindBin::Bin/../../lib";
 
-#use CGI::Carp qw(fatalsToBrowser);
+# Enable log redirection
+use CGI::Carp qw(carpout);
+open(my $LOG, ">>$FindBin::Bin/../log/application.log")
+    or die("Unable to open mycgi-log: $!\n");
+carpout($LOG);
 
 # Check if Mojo is installed
 eval 'use Mojolicious::Commands';

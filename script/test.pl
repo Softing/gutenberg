@@ -1,23 +1,15 @@
-#!/usr/bin/env perl
-use Mojolicious::Lite;
+#!/usr/bin/perl
 
-any '/' => sub {
-    my $self = shift;
-    
-    my $text = '
-        <form method="post">
-            <input type="text" name="text" value="111">
-            <input type="submit">
-        </form>
-        <form method="get">
-            <input type="text" name="text" value="222">
-            <input type="submit">
-        </form>
-    ';
-    
-    my $value = $self->param("text");
-    
-    $self->render_text($value . $text);
-};
+use DBI;
 
-app->start;
+
+$dbh = DBI->connect("dbi:Pg:dbname=inprint-4.5", 'postgres', 'postgres', {AutoCommit => 0});
+
+my $sth = $dbh->prepare(" select * from catalog where path = ?::ltree ");
+$sth->execute([ '00000000000000000000000000000000' ]);
+
+while (my $row = $sth->fetchrow_hashref()){
+    print %$row ;
+}
+
+$sth->finish();
