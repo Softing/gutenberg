@@ -1,4 +1,4 @@
-#!/usr/bin/perl;
+#!/usr/bin/perl
 
 use utf8;
 use strict;
@@ -134,31 +134,6 @@ foreach my $item( @{ $documents } ) {
     print "$item->{created}, $item->{updated}\n";
     print "------------------------------------------------------------\n\n";
     
-    $sql->Do("
-        INSERT INTO documents(
-            id,
-            holder, creator, manager, owner_shortcut, creator_shortcut, manager_shortcut, 
-            maingroup, maingroup_shortcut, ingroups,
-            islooked, isopen,
-            branch, branch_shortcut, stage, stage_shortcut, color, progress,
-            title, author, 
-            pdate, psize, rdate, rsize,
-            images, files,
-            created, updated
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-    ",
-    [
-        $item->{uuid},
-        $item->{theowner}, $item->{creator}, $item->{manager}, $item->{owner_nick}, $item->{creator_nick}, $item->{manager_nick},
-        $item->{edition}, $item->{edition_sname}, [],
-        $item->{look}, $item->{isopen},
-        $branch->{id}, $branch->{title}, $stage->{id}, $stage->{title}, $stage->{color}, $stage->{weight},
-        $item->{title}, $item->{author},
-        $item->{planned_date}, $item->{planned_size}, $item->{real_date}, $item->{calibr_real},
-        $item->{image_count}, $item->{file_count},
-        $item->{created}, $item->{updated}
-    ]);
-    
     # Map document to fascicle
     
     if ($item->{trash}) {
@@ -170,16 +145,45 @@ foreach my $item( @{ $documents } ) {
     }
     
     $sql->Do("
-        INSERT INTO map_documents_to_fascicles(
-            document, fascicle, fascicle_nick,
+        INSERT INTO documents(
+            id,
+            holder, creator, manager, holder_shortcut, creator_shortcut, manager_shortcut, 
+            maingroup, maingroup_shortcut, ingroups,
+            fascicle, fascicle_shortcut,
             headline, headline_shortcut, rubric, rubric_shortcut,
-            copygroup)
-        VALUES (?, ?, ?, ?, ?, ?, ?, uuid_generate_v4());
+            islooked, isopen,
+            branch, branch_shortcut, stage, stage_shortcut, color, progress,
+            title, author, 
+            pdate, psize, rdate, rsize,
+            images, files,
+            created, updated
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
     ",
     [
-        $item->{uuid}, $item->{fascicle}, $item->{fascicle_name},
-        $item->{section}, $item->{section_name}, $item->{rubric}, $item->{rubric_name}
+        $item->{uuid},
+        $item->{theowner}, $item->{creator}, $item->{manager}, $item->{owner_nick}, $item->{creator_nick}, $item->{manager_nick},
+        $item->{edition}, $item->{edition_sname}, [],
+        $item->{fascicle}, $item->{fascicle_name},
+        $item->{section}, $item->{section_name}, $item->{rubric}, $item->{rubric_name},
+        $item->{look}, $item->{isopen},
+        $branch->{id}, $branch->{title}, $stage->{id}, $stage->{title}, $stage->{color}, $stage->{weight},
+        $item->{title}, $item->{author},
+        $item->{planned_date}, $item->{planned_size}, $item->{real_date}, $item->{calibr_real},
+        $item->{image_count}, $item->{file_count},
+        $item->{created}, $item->{updated}
     ]);
+    
+    #$sql->Do("
+    #    INSERT INTO map_documents_to_fascicles(
+    #        document, fascicle, fascicle_nick,
+    #        headline, headline_shortcut, rubric, rubric_shortcut,
+    #        copygroup)
+    #    VALUES (?, ?, ?, ?, ?, ?, ?, uuid_generate_v4());
+    #",
+    #[
+    #    $item->{uuid}, $item->{fascicle}, $item->{fascicle_name},
+    #    $item->{section}, $item->{section_name}, $item->{rubric}, $item->{rubric_name}
+    #]);
     
 
 }

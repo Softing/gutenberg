@@ -44,7 +44,7 @@ sub combo {
             repeat('&nbsp;', t2.depth * 2) || '- ' || t1.shortcut as path
         FROM catalog t1, catalog_tree t2
         WHERE
-            t2.parent	= '00000000-0000-0000-0000-000000000000' AND t2.child = t1.id
+            t2.parent = '00000000-0000-0000-0000-000000000000' AND t2.child = t1.id
         ORDER BY named_path, t1.shortcut
     ")->Hashes;
 

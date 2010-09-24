@@ -33,14 +33,28 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                 header: _("Group"),
                 width: 100,
                 sortable: true,
-                filter: {
-                    filterName:"flt_group",
-                    xtype: "combo",
-                    clearable:true,
-                    mode: "local",
-                    store: [["A","Type1"],["B","Type2"]],
-                    triggerAction: "all"
-                }
+                filter: Inprint.factory.Combo.getConfig(
+                    "/documents/combos/groups",
+                    {
+                        xtype: "xcombo",
+                        filterName:"flt_group",
+                        clearable:true,
+                        listeners:{
+                            clear: {
+                                scope:this,
+                                fn: function() {
+                                    this.applyHeaderFilters();
+                                }
+                            },
+                            beforeselect: {
+                                scope:this,
+                                fn: function() {
+                                    //alert("select");
+                                }
+                            }
+                        }
+                    }
+                )
             },
             
             {
@@ -59,13 +73,14 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                 width: 90,
                 sortable: true,
                 renderer : this.renderers.fascicle,
-                filter: {
-                    filterName:"flt_fascicle",
-                    xtype: "combo",
-                    mode: "local",
-                    store: [["A","Type1"],["B","Type2"]],
-                    triggerAction: "all"
-                }
+                filter: Inprint.factory.Combo.getConfig(
+                    "/documents/combos/fascicles",
+                    {
+                        xtype: "xcombo",
+                        filterName:"flt_fascicle",
+                        clearable:true
+                    }
+                )
             },
             
             {
@@ -81,13 +96,15 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                 header: _("Headline"),
                 width: 100,
                 sortable: true,
-                filter: {
-                    filterName:"flt_hedline",
-                    xtype: "combo",
-                    mode: "local",
-                    store: [["A","Type1"],["B","Type2"]],
-                    triggerAction: "all"
-                }
+                filter: Inprint.factory.Combo.getConfig(
+                    "/documents/combos/headlines",
+                    {
+                        xtype: "xcombo",
+                        disabled:true,
+                        filterName:"flt_headline",
+                        clearable:true
+                    }
+                )
             },
             {
                 id:"rubric",
@@ -95,13 +112,15 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                 header: _("Rubric"),
                 width: 100,
                 sortable: true,
-                filter: {
-                    filterName:"flt_shortcut",
-                    xtype: "combo",
-                    mode: "local",
-                    store: [["A","Type1"],["B","Type2"]],
-                    triggerAction: "all"
-                }
+                filter: Inprint.factory.Combo.getConfig(
+                    "/documents/combos/rubrics",
+                    {
+                        xtype: "xcombo",
+                        disabled:true,
+                        filterName:"flt_rubric",
+                        clearable:true
+                    }
+                )
             },
             
             {
@@ -110,13 +129,14 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                 header: _("Manager"),
                 width: 100,
                 sortable: true,
-                filter: {
-                    filterName:"flt_manager",
-                    xtype: "combo",
-                    mode: "local",
-                    store: [["A","Type1"],["B","Type2"]],
-                    triggerAction: "all"
-                }
+                filter: Inprint.factory.Combo.getConfig(
+                    "/documents/combos/managers",
+                    {
+                        xtype: "xcombo",
+                        filterName:"flt_manager",
+                        clearable:true
+                    }
+                )
             },
             {
                 id:"progress",
@@ -125,27 +145,29 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                 sortable: true,
                 width: 100,
                 renderer : this.renderers.progress,
-                filter: {
-                    filterName:"flt_progress",
-                    xtype: "combo",
-                    mode: "local",
-                    store: [["A","Type1"],["B","Type2"]],
-                    triggerAction: "all"
-                }
+                filter: Inprint.factory.Combo.getConfig(
+                    "/documents/combos/progress",
+                    {
+                        xtype: "xcombo",
+                        filterName:"flt_progress",
+                        clearable:true
+                    }
+                )
             },
             {
-                id:"owner",
-                dataIndex: "owner_shortcut",
-                header: _("Owner"),
+                id:"holder",
+                dataIndex: "holder_shortcut",
+                header: _("Holder"),
                 width: 100,
                 sortable: true,
-                filter: {
-                    filterName:"flt_owner",
-                    xtype: "combo",
-                    mode: "local",
-                    store: [["A","Type1"],["B","Type2"]],
-                    triggerAction: "all"
-                }
+                filter: Inprint.factory.Combo.getConfig(
+                    "/documents/combos/holders",
+                    {
+                        xtype: "xcombo",
+                        filterName:"flt_holder",
+                        clearable:true
+                    }
+                )
             },
             {
                 id:"images",

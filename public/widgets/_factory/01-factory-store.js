@@ -31,7 +31,7 @@ Inprint.factory.Store = new function() {
             'rubric', 'rubric_shortcut',
             'copygroup',
             
-            'holder','creator','manager','owner_shortcut','creator_shortcut','manager_shortcut',
+            'holder','creator','manager','holder_shortcut','creator_shortcut','manager_shortcut',
             'maingroup','maingroup_shortcut','ingroups',
             'islooked','isopen',
             'branch','branch_shortcut','stage','stage_shortcut','color','progress',
@@ -57,25 +57,45 @@ Inprint.factory.Store = new function() {
         "/stages/list/":            [ "id", "chain", "color", "weight", "name", "shortcut", "description" ],
 
         // Comboboxes
-        "/catalog/combo/":          [ 'id', 'name', 'path', 'shortcut' ],
-        "/chains/combo/":           [ 'id', 'name', 'path', 'shortcut', 'catalog_shortcut' ],
-        "/calendar/combo/groups/":  [ 'id', 'name', 'shortcut' ],
-
+        //"/catalog/combo/":          [ 'id', 'name', 'path', 'shortcut' ],
+        //"/chains/combo/":           [ 'id', 'name', 'path', 'shortcut', 'catalog_shortcut' ],
+        //"/calendar/combo/groups/":  [ 'id', 'name', 'shortcut' ],
+    
         "" : []
-
+    
     }
-
+    
+    var combos = new Array(
+        
+        //"/catalog/combo/",
+        //"/chains/combo/",
+        //"/calendar/combo/groups/",
+        
+        "/documents/combos/groups",
+        "/documents/combos/fascicles",
+        "/documents/combos/headlines",
+        "/documents/combos/rubrics",
+        "/documents/combos/holders",
+        "/documents/combos/managers",
+        "/documents/combos/progress"
+        
+    );
+    
+    for ( var i = 0; i < combos.length; i++ ) {
+        source[ combos[i] ] = [ 'id', 'icon', 'title', 'shortcut', 'description' ];
+    }
+    
     for (var i in source) {
         items[i] = {
             url: _url(i), fields: source[i]
         };
     }
-
+    
     return {
-
+        
         items: items,
         source: source,
-
+        
         array: function(myclass, config) {
             if (items[myclass]) {
                 var configuration = defaults;
@@ -90,13 +110,15 @@ Inprint.factory.Store = new function() {
 
         json: function(myclass, config) {
             if (items[myclass]) {
+                
                 var configuration = defaults;
                 configuration = Ext.apply(configuration, items[myclass]);
                 configuration = Ext.apply(configuration, config);
+                
                 return new Ext.data.JsonStore(configuration);
-            } else {
-                alert("Can't find json store <" + myclass + ">");
             }
+            
+            alert("Can't find json store <" + myclass + ">");
             return false;
         },
 

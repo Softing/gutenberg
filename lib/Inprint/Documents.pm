@@ -34,11 +34,13 @@ sub list {
     my $sql_query = "
         SELECT 
             dcm.id,
-            fsc.fascicle, fsc.fascicle_shortcut,
-            fsc.headline, fsc.headline_shortcut,
-            fsc.rubric, fsc.rubric_shortcut,
-            fsc.copygroup,
-            dcm.holder, dcm.creator, dcm.manager,owner_shortcut, dcm.creator_shortcut, dcm.manager_shortcut,
+            
+            dcm.fascicle, dcm.fascicle_shortcut,
+            dcm.headline, dcm.headline_shortcut,
+            dcm.rubric, dcm.rubric_shortcut,
+            dcm.copygroup,
+            
+            dcm.holder, dcm.creator, dcm.manager, holder_shortcut, dcm.creator_shortcut, dcm.manager_shortcut,
             dcm.maingroup, dcm.maingroup_shortcut, dcm.ingroups,
             dcm.islooked, dcm.isopen,
             dcm.branch, dcm.branch_shortcut, dcm.stage,stage_shortcut, dcm.color, dcm.progress,
@@ -51,14 +53,12 @@ sub list {
             to_char(dcm.updated, 'YYYY-MM-DD HH24:MI:SS') as updated
             
         FROM documents dcm
-        LEFT OUTER JOIN map_documents_to_fascicles fsc ON fsc.document = dcm.id
         
     ";
     
     my $sql_total = "
         SELECT count(*)
         FROM documents dcm
-        LEFT OUTER JOIN map_documents_to_fascicles fsc ON fsc.document = dcm.id
     ";
     
     # Set filters

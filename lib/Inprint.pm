@@ -1,4 +1,4 @@
-package Inprint;
+    package Inprint;
 
 # Inprint Content 4.5
 # Copyright(c) 2001-2010, Softing, LLC.
@@ -106,6 +106,15 @@ sub startup {
     $sessionBridge->route('/documents/read/')->to( 'documents#read' );
     $sessionBridge->route('/documents/update/')->to( 'documents#update' );
     $sessionBridge->route('/documents/delete/')->to( 'documents#delete' );
+    
+    # Documents combos
+    $sessionBridge->route('/documents/combos/groups')->to( 'documents-combos#groups' );
+    $sessionBridge->route('/documents/combos/fascicles')->to( 'documents-combos#fascicles' );
+    $sessionBridge->route('/documents/combos/headlines')->to( 'documents-combos#headlines' );
+    $sessionBridge->route('/documents/combos/rubrics')->to( 'documents-combos#rubrics' );
+    $sessionBridge->route('/documents/combos/holders')->to( 'documents-combos#holders' );
+    $sessionBridge->route('/documents/combos/managers')->to( 'documents-combos#managers' );
+    $sessionBridge->route('/documents/combos/progress')->to( 'documents-combos#progress' );
 
     # Catalog routes
     $sessionBridge->route('/catalog/tree/')->to( 'catalog#tree' );
