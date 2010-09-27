@@ -50,6 +50,7 @@ our %Lexicon = (
     "Group"                 => "Группа",
     "Group access"          => "Правила группы",
     "Headline"              => "Раздел",
+    "Holder"                => "Держатель",
     "Help"                  => "Помощь",
     "Inprint"               => "Инпринт",
     "Limit"                 => "Ограничение",
@@ -99,9 +100,14 @@ our %Lexicon = (
 
     "No documents to display" => "Документы не найдены",
     "Displaying documents {0} - {1} of {2}" => "Показаны материалы {0} - {1} из {2}",
-    
 
 );
+
+sub get {
+    my $c = shift;
+    my $key = shift;
+    return $Lexicon{$key} || $key;
+}
 
 sub getAll {
     return \%Lexicon;

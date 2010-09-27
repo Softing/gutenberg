@@ -14,41 +14,36 @@ sub tree {
 
     my $c = shift;
 
-    my $node = $c->param("node");
+    my $node = $c->param("node") || "00000000-0000-0000-0000-000000000000";
 
-    my $data = $c->sql->Q(
-        " SELECT *, not exists (SELECT true FROM catalog_tree WHERE depth =1 AND parent = catalog.id ) as leaf
-            FROM catalog WHERE parent = ?
-            ORDER BY shortcut
-        ", [$node])->Hashes;
+    my $data = $c->sql->Q("
+        SELECT *, ( SELECT count(*) FROM catalog c2 WHERE c2.path ~ (replace(?, '-', '')::text || '.*{1}')::lquery ) as have_childs
+        FROM catalog
+        WHERE
+            id <> '00000000-0000-0000-0000-000000000000'
+            AND subpath(path, nlevel(path) - 2, 1)::text = replace(?, '-', '')::text
+        ORDER BY shortcut
+    ", [ $node, $node ])->Hashes;
 
     my $result = [];
 
     foreach my $item (@$data) {
-        push @$result, {
+
+        my $record = {
             id   => $item->{id},
             text => $item->{shortcut},
-            leaf => $item->{leaf},
+            leaf => $c->json->true,
             data => $item
         };
+
+        if ( $item->{have_childs} ) {
+            $record->{leaf} = $c->json->false;
+        }
+
+        push @$result, $record;
     }
 
     $c->render_json( $result );
-}
-
-sub combo {
-    my $c = shift;
-    my $result = $c->sql->Q("
-        SELECT
-            t1.id, t1.name, t1.shortcut, t1.description,
-            repeat('&nbsp;', t2.depth * 2) || '- ' || t1.shortcut as path
-        FROM catalog t1, catalog_tree t2
-        WHERE
-            t2.parent = '00000000-0000-0000-0000-000000000000' AND t2.child = t1.id
-        ORDER BY named_path, t1.shortcut
-    ")->Hashes;
-
-    $c->render_json( { data => $result } );
 }
 
 sub create {
@@ -56,17 +51,98 @@ sub create {
 
     my $id            = $c->uuid();
 
-    my $i_name        = $c->param("name");
+    my $i_path        = $c->param("path");
+    my $i_title       = $c->param("title");
     my $i_shortcut    = $c->param("shortcut");
     my $i_description = $c->param("description");
+
+    my $result = {
+        success => $c->json->false,
+        errors => []
+    };
+
+    push @{ $result->{errors} }, { id => "path", msg => "" } unless $i_path;
+    push @{ $result->{errors} }, { id => "title", msg => "" } unless $i_title;
+    push @{ $result->{errors} }, { id => "shortcut", msg => "" } unless $i_shortcut;
+
+    my $path;
+    my $count = 0;
+
+    unless (@{ $result->{errors} }) {
+        $path = $c->sql->Q(" SELECT path FROM catalog WHERE id =? ",
+        [ $i_path ])->Value;
+    }
+
+    push @{ $result->{errors} }, { id => "path", msg => "" } unless $path;
+
+    unless (@{ $result->{errors} }) {
+        $count = $c->sql->Do("
+            INSERT INTO catalog (id, title, shortcut, description, path, type, capables)
+                VALUES (?, ?, ?, ?, replace(?, '-',  '')::ltree, ?, ?)
+        ", [ $id, $i_title, $i_shortcut, $i_description, "$path.$id", 'default', [] ]);
+    }
+
+    $result->{success} = $c->json->true if $count;
+
+    $c->render_json( $result );
+}
+
+
+sub read {
+    my $c = shift;
+    my $i_id            = $c->param("id");
+    my $result = {
+        success => $c->json->false,
+        errors => []
+    };
+    push @{ $result->{errors} }, { id => "id", msg => "" } unless $i_id;
+    $result->{data} = $c->sql->Q("
+        SELECT t1.*,
+            subpath(path, -2,1) as parent,
+            (select shortcut from catalog where subpath(path, -1,1) = subpath(t1.path, -2,1) ) as parent_shortcut
+        FROM catalog t1 WHERE t1.id = ?
+    ", [ $i_id ])->Hash;
+    $result->{success} = $c->json->true if $result->{data};
+    $c->render_json( $result );
+}
+
+sub update {
+    my $c = shift;
+
+    my $i_id          = $c->param("id");
     my $i_path        = $c->param("path");
+    my $i_title       = $c->param("title");
+    my $i_shortcut    = $c->param("shortcut");
+    my $i_description = $c->param("description");
 
-    $c->sql->Do("
-        INSERT INTO catalog (id, parent, name, shortcut, description, type, capables)
-            VALUES (?,?,?,?,?,?,?)
-    ", [ $id, $i_path, $i_name, $i_shortcut, $i_description, 'default', [] ]);
+    my $result = {
+        success => $c->json->false,
+        errors => []
+    };
 
-    $c->render_json( { } );
+    push @{ $result->{errors} }, { id => "id", msg => "" } unless $i_id;
+    push @{ $result->{errors} }, { id => "path", msg => "" } unless $i_path;
+    push @{ $result->{errors} }, { id => "title", msg => "" } unless $i_title;
+    push @{ $result->{errors} }, { id => "shortcut", msg => "" } unless $i_shortcut;
+
+    my $path;
+    my $count = 0;
+
+    unless (@{ $result->{errors} }) {
+        $path = $c->sql->Q(" SELECT path FROM catalog WHERE id =? ",
+        [ $i_path ])->Value;
+    }
+
+    push @{ $result->{errors} }, { id => "path", msg => "" } unless $path;
+
+    unless (@{ $result->{errors} }) {
+        $count = $c->sql->Do(" UPDATE catalog SET title=?, shortcut=?, description=?, path=replace(?, '-',  '')::ltree WHERE id=? ",
+            [ $i_title, $i_shortcut, $i_description, "$path.$i_id", $i_id ]);
+    }
+
+    $result->{success} = $c->json->true if $count;
+
+    $c->render_json( $result );
 }
 
 sub delete {

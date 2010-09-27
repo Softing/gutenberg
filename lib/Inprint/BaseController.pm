@@ -80,7 +80,7 @@ sub l {
     my $text = shift;
     my @vars = @_;
 
-    eval { $text = $c->stash->{i18n}->localize($text); };
+    $text = $c->stash->{i18n}->{_handle}->get($text) || $text;
 
     for (1 .. $#vars+1) {
         my $placer = "%$_";

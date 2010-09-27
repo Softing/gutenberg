@@ -25,12 +25,12 @@ Inprint.factory.Store = new function() {
         // Documents
         '/documents/list/':         [
             'id',
-            
+
             'fascicle', 'fascicle_shortcut',
             'headline', 'headline_shortcut',
             'rubric', 'rubric_shortcut',
             'copygroup',
-            
+
             'holder','creator','manager','holder_shortcut','creator_shortcut','manager_shortcut',
             'maingroup','maingroup_shortcut','ingroups',
             'islooked','isopen',
@@ -45,32 +45,27 @@ Inprint.factory.Store = new function() {
 
         // Settings
 
-        "/principals/list/":        [ "id", "name", "shortcut", "description", "type" ],
-        "/members/list/":           [ "id", "login", "password", "position", "email", "name", "shortcut", createDateField("created"), createDateField("updated") ],
-        "/rules/list/":             [ "id", "rule",  "name", "shortcut", "groupby", "limit", "selection" ],
-        "/roles/list/":             [ "id", "name", "shortcut", "description", "catalog_id", "catalog_name", "catalog_shortcut" ],
+        "/principals/list/":        [ "id", "title", "shortcut", "description", "type" ],
+        "/members/list/":           [ "id", "login", "password", "position", "email", "title", "shortcut", createDateField("created"), createDateField("updated") ],
+        "/rules/list/":             [ "id", "rule",  "title", "shortcut", "groupby", "limit", "selection" ],
+        "/roles/list/":             [ "id", "title", "shortcut", "description", "catalog_id", "catalog_name", "catalog_shortcut" ],
 
-        /*???*/ 
-        "/exchange/list/":          [ "id", "rule",  "name", "shortcut", "groupby", "limit", "selection" ],
+        /*???*/
+        "/exchange/list/":          [ "id", "rule",  "title", "shortcut", "groupby", "limit", "selection" ],
 
-        "/chains/list/":            [ "id", "rule",  "name", "shortcut", "groupby", "limit", "selection" ],
-        "/stages/list/":            [ "id", "chain", "color", "weight", "name", "shortcut", "description" ],
+        "/chains/list/":            [ "id", "rule",  "title", "shortcut", "groupby", "limit", "selection" ],
+        "/stages/list/":            [ "id", "chain", "color", "weight", "title", "shortcut", "description" ],
 
-        // Comboboxes
-        //"/catalog/combo/":          [ 'id', 'name', 'path', 'shortcut' ],
-        //"/chains/combo/":           [ 'id', 'name', 'path', 'shortcut', 'catalog_shortcut' ],
-        //"/calendar/combo/groups/":  [ 'id', 'name', 'shortcut' ],
-    
         "" : []
-    
+
     }
-    
+
     var combos = new Array(
-        
-        //"/catalog/combo/",
-        //"/chains/combo/",
-        //"/calendar/combo/groups/",
-        
+
+        "/catalog/combos/groups/",
+        "/catalog/combos/roles/",
+
+
         "/documents/combos/groups",
         "/documents/combos/fascicles",
         "/documents/combos/headlines",
@@ -78,24 +73,24 @@ Inprint.factory.Store = new function() {
         "/documents/combos/holders",
         "/documents/combos/managers",
         "/documents/combos/progress"
-        
+
     );
-    
+
     for ( var i = 0; i < combos.length; i++ ) {
-        source[ combos[i] ] = [ 'id', 'icon', 'title', 'shortcut', 'description' ];
+        source[ combos[i] ] = [ 'id', 'icon', 'spacer', 'bold', 'nlevel', 'title', 'shortcut', 'description' ];
     }
-    
+
     for (var i in source) {
         items[i] = {
             url: _url(i), fields: source[i]
         };
     }
-    
+
     return {
-        
+
         items: items,
         source: source,
-        
+
         array: function(myclass, config) {
             if (items[myclass]) {
                 var configuration = defaults;
@@ -110,14 +105,14 @@ Inprint.factory.Store = new function() {
 
         json: function(myclass, config) {
             if (items[myclass]) {
-                
+
                 var configuration = defaults;
                 configuration = Ext.apply(configuration, items[myclass]);
                 configuration = Ext.apply(configuration, config);
-                
+
                 return new Ext.data.JsonStore(configuration);
             }
-            
+
             alert("Can't find json store <" + myclass + ">");
             return false;
         },

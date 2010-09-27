@@ -2,19 +2,17 @@ Inprint.factory.Combo = new function() {
 
     var defaults = {
         xtype: "combo",
-        
-        clearable:true,
-        
+
+        clearable:false,
+        nocache: false,
+
         editable:false,
         forceSelection: true,
-
         typeAhead: true,
         triggerAction: "all",
-        //hideOnSelect:false,
-        //selectOnFocus:true,
+        hideOnSelect:false,
 
         minListWidth: 200,
-
         valueField: "id",
         displayField: "title",
         emptyText: _("Select..."),
@@ -23,227 +21,166 @@ Inprint.factory.Combo = new function() {
 
     var items = {};
 
-    //items["catalog"] = Ext.extend(Inprint.ext.Combobox, {
-    //    initComponent: function() {
-    //        Ext.apply(this, defaults);
-    //        Ext.apply(this, {
-    //            name: "catalog",
-    //            valueField: "id",
-    //            displayField: "shortcut",
-    //            emptyText: _("Select a path1..."),
-    //            fieldLabel: _("Group"),
-    //            store: Inprint.factory.Store.json("/catalog/combo/"),
-    //            width: this.width,
-    //            editable:false,
-    //            forceSelection: true,
-    //            triggerAction: "all",
-    //            tpl: '<tpl for="."><div class="x-combo-list-item" style="background:url('+ _ico("node") +') no-repeat;padding-left:20px;">{path}</div></tpl>',
-    //            itemSelector: "div.x-combo-list-item"
-    //        });
-    //        items["catalog"].superclass.initComponent.apply(this, arguments);
-    //    }
-    //});
-    //
-    //items["calendar-groups"] = Ext.extend(Ext.form.ComboBox, {
-    //    initComponent: function() {
-    //        Ext.apply(this, defaults);
-    //        Ext.apply(this, {
-    //            name: "calendar-group",
-    //            valueField: "id",
-    //            displayField: "shortcut",
-    //            emptyText: _("Select an edition..."),
-    //            fieldLabel: _("Edition"),
-    //            store: Inprint.factory.Store.json("/calendar/combo/groups/"),
-    //            width: this.width,
-    //            editable:false,
-    //            forceSelection: true,
-    //            triggerAction: "all",
-    //            tpl: '<tpl for="."><div class="x-combo-list-item" style="background:url('+ _ico("folder") +') no-repeat;padding-left:20px;">{shortcut}</div></tpl>',
-    //            itemSelector: "div.x-combo-list-item"
-    //        });
-    //        items["calendar-groups"].superclass.initComponent.apply(this, arguments);
-    //    }
-    //});
-    //
-    //
-    //items["roles"] = Ext.extend(Ext.form.ComboBox, {
-    //    initComponent: function() {
-    //        Ext.apply(this, defaults);
-    //        Ext.apply(this, {
-    //            name: "role",
-    //            hiddenName:"role",
-    //            store: Inprint.factory.Store.json("/roles/list/"),
-    //            width: this.width,
-    //            fieldLabel: _("Role"),
-    //            emptyText: _("Role") + "...",
-    //            tpl: '<tpl for="."><div class="x-combo-list-item" style="background: url('+ _ico("key") +') no-repeat;padding-left:20px;">{name}</div></tpl>',
-    //            itemSelector: "div.x-combo-list-item"
-    //        });
-    //        items["roles"].superclass.initComponent.apply(this, arguments);
-    //    }
-    //});
-    //
-    //items["chains"] = Ext.extend(Ext.form.ComboBox, {
-    //    initComponent: function() {
-    //        Ext.apply(this, defaults);
-    //        Ext.apply(this, {
-    //            name: "role",
-    //            hiddenName:"role",
-    //            store: Inprint.factory.Store.json("/chains/combo/"),
-    //            width: this.width,
-    //            fieldLabel: _("Chain"),
-    //            emptyText: _("Select chain") + "...",
-    //            tpl: '<tpl for=".">'+
-    //                '<div class="x-combo-list-item" style="background: url('+ _ico("arrow-switch") +') no-repeat;padding-left:20px;">'+
-    //                    '{shortcut}<br><small><i>{catalog_shortcut}</i></small>'+
-    //                '</div></tpl>',
-    //            itemSelector: "div.x-combo-list-item"
-    //        });
-    //        items["roles"].superclass.initComponent.apply(this, arguments);
-    //    }
-    //});
-    
     var combos = {
-        
+
         // Catalog
-        "/catalog/combo/": {
+        "/catalog/combos/groups/": {
             name: "catalog",
             fieldLabel: _("Group"),
-            emptyText: _("Select a path1...")
+            emptyText: _("Select a path...")
         },
-        
-        "/roles/list/": {
+        "/catalog/combos/roles/": {
             name: "role",
             fieldLabel: _("Role"),
             emptyText: _("Role") + "..."
         },
-        
-        // Exchange
-        "/chains/combo/": {
+
+
+        "/exchange/combos/chains/": {
             name: "chain",
             fieldLabel: _("Chain"),
             emptyText: _("Select chain") + "..."
         },
-        
+
+
         // Fascicles
         "/calendar/combo/groups/": {
             name: "calendar-group",
             emptyText: _("Select an edition..."),
             fieldLabel: _("Edition")
         },
-        
-        // Documents 
+
+
+        // Documents
         "/documents/combos/groups": {
             name: "group",
-            icon: "node",
+            icon: "toggle-small",
             emptyText: _("Select an group..."),
             fieldLabel: _("Group")
         },
-        
+
         "/documents/combos/fascicles": {
             name: "fascicle",
+            icon:"folder",
             emptyText: _("Select an fascicle..."),
             fieldLabel: _("Fascicle")
         },
-        
+
         "/documents/combos/headlines": {
             name: "headline",
+            icon: "tag-label",
             emptyText: _("Select an headline..."),
             fieldLabel: _("Headline")
         },
-        
+
         "/documents/combos/rubrics": {
             name: "rubric",
+            icon: "tag-label-pink",
             emptyText: _("Select an rubric..."),
             fieldLabel: _("rubric")
         },
-        
+
         "/documents/combos/holders": {
             name: "holder",
-            icon: "user",
+            icon: "user-business",
             emptyText: _("Select an holder..."),
             fieldLabel: _("Holder")
         },
-        
+
         "/documents/combos/managers": {
             name: "manager",
-            icon: "user",
+            icon: "user-business",
             emptyText: _("Select an manager..."),
             fieldLabel: _("Manager")
         },
-        
+
         "/documents/combos/progress": {
             name: "progress",
             emptyText: _("Select an progress..."),
             fieldLabel: _("Progress")
         }
-        
+
     };
-    
+
     return {
-        
+
         getConfig: function(url, config, storeconfig) {
-            
+
             var combo = {};
-            
-            // Add defaults 
+
+            // Add defaults
             Ext.apply(combo, defaults);
-            
+
             // Add combo item
             if (combos[url])
                 Ext.apply(combo, combos[url]);
-            
+
             // Add store
             Ext.apply(combo, {
                 store: Inprint.factory.Store.json( url, storeconfig )
             });
-            
+
             // Add icons
-            if (combo.icon) {
-                Ext.apply(combo, {
-                    tpl:    '<tpl for=".">'+
-                               '<div class="x-combo-list-item" style="background: url('+ _ico( combo.icon ) +') no-repeat;padding-left:20px;">'+
-                                    '{shortcut}'+
-                                    '<tpl if="description"><br><small><i>{description}</i></small></tpl>'+
-                                '</div>'+
-                            '</tpl>',
-                    itemSelector: "div.x-combo-list-item"
-                });
-            } else {
-                Ext.apply(combo, {
-                    tpl:    '<tpl for=".">'+
-                               '<div class="x-combo-list-item">'+
-                                    '{shortcut}'+
-                                    '<tpl if="description"><br><small><i>{description}</i></small></tpl>'+
-                                '</div>'+
-                            '</tpl>'
-                });
-            }
-            
+
+            var tpl = new Ext.XTemplate(
+                '<tpl for=".">'+
+                    '<div class="x-combo-list-item" style="'+
+                    '{[ this.haveIcon(values) ]}'+
+                    '<tpl if="nlevel"> padding-left:{nlevel*10+5}px; </tpl>'+
+                    '<tpl if="!nlevel"> padding-left:20px; </tpl>'+
+                    '<tpl if="spacer"> padding-bottom:4px;margin-bottom:4px;border-bottom:1px solid silver; </tpl>'+
+                    '<tpl if="bold"> font-weight:bold; </tpl>'+
+                    '">'+
+                        '{title}'+
+                        '<tpl if="description"><br><small><i>{description}</i></small></tpl>'+
+                    '</div>'+
+                '</tpl>', {
+                    haveIcon: function(values) {
+
+                        var src = '';
+                        var hpadding = 2;
+                        var vpadding = 1;
+
+                        if (values.icon) {
+                            src = _ico(values.icon);
+                        }
+                        if (combo.icon) {
+                            src = _ico(combo.icon);
+                        }
+
+                        if (values.description) {
+                            hpadding = 4;
+                        }
+
+                        if (values.nlevel) {
+                            hpadding = 2;
+                            vpadding = values.nlevel * 10 - 10;
+                        }
+
+                        return ' background: url('+ src +') '+ vpadding +'px '+ hpadding +'px no-repeat; ';
+                    }
+                }
+            );
+
+            Ext.apply(combo, {
+                tpl: tpl,
+                itemSelector: "div.x-combo-list-item"
+            });
+
             // Add custom config
             if (combos[url] && config)
                 Ext.apply(combo, config);
-            
+
             return combo;
-            
+
         },
-        
+
         create: function(url, config) {
-
             if (combos[url]) {
-
-                //var combo = new items[myclass](config);
-                
                 var combo = this.getConfig(url, config);
-                
-                //if (config && config.disableCaching) {
-                //    combo.on("beforequery", function(qe){ delete qe.combo.lastQuery; });
-                //}
-                
                 return combo;
             }
-
-            alert("Can't find combobox <" + myclass + ">");
+            alert("Can't find combobox <" + url + ">");
             return new Ext.Component();
         }
     };

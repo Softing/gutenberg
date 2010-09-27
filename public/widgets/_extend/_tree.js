@@ -5,7 +5,7 @@ Ext.tree.TreePanel.prototype.cmpCurrentNode = function () {
 };
 
 Ext.tree.TreePanel.prototype.cmpReload = function() {
-    if (! this.seletion.leaf ) {
-        this.seletion.reload();
+    if (! this.selection.leaf ) {
+        this.selection.reload();
     }
 }

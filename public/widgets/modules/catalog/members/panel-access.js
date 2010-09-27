@@ -98,8 +98,10 @@ Inprint.member.profile.Access = Ext.extend(Ext.grid.EditorGridPanel, {
                     scope:this,
                     handler: this.cmpSaveRecursive
                 },
+                
                 '->',
-                Inprint.factory.Combo.create("roles", {
+                
+                Inprint.factory.Combo.create("/catalog/combos/roles/", {
                     width: 150,
                     disableCaching: true,
                     listeners: {

@@ -37,32 +37,45 @@ $sql2->SetConnection($conn2);
 my $rootnode = '00000000-0000-0000-0000-000000000000';
 
 $sql->Do("DELETE FROM catalog");
-$sql->Do("DELETE FROM catalog_tree");
-
 
 $sql->Do("
-    INSERT INTO catalog (id, parent, path, named_path, name, shortcut, description, type, capables, created, updated)
-    VALUES ('00000000-0000-0000-0000-000000000000', null, '00000000-0000-0000-0000-000000000000', 'pubhouse', 'Publish House', 'pubhouse', 'ph', 'ou', '{default}', '2010-08-03 19:01:13.77+04', '2010-08-03 19:01:13.77+04');
+    INSERT INTO catalog (id, path, title, shortcut, description, type, capables, created, updated)
+    VALUES ('00000000-0000-0000-0000-000000000000', '00000000000000000000000000000000',
+        'Издательский Дом', 'ИД ЗР', 'Издательский дом \"За рулем\"', 'ou', '{default}', '2010-08-03 19:01:13.77+04', '2010-08-03 19:01:13.77+04');
 ");
 
 # Import Editions
 
-my $editions = $sql2->Q(" SELECT * FROM edition.edition WHERE deleted=false ")->Hashes();
+my $editions = $sql2->Q("
+    SELECT id, name, sname, description, uuid, deleted
+    FROM edition.edition WHERE deleted=false
+")->Hashes();
 
 foreach my $item( @{ $editions } ) {
+
     $sql->Do("
-        INSERT INTO catalog (id, parent, name, shortcut, description, type, capables)
+        INSERT INTO catalog (id, path, title, shortcut, description, type, capables)
         VALUES (?, ?, ?, ?, ?, 'ou', '{default}')
-    ", [ $item->{uuid}, $rootnode, $item->{name}, $item->{sname}, $item->{description} ]);
+    ", [ $item->{uuid}, cleanUUID($rootnode), $item->{name}, $item->{sname}, $item->{description} ]);
+
+
+    # Import Departments
+
+    my $departments = $sql2->Q("
+        SELECT * FROM passport.department WHERE edition = ?
+    ", [ $item->{uuid} ])->Hashes();
+
+    foreach my $item2 ( @{ $departments } ) {
+        $sql->Do("
+            INSERT INTO catalog (id, path, title, shortcut, description, type, capables)
+            VALUES (?, ?, ?, ?, ?, 'ou', '{default}')
+        ", [ $item2->{uuid}, cleanUUID($item2->{edition}), $item2->{title}, $item->{sname}."/".$item2->{title}, $item2->{description} ]);
+    }
+
 }
 
-# Import Departments
-
-my $departments = $sql2->Q("SELECT * FROM passport.department")->Hashes();
-
-foreach my $item( @{ $departments } ) {
-    $sql->Do("
-        INSERT INTO catalog (id, parent, name, shortcut, description, type, capables)
-        VALUES (?, ?, ?, ?, ?, 'ou', '{default}')
-    ", [ $item->{uuid}, $item->{edition}, $item->{title}, $item->{title}, $item->{description} ]);
+sub cleanUUID {
+    my $uuid = shift;
+    $uuid =~ s/\-//sg;
+    return $uuid;
 }

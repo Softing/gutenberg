@@ -13,33 +13,33 @@ use base 'Inprint::BaseController';
 sub list {
 
     my $c = shift;
-    
+
     my @params;
-    
+
     # Pagination
     my $start = $c->param("start") || 0;
     my $limit = $c->param("limit") || 60;
-    
+
     # Filters
-    my $group    = $c->param("group")    || undef;
-    my $title    = $c->param("title")    || undef;
-    my $fascicle = $c->param("fascicle") || undef;
-    my $headline = $c->param("headline") || undef;
-    my $rubric   = $c->param("rubric")   || undef;
-    my $manager  = $c->param("mmanager") || undef;
-    my $owner    = $c->param("owner")    || undef;
-    my $progress = $c->param("progress") || undef;
-    
+    my $group    = $c->param("flt_group")    || undef;
+    my $title    = $c->param("flt_title")    || undef;
+    my $fascicle = $c->param("flt_fascicle") || undef;
+    my $headline = $c->param("flt_headline") || undef;
+    my $rubric   = $c->param("flt_rubric")   || undef;
+    my $manager  = $c->param("flt_manager") || undef;
+    my $holder   = $c->param("flt_holder")    || undef;
+    my $progress = $c->param("flt_progress") || undef;
+
     # Query headers
     my $sql_query = "
-        SELECT 
+        SELECT
             dcm.id,
-            
+
             dcm.fascicle, dcm.fascicle_shortcut,
             dcm.headline, dcm.headline_shortcut,
             dcm.rubric, dcm.rubric_shortcut,
             dcm.copygroup,
-            
+
             dcm.holder, dcm.creator, dcm.manager, holder_shortcut, dcm.creator_shortcut, dcm.manager_shortcut,
             dcm.maingroup, dcm.maingroup_shortcut, dcm.ingroups,
             dcm.islooked, dcm.isopen,
@@ -51,57 +51,64 @@ sub list {
             dcm.images, dcm.files,
             to_char(dcm.created, 'YYYY-MM-DD HH24:MI:SS') as created,
             to_char(dcm.updated, 'YYYY-MM-DD HH24:MI:SS') as updated
-            
+
         FROM documents dcm
-        
+
     ";
-    
+
     my $sql_total = "
         SELECT count(*)
         FROM documents dcm
     ";
-    
+
     # Set filters
     my $sql_filters = " WHERE 1=1 ";
-    
+
     if ($group) {
-        $sql_filters .= "";
+        $sql_filters .= " AND ? = ANY(dcm.ingroups) ";
+        push @params, $group;
     }
-    
+
     if ($title) {
-        $sql_filters .= "";
+        $sql_filters .= " AND title LIKE ? ";
+        push @params, "%$title%";
     }
-    
+
     if ($fascicle) {
-        $sql_filters .= "";
+        $sql_filters .= " AND fascicle = ? ";
+        push @params, $fascicle;
     }
-    
+
     if ($headline) {
-        $sql_filters .= "";
+        $sql_filters .= " AND headline = ? ";
+        push @params, $headline;
     }
-    
+
     if ($rubric) {
-        $sql_filters .= "";
+        $sql_filters .= " AND rubric = ? ";
+        push @params, $rubric;
     }
-    
+
     if ($manager) {
-        $sql_filters .= "";
+        $sql_filters .= " AND manager=? ";
+        push @params, $manager;
     }
-    
-    if ($owner) {
-        $sql_filters .= "";
+
+    if ($holder) {
+        $sql_filters .= " AND holder=? ";
+        push @params, $holder;
     }
-    
+
     if ($progress) {
         $sql_filters .= "";
     }
-    
+
     $sql_total .= $sql_filters;
     $sql_query .= $sql_filters;
-    
+
     # Calculate total param
     my $total = $c->sql->Q($sql_total, \@params)->Value || 0;
-    
+
     # Select rows with pagination
     $sql_query .= " LIMIT ? OFFSET ? ";
     push @params, $limit;

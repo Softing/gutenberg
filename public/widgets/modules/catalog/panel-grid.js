@@ -46,10 +46,10 @@ Inprint.catalog.Grid = Ext.extend(Ext.grid.GridPanel, {
                 },
                 {
                     id:"name",
-                    header: _("Name"),
+                    header: _("Title"),
                     width: 120,
                     sortable: true,
-                    dataIndex: "name"
+                    dataIndex: "title"
                 }
             ],
 

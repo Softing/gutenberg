@@ -10,6 +10,8 @@ use lib "../lib";
 use Inprint::Frameworks::Config;
 use Inprint::Frameworks::SQL;
 
+binmode STDOUT, ":utf8";
+
 my $config = new Inprint::Frameworks::Config("../");
 
 my $dbname     = $config->get("db.name");
@@ -43,25 +45,27 @@ $sql->Do("DELETE FROM map_documents_to_fascicles");
 
 my $documents = $sql2->Q("
     SELECT
-        id, uuid, edition, fascicle, theowner, creator, manager, department, 
-        progress, title, author, section, rubric, planned_size, planned_date, 
-        real_date, status, look, block, trash, createdold, updatedold, 
-        created, updated, isopen, fascicle_name, edition_name, edition_sname, 
-        department_name, section_name, rubric_name, owner_nick, manager_nick, 
+        id, uuid, edition, fascicle, theowner, creator, manager, department,
+        progress, title, author, section, rubric, planned_size, planned_date,
+        real_date, status, look, block, trash, createdold, updatedold,
+        created, updated, isopen, fascicle_name, edition_name, edition_sname,
+        department_name, section_name, rubric_name, owner_nick, manager_nick,
         image_count, file_count, calibr_real, page,
         ( SELECT card.stitle
            FROM views.\"passport.owners\" card
           WHERE card.uuid = creator) AS creator_nick
-    FROM views.documents LIMIT 100000000
+    FROM views.documents
+    WHERE uuid = '98da44c6-9114-4b58-9238-c15592d50e32'
+    LIMIT 100000000
  ")->Hashes;
 
 my $counter=0;
 my @errors;
 
 foreach my $item( @{ $documents } ) {
-    
+
     $counter++;
-    
+
     my $oldstate = $sql2->Q("
         SELECT uuid, edition, object_uuid, status_uuid, member_uuid, created
         FROM exchange2.state
@@ -74,21 +78,21 @@ foreach my $item( @{ $documents } ) {
         FROM branches
         WHERE catalog=?
     ", [$item->{edition}])->Hash;
-    
+
     unless ($branch) {
         push @errors, {
             text => "branch", id=> $item->{id}
         };
         next;
     }
-    
+
     # Select stage
     my $stage = $sql->Q("
         SELECT id, branch, color, weight, title, shortcut, description, created, updated
         FROM stages
         WHERE branch=? AND id=?
     ", [$branch->{id}, $oldstate->{status_uuid} ])->Hash;
-    
+
     unless ($stage) {
         $stage = $sql->Q("
             SELECT id, branch, color, weight, title, shortcut, description, created, updated
@@ -96,46 +100,66 @@ foreach my $item( @{ $documents } ) {
             WHERE branch=? ORDER BY weight LIMIT 1
         ", [$branch->{id} ])->Hash;
     }
-    
+
     unless ($stage) {
         push @errors, {
             text => "stage", id=> $item->{id}
         };
         next;
     }
-    
+
     $item->{theowner} = '4f5ad92e-b3e7-4c54-937e-e70aa999c0c7' unless ($item->{theowner});
     $item->{creator}  = '4f5ad92e-b3e7-4c54-937e-e70aa999c0c7' unless ($item->{creator});
     $item->{manager}  = '4f5ad92e-b3e7-4c54-937e-e70aa999c0c7' unless ($item->{manager});
-    
+
     $item->{owner_nick}    = 'Администратор' unless ($item->{owner_nick});
     $item->{creator_nick}  = 'Администратор' unless ($item->{creator_nick});
     $item->{manager_nick}  = 'Администратор' unless ($item->{manager_nick});
-    
+
     $item->{look}   = 'false' unless ($item->{look});
     $item->{isopen} = 'false' unless ($item->{isopen});
-    
+
     $item->{rubric}  = $rootnode unless ($item->{rubric});
     $item->{section}  = $rootnode unless ($item->{section});
     $item->{rubric_name}   = "Not found" unless ($item->{rubric_name});
     $item->{section_name}  = "Not found" unless ($item->{section_name});
-    
+
     print "------------------------------------------------------------\n";
     print ">>$counter\n";
-    print "$item->{uuid}\n";
-    print "$item->{theowner}, $item->{creator}, $item->{manager}, $item->{owner_nick}, $item->{creator_nick}, $item->{manager_nick}\n";
-    print "$item->{edition}, $item->{edition_sname}, []\n";
-    print "$item->{look}, $item->{isopen}\n";
-    print "$branch->{id}, $branch->{title}, $stage->{id}, $stage->{title}, $stage->{color}, $stage->{weight}\n";
-    print "$item->{title}, $item->{author}\n";
-    print "$item->{section}, $item->{section_name}, $item->{rubric}, $item->{rubric_name}\n";
-    print "$item->{planned_date}, $item->{planned_size}, $item->{real_date}, $item->{calibr_real}\n";
-    print "$item->{image_count}, $item->{file_count}\n";
-    print "$item->{created}, $item->{updated}\n";
+    #print "$item->{uuid}\n";
+    #print "$item->{theowner}, $item->{creator}, $item->{manager}, $item->{owner_nick}, $item->{creator_nick}, $item->{manager_nick}\n";
+    #print "$item->{edition}, $item->{edition_sname}, []\n";
+    #print "$item->{look}, $item->{isopen}\n";
+    #print "$branch->{id}, $branch->{title}, $stage->{id}, $stage->{title}, $stage->{color}, $stage->{weight}\n";
+    #print "$item->{title}, $item->{author}\n";
+    #print "$item->{section}, $item->{section_name}, $item->{rubric}, $item->{rubric_name}\n";
+    #print "$item->{planned_date}, $item->{planned_size}, $item->{real_date}, $item->{calibr_real}\n";
+    #print "$item->{image_count}, $item->{file_count}\n";
+    #print "$item->{created}, $item->{updated}\n";
     print "------------------------------------------------------------\n\n";
-    
+
+    # Found catalog folder
+
+    my $catalog_folder   = $item->{edition};
+    my $catalog_shortcut = $item->{edition_sname};
+
+    print "MANAGER $item->{manager}, $item->{manager_nick}\n";
+    print "OWNER $item->{theowner}, $item->{owner_nick}\n";
+    print "DEPARTMENT $item->{department}, $item->{department_name}\n";
+
+    if ($item->{department}) {
+
+        my $department = $sql->Q(" SELECT id, shortcut FROM catalog WHERE id = ? ",
+            [ $item->{department} ])->Hash;
+
+        if ($department) {
+            $catalog_folder = $department->{id};
+            $catalog_shortcut = $department->{shortcut};
+        }
+    }
+
     # Map document to fascicle
-    
+
     if ($item->{trash}) {
         $item->{fascicle} = '99999999-9999-9999-9999-999999999999';
         $item->{fascicle_name} = "Корзина";
@@ -143,17 +167,23 @@ foreach my $item( @{ $documents } ) {
         $item->{fascicle} = $rootnode unless ($item->{fascicle});
         $item->{fascicle_name} = "Портфель" unless ($item->{fascicle_name});
     }
-    
+
+    # Select groups index
+    my $groups = $sql->Q("
+        SELECT ARRAY( select id from catalog where path @> ( select path from catalog where id = ? ) )
+    ", [ $catalog_folder ])->Array;
+
+    # do insert
     $sql->Do("
         INSERT INTO documents(
             id,
-            holder, creator, manager, holder_shortcut, creator_shortcut, manager_shortcut, 
             maingroup, maingroup_shortcut, ingroups,
+            holder, creator, manager, holder_shortcut, creator_shortcut, manager_shortcut,
             fascicle, fascicle_shortcut,
             headline, headline_shortcut, rubric, rubric_shortcut,
             islooked, isopen,
             branch, branch_shortcut, stage, stage_shortcut, color, progress,
-            title, author, 
+            title, author,
             pdate, psize, rdate, rsize,
             images, files,
             created, updated
@@ -161,8 +191,8 @@ foreach my $item( @{ $documents } ) {
     ",
     [
         $item->{uuid},
+        $catalog_folder, $catalog_shortcut, @$groups[0],
         $item->{theowner}, $item->{creator}, $item->{manager}, $item->{owner_nick}, $item->{creator_nick}, $item->{manager_nick},
-        $item->{edition}, $item->{edition_sname}, [],
         $item->{fascicle}, $item->{fascicle_name},
         $item->{section}, $item->{section_name}, $item->{rubric}, $item->{rubric_name},
         $item->{look}, $item->{isopen},
@@ -172,19 +202,6 @@ foreach my $item( @{ $documents } ) {
         $item->{image_count}, $item->{file_count},
         $item->{created}, $item->{updated}
     ]);
-    
-    #$sql->Do("
-    #    INSERT INTO map_documents_to_fascicles(
-    #        document, fascicle, fascicle_nick,
-    #        headline, headline_shortcut, rubric, rubric_shortcut,
-    #        copygroup)
-    #    VALUES (?, ?, ?, ?, ?, ?, ?, uuid_generate_v4());
-    #",
-    #[
-    #    $item->{uuid}, $item->{fascicle}, $item->{fascicle_name},
-    #    $item->{section}, $item->{section_name}, $item->{rubric}, $item->{rubric_name}
-    #]);
-    
 
 }
 

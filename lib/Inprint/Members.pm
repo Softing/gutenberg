@@ -22,14 +22,14 @@ sub list {
         $node = '00000000-0000-0000-0000-000000000000';
     }
 
-    $result = $c->sql->Q('
-        SELECT distinct t1.id, t1.login, t2.name, t2.shortcut, t2.position
+    $result = $c->sql->Q("
+        SELECT distinct t1.id, t1.login, t2.title, t2.shortcut, t2.position
         FROM members t1 LEFT JOIN profiles t2 ON t1.id = t2.id,
             map_member_to_catalog m1
         WHERE m1.member = t1.id AND m1.catalog in (
-            SELECT id FROM catalog WHERE path LIKE ?
+            SELECT id FROM catalog WHERE path ~ ('*.' || replace(?, '-', '')::text || '.*')::lquery
         ) ORDER BY t2.shortcut
-    ', [ "%$node%" ])->Hashes;
+    ", [ $node ])->Hashes;
 
     $c->render_json( { data => $result } );
 }

@@ -28,23 +28,23 @@ Inprint.catalog.Interaction = function(panels) {
                 ref: "../btnCreate",
                 scope:this,
                 handler: this.cmpCreate
+            }, {
+                icon: _ico("pencil"),
+                cls: "x-btn-text-icon",
+                text: _("Edit"),
+                ref: "../btnEdit",
+                scope:this,
+                handler: this.cmpUpdate
             });
 
             if (node.attributes.id != NULLID) {
                 items.push({
-                    icon: _ico("pencil"),
-                    cls: "x-btn-text-icon",
-                    text: _("Edit"),
-                    ref: "../btnEdit",
-                    scope:this,
-                    handler: this.cmpEdit
-                },{
                     icon: _ico("bin--arrow"),
                     cls: "x-btn-text-icon",
                     text: _("Remove"),
                     ref: "../btnRemove",
                     scope:this,
-                    handler: this.cmpRemove
+                    handler: this.cmpDelete
                 });
             }
 
@@ -63,15 +63,9 @@ Inprint.catalog.Interaction = function(panels) {
     tree.on("beforenodedrop", function (e) {
 
         if(Ext.isArray(e.data.selections)) {
-
             var node = this.cmpCurrentNode();
-
             e.cancel = false;
             var data = _get_values("id", e.data.selections);
-
-            //alert(e.target.attributes.id);
-            //alert(node.attributes.id);
-
         }
         return false;
     }, tree);
@@ -81,13 +75,6 @@ Inprint.catalog.Interaction = function(panels) {
         grid.cmpLoad({ node: node.id });
         grid.setTitle(_("Members") +' - '+ tree.cmpCurrentNode().text);
     });
-
-    // Tab
-
-    //tabs.on("tabchange", function(tabpanel, panel) {
-    //    if (panel && panel.cmpFill)
-    //        panel.cmpFill();
-    //});
 
     // Grid
 

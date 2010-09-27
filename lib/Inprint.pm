@@ -89,7 +89,7 @@ sub startup {
     $sessionBridge->route('/workspace/state/')->to('index#state');
     $sessionBridge->route('/workspace/online/')->to('index#online');
     $sessionBridge->route('/workspace/appsession/')->to('index#appsession');
-    
+
     # Calendar routes
     $sessionBridge->route('/calendar/list/')->to( 'calendar#list' );
     $sessionBridge->route('/calendar/create/')->to( 'calendar#create' );
@@ -106,7 +106,7 @@ sub startup {
     $sessionBridge->route('/documents/read/')->to( 'documents#read' );
     $sessionBridge->route('/documents/update/')->to( 'documents#update' );
     $sessionBridge->route('/documents/delete/')->to( 'documents#delete' );
-    
+
     # Documents combos
     $sessionBridge->route('/documents/combos/groups')->to( 'documents-combos#groups' );
     $sessionBridge->route('/documents/combos/fascicles')->to( 'documents-combos#fascicles' );
@@ -120,7 +120,14 @@ sub startup {
     $sessionBridge->route('/catalog/tree/')->to( 'catalog#tree' );
     $sessionBridge->route('/catalog/combo/')->to( 'catalog#combo' );
     $sessionBridge->route('/catalog/create/')->to( 'catalog#create' );
+    $sessionBridge->route('/catalog/read/')->to( 'catalog#read' );
+    $sessionBridge->route('/catalog/update/')->to( 'catalog#update' );
     $sessionBridge->route('/catalog/delete/')->to( 'catalog#delete' );
+
+
+    # Catalog combos
+    $sessionBridge->route('/catalog/combos/groups/')->to( 'catalog-combos#groups' );
+    $sessionBridge->route('/catalog/combos/roles/')->to( 'catalog-combos#roles' );
 
     # Rules routes
     $sessionBridge->route('/rules/list/')->to( 'rules#list' );

@@ -1,18 +1,18 @@
 Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
 
     initComponent: function() {
-        
+
         this.params = {};
         this.components = {};
-        
+
         this.urls = {
             list:    "/documents/list/"
         }
-        
+
         this.store = Inprint.factory.Store.json(this.urls.list, {
             totalProperty: 'total'
         });
-        
+
         this.sm = new Ext.grid.CheckboxSelectionModel();
 
         this.columns = [
@@ -26,7 +26,16 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                 sortable : true,
                 renderer : this.renderers.viewed
             },
-            
+            {
+                id:"title",
+                dataIndex: "title",
+                header: _("Title"),
+                width: 210,
+                sortable: true,
+                renderer : this.renderers.title,
+                filter: { xtype:"textfield", filterName:"flt_title" }
+            },
+
             {
                 id:"maingroup",
                 dataIndex: "maingroup_shortcut",
@@ -38,33 +47,9 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                     {
                         xtype: "xcombo",
                         filterName:"flt_group",
-                        clearable:true,
-                        listeners:{
-                            clear: {
-                                scope:this,
-                                fn: function() {
-                                    this.applyHeaderFilters();
-                                }
-                            },
-                            beforeselect: {
-                                scope:this,
-                                fn: function() {
-                                    //alert("select");
-                                }
-                            }
-                        }
+                        nocache: true
                     }
                 )
-            },
-            
-            {
-                id:"title",
-                dataIndex: "title",
-                header: _("Title"),
-                width: 210,
-                sortable: true,
-                renderer : this.renderers.title,
-                filter: { xtype:"textfield", filterName:"flt_title" }
             },
             {
                 id:"fascicle",
@@ -78,17 +63,30 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                     {
                         xtype: "xcombo",
                         filterName:"flt_fascicle",
-                        clearable:true
+                        nocache: true,
+                        listeners:{
+                            beforeselect: {
+                                scope:this,
+                                fn: function(combo, record, indx) {
+                                    if (record.data.id) {
+                                        this.getHeaderFilterField("flt_headline").enable();
+                                    } else {
+                                        this.getHeaderFilterField("flt_headline").disable();
+                                        this.getHeaderFilterField("flt_rubric").disable();
+                                    }
+                                }
+                            },
+                            beforequery : {
+                                scope:this,
+                                fn: function(e) {
+                                    e.combo.getStore().baseParams = {
+                                        flt_group: this.getHeaderFilter("flt_group")
+                                    };
+                                }
+                            }
+                        }
                     }
                 )
-            },
-            
-            {
-                id:"pages",
-                dataIndex: "pages",
-                header: _("Pages"),
-                width: 90,
-                sortable: true
             },
             {
                 id:"headline",
@@ -100,9 +98,29 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                     "/documents/combos/headlines",
                     {
                         xtype: "xcombo",
-                        disabled:true,
                         filterName:"flt_headline",
-                        clearable:true
+                        disabled:true,
+                        nocache: true,
+                        listeners:{
+                            beforeselect: {
+                                scope:this,
+                                fn: function(combo, record, indx) {
+                                    if (record.data.id) {
+                                        this.getHeaderFilterField("flt_rubric").enable();
+                                    } else {
+                                        this.getHeaderFilterField("flt_rubric").disable();
+                                    }
+                                }
+                            },
+                            beforequery : {
+                                scope:this,
+                                fn: function(e) {
+                                    e.combo.getStore().baseParams = {
+                                        flt_fascicle: this.getHeaderFilter("flt_fascicle")
+                                    };
+                                }
+                            }
+                        }
                     }
                 )
             },
@@ -116,25 +134,53 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                     "/documents/combos/rubrics",
                     {
                         xtype: "xcombo",
-                        disabled:true,
                         filterName:"flt_rubric",
-                        clearable:true
+                        disabled:true,
+                        nocache: true,
+                        listeners:{
+                            beforequery : {
+                                scope:this,
+                                fn: function(e) {
+                                    e.combo.getStore().baseParams = {
+                                        flt_fascicle: this.getHeaderFilter("flt_fascicle"),
+                                        flt_headline: this.getHeaderFilter("flt_headline")
+                                    };
+                                }
+                            }
+                        }
                     }
                 )
             },
-            
+            {
+                id:"pages",
+                dataIndex: "pages",
+                header: _("Pages"),
+                width: 90,
+                sortable: true
+            },
+
             {
                 id:"manager",
                 dataIndex: "manager_shortcut",
                 header: _("Manager"),
-                width: 100,
+                width: 120,
                 sortable: true,
                 filter: Inprint.factory.Combo.getConfig(
                     "/documents/combos/managers",
                     {
                         xtype: "xcombo",
                         filterName:"flt_manager",
-                        clearable:true
+                        nocache: true,
+                        listeners:{
+                            beforequery : {
+                                scope:this,
+                                fn: function(e) {
+                                    e.combo.getStore().baseParams = {
+                                        flt_group: this.getHeaderFilter("flt_group")
+                                    };
+                                }
+                            }
+                        }
                     }
                 )
             },
@@ -143,14 +189,24 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                 dataIndex: "progress",
                 header: _("Progress"),
                 sortable: true,
-                width: 100,
+                width: 120,
                 renderer : this.renderers.progress,
                 filter: Inprint.factory.Combo.getConfig(
                     "/documents/combos/progress",
                     {
                         xtype: "xcombo",
                         filterName:"flt_progress",
-                        clearable:true
+                        nocache: true,
+                        listeners:{
+                            beforequery : {
+                                scope:this,
+                                fn: function(e) {
+                                    e.combo.getStore().baseParams = {
+                                        flt_group: this.getHeaderFilter("flt_group")
+                                    };
+                                }
+                            }
+                        }
                     }
                 )
             },
@@ -158,14 +214,24 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                 id:"holder",
                 dataIndex: "holder_shortcut",
                 header: _("Holder"),
-                width: 100,
+                width: 120,
                 sortable: true,
                 filter: Inprint.factory.Combo.getConfig(
                     "/documents/combos/holders",
                     {
                         xtype: "xcombo",
                         filterName:"flt_holder",
-                        clearable:true
+                        nocache: true,
+                        listeners:{
+                            beforequery : {
+                                scope:this,
+                                fn: function(e) {
+                                    e.combo.getStore().baseParams = {
+                                        flt_group: this.getHeaderFilter("flt_group")
+                                    };
+                                }
+                            }
+                        }
                     }
                 )
             },
@@ -184,9 +250,9 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                 sortable: true,
                 renderer : this.renderers.size
             }
-            
+
         ];
-        
+
         this.tbar = [
             {
                 icon: _ico("plus-button"),
@@ -282,7 +348,7 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                 handler: this.cmpDelete
             }
         ];
-        
+
         this.bbar = new Ext.PagingToolbar({
             pageSize: 60,
             store: this.store,
@@ -292,29 +358,22 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
             items:[
                 '-',
                 {
-                    pressed: true,
-                    enableToggle:true,
-                    text: '60',
-                    //cls: 'x-btn-text-icon details',
-                    toggleHandler: function(btn, pressed){}
-                },
-                {
-                    pressed: false,
-                    enableToggle:true,
-                    text: '90',
-                    //cls: 'x-btn-text-icon details',
-                    toggleHandler: function(btn, pressed){}
-                },
-                {
-                    pressed: false,
-                    enableToggle:true,
-                    text: '120',
-                    //cls: 'x-btn-text-icon details',
-                    toggleHandler: function(btn, pressed){}
+                    xtype:'slider',
+                    width: 214,
+                    value:60,
+                    increment: 30,
+                    minValue: 60,
+                    maxValue: 120,
+                    listeners: {
+                        scope:this,
+                        changecomplete: function(field, value) {
+                            this.store.load({params:{start:0, limit:value}});
+                        }
+                    }
                 }
             ]
         });
-        
+
         Ext.apply(this, {
             //disabled:false,
             border:false,
@@ -327,14 +386,20 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
             bbar: this.bbar,
             plugins: [new Ext.ux.grid.GridHeaderFilters()]
         });
-        
+
         Inprint.documents.Grid.superclass.initComponent.apply(this, arguments);
-        
+
     },
-    
+
     onRender: function() {
+
         Inprint.documents.Grid.superclass.onRender.apply(this, arguments);
-        this.store.load({params:{start:0, limit:60}});
+
+        this.on("render", function() {
+            this.getHeaderFilterField("flt_group").setValueById("00000000-0000-0000-0000-000000000000");
+            this.store.load({params:{start:0, limit:60}});
+        }, this);
+
     },
 
     renderers: {
@@ -343,41 +408,41 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                return '<img title="Материал был просмотрен текущим владельцем" src="'+ _ico("eye") +'">';
            return '';
         },
-        
+
         title: function(value, p, record){
             value = String.format(
                 '<a href="/?part=documents&page=formular&oid={0}&text={1}" '+
                     'onClick="Inprint.objResolver(\'documents\', \'formular\', { oid:\'{0}\', text:\'{1}\' });return false;">'+
                     '{1}'+
-                '</a>', 
-                record.data.uuid, value
+                '</a>',
+                record.data.id, value
             );
             return String.format('{0}', value);
         },
-        
+
         fascicle: function(value, p, record) {
            return value;
         },
-        
+
         progress: function(v, p, record) {
-            
+
             var string = '';
-            
+
             if (record.data.pdate) {
                 string = _fmtDate(record.data.pdate);
             }
             else if (record.data.rdate) {
                 string = _fmtDate(record.data.rdate);
             }
-            
+
             var style = '';
             var textClass = (v < 55) ? 'x-progress-text-back' : 'x-progress-text-front' + (Ext.isIE6 ? '-ie6' : '');
-          
+
             // ugly hack to deal with IE6 issue
             var text = String.format('<div><div class="x-progress-text {0}" style="width:100%;" id="{1}">{2}</div></div>', textClass, Ext.id(), string);
             var color = '#' + record.data.color || 'transparent';
             p.css += ' x-grid3-progresscol ';
-          
+
             return String.format(
                 '<div class="x-progress-wrap">'+
                     '<div class="x-progress-inner" style="border:1px solid {3};">'+
@@ -385,7 +450,7 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                     '</div>'+
                 '</div>', style, v, text, color);
         },
-        
+
         size: function(value, p, record) {
             if (record.data.rsize)
                 return record.data.rsize;

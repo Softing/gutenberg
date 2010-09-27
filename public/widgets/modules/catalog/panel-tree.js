@@ -6,9 +6,10 @@ Inprint.catalog.Tree = Ext.extend(Ext.tree.TreePanel, {
 
         this.urls = {
             tree:    _url("/catalog/tree/"),
-            combo:   _url("/catalog/combo/"),
             create:  _url("/catalog/create/"),
-            remove:  _url("/catalog/remove/")
+            read:    _url("/catalog/read/"),
+            update:  _url("/catalog/update/"),
+            delete:  _url("/catalog/delete/")
         };
 
         Ext.apply(this, {
@@ -71,104 +72,59 @@ Inprint.catalog.Tree = Ext.extend(Ext.tree.TreePanel, {
         var win = this.components["add-window"];
         if (!win) {
 
+            var form = new Ext.FormPanel({
+
+                url: this.urls.create,
+
+                frame:false,
+                border:false,
+
+                labelWidth: 75,
+                defaults: {
+                    anchor: "100%",
+                    allowBlank:false
+                },
+                bodyStyle: "padding:5px 5px",
+                items: [
+                    _FLD_HDN_PATH,
+                    _FLD_TITLE,
+                    _FLD_SHORTCUT,
+                    _FLD_DESCRIPTION,
+                    Inprint.factory.Combo.create("/catalog/combos/groups/", {
+                        scope:this,
+                        listeners: {
+                            select: function(combo, record, indx) {
+                                combo.ownerCt.getForm().findField("path").setValue(record.get("id"));
+                            }
+                        }
+                    }),
+                    {
+                        xtype: 'checkboxgroup',
+                        fieldLabel: 'Capables',
+                        itemCls: 'x-check-group-alt',
+                        allowBlank: true,
+                        columns: 1,
+                        items: [
+                            {boxLabel: _("Можно хранить выпуски"), name: 'capable-store'},
+                            {boxLabel: _("Можно хранить материалы"), name: 'capable-exchange'}
+                        ]
+                    }
+                ],
+                keys: [ _KEY_ENTER_SUBMIT ],
+                buttons: [ _BTN_SAVE,_BTN_CLOSE ]
+            });
+
             win = new Ext.Window({
                 title: _("Catalog item creation"),
                 layout: "fit",
                 closeAction: "hide",
                 width:400, height:300,
-                items: new Ext.FormPanel({
+                items: form
+            });
 
-                    url: this.urls.create,
-
-                    frame:false,
-                    border:false,
-
-                    labelWidth: 75,
-                    defaults: {
-                        anchor: "95%",
-                        allowBlank:false
-                    },
-                    bodyStyle: "padding:5px 5px",
-                    items: [
-                        {
-                            xtype: "textfield",
-                            name: "name",
-                            fieldLabel: _("Name")
-                        },
-                        {
-                            xtype: "textfield",
-                            name: "shortcut",
-                            fieldLabel: _("Shortcut")
-                        },
-                        {
-                            xtype: "textarea",
-                            name: "description",
-                            allowBlank: true,
-                            fieldLabel: _("Description")
-                        },
-                        {
-                            xtype: 'combo',
-                            hiddenName: "path",
-                            store: new Ext.data.JsonStore({
-                                autoDestroy: true,
-                                url: this.urls.combo,
-                                root: 'data',
-                                idProperty: 'id',
-                                fields: [ 'id', 'name', 'shortcut' ]
-                            }),
-                            listeners: {
-                                select: function(combo, record, indx) {
-                                    var value = record.data.shortcut.replace(/&nbsp;/gi,"");
-                                    combo.setRawValue( value );
-                                },
-                                change: function(combo, record, indx) {
-                                    var value = combo.getRawValue().replace(/&nbsp;/gi,"");
-                                    combo.setRawValue( value );
-                                }
-                            },
-                            valueField: 'id',
-                            displayField:'shortcut',
-                            editable:false,
-                            forceSelection: true,
-                            triggerAction: 'all',
-                            emptyText: _("Select a path..."),
-                            fieldLabel: _("Path")
-                        },
-
-                        {
-                            xtype: 'checkboxgroup',
-                            fieldLabel: 'Capables',
-                            itemCls: 'x-check-group-alt',
-                            allowBlank: true,
-                            columns: 1,
-                            items: [
-                                {boxLabel: _("Можно хранить выпуски"), name: 'capable-store'},
-                                {boxLabel: _("Можно хранить материалы"), name: 'capable-exchange'}
-                            ]
-                        }
-                    ],
-                    buttons: [
-                        {
-                            text: _("Create"),
-                            handler: function() {
-                                win.items.first().getForm().submit();
-                            }
-                        },
-                        {
-                            text: _("Cancel"),
-                            handler: function() {
-                                win.hide();
-                            }
-                        }
-                    ],
-                    listeners: {
-                        scope:this,
-                        "actioncomplete": function() {
-                            win.hide();
-                            this.cmpReload();
-                        }
-                    }
-                })
+            form.on("actioncomplete", function (form, action) {
+                if (action.type == "submit")
+                    win.hide();
             });
         }
 
@@ -179,135 +135,118 @@ Inprint.catalog.Tree = Ext.extend(Ext.tree.TreePanel, {
         this.components["add-window"] = win;
     },
 
-    cmpEdit: function() {
+    cmpUpdate: function() {
 
         var win = this.components["edit-window"];
 
         if (!win) {
+
+            var form = new Ext.FormPanel({
+                url: this.urls.update,
+                frame:false,
+                border:false,
+                labelWidth: 75,
+                defaults: {
+                    anchor: "100%",
+                    allowBlank:false
+                },
+                bodyStyle: "padding:5px 5px",
+                items: [
+                    _FLD_HDN_ID,
+                    _FLD_HDN_PATH,
+                    _FLD_TITLE,
+                    _FLD_SHORTCUT,
+                    _FLD_DESCRIPTION,
+                    Inprint.factory.Combo.create("/catalog/combos/groups/", {
+                        scope:this,
+                        listeners: {
+                            select: function(combo, record, indx) {
+                                combo.ownerCt.getForm().findField("path").setValue(record.get("id"));
+                            }
+                        }
+                    }),
+                    {
+                        xtype: 'checkboxgroup',
+                        fieldLabel: 'Capables',
+                        itemCls: 'x-check-group-alt',
+                        allowBlank: true,
+                        columns: 1,
+                        items: [
+                            {boxLabel: _("Можно хранить выпуски"), name: 'capable-store'},
+                            {boxLabel: _("Можно хранить материалы"), name: 'capable-exchange'}
+                        ]
+                    }
+                ],
+                keys: [ _KEY_ENTER_SUBMIT ],
+                buttons: [ _BTN_SAVE,_BTN_CLOSE ]
+            });
 
             win = new Ext.Window({
                 title: _("Catalog item creation"),
                 layout: "fit",
                 closeAction: "hide",
                 width:400, height:300,
-                items: new Ext.FormPanel({
+                items: form
+            });
 
-                    url: this.urls.edit,
-
-                    frame:false,
-                    border:false,
-
-                    labelWidth: 75,
-                    defaults: {
-                        anchor: "95%",
-                        allowBlank:false
-                    },
-                    bodyStyle: "padding:5px 5px",
-                    items: [
-                        {
-                            xtype: "textfield",
-                            name: "name",
-                            fieldLabel: _("Name")
-                        },
-                        {
-                            xtype: "textfield",
-                            name: "shortcut",
-                            fieldLabel: _("Shortcut")
-                        },
-                        {
-                            xtype: "textarea",
-                            name: "description",
-                            allowBlank: true,
-                            fieldLabel: _("Description")
-                        },
-                        {
-                            xtype: 'combo',
-                            hiddenName: "parent",
-                            store: new Ext.data.JsonStore({
-                                autoDestroy: true,
-                                url: this.urls.combo,
-                                root: 'data',
-                                idProperty: 'id',
-                                fields: [ 'id', 'name', 'shortcut' ]
-                            }),
-                            listeners: {
-                                select: function(combo, record, indx) {
-                                    var value = record.data.shortcut.replace(/&nbsp;/gi,"");
-                                    combo.setRawValue( value );
-                                },
-                                change: function(combo, record, indx) {
-                                    var value = combo.getRawValue().replace(/&nbsp;/gi,"");
-                                    combo.setRawValue( value );
-                                }
-                            },
-                            valueField: 'id',
-                            displayField:'shortcut',
-                            editable:false,
-                            forceSelection: true,
-                            triggerAction: 'all',
-                            emptyText: _("Select a path..."),
-                            fieldLabel: _("Path")
-                        },
-
-                        {
-                            xtype: 'checkboxgroup',
-                            fieldLabel: 'Capables',
-                            itemCls: 'x-check-group-alt',
-                            allowBlank: true,
-                            columns: 1,
-                            items: [
-                                {boxLabel: _("Можно хранить выпуски"), name: 'capable-store'},
-                                {boxLabel: _("Можно хранить материалы"), name: 'capable-exchange'}
-                            ]
-                        }
-                    ],
-                    buttons: [
-                        {
-                            text: _("Save"),
-                            handler: function() {
-                                win.items.first().getForm().submit();
-                            }
-                        },
-                        {
-                            text: _("Cancel"),
-                            handler: function() {
-                                win.hide();
-                            }
-                        }
-                    ],
-                    listeners: {
-                        scope:this,
-                        "actioncomplete": function() {
-                            win.hide();
-                            this.cmpReload();
-                        }
-                    }
-                })
+            form.on("actioncomplete", function (form, action) {
+                if (action.type == "submit")
+                    win.hide();
             });
         }
+
+        win.show(this);
+        win.body.mask(_("Loading..."));
+        this.components["edit-window"] = win;
 
         var form = win.items.first().getForm();
         form.reset();
 
-        if( this.selection.attributes.object );
-            form.loadRecord(this.selection.attributes);
+        form.load({
+            url: this.urls.read,
+            scope:this,
+            params: {
+                id: this.getSelectionModel().getSelectedNode().attributes.id
+            },
+            success: function(form, action) {
 
-        win.show(this);
-        this.components["edit-window"] = win;
+                win.body.unmask();
+
+                form.findField("id").setValue(action.result.data.id);
+                form.findField("path").setValue(action.result.data.parent);
+                form.findField("catalog").setValue(action.result.data.parent_shortcut);
+
+                if (action.result.data.id == '00000000-0000-0000-0000-000000000000') {
+                    form.findField("catalog").disable();
+                } else {
+                    form.findField("catalog").enable();
+                }
+
+            },
+            failure: function(form, action) {
+                Ext.Msg.alert("Load failed", action.result.errorMessage);
+            }
+        });
     },
 
-    cmpRemove: function() {
+    cmpDelete: function() {
 
-        Ext.MessageBox.confirm(_("Group removal"), _("You really wish to do this?"), function(btn) {
-            if (btn == "yes") {
-                Ext.Ajax.request({
-                    url: this.urls.remove,
-                    scope:this,
-                    success: this.cmpReload,
-                    params: { id: this.getSelectionModel().getSelectedNode().attributes.id }
-                });
-            }
-        }, this).setIcon(Ext.MessageBox.WARNING);
+        var title = _("Group removal")+
+            " <"+ this.getSelectionModel().getSelectedNode().attributes.shortcut +">"
+        
+        Ext.MessageBox.confirm(
+            title,
+            _("You really wish to do this?"),
+            function(btn) {
+                if (btn == "yes") {
+                    Ext.Ajax.request({
+                        url: this.urls.delete,
+                        scope:this,
+                        success: this.cmpReload,
+                        params: { id: this.getSelectionModel().getSelectedNode().attributes.id }
+                    });
+                }
+            }, this).setIcon(Ext.MessageBox.WARNING);
     }
 
 });

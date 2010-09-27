@@ -33,12 +33,14 @@ Ext.Ajax.on('beforerequest', function(conn, options) {
 
 _FLD_HDN_ID = {
     xtype: "hidden",
-    name: "id"
+    name: "id",
+    allowBlank:false
 };
 
 _FLD_HDN_PATH = {
     xtype: "hidden",
-    name: "path"
+    name: "path",
+    allowBlank:false
 };
 
 _FLD_NAME = {
@@ -46,6 +48,13 @@ _FLD_NAME = {
     allowBlank:false,
     name: "name",
     fieldLabel: _("Name")
+};
+
+_FLD_TITLE = {
+    xtype: "textfield",
+    allowBlank:false,
+    name: "title",
+    fieldLabel: _("Title")
 };
 
 _FLD_SHORTCUT = {
@@ -74,6 +83,7 @@ var _BTN_ADD = {
 var _BTN_SAVE = {
     text: _("Save"),
     handler: function() {
+        //alert(this.findParentByType('form').getForm().isValid());
         this.findParentByType('form').getForm().submit();
     }
 };
