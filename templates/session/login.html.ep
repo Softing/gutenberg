@@ -24,4 +24,4 @@
 <script type="text/javascript" src="/ext-3.2.1/ext-all.js"></script>
 <!-- Locale support -->
 <script type="text/javascript" src="/locale/"></script>
-<script type="text/javascript" src="/login.js"></script>
+<script type="text/javascript" src="/login-page.js"></script>
