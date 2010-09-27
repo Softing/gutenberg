@@ -55,7 +55,7 @@ my $documents = $sql2->Q("
            FROM views.\"passport.owners\" card
           WHERE card.uuid = creator) AS creator_nick
     FROM views.documents
-    WHERE uuid = '98da44c6-9114-4b58-9238-c15592d50e32'
+    --WHERE uuid = '98da44c6-9114-4b58-9238-c15592d50e32'
     LIMIT 100000000
  ")->Hashes;
 
