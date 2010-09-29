@@ -172,6 +172,9 @@ sub startup {
     $sessionBridge->route('/stages/delete/')->to( 'stages#delete' );
     $sessionBridge->route('/stages/list/')->to( 'stages#list' );
 
+    # State route
+    $sessionBridge->route('/state/')->to('state#index');
+
     # Main route
     $sessionBridge->route('/')->to('index#index');
 

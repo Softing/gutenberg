@@ -4,8 +4,12 @@ Inprint.documents.all.Panel = Ext.extend(Ext.Panel, {
 
         this.panels = {};
 
-        this.panels.grid    = new Inprint.documents.Grid();
-        
+        this.panels.grid    = new Inprint.documents.Grid({
+            gridmode: 'all',
+            stateful: true,
+            stateId: 'documents.grid.all'
+        });
+
         Ext.apply(this, {
 
             border:true,
@@ -31,11 +35,11 @@ Inprint.documents.all.Panel = Ext.extend(Ext.Panel, {
         Inprint.documents.all.Interaction(this.panels);
 
     },
-    
+
     cmpReload: function() {
         this.panels.grid.cmpReload();
     },
-    
+
     onRender: function() {
         Inprint.documents.all.Panel.superclass.onRender.apply(this, arguments);
     }

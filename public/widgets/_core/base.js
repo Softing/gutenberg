@@ -9,13 +9,13 @@
 // Global functions
 
 function _fmtDate(str, format, inputFormat) {
-    
+
     var dt = Date.parseDate(str, "Y-m-d h:i:s");
     if (dt) {
         return dt.dateFormat(format || 'M j, Y');
     }
     return '';
-    
+
 };
 
 function _enable() {
@@ -86,6 +86,49 @@ Ext.onReady(function() {
         if(token) {}
     }, this);
 
+    // Enable State Manager
+
+    var stateProvider = new Ext.ux.state.HttpProvider({
+        url:'/state/',
+        readBaseParams: {
+            cmd: 'read'
+        },
+        saveBaseParams: {
+            cmd: 'save'
+        }
+    });
+
+    Ext.state.Manager.setProvider(
+        stateProvider
+    );
+
+    // Start session manager
+    Inprint.updateSession = function(async) {
+        Ext.Ajax.request({
+            async: async,
+            url: '/workspace/appsession/',
+            scope: this,
+            success: function(response) {
+                var data = Ext.util.JSON.decode( response.responseText );
+                if (data.member){
+                    //Inprint.session = data.session;
+                    //Inprint.session.access = data.access;
+                    //Inprint.session.card = data.card;
+                    //Inprint.session.settings = data.settings;
+                    Inprint.updateSession.defer( 60000, this, [ true ]);
+                } else {
+                    Ext.MessageBox.alert(
+                    'Сессия закрыта',
+                    'Возможно кто-то вошел в Инпринт с вашим логином на другом компьютере.<br />Окно будет перезагружено.',
+                    function() {
+                        /*window.location = '/login/';*/
+                    });
+                }
+            }
+        });
+    }(false);
+
+    // Enable registry and layout
     Inprint.registry = new Inprint.Registry();
     Inprint.layout   = new Inprint.Workspace();
 
@@ -101,33 +144,10 @@ Ext.onReady(function() {
         });
     }
 
-    // Start session manager
-    Inprint.updateSession = function(async) {
-        Ext.Ajax.request({
-            async: async,
-            url: '/workspace/appsession/',
-            scope: this,
-            success: function(response) {
-                var data = Ext.util.JSON.decode( response.responseText );
-                if (data.session && data.session.uuid){
-                    Inprint.session = data.session;
-                    Inprint.session.access = data.access;
-                    Inprint.session.card = data.card;
-                    Inprint.session.settings = data.settings;
-                    Inprint.updateSession.defer( 60000, this, [ true ]);
-                } else {
-                    //Ext.MessageBox.alert(
-                    //'Сессия закрыта',
-                    //'Возможно кто-то вошел в Инпринт с вашим логином на другом компьютере.<br />Окно будет перезагружено.',
-                    //function() { /*window.location = '/login/';*/ });
-                }
-            }
-        });
-    }(false);
-
     // Remove loading mask
     setTimeout(function(){
         Ext.get('loading').remove();
         Ext.get('loading-mask').fadeOut({remove:true});
     }, 100);
+
 });

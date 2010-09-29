@@ -2,7 +2,6 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
 
     initComponent: function() {
 
-        this.params = {};
         this.components = {};
 
         this.urls = {
@@ -10,7 +9,11 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
         }
 
         this.store = Inprint.factory.Store.json(this.urls.list, {
-            totalProperty: 'total'
+            remoteSort: true,
+            totalProperty: 'total',
+            baseParams: {
+                gridmode: this.gridmode
+            }
         });
 
         this.sm = new Ext.grid.CheckboxSelectionModel();
@@ -46,6 +49,7 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                     "/documents/combos/groups",
                     {
                         xtype: "xcombo",
+                        stateful:true,
                         filterName:"flt_group",
                         nocache: true
                     }
@@ -359,6 +363,8 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                 '-',
                 {
                     xtype:'slider',
+                    stateful: true,
+                    stateId: 'documents.grid.slider',
                     width: 214,
                     value:60,
                     increment: 30,
@@ -366,6 +372,9 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                     maxValue: 120,
                     listeners: {
                         scope:this,
+                        statesave: function (field, state) {
+                            alert(state);
+                        },
                         changecomplete: function(field, value) {
                             this.store.load({params:{start:0, limit:value}});
                         }
@@ -375,7 +384,6 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
         });
 
         Ext.apply(this, {
-            //disabled:false,
             border:false,
             stripeRows: true,
             columnLines: true,
@@ -396,10 +404,41 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
         Inprint.documents.Grid.superclass.onRender.apply(this, arguments);
 
         this.on("render", function() {
-            this.getHeaderFilterField("flt_group").setValueById("00000000-0000-0000-0000-000000000000");
+
+            var flt_group    = this.getHeaderFilterField("flt_group");
+            var flt_fascicle = this.getHeaderFilterField("flt_fascicle");
+            var flt_headline = this.getHeaderFilterField("flt_headline");
+            var flt_rubric   = this.getHeaderFilterField("flt_rubric");
+
+            if (!flt_group.getValue()) {
+                flt_group.setValueById("00000000-0000-0000-0000-000000000000");
+            }
+
+            if (flt_fascicle.getValue()) {
+                flt_headline.enable();
+            }
+
+            if (flt_headline.getValue()) {
+                flt_rubric.enable();
+            }
+
+        }, this);
+
+        this.on("afterrender", function() {
             this.store.load({params:{start:0, limit:60}});
         }, this);
 
+    },
+
+    cmpCreate: function() {
+        var win = this.components["create-window"];
+        
+        if (!win) {
+            win = new Inprint.cmp.AddDocumentWindow();
+            this.components["create-window"] = win;
+        }
+
+        win.show();
     },
 
     renderers: {
@@ -410,14 +449,20 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
         },
 
         title: function(value, p, record){
+
+            var color = 'blue';
+
+            if (!record.data.isopen)
+                color = 'gray';
+
             value = String.format(
-                '<a href="/?part=documents&page=formular&oid={0}&text={1}" '+
+                '<a style="color:{2}" href="/?part=documents&page=formular&oid={0}&text={1}" '+
                     'onClick="Inprint.objResolver(\'documents\', \'formular\', { oid:\'{0}\', text:\'{1}\' });return false;">'+
                     '{1}'+
                 '</a>',
-                record.data.id, value
+                record.data.id, value, color
             );
-            return String.format('{0}', value);
+            return value;
         },
 
         fascicle: function(value, p, record) {

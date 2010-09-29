@@ -17,8 +17,15 @@ sub list {
     my @params;
 
     # Pagination
-    my $start = $c->param("start") || 0;
-    my $limit = $c->param("limit") || 60;
+    my $start    = $c->param("start")        || 0;
+    my $limit    = $c->param("limit")        || 60;
+
+    # Grid mode
+    my $mode     = $c->param("gridmode")     || "all";
+
+    # Sorting
+    my $dir      = $c->param("dir")          || undef;
+    my $sort     = $c->param("sort")         || undef;
 
     # Filters
     my $group    = $c->param("flt_group")    || undef;
@@ -26,8 +33,8 @@ sub list {
     my $fascicle = $c->param("flt_fascicle") || undef;
     my $headline = $c->param("flt_headline") || undef;
     my $rubric   = $c->param("flt_rubric")   || undef;
-    my $manager  = $c->param("flt_manager") || undef;
-    my $holder   = $c->param("flt_holder")    || undef;
+    my $manager  = $c->param("flt_manager")  || undef;
+    my $holder   = $c->param("flt_holder")   || undef;
     my $progress = $c->param("flt_progress") || undef;
 
     # Query headers
@@ -63,6 +70,36 @@ sub list {
 
     # Set filters
     my $sql_filters = " WHERE 1=1 ";
+
+    # Set mode
+
+    if ($mode eq "todo") {
+        $sql_filters .= " AND isopen = true ";
+        $sql_filters .= " AND fascicle <> '99999999-9999-9999-9999-999999999999' ";
+        $sql_filters .= " AND fascicle <> '00000000-0000-0000-0000-000000000000' ";
+    }
+
+    if ($mode eq "all") {
+        $sql_filters .= " AND isopen = true ";
+        $sql_filters .= " AND fascicle <> '99999999-9999-9999-9999-999999999999' ";
+        $sql_filters .= " AND fascicle <> '00000000-0000-0000-0000-000000000000' ";
+    }
+
+    if ($mode eq "archive") {
+        $sql_filters .= " AND isopen = false ";
+        $sql_filters .= " AND fascicle <> '99999999-9999-9999-9999-999999999999' ";
+        $sql_filters .= " AND fascicle <> '00000000-0000-0000-0000-000000000000' ";
+    }
+
+    if ($mode eq "briefcase") {
+        $sql_filters .= " AND fascicle = '00000000-0000-0000-0000-000000000000' ";
+    }
+
+    if ($mode eq "recycle") {
+        $sql_filters .= " AND fascicle = '99999999-9999-9999-9999-999999999999' ";
+    }
+
+    # Set Filters
 
     if ($group) {
         $sql_filters .= " AND ? = ANY(dcm.ingroups) ";
@@ -108,6 +145,15 @@ sub list {
 
     # Calculate total param
     my $total = $c->sql->Q($sql_total, \@params)->Value || 0;
+
+    if ($dir && $sort) {
+        if ( $dir ~~ ["ASC", "DESC"] ) {
+            if ( $sort ~~ ["title", "maingroup_shortcut", "fascicle_shortcut", "headline_shortcut",
+                           "rubric_shortcut", "pages", "manager_shortcut", "progress", "holder_shortcut", "images", "rsize" ] ) {
+                $sql_query .= " ORDER BY $sort $dir ";
+            }
+        }
+    }
 
     # Select rows with pagination
     $sql_query .= " LIMIT ? OFFSET ? ";

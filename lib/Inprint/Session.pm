@@ -74,7 +74,8 @@ sub login
                     [ $sid, $member->{id} ]
                 );
 
-                $c->session(sid=>$sid);
+                $c->session( sid=>$sid );
+                $c->session( member=>$member->{id} );
 
                 $json->{success}   = 'true';
 

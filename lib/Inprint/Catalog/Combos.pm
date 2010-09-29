@@ -14,7 +14,7 @@ sub groups {
     my $c = shift;
     my $result = $c->sql->Q("
         SELECT t1.id, t1.shortcut as title, nlevel(path) as nlevel, '' as description,
-            array_to_string( ARRAY( select shortcut FROM catalog where path @> t1.path order by nlevel(path) ), '.') as title_path
+            array_to_string( ARRAY( select shortcut FROM catalog where path @> t1.path ORDER BY nlevel(path) ), '.') as title_path
         FROM catalog t1
         ORDER BY title_path
     ")->Hashes;

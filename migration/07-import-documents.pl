@@ -56,6 +56,7 @@ my $documents = $sql2->Q("
           WHERE card.uuid = creator) AS creator_nick
     FROM views.documents
     --WHERE uuid = '98da44c6-9114-4b58-9238-c15592d50e32'
+    --WHERE trash = 1
     LIMIT 100000000
  ")->Hashes;
 
@@ -146,6 +147,8 @@ foreach my $item( @{ $documents } ) {
     print "MANAGER $item->{manager}, $item->{manager_nick}\n";
     print "OWNER $item->{theowner}, $item->{owner_nick}\n";
     print "DEPARTMENT $item->{department}, $item->{department_name}\n";
+    print "TRASH $item->{trash}\n";
+    print "FASCICLE $item->{fascicle}\n";
 
     if ($item->{department}) {
 
@@ -163,9 +166,11 @@ foreach my $item( @{ $documents } ) {
     if ($item->{trash}) {
         $item->{fascicle} = '99999999-9999-9999-9999-999999999999';
         $item->{fascicle_name} = "Корзина";
-    } else {
-        $item->{fascicle} = $rootnode unless ($item->{fascicle});
-        $item->{fascicle_name} = "Портфель" unless ($item->{fascicle_name});
+    }
+
+    if ($item->{fascicle} eq $rootnode || ! $item->{fascicle}) {
+        $item->{fascicle} = $rootnode;
+        $item->{fascicle_name} = "Портфель";
     }
 
     # Select groups index

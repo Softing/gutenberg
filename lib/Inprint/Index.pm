@@ -120,9 +120,9 @@ sub menu
     push @result, $documents;
     push @result, "-";
 
-    
+
     # Fascicles and Composition
-    
+
     # Выбираем выпуски
     my $fascicles = $c->sql->Q("
         SELECT
@@ -133,11 +133,11 @@ sub menu
             AND t1.catalog = t2.id
         ORDER BY t2.shortcut, t1.shortcut
     ")->Hashes;
-    
+
     my $composition  = {
         id => "composition"
     };
-    
+
     if ($#$fascicles < 10) {
         push @result, { id => 'composition-calendar' };
         #push @result, { id => 'composition-archive'  };
@@ -146,20 +146,20 @@ sub menu
         #push @{ $composition->{menu} }, { id => 'composition-archive'  };
         push @result, $composition;
     }
-    
+
     foreach my $fascicle (@$fascicles) {
-    
+
         my $fascicle = {
             id   => "fascicle",
             text => $fascicle->{catalog_shortcut} . '/'. $fascicle->{shortcut}
         };
-        
+
         push @{ $fascicle->{menu} }, {
             id   => "fascicle-plan",
             oid  => $fascicle->{id},
             description => $fascicle->{shortcut}
         };
-        
+
         push @{ $fascicle->{menu} }, {
             id   => "fascicle-planner",
             oid  => $fascicle->{id},
@@ -175,11 +175,11 @@ sub menu
             oid => $fascicle->{id},
             description => $fascicle->{shortcut}
         };
-        
+
         push @result, $fascicle;
 
     }
-    
+
     push @result, '->';
 
     # Settings
@@ -223,72 +223,21 @@ sub menu
     $c->render_json({ data => \@result });
 }
 
-sub appsession
-{
+sub appsession {
+
     my $c = shift;
 
+    my $member = $c->sql->Q("
+        SELECT t1.* FROM members t1, sessions t2 WHERE t2.id = ? AND t2.member = t1.id
+    ", [ $c->session("sid") ])->Hash;
+
     my $result = {
-#       access   => Inprint::Core::User::Access(),
-#       card     => Inprint::Core::User::Card(),
-#       session  => Inprint::Core::User::Session(),
-#       settings => Inprint::Core::User::Settings(),
+        member => $member->{id}
     };
 
     $c->render_json($result);
 }
 
-sub state
-{
-    my $c = shift;
-
-=cut
-my $cgi_action = Inprint::Core::CGI::param('action');
-my $cgi_name   = Inprint::Core::CGI::param('name');
-my $cgi_value  = Inprint::Core::CGI::param('value');
-
-if ( $cgi_action eq 'save' )
-{
-	$rh_data->{SqlDrive}->Do({
-		query 	=> " DELETE FROM inprint.state WHERE member=? AND variable=? ",
-		value	=> [ $rh_data->{session}->{uuid}, $cgi_name ]
-	});
-	$rh_data->{SqlDrive}->Do({
-		query 	=> " INSERT INTO inprint.state ( member, variable, variable_value) VALUES (?,?,?) ",
-		value	=> [ $rh_data->{session}->{uuid}, $cgi_name, $cgi_value ]
-	});
-	Inprint::Core::render_json({
-	    success => $JSON::true
-	});
-}
-
-if ( $cgi_action eq 'clear' )
-{
-	$rh_data->{SqlDrive}->Do({
-		query 	=> " DELETE FROM inprint.state WHERE member=? AND variable=? ",
-		value	=> [ $rh_data->{session}->{uuid}, $cgi_name ]
-	});
-	Inprint::Core::render_json({
-	    success => $JSON::true
-	});
-}
-
-if ( $cgi_action eq 'read' )
-{
-	my $data = $rh_data->{SqlDrive}->Query({
-		type	=> 'array_hashref',
-		query 	=> " SELECT variable as name, variable_value as value FROM inprint.state WHERE member=? ",
-		value	=> [ $rh_data->{session}->{uuid} ]
-	});
-
-	Inprint::Core::render_json({
-		data => $data,
-	    success => $JSON::true
-	});
-}
-=cut
-
-    $c->render_json({});
-}
 
 sub online
 {
