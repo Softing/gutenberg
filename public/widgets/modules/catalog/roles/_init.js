@@ -1,1 +1,1 @@
-Ext.namespace("Inprint.roles");
+Ext.namespace("Inprint.catalog.roles");

@@ -1,4 +1,4 @@
-Inprint.roles.EditPanel = Ext.extend(Ext.FormPanel, {
+Inprint.catalog.roles.EditPanel = Ext.extend(Ext.FormPanel, {
     initComponent: function() {
 
         this.urls = {
@@ -68,14 +68,14 @@ Inprint.roles.EditPanel = Ext.extend(Ext.FormPanel, {
             ]
         });
 
-        Inprint.roles.EditPanel.superclass.initComponent.apply(this, arguments);
+        Inprint.catalog.roles.EditPanel.superclass.initComponent.apply(this, arguments);
 
         this.getForm().url = this.urls.save;
 
     },
 
     onRender: function() {
-        Inprint.roles.EditPanel.superclass.onRender.apply(this, arguments);
+        Inprint.catalog.roles.EditPanel.superclass.onRender.apply(this, arguments);
     },
 
     cmpFill: function(record) {

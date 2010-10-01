@@ -1,4 +1,4 @@
-Inprint.roles.Grid = Ext.extend(Ext.grid.GridPanel, {
+Inprint.catalog.roles.Grid = Ext.extend(Ext.grid.GridPanel, {
 
     initComponent: function() {
 
@@ -82,12 +82,12 @@ Inprint.roles.Grid = Ext.extend(Ext.grid.GridPanel, {
             ]
         });
 
-        Inprint.roles.Grid.superclass.initComponent.apply(this, arguments);
+        Inprint.catalog.roles.Grid.superclass.initComponent.apply(this, arguments);
 
     },
 
     onRender: function() {
-        Inprint.roles.Grid.superclass.onRender.apply(this, arguments);
+        Inprint.catalog.roles.Grid.superclass.onRender.apply(this, arguments);
 
         this.store.load();
     },

@@ -1,4 +1,4 @@
-Inprint.roles.HelpPanel = Ext.extend(Ext.Panel, {
+Inprint.catalog.roles.HelpPanel = Ext.extend(Ext.Panel, {
     initComponent: function() {
 
         Ext.apply(this, {
@@ -7,11 +7,11 @@ Inprint.roles.HelpPanel = Ext.extend(Ext.Panel, {
             preventBodyReset: true
         });
 
-        Inprint.roles.HelpPanel.superclass.initComponent.apply(this, arguments);
+        Inprint.catalog.roles.HelpPanel.superclass.initComponent.apply(this, arguments);
     },
     onRender: function() {
 
-        Inprint.roles.HelpPanel.superclass.onRender.apply(this, arguments);
+        Inprint.catalog.roles.HelpPanel.superclass.onRender.apply(this, arguments);
 
         this.load({
             method: "get",

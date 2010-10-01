@@ -1,4 +1,4 @@
-Inprint.roles.RestrictionsPanel = Ext.extend(Ext.grid.EditorGridPanel, {
+Inprint.catalog.roles.RestrictionsPanel = Ext.extend(Ext.grid.EditorGridPanel, {
 
     initComponent: function() {
 
@@ -109,13 +109,13 @@ Inprint.roles.RestrictionsPanel = Ext.extend(Ext.grid.EditorGridPanel, {
             ]
         });
 
-        Inprint.roles.RestrictionsPanel.superclass.initComponent.apply(this, arguments);
+        Inprint.catalog.roles.RestrictionsPanel.superclass.initComponent.apply(this, arguments);
 
     },
 
     onRender: function() {
 
-        Inprint.roles.RestrictionsPanel.superclass.onRender.apply(this, arguments);
+        Inprint.catalog.roles.RestrictionsPanel.superclass.onRender.apply(this, arguments);
 
         this.on("afteredit", function(e) {
             var combo = this.getColumnModel().getCellEditor(e.column, e.row).field;

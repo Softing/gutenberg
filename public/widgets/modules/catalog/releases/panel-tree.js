@@ -5,11 +5,11 @@ Inprint.catalog.releases.Tree = Ext.extend(Ext.tree.TreePanel, {
         this.components = {};
 
         this.urls = {
-            tree:    _url("/catalog/tree/"),
-            create:  _url("/catalog/create/"),
-            read:    _url("/catalog/read/"),
-            update:  _url("/catalog/update/"),
-            delete:  _url("/catalog/delete/")
+            tree:    _url("/catalog/releases/tree/"),
+            create:  _url("/catalog/releases/create/"),
+            read:    _url("/catalog/releases/read/"),
+            update:  _url("/catalog/releases/update/"),
+            delete:  _url("/catalog/releases/delete/")
         };
 
         Ext.apply(this, {
@@ -97,18 +97,7 @@ Inprint.catalog.releases.Tree = Ext.extend(Ext.tree.TreePanel, {
                                 combo.ownerCt.getForm().findField("path").setValue(record.get("id"));
                             }
                         }
-                    }),
-                    {
-                        xtype: 'checkboxgroup',
-                        fieldLabel: 'Capables',
-                        itemCls: 'x-check-group-alt',
-                        allowBlank: true,
-                        columns: 1,
-                        items: [
-                            {boxLabel: _("Можно хранить выпуски"), name: 'capable-store'},
-                            {boxLabel: _("Можно хранить материалы"), name: 'capable-exchange'}
-                        ]
-                    }
+                    })
                 ],
                 keys: [ _KEY_ENTER_SUBMIT ],
                 buttons: [ _BTN_SAVE,_BTN_CLOSE ]
@@ -164,18 +153,7 @@ Inprint.catalog.releases.Tree = Ext.extend(Ext.tree.TreePanel, {
                                 combo.ownerCt.getForm().findField("path").setValue(record.get("id"));
                             }
                         }
-                    }),
-                    {
-                        xtype: 'checkboxgroup',
-                        fieldLabel: 'Capables',
-                        itemCls: 'x-check-group-alt',
-                        allowBlank: true,
-                        columns: 1,
-                        items: [
-                            {boxLabel: _("Можно хранить выпуски"), name: 'capable-store'},
-                            {boxLabel: _("Можно хранить материалы"), name: 'capable-exchange'}
-                        ]
-                    }
+                    })
                 ],
                 keys: [ _KEY_ENTER_SUBMIT ],
                 buttons: [ _BTN_SAVE,_BTN_CLOSE ]

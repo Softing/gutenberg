@@ -1,4 +1,4 @@
-Inprint.roles.Interaction = function(panels) {
+Inprint.catalog.roles.Interaction = function(panels) {
 
     var tab    = panels.tab;
     var tree   = panels.tree;
