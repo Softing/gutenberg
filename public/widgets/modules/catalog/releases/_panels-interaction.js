@@ -1,4 +1,4 @@
-Inprint.catalog.organization.Interaction = function(panels) {
+Inprint.catalog.releases.Interaction = function(panels) {
 
     var acl_view   = _a(null, "settings.edition.view");
     var acl_manage = _a(null, "settings.edition.manage");

@@ -1,7 +1,7 @@
-Inprint.catalog.organization.HelpPanel = Ext.extend(Ext.Panel, {
+Inprint.catalog.releases.HelpPanel = Ext.extend(Ext.Panel, {
     initComponent: function() {
 
-        this.oid = "Inprint.catalog.organization";
+        this.oid = "Inprint.catalog.releases";
 
         Ext.apply(this, {
             title: "Help",
@@ -10,11 +10,11 @@ Inprint.catalog.organization.HelpPanel = Ext.extend(Ext.Panel, {
             preventBodyReset: true
         });
 
-        Inprint.catalog.organization.HelpPanel.superclass.initComponent.apply(this, arguments);
+        Inprint.catalog.releases.HelpPanel.superclass.initComponent.apply(this, arguments);
     },
     onRender: function() {
 
-        Inprint.catalog.organization.HelpPanel.superclass.onRender.apply(this, arguments);
+        Inprint.catalog.releases.HelpPanel.superclass.onRender.apply(this, arguments);
 
         this.load({
             method: 'get',
