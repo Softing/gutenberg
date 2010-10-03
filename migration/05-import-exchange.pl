@@ -39,8 +39,24 @@ $sql2->SetConnection($conn2);
 
 my $rootnode = '00000000-0000-0000-0000-000000000000';
 
-$sql->Do("DELETE FROM chains");
+$sql->Do("DELETE FROM branches");
 $sql->Do("DELETE FROM stages");
+$sql->Do("DELETE FROM statuses");
+
+# Import statuses
+my $statuses = $sql2->Q("
+    SELECT distinct
+        status_title as title, status_percent as weight, status_color as color
+    FROM exchange2.readiness
+")->Hashes;
+
+foreach my $item ( @$statuses ) {
+    $item->{color} =~ s/#//g;
+    $sql->Do("
+        INSERT INTO statuses(color, weight, title, shortcut, description, created, updated)
+            VALUES (?, ?, ?, ?, ?, now(), now());
+    ", [ $item->{color}, $item->{weight}, $item->{title}, $item->{title}, "" ]);
+}
 
 # Import roles
 
@@ -55,7 +71,7 @@ foreach my $item( @{ $chains } ) {
     my $id = $ug->create_str();
 
     $sql->Do("
-        INSERT INTO chains(id, catalog, name, shortcut, description, created, updated)
+        INSERT INTO branches (id, catalog, title, shortcut, description, created, updated)
             VALUES (?,?,?,?,?,now(),now());
     ", [ $id, $item->{catalog}, $item->{name}, $item->{sname}, "" ]);
 
@@ -70,7 +86,7 @@ foreach my $item( @{ $chains } ) {
     foreach my $item2( @{ $stages } ) {
         $item2->{color} =~ s/#//g;
         $sql->Do("
-            INSERT INTO stages(id, chain, color, weight, name, shortcut, description, created, updated)
+            INSERT INTO stages(id, branch, color, weight, title, shortcut, description, created, updated)
                 VALUES (?,?,?,?,?,?,?,now(),now());
         ", [ $item2->{id}, $id, $item2->{color}, $item2->{weight}, $item2->{name}, $item2->{name}, $item2->{description} ]);
 

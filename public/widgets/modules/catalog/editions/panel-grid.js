@@ -1,4 +1,4 @@
-Inprint.catalog.releases.Grid = Ext.extend(Ext.grid.GridPanel, {
+Inprint.catalog.editions.Grid = Ext.extend(Ext.grid.GridPanel, {
 
     initComponent: function() {
 
@@ -83,12 +83,12 @@ Inprint.catalog.releases.Grid = Ext.extend(Ext.grid.GridPanel, {
             ]
         });
 
-        Inprint.catalog.releases.Grid.superclass.initComponent.apply(this, arguments);
+        Inprint.catalog.editions.Grid.superclass.initComponent.apply(this, arguments);
 
     },
 
     onRender: function() {
-        Inprint.catalog.releases.Grid.superclass.onRender.apply(this, arguments);
+        Inprint.catalog.editions.Grid.superclass.onRender.apply(this, arguments);
         //this.store.load();
     },
 

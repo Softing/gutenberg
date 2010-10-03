@@ -55,30 +55,88 @@ Inprint.catalog.organization.Grid = Ext.extend(Ext.grid.GridPanel, {
 
             tbar: [
                 {
-                    icon: _ico("plus-button"),
-                    cls: "x-btn-text-icon",
-                    text: _("Add"),
-                    disabled:true,
-                    ref: "../btnAdd",
-                    scope:this,
-                    handler: this.cmpAdd
+                    xtype: 'buttongroup',
+                    title: _("Organization"),
+                    defaults: { scale: 'small' },
+                    items: [
+                        {
+                            icon: _ico("user--plus"),
+                            cls: "x-btn-text-icon",
+                            text: _("Add"),
+                            disabled:true,
+                            ref: "../../btnAdd",
+                            scope:this,
+                            handler: this.cmpAdd
+                        },
+                        {
+                            icon: _ico("user--minus"),
+                            cls: "x-btn-text-icon",
+                            text: _("Remove"),
+                            disabled:true,
+                            ref: "../../btnDelete",
+                            scope:this,
+                            handler: this.cmpDelete
+                        }
+                    ]
                 },
-                '-',
                 {
-                    icon: _ico("minus-button"),
-                    cls: "x-btn-text-icon",
-                    text: _("Remove"),
-                    disabled:true,
-                    ref: "../btnRemove",
-                    scope:this,
-                    handler: this.cmpRemove
+                    xtype: 'buttongroup',
+                    title: _("Membership in group"),
+                    defaults: { scale: 'small' },
+                    items: [
+                        {
+                            icon: _ico("plug"),
+                            cls: "x-btn-text-icon",
+                            text: _("Add"),
+                            disabled:true,
+                            ref: "../../btnAddToGroup",
+                            scope:this,
+                            handler: this.cmpAddToGroup
+                        },
+                        {
+                            icon: _ico("plug-disconnect"),
+                            cls: "x-btn-text-icon",
+                            text: _("Remove"),
+                            disabled:true,
+                            ref: "../../btnDeleteFromGroup",
+                            scope:this,
+                            handler: this.cmpDeleteFromGroup
+                        }
+                    ]
                 },
-                '->',
                 {
-                    icon: _ico("arrow-circle-double"),
-                    cls: "x-btn-icon",
-                    scope:this,
-                    handler: this.cmpReload
+                    xtype: 'buttongroup',
+                    title: _("Profile of the employee"),
+                    defaults: { scale: 'small' },
+                    items: [
+                        {
+                            icon: _ico("card"),
+                            cls: "x-btn-text-icon",
+                            text: _("Profile viewing"),
+                            disabled:true,
+                            ref: "../../btnViewProfile",
+                            scope:this,
+                            handler: this.cmpViewProfile
+                        },
+                        {
+                            icon: _ico("card--pencil"),
+                            cls: "x-bt  n-text-icon",
+                            text: _("Profile editing"),
+                            disabled:true,
+                            ref: "../../btnUpdateProfile",
+                            scope:this,
+                            handler: this.cmpUpdateProfile
+                        },
+                        {
+                            icon: _ico("key-solid"),
+                            cls: "x-bt  n-text-icon",
+                            text: _("The rights"),
+                            disabled:true,
+                            ref: "../../btnManageRules",
+                            scope:this,
+                            handler: this.cmpManageRules
+                        }
+                    ]
                 }
             ]
         });
@@ -89,7 +147,6 @@ Inprint.catalog.organization.Grid = Ext.extend(Ext.grid.GridPanel, {
 
     onRender: function() {
         Inprint.catalog.organization.Grid.superclass.onRender.apply(this, arguments);
-        //this.store.load();
     },
 
     cmpAdd: function() {

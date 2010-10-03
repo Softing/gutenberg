@@ -1,4 +1,4 @@
-package Inprint::Index;
+package Inprint::Workspace;
 
 # Inprint Content 4.5
 # Copyright(c) 2001-2010, Softing, LLC.
@@ -182,29 +182,23 @@ sub menu
 
     push @result, '->';
 
+    #
     # Settings
+    #
     my $settings = {
         id => "settings"
     };
 
-    #if ( &check_rule('settings.manage.edition') ) {
-    push @{ $settings->{menu} }, { id => "settings-catalog" };
-    #push @{ $settings->{menu} }, { id => "settings-editions" };
-
-    #if ( &check_rule('settings.manage.people') ) {
-    #push @{ $settings->{menu} }, "-";
+    push @{ $settings->{menu} }, { id => "settings-organization" };
+    push @{ $settings->{menu} }, { id => "settings-editions" };
     push @{ $settings->{menu} }, { id => "settings-roles" };
-    #push @{ $settings->{menu} }, { id => "settings-departments" };
-    #push @{ $settings->{menu} }, { id => "settings-members" };
+    push @{ $settings->{menu} }, { id => "settings-statuses" };
 
-    #if ( &check_rule('settings.manage.exchange') ) {
-    push @{ $settings->{menu} }, "-";
-    push @{ $settings->{menu} }, { id => "settings-exchange" };
-
-    #if ( &check_rule('settings.view') ) {
     push @result, $settings;
 
+    #
     # Employee
+    #
     my $employee = {
         id => "employee",
         text => $c->session("stitle")

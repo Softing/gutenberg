@@ -8,6 +8,8 @@ package Inprint::Selftest;
 use strict;
 use warnings;
 
+use File::Path qw(make_path);
+
 use base 'Inprint::BaseController';
 
 sub preinit
@@ -19,6 +21,23 @@ sub preinit
     }
 
     #$c->app->log->warn("SELFTEST PREINIT");
+    return $c;
+}
+
+sub store
+{
+    my $c = shift;
+
+    my $path = $c->config->get("store.path");
+
+    unless ( -e $path ) {
+        make_path($path, { mode => 0755 });
+    }
+
+    unless ( -e $path ) {
+        $c->redirect_to('/setup/store/');
+    }
+
     return $c;
 }
 

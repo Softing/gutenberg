@@ -26,6 +26,13 @@ Inprint.factory.Combo = new function() {
         // Catalog
         "/catalog/combos/groups/": {
             name: "catalog",
+            icon: "building",
+            fieldLabel: _("Group"),
+            emptyText: _("Select a path...")
+        },
+        "/catalog/combos/editions/": {
+            name: "catalog",
+            icon: "book",
             fieldLabel: _("Group"),
             emptyText: _("Select a path...")
         },
@@ -126,7 +133,7 @@ Inprint.factory.Combo = new function() {
                 '<tpl for=".">'+
                     '<div class="x-combo-list-item" style="'+
                     '{[ this.haveIcon(values) ]}'+
-                    '<tpl if="nlevel"> padding-left:{nlevel*10+5}px; </tpl>'+
+                    '<tpl if="nlevel"> padding-left:{nlevel*10+8}px; </tpl>'+
                     '<tpl if="!nlevel"> padding-left:20px; </tpl>'+
                     '<tpl if="spacer"> padding-bottom:4px;margin-bottom:4px;border-bottom:1px solid silver; </tpl>'+
                     '<tpl if="bold"> font-weight:bold; </tpl>'+

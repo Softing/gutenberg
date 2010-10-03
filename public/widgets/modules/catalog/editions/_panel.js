@@ -1,14 +1,14 @@
-Inprint.catalog.releases.Panel = Ext.extend(Ext.Panel, {
+Inprint.catalog.editions.Panel = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
 
         this.panels = {};
 
-        this.panels.tree = new Inprint.catalog.releases.Tree();
-        this.panels.grid = new Inprint.catalog.releases.Grid({
+        this.panels.tree = new Inprint.catalog.editions.Tree();
+        this.panels.grid = new Inprint.catalog.editions.statuses.Grid({
             title: _("Members")
         });
-        this.panels.help = new Inprint.catalog.releases.HelpPanel();
+        this.panels.help = new Inprint.catalog.editions.HelpPanel();
 
         this.panels.profile = new Inprint.member.Profile();
         this.panels.edit    = new Inprint.member.profile.Form();
@@ -64,12 +64,12 @@ Inprint.catalog.releases.Panel = Ext.extend(Ext.Panel, {
             ]
         });
 
-        Inprint.catalog.releases.Panel.superclass.initComponent.apply(this, arguments);
-        Inprint.catalog.releases.Interaction(this.panels);
+        Inprint.catalog.editions.Panel.superclass.initComponent.apply(this, arguments);
+        Inprint.catalog.editions.Interaction(this.panels);
     },
 
     onRender: function() {
-        Inprint.catalog.releases.Panel.superclass.onRender.apply(this, arguments);
+        Inprint.catalog.editions.Panel.superclass.onRender.apply(this, arguments);
     },
 
     getRow: function() {

@@ -120,21 +120,27 @@ Inprint.Registry = function() {
             icon: "switch",
             text: _("Settings")
         },
-        "settings-catalog": {
-            icon: "node",
-            text: _("Catalog"),
-            xobject: Inprint.catalog.Panel
+        "settings-organization": {
+            icon: "building",
+            text: _("Organization"),
+            xobject: Inprint.catalog.organization.Panel
+        },
+        "settings-editions": {
+            icon: "books",
+            text: _("Editions"),
+            xobject: Inprint.catalog.editions.Panel
         },
         "settings-roles": {
-            icon: "users",
+            icon: "user-silhouette",
             text: _("Roles"),
-            xobject: Inprint.roles.Panel
+            xobject: Inprint.catalog.roles.Panel
         },
-        "settings-exchange": {
-            icon: "arrow-switch",
-            text: _("Exchange"),
-            xobject: Inprint.exchange.Panel
+        "settings-statuses": {
+            icon: "category",
+            text: _("Readiness"),
+            xobject: Inprint.catalog.statuses.Panel
         },
+
 
         "employee": {
             icon: "dummy",

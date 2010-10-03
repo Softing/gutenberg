@@ -62,123 +62,96 @@ sub startup {
     $self->plugin('i18n');
 
     # Create Routes
-
     $self->routes->route('/setup/database/')->to('setup#database');
+    #$self->routes->route('/setup/store/')->to('setup#store');
     $self->routes->route('/setup/import/')->to('setup#import');
     $self->routes->route('/setup/success/')->to('setup#success');
 
     $self->routes->route('/errors/database/')->to('errors#database');
 
-    my $preinitBridge = $self->routes->bridge->to('selftest#preinit');
-    #my $databaseBridge = $preinitBridge->bridge->to('filters#database');
-    my $postinitBridge = $preinitBridge->bridge->to('selftest#postinit');
+    my $preinitBridge  = $self->routes->bridge->to('selftest#preinit');
+    my $storeBridge    = $preinitBridge->bridge->to('selftest#store');
+    my $postinitBridge = $storeBridge->bridge->to('selftest#postinit');
 
     # Add routes
     $postinitBridge->route('/login/')->to('session#login');
     $postinitBridge->route('/logout/')->to('session#logout');
     $postinitBridge->route('/locale/')->to('locale#index');
 
-    $postinitBridge->route('/common/list/edition-all/')->to('common-list#editions', filter => 'all');
-
     # Add sessionable routes
     my $sessionBridge  = $postinitBridge->bridge->to('filters#mysession');
 
-    # Workspace routes
-    $sessionBridge->route('/workspace/')->to('index#index');
-    $sessionBridge->route('/workspace/menu/')->to('index#menu');
-    $sessionBridge->route('/workspace/state/')->to('index#state');
-    $sessionBridge->route('/workspace/online/')->to('index#online');
-    $sessionBridge->route('/workspace/appsession/')->to('index#appsession');
-
     # Calendar routes
-    $sessionBridge->route('/calendar/list/')->to( 'calendar#list' );
-    $sessionBridge->route('/calendar/create/')->to( 'calendar#create' );
-    $sessionBridge->route('/calendar/read/')->to( 'calendar#read' );
-    $sessionBridge->route('/calendar/update/')->to( 'calendar#update' );
-    $sessionBridge->route('/calendar/delete/')->to( 'calendar#delete' );
-    $sessionBridge->route('/calendar/enable/')->to( 'calendar#enable' );
-    $sessionBridge->route('/calendar/disable/')->to( 'calendar#disable' );
-    $sessionBridge->route('/calendar/combo/groups/')->to( 'calendar#combogroups' );
+    $self->createRoutes($sessionBridge, "calendar", [ "create", "read", "update", "delete", "list", "enable", "disable", "combogroups" ]);
 
     # Documents routes
-    $sessionBridge->route('/documents/list/')->to( 'documents#list' );
-    $sessionBridge->route('/documents/create/')->to( 'documents#create' );
-    $sessionBridge->route('/documents/read/')->to( 'documents#read' );
-    $sessionBridge->route('/documents/update/')->to( 'documents#update' );
-    $sessionBridge->route('/documents/delete/')->to( 'documents#delete' );
+    $self->createRoutes($sessionBridge, "documents", [ "create", "read", "update", "delete", "list" ]);
 
     # Documents combos
-    $sessionBridge->route('/documents/combos/groups')->to( 'documents-combos#groups' );
-    $sessionBridge->route('/documents/combos/fascicles')->to( 'documents-combos#fascicles' );
-    $sessionBridge->route('/documents/combos/headlines')->to( 'documents-combos#headlines' );
-    $sessionBridge->route('/documents/combos/rubrics')->to( 'documents-combos#rubrics' );
-    $sessionBridge->route('/documents/combos/holders')->to( 'documents-combos#holders' );
-    $sessionBridge->route('/documents/combos/managers')->to( 'documents-combos#managers' );
-    $sessionBridge->route('/documents/combos/progress')->to( 'documents-combos#progress' );
+    $self->createRoutes($sessionBridge, "documents/combos", [ "groups", "fascicles", "headlines", "rubrics", "holders", "managers", "progress" ]);
 
     # Catalog routes
-    $sessionBridge->route('/catalog/tree/')->to( 'catalog#tree' );
-    $sessionBridge->route('/catalog/combo/')->to( 'catalog#combo' );
-    $sessionBridge->route('/catalog/create/')->to( 'catalog#create' );
-    $sessionBridge->route('/catalog/read/')->to( 'catalog#read' );
-    $sessionBridge->route('/catalog/update/')->to( 'catalog#update' );
-    $sessionBridge->route('/catalog/delete/')->to( 'catalog#delete' );
-
-
-    # Catalog combos
-    $sessionBridge->route('/catalog/combos/groups/')->to( 'catalog-combos#groups' );
-    $sessionBridge->route('/catalog/combos/roles/')->to( 'catalog-combos#roles' );
+    $self->createRoutes($sessionBridge, "catalog/combos",       [ "groups", "editions", "roles", "statuses" ]);
+    $self->createRoutes($sessionBridge, "catalog/editions",     [ "create", "read", "update", "delete", "tree" ]);
+    $self->createRoutes($sessionBridge, "catalog/organization", [ "create", "read", "update", "delete", "tree" ]);
+    $self->createRoutes($sessionBridge, "catalog/statuses",     [ "create", "read", "update", "delete", "list" ]);
 
     # Rules routes
-    $sessionBridge->route('/rules/list/')->to( 'rules#list' );
+    $self->createRoutes($sessionBridge, "rules", [ "list" ]);
 
     # Roles routes
-    $sessionBridge->route('/roles/list/')->to( 'roles#list' );
-    $sessionBridge->route('/roles/create/')->to( 'roles#create' );
-    $sessionBridge->route('/roles/read/')->to( 'roles#read' );
-    $sessionBridge->route('/roles/update/')->to( 'roles#update' );
-    $sessionBridge->route('/roles/delete/')->to( 'roles#delete' );
-    $sessionBridge->route('/roles/map/')->to( 'roles#map' );
-    $sessionBridge->route('/roles/mapping/')->to( 'roles#mapping' );
+    $self->createRoutes($sessionBridge, "roles", [ "create", "read", "update", "delete", "list", "map", "mapping" ]);
 
     # Principals routes
-    $sessionBridge->route('/principals/list/') ->to( 'principals#list' );
-    $sessionBridge->route('/principals/combo/')->to( 'principals#combo' );
+    $self->createRoutes($sessionBridge, "principals", [ "list", "combo" ]);
 
     # Members routes
-    $sessionBridge->route('/members/list/')   ->to( 'members#list' );
-    $sessionBridge->route('/members/combo/')  ->to( 'members#combo' );
-    $sessionBridge->route('/members/create/') ->to( 'members#create' );
-    $sessionBridge->route('/members/delete/') ->to( 'members#delete' );
-    $sessionBridge->route('/members/map/')    ->to( 'members#map' );
-    $sessionBridge->route('/members/mapping/')->to( 'members#mapping' );
+    $self->createRoutes($sessionBridge, "members", [ "list", "combo", "create", "delete", "map", "mapping" ]);
 
     # Profile routes
-    $sessionBridge->route('/profile/load/')->to( 'profile#load' );
-    $sessionBridge->route('/profile/image/:id')->to( 'profile#image' );
-    $sessionBridge->route('/profile/update/')->to( 'profile#update' );
+    $self->createRoutes($sessionBridge, "profile", [ "load", "update" ]);
+    $sessionBridge->route('/profile/image/:id')->to('profile#image', id => "00000000-0000-0000-0000-000000000000");
 
     # Chains route
-    $sessionBridge->route('/chains/create/')->to( 'chains#create' );
-    $sessionBridge->route('/chains/read/')->to( 'chains#read' );
-    $sessionBridge->route('/chains/update/')->to( 'chains#update' );
-    $sessionBridge->route('/chains/delete/')->to( 'chains#delete' );
-    $sessionBridge->route('/chains/combo/')->to( 'chains#combo' );
+    $self->createRoutes($sessionBridge, "chains", [ "create", "read", "update", "delete", "combo" ]);
 
     # Stages route
-    $sessionBridge->route('/stages/create/')->to( 'stages#create' );
-    $sessionBridge->route('/stages/read/')->to( 'stages#read' );
-    $sessionBridge->route('/stages/update/')->to( 'stages#update' );
-    $sessionBridge->route('/stages/delete/')->to( 'stages#delete' );
-    $sessionBridge->route('/stages/list/')->to( 'stages#list' );
+    $self->createRoutes($sessionBridge, "stages", [ "create", "read", "update", "delete", "list" ]);
+
 
     # State route
-    $sessionBridge->route('/state/')->to('state#index');
+    $self->createRoutes($sessionBridge, "state", [ "index", "read", "update" ]);
+
+    # Workspace routess
+    $self->createRoutes($sessionBridge, "workspace", [ "index", "menu", "state", "online", "appsession" ]);
 
     # Main route
-    $sessionBridge->route('/')->to('index#index');
+    $sessionBridge->route('/')->to('workspace#index');
 
     return $self;
 }
+
+sub createRoutes {
+    my $c = shift;
+    my $bridge = shift;
+    my $prefix = shift;
+    my $routes = shift;
+
+    foreach my $route (@$routes) {
+        my $cprefix = "/$prefix/$route/";
+        if ($route eq "index") {
+            $cprefix = "/$prefix/";
+        }
+
+        my $croute  = $prefix;
+        $croute =~ s/\//-/g;
+        $croute = "$croute#$route";
+        $bridge->route($cprefix)->to( $croute );
+    }
+
+    return 1;
+}
+
+
 
 1;

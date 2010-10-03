@@ -61,7 +61,6 @@ Inprint.catalog.organization.Interaction = function(panels) {
     }, tree);
 
     tree.on("beforenodedrop", function (e) {
-
         if(Ext.isArray(e.data.selections)) {
             var node = this.cmpCurrentNode();
             e.cancel = false;
@@ -80,6 +79,7 @@ Inprint.catalog.organization.Interaction = function(panels) {
 
     if (acl_manage) {
         grid.btnAdd.enable();
+        grid.btnAddToGroup.enable();
     }
 
     grid.getStore().on("load", function(store) {
@@ -88,23 +88,18 @@ Inprint.catalog.organization.Interaction = function(panels) {
 
     grid.getSelectionModel().on("selectionchange", function(sm) {
 
-        if (sm.getCount()) {
-            if (acl_manage) _enable(grid.btnEnable, grid.btnDisable);
-            if (acl_remove) _enable(grid.btnRemove);
-        } else {
-            _disable(grid.btnEnable, grid.btnDisable, grid.btnRemove);
-        }
+        var count = sm.getCount();
 
-        if (acl_manage) {
-            if (sm.getCount() == 1) {
-                _enable(profile, edit, access);
-                if (tabs.getActiveTab().cmpFill)
-                    tabs.getActiveTab().cmpFill();
-            } else {
-                _disable(profile, edit, access);
+        _disable( grid.btnDelete, grid.btnDeleteFromGroup );
+        _disable( grid.btnViewProfile, grid.btnUpdateProfile, grid.btnManageRules);
+
+        if (count > 0) {
+            _enable( grid.btnDelete, grid.btnDeleteFromGroup );
+            if (count == 1) {
+                _enable( grid.btnViewProfile, grid.btnUpdateProfile, grid.btnManageRules);
             }
         }
-
+        
     });
 
     // Card

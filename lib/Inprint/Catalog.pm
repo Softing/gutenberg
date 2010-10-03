@@ -17,7 +17,7 @@ sub tree {
     my $node = $c->param("node") || "00000000-0000-0000-0000-000000000000";
 
     my $data = $c->sql->Q("
-        SELECT *, ( SELECT count(*) FROM catalog c2 WHERE c2.path ~ (replace(?, '-', '')::text || '.*{1}')::lquery ) as have_childs
+        SELECT *, ( SELECT count(*) FROM catalog c2 WHERE c2.path ~ ('*.' || replace(?, '-', '')::text || '.*{2}')::lquery ) as have_childs
         FROM catalog
         WHERE
             id <> '00000000-0000-0000-0000-000000000000'

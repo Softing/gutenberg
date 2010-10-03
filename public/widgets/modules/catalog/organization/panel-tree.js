@@ -5,29 +5,30 @@ Inprint.catalog.organization.Tree = Ext.extend(Ext.tree.TreePanel, {
         this.components = {};
 
         this.urls = {
-            tree:    _url("/catalog/tree/"),
-            create:  _url("/catalog/create/"),
-            read:    _url("/catalog/read/"),
-            update:  _url("/catalog/update/"),
-            delete:  _url("/catalog/delete/")
+            tree:    _url("/catalog/organization/tree/"),
+            create:  _url("/catalog/organization/create/"),
+            read:    _url("/catalog/organization/read/"),
+            update:  _url("/catalog/organization/update/"),
+            delete:  _url("/catalog/organization/delete/")
         };
 
         Ext.apply(this, {
             autoScroll:true,
             dataUrl: this.urls.tree,
             border:false,
+            rootVisible: false,
 
             // DD
             enableDD:true,
             ddGroup:'member2catalog',
 
             root: {
-                id:'00000000-0000-0000-0000-000000000000',
+                id:'root-node',
                 nodeType: 'async',
                 expanded: true,
                 draggable: false,
-                icon: _ico("newspapers"),
-                text: _("Publishing House")
+                icon: _ico("node"),
+                text: _("Root node")
             }
         });
 
@@ -61,8 +62,10 @@ Inprint.catalog.organization.Tree = Ext.extend(Ext.tree.TreePanel, {
             this.body.unmask();
         });
 
+        this.getRootNode().expand();
         this.getRootNode().on("expand", function(node) {
-            node.select();
+            node.firstChild.expand();
+            node.firstChild.select();
         });
 
     },

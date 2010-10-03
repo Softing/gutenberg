@@ -21,13 +21,12 @@ sub image {
 
     my $path = $c->config->get("store.path");
 
-    $c->tx->res->headers->content_type('image/png');
-
-    unless (-r "$path/profiles/$id/profile.png") {
-        $id = '00000000-0000-0000-0000-000000000000';
+    if ( -r "$path/profiles/$id/profile.png") {
+        $c->tx->res->headers->content_type('image/png');
+        $c->res->content->asset(Mojo::Asset::File->new(path => "$path/profiles/$id/profile.png"));
     }
-    
-    $c->res->content->asset(Mojo::Asset::File->new(path => "$path/profiles/$id/profile.png"));
+
+    $c->render_json({});
 }
 
 sub load {

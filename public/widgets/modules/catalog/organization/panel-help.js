@@ -18,7 +18,7 @@ Inprint.catalog.organization.HelpPanel = Ext.extend(Ext.Panel, {
 
         this.load({
             method: 'get',
-            url: "/help/" + this.oid + "/",
+            url: "/help/" + this.oid + "/index.html",
             text: _("Loading...")
         });
 

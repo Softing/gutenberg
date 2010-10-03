@@ -1,37 +1,38 @@
-Inprint.catalog.releases.Tree = Ext.extend(Ext.tree.TreePanel, {
+Inprint.catalog.editions.Tree = Ext.extend(Ext.tree.TreePanel, {
 
     initComponent: function() {
 
         this.components = {};
 
         this.urls = {
-            tree:    _url("/catalog/releases/tree/"),
-            create:  _url("/catalog/releases/create/"),
-            read:    _url("/catalog/releases/read/"),
-            update:  _url("/catalog/releases/update/"),
-            delete:  _url("/catalog/releases/delete/")
+            tree:    _url("/catalog/editions/tree/"),
+            create:  _url("/catalog/editions/create/"),
+            read:    _url("/catalog/editions/read/"),
+            update:  _url("/catalog/editions/update/"),
+            delete:  _url("/catalog/editions/delete/")
         };
 
         Ext.apply(this, {
             autoScroll:true,
             dataUrl: this.urls.tree,
             border:false,
+            rootVisible: false,
 
             // DD
             enableDD:true,
             ddGroup:'member2catalog',
 
             root: {
-                id:'00000000-0000-0000-0000-000000000000',
+                id:'root-node',
                 nodeType: 'async',
                 expanded: true,
                 draggable: false,
-                icon: _ico("newspapers"),
-                text: _("Publishing House")
+                icon: _ico("node"),
+                text: _("Root node")
             }
         });
 
-        Inprint.catalog.releases.Tree.superclass.initComponent.apply(this, arguments);
+        Inprint.catalog.editions.Tree.superclass.initComponent.apply(this, arguments);
 
         this.on("beforeappend", function(tree, parent, node) {
 
@@ -51,7 +52,7 @@ Inprint.catalog.releases.Tree = Ext.extend(Ext.tree.TreePanel, {
 
     onRender: function() {
 
-        Inprint.catalog.releases.Tree.superclass.onRender.apply(this, arguments);
+        Inprint.catalog.editions.Tree.superclass.onRender.apply(this, arguments);
 
         this.on("beforeload", function() {
             this.body.mask(_("Please wait..."));
@@ -61,15 +62,17 @@ Inprint.catalog.releases.Tree = Ext.extend(Ext.tree.TreePanel, {
             this.body.unmask();
         });
 
+        this.getRootNode().expand();
         this.getRootNode().on("expand", function(node) {
-            node.select();
+            node.firstChild.expand();
+            node.firstChild.select();
         });
 
     },
 
     cmpCreate: function() {
 
-        var win = this.components["add-window"];
+        var win = this.components["create-window"];
         if (!win) {
 
             var form = new Ext.FormPanel({
@@ -90,7 +93,7 @@ Inprint.catalog.releases.Tree = Ext.extend(Ext.tree.TreePanel, {
                     _FLD_TITLE,
                     _FLD_SHORTCUT,
                     _FLD_DESCRIPTION,
-                    Inprint.factory.Combo.create("/catalog/combos/groups/", {
+                    Inprint.factory.Combo.create("/catalog/combos/editions/", {
                         scope:this,
                         listeners: {
                             select: function(combo, record, indx) {
@@ -115,13 +118,15 @@ Inprint.catalog.releases.Tree = Ext.extend(Ext.tree.TreePanel, {
                 if (action.type == "submit")
                     win.hide();
             });
+
+            this.components["create-window"] = win;
         }
 
         var form = win.items.first().getForm();
         form.reset();
 
         win.show(this);
-        this.components["add-window"] = win;
+
     },
 
     cmpUpdate: function() {
@@ -146,7 +151,7 @@ Inprint.catalog.releases.Tree = Ext.extend(Ext.tree.TreePanel, {
                     _FLD_TITLE,
                     _FLD_SHORTCUT,
                     _FLD_DESCRIPTION,
-                    Inprint.factory.Combo.create("/catalog/combos/groups/", {
+                    Inprint.factory.Combo.create("/catalog/combos/editions/", {
                         scope:this,
                         listeners: {
                             select: function(combo, record, indx) {

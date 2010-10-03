@@ -71,6 +71,35 @@ _FLD_DESCRIPTION = {
     fieldLabel: _("Description")
 };
 
+_FLD_COLOR = {
+    xtype: "colorpickerfield",
+    fieldLabel: _("Color"),
+    editable:false,
+    name: "color",
+    value: "000000"
+};
+
+_FLD_PERCENT = {
+    xtype: 'spinnerfield',
+    fieldLabel: _("Percent"),
+    name: 'percent',
+    minValue: 0,
+    maxValue: 100,
+    incrementValue: 5,
+    accelerate: true
+};
+
+_FLD_WEIGHT = {
+    xtype: 'spinnerfield',
+    fieldLabel: _("Weight"),
+    name: 'weight',
+    minValue: 0,
+    maxValue: 100,
+    incrementValue: 5,
+    accelerate: true
+};
+
+
 /* Buttons */
 
 var _BTN_ADD = {

@@ -43,7 +43,8 @@ Inprint.factory.Store = new function() {
 
         // System
 
-        // Settings
+        // Catalog
+        "/catalog/statuses/list/":  [ "id", "color", "percent", "title", "shortcut", "description" ],
 
         "/principals/list/":        [ "id", "title", "shortcut", "description", "type" ],
         "/members/list/":           [ "id", "login", "password", "position", "email", "title", "shortcut", createDateField("created"), createDateField("updated") ],
@@ -63,8 +64,9 @@ Inprint.factory.Store = new function() {
     var combos = new Array(
 
         "/catalog/combos/groups/",
+        "/catalog/combos/editions/",
         "/catalog/combos/roles/",
-
+        "/catalog/combos/statuses/",
 
         "/documents/combos/groups",
         "/documents/combos/fascicles",

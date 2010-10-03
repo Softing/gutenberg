@@ -22,7 +22,7 @@ sub index {
     }
 
     if ($i_cmd eq 'save') {
-        $result = $c->save();
+        $result = $c->update();
     }
 
     $c->render_json( $result );
@@ -44,7 +44,7 @@ sub read {
     return $result;
 }
 
-sub save {
+sub update {
     my $c = shift;
 
     my $sid = $c->session("sid");

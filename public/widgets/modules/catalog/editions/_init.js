@@ -1,1 +1,1 @@
-Ext.namespace("Inprint.catalog.releases");
+Ext.namespace("Inprint.catalog.editions");
