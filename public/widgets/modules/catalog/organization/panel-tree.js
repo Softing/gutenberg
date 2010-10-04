@@ -5,11 +5,11 @@ Inprint.catalog.organization.Tree = Ext.extend(Ext.tree.TreePanel, {
         this.components = {};
 
         this.urls = {
-            tree:    _url("/catalog/organization/tree/"),
-            create:  _url("/catalog/organization/create/"),
-            read:    _url("/catalog/organization/read/"),
-            update:  _url("/catalog/organization/update/"),
-            delete:  _url("/catalog/organization/delete/")
+            "tree":    _url("/catalog/organization/tree/"),
+            "create":  _url("/catalog/organization/create/"),
+            "read":    _url("/catalog/organization/read/"),
+            "update":  _url("/catalog/organization/update/"),
+            "delete":  _url("/catalog/organization/delete/")
         };
 
         Ext.apply(this, {
@@ -231,7 +231,7 @@ Inprint.catalog.organization.Tree = Ext.extend(Ext.tree.TreePanel, {
             function(btn) {
                 if (btn == "yes") {
                     Ext.Ajax.request({
-                        url: this.urls.delete,
+                        url: this.urls["delete"],
                         scope:this,
                         success: function() {
                             node.parentNode.reload();

@@ -5,11 +5,11 @@ Inprint.catalog.editions.Tree = Ext.extend(Ext.tree.TreePanel, {
         this.components = {};
 
         this.urls = {
-            tree:    _url("/catalog/editions/tree/"),
-            create:  _url("/catalog/editions/create/"),
-            read:    _url("/catalog/editions/read/"),
-            update:  _url("/catalog/editions/update/"),
-            delete:  _url("/catalog/editions/delete/")
+            "tree":    _url("/catalog/editions/tree/"),
+            "create":  _url("/catalog/editions/create/"),
+            "read":    _url("/catalog/editions/read/"),
+            "update":  _url("/catalog/editions/update/"),
+            "delete":  _url("/catalog/editions/delete/")
         };
 
         Ext.apply(this, {
@@ -223,7 +223,7 @@ Inprint.catalog.editions.Tree = Ext.extend(Ext.tree.TreePanel, {
             function(btn) {
                 if (btn == "yes") {
                     Ext.Ajax.request({
-                        url: this.urls.delete,
+                        url: this.urls["delete"],
                         scope:this,
                         success: this.cmpReload,
                         params: { id: this.getSelectionModel().getSelectedNode().attributes.id }
