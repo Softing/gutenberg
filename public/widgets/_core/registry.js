@@ -48,7 +48,12 @@ Inprint.Registry = function() {
             icon: "plus-button",
             text:  _("Create document"),
             menutext:  _("Create"),
-            xobject: Inprint.documents.create.Panel
+            //xobject: Inprint.documents.create.Panel
+            handler: function() {
+                new Inprint.cmp.AddDocumentWindow({
+                    closeAction: "close"
+                }).show();
+            }
         },
         "documents-todo": {
             icon: "document-share",

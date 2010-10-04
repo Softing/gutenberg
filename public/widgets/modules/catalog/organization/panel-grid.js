@@ -66,7 +66,7 @@ Inprint.catalog.organization.Grid = Ext.extend(Ext.grid.GridPanel, {
                             disabled:true,
                             ref: "../../btnAdd",
                             scope:this,
-                            handler: this.cmpAdd
+                            handler: this.cmpAddToOrganization
                         },
                         {
                             icon: _ico("user--minus"),
@@ -75,7 +75,7 @@ Inprint.catalog.organization.Grid = Ext.extend(Ext.grid.GridPanel, {
                             disabled:true,
                             ref: "../../btnDelete",
                             scope:this,
-                            handler: this.cmpDelete
+                            handler: this.cmpDeleteFromOrganization
                         }
                     ]
                 },
@@ -89,18 +89,14 @@ Inprint.catalog.organization.Grid = Ext.extend(Ext.grid.GridPanel, {
                             cls: "x-btn-text-icon",
                             text: _("Add"),
                             disabled:true,
-                            ref: "../../btnAddToGroup",
-                            scope:this,
-                            handler: this.cmpAddToGroup
+                            ref: "../../btnAddToGroup"
                         },
                         {
                             icon: _ico("plug-disconnect"),
                             cls: "x-btn-text-icon",
                             text: _("Remove"),
                             disabled:true,
-                            ref: "../../btnDeleteFromGroup",
-                            scope:this,
-                            handler: this.cmpDeleteFromGroup
+                            ref: "../../btnDeleteFromGroup"
                         }
                     ]
                 },
@@ -114,27 +110,33 @@ Inprint.catalog.organization.Grid = Ext.extend(Ext.grid.GridPanel, {
                             cls: "x-btn-text-icon",
                             text: _("Profile viewing"),
                             disabled:true,
-                            ref: "../../btnViewProfile",
-                            scope:this,
-                            handler: this.cmpViewProfile
+                            ref: "../../btnViewProfile"
                         },
                         {
                             icon: _ico("card--pencil"),
                             cls: "x-bt  n-text-icon",
                             text: _("Profile editing"),
                             disabled:true,
-                            ref: "../../btnUpdateProfile",
-                            scope:this,
-                            handler: this.cmpUpdateProfile
+                            ref: "../../btnUpdateProfile"
                         },
                         {
                             icon: _ico("key-solid"),
                             cls: "x-bt  n-text-icon",
                             text: _("The rights"),
                             disabled:true,
-                            ref: "../../btnManageRules",
-                            scope:this,
-                            handler: this.cmpManageRules
+                            ref: "../../btnManageRules"
+                        }
+                    ]
+                },
+                {
+                    xtype: 'buttongroup',
+                    title: _("Filter"),
+                    defaults: { scale: 'small' },
+                    items: [
+                        {
+                            xtype:"searchfield",
+                            width:200,
+                            store: this.store
                         }
                     ]
                 }
@@ -149,9 +151,11 @@ Inprint.catalog.organization.Grid = Ext.extend(Ext.grid.GridPanel, {
         Inprint.catalog.organization.Grid.superclass.onRender.apply(this, arguments);
     },
 
-    cmpAdd: function() {
+    // Organization
 
-        var win = this.components["add-window"];
+    cmpAddToOrganization: function() {
+
+        var win = this.components["add-to-organization-window"];
         if (!win) {
 
             win = new Ext.Window({
@@ -196,8 +200,8 @@ Inprint.catalog.organization.Grid = Ext.extend(Ext.grid.GridPanel, {
                             defaultType: "textfield",
                             items :[
                                 {
-                                    fieldLabel: _("Name"),
-                                    name: "name"
+                                    fieldLabel: _("Title"),
+                                    name: "title"
                                 },
                                 {
                                     fieldLabel: _("Shortcut"),
@@ -242,21 +246,25 @@ Inprint.catalog.organization.Grid = Ext.extend(Ext.grid.GridPanel, {
         form.reset();
 
         win.show(this);
-        this.components["add-window"] = win;
+        this.components["add-to-organization-window"] = win;
     },
 
-    cmpRemove: function() {
 
-        Ext.MessageBox.confirm(_("Edition removal"), _("You really wish to do this?"), function(btn) {
-            if (btn == "yes") {
-                Ext.Ajax.request({
-                    url: this.urls.remove,
-                    scope:this,
-                    success: this.cmpReload,
-                    params: { id: this.getValues("id") }
-                });
-            }
-        }, this).setIcon(Ext.MessageBox.WARNING);
+    cmpDeleteFromOrganization: function() {
+
+        Ext.MessageBox.confirm(
+            _("Account removal"),
+            _("You really want to remove the selected accounts?"),
+            function(btn) {
+                if (btn == "yes") {
+                    Ext.Ajax.request({
+                        url: this.urls.remove,
+                        scope:this,
+                        success: this.cmpReload,
+                        params: { id: this.getValues("id") }
+                    });
+                }
+            }, this).setIcon(Ext.MessageBox.WARNING);
     }
 
 });

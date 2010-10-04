@@ -1,0 +1,1 @@
+./start.pl daemon --reload

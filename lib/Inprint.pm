@@ -93,8 +93,9 @@ sub startup {
     # Catalog routes
     $self->createRoutes($sessionBridge, "catalog/combos",       [ "groups", "editions", "roles", "statuses" ]);
     $self->createRoutes($sessionBridge, "catalog/editions",     [ "create", "read", "update", "delete", "tree" ]);
-    $self->createRoutes($sessionBridge, "catalog/organization", [ "create", "read", "update", "delete", "tree" ]);
+    $self->createRoutes($sessionBridge, "catalog/organization", [ "create", "read", "update", "delete", "tree", "map", "unmap" ]);
     $self->createRoutes($sessionBridge, "catalog/statuses",     [ "create", "read", "update", "delete", "list" ]);
+
 
     # Rules routes
     $self->createRoutes($sessionBridge, "rules", [ "list" ]);
@@ -109,7 +110,7 @@ sub startup {
     $self->createRoutes($sessionBridge, "members", [ "list", "combo", "create", "delete", "map", "mapping" ]);
 
     # Profile routes
-    $self->createRoutes($sessionBridge, "profile", [ "load", "update" ]);
+    $self->createRoutes($sessionBridge, "profile", [ "read", "update" ]);
     $sessionBridge->route('/profile/image/:id')->to('profile#image', id => "00000000-0000-0000-0000-000000000000");
 
     # Chains route

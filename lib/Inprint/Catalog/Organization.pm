@@ -160,6 +160,47 @@ sub update {
     $c->render_json( $result );
 }
 
+sub map {
+    my $c = shift;
+
+    my @i_members = $c->param("members");
+    my $i_group   = $c->param("group") || undef;
+
+    my $result = {
+        success => $c->json->false
+    };
+
+    push @{ $result->{errors} }, { id => "group", msg => "" } unless $i_group;
+
+    foreach my $member (@i_members) {
+        $c->sql->Do(" DELETE FROM map_member_to_catalog WHERE id=? AND catalog=? ", [ $member, $i_group ]);
+        $c->sql->Do(" INSERT INTO map_member_to_catalog( member, catalog) VALUES (?, ?) ", [ $member, $i_group ]);
+        $result->{success} = $c->json->true;
+    }
+
+    $c->render_json( $result );
+}
+
+sub unmap {
+    my $c = shift;
+
+    my @i_members = $c->param("members");
+    my $i_group   = $c->param("group") || undef;
+
+    my $result = {
+        success => $c->json->false
+    };
+
+    push @{ $result->{errors} }, { id => "group", msg => "" } unless $i_group;
+
+    foreach my $member (@i_members) {
+        $c->sql->Do(" DELETE FROM map_member_to_catalog WHERE member=? AND catalog=? ", [ $member, $i_group ]);
+        $result->{success} = $c->json->true;
+    }
+
+    $c->render_json( $result );
+}
+
 sub delete {
     my $c = shift;
 

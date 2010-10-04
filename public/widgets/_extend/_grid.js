@@ -25,7 +25,6 @@ Ext.grid.GridPanel.prototype.cmpClear = function() {
 }
 
 Ext.grid.GridPanel.prototype.cmpLoad = function(params, clear) {
-    
     if (clear) {
         this.cacheParams = params;
         this.getStore().reload({ params: this.cacheParams });
@@ -33,13 +32,6 @@ Ext.grid.GridPanel.prototype.cmpLoad = function(params, clear) {
         Ext.apply (this.cacheParams, params);
         this.getStore().reload({ params: this.cacheParams });
     }
-    
-    //if (params) {
-    //    this.params = params;
-    //    this.getStore().reload({ params: params });
-    //} else {
-    //    this.getStore().reload({ params: this.params});
-    //}
 }
 
 Ext.grid.GridPanel.prototype.cmpReload = function() {

@@ -15,8 +15,8 @@ Inprint.catalog.roles.HelpPanel = Ext.extend(Ext.Panel, {
 
         this.load({
             method: "get",
-            url: "/help/" + this.oid + "/",
-            text: _("Loading...")
+            url: "/help/" + this.oid + "/index.html",
+            text: _("Loading") + "...'"
         });
 
     }

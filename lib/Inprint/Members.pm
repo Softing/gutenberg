@@ -14,30 +14,36 @@ sub list {
 
     my $c = shift;
 
-    my $node = $c->param("node") || "";
-
+    my @params;
     my $result = [];
 
-    if ($node eq 'root-node') {
-        $node = '00000000-0000-0000-0000-000000000000';
+    my $i_filter = $c->param("filter") || undef;
+    my $i_node = $c->param("node") || undef;
+
+    if ($i_node eq 'root-node') {
+        $i_node = '00000000-0000-0000-0000-000000000000';
     }
 
-    $result = $c->sql->Q("
+    my $sql = "
         SELECT distinct t1.id, t1.login, t2.title, t2.shortcut, t2.position
         FROM members t1 LEFT JOIN profiles t2 ON t1.id = t2.id,
             map_member_to_catalog m1
         WHERE m1.member = t1.id AND m1.catalog in (
             SELECT id FROM catalog WHERE path ~ ('*.' || replace(?, '-', '')::text || '.*')::lquery
-        ) ORDER BY t2.shortcut
-    ", [ $node ])->Hashes;
+        )
+    ";
+    push @params, $i_node;
 
-    $c->render_json( { data => $result } );
-}
-
-sub combo {
-    my $c = shift;
-    my $result = $c->sql->Q(
-        " SELECT id, name, shortcut, description FROM catalog  ")->Hashes;
+    if ( $i_filter ) {
+        $sql .= " AND (login LIKE ? OR title LIKE ? OR shortcut LIKE ?) ";
+        push @params, "%$i_filter%";
+        push @params, "%$i_filter%";
+        push @params, "%$i_filter%";
+    }
+     
+    if ($i_node) {
+        $result = $c->sql->Q(" $sql ORDER BY t2.shortcut ", \@params)->Hashes;
+    }
 
     $c->render_json( { data => $result } );
 }
@@ -46,8 +52,8 @@ sub create {
 
     my $c = shift;
 
-    my $i_login	   = $c->param("login");
-    my $i_name	   = $c->param("name");
+    my $i_login    = $c->param("login");
+    my $i_title     = $c->param("title");
     my $i_password = $c->param("password");
     my $i_position = $c->param("position");
     my $i_shortcut = $c->param("shortcut");
@@ -61,8 +67,8 @@ sub create {
     push @{ $result->{errors} }, { id => "login", msg => "" }
         unless $i_login;
 
-    push @{ $result->{errors} }, { id => "name", msg => "" }
-        unless $i_name;
+    push @{ $result->{errors} }, { id => "title", msg => "" }
+        unless $i_title;
 
     push @{ $result->{errors} }, { id => "password", msg => "" }
         unless $i_password;
@@ -100,9 +106,9 @@ sub create {
 
 
         $c->sql->Do("
-            INSERT INTO profiles (id, name, shortcut, position)
+            INSERT INTO profiles (id, title, shortcut, position)
                 VALUES (?,?,?,?)
-            ", [ $id, $i_name, $i_shortcut, $i_position ]);
+            ", [ $id, $i_title, $i_shortcut, $i_position ]);
 
     }
     $c->render_json( $result );
