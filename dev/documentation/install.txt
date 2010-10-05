@@ -1,0 +1,6 @@
+Perl modules:
+
+DBD::Pg
+Config::INIPlus
+Data::UUID
+Devel::SimpleTrace
