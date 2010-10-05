@@ -13,63 +13,57 @@ use base 'Inprint::BaseController';
 sub list {
 
     my $c = shift;
-    
+
     my $edition     = $c->param("edition") || undef;
     my $showArchive = $c->param("showArchive") || "false";
-    
+
     my @params;
-    
+
     my $sql1 = "
         SELECT
-            t1.id, t1.issystem, t1.catalog, t2.shortcut as catalog_shortcut,
+            t1.id, t1.issystem, t1.edition, t2.shortcut as edition_shortcut,
             t1.title, t1.shortcut, t1.description,
             to_char(t1.begindate, 'YYYY-MM-DD HH24:MI:SS') as begindate,
             to_char(t1.enddate, 'YYYY-MM-DD HH24:MI:SS') as enddate,
             t1.enabled, t1.created, t1.updated,
             EXTRACT( DAY FROM t1.enddate-t1.begindate) as totaldays,
             EXTRACT( DAY FROM now()-t1.begindate) as passeddays
-        FROM fascicles t1, catalog t2
+        FROM fascicles t1, editions t2
         WHERE
-            t1.issystem = false AND t1.catalog = t2.id AND t1.enabled = true
+            t1.issystem = false AND t1.edition = t2.id AND t1.enabled = true
     ";
-    
+
     my $sql2 = "
         SELECT
-            t1.id, t1.issystem, t1.catalog, t2.shortcut as catalog_shortcut,
+            t1.id, t1.issystem, t1.edition, t2.shortcut as edition_shortcut,
             t1.title, t1.shortcut, t1.description,
             to_char(t1.begindate, 'YYYY-MM-DD HH24:MI:SS') as begindate,
             to_char(t1.enddate, 'YYYY-MM-DD HH24:MI:SS') as enddate,
             t1.enabled, t1.created, t1.updated,
             EXTRACT( DAY FROM t1.enddate-t1.begindate) as totaldays,
             EXTRACT( DAY FROM now()-t1.begindate) as passeddays
-        FROM fascicles t1, catalog t2
+        FROM fascicles t1, editions t2
         WHERE
-            t1.issystem = false AND t1.catalog = t2.id AND t1.enabled = false
+            t1.issystem = false AND t1.edition = t2.id AND t1.enabled = false
     ";
-    
-    if ($edition) {
-        $sql1 .= " AND catalog =? ";
+
+    if ($edition && $edition ne "00000000-0000-0000-0000-000000000000") {
+        $sql1 .= " AND edition=? ";
         push @params, $edition;
     }
-    
+
     if ($showArchive eq 'true') {
         if ($edition) {
-            $sql2 .= " AND catalog =? ";
+            $sql2 .= " AND edition=? ";
             push @params, $edition;
         }
         $sql1 = " ($sql1) UNION ($sql2) ";
     }
-    
-    $sql1 .= " ORDER BY enabled desc, catalog_shortcut, begindate ";
+
+    $sql1 .= " ORDER BY enabled desc, edition_shortcut, begindate ";
 
     my $result = $c->sql->Q($sql1, \@params)->Hashes;
 
-    $c->render_json( { data => $result } );
-}
-
-sub combogroups {
-    my $c = shift;
-    my $result = $c->sql->Q(" SELECT DISTINCT t2.id, t2.name, t2.shortcut FROM fascicles t1, catalog t2 WHERE t1.catalog = t2.id ORDER BY t2.shortcut ")->Hashes;
     $c->render_json( { data => $result } );
 }
 
@@ -79,14 +73,14 @@ sub create {
     my $id = $c->uuid();
 
     my $i_name        = $c->param("name");
-    my $i_path        = $c->param("path");
+    my $i_edition     = $c->param("edition");
     my $i_shortcut    = $c->param("shortcut");
     my $i_description = $c->param("description");
 
     $c->sql->Do("
-        INSERT INTO roles(id, catalog, name, shortcut, description, created, updated)
+        INSERT INTO roles(id, edition, name, shortcut, description, created, updated)
         VALUES (?, ?, ?, ?, ?, now(), now());
-    ", [ $id, $i_path, $i_name, $i_shortcut, $i_description ]);
+    ", [ $id, $i_edition, $i_name, $i_shortcut, $i_description ]);
 
     $c->render_json( { success => $c->json->true} );
 }
@@ -99,9 +93,9 @@ sub read {
 
     my $result = $c->sql->Q("
         SELECT t1.id, t1.name, t1.shortcut, t1.description,
-            t2.id as catalog_id, t2.name as catalog_name, t2.shortcut as catalog_shortcut
-        FROM roles t1, catalog t2
-        WHERE t1.id =? AND t1.catalog = t2.id
+            t2.id as edition_id, t2.shortcut as edition_shortcut
+        FROM roles t1, editions t2
+        WHERE t1.id =? AND t1.edition = t2.id
         ORDER BY t2.shortcut, t1.shortcut
     ", [ $id ])->Hash;
 
@@ -114,15 +108,15 @@ sub update {
 
     my $i_id          = $c->param("id");
     my $i_name        = $c->param("name");
-    my $i_path        = $c->param("path");
+    my $i_edition     = $c->param("edition");
     my $i_shortcut    = $c->param("shortcut");
     my $i_description = $c->param("description");
 
     $c->sql->Do("
         UPDATE roles
-            SET catalog=?, name=?, shortcut=?, description=?, updated=now()
+            SET edition=?, name=?, shortcut=?, description=?, updated=now()
         WHERE id =?;
-    ", [ $i_path, $i_name, $i_shortcut, $i_description, $i_id ]);
+    ", [ $i_edition, $i_name, $i_shortcut, $i_description, $i_id ]);
 
     $c->render_json( { success => $c->json->true} );
 }

@@ -10,6 +10,17 @@ use warnings;
 
 use base 'Inprint::BaseController';
 
+sub editions {
+    my $c = shift;
+    my $result = $c->sql->Q("
+        SELECT t1.id, t1.shortcut as title, nlevel(path) as nlevel, description,
+            array_to_string( ARRAY( SELECT shortcut FROM editions WHERE path @> t1.path ORDER BY nlevel(path) ), '.') as title_path
+        FROM editions t1
+        ORDER BY title_path
+    ")->Hashes;
+    $c->render_json( { data => $result } );
+}
+
 sub groups {
     my $c = shift;
     my $result = $c->sql->Q("
@@ -21,16 +32,18 @@ sub groups {
     $c->render_json( { data => $result } );
 }
 
-sub editions {
+sub fascicles {
     my $c = shift;
     my $result = $c->sql->Q("
-        SELECT t1.id, t1.shortcut as title, nlevel(path) as nlevel, '' as description,
-            array_to_string( ARRAY( SELECT shortcut FROM editions WHERE path @> t1.path ORDER BY nlevel(path) ), '.') as title_path
-        FROM editions t1
-        ORDER BY title_path
+        SELECT t1.id, t2.shortcut || '/' || t1.shortcut as title, t1.shortcut, t1.description,
+            CASE WHEN enabled is true THEN  'rocket-fly' ELSE 'book' END as icon
+        FROM fascicles t1, editions t2
+        WHERE t2.id = t1.edition AND issystem = false
+        ORDER BY enabled DESC, t2.shortcut, t1.shortcut
     ")->Hashes;
     $c->render_json( { data => $result } );
 }
+
 
 sub roles {
     my $c = shift;

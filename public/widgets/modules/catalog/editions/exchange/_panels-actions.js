@@ -1,4 +1,4 @@
-Inprint.exchange.Actions = function(panels) {
+Inprint.catalog.exchange.Actions = function(panels) {
 
     var grid = panels.grid;
 
@@ -9,7 +9,7 @@ Inprint.exchange.Actions = function(panels) {
     grid.actions.createChain = function() {
         var win = components["create-chain-window"];
         if (!win) {
-            win = Inprint.exchange.CreateChainPanel();
+            win = Inprint.catalog.exchange.CreateChainPanel();
             components["create-chain-window"] = win;
         }
         win.items.first().getForm().reset();
@@ -19,7 +19,7 @@ Inprint.exchange.Actions = function(panels) {
     grid.actions.changeChain = function() {
         var win = components["change-chain-window"];
         if (!win) {
-            win = Inprint.exchange.ChangeChainPanel();
+            win = Inprint.catalog.exchange.ChangeChainPanel();
             components["change-chain-window"] = win;
         }
         win.show();
@@ -59,7 +59,7 @@ Inprint.exchange.Actions = function(panels) {
     grid.actions.createStage = function() {
         var win = components["create-stage-window"];
         if (!win) {
-            win = Inprint.exchange.CreateStagePanel();
+            win = Inprint.catalog.exchange.CreateStagePanel();
             components["create-stage-window"] = win;
         }
         var form = win.items.first().getForm();
@@ -71,7 +71,7 @@ Inprint.exchange.Actions = function(panels) {
     grid.actions.changeStage = function() {
         var win = components["change-stage-window"];
         if (!win) {
-            win = Inprint.exchange.ChangeStagePanel();
+            win = Inprint.catalog.exchange.ChangeStagePanel();
             components["change-stage-window"] = win;
         }
         win.show();

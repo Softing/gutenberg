@@ -1,4 +1,4 @@
-Inprint.exchange.CreateChainPanel = function () {
+Inprint.catalog.exchange.CreateChainPanel = function () {
 
     var url = _url("/chains/create/");
 

@@ -1,4 +1,4 @@
-Inprint.exchange.CreateStagePanel = function () {
+Inprint.catalog.exchange.CreateStagePanel = function () {
 
     var url = _url("/stages/create/");
 

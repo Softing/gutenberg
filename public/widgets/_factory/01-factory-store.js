@@ -20,7 +20,7 @@ Inprint.factory.Store = new function() {
     var source = {
 
         // Calendar
-        '/calendar/list/':          [ 'id', 'catalog', 'catalog_shortcut', 'enabled', 'title', 'shortcut', 'description', 'begindate', 'enddate', 'totaldays', 'passeddays' ],
+        '/calendar/list/':          [ 'id', 'edition', 'edition_shortcut', 'enabled', 'title', 'shortcut', 'description', 'begindate', 'enddate', 'totaldays', 'passeddays' ],
 
         // Documents
         '/documents/list/':         [
@@ -49,7 +49,7 @@ Inprint.factory.Store = new function() {
         "/principals/list/":        [ "id", "title", "shortcut", "description", "type" ],
         "/members/list/":           [ "id", "login", "password", "position", "email", "title", "shortcut", createDateField("created"), createDateField("updated") ],
         "/rules/list/":             [ "id", "rule",  "title", "shortcut", "groupby", "limit", "selection" ],
-        "/roles/list/":             [ "id", "title", "shortcut", "description", "catalog_id", "catalog_name", "catalog_shortcut" ],
+        "/roles/list/":             [ "id", "title", "shortcut", "description", "rules" ],
 
         /*???*/
         "/exchange/list/":          [ "id", "rule",  "title", "shortcut", "groupby", "limit", "selection" ],
@@ -65,6 +65,7 @@ Inprint.factory.Store = new function() {
 
         "/catalog/combos/groups/",
         "/catalog/combos/editions/",
+        "/catalog/combos/fascicles/",
         "/catalog/combos/roles/",
         "/catalog/combos/statuses/",
 

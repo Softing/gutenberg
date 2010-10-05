@@ -18,9 +18,6 @@ Inprint.catalog.statuses.Grid = Ext.extend(Ext.grid.GridPanel, {
             sm: this.selectionModel,
             autoExpandColumn: "description",
 
-            enableDragDrop: true,
-            ddGroup:'member2catalog',
-
             columns: [
                 this.selectionModel,
                 {
@@ -145,17 +142,19 @@ Inprint.catalog.statuses.Grid = Ext.extend(Ext.grid.GridPanel, {
     },
 
     cmpRemove: function() {
-
-        Ext.MessageBox.confirm(_("Edition removal"), _("You really wish to do this?"), function(btn) {
-            if (btn == "yes") {
-                Ext.Ajax.request({
-                    url: this.urls.remove,
-                    scope:this,
-                    success: this.cmpReload,
-                    params: { id: this.getValues("id") }
-                });
-            }
-        }, this).setIcon(Ext.MessageBox.WARNING);
+        Ext.MessageBox.confirm(
+            _("Warning"),
+            _("You really wish to do this?"),
+            function(btn) {
+                if (btn == "yes") {
+                    Ext.Ajax.request({
+                        url: this.urls.remove,
+                        scope:this,
+                        success: this.cmpReload,
+                        params: { id: this.getValues("id") }
+                    });
+                }
+            }, this).setIcon(Ext.MessageBox.WARNING);
     }
 
 });

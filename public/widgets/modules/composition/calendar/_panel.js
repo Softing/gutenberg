@@ -1,13 +1,13 @@
 Inprint.edition.calendar.Panel = Ext.extend(Ext.grid.GridPanel, {
-    
+
     initComponent: function() {
-        
+
         this.components = {};
-        
+
         this.access = {
             edit:true
         };
-        
+
         this.url = {
             'load':   '/calendar/list/',
             'create': '/calendar/create/',
@@ -15,12 +15,12 @@ Inprint.edition.calendar.Panel = Ext.extend(Ext.grid.GridPanel, {
             'update': '/calendar/update/',
             'delete': '/calendar/delete/'
         };
-        
+
         var sm = new Ext.grid.CheckboxSelectionModel();
         var store = Inprint.factory.Store.json("/calendar/list/", {
             autoLoad:true
         });
-        
+
         var cm = new Ext.grid.ColumnModel([
             sm,
             {
@@ -30,18 +30,18 @@ Inprint.edition.calendar.Panel = Ext.extend(Ext.grid.GridPanel, {
                     if (v == 1) {
                         return '<img src="'+ _ico("rocket-fly") +'"/>';
                     }
-                    return "";
+                    return '<img src="'+ _ico("book") +'"/>';
                 }
             },
             {
-                dataIndex: 'catalog_shortcut',
-                width: 60,
-                header: _("Каталог")
+                header: _("Edition"),
+                dataIndex: 'edition_shortcut',
+                width: 60
             },
             {
+                header: _("Title"),
                 dataIndex: 'title',
                 width: 240,
-                header: _("Название выпуска"),
                 renderer: function(v,p,r) {
                     var id    = r.data.id;
                     var title = r.data.title;
@@ -51,38 +51,38 @@ Inprint.edition.calendar.Panel = Ext.extend(Ext.grid.GridPanel, {
                 }
             },
             {
+                header: _("Opening date"),
                 dataIndex: 'begindate',
-                width: 140,
-                header: _("Был открыт")
+                width: 140
             },
             {
+                header: _("Closing date"),
                 dataIndex: 'enddate',
-                width: 140,
-                header: _("Будет закрыт")
+                width: 140
             },
-            
+
             {
+                header: _("Readiness"),
                 dataIndex: 'progress',
                 width: 200,
-                header: _("Готовность"),
                 renderer: function(v, p, record){
-                    
+
                     var totaldays  = record.data.totaldays;
                     var passeddays = record.data.passeddays;
-                    
+
                     var progress = Math.round((totaldays/100)*passeddays);
-                    
+
                     if (progress > 100) progress = 100;
-                    
+
                     p.css += ' x-grid3-progresscol';
-                    
+
                     var bg1 = 'red';
                     var bg2 = 'green';
-                    
+
                     if (record.data.enabled === 0){
                         bg2 = 'silver';
                     }
-                    
+
                     return String.format(
                         '<div class="x-progress-wrap">'+
                             '<div class="x-progress-inner">'+
@@ -93,14 +93,13 @@ Inprint.edition.calendar.Panel = Ext.extend(Ext.grid.GridPanel, {
                         0, progress, bg1, bg2);
                 }
             }
-            
+
         ]);
-        
+
         var tbar = [
             {
                 id: 'add',
                 text: _("Add"),
-                tooltip:'Добавление нового выпуска',
                 disabled: true,
                 icon: _ico("plus-button"),
                 cls: 'x-btn-text-icon',
@@ -110,7 +109,6 @@ Inprint.edition.calendar.Panel = Ext.extend(Ext.grid.GridPanel, {
             {
                 id: 'edit',
                 text: _("Edit"),
-                tooltip:'Редактирование выпуска',
                 disabled: true,
                 icon: _ico("pencil"),
                 cls: 'x-btn-text-icon',
@@ -120,7 +118,6 @@ Inprint.edition.calendar.Panel = Ext.extend(Ext.grid.GridPanel, {
             {
                 id: 'delete',
                 text: _("Delete"),
-                tooltip:'Удаление выпуска',
                 disabled: true,
                 icon: _ico("minus-button"),
                 cls: 'x-btn-text-icon',
@@ -131,7 +128,6 @@ Inprint.edition.calendar.Panel = Ext.extend(Ext.grid.GridPanel, {
             {
                 id: 'archvie',
                 text: _("Show archvies"),
-                tooltip:_("Показать архивные выпуски"),
                 icon: _ico("folder-zipper"),
                 cls: 'x-btn-text-icon',
                 enableToggle: true,
@@ -146,7 +142,6 @@ Inprint.edition.calendar.Panel = Ext.extend(Ext.grid.GridPanel, {
             {
                 id: 'enable',
                 text: _("Enable"),
-                tooltip:_("Сделать рабочим"),
                 disabled: true,
                 icon: _ico("switch--plus"),
                 cls: 'x-btn-text-icon'
@@ -154,13 +149,12 @@ Inprint.edition.calendar.Panel = Ext.extend(Ext.grid.GridPanel, {
             {
                 id: 'disable',
                 text: _("Disable"),
-                tooltip:_("Отправить в архив"),
                 disabled: true,
                 icon: _ico("switch--minus"),
                 cls: 'x-btn-text-icon'
             },
             '-',
-            Inprint.factory.Combo.create("calendar-groups", {
+            Inprint.factory.Combo.create("/catalog/combos/editions/", {
                 width: 150,
                 disableCaching: true,
                 listeners: {
@@ -173,7 +167,7 @@ Inprint.edition.calendar.Panel = Ext.extend(Ext.grid.GridPanel, {
                 }
             }),
         ];
-        
+
         Ext.apply(this, {
             loadMask: true,
             stripeRows: true,
@@ -183,55 +177,55 @@ Inprint.edition.calendar.Panel = Ext.extend(Ext.grid.GridPanel, {
             cm: cm,
             tbar: tbar
         });
-        
+
         Inprint.edition.calendar.Panel.superclass.initComponent.apply(this, arguments);
-        
+
         this.on("rowclick", function(grid, rowIndex, e) {
             if (this.getSelectionModel().getCount() == 0) {
                this.topToolbar.items.get('edit').disable();
                this.topToolbar.items.get('delete').disable();
             }
-            
+
             if (this.getSelectionModel().getCount() == 1 && this.access.edit) {
               this.topToolbar.items.get('edit').enable();
               this.topToolbar.items.get('delete').enable();
             }
-            
+
             if (this.getSelectionModel().getCount() > 1 && this.access.edit) {
               this.topToolbar.items.get('edit').disable();
               this.topToolbar.items.get('delete').enable();
             }
         }, this);
-        
+
     },
-    
+
     onRender: function() {
-        
+
         Inprint.edition.calendar.Panel.superclass.onRender.apply(this, arguments);
-        
+
         if (this.access.edit) {
             this.getTopToolbar().items.get('add').enable();
         }
-        
+
     },
-    
+
     cmpAdd: function() {
-        
+
         var win = this.components["add-window"];
         if (!win) {
-            
+
             win = new Ext.Window({
-                title: _("Добавление выпуска"),
+                title: _("Release addition"),
                 layout: "fit",
                 closeAction: "hide",
-                width:400, height:350,
+                width:400, height:250,
                 items: new Ext.FormPanel({
                     url: this.url.create,
 
                     frame:false,
                     border:false,
 
-                    labelWidth: 75,
+                    labelWidth: 120,
                     defaults: {
                         anchor: "100%"
                     },
@@ -245,7 +239,7 @@ Inprint.edition.calendar.Panel = Ext.extend(Ext.grid.GridPanel, {
                             format:'F j, Y',
                             submitFormat:'Y-m-d',
                             allowBlank:false,
-                            fieldLabel: _("Открытия"),
+                            fieldLabel: _("Opening date"),
                             listeners: {
                                 scope:this
                             }
@@ -256,7 +250,7 @@ Inprint.edition.calendar.Panel = Ext.extend(Ext.grid.GridPanel, {
                             format:'F j, Y',
                             submitFormat:'Y-m-d',
                             allowBlank:false,
-                            fieldLabel: _("Закрыть"),
+                            fieldLabel: _("Closing date"),
                             listeners: {
                                 scope:this,
                                 change: function(field, value, old)
@@ -269,26 +263,20 @@ Inprint.edition.calendar.Panel = Ext.extend(Ext.grid.GridPanel, {
                                 }
                             }
                         },
-                        {
-                            xtype: 'combo',
-                            fieldLabel: _("Копировать"),
-                            hiddenName: 'copyfrom',
-                            displayField: 'title',
-                            valueField: 'id',
-                            emptyText: _("it is not chosen"),
-                            editable: false,
-                            allowBlank:true,
-                            store: new Ext.data.Store({
-                                proxy: new Ext.data.HttpProxy({
-                                    url: '/common/combo/all-fascicles/'
-                                }),
-                                reader: new Ext.data.JsonReader({
-                                    id: 'id'
-                                }, [ 'id', 'title' ])
-                            })
-                        }
+
+                        Inprint.factory.Combo.create("/catalog/combos/editions/", {
+                            width: 150,
+                            disableCaching: true
+                        }),
+
+                        Inprint.factory.Combo.create("/catalog/combos/fascicles/", {
+                            width: 150,
+                            disableCaching: true,
+                            fieldLabel: _("Copy from"),
+                            hiddenName: 'copyfrom'
+                        })
                     ],
-                    
+
                     buttons: [ _BTN_ADD, _BTN_CANCEL ],
 
                     listeners: {
@@ -301,30 +289,30 @@ Inprint.edition.calendar.Panel = Ext.extend(Ext.grid.GridPanel, {
                 })
             });
         }
-        
+
         var form = win.items.first().getForm();
         form.reset();
 
         win.show(this);
         this.components["add-window"] = win;
     },
-    
+
     cmpEdit: function() {
         var win = this.components["edit-window"];
         if (!win) {
-            
+
             win = new Ext.Window({
-                title: _("Редактирование выпуска"),
+                title: _("Release change"),
                 layout: "fit",
                 closeAction: "hide",
-                width:400, height:350,
+                width:400, height:200,
                 items: new Ext.FormPanel({
                     url: this.url.create,
 
                     frame:false,
                     border:false,
 
-                    labelWidth: 75,
+                    labelWidth: 120,
                     defaults: {
                         anchor: "100%"
                     },
@@ -339,7 +327,7 @@ Inprint.edition.calendar.Panel = Ext.extend(Ext.grid.GridPanel, {
                             format:'F j, Y',
                             submitFormat:'Y-m-d',
                             allowBlank:false,
-                            fieldLabel: _("Открыть"),
+                            fieldLabel: _("Opening date"),
                             listeners: {
                                 scope:this
                             }
@@ -350,20 +338,10 @@ Inprint.edition.calendar.Panel = Ext.extend(Ext.grid.GridPanel, {
                             format:'F j, Y',
                             submitFormat:'Y-m-d',
                             allowBlank:false,
-                            fieldLabel: _("Закрыть"),
-                            listeners: {
-                                scope:this,
-                                change: function(field, value, old){
-                                    //var v = field.getValue();
-                                    //var f = field.ownerCt.getForm().findField('title');
-                                    //if (f.getValue().length === 0) {
-                                    //    f.setValue(v.dateFormat('F j, Y'));
-                                    //}
-                                }
-                            }
+                            fieldLabel: _("Closing date")
                         }
                     ],
-                    
+
                     buttons: [ _BTN_SAVE, _BTN_CANCEL ],
 
                     listeners: {
@@ -376,26 +354,26 @@ Inprint.edition.calendar.Panel = Ext.extend(Ext.grid.GridPanel, {
                 })
             });
         }
-        
+
         var form = win.items.first().getForm();
         form.reset();
 
         var record = this.getSelectionModel().getSelected();
-        
+
         form.findField('id').setValue(record.data.id);
         form.findField('name').setValue(record.data.title);
         form.findField('begindate').setValue( _fmtDate( record.data.begindate, 'F j, Y' ) );
         form.findField('enddate').setValue( _fmtDate( record.data.enddate, 'F j, Y' ) );
-        
+
         win.show(this);
         this.components["edit-window"] = win;
-        
+
     },
-    
+
     cmpEnable: function(btn) {
-            
+
             var data = this.getValues();
-            
+
             Ext.Ajax.request({
                 url: this.url.remove,
                 params: {
@@ -405,13 +383,13 @@ Inprint.edition.calendar.Panel = Ext.extend(Ext.grid.GridPanel, {
                 success: this.cmpReload,
                 failure: this.failure
             });
-        
+
     },
-    
+
     cmpDisable: function(btn) {
-        
+
         var data = this.getValues();
-        
+
         Ext.Ajax.request({
             url: this.url.remove,
             params: {
@@ -422,21 +400,21 @@ Inprint.edition.calendar.Panel = Ext.extend(Ext.grid.GridPanel, {
             failure: this.failure
         });
     },
-    
+
     cmpRemove: function(btn) {
-        
+
         if (btn != 'yes' && btn != 'no') {
             Ext.MessageBox.confirm(
-                _("Предупреждение"),
-                'Вы действительно хотите удалить эти выпуски?<br> <span style="color:red">Вся информация об их компоновке будет стерта!</span>',
+                _("Warning"),
+                _("You really want to do it?"),
                 this.cmpRemove, this);
             return;
         }
-        
+
         if (btn == 'yes') {
-            
+
             var data = this.getValues();
-            
+
             Ext.Ajax.request({
                 url: this.url.remove,
                 params: {
@@ -448,5 +426,5 @@ Inprint.edition.calendar.Panel = Ext.extend(Ext.grid.GridPanel, {
             });
         }
     }
-    
+
 });

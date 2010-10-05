@@ -1,4 +1,4 @@
-Inprint.exchange.ChangeChainPanel = function () {
+Inprint.catalog.exchange.ChangeChainPanel = function () {
 
     var url = _url("/chains/update/");
 

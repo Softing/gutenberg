@@ -24,34 +24,9 @@ Inprint.catalog.roles.EditPanel = Ext.extend(Ext.FormPanel, {
                     xtype:"hidden",
                     name:"id"
                 },
-                {
-                    xtype:"hidden",
-                    name:"path"
-                },
-                Inprint.factory.Combo.create("catalog", {
-                    listeners: {
-                        scope:this,
-                        select: function(combo, record) {
-                            this.getForm().findField("path").setValue(record.get("id"));
-                        }
-                    }
-                }),
-                {
-                    xtype: "textfield",
-                    name: "name",
-                    fieldLabel: _("Name")
-                },
-                {
-                    xtype: "textfield",
-                    name: "shortcut",
-                    fieldLabel: _("Shortcut")
-                },
-                {
-                    xtype: "textarea",
-                    name: "description",
-                    fieldLabel: _("Description"),
-                    allowBlank:true
-                }
+                _FLD_TITLE,
+                _FLD_SHORTCUT,
+                _FLD_DESCRIPTION
             ],
 
             tbar: [

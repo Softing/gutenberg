@@ -2,6 +2,7 @@ Inprint.catalog.roles.RestrictionsPanel = Ext.extend(Ext.grid.EditorGridPanel, {
 
     initComponent: function() {
 
+        this.uid;
         this.record;
 
         this.components = {};
@@ -27,11 +28,9 @@ Inprint.catalog.roles.RestrictionsPanel = Ext.extend(Ext.grid.EditorGridPanel, {
         });
 
         Ext.apply(this, {
-            title: _("Rules"),
             stripeRows: true,
             columnLines: true,
             clicksToEdit: 1,
-            disabled:true,
             columns: [
                 this.sm,
                 {
@@ -90,16 +89,6 @@ Inprint.catalog.roles.RestrictionsPanel = Ext.extend(Ext.grid.EditorGridPanel, {
                     handler: this.cmpSave
                 },
                 '->',
-                Inprint.factory.Combo.create("roles", {
-                    width: 150,
-                    disableCaching: true,
-                    listeners: {
-                        scope:this,
-                        select: function(combo, record) {
-                            this.cmpFill(record.get("id"));
-                        }
-                    }
-                }),
                 {
                     icon: _ico("arrow-circle-double"),
                     cls: "x-btn-icon",
@@ -129,6 +118,10 @@ Inprint.catalog.roles.RestrictionsPanel = Ext.extend(Ext.grid.EditorGridPanel, {
 
     },
 
+    cmpSetId: function(id) {
+        this.uid = id;
+    },
+
     cmpSave: function() {
 
         var data = [];
@@ -144,20 +137,14 @@ Inprint.catalog.roles.RestrictionsPanel = Ext.extend(Ext.grid.EditorGridPanel, {
             scope:this,
             success: this.cmpReload,
             params: {
-                id: this.cmpGetId(),
+                id: this.uid,
                 rules: data
             }
         });
 
     },
 
-    cmpFill: function(loadid) {
-
-        if (this.rendered == false)
-            return;
-
-        if (!loadid || typeof loadid != "string")
-            loadid = this.cmpGetId();
+    cmpFill: function(id) {
 
         this.getSelectionModel().clearSelections();
         this.getStore().rejectChanges();
@@ -168,7 +155,7 @@ Inprint.catalog.roles.RestrictionsPanel = Ext.extend(Ext.grid.EditorGridPanel, {
             url: this.urls.fill,
             scope:this,
             params: {
-                id: loadid
+                id: this.uid
             },
             callback: function() {
                 this.body.unmask();

@@ -9,7 +9,7 @@ Inprint.catalog.organization.Panel = Ext.extend(Ext.Panel, {
             title: _("Members")
         });
         this.panels.help = new Inprint.catalog.organization.HelpPanel();
-        
+
         Ext.apply(this, {
 
             layout: "border",
@@ -42,8 +42,8 @@ Inprint.catalog.organization.Panel = Ext.extend(Ext.Panel, {
                     width: 400,
                     minSize: 200,
                     maxSize: 600,
-                    collapseMode: 'mini',
                     layout:"fit",
+                    collapseMode: 'mini',
                     items: this.panels.help
                 }
             ]

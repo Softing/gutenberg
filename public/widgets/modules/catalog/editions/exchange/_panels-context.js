@@ -1,4 +1,4 @@
-Inprint.exchange.Context = function(panels) {
+Inprint.catalog.exchange.Context = function(panels) {
 
     var grid = panels.grid;
 

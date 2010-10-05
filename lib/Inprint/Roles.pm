@@ -15,21 +15,17 @@ sub list {
     my $c = shift;
 
     my $result = $c->sql->Q("
-        SELECT t1.id, t1.name, t1.shortcut, t1.description,
-            t2.id as catalog_id, t2.name as catalog_name, t2.shortcut as catalog_shortcut
-        FROM roles t1, catalog t2
-        WHERE t1.catalog = t2.id
-        ORDER BY t2.shortcut, t1.shortcut
+        SELECT id, title, shortcut, description,
+            array_to_string(
+                ARRAY(
+                    SELECT rules.shortcut
+                    FROM rules rules, map_role_to_rule mapping
+                    WHERE mapping.rule = rules.id AND mapping.role = roles.id
+                )
+            , ', ') as rules
+        FROM roles
+        ORDER BY shortcut
     ")->Hashes;
-
-    $c->render_json( { data => $result } );
-}
-
-sub combo {
-
-    my $c = shift;
-
-    my $result = $c->sql->Q(" SELECT id, name, shortcut, description FROM roles ")->Hashes;
 
     $c->render_json( { data => $result } );
 }
@@ -39,15 +35,14 @@ sub create {
 
     my $id = $c->uuid();
 
-    my $i_name        = $c->param("name");
-    my $i_path        = $c->param("path");
+    my $i_title       = $c->param("title");
     my $i_shortcut    = $c->param("shortcut");
     my $i_description = $c->param("description");
 
     $c->sql->Do("
-        INSERT INTO roles(id, catalog, name, shortcut, description, created, updated)
-        VALUES (?, ?, ?, ?, ?, now(), now());
-    ", [ $id, $i_path, $i_name, $i_shortcut, $i_description ]);
+        INSERT INTO roles(id, title, shortcut, description, created, updated)
+        VALUES (?, ?, ?, ?, now(), now());
+    ", [ $id, $i_title, $i_shortcut, $i_description ]);
 
     $c->render_json( { success => $c->json->true} );
 }
@@ -56,15 +51,13 @@ sub read {
 
     my $c = shift;
 
-    my $id = $c->param("id");
+    my $i_id = $c->param("id");
 
     my $result = $c->sql->Q("
-        SELECT t1.id, t1.name, t1.shortcut, t1.description,
-            t2.id as catalog_id, t2.name as catalog_name, t2.shortcut as catalog_shortcut
-        FROM roles t1, catalog t2
-        WHERE t1.id =? AND t1.catalog = t2.id
-        ORDER BY t2.shortcut, t1.shortcut
-    ", [ $id ])->Hash;
+        SELECT id, title, shortcut, description,
+        FROM roles
+        WHERE t1.id =?
+    ", [ $i_id ])->Hash;
 
     $c->render_json( { success => $c->json->true, data => $result } );
 }
@@ -74,16 +67,15 @@ sub update {
     my $c = shift;
 
     my $i_id          = $c->param("id");
-    my $i_name        = $c->param("name");
-    my $i_path        = $c->param("path");
+    my $i_title       = $c->param("title");
     my $i_shortcut    = $c->param("shortcut");
     my $i_description = $c->param("description");
 
     $c->sql->Do("
         UPDATE roles
-            SET catalog=?, name=?, shortcut=?, description=?, updated=now()
+            SET title=?, shortcut=?, description=?, updated=now()
         WHERE id =?;
-    ", [ $i_path, $i_name, $i_shortcut, $i_description, $i_id ]);
+    ", [ $i_title, $i_shortcut, $i_description, $i_id ]);
 
     $c->render_json( { success => $c->json->true} );
 }

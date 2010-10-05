@@ -24,37 +24,43 @@ Inprint.factory.Combo = new function() {
     var combos = {
 
         // Catalog
+        "/catalog/combos/editions/": {
+            name: "edition",
+            icon: "building",
+            fieldLabel: _("Edition"),
+            emptyText: _("Select") + "..."
+        },
         "/catalog/combos/groups/": {
             name: "catalog",
             icon: "building",
             fieldLabel: _("Group"),
-            emptyText: _("Select a path...")
+            emptyText: _("Select") + "..."
         },
-        "/catalog/combos/editions/": {
+        "/catalog/combos/fascicles/": {
             name: "catalog",
             icon: "book",
-            fieldLabel: _("Group"),
-            emptyText: _("Select a path...")
+            fieldLabel: _("Fascic;e"),
+            emptyText: _("Select") + "..."
         },
         "/catalog/combos/roles/": {
             name: "role",
             fieldLabel: _("Role"),
-            emptyText: _("Role") + "..."
+            emptyText: _("Select") + "..."
         },
 
 
         "/exchange/combos/chains/": {
             name: "chain",
             fieldLabel: _("Chain"),
-            emptyText: _("Select chain") + "..."
+            emptyText: _("Select") + "..."
         },
 
 
         // Fascicles
         "/calendar/combo/groups/": {
             name: "calendar-group",
-            emptyText: _("Select an edition..."),
-            fieldLabel: _("Edition")
+            fieldLabel: _("Edition"),
+            emptyText: _("Select") + "..."
         },
 
 
@@ -62,49 +68,49 @@ Inprint.factory.Combo = new function() {
         "/documents/combos/groups": {
             name: "group",
             icon: "toggle-small",
-            emptyText: _("Select an group..."),
-            fieldLabel: _("Group")
+            fieldLabel: _("Group"),
+            emptyText: _("Select") + "..."
         },
 
         "/documents/combos/fascicles": {
             name: "fascicle",
             icon:"folder",
-            emptyText: _("Select an fascicle..."),
-            fieldLabel: _("Fascicle")
+            fieldLabel: _("Fascicle"),
+            emptyText: _("Select") + "..."
         },
 
         "/documents/combos/headlines": {
             name: "headline",
             icon: "tag-label",
-            emptyText: _("Select an headline..."),
-            fieldLabel: _("Headline")
+            fieldLabel: _("Headline"),
+            emptyText: _("Select") + "..."
         },
 
         "/documents/combos/rubrics": {
             name: "rubric",
             icon: "tag-label-pink",
-            emptyText: _("Select an rubric..."),
-            fieldLabel: _("rubric")
+            fieldLabel: _("rubric"),
+            emptyText: _("Select") + "..."
         },
 
         "/documents/combos/holders": {
             name: "holder",
             icon: "user-business",
-            emptyText: _("Select an holder..."),
-            fieldLabel: _("Holder")
+            fieldLabel: _("Holder"),
+            emptyText: _("Select") + "..."
         },
 
         "/documents/combos/managers": {
             name: "manager",
             icon: "user-business",
-            emptyText: _("Select an manager..."),
-            fieldLabel: _("Manager")
+            fieldLabel: _("Manager"),
+            emptyText: _("Select") + "..."
         },
 
         "/documents/combos/progress": {
             name: "progress",
-            emptyText: _("Select an progress..."),
-            fieldLabel: _("Progress")
+            fieldLabel: _("Progress"),
+            emptyText: _("Select") + "..."
         }
 
     };
@@ -141,18 +147,20 @@ Inprint.factory.Combo = new function() {
                         '{title}'+
                         '<tpl if="description"><br><small><i>{description}</i></small></tpl>'+
                     '</div>'+
-                '</tpl>', {
+                '</tpl>',
+                {
                     haveIcon: function(values) {
 
                         var src = '';
                         var hpadding = 2;
                         var vpadding = 1;
 
-                        if (values.icon) {
-                            src = _ico(values.icon);
-                        }
                         if (combo.icon) {
                             src = _ico(combo.icon);
+                        }
+
+                        if (values.icon) {
+                            src = _ico(values.icon);
                         }
 
                         if (values.description) {

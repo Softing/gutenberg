@@ -1,1 +1,1 @@
-Ext.namespace("Inprint.exchange");
+Ext.namespace("Inprint.catalog.exchange");

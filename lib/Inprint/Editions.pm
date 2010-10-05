@@ -7,7 +7,7 @@ package Inprint::Editions;
 
 use strict;
 use warnings;
-                         
+
 use base 'Inprint::BaseController';
 
 sub tree {
@@ -17,7 +17,8 @@ sub tree {
     my $node = $c->param("node") || "00000000-0000-0000-0000-000000000000";
 
     my $data = $c->sql->Q("
-        SELECT *, ( SELECT count(*) FROM editions c2 WHERE c2.path ~ ('*.' || replace(?, '-', '')::text || '.*{2}')::lquery ) as have_childs
+        SELECT *, ( SELECT count(*) FROM editions c2 WHERE c2.path ~ ('*.' || replace(?, '-', '')::text || '.*{2}')::lquery ) as have_childs,
+        'book' as icon
         FROM editions
         WHERE
             id <> '00000000-0000-0000-0000-000000000000'

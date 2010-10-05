@@ -45,6 +45,7 @@ sub tree {
             id   => $item->{id},
             text => $item->{shortcut},
             leaf => $c->json->true,
+            icon => "book",
             data => $item
         };
 

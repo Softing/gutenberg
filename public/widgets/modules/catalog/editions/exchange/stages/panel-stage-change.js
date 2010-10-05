@@ -1,4 +1,4 @@
-Inprint.exchange.ChangeStagePanel = function () {
+Inprint.catalog.exchange.ChangeStagePanel = function () {
 
     var url = _url("/stages/update/");
 

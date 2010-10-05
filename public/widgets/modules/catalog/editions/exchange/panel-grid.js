@@ -1,4 +1,4 @@
-Inprint.exchange.Grid = Ext.extend(Ext.grid.GridPanel, {
+Inprint.catalog.exchange.Grid = Ext.extend(Ext.grid.GridPanel, {
 
     initComponent: function() {
 
@@ -8,7 +8,6 @@ Inprint.exchange.Grid = Ext.extend(Ext.grid.GridPanel, {
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
 
         Ext.apply(this, {
-            title:_("Stages"),
             border:false,
             stripeRows: true,
             columnLines: true,
@@ -16,14 +15,14 @@ Inprint.exchange.Grid = Ext.extend(Ext.grid.GridPanel, {
             autoExpandColumn: "employee",
             columns: [
                 this.selectionModel,
-                {   id:"color",
-                    width: 60,
-                    dataIndex: "color",
-                    header : '<img src="' + _ico("color") + '">',
-                    renderer: function(val) {
-                        return "<div style=\"background:#" + val + ";padding:2px 3px;font-size:10px;-webkit-border-radius:2px;-moz-border-radius:3px;\">"+val+"</div>"
-                    }
-                },
+                //{   id:"color",
+                //    width: 60,
+                //    dataIndex: "color",
+                //    header : '<img src="' + _ico("color") + '">',
+                //    renderer: function(val) {
+                //        return "<div style=\"background:#" + val + ";padding:2px 3px;font-size:10px;-webkit-border-radius:2px;-moz-border-radius:3px;\">"+val+"</div>"
+                //    }
+                //},
                 {   id:"weight",
                     width: 40,
                     dataIndex: "weight",
@@ -45,33 +44,33 @@ Inprint.exchange.Grid = Ext.extend(Ext.grid.GridPanel, {
             ],
 
             tbar: [
-                {
-                    xtype: 'buttongroup',
-                    title: 'Цепочки',
-                    defaults: {
-                        scale: 'small'
-                    },
-                    items: [
-                        {   icon: _ico("plus-button"),
-                            cls: "x-btn-text-icon",
-                            text: _("Add"),
-                            disabled:true,
-                            ref: "../../btnCreateChain"
-                        },
-                        {   icon: _ico("pencil"),
-                            cls: "x-btn-text-icon",
-                            text: _("Change"),
-                            disabled:true,
-                            ref: "../../btnChangeChain"
-                        },
-                        {   icon: _ico("minus-button"),
-                            cls: "x-btn-text-icon",
-                            text: _("Remove"),
-                            disabled:true,
-                            ref: "../../btnRemoveChain"
-                        }
-                    ]
-                },
+                //{
+                //    xtype: 'buttongroup',
+                //    title: 'Цепочки',
+                //    defaults: {
+                //        scale: 'small'
+                //    },
+                //    items: [
+                //        {   icon: _ico("plus-button"),
+                //            cls: "x-btn-text-icon",
+                //            text: _("Add"),
+                //            disabled:true,
+                //            ref: "../../btnCreateChain"
+                //        },
+                //        {   icon: _ico("pencil"),
+                //            cls: "x-btn-text-icon",
+                //            text: _("Change"),
+                //            disabled:true,
+                //            ref: "../../btnChangeChain"
+                //        },
+                //        {   icon: _ico("minus-button"),
+                //            cls: "x-btn-text-icon",
+                //            text: _("Remove"),
+                //            disabled:true,
+                //            ref: "../../btnRemoveChain"
+                //        }
+                //    ]
+                //},
                 {
                     xtype: 'buttongroup',
                     title: 'Ступеньки',
@@ -117,12 +116,12 @@ Inprint.exchange.Grid = Ext.extend(Ext.grid.GridPanel, {
             ]
         });
 
-        Inprint.exchange.Grid.superclass.initComponent.apply(this, arguments);
+        Inprint.catalog.exchange.Grid.superclass.initComponent.apply(this, arguments);
 
     },
 
     onRender: function() {
-        Inprint.exchange.Grid.superclass.onRender.apply(this, arguments);
+        Inprint.catalog.exchange.Grid.superclass.onRender.apply(this, arguments);
     }
 
 });

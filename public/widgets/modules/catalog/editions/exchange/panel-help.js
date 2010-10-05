@@ -1,4 +1,4 @@
-Inprint.exchange.HelpPanel = Ext.extend(Ext.Panel, {
+Inprint.catalog.exchange.HelpPanel = Ext.extend(Ext.Panel, {
     initComponent: function() {
 
         Ext.apply(this, {
@@ -7,15 +7,15 @@ Inprint.exchange.HelpPanel = Ext.extend(Ext.Panel, {
             preventBodyReset: true
         });
 
-        Inprint.exchange.HelpPanel.superclass.initComponent.apply(this, arguments);
+        Inprint.catalog.exchange.HelpPanel.superclass.initComponent.apply(this, arguments);
     },
     onRender: function() {
 
-        Inprint.exchange.HelpPanel.superclass.onRender.apply(this, arguments);
+        Inprint.catalog.exchange.HelpPanel.superclass.onRender.apply(this, arguments);
 
         this.load({
             method: "get",
-            url: "/help/Inprint.exchange/",
+            url: "/help/Inprint.catalog.exchange/",
             text: _("Loading...")
         });
 

@@ -5,25 +5,8 @@ Inprint.catalog.editions.Panel = Ext.extend(Ext.Panel, {
         this.panels = {};
 
         this.panels.tree = new Inprint.catalog.editions.Tree();
-        this.panels.grid = new Inprint.catalog.editions.statuses.Grid({
-            title: _("Members")
-        });
+        this.panels.grid = new Inprint.catalog.exchange.Panel();
         this.panels.help = new Inprint.catalog.editions.HelpPanel();
-
-        this.panels.profile = new Inprint.member.Profile();
-        this.panels.edit    = new Inprint.member.profile.Form();
-        this.panels.access  = new Inprint.member.profile.Access();
-
-        this.panels.tab = new Ext.TabPanel({
-            border:false,
-            activeItem: 0,
-            items: [
-                this.panels.help,
-                this.panels.profile,
-                this.panels.edit,
-                this.panels.access
-            ]
-        });
 
         Ext.apply(this, {
 
@@ -59,7 +42,7 @@ Inprint.catalog.editions.Panel = Ext.extend(Ext.Panel, {
                     maxSize: 600,
                     collapseMode: 'mini',
                     layout:"fit",
-                    items: this.panels.tab
+                    items: this.panels.help
                 }
             ]
         });

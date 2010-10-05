@@ -91,7 +91,7 @@ sub startup {
     $self->createRoutes($sessionBridge, "documents/combos", [ "groups", "fascicles", "headlines", "rubrics", "holders", "managers", "progress" ]);
 
     # Catalog routes
-    $self->createRoutes($sessionBridge, "catalog/combos",       [ "groups", "editions", "roles", "statuses" ]);
+    $self->createRoutes($sessionBridge, "catalog/combos",       [ "editions", "groups", "fascicles", "roles", "statuses" ]);
     $self->createRoutes($sessionBridge, "catalog/editions",     [ "create", "read", "update", "delete", "tree" ]);
     $self->createRoutes($sessionBridge, "catalog/organization", [ "create", "read", "update", "delete", "tree", "map", "unmap" ]);
     $self->createRoutes($sessionBridge, "catalog/statuses",     [ "create", "read", "update", "delete", "list" ]);

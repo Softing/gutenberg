@@ -2,17 +2,127 @@ Inprint.catalog.roles.Grid = Ext.extend(Ext.grid.GridPanel, {
 
     initComponent: function() {
 
-        this.params = {};
         this.components = {};
 
         this.urls = {
             list:    "/roles/list/",
             create:  _url("/roles/create/"),
+            update:  _url("/roles/update/"),
             remove:  _url("/roles/delete/")
         }
 
         this.store = Inprint.factory.Store.json(this.urls.list);
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
+
+        // Editor
+        var editor = new Inprint.factory.RowEditor({
+            create: this.urls.create,
+            update: this.urls.update,
+            record: [
+                { name: 'id', type: 'string' },
+                { name: 'title', type: 'string' },
+                { name: 'shortcut', type: 'string' },
+                { name: 'description', type: 'string' }
+            ]
+        });
+
+        editor.on("success", function() {
+            this.cmpReload();
+        }, this);
+
+        // Toolbar
+        this.tbar = [
+            {
+                icon: _ico("plus-button"),
+                cls: "x-btn-text-icon",
+                text: _("Add"),
+                ref: "../btnCreate",
+                scope:this,
+                handler: function() {
+                    var e = new editor.cmpRecord();
+                    editor.stopEditing();
+                    this.store.insert(0, e);
+                    this.getView().refresh();
+                    this.getSelectionModel().selectRow(0);
+                    editor.startEditing(0);
+                }
+            },
+            {
+                icon: _ico("minus-button"),
+                cls: "x-btn-text-icon",
+                text: _("Remove"),
+                disabled:true,
+                ref: "../btnDelete",
+                scope:this,
+                handler: function() {
+                    Ext.MessageBox.confirm(
+                    _("Warning"),
+                    _("You really wish to do this?"),
+                    function(btn) {
+                        if (btn == "yes") {
+                            Ext.Ajax.request({
+                                url: this.urls.remove,
+                                scope:this,
+                                success: this.cmpReload,
+                                params: { id: this.getValues("id") }
+                            });
+                        }
+                    }, this);
+                }
+            },
+            {
+                icon: _ico("key-solid"),
+                cls: "x-bt  n-text-icon",
+                text: _("The rights"),
+                disabled:true,
+                scope:this,
+                ref: "../btnManageRules",
+                handler: this.cmpManageRules
+            }
+        ];
+
+        // Column model
+        this.columns = [
+            this.selectionModel,
+            {
+                id:"title",
+                header: _("Title"),
+                width: 160,
+                sortable: true,
+                dataIndex: "title",
+                editor: {
+                    xtype: 'textfield',
+                    allowBlank: false
+                }
+            },
+            {
+                id:"shortcut",
+                header: _("Shortcut"),
+                width: 160,
+                sortable: true,
+                dataIndex: "shortcut",
+                editor: {
+                    xtype: 'textfield',
+                    allowBlank: false
+                }
+            },
+            {
+                id:"description",
+                header: _("Description"),
+                width: 200,
+                sortable: true,
+                dataIndex: "description",
+                editor: {
+                    xtype: 'textfield'
+                }
+            },
+            {
+                id:"rules",
+                header: _("Rules"),
+                sortable: true,
+                dataIndex: "rules"
+            }
+        ];
 
         Ext.apply(this, {
             disabled:true,
@@ -20,166 +130,35 @@ Inprint.catalog.roles.Grid = Ext.extend(Ext.grid.GridPanel, {
             stripeRows: true,
             columnLines: true,
             sm: this.selectionModel,
-            autoExpandColumn: "description",
-            columns: [
-                this.selectionModel,
-                {
-                    id:"group",
-                    header: _("Group"),
-                    width: 100,
-                    sortable: true,
-                    dataIndex: "catalog_shortcut"
-                },
-                {
-                    id:"title",
-                    header: _("Name"),
-                    width: 200,
-                    sortable: true,
-                    dataIndex: "name"
-                },
-                {
-                    id:"shortcut",
-                    header: _("Shortcut"),
-                    width: 200,
-                    sortable: true,
-                    dataIndex: "shortcut"
-                },
-                {
-                    id:"description",
-                    header: _("Description"),
-                    sortable: true,
-                    dataIndex: "description"
-                }
-            ],
-
-            tbar: [
-                {
-                    icon: _ico("plus-button"),
-                    cls: "x-btn-text-icon",
-                    text: _("Add"),
-                    disabled:true,
-                    ref: "../btnCreate",
-                    scope:this,
-                    handler: this.cmpCreate
-                },
-                '-',
-                {
-                    icon: _ico("minus-button"),
-                    cls: "x-btn-text-icon",
-                    text: _("Remove"),
-                    disabled:true,
-                    ref: "../btnDelete",
-                    scope:this,
-                    handler: this.cmpDelete
-                },
-                '->',
-                {
-                    icon: _ico("arrow-circle-double"),
-                    cls: "x-btn-icon",
-                    scope:this,
-                    handler: this.cmpReload
-                }
-            ]
+            autoExpandColumn: "rules",
+            plugins: [editor]
         });
 
         Inprint.catalog.roles.Grid.superclass.initComponent.apply(this, arguments);
-
     },
 
     onRender: function() {
         Inprint.catalog.roles.Grid.superclass.onRender.apply(this, arguments);
-
-        this.store.load();
+        this.on("afterrender", function(grid) {
+            grid.store.load();
+        });
     },
 
-    cmpCreate: function() {
-
-        var win = this.components["create-window"];
+    cmpManageRules: function() {
+        var win = this.components["manage-rules-window"];
         if (!win) {
-
             win = new Ext.Window({
-                title: _("Addition of a role"),
+                title: _("Rules"),
                 layout: "fit",
-                modal:true,
                 closeAction: "hide",
-                width:400, height:300,
-                items: {
-                    xtype: 'form',
-
-                    url: this.urls.create,
-
-                    frame:false,
-                    border:false,
-
-                    labelWidth: 75,
-                    defaults: {
-                        anchor: "95%",
-                        allowBlank:false
-                    },
-                    bodyStyle: "padding:5px 5px",
-                    items: [
-                        Inprint.factory.Combo.create("catalog"),
-                        {
-                            xtype: "textfield",
-                            name: "name",
-                            fieldLabel: _("Name")
-                        },
-                        {
-                            xtype: "textfield",
-                            name: "shortcut",
-                            fieldLabel: _("Shortcut")
-                        },
-                        {
-                            xtype: "textarea",
-                            name: "description",
-                            fieldLabel: _("Description"),
-                            allowBlank:true
-                        }
-                    ],
-                    buttons: [
-                        {
-                            text: _("Save"),
-                            handler: function() {
-                                win.items.first().getForm().submit();
-                            }
-                        },
-                        {
-                            text: _("Cancel"),
-                            handler: function() {
-                                win.hide();
-                            }
-                        }
-                    ],
-                    listeners: {
-                        scope:this,
-                        "actioncomplete": function() {
-                            win.hide();
-                            this.cmpReload();
-                        }
-                    }
-                }
+                width:400, height:350,
+                items: new Inprint.catalog.roles.RestrictionsPanel()
             });
+            this.components["manage-rules-window"] = win;
         }
-
-        var form = win.items.first().getForm();
-        form.reset();
-
         win.show(this);
-        this.components["create-window"] = win;
-    },
-
-    cmpDelete: function() {
-
-        Ext.MessageBox.confirm(_("Edition removal"), _("You really wish to do this?"), function(btn) {
-            if (btn == "yes") {
-                Ext.Ajax.request({
-                    url: this.urls.remove,
-                    scope:this,
-                    success: this.cmpReload,
-                    params: { id: this.getValues("id") }
-                });
-            }
-        }, this);
+        win.items.first().cmpSetId(this.getValue("id"));
+        win.items.first().cmpFill();
     }
 
 });

@@ -126,11 +126,11 @@ sub menu
     # Выбираем выпуски
     my $fascicles = $c->sql->Q("
         SELECT
-            t1.id, t1.shortcut, t2.shortcut as catalog_shortcut
-        FROM fascicles t1, catalog t2
+            t1.id, t1.shortcut, t2.shortcut as edition_shortcut
+        FROM fascicles t1, editions t2
         WHERE
             t1.issystem = false AND t1.enabled = true
-            AND t1.catalog = t2.id
+            AND t1.edition = t2.id
         ORDER BY t2.shortcut, t1.shortcut
     ")->Hashes;
 
@@ -151,7 +151,7 @@ sub menu
 
         my $fascicle = {
             id   => "fascicle",
-            text => $fascicle->{catalog_shortcut} . '/'. $fascicle->{shortcut}
+            text => $fascicle->{edition_shortcut} . '/'. $fascicle->{shortcut}
         };
 
         push @{ $fascicle->{menu} }, {
