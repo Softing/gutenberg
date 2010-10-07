@@ -31,7 +31,7 @@ sub store
     my $path = $c->config->get("store.path");
 
     unless ( -e $path ) {
-        make_path($path, { mode => 0755 });
+        make_path($path, { mode => 0755, error => \my $err});
     }
 
     unless ( -e $path ) {

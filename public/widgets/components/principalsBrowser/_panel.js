@@ -1,65 +1,62 @@
-Inprint.membersBrowser.Panel = Ext.extend(Ext.Panel, {
+Inprint.cmp.PrincipalsBrowser = Ext.extend(Ext.Window, {
 
     initComponent: function() {
 
-        this.panels = {
-            tree: new Inprint.catalog.Tree(),
-            view: new Inprint.membersBrowser.PrincipalsView()
-        };
+        this.panels = {};
+        this.panels.grid = new Inprint.cmp.PrincipalsBrowser.Grid()
+        this.panels.tree = new Inprint.cmp.PrincipalsBrowser.Tree()
 
         Ext.apply(this, {
-
+            title: _("Principals list"),
             layout: "border",
-
-            defaults: {
-                collapsible: false,
-                split: true
-            },
-
+            closeAction: "hide",
+            width:800, height:400,
             items: [
-                {   title: _("Employees"),
+                {
                     region: "center",
-                    margins: "3 0 3 0",
                     layout:"fit",
-                    bodyStyle:"background:transparent",
-                    items: this.panels.view
+                    margins: "3 3 3 0",
+                    border:false,
+                    items: this.panels.grid
                 },
-                {   title:_("Catalog"),
+                {
                     region:"west",
+                    layout:"fit",
                     margins: "3 0 3 3",
                     width: 200,
                     minSize: 100,
-                    maxSize: 400,
-                    layout:"fit",
+                    maxSize: 600,
+                    collapsible: false,
+                    split: true,
                     items: this.panels.tree
+                }
+            ],
+            buttons:[
+                {
+                    text: _("Select"),
+                    scope:this,
+                    handler: function() {
+                        this.hide();
+                        this.fireEvent('select', this.panels.grid.getValues("id"));
+                    }
+                },
+                {
+                    text: _("Close"),
+                    scope:this,
+                    handler: function() {
+                        this.hide();
+                    }
                 }
             ]
         });
+        Inprint.cmp.PrincipalsBrowser.superclass.initComponent.apply(this, arguments);
+        Inprint.cmp.PrincipalsBrowser.Interaction(this.panels);
 
-        Inprint.membersBrowser.Panel.superclass.initComponent.apply(this, arguments);
-
-        Inprint.membersBrowser.Interaction(this.panels);
+        this.addEvents('select');
     },
 
     onRender: function() {
-        Inprint.membersBrowser.Panel.superclass.onRender.apply(this, arguments);
-    },
-
-    cmpReload:function() {
-
+        Inprint.cmp.PrincipalsBrowser.superclass.onRender.apply(this, arguments);
     }
 
 });
-
-Inprint.membersBrowser.Window = function(config) {
-
-    var mywindow = new Ext.Window({
-        title: _("Employees browser"),
-        layout: "fit",
-        width:800, height:400,
-        items: new Inprint.membersBrowser.Panel(config)
-    });
-
-    mywindow.show();
-
-}

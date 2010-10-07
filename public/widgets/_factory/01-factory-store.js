@@ -44,18 +44,14 @@ Inprint.factory.Store = new function() {
         // System
 
         // Catalog
-        "/catalog/statuses/list/":  [ "id", "color", "percent", "title", "shortcut", "description" ],
+        "/catalog/readiness/list/":             [ "id", "color", "percent", "title", "shortcut", "description" ],
+        "/catalog/roles/list/":                 [ "id", "title", "shortcut", "description", "rules" ],
+        "/catalog/rules/list/":                 [ "id", "rule",  "title", "shortcut", "groupby", "limit", "selection" ],
+        "/catalog/members/list/":               [ "id", "login", "password", "position", "email", "title", "shortcut", createDateField("created"), createDateField("updated") ],
+        "/catalog/stages/list/":                [ "id", "chain", "readiness_shortcut", "readiness_color", "weight", "title", "shortcut", "description", "members" ],
+        "/catalog/stages/principals-mapping/":  [ "id", "type", "catalog", "stage", "principal", "title", "description", "catalog_shortcut", "stage_shortcut" ],
+        "/catalog/principals/list/":            [ "id", "type", "title", "description" ],
 
-        "/principals/list/":        [ "id", "title", "shortcut", "description", "type" ],
-        "/members/list/":           [ "id", "login", "password", "position", "email", "title", "shortcut", createDateField("created"), createDateField("updated") ],
-        "/rules/list/":             [ "id", "rule",  "title", "shortcut", "groupby", "limit", "selection" ],
-        "/roles/list/":             [ "id", "title", "shortcut", "description", "rules" ],
-
-        /*???*/
-        "/exchange/list/":          [ "id", "rule",  "title", "shortcut", "groupby", "limit", "selection" ],
-
-        "/chains/list/":            [ "id", "rule",  "title", "shortcut", "groupby", "limit", "selection" ],
-        "/stages/list/":            [ "id", "chain", "color", "weight", "title", "shortcut", "description" ],
 
         "" : []
 
@@ -66,8 +62,8 @@ Inprint.factory.Store = new function() {
         "/catalog/combos/groups/",
         "/catalog/combos/editions/",
         "/catalog/combos/fascicles/",
+        "/catalog/combos/readiness/",
         "/catalog/combos/roles/",
-        "/catalog/combos/statuses/",
 
         "/documents/combos/groups",
         "/documents/combos/fascicles",

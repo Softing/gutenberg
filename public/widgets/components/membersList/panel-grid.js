@@ -2,7 +2,7 @@ Inprint.cmp.membersList.Grid = Ext.extend(Ext.grid.GridPanel, {
 
     initComponent: function() {
 
-        this.store = Inprint.factory.Store.json("/members/list/");
+        this.store = Inprint.factory.Store.json("/catalog/members/list/");
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
 
         Ext.apply(this, {

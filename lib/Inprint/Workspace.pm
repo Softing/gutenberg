@@ -192,7 +192,7 @@ sub menu
     push @{ $settings->{menu} }, { id => "settings-organization" };
     push @{ $settings->{menu} }, { id => "settings-editions" };
     push @{ $settings->{menu} }, { id => "settings-roles" };
-    push @{ $settings->{menu} }, { id => "settings-statuses" };
+    push @{ $settings->{menu} }, { id => "settings-readiness" };
 
     push @result, $settings;
 

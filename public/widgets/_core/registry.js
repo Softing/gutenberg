@@ -140,10 +140,10 @@ Inprint.Registry = function() {
             text: _("Roles"),
             xobject: Inprint.catalog.roles.Panel
         },
-        "settings-statuses": {
+        "settings-readiness": {
             icon: "category",
             text: _("Readiness"),
-            xobject: Inprint.catalog.statuses.Panel
+            xobject: Inprint.catalog.readiness.Panel
         },
 
 

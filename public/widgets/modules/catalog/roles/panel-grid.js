@@ -5,10 +5,10 @@ Inprint.catalog.roles.Grid = Ext.extend(Ext.grid.GridPanel, {
         this.components = {};
 
         this.urls = {
-            list:    "/roles/list/",
-            create:  _url("/roles/create/"),
-            update:  _url("/roles/update/"),
-            remove:  _url("/roles/delete/")
+            list:         "/catalog/roles/list/",
+            create:  _url("/catalog/roles/create/"),
+            update:  _url("/catalog/roles/update/"),
+            remove:  _url("/catalog/roles/delete/")
         }
 
         this.store = Inprint.factory.Store.json(this.urls.list);

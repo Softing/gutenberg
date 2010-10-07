@@ -8,15 +8,16 @@ Inprint.catalog.roles.RestrictionsPanel = Ext.extend(Ext.grid.EditorGridPanel, {
         this.components = {};
 
         this.urls = {
-            save:    _url("/roles/map/"),
-            fill:    _url("/roles/mapping/")
+            "list":         "/catalog/rules/list/",
+            "save":    _url("/catalog/roles/map/"),
+            "fill":    _url("/catalog/roles/mapping/")
         };
 
         this.sm = new Ext.grid.CheckboxSelectionModel({
             checkOnly:true
         });
 
-        this.store = Inprint.factory.Store.group("/rules/list/", {
+        this.store = Inprint.factory.Store.group(this.urls.list, {
             autoLoad: false
         });
 

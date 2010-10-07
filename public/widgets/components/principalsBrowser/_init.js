@@ -1,1 +1,1 @@
-Ext.namespace("Inprint.membersBrowser");
+Ext.namespace("Inprint.cmp.PrincipalsBrowser");

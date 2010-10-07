@@ -25,7 +25,7 @@ sub startup {
 
     my $self = shift;
 
-    $self->log->level('warn');
+    $self->log->level('debug');
     $self->secret('passw0rd');
 
     $self->session->cookie_name("inprint");
@@ -86,39 +86,22 @@ sub startup {
 
     # Documents routes
     $self->createRoutes($sessionBridge, "documents", [ "create", "read", "update", "delete", "list" ]);
-
-    # Documents combos
     $self->createRoutes($sessionBridge, "documents/combos", [ "groups", "fascicles", "headlines", "rubrics", "holders", "managers", "progress" ]);
 
     # Catalog routes
-    $self->createRoutes($sessionBridge, "catalog/combos",       [ "editions", "groups", "fascicles", "roles", "statuses" ]);
+    $self->createRoutes($sessionBridge, "catalog/combos",       [ "editions", "groups", "fascicles", "roles", "readiness" ]);
     $self->createRoutes($sessionBridge, "catalog/editions",     [ "create", "read", "update", "delete", "tree" ]);
     $self->createRoutes($sessionBridge, "catalog/organization", [ "create", "read", "update", "delete", "tree", "map", "unmap" ]);
-    $self->createRoutes($sessionBridge, "catalog/statuses",     [ "create", "read", "update", "delete", "list" ]);
-
-
-    # Rules routes
-    $self->createRoutes($sessionBridge, "rules", [ "list" ]);
-
-    # Roles routes
-    $self->createRoutes($sessionBridge, "roles", [ "create", "read", "update", "delete", "list", "map", "mapping" ]);
-
-    # Principals routes
-    $self->createRoutes($sessionBridge, "principals", [ "list", "combo" ]);
-
-    # Members routes
-    $self->createRoutes($sessionBridge, "members", [ "list", "combo", "create", "delete", "map", "mapping" ]);
-
+    $self->createRoutes($sessionBridge, "catalog/readiness",    [ "create", "read", "update", "delete", "list" ]);
+    $self->createRoutes($sessionBridge, "catalog/roles",        [ "create", "read", "update", "delete", "list", "map", "mapping" ]);
+    $self->createRoutes($sessionBridge, "catalog/rules",        [ "list" ]);
+    $self->createRoutes($sessionBridge, "catalog/members",      [ "create", "delete", "list", "map", "mapping" ]);
+    $self->createRoutes($sessionBridge, "catalog/stages",       [ "create", "read", "update", "delete", "list", "map-principals", "unmap-principals", "principals-mapping" ]);
+    $self->createRoutes($sessionBridge, "catalog/principals",   [ "list" ]);
+    
     # Profile routes
     $self->createRoutes($sessionBridge, "profile", [ "read", "update" ]);
     $sessionBridge->route('/profile/image/:id')->to('profile#image', id => "00000000-0000-0000-0000-000000000000");
-
-    # Chains route
-    $self->createRoutes($sessionBridge, "chains", [ "create", "read", "update", "delete", "combo" ]);
-
-    # Stages route
-    $self->createRoutes($sessionBridge, "stages", [ "create", "read", "update", "delete", "list" ]);
-
 
     # State route
     $self->createRoutes($sessionBridge, "state", [ "index", "read", "update" ]);
@@ -146,8 +129,16 @@ sub createRoutes {
 
         my $croute  = $prefix;
         $croute =~ s/\//-/g;
+
+        my @routes = split('-', $route);
+        for (my $i=1; $i <= $#routes; $i++) {
+            $routes[$i] = ucfirst($routes[$i]);
+        }
+        $route = join("", @routes);
         $croute = "$croute#$route";
+
         $bridge->route($cprefix)->to( $croute );
+        #say STDERR "$bridge->route($cprefix)->to( $croute );";
     }
 
     return 1;

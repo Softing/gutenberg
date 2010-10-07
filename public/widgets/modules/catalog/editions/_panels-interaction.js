@@ -1,84 +1,13 @@
 Inprint.catalog.editions.Interaction = function(panels) {
-    //
-    //var acl_view   = _a(null, "settings.edition.view");
-    //var acl_manage = _a(null, "settings.edition.manage");
-    //var acl_remove = _a(null, "settings.edition.remove");
-    //
+
     var tree = panels.tree;
     var grid = panels.grid;
     var help = panels.help;
 
-    //var tabs    = panels.tab;
-    //var edit    = panels.edit;
-    //var access  = panels.access;
-    //var profile = panels.profile;
-    //
-    //// Tree
-    //
-    tree.on("contextmenu", function(node) {
+    var currentStage;
 
-        this.selection = node;
 
-        var items = [];
-
-        items.push({
-            icon: _ico("book--plus"),
-            cls: "x-btn-text-icon",
-            text: _("Create"),
-            ref: "../btnCreate",
-            scope:this,
-            handler: this.cmpCreate
-        }, {
-            icon: _ico("book--pencil"),
-            cls: "x-btn-text-icon",
-            text: _("Edit"),
-            ref: "../btnEdit",
-            scope:this,
-            handler: this.cmpUpdate
-        });
-
-        if (node.attributes.id != NULLID) {
-            items.push({
-                icon: _ico("book--minus"),
-                cls: "x-btn-text-icon",
-                text: _("Remove"),
-                ref: "../btnRemove",
-                scope:this,
-                handler: this.cmpDelete
-            });
-        }
-
-        items.push('-', {
-            text: _("Add chain"),
-            icon: _ico("node-insert"),
-            cls: "x-btn-text-icon",
-            scope: this,
-            handler: this.cmpReload
-        }, {
-            text: _("Change chain"),
-            icon: _ico("node-design"),
-            cls: "x-btn-text-icon",
-            scope: this,
-            handler: this.cmpReload
-        }, {
-            text: _("Delete chain"),
-            icon: _ico("node-delete"),
-            cls: "x-btn-text-icon",
-            scope: this,
-            handler: this.cmpReload
-        });
-
-        items.push('-', {
-            icon: _ico("arrow-circle-double"),
-            cls: "x-btn-text-icon",
-            text: _("Reload"),
-            scope: this,
-            handler: this.cmpReload
-        });
-
-        new Ext.menu.Menu({ items : items }).show(node.ui.getAnchor());
-
-    }, tree);
+    // Tree
 
     //tree.on("beforenodedrop", function (e) {
     //
@@ -89,13 +18,38 @@ Inprint.catalog.editions.Interaction = function(panels) {
     //    }
     //    return false;
     //}, tree);
-    //
-    //tree.getSelectionModel().on("selectionchange", function(sm, node) {
-    //    grid.enable();
-    //    grid.cmpLoad({ node: node.id });
-    //    //grid.setTitle(_("Members") +' - '+ tree.cmpCurrentNode().text);
-    //});
-    //
+
+    tree.getSelectionModel().on("selectionchange", function(sm, node) {
+        grid.enable();
+        grid.cmpLoad({ branch: node.id });
+        //grid.setTitle(_("Members") +' - '+ tree.cmpCurrentNode().text);
+    });
+
+    // Grid
+
+    grid.btnCreateStage.enable();
+
+    grid.getSelectionModel().on("selectionchange", function(sm) {
+        if (sm.getCount()) {
+            _enable(grid.btnRemoveStage);
+        } else {
+            _disable(grid.btnRemoveStage);
+        }
+        if (sm.getCount() == 1) {
+            currentStage = grid.getValue("id");
+           _enable(grid.btnChangeStage, grid.btnSelectMembers, grid.btnManagePrincipals);
+        } else {
+           _disable(grid.btnChangeStage, grid.btnSelectMembers, grid.btnManagePrincipals);
+        }
+    });
+
+    // Stages
+    grid.btnCreateStage.on("click", grid.actions.createStage.createDelegate(this));
+    grid.btnChangeStage.on("click", grid.actions.changeStage.createDelegate(this));
+    grid.btnRemoveStage.on("click", grid.actions.removeStage.createDelegate(this));
+    grid.btnManagePrincipals.on("click", grid.actions.managePrincipals.createDelegate(this));
+
+
     //// Grid
     //
     //if (acl_manage) {

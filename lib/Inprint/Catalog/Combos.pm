@@ -44,6 +44,15 @@ sub fascicles {
     $c->render_json( { data => $result } );
 }
 
+sub readiness {
+    my $c = shift; #weight || '% ' || 
+    my $sql = "
+        SELECT id, color, shortcut as title, description
+        FROM readiness ORDER BY weight, shortcut;
+    ";
+    my $result = $c->sql->Q($sql)->Hashes;
+    $c->render_json( { data => $result } );
+}
 
 sub roles {
     my $c = shift;

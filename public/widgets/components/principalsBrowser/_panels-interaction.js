@@ -1,10 +1,15 @@
-Inprint.membersBrowser.Interaction = function(panels) {
+Inprint.cmp.PrincipalsBrowser.Interaction = function(panels) {
 
     var tree = panels.tree;
-    var view = panels.view;
+    var grid = panels.grid;
 
     tree.getSelectionModel().on("selectionchange", function(sm, node) {
-        view.cmpLoad({ node: node.id });
+        grid.enable();
+        if (node) {
+            grid.cmpLoad({ node: node.id });
+            grid.setTitle(_("Members") +' - '+ node.text);
+        }
     });
+
 
 }

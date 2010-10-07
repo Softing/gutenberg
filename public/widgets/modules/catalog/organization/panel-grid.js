@@ -5,11 +5,12 @@ Inprint.catalog.organization.Grid = Ext.extend(Ext.grid.GridPanel, {
         this.components = {};
 
         this.urls = {
-            create:  _url("/members/create/"),
-            remove:  _url("/members/delete/")
+            "list":        "/catalog/members/list/",
+            "create": _url("/catalog/members/create/"),
+            "remove": _url("/catalog/members/delete/")
         };
 
-        this.store = Inprint.factory.Store.json("/members/list/");
+        this.store = Inprint.factory.Store.json(this.urls.list);
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
 
         Ext.apply(this, {

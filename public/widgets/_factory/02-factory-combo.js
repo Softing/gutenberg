@@ -11,7 +11,6 @@ Inprint.factory.Combo = new function() {
         typeAhead: true,
         triggerAction: "all",
         hideOnSelect:false,
-
         minListWidth: 200,
         valueField: "id",
         displayField: "title",
@@ -42,16 +41,14 @@ Inprint.factory.Combo = new function() {
             fieldLabel: _("Fascic;e"),
             emptyText: _("Select") + "..."
         },
+        "/catalog/combos/readiness/": {
+            hiddenName: "readiness",
+            fieldLabel: _("Readiness"),
+            emptyText: _("Select") + "..."
+        },
         "/catalog/combos/roles/": {
             name: "role",
             fieldLabel: _("Role"),
-            emptyText: _("Select") + "..."
-        },
-
-
-        "/exchange/combos/chains/": {
-            name: "chain",
-            fieldLabel: _("Chain"),
             emptyText: _("Select") + "..."
         },
 
@@ -62,7 +59,6 @@ Inprint.factory.Combo = new function() {
             fieldLabel: _("Edition"),
             emptyText: _("Select") + "..."
         },
-
 
         // Documents
         "/documents/combos/groups": {

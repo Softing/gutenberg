@@ -10,6 +10,44 @@ use warnings;
 
 use base 'Inprint::BaseController';
 
+sub list {
+
+    my $c = shift;
+
+    my @params;
+    my $result = [];
+
+    my $i_filter = $c->param("filter") || undef;
+    my $i_node = $c->param("node") || undef;
+
+    if ($i_node eq 'root-node') {
+        $i_node = '00000000-0000-0000-0000-000000000000';
+    }
+
+    my $sql = "
+        SELECT distinct t1.id, t1.login, t2.title, t2.shortcut, t2.position
+        FROM members t1 LEFT JOIN profiles t2 ON t1.id = t2.id,
+            map_member_to_catalog m1
+        WHERE m1.member = t1.id AND m1.catalog in (
+            SELECT id FROM catalog WHERE path ~ ('*.' || replace(?, '-', '')::text || '.*')::lquery
+        )
+    ";
+    push @params, $i_node;
+
+    if ( $i_filter ) {
+        $sql .= " AND (login LIKE ? OR title LIKE ? OR shortcut LIKE ?) ";
+        push @params, "%$i_filter%";
+        push @params, "%$i_filter%";
+        push @params, "%$i_filter%";
+    }
+
+    if ($i_node) {
+        $result = $c->sql->Q(" $sql ORDER BY t2.shortcut ", \@params)->Hashes;
+    }
+
+    $c->render_json( { data => $result } );
+}
+
 sub create {
 
     my $c = shift;

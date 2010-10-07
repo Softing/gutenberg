@@ -7,7 +7,7 @@ use Data::UUID;
 use Data::Dump qw /dump/;
 use DBIx::Connector;
 
-use lib "../lib";
+use lib "../../lib";
 use Inprint::Frameworks::Config;
 use Inprint::Frameworks::SQL;
 
@@ -58,7 +58,7 @@ foreach my $item ( @$statuses ) {
     ", [ $item->{color}, $item->{weight}, $item->{title}, $item->{title}, "" ]);
 }
 
-# Import roles
+# Import chains
 
 my $chains = $sql2->Q("
     SELECT distinct t2.uuid as catalog, t2.name, t2.sname
@@ -75,6 +75,7 @@ foreach my $item( @{ $chains } ) {
             VALUES (?,?,?,?,?,now(),now());
     ", [ $id, $item->{catalog}, $item->{name}, $item->{sname}, "" ]);
 
+    # Import stages
     my $stages = $sql2->Q("
         SELECT
             uuid as id, status_title as name, status_description as description,

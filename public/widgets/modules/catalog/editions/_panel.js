@@ -5,7 +5,7 @@ Inprint.catalog.editions.Panel = Ext.extend(Ext.Panel, {
         this.panels = {};
 
         this.panels.tree = new Inprint.catalog.editions.Tree();
-        this.panels.grid = new Inprint.catalog.exchange.Panel();
+        this.panels.grid = new Inprint.catalog.editions.Grid();
         this.panels.help = new Inprint.catalog.editions.HelpPanel();
 
         Ext.apply(this, {
@@ -48,11 +48,17 @@ Inprint.catalog.editions.Panel = Ext.extend(Ext.Panel, {
         });
 
         Inprint.catalog.editions.Panel.superclass.initComponent.apply(this, arguments);
+
+        Inprint.catalog.editions.Actions(this.panels);
         Inprint.catalog.editions.Interaction(this.panels);
+        Inprint.catalog.editions.Context(this.panels);
+        
     },
 
     onRender: function() {
         Inprint.catalog.editions.Panel.superclass.onRender.apply(this, arguments);
+
+
     },
 
     getRow: function() {

@@ -2,8 +2,8 @@ Inprint.catalog.roles.EditPanel = Ext.extend(Ext.FormPanel, {
     initComponent: function() {
 
         this.urls = {
-            load: _url("/roles/read/"),
-            save: _url("/roles/update/")
+            load: _url("/catalog/roles/read/"),
+            save: _url("/catalog/roles/update/")
         };
 
         Ext.apply(this, {
