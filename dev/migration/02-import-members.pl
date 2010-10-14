@@ -6,11 +6,12 @@ use strict;
 use Data::Dump qw /dump/;
 use DBIx::Connector;
 
-use lib "../lib";
+use lib "../../lib";
 use Inprint::Frameworks::Config;
 use Inprint::Frameworks::SQL;
 
-my $config = new Inprint::Frameworks::Config("../");
+my $config = new Inprint::Frameworks::Config();
+$config->load("../../");
 
 my $dbname     = $config->get("db.name");
 my $dbhost     = $config->get("db.host");
@@ -54,7 +55,7 @@ foreach my $item( @{ $members } ) {
     ", [ $item->{uuid}, $item->{uid}, $item->{secret}, $item->{created} ]);
 
     $sql->Do("
-        INSERT INTO profiles (id, name, shortcut, position)
+        INSERT INTO profiles (id, title, shortcut, position)
         VALUES (?, ?, ?, ?)
     ", [ $item->{uuid}, $item->{title}, $item->{stitle}, $item->{position} ]);
 

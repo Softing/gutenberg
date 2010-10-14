@@ -65,13 +65,14 @@ Inprint.factory.Store = new function() {
         "/catalog/combos/readiness/",
         "/catalog/combos/roles/",
 
-        "/documents/combos/groups",
-        "/documents/combos/fascicles",
-        "/documents/combos/headlines",
-        "/documents/combos/rubrics",
-        "/documents/combos/holders",
-        "/documents/combos/managers",
-        "/documents/combos/progress"
+        "/documents/combos/editions/",
+        "/documents/combos/groups/",
+        "/documents/combos/fascicles/",
+        "/documents/combos/headlines/",
+        "/documents/combos/rubrics/",
+        "/documents/combos/holders/",
+        "/documents/combos/managers/",
+        "/documents/combos/progress/"
 
     );
 

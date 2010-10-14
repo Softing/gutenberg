@@ -1,4 +1,4 @@
-    package Inprint;
+package Inprint;
 
 # Inprint Content 4.5
 # Copyright(c) 2001-2010, Softing, LLC.
@@ -34,11 +34,8 @@ sub startup {
     $self->types->type(json => 'application/json; charset=utf-8;');
 
     # Load configuration
-    my $config = new Inprint::Frameworks::Config(
-        $self->home->to_string
-    );
-
-    $self->{config} = $config;
+    my $config = new Inprint::Frameworks::Config();
+    $self->{config} = $config->load( $self->home->to_string );
 
     my $name     = $config->get("db.name");
     my $host     = $config->get("db.host");
@@ -98,7 +95,7 @@ sub startup {
     $self->createRoutes($sessionBridge, "catalog/members",      [ "create", "delete", "list", "map", "mapping" ]);
     $self->createRoutes($sessionBridge, "catalog/stages",       [ "create", "read", "update", "delete", "list", "map-principals", "unmap-principals", "principals-mapping" ]);
     $self->createRoutes($sessionBridge, "catalog/principals",   [ "list" ]);
-    
+
     # Profile routes
     $self->createRoutes($sessionBridge, "profile", [ "read", "update" ]);
     $sessionBridge->route('/profile/image/:id')->to('profile#image', id => "00000000-0000-0000-0000-000000000000");
@@ -143,7 +140,5 @@ sub createRoutes {
 
     return 1;
 }
-
-
 
 1;

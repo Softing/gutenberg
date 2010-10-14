@@ -119,8 +119,9 @@ Ext.extend(Ext.ux.grid.GridHeaderFilters, Ext.util.Observable, {
             //I TD corrispondenti ai vari headers
             this.headerCells = null;
             this.grid.on("render", this.onRender, this);
-            this.grid.on("columnmove", this.renderFilters.createDelegate(this, [false]), this);
+            //this.grid.on("columnmove", this.renderFilters.createDelegate(this, [false]), this);
             this.grid.on("columnresize", this.onColResize, this);
+
             if(this.stateful) {
                 this.grid.on("beforestatesave", this.saveFilters, this);
                 this.grid.on("beforestaterestore", this.loadFilters, this);
@@ -218,6 +219,7 @@ Ext.extend(Ext.ux.grid.GridHeaderFilters, Ext.util.Observable, {
     },
 
     renderFilters: function(bReload) {
+        
         //Eliminazione Fields di filtro esistenti
         this.filterFields = {};
 
@@ -253,13 +255,13 @@ Ext.extend(Ext.ux.grid.GridHeaderFilters, Ext.util.Observable, {
     onRender: function()
     {
             if(!this.filters)
-                    this.filters = {};
-            this.renderFilters(true);
+                this.filters = {};
+            //this.renderFilters(true);
             this.fireEvent("render", this);
     },
 
     onRefresh: function(){
-            this.renderFilters(false);
+            //this.renderFilters(false);
     },
 
     onColResize: function(index, iWidth){

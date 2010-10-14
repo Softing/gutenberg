@@ -6,13 +6,14 @@ use strict;
 use Data::Dump qw /dump/;
 use DBIx::Connector;
 
-use lib "../lib";
+use lib "../../lib";
 use Inprint::Frameworks::Config;
 use Inprint::Frameworks::SQL;
 
 binmode STDOUT, ":utf8";
 
-my $config = new Inprint::Frameworks::Config("../");
+my $config = new Inprint::Frameworks::Config();
+$config->load("../../");
 
 my $dbname     = $config->get("db.name");
 my $dbhost     = $config->get("db.host");
@@ -55,9 +56,9 @@ my $documents = $sql2->Q("
            FROM views.\"passport.owners\" card
           WHERE card.uuid = creator) AS creator_nick
     FROM views.documents
-    --WHERE uuid = '98da44c6-9114-4b58-9238-c15592d50e32'
-    --WHERE trash = 1
-    LIMIT 100000000
+    -- WHERE uuid = 'b94245da-bd60-442e-a4da-7e0570af3cdd'
+    -- WHERE trash = 1
+    LIMIT 3000000
  ")->Hashes;
 
 my $counter=0;
@@ -67,47 +68,102 @@ foreach my $item( @{ $documents } ) {
 
     $counter++;
 
+    print "------------------------------------------------------------\n";
+    print ">>$counter\n";
+    print "$item->{uuid}\n";
+    print "$item->{theowner}, $item->{creator}, $item->{manager}, $item->{owner_nick}, $item->{creator_nick}, $item->{manager_nick}\n";
+    print "$item->{edition}, $item->{edition_sname}, []\n";
+    print "$item->{look}, $item->{isopen}\n";
+    print "$item->{title}, $item->{author}\n";
+    print "$item->{section}, $item->{section_name}, $item->{rubric}, $item->{rubric_name}\n";
+    print "$item->{planned_date}, $item->{planned_size}, $item->{real_date}, $item->{calibr_real}\n";
+    print "$item->{image_count}, $item->{file_count}\n";
+    print "$item->{created}, $item->{updated}\n";
+    print "------------------------------------------------------------\n\n";
+
+    # Editions
+    my $EditionId = $sql->Q(" SELECT newid FROM migration WHERE oldid=? AND mtype = 'edition' ", [ $item->{edition} ])->Value;
+    die "Can't find edition id $item->{edition}" unless $EditionId;
+
+    my $Edition = $sql->Q(" SELECT * FROM editions WHERE id = ? ",
+        [ $EditionId ])->Hash;
+    die "Can't find edition object $EditionId" unless $Edition;
+
+    # Select Editions index
+    my $Editions = $sql->Q("
+        SELECT ARRAY( select id from editions where path @> ( select path from editions where id = ? ) )
+    ", [ $EditionId ])->Array;
+
+    # Oldstate
     my $oldstate = $sql2->Q("
         SELECT uuid, edition, object_uuid, status_uuid, member_uuid, created
         FROM exchange2.state
         WHERE object_uuid=?
     ", [$item->{uuid}])->Hash;
+    push @errors, { id=>"oldstate", text=>"Cant found old status $item->{uuid}" } unless ($oldstate);
 
-    # Select branch
-    my $branch = $sql->Q("
-        SELECT id, catalog, mtype, title, shortcut, description, created, updated
-        FROM branches
-        WHERE catalog=?
-    ", [$item->{edition}])->Hash;
+    # Select Branch
+    my $Branch = $sql->Q(" SELECT * FROM branches WHERE edition=? ", [ $EditionId ])->Hash;
+    die "Cant found branch $EditionId" unless ($Branch);
 
-    unless ($branch) {
-        push @errors, {
-            text => "branch", id=> $item->{id}
-        };
-        next;
+    my $Stage = {};
+    my $Readiness  = {};
+
+    if ($oldstate) {
+
+        # Select stage
+        my $StageId = $sql->Q(" SELECT newid FROM migration WHERE oldid=? AND mtype = 'stage' ", [ $oldstate->{status_uuid} ])->Value;
+        die "Cant found stage id $oldstate->{status_uuid}" unless ($StageId);
+
+        $Stage = $sql->Q(" SELECT * FROM stages WHERE id=? ", [ $StageId ])->Hash;
+        die "Cant found stage object $StageId " unless ($Stage);
+
+    } else {
+
+        $Stage = $sql->Q(" SELECT * FROM stages WHERE branch=? ORDER BY weight LIMIT 1 ", [ $Branch->{id} ])->Hash;
+        die "Cant found stage object by Branch $Branch->{id}" unless ($Stage);
     }
 
-    # Select stage
-    my $stage = $sql->Q("
-        SELECT id, branch, color, weight, title, shortcut, description, created, updated
-        FROM stages
-        WHERE branch=? AND id=?
-    ", [$branch->{id}, $oldstate->{status_uuid} ])->Hash;
+    # Select readiness
+    $Readiness = $sql->Q(" SELECT * FROM readiness WHERE id=? ", [ $Stage->{readiness} ])->Hash;
+    die "Cant found readiness object $Stage->{readiness}" unless ($Readiness);
 
-    unless ($stage) {
-        $stage = $sql->Q("
-            SELECT id, branch, color, weight, title, shortcut, description, created, updated
-            FROM stages
-            WHERE branch=? ORDER BY weight LIMIT 1
-        ", [$branch->{id} ])->Hash;
+    # Found catalog folder
+
+    my $CatalogID = $sql->Q(" SELECT newid FROM migration WHERE oldid=? AND mtype = 'catalog' ", [ $item->{edition} ])->Value;
+    die "Cant find catalog id $item->{edition}" unless $CatalogID;
+
+    my $Catalog = $sql->Q(" SELECT * FROM catalog WHERE id=? ", [ $CatalogID ])->Hash;
+    die "Cant found catalog object $CatalogID" unless ($Catalog);
+
+    my $catalog_folder   = $Catalog->{id};
+    my $catalog_shortcut = $Catalog->{shortcut};
+
+    if ($item->{department}) {
+        my $department = $sql->Q(" SELECT id, shortcut FROM catalog WHERE id = ? ", [ $item->{department} ])->Hash;
+        if ($department) {
+            $catalog_folder = $department->{id};
+            $catalog_shortcut = $department->{shortcut};
+        }
     }
 
-    unless ($stage) {
-        push @errors, {
-            text => "stage", id=> $item->{id}
-        };
-        next;
+    # Map document to fascicle
+    if ($item->{trash}) {
+        $item->{fascicle} = '99999999-9999-9999-9999-999999999999';
+        $item->{fascicle_name} = "Корзина";
     }
+
+    if ($item->{fascicle} eq $rootnode || ! $item->{fascicle}) {
+        $item->{fascicle} = $rootnode;
+        $item->{fascicle_name} = "Портфель";
+    }
+
+    # Select groups index
+    my $groups = $sql->Q("
+        SELECT ARRAY( select id from catalog where path @> ( select path from catalog where id = ? ) )
+    ", [ $catalog_folder ])->Array;
+
+    # Other fields
 
     $item->{theowner} = '4f5ad92e-b3e7-4c54-937e-e70aa999c0c7' unless ($item->{theowner});
     $item->{creator}  = '4f5ad92e-b3e7-4c54-937e-e70aa999c0c7' unless ($item->{creator});
@@ -125,66 +181,15 @@ foreach my $item( @{ $documents } ) {
     $item->{rubric_name}   = "Not found" unless ($item->{rubric_name});
     $item->{section_name}  = "Not found" unless ($item->{section_name});
 
-    print "------------------------------------------------------------\n";
-    print ">>$counter\n";
-    #print "$item->{uuid}\n";
-    #print "$item->{theowner}, $item->{creator}, $item->{manager}, $item->{owner_nick}, $item->{creator_nick}, $item->{manager_nick}\n";
-    #print "$item->{edition}, $item->{edition_sname}, []\n";
-    #print "$item->{look}, $item->{isopen}\n";
-    #print "$branch->{id}, $branch->{title}, $stage->{id}, $stage->{title}, $stage->{color}, $stage->{weight}\n";
-    #print "$item->{title}, $item->{author}\n";
-    #print "$item->{section}, $item->{section_name}, $item->{rubric}, $item->{rubric_name}\n";
-    #print "$item->{planned_date}, $item->{planned_size}, $item->{real_date}, $item->{calibr_real}\n";
-    #print "$item->{image_count}, $item->{file_count}\n";
-    #print "$item->{created}, $item->{updated}\n";
-    print "------------------------------------------------------------\n\n";
-
-    # Found catalog folder
-
-    my $catalog_folder   = $item->{edition};
-    my $catalog_shortcut = $item->{edition_sname};
-
-    print "MANAGER $item->{manager}, $item->{manager_nick}\n";
-    print "OWNER $item->{theowner}, $item->{owner_nick}\n";
-    print "DEPARTMENT $item->{department}, $item->{department_name}\n";
-    print "TRASH $item->{trash}\n";
-    print "FASCICLE $item->{fascicle}\n";
-
-    if ($item->{department}) {
-
-        my $department = $sql->Q(" SELECT id, shortcut FROM catalog WHERE id = ? ",
-            [ $item->{department} ])->Hash;
-
-        if ($department) {
-            $catalog_folder = $department->{id};
-            $catalog_shortcut = $department->{shortcut};
-        }
-    }
-
-    # Map document to fascicle
-
-    if ($item->{trash}) {
-        $item->{fascicle} = '99999999-9999-9999-9999-999999999999';
-        $item->{fascicle_name} = "Корзина";
-    }
-
-    if ($item->{fascicle} eq $rootnode || ! $item->{fascicle}) {
-        $item->{fascicle} = $rootnode;
-        $item->{fascicle_name} = "Портфель";
-    }
-
-    # Select groups index
-    my $groups = $sql->Q("
-        SELECT ARRAY( select id from catalog where path @> ( select path from catalog where id = ? ) )
-    ", [ $catalog_folder ])->Array;
 
     # do insert
     $sql->Do("
         INSERT INTO documents(
             id,
+            edition, edition_shortcut, ineditions,
             maingroup, maingroup_shortcut, ingroups,
             holder, creator, manager, holder_shortcut, creator_shortcut, manager_shortcut,
-            fascicle, fascicle_shortcut,
+            fascicle, fascicle_shortcut, infascicles,
             headline, headline_shortcut, rubric, rubric_shortcut,
             islooked, isopen,
             branch, branch_shortcut, stage, stage_shortcut, color, progress,
@@ -192,16 +197,17 @@ foreach my $item( @{ $documents } ) {
             pdate, psize, rdate, rsize,
             images, files,
             created, updated
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
     ",
     [
         $item->{uuid},
+        $Edition->{id}, $Edition->{shortcut}, @$Editions[0],
         $catalog_folder, $catalog_shortcut, @$groups[0],
         $item->{theowner}, $item->{creator}, $item->{manager}, $item->{owner_nick}, $item->{creator_nick}, $item->{manager_nick},
-        $item->{fascicle}, $item->{fascicle_name},
+        $item->{fascicle}, $item->{fascicle_name}, [],
         $item->{section}, $item->{section_name}, $item->{rubric}, $item->{rubric_name},
         $item->{look}, $item->{isopen},
-        $branch->{id}, $branch->{title}, $stage->{id}, $stage->{title}, $stage->{color}, $stage->{weight},
+        $Branch->{id}, $Branch->{title}, $Stage->{id}, $Stage->{title}, $Readiness->{color}, $Readiness->{weight},
         $item->{title}, $item->{author},
         $item->{planned_date}, $item->{planned_size}, $item->{real_date}, $item->{calibr_real},
         $item->{image_count}, $item->{file_count},
@@ -216,7 +222,10 @@ foreach my $item( @{ $documents } ) {
 
 # Import versions
 
+my $errcount = 0;
+
 foreach (@errors) {
+    print $errcount++;
     print "$_->{text}, $_->{id}\n";
 }
 

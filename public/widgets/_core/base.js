@@ -69,10 +69,44 @@ _get_values = function(myfield, myarray) {
     return data;
 };
 
+// Inverse colors
+
+function inverse(input) {
+    if(input.length < 6 || input.length > 6){
+    window.alert('You Must Enter a six digit color code')
+    return false;
+    }
+    hex1 = input.slice(0,2);
+    hexb1 = input.slice(2,4);
+    hexc1 = input.slice(4,6);
+    hex2 = 16 * giveHex(hex1.slice(0,1));
+    hex3 = giveHex(hex1.slice(1,2));
+    hex1 = hex1 + hex2;
+    hexb2 = 16 * giveHex(hexb1.slice(0,1));
+    hexb3 = giveHex(hexb1.slice(1,2));
+    hexb1 = hexb2 + hexb3;
+    hexc2 = 16 * giveHex(hexc1.slice(0,1));
+    hexc3 = giveHex(hexc1.slice(1,2));
+    hexc1 = hexc2 + hexc3;
+    newColor = DecToHex(255-hex1) + "" + DecToHex(255-hexb1) + "" + DecToHex(255-hexc1);
+    return newColor;
+}
+
+function DecToHex(number) {
+    var hexbase="0123456789ABCDEF";
+    return hexbase.charAt((number>> 4)& 0xf)+ hexbase.charAt(number& 0xf);
+}
+
+function giveHex(s){
+    s=s.toUpperCase();
+    return parseInt(s,16);
+}
+
+
 
 // Executor
 
-Ext.BLANK_IMAGE_URL = '/ext-3.2.1/resources/images/default/s.gif';
+Ext.BLANK_IMAGE_URL = '/ext-3.3.0/resources/images/default/s.gif';
 
 Ext.ns('Inprint');
 

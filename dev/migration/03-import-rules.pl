@@ -6,11 +6,12 @@ use strict;
 use Data::Dump qw /dump/;
 use DBIx::Connector;
 
-use lib "../lib";
+use lib "../../lib";
 use Inprint::Frameworks::Config;
 use Inprint::Frameworks::SQL;
 
-my $config = new Inprint::Frameworks::Config("../");
+my $config = new Inprint::Frameworks::Config();
+$config->load("../../");
 
 my $dbname     = $config->get("db.name");
 my $dbhost     = $config->get("db.host");

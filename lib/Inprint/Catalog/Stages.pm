@@ -14,7 +14,11 @@ sub list {
 
     my $c = shift;
 
-    my $i_branch = $c->param("branch");
+    my $i_edition = $c->param("branch");
+
+    my $idBranch = $c->sql->Q("
+        SELECT id FROM branches WHERE edition=? LIMIT 1
+    ", [$i_edition])->Value;
 
     my $result = $c->sql->Q("
         SELECT t1.id, t1.branch, t1.readiness, t1.weight, t1.title, t1.shortcut, t1.description,
@@ -22,7 +26,7 @@ sub list {
         FROM stages t1, readiness t2
         WHERE t1.branch=? AND t1.readiness=t2.id
         ORDER BY t1.weight, t1.shortcut
-    ", [ $i_branch ])->Hashes;
+    ", [ $idBranch ])->Hashes;
 
     foreach my $stage (@$result) {
 
@@ -38,7 +42,7 @@ sub list {
                 AND t1.catalog = t2.id
                 AND t1.stage = t3.id
                 AND t1.principal = t4.id
-            ORDER BY t4.type, t4.shortcut 
+            ORDER BY t4.type, t4.shortcut
         ", [ $stage->{id} ])->Hashes;
 
     }

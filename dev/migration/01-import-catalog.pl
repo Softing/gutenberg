@@ -3,14 +3,18 @@
 use utf8;
 use strict;
 
+use Data::UUID;
 use Data::Dump qw /dump/;
 use DBIx::Connector;
 
-use lib "../lib";
+use lib "../../lib";
 use Inprint::Frameworks::Config;
 use Inprint::Frameworks::SQL;
 
-my $config = new Inprint::Frameworks::Config("../");
+my $ug = new Data::UUID;
+
+my $config = new Inprint::Frameworks::Config();
+$config->load("../../");
 
 my $dbname     = $config->get("db.name");
 my $dbhost     = $config->get("db.host");
@@ -36,8 +40,9 @@ $sql2->SetConnection($conn2);
 
 my $rootnode = '00000000-0000-0000-0000-000000000000';
 
-$sql->Do("DELETE FROM catalog");
-$sql->Do("DELETE FROM editions");
+$sql->Do(" DELETE FROM catalog ");
+$sql->Do(" DELETE FROM editions ");
+$sql->Do(" DELETE FROM migration WHERE mtype = 'edition' OR mtype='catalog' ");
 
 $sql->Do("
     INSERT INTO catalog (id, path, title, shortcut, description, type, capables, created, updated)
@@ -60,16 +65,26 @@ my $editions = $sql2->Q("
 
 foreach my $item( @{ $editions } ) {
 
+    my $idEdition = $ug->create_str();
+    my $idCatalog = $ug->create_str();
+
     $sql->Do("
-        INSERT INTO catalog (id, path, title, shortcut, description, type, capables)
-        VALUES (?, ?, ?, ?, ?, 'ou', '{default}')
-    ", [ $item->{uuid}, cleanUUID($rootnode), $item->{name}, $item->{sname}, $item->{description} ]);
+        INSERT INTO migration(mtype, oldid, newid) VALUES (?, ?, ?);
+    ", [ "edition", $item->{uuid}, $idEdition ]);
+
+    $sql->Do("
+        INSERT INTO migration(mtype, oldid, newid) VALUES (?, ?, ?);
+    ", [ "catalog", $item->{uuid}, $idCatalog ]);
 
     $sql->Do("
         INSERT INTO editions (id, path, title, shortcut, description)
         VALUES (?, ?, ?, ?, ?)
-    ", [ $item->{uuid}, cleanUUID($rootnode), $item->{name}, $item->{sname}, $item->{description} ]);
+    ", [ $idEdition, cleanUUID($rootnode), $item->{name}, $item->{sname}, $item->{description} ]);
 
+    $sql->Do("
+        INSERT INTO catalog (id, path, title, shortcut, description, type, capables)
+        VALUES (?, ?, ?, ?, ?, 'ou', '{default}')
+    ", [ $idCatalog, cleanUUID($rootnode), $item->{name}, $item->{sname}, $item->{description} ]);
 
     # Import Departments
 
@@ -81,7 +96,7 @@ foreach my $item( @{ $editions } ) {
         $sql->Do("
             INSERT INTO catalog (id, path, title, shortcut, description, type, capables)
             VALUES (?, ?, ?, ?, ?, 'ou', '{default}')
-        ", [ $item2->{uuid}, cleanUUID($item2->{edition}), $item2->{title}, $item->{sname}."/".$item2->{title}, $item2->{description} ]);
+        ", [ $item2->{uuid}, cleanUUID($idCatalog), $item2->{title}, $item->{sname}."/".$item2->{title}, $item2->{description} ]);
     }
 
 }

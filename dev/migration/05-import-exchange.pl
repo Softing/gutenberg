@@ -13,7 +13,8 @@ use Inprint::Frameworks::SQL;
 
 my $ug = new Data::UUID;
 
-my $config = new Inprint::Frameworks::Config("../");
+my $config = new Inprint::Frameworks::Config();
+$config->load("../../");
 
 my $dbname     = $config->get("db.name");
 my $dbhost     = $config->get("db.host");
@@ -41,22 +42,80 @@ my $rootnode = '00000000-0000-0000-0000-000000000000';
 
 $sql->Do("DELETE FROM branches");
 $sql->Do("DELETE FROM stages");
-$sql->Do("DELETE FROM statuses");
+$sql->Do("DELETE FROM readiness");
+$sql->Do("DELETE FROM map_principals_to_stages");
+
+$sql->Do(" DELETE FROM migration WHERE mtype = 'branch' OR mtype='stage' ");
 
 # Import statuses
-my $statuses = $sql2->Q("
-    SELECT distinct
-        status_title as title, status_percent as weight, status_color as color
-    FROM exchange2.readiness
-")->Hashes;
 
-foreach my $item ( @$statuses ) {
+my @readiness = (
+    {
+        percent=>10,
+        description=>"Автор",
+        color=>"ffcd04",
+        title=>"Написание",
+        shortcut=>"Написание",
+    },
+    {
+        percent=>25,
+        description=>"Зав. отделом",
+        color=>"f6f67d",
+        title=>"Редактирование",
+        shortcut=>"Редактирование",
+    },
+    {
+        percent=>50,
+        description=>"Зам.гл. редактора",
+        color=>"b2be0f",
+        title=>"Сдача и утверждение",
+        shortcut=>"Сдача и утверждение",
+    },
+    {
+        percent=>60,
+        description=>"Шеф по тексту",
+        color=>"f87878",
+        title=>"Правка",
+        shortcut=>"Правка",
+    },
+    {
+        percent=>70,
+        description=>"Автор",
+        color=>"01cd42",
+        title=>"Вычитка",
+        shortcut=>"Вычитка",
+    },
+    {
+        percent=>80,
+        description=>"Корректор",
+        color=>"07f9c4",
+        title=>"Корректура",
+        shortcut=>"Корректура",
+    },
+    {
+        percent=>90,
+        description=>"Отдел ОХО",
+        color=>"009790",
+        title=>"Верстка",
+        shortcut=>"Верстка",
+    },
+    {
+        percent=>100,
+        description=>"",
+        color=>"0c48f9",
+        title=>"Сверстано",
+        shortcut=>"Сверстано",
+    }
+);
+
+foreach my $item ( @readiness ) {
     $item->{color} =~ s/#//g;
     $sql->Do("
-        INSERT INTO statuses(color, weight, title, shortcut, description, created, updated)
+        INSERT INTO readiness (color, weight, title, shortcut, description, created, updated)
             VALUES (?, ?, ?, ?, ?, now(), now());
-    ", [ $item->{color}, $item->{weight}, $item->{title}, $item->{title}, "" ]);
+    ", [ $item->{color}, $item->{percent}, $item->{title}, $item->{shortcut}, $item->{description} ]);
 }
+
 
 # Import chains
 
@@ -68,12 +127,21 @@ my $chains = $sql2->Q("
 
 foreach my $item( @{ $chains } ) {
 
-    my $id = $ug->create_str();
+    my $idBranch = $ug->create_str();
+
+    $sql->Do("INSERT INTO migration(mtype, oldid, newid) VALUES (?, ?, ?) ",
+        [ "branch", $item->{catalog}, $idBranch ]);
+
+    my $idEdition = $sql->Q("
+        SELECT newid FROM migration WHERE mtype='edition' AND oldid=?
+    ", [ $item->{catalog} ])->Value;
+
+    die "Cant find branch for $item->{catalog}" unless $idBranch;
 
     $sql->Do("
-        INSERT INTO branches (id, catalog, title, shortcut, description, created, updated)
+        INSERT INTO branches (id, edition, title, shortcut, description, created, updated)
             VALUES (?,?,?,?,?,now(),now());
-    ", [ $id, $item->{catalog}, $item->{name}, $item->{sname}, "" ]);
+    ", [ $idBranch, $idEdition, $item->{name}, $item->{sname}, "" ]);
 
     # Import stages
     my $stages = $sql2->Q("
@@ -85,11 +153,80 @@ foreach my $item( @{ $chains } ) {
     ", [ $item->{catalog} ])->Hashes;
 
     foreach my $item2( @{ $stages } ) {
-        $item2->{color} =~ s/#//g;
+
+        my $idStage = $ug->create_str();
+
+        my $idReadiness = $sql->Q("
+            SELECT id FROM readiness WHERE weight >= ? AND weight <= 100  ORDER BY weight LIMIT 1
+        ", [$item2->{weight}])->Value;
+
+        die "Cant find Readiness for $item2->{weight}" unless $idReadiness;
+
+        #my $idBranch = $sql->Q("
+        #    SELECT newid FROM migration WHERE mtype='edition' AND oldid=?
+        #", [ $item->{catalog} ])->Value;
+        #
+        #die "Cant find branch for $item->{catalog}" unless $idBranch;
+
+        $sql->Do("INSERT INTO migration(mtype, oldid, newid) VALUES (?, ?, ?) ",
+            [ "stage", $item2->{id}, $idStage ]);
+
         $sql->Do("
-            INSERT INTO stages(id, branch, color, weight, title, shortcut, description, created, updated)
+            INSERT INTO stages(id, branch, readiness, weight, title, shortcut, description, created, updated)
                 VALUES (?,?,?,?,?,?,?,now(),now());
-        ", [ $item2->{id}, $id, $item2->{color}, $item2->{weight}, $item2->{name}, $item2->{name}, $item2->{description} ]);
+        ", [ $idStage, $idBranch, $idReadiness, $item2->{weight}, $item2->{name}, $item2->{name}, $item2->{description} ]);
+
+        # Import users
+        my $members = $sql2->Q("
+            SELECT uuid, edition, status_uuid, member_uuid, is_group
+            FROM exchange2.mappings WHERE status_uuid=? AND is_group = false;
+        ", [ $item2->{id} ])->Hashes;
+
+        foreach my $item3( @{ $members } ) {
+
+            my $idMember = $sql->Q("
+                SELECT id FROM members WHERE id=?
+            ", [ $item3->{member_uuid} ])->Value;
+
+            my $idDepartment = $sql2->Q("
+                SELECT department FROM passport.member_department WHERE edition=? AND member=? LIMIT 1
+            ", [ $item3->{edition}, $item3->{member_uuid} ])->Value || '00000000-0000-0000-0000-000000000000';
+
+            my $idCatalog = $sql->Q(" SELECT id FROM catalog WHERE id = ? ", [ $idDepartment ])->Value;
+
+            if ($idMember) {
+                $sql->Do("
+                    INSERT INTO map_principals_to_stages( stage, catalog, principal)
+                    VALUES (?, ?, ?);
+                ",
+                [ $idStage, $idDepartment, $idMember ]);
+
+            }
+        }
+
+        # Import departments
+        my $departments = $sql2->Q("
+            SELECT uuid, edition, status_uuid, member_uuid, is_group
+            FROM exchange2.mappings WHERE status_uuid=? AND is_group = true;
+        ", [ $item2->{id} ])->Hashes;
+
+        foreach my $item4 ( @{ $departments } ) {
+
+            my $idDepartment = $sql->Q("
+                SELECT id FROM catalog WHERE id=?
+            ", [ $item4->{member_uuid} ])->Value;
+
+            die "cant't find department $idDepartment" unless $idDepartment;
+
+            if ($idDepartment) {
+                $sql->Do("
+                    INSERT INTO map_principals_to_stages( stage, catalog, principal)
+                    VALUES (?, ?, ?);
+                ",
+                [ $idStage, $idDepartment, $idDepartment ]);
+
+            }
+        }
 
     }
 

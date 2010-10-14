@@ -57,56 +57,60 @@ Inprint.factory.Combo = new function() {
         "/calendar/combo/groups/": {
             name: "calendar-group",
             fieldLabel: _("Edition"),
-            emptyText: _("Select") + "..."
+            emptyText: _("Edition") + "..."
         },
 
         // Documents
-        "/documents/combos/groups": {
+        "/documents/combos/editions/": {
+            name: "group",
+            icon: "toggle-small",
+            fieldLabel: _("Edition"),
+            emptyText: _("Edition") + "..."
+        },
+        "/documents/combos/groups/": {
             name: "group",
             icon: "toggle-small",
             fieldLabel: _("Group"),
-            emptyText: _("Select") + "..."
+            emptyText: _("Group") + "..."
         },
 
-        "/documents/combos/fascicles": {
+        "/documents/combos/fascicles/": {
             name: "fascicle",
             icon:"folder",
             fieldLabel: _("Fascicle"),
-            emptyText: _("Select") + "..."
+            emptyText: _("Fascicle") + "..."
         },
-
-        "/documents/combos/headlines": {
+        "/documents/combos/headlines/": {
             name: "headline",
             icon: "tag-label",
             fieldLabel: _("Headline"),
-            emptyText: _("Select") + "..."
+            emptyText: _("Headline") + "..."
         },
-
-        "/documents/combos/rubrics": {
+        "/documents/combos/rubrics/": {
             name: "rubric",
             icon: "tag-label-pink",
             fieldLabel: _("rubric"),
-            emptyText: _("Select") + "..."
+            emptyText: _("Rubric") + "..."
         },
 
-        "/documents/combos/holders": {
+        "/documents/combos/holders/": {
             name: "holder",
             icon: "user-business",
             fieldLabel: _("Holder"),
-            emptyText: _("Select") + "..."
+            emptyText: _("Holder") + "..."
         },
 
-        "/documents/combos/managers": {
+        "/documents/combos/managers/": {
             name: "manager",
             icon: "user-business",
             fieldLabel: _("Manager"),
-            emptyText: _("Select") + "..."
+            emptyText: _("Manager") + "..."
         },
 
-        "/documents/combos/progress": {
+        "/documents/combos/progress/": {
             name: "progress",
             fieldLabel: _("Progress"),
-            emptyText: _("Select") + "..."
+            emptyText: _("Progress") + "..."
         }
 
     };

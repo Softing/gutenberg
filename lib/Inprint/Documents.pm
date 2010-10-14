@@ -161,6 +161,8 @@ sub list {
     push @params, $start;
     my $result = $c->sql->Q($sql_query, \@params)->Hashes;
 
+    print STDERR $sql_query;
+
     # Create result
     $c->render_json( { "data" => $result, "total" => $total } );
 }
