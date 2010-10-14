@@ -36,30 +36,13 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                 width: 210,
                 sortable: true,
                 renderer : this.renderers.title
-                //filter: { xtype:"textfield", filterName:"flt_title" }
             },
             {
                 id:"edition",
                 dataIndex: "edition_shortcut",
                 header: _("Edition"),
-                width: 90,
+                width: 50,
                 sortable: true
-            },
-            {
-                id:"maingroup",
-                dataIndex: "maingroup_shortcut",
-                header: _("Group"),
-                width: 90,
-                sortable: true
-                //filter: Inprint.factory.Combo.getConfig(
-                //    "/documents/combos/groups",
-                //    {
-                //        xtype: "combo",
-                //        stateful:true,
-                //        //filterName:"flt_group",
-                //        nocache: true
-                //    }
-                //)
             },
             {
                 id:"fascicle",
@@ -68,106 +51,29 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                 width: 90,
                 sortable: true,
                 renderer : this.renderers.fascicle
-                //filter: Inprint.factory.Combo.getConfig(
-                //    "/documents/combos/fascicles",
-                //    {
-                //        xtype: "xcombo",
-                //        filterName:"flt_fascicle",
-                //        nocache: true,
-                //        listeners:{
-                //            beforeselect: {
-                //                scope:this,
-                //                fn: function(combo, record, indx) {
-                //                    if (record.data.id) {
-                //                        this.getHeaderFilterField("flt_headline").enable();
-                //                    } else {
-                //                        this.getHeaderFilterField("flt_headline").disable();
-                //                        this.getHeaderFilterField("flt_rubric").disable();
-                //                    }
-                //                }
-                //            },
-                //            beforequery : {
-                //                scope:this,
-                //                fn: function(e) {
-                //                    e.combo.getStore().baseParams = {
-                //                        flt_group: this.getHeaderFilter("flt_group")
-                //                    };
-                //                }
-                //            }
-                //        }
-                //    }
-                //)
             },
             {
                 id:"headline",
                 dataIndex: "headline_shortcut",
                 header: _("Headline"),
-                width: 90,
+                width: 100,
                 sortable: true
-                //filter: Inprint.factory.Combo.getConfig(
-                //    "/documents/combos/headlines",
-                //    {
-                //        xtype: "xcombo",
-                //        filterName:"flt_headline",
-                //        disabled:true,
-                //        nocache: true,
-                //        listeners:{
-                //            beforeselect: {
-                //                scope:this,
-                //                fn: function(combo, record, indx) {
-                //                    if (record.data.id) {
-                //                        this.getHeaderFilterField("flt_rubric").enable();
-                //                    } else {
-                //                        this.getHeaderFilterField("flt_rubric").disable();
-                //                    }
-                //                }
-                //            },
-                //            beforequery : {
-                //                scope:this,
-                //                fn: function(e) {
-                //                    e.combo.getStore().baseParams = {
-                //                        flt_fascicle: this.getHeaderFilter("flt_fascicle")
-                //                    };
-                //                }
-                //            }
-                //        }
-                //    }
-                //)
             },
             {
                 id:"rubric",
                 dataIndex: "rubric_shortcut",
                 header: _("Rubric"),
-                width: 90,
+                width: 100,
                 sortable: true
-                //filter: Inprint.factory.Combo.getConfig(
-                //    "/documents/combos/rubrics",
-                //    {
-                //        xtype: "xcombo",
-                //        filterName:"flt_rubric",
-                //        disabled:true,
-                //        nocache: true,
-                //        listeners:{
-                //            beforequery : {
-                //                scope:this,
-                //                fn: function(e) {
-                //                    e.combo.getStore().baseParams = {
-                //                        flt_fascicle: this.getHeaderFilter("flt_fascicle"),
-                //                        flt_headline: this.getHeaderFilter("flt_headline")
-                //                    };
-                //                }
-                //            }
-                //        }
-                //    }
-                //)
             },
             {
                 id:"pages",
                 dataIndex: "pages",
                 header: _("Pages"),
-                width: 80,
+                width: 50,
                 sortable: true
             },
+
 
             {
                 id:"manager",
@@ -175,24 +81,6 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                 header: _("Manager"),
                 width: 100,
                 sortable: true
-                //filter: Inprint.factory.Combo.getConfig(
-                //    "/documents/combos/managers",
-                //    {
-                //        xtype: "xcombo",
-                //        filterName:"flt_manager",
-                //        nocache: true,
-                //        listeners:{
-                //            beforequery : {
-                //                scope:this,
-                //                fn: function(e) {
-                //                    e.combo.getStore().baseParams = {
-                //                        flt_group: this.getHeaderFilter("flt_group")
-                //                    };
-                //                }
-                //            }
-                //        }
-                //    }
-                //)
             },
             {
                 id:"progress",
@@ -201,24 +89,13 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                 sortable: true,
                 width: 80,
                 renderer : this.renderers.progress
-                //filter: Inprint.factory.Combo.getConfig(
-                //    "/documents/combos/progress",
-                //    {
-                //        xtype: "xcombo",
-                //        filterName:"flt_progress",
-                //        nocache: true,
-                //        listeners:{
-                //            beforequery : {
-                //                scope:this,
-                //                fn: function(e) {
-                //                    e.combo.getStore().baseParams = {
-                //                        flt_group: this.getHeaderFilter("flt_group")
-                //                    };
-                //                }
-                //            }
-                //        }
-                //    }
-                //)
+            },
+            {
+                id:"maingroup",
+                dataIndex: "maingroup_shortcut",
+                header: _("Group"),
+                width: 90,
+                sortable: true
             },
             {
                 id:"holder",
@@ -226,24 +103,6 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                 header: _("Holder"),
                 width: 100,
                 sortable: true
-                //filter: Inprint.factory.Combo.getConfig(
-                //    "/documents/combos/holders",
-                //    {
-                //        xtype: "xcombo",
-                //        filterName:"flt_holder",
-                //        nocache: true,
-                //        listeners:{
-                //            beforequery : {
-                //                scope:this,
-                //                fn: function(e) {
-                //                    e.combo.getStore().baseParams = {
-                //                        flt_group: this.getHeaderFilter("flt_group")
-                //                    };
-                //                }
-                //            }
-                //        }
-                //    }
-                //)
             },
             {
                 id:"images",
@@ -263,35 +122,14 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
 
         ];
 
-        var xc = Inprint.factory.Combo;
-
-        this.filter = new Ext.FormPanel({
-            border:false,
-            layout:'column',
-            defaults: {
-                nocache: true
-            },
-            items: [
-                {
-                    width:180,
-                    xtype: 'textfield',
-                    emptyText: _("Title") + "..."
-                },
-                xc.getConfig("/documents/combos/editions/", { columnWidth:.125 }),
-                xc.getConfig("/documents/combos/groups/", { columnWidth:.125 }),
-                xc.getConfig("/documents/combos/fascicles/", { columnWidth:.125 }),
-                xc.getConfig("/documents/combos/headlines/", { columnWidth:.125 }),
-                xc.getConfig("/documents/combos/rubrics/", { columnWidth:.125 }),
-                xc.getConfig("/documents/combos/managers/", { columnWidth:.125 }),
-                xc.getConfig("/documents/combos/progress/", { columnWidth:.125 }),
-                xc.getConfig("/documents/combos/holders/", { columnWidth:.125 }),
-                {
-                    xtype: 'button',
-                    icon: _ico('magnifier'),
-                    cls: 'x-btn-icon'
-                }
-            ]
+        this.filter = new Inprint.documents.GridFilter({
+            stateId: this.stateId,
+            gridmode: this.gridmode
         });
+
+        this.filter.on("filter", function(filter, params) {
+            this.cmpLoad(params);
+        }, this);
 
         this.tbar = {
             xtype    : 'container',
@@ -405,102 +243,6 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
             ]
         };
 
-        //this.tbar = [
-        //    {
-        //        icon: _ico("plus-button"),
-        //        cls: "x-btn-text-icon",
-        //        text: _("Add"),
-        //        disabled:true,
-        //        ref: "../btnCreate",
-        //        scope:this,
-        //        handler: this.cmpCreate
-        //    },
-        //    {
-        //        icon: _ico("pencil"),
-        //        cls: "x-btn-text-icon",
-        //        text: _("Edit"),
-        //        disabled:true,
-        //        ref: "../btnUpdate",
-        //        scope:this,
-        //        handler: this.cmpCreate
-        //    },
-        //    '-',
-        //    {
-        //        icon: _ico("hand"),
-        //        cls: "x-btn-text-icon",
-        //        text: _("Capture"),
-        //        disabled:true,
-        //        ref: "../btnCapture",
-        //        scope:this,
-        //        handler: this.cmpDelete
-        //    },
-        //    {
-        //        icon: _ico("arrow"),
-        //        cls: "x-btn-text-icon",
-        //        text: _("Transfer"),
-        //        disabled:true,
-        //        ref: "../btnTransfer",
-        //        scope:this,
-        //        handler: this.cmpDelete
-        //    },
-        //    {
-        //        icon: _ico("briefcase"),
-        //        cls: "x-btn-text-icon",
-        //        text: _("Briefcase"),
-        //        disabled:true,
-        //        ref: "../btnBriefcase",
-        //        scope:this,
-        //        handler: this.cmpDelete
-        //    },
-        //    "-",
-        //    {
-        //        icon: _ico("document-copy"),
-        //        cls: "x-btn-text-icon",
-        //        text: _("Copy"),
-        //        disabled:true,
-        //        ref: "../btnCopy",
-        //        scope:this,
-        //        handler: this.cmpDelete
-        //    },
-        //    {
-        //        icon: _ico("documents"),
-        //        cls: "x-btn-text-icon",
-        //        text: _("Duplicate"),
-        //        disabled:true,
-        //        ref: "../btnDuplicate",
-        //        scope:this,
-        //        handler: this.cmpDelete
-        //    },
-        //    "-",
-        //    {
-        //        icon: _ico("bin--plus"),
-        //        cls: "x-btn-text-icon",
-        //        text: _("Recycle Bin"),
-        //        disabled:true,
-        //        ref: "../btnRecycle",
-        //        scope:this,
-        //        handler: this.cmpDelete
-        //    },
-        //    {
-        //        icon: _ico("bin--arrow"),
-        //        cls: "x-btn-text-icon",
-        //        text: _("Restore"),
-        //        disabled:true,
-        //        ref: "../btnRestore",
-        //        scope:this,
-        //        handler: this.cmpDelete
-        //    },
-        //    {
-        //        icon: _ico("minus-button"),
-        //        cls: "x-btn-text-icon",
-        //        text: _("Delete"),
-        //        disabled:true,
-        //        ref: "../btnDelete",
-        //        scope:this,
-        //        handler: this.cmpDelete
-        //    }
-        //];
-
         this.bbar = new Ext.PagingToolbar({
             pageSize: 60,
             store: this.store,
@@ -540,7 +282,6 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
             tbar: this.tbar,
             columns: this.columns,
             bbar: this.bbar
-            //plugins: [new Ext.ux.grid.GridHeaderFilters()]
         });
 
         Inprint.documents.Grid.superclass.initComponent.apply(this, arguments);
@@ -551,33 +292,8 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
 
         Inprint.documents.Grid.superclass.onRender.apply(this, arguments);
 
-        this.on("render", function() {
-
-            //var flt_group    = this.getHeaderFilterField("flt_group");
-            //var flt_fascicle = this.getHeaderFilterField("flt_fascicle");
-            //var flt_headline = this.getHeaderFilterField("flt_headline");
-            //var flt_rubric   = this.getHeaderFilterField("flt_rubric");
-            //
-            //if (!flt_group.getValue()) {
-            //    flt_group.setValueById("00000000-0000-0000-0000-000000000000");
-            //}
-            //
-            //if (flt_fascicle.getValue()) {
-            //    flt_headline.enable();
-            //}
-            //
-            //if (flt_headline.getValue()) {
-            //    flt_rubric.enable();
-            //}
-
-        }, this);
-
-        //this.store.on('load', function() {
-        //    this.headerFilters.renderFilters(false)
-        //}, this, { single:true });
-
-        this.on("afterrender", function() {
-            this.store.load({params:{start:0, limit:60}});
+        this.filter.on("ready", function(filter, params) {
+            this.store.load({ params: Ext.apply({start:0, limit:60}, params) });
         }, this);
 
     },
@@ -627,10 +343,10 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
             var string = '';
 
             if (record.data.pdate) {
-                string = _fmtDate(record.data.pdate);
+                string = _fmtDate(record.data.pdate, 'M j');
             }
             else if (record.data.rdate) {
-                string = _fmtDate(record.data.rdate);
+                string = _fmtDate(record.data.rdate, 'M j');
             }
 
             var style = '';
@@ -646,7 +362,7 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
 
             return String.format(
                 '<div class="x-progress-wrap">'+
-                    '<div class="x-progress-inner" style="border:2px solid {4};background:{3}!important;">'+
+                    '<div class="x-progress-inner" style="border:1px solid {4};background:{3}!important;">'+
                         '<div class="x-progress-bar{0}" style="width:{1}%;background:{4}!important;color:{5} !important;">{2}</div>'+
                 '</div>',
                 style, v, text, bgcolor.rgb(), fgcolor.rgb(), txtcolor);

@@ -3,12 +3,15 @@
 use utf8;
 use strict;
 
+use Data::UUID;
 use Data::Dump qw /dump/;
 use DBIx::Connector;
 
 use lib "../../lib";
 use Inprint::Frameworks::Config;
 use Inprint::Frameworks::SQL;
+
+my $ug = new Data::UUID;
 
 binmode STDOUT, ":utf8";
 
@@ -56,7 +59,7 @@ my $documents = $sql2->Q("
            FROM views.\"passport.owners\" card
           WHERE card.uuid = creator) AS creator_nick
     FROM views.documents
-    -- WHERE uuid = 'b94245da-bd60-442e-a4da-7e0570af3cdd'
+    -- WHERE uuid = 'e009789c-7da2-47a5-b9d3-0dfae34515df'
     -- WHERE trash = 1
     LIMIT 3000000
  ")->Hashes;
@@ -71,14 +74,14 @@ foreach my $item( @{ $documents } ) {
     print "------------------------------------------------------------\n";
     print ">>$counter\n";
     print "$item->{uuid}\n";
-    print "$item->{theowner}, $item->{creator}, $item->{manager}, $item->{owner_nick}, $item->{creator_nick}, $item->{manager_nick}\n";
-    print "$item->{edition}, $item->{edition_sname}, []\n";
-    print "$item->{look}, $item->{isopen}\n";
-    print "$item->{title}, $item->{author}\n";
-    print "$item->{section}, $item->{section_name}, $item->{rubric}, $item->{rubric_name}\n";
-    print "$item->{planned_date}, $item->{planned_size}, $item->{real_date}, $item->{calibr_real}\n";
-    print "$item->{image_count}, $item->{file_count}\n";
-    print "$item->{created}, $item->{updated}\n";
+    #print "$item->{theowner}, $item->{creator}, $item->{manager}, $item->{owner_nick}, $item->{creator_nick}, $item->{manager_nick}\n";
+    #print "$item->{edition}, $item->{edition_sname}, []\n";
+    #print "$item->{look}, $item->{isopen}\n";
+    #print "$item->{title}, $item->{author}\n";
+    #print "$item->{section}, $item->{section_name}, $item->{rubric}, $item->{rubric_name}\n";
+    #print "$item->{planned_date}, $item->{planned_size}, $item->{real_date}, $item->{calibr_real}\n";
+    #print "$item->{image_count}, $item->{file_count}\n";
+    #print "$item->{created}, $item->{updated}\n";
     print "------------------------------------------------------------\n\n";
 
     # Editions
@@ -176,11 +179,122 @@ foreach my $item( @{ $documents } ) {
     $item->{look}   = 'false' unless ($item->{look});
     $item->{isopen} = 'false' unless ($item->{isopen});
 
-    $item->{rubric}  = $rootnode unless ($item->{rubric});
-    $item->{section}  = $rootnode unless ($item->{section});
-    $item->{rubric_name}   = "Not found" unless ($item->{rubric_name});
-    $item->{section_name}  = "Not found" unless ($item->{section_name});
+    my $Tag1;
+    my $Tag2;
+    my $Headline;
+    my $Rubric;
 
+    $Tag1 = $sql->Q("
+        SELECT * FROM tags WHERE title =? AND mtype='headline'
+    ", [ $item->{section_name} || "Not found" ])->Hash;
+
+    unless ($Tag1) {
+
+        $sql->Do("
+            INSERT INTO tags(mtype, title, shortcut, description, created, updated)
+            VALUES (?, ?, ?, ?, now(), now());
+        ", [ "headline", $item->{section_name}, $item->{section_name}, "" ]);
+
+        $Tag1 = $sql->Q("
+            SELECT * FROM tags WHERE title =? AND mtype='headline'
+        ", [$item->{section_name} ])->Hash;
+    }
+
+    die unless $Tag1;
+
+    $Headline = $sql->Q("
+        SELECT * FROM headlines WHERE fascicle=? AND tag=?
+    ", [ $item->{fascicle}, $Tag1->{id} ])->Hash;
+
+    unless ($Headline) {
+        $sql->Do("
+            INSERT INTO headlines(fascicle, tag, created, updated)
+            VALUES (?, ?, now(), now());
+        ", [ $item->{fascicle}, $Tag1->{id} ]);
+
+        $Headline = $sql->Q("
+            SELECT * FROM headlines WHERE fascicle=? AND tag=?
+        ", [ $item->{fascicle}, $Tag1->{id} ])->Hash;
+    }
+    die unless $Headline;
+
+
+
+    $Tag2 = $sql->Q("
+        SELECT * FROM tags WHERE title =? AND mtype='rubric'
+    ", [$item->{rubric_name} || "Not found" ])->Hash;
+
+    unless ($Tag2) {
+        $sql->Do("
+            INSERT INTO tags(mtype, title, shortcut, description, created, updated)
+            VALUES (?, ?, ?, ?, now(), now());
+        ", [ "rubric", $item->{section_name}, $item->{section_name}, "" ]);
+
+        $Tag2 = $sql->Q("
+            SELECT * FROM tags WHERE title =? AND mtype='rubric'
+        ", [$item->{section_name} ])->Hash;
+    }
+    die unless $Tag2;
+
+    $Rubric = $sql->Q("
+        SELECT * FROM rubrics WHERE fascicle=? AND headline=? AND tag=?
+    ", [ $item->{fascicle}, $Headline->{id}, $Tag2->{id} ])->Hash;
+
+    unless ($Rubric) {
+        $sql->Do("
+            INSERT INTO rubrics(fascicle, headline, tag, created, updated)
+            VALUES (?, ?, ?, now(), now());
+        ", [ $item->{fascicle}, $Headline->{id}, $Tag2->{id} ]);
+
+        $Rubric = $sql->Q("
+            SELECT * FROM rubrics WHERE fascicle=? AND headline=? AND tag=?
+        ", [ $item->{fascicle}, $Headline->{id}, $Tag2->{id} ])->Hash;
+    }
+    die unless $Rubric;
+
+
+    #if ($item->{section} && $item->{section_name}) {
+    #    $Section = $sql->Q(" SELECT * FROM headlines WHERE id=? AND fascicle=?", [ $item->{section}, $item->{fascicle} ])->Hash;
+    #    unless ($Section) {
+    #        $Section = $sql->Q(" SELECT * FROM headlines WHERE fascicle=? AND (title=? OR shortcut=?) ", [ $item->{fascicle}, $item->{section_name}, $item->{section_name} ])->Hash;
+    #    }
+    #    unless ($Section) {
+    #        my $idSection = $ug->create_str();
+    #        $sql->Do("
+    #            INSERT INTO headlines(id, fascicle, title, shortcut, description, created, updated)
+    #            VALUES (?, ?, ?, ?, ?, now(), now());
+    #        ", [ $idSection, $item->{fascicle}, $item->{section_name}, $item->{section_name}, $item->{section_name} ]);
+    #        $Section = $sql->Q(" SELECT * FROM headlines WHERE id=? ", [ $idSection ])->Hash;
+    #    }
+    #    die "Cant find Section" unless $Section;
+    #} else {
+    #    $Section = {
+    #        id => $rootnode,
+    #        title => "Not found"
+    #    };
+    #}
+    #
+    #if ($item->{rubric} && $item->{rubric_name}) {
+    #    $Rubric = $sql->Q(" SELECT * FROM rubrics WHERE id=? AND fascicle=? AND parent=?", [ $item->{rubric}, $item->{fascicle}, $Section->{id} ])->Hash;
+    #    unless ($Rubric) {
+    #        $Rubric = $sql->Q(" SELECT * FROM rubrics WHERE fascicle=? AND parent=? AND ( title=? OR shortcut=?) ", [ $item->{fascicle}, $Section->{id}, $item->{rubric_name}, $item->{rubric_name} ])->Hash;
+    #    }
+    #    unless ($Rubric) {
+    #        my $idRubric = $ug->create_str();
+    #        $sql->Do("
+    #            INSERT INTO rubrics(id, fascicle, parent, title, shortcut, description, created, updated)
+    #            VALUES (?, ?, ?, ?, ?, ?, now(), now());
+    #        ", [ $idRubric, $item->{fascicle}, $Section->{id}, $item->{rubric_name}, $item->{rubric_name}, $item->{rubric_name} ]);
+    #        $Rubric = $sql->Q(" SELECT * FROM rubrics WHERE id=? ", [ $idRubric ])->Hash;
+    #    }
+    #    die "Cant find Rubric" unless $Rubric;
+    #
+    #} else {
+    #    $Rubric = {
+    #        id => $rootnode,
+    #        title => "Not found"
+    #    };
+    #}
 
     # do insert
     $sql->Do("
@@ -190,14 +304,16 @@ foreach my $item( @{ $documents } ) {
             maingroup, maingroup_shortcut, ingroups,
             holder, creator, manager, holder_shortcut, creator_shortcut, manager_shortcut,
             fascicle, fascicle_shortcut, infascicles,
-            headline, headline_shortcut, rubric, rubric_shortcut,
+            headline, headline_shortcut,
+            rubric, rubric_shortcut,
             islooked, isopen,
-            branch, branch_shortcut, stage, stage_shortcut, color, progress,
+            branch, branch_shortcut, stage, stage_shortcut,
+            readiness, readiness_shortcut, color, progress,
             title, author,
             pdate, psize, rdate, rsize,
             images, files,
             created, updated
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
     ",
     [
         $item->{uuid},
@@ -205,9 +321,11 @@ foreach my $item( @{ $documents } ) {
         $catalog_folder, $catalog_shortcut, @$groups[0],
         $item->{theowner}, $item->{creator}, $item->{manager}, $item->{owner_nick}, $item->{creator_nick}, $item->{manager_nick},
         $item->{fascicle}, $item->{fascicle_name}, [],
-        $item->{section}, $item->{section_name}, $item->{rubric}, $item->{rubric_name},
+        $Headline->{id}, $Tag1->{title},
+        $Rubric->{id}, $Tag2->{title},
         $item->{look}, $item->{isopen},
-        $Branch->{id}, $Branch->{title}, $Stage->{id}, $Stage->{title}, $Readiness->{color}, $Readiness->{weight},
+        $Branch->{id}, $Branch->{title}, $Stage->{id}, $Stage->{title},
+        $Readiness->{id}, $Readiness->{shortcut}, $Readiness->{color}, $Readiness->{weight},
         $item->{title}, $item->{author},
         $item->{planned_date}, $item->{planned_size}, $item->{real_date}, $item->{calibr_real},
         $item->{image_count}, $item->{file_count},

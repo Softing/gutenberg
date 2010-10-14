@@ -177,6 +177,8 @@ Ext.extend(Ext.ux.state.HttpProvider, Ext.state.Provider, {
           }
           var changed = undefined === lastValue || lastValue !== value;
 
+          changed = true;
+
           if(changed) {
                o[this.paramNames.name] = name;
                o[this.paramNames.value] = this.encodeValue(value);

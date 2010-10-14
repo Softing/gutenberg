@@ -4,13 +4,16 @@ Inprint.factory.Combo = new function() {
         xtype: "combo",
 
         clearable:false,
-        nocache: false,
 
         editable:false,
         forceSelection: true,
-        typeAhead: true,
+        //typeAhead: true,
         triggerAction: "all",
-        hideOnSelect:false,
+        //hideOnSelect:false,
+
+        minChars:2,
+        queryDelay: 50,
+
         minListWidth: 200,
         valueField: "id",
         displayField: "title",
@@ -62,53 +65,53 @@ Inprint.factory.Combo = new function() {
 
         // Documents
         "/documents/combos/editions/": {
-            name: "group",
+            hiddenName: "edition",
             icon: "toggle-small",
             fieldLabel: _("Edition"),
             emptyText: _("Edition") + "..."
         },
         "/documents/combos/groups/": {
-            name: "group",
+            hiddenName: "group",
             icon: "toggle-small",
             fieldLabel: _("Group"),
             emptyText: _("Group") + "..."
         },
 
         "/documents/combos/fascicles/": {
-            name: "fascicle",
+            hiddenName: "fascicle",
             icon:"folder",
             fieldLabel: _("Fascicle"),
             emptyText: _("Fascicle") + "..."
         },
         "/documents/combos/headlines/": {
-            name: "headline",
+            hiddenName: "headline",
             icon: "tag-label",
             fieldLabel: _("Headline"),
             emptyText: _("Headline") + "..."
         },
         "/documents/combos/rubrics/": {
-            name: "rubric",
+            hiddenName: "rubric",
             icon: "tag-label-pink",
             fieldLabel: _("rubric"),
             emptyText: _("Rubric") + "..."
         },
 
         "/documents/combos/holders/": {
-            name: "holder",
+            hiddenName: "holder",
             icon: "user-business",
             fieldLabel: _("Holder"),
             emptyText: _("Holder") + "..."
         },
 
         "/documents/combos/managers/": {
-            name: "manager",
+            hiddenName: "manager",
             icon: "user-business",
             fieldLabel: _("Manager"),
             emptyText: _("Manager") + "..."
         },
 
         "/documents/combos/progress/": {
-            name: "progress",
+            hiddenName: "progress",
             fieldLabel: _("Progress"),
             emptyText: _("Progress") + "..."
         }
@@ -140,10 +143,11 @@ Inprint.factory.Combo = new function() {
                     '<div class="x-combo-list-item" style="'+
                     '{[ this.haveIcon(values) ]}'+
                     '<tpl if="nlevel"> padding-left:{nlevel*10+8}px; </tpl>'+
-                    '<tpl if="!nlevel"> padding-left:20px; </tpl>'+
+                    '<tpl if="!nlevel && !color"> padding-left:20px; </tpl>'+
                     '<tpl if="spacer"> padding-bottom:4px;margin-bottom:4px;border-bottom:1px solid silver; </tpl>'+
                     '<tpl if="bold"> font-weight:bold; </tpl>'+
                     '">'+
+                        '<tpl if="color"><div style="width:10px;height:10px;margin:2px 5px 2px 3px;float:left;background:#{color};">&nbsp;</div></tpl>'+
                         '{title}'+
                         '<tpl if="description"><br><small><i>{description}</i></small></tpl>'+
                     '</div>'+
@@ -172,10 +176,26 @@ Inprint.factory.Combo = new function() {
                             vpadding = values.nlevel * 10 - 10;
                         }
 
+                        if (values.color) {
+                            hpadding = 0;
+                            vpadding = 0;
+                        }
+
                         return ' background: url('+ src +') '+ vpadding +'px '+ hpadding +'px no-repeat; ';
                     }
                 }
             );
+
+
+            //if ( config.cacheQuery == false ) {
+            //    Ext.apply(config, {
+            //        listeners: {
+            //            beforequery: function(qe){
+            //                delete qe.combo.lastQuery;
+            //            }
+            //        }
+            //    });
+            //}
 
             Ext.apply(combo, {
                 tpl: tpl,

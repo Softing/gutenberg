@@ -28,6 +28,7 @@ sub list {
     my $sort     = $c->param("sort")         || undef;
 
     # Filters
+    my $edition  = $c->param("flt_edition")    || undef;
     my $group    = $c->param("flt_group")    || undef;
     my $title    = $c->param("flt_title")    || undef;
     my $fascicle = $c->param("flt_fascicle") || undef;
@@ -42,15 +43,22 @@ sub list {
         SELECT
             dcm.id,
 
+            dcm.edition, dcm.edition_shortcut,
             dcm.fascicle, dcm.fascicle_shortcut,
             dcm.headline, dcm.headline_shortcut,
             dcm.rubric, dcm.rubric_shortcut,
-            dcm.copygroup,
 
-            dcm.holder, dcm.creator, dcm.manager, holder_shortcut, dcm.creator_shortcut, dcm.manager_shortcut,
-            dcm.maingroup, dcm.maingroup_shortcut, dcm.ingroups,
+            dcm.maingroup, dcm.maingroup_shortcut,
+            dcm.ingroups, dcm.copygroup,
+
+            dcm.holder,  dcm.holder_shortcut,
+            dcm.creator, dcm.creator_shortcut,
+            dcm.manager, dcm.manager_shortcut,
+
             dcm.islooked, dcm.isopen,
-            dcm.branch, dcm.branch_shortcut, dcm.stage,stage_shortcut, dcm.color, dcm.progress,
+            dcm.branch, dcm.branch_shortcut,
+            dcm.stage, stage_shortcut,
+            dcm.color, dcm.progress,
             dcm.title, dcm.author,
             to_char(dcm.pdate, 'YYYY-MM-DD HH24:MI:SS') as pdate,
             to_char(dcm.rdate, 'YYYY-MM-DD HH24:MI:SS') as rdate,
@@ -101,43 +109,49 @@ sub list {
 
     # Set Filters
 
-    if ($group) {
-        $sql_filters .= " AND ? = ANY(dcm.ingroups) ";
-        push @params, $group;
-    }
-
     if ($title) {
         $sql_filters .= " AND title LIKE ? ";
         push @params, "%$title%";
     }
 
-    if ($fascicle) {
+    if ($edition && $edition ne "clear") {
+        $sql_filters .= " AND ? = ANY(dcm.ineditions) ";
+        push @params, $edition;
+    }
+
+    if ($group && $group ne "clear") {
+        $sql_filters .= " AND ? = ANY(dcm.ingroups) ";
+        push @params, $group;
+    }
+
+    if ($fascicle && $fascicle ne "clear") {
         $sql_filters .= " AND fascicle = ? ";
         push @params, $fascicle;
     }
 
-    if ($headline) {
+    if ($headline && $headline ne "clear") {
         $sql_filters .= " AND headline = ? ";
         push @params, $headline;
     }
 
-    if ($rubric) {
+    if ($rubric && $rubric ne "clear") {
         $sql_filters .= " AND rubric = ? ";
         push @params, $rubric;
     }
 
-    if ($manager) {
+    if ($manager && $manager ne "clear") {
         $sql_filters .= " AND manager=? ";
         push @params, $manager;
     }
 
-    if ($holder) {
+    if ($holder && $holder ne "clear") {
         $sql_filters .= " AND holder=? ";
         push @params, $holder;
     }
 
-    if ($progress) {
-        $sql_filters .= "";
+    if ($progress && $progress ne "clear") {
+        $sql_filters .= " AND readiness=? ";
+        push @params, $progress;
     }
 
     $sql_total .= $sql_filters;

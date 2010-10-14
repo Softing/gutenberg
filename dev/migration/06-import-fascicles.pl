@@ -3,12 +3,15 @@
 use utf8;
 use strict;
 
+use Data::UUID;
 use Data::Dump qw /dump/;
 use DBIx::Connector;
 
 use lib "../../lib";
 use Inprint::Frameworks::Config;
 use Inprint::Frameworks::SQL;
+
+my $ug = new Data::UUID;
 
 my $config = new Inprint::Frameworks::Config();
 $config->load("../../");
@@ -40,6 +43,7 @@ my $rootnode = '00000000-0000-0000-0000-000000000000';
 $sql->Do("DELETE FROM fascicles");
 $sql->Do("DELETE FROM rubrics");
 $sql->Do("DELETE FROM headlines");
+$sql->Do("DELETE FROM tags");
 
 # Import fascicles
 
@@ -53,19 +57,32 @@ $sql->Do("
 ", [ '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', "Портфель", "Портфель документов", "" ]);
 
 $sql->Do("
-    INSERT INTO headlines(id, fascicle, title, shortcut, description, created, updated)
-    VALUES (?, ?, ?, ?, ?, now(), now());
-", [ '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', "Not found", "Not found", "" ]);
-
-$sql->Do("
-    INSERT INTO rubrics(id, fascicle, parent, title, shortcut, description, created, updated)
-    VALUES (?, ?, ?, ?, ?, ?, now(), now());
-", [ '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', "Not found", "Not found", "" ]);
-
-$sql->Do("
     INSERT INTO fascicles(id, issystem, edition, title, shortcut, description, enabled, created, updated)
     VALUES (?, true, ?, ?, ?, ?, true, now(), now());
 ", [ '99999999-9999-9999-9999-999999999999', '00000000-0000-0000-0000-000000000000', "Корзина", "Корзина для удаления", "" ]);
+
+
+$sql->Do("
+    INSERT INTO tags(id, mtype, title, shortcut, description, created, updated)
+    VALUES (?, ?, ?, ?, ?, now(), now());
+", [ '00000000-0000-0000-0000-000000000000', "headline", "Not found", "Not found", "Not found" ]);
+
+$sql->Do("
+    INSERT INTO tags(id, mtype, title, shortcut, description, created, updated)
+    VALUES (?, ?, ?, ?, ?, now(), now());
+", [ '00000000-0000-0000-0000-000000000000', "rubric", "Not found", "Not found", "Not found" ]);
+
+$sql->Do("
+    INSERT INTO headlines (id, fascicle, tag, created, updated)
+    VALUES (?, ?, ?, now(), now());
+", [ '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000' ]);
+
+$sql->Do("
+    INSERT INTO rubrics(id, fascicle, headline, tag, created, updated)
+    VALUES (?, ?, ?, ?, now(), now());
+", [ '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000' ]);
+
+
 
 foreach my $item( @{ $fascicles } ) {
 
@@ -86,14 +103,14 @@ foreach my $item( @{ $fascicles } ) {
     # Import default headline && rubric
 
     $sql->Do("
-        INSERT INTO headlines(id, fascicle, title, shortcut, description, created, updated)
-        VALUES (?, ?, ?, ?, ?, now(), now());
-    ", [ '00000000-0000-0000-0000-000000000000', $item->{id}, "Not found", "Not found", "" ]);
+        INSERT INTO headlines(id, fascicle, tag, created, updated)
+        VALUES (?, ?, ?, now(), now());
+    ", [ '00000000-0000-0000-0000-000000000000', $item->{id}, '00000000-0000-0000-0000-000000000000' ]);
 
     $sql->Do("
-        INSERT INTO rubrics(id, fascicle, parent, title, shortcut, description, created, updated)
-        VALUES (?, ?, ?, ?, ?, ?, now(), now());
-    ", [ '00000000-0000-0000-0000-000000000000', $item->{id}, '00000000-0000-0000-0000-000000000000', "Not found", "Not found", "" ]);
+        INSERT INTO rubrics(id, fascicle, headline, tag, created, updated)
+        VALUES (?, ?, ?, ?, now(), now());
+    ", [ '00000000-0000-0000-0000-000000000000', $item->{id}, '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000' ]);
 
     # Import headlines
 
@@ -103,10 +120,27 @@ foreach my $item( @{ $fascicles } ) {
     ", [$item->{id}])->Hashes;
 
     foreach my $item2 ( @{ $catchwords } ) {
+
+        my $Headline = $sql->Q("
+            SELECT * FROM tags WHERE title =? AND mtype='headline'
+        ", [$item2->{title} ])->Hash;
+
+        unless ($Headline) {
+            $sql->Do("
+                INSERT INTO tags(mtype, title, shortcut, description, created, updated)
+                VALUES (?, ?, ?, ?, now(), now());
+            ", [ "headline", $item2->{title}, $item2->{title}, $item2->{description} || "" ]);
+        }
+
+        $Headline = $sql->Q("
+            SELECT * FROM tags WHERE title =? AND mtype='headline'
+        ", [$item2->{title} ])->Hash;
+
         $sql->Do("
-            INSERT INTO headlines(id, fascicle, title, shortcut, description, created, updated)
-            VALUES (?, ?, ?, ?, ?, now(), now());
-        ", [ $item2->{uuid}, $item->{id}, $item2->{title}, $item2->{title}, $item2->{description} || "" ]);
+            INSERT INTO headlines(fascicle, tag, created, updated)
+            VALUES (?, ?, now(), now());
+        ", [ $item->{id}, $Headline->{id} ]);
+
     }
 
 
@@ -118,9 +152,25 @@ foreach my $item( @{ $fascicles } ) {
 
     foreach my $item3 ( @{ $rubrics } ) {
 
+        my $Rubric = $sql->Q("
+            SELECT * FROM tags WHERE title =? AND mtype='rubric'
+        ", [$item3->{title} ])->Hash;
+
+        unless ($Rubric) {
+            $sql->Do("
+                INSERT INTO tags(mtype, title, shortcut, description, created, updated)
+                VALUES (?, ?, ?, ?, now(), now());
+            ", [ "rubric", $item3->{title}, $item3->{title}, $item3->{description} || "" ]);
+        }
+
+        $Rubric = $sql->Q("
+            SELECT * FROM tags WHERE title =? AND mtype='rubric'
+        ", [ $item3->{title} ])->Hash;
+
         $sql->Do("
-            INSERT INTO rubrics(id, fascicle, parent, title, shortcut, description, created, updated)
-            VALUES (?, ?, ?, ?, ?, ?, now(), now());
-        ", [ $item3->{uuid}, $item->{id}, $item3->{catchword}, $item3->{title}, $item3->{title}, $item3->{description} || "" ]);
+            INSERT INTO Rubrics(fascicle, headline, tag, created, updated)
+            VALUES (?, ?, ?, now(), now());
+        ", [ $item->{id}, $item3->{catchword}, $Rubric->{id} ]);
+
     }
 }

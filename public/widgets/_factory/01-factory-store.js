@@ -26,6 +26,7 @@ Inprint.factory.Store = new function() {
         '/documents/list/':         [
             'id',
 
+            'edition',  'edition_shortcut',
             'fascicle', 'fascicle_shortcut',
             'headline', 'headline_shortcut',
             'rubric', 'rubric_shortcut',
@@ -77,7 +78,7 @@ Inprint.factory.Store = new function() {
     );
 
     for ( var i = 0; i < combos.length; i++ ) {
-        source[ combos[i] ] = [ 'id', 'icon', 'spacer', 'bold', 'nlevel', 'title', 'shortcut', 'description' ];
+        source[ combos[i] ] = [ 'id', 'icon', 'color', 'spacer', 'bold', 'nlevel', 'title', 'shortcut', 'description' ];
     }
 
     for (var i in source) {

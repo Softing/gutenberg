@@ -131,7 +131,7 @@ Ext.onReady(function() {
             cmd: 'save'
         }
     });
-
+    
     Ext.state.Manager.setProvider(
         stateProvider
     );

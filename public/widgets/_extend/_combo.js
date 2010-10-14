@@ -25,10 +25,6 @@ Ext.form.ComboBox.prototype.setValueById = function(value, params) {
     }
 };
 
-//Ext.form.ComboBox.prototype.CmpSelectFirst = function() {
-//    this.select(1);
-//};
-
 // Create XCombobox
 
 Ext.ns("Inprint.ext");
@@ -69,11 +65,11 @@ Inprint.ext.Combobox = Ext.extend(Ext.form.ComboBox, {
 
         Inprint.ext.Combobox.superclass.initComponent.call(this);
 
-        if ( this.nocache ){
-            this.on("beforequery", function(qe) {
-                delete qe.combo.lastQuery;
-            });
-        }
+        //if ( this.nocache ){
+        //    this.on("beforequery", function(qe) {
+        //        delete qe.combo.lastQuery;
+        //    });
+        //}
 
     },
 
