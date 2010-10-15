@@ -6,6 +6,7 @@ Inprint.cmp.memberProfileForm.Form = Ext.extend(Ext.FormPanel, {
         Ext.apply(this,
         {
             fileUpload: true,
+            border:false,
             bodyStyle: "padding: 10px 10px",
             url: _url("/profile/update/"),
             autoScroll:true,
@@ -35,10 +36,10 @@ Inprint.cmp.memberProfileForm.Form = Ext.extend(Ext.FormPanel, {
                                     hideLabel:true
                                 },
                                 new Ext.ux.form.FileUploadField({
-                                    emptyText: 'Select an image',
+                                    emptyText: _('Select an image'),
                                     hideLabel:true,
                                     name: 'image',
-                                    buttonText: 'upload'
+                                    buttonText: _('Upload')
                                 })
                             ]
                         }
@@ -51,8 +52,8 @@ Inprint.cmp.memberProfileForm.Form = Ext.extend(Ext.FormPanel, {
                     items: [
                         {
                             xtype:'fieldset',
-                            title: _("System Information"),
-                            labelWidth: 60,
+                            title: _("System information"),
+                            labelWidth: 80,
                             defaults: { anchor: "100%" },
                             defaultType: "textfield",
                             items :[
@@ -66,8 +67,8 @@ Inprint.cmp.memberProfileForm.Form = Ext.extend(Ext.FormPanel, {
                         },
                         {
                             xtype:'fieldset',
-                            title: _("User Information"),
-                            labelWidth: 60,
+                            title: _("Employee information"),
+                            labelWidth: 80,
                             defaults: { anchor: "100%" },
                             defaultType: "textfield",
                             items :[

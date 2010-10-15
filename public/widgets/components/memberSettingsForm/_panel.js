@@ -1,12 +1,12 @@
-Inprint.cmp.memberProfileForm.Window = Ext.extend(Ext.Window, {
+Inprint.cmp.memberSettingsForm.Window = Ext.extend(Ext.Window, {
 
     initComponent: function() {
 
         this.addEvents('actioncomplete');
-        this.form = new Inprint.cmp.memberProfileForm.Form();
+        this.form = new Inprint.cmp.memberSettingsForm.Form();
 
         Ext.apply(this, {
-            title: _("Edit profile"),
+            title: _("Employee settings"),
             layout: "fit",
             closeAction: "hide",
             width:600, height:320,
@@ -36,13 +36,13 @@ Inprint.cmp.memberProfileForm.Window = Ext.extend(Ext.Window, {
             }
         }, this);
 
-        Inprint.cmp.memberProfileForm.Window.superclass.initComponent.apply(this, arguments);
-        Inprint.cmp.memberProfileForm.Interaction(this.panels);
+        Inprint.cmp.memberSettingsForm.Window.superclass.initComponent.apply(this, arguments);
+        Inprint.cmp.memberSettingsForm.Interaction(this.panels);
 
     },
 
     onRender: function() {
-        Inprint.cmp.memberProfileForm.Window.superclass.onRender.apply(this, arguments);
+        Inprint.cmp.memberSettingsForm.Window.superclass.onRender.apply(this, arguments);
     },
 
     cmpFill: function(id) {
@@ -55,7 +55,6 @@ Inprint.cmp.memberProfileForm.Window = Ext.extend(Ext.Window, {
             url: "/profile/read/",
             success: function(form, action) {
                 this.body.unmask();
-                this.form.getForm().findField("imagefield").setValue("/profile/image/"+ id);
             },
             failure: function(form, action) {
                 Ext.Msg.alert("Load failed", action.result.errorMessage);
