@@ -114,6 +114,12 @@ Inprint.factory.Combo = new function() {
             hiddenName: "progress",
             fieldLabel: _("Progress"),
             emptyText: _("Progress") + "..."
+        },
+
+        "/options/combos/capture-destination/": {
+            hiddenName: "capture.destination",
+            fieldLabel: _("Default destination"),
+            emptyText: _("Default destination") + "..."
         }
 
     };

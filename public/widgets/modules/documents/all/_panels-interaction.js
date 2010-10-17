@@ -12,10 +12,14 @@ Inprint.documents.all.Interaction = function(panels) {
         if (sm.getCount() > 0 ) {
             _enable(grid.btnUpdate, grid.btnCapture, grid.btnTransfer, grid.btnBriefcase, grid.btnCopy,
                     grid.btnDuplicate, grid.btnRecycle, grid.btnRestore, grid.btnDelete);
-        } else if (sm.getCount() == 1) {
+        }
+
+        if (sm.getCount() == 1) {
             _enable(grid.btnUpdate, grid.btnCapture, grid.btnTransfer, grid.btnBriefcase, grid.btnCopy,
                     grid.btnDuplicate, grid.btnRecycle, grid.btnRestore, grid.btnDelete);
-        } else {
+        }
+
+        if (sm.getCount() == 0 ) {
             _disable(grid.btnUpdate, grid.btnCapture, grid.btnTransfer, grid.btnBriefcase, grid.btnCopy,
                     grid.btnDuplicate, grid.btnRecycle, grid.btnRestore, grid.btnDelete);
         }

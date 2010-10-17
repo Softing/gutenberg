@@ -1,13 +1,11 @@
 Inprint.cmp.memberSettingsForm.Form = Ext.extend(Ext.FormPanel, {
     initComponent: function() {
 
-        this.imgid = Ext.id();
+        this.url = _url("/options/update/");
 
         Ext.apply(this,
         {
-            fileUpload: true,
             border:false,
-            url: _url("/settings/update/"),
             autoScroll:true,
             layout: "fit",
             items: {
@@ -20,17 +18,13 @@ Inprint.cmp.memberSettingsForm.Form = Ext.extend(Ext.FormPanel, {
                     {
                         title: _("Exchange"),
                         layout:'form',
+                        labelWidth: 120,
                         defaults: {
                             width: 230
                         },
                         defaultType: 'textfield',
                         items: [
-                            {
-                                fieldLabel: _("Default department"),
-                                name: 'first',
-                                allowBlank:false,
-                                value: 'Jack'
-                            }
+                            Inprint.factory.Combo.create("/options/combos/capture-destination/")
                         ]
                     }
                 ]
@@ -44,7 +38,12 @@ Inprint.cmp.memberSettingsForm.Form = Ext.extend(Ext.FormPanel, {
     },
 
     onRender: function() {
+
         Inprint.cmp.memberSettingsForm.Form.superclass.onRender.apply(this, arguments);
+
+        if (Inprint.session.options && Inprint.session.options["transfer.capture.destination"]) {
+            this.getForm().findField("capture.destination").loadValue(Inprint.session.options["transfer.capture.destination"]);
+        }
     }
 
 });

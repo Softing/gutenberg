@@ -36,10 +36,10 @@ Inprint.cmp.memberProfileForm.Form = Ext.extend(Ext.FormPanel, {
                                     hideLabel:true
                                 },
                                 new Ext.ux.form.FileUploadField({
-                                    emptyText: _('Select an image'),
+                                    emptyText: _('Path to image'),
                                     hideLabel:true,
                                     name: 'image',
-                                    buttonText: _('Upload')
+                                    buttonText: _('Select')
                                 })
                             ]
                         }
@@ -75,7 +75,7 @@ Inprint.cmp.memberProfileForm.Form = Ext.extend(Ext.FormPanel, {
                                 {   fieldLabel: _("Title"),
                                     name: "title"
                                 },
-                                {   fieldLabel: _("Shortcut"),
+                                {   fieldLabel: _("Alias"),
                                     name: "shortcut"
                                 },
                                 {   fieldLabel: _("Position"),

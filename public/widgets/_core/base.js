@@ -131,36 +131,54 @@ Ext.onReady(function() {
             cmd: 'save'
         }
     });
-    
+
     Ext.state.Manager.setProvider(
         stateProvider
     );
 
+    Inprint.session = {};
+
     // Start session manager
-    Inprint.updateSession = function(async) {
+    Inprint.updateSession = function(async, defer) {
         Ext.Ajax.request({
             async: async,
             url: '/workspace/appsession/',
             scope: this,
             success: function(response) {
-                var data = Ext.util.JSON.decode( response.responseText );
-                if (data.member){
-                    //Inprint.session = data.session;
-                    //Inprint.session.access = data.access;
-                    //Inprint.session.card = data.card;
-                    //Inprint.session.settings = data.settings;
-                    Inprint.updateSession.defer( 60000, this, [ true ]);
+                Inprint.session = Ext.util.JSON.decode( response.responseText );
+                if (Inprint.session && Inprint.session.member && Inprint.session.member.id ){
+                    Inprint.checkSettings();
+                    if (defer) Inprint.updateSession.defer( 5000, this, [ true, true ]);
                 } else {
                     Ext.MessageBox.alert(
-                    'Сессия закрыта',
-                    'Возможно кто-то вошел в Инпринт с вашим логином на другом компьютере.<br />Окно будет перезагружено.',
-                    function() {
-                        /*window.location = '/login/';*/
-                    });
+                    _("Your session is closed"),
+                    _("Probably someone has entered in Inprint with your login on other computer. <br/> push F5 what to pass to authorization page"),
+                    function() {});
                 }
             }
         });
-    }(false);
+    };
+
+    Inprint.checkInProgress = false;
+    Inprint.checkSettings = function(){
+        if (Inprint.checkInProgress) return;
+        if (
+            !Inprint.session.member.title ||
+            !Inprint.session.member.shortcut ||
+            !Inprint.session.member.position ||
+            !Inprint.session.options ||
+            !Inprint.session.options["transfer.capture.destination"]
+        ) {
+            Inprint.checkInProgress = true;
+            var setupWindow = new Inprint.cmp.memberSetupWindow();
+            setupWindow.on("hide", function() {
+                Inprint.checkInProgress = false;
+            });
+            setupWindow.show();
+        }
+    };
+
+    Inprint.updateSession(false, true);
 
     // Enable registry and layout
     Inprint.registry = new Inprint.Registry();
@@ -182,6 +200,6 @@ Ext.onReady(function() {
     setTimeout(function(){
         Ext.get('loading').remove();
         Ext.get('loading-mask').fadeOut({remove:true});
-    }, 100);
+    }, 50);
 
 });

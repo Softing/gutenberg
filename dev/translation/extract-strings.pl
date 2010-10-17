@@ -9,15 +9,14 @@ use File::Copy;
 use File::Find;
 
 binmode DATA, ":utf8";
-#binmode STDOUT, ":utf8";
 
 my @langs = ("en", "ru");
 
 my @result;
 my @words;
 my @jsfiles;
-#my $path = $FindBin::Bin ."/../../public/widgets/";
-my $path = "../../public/widgets/";
+
+my $path = "../../public/widgets";
 
 find({ wanted => sub {
     my $filename = $File::Find::name;
@@ -34,11 +33,10 @@ foreach my $path (@jsfiles) {
         while (/_\("(.*?)"\)/g) {
             my $string = $1;
             push @words, $string;
-            #if ($string =~ m/[а-я]/) {
-            #    say "$path";
-            #    say "\t$string";
-            #    say "-----------------------------------------";
-            #}
+        }
+        while (/_\('(.*?)'\)/g) {
+            my $string = $1;
+            push @words, $string;
         }
     }
     close($file);
@@ -51,7 +49,6 @@ foreach my $item (@words) {
 }
 
 @result = sort {$a cmp $b} @result;
-
 
 foreach my $lang (@langs) {
 
@@ -113,7 +110,7 @@ foreach my $lang (@langs) {
 
     if (-e $FindBin::Bin ."/../../lib/Inprint/I18N/$lang.pm") {
         #move($FindBin::Bin ."/../../lib/Inprint/I18N/$lang.pm", $FindBin::Bin ."/../../lib/Inprint/I18N/$lang.pm.old");
-        move($FindBin::Bin ."/translations/$lang.pm", $FindBin::Bin ."/../../lib/Inprint/I18N/$lang.pm");
+        #move($FindBin::Bin ."/translations/$lang.pm", $FindBin::Bin ."/../../lib/Inprint/I18N/$lang.pm");
     }
 
 }

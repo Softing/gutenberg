@@ -52,6 +52,7 @@ Inprint.factory.Store = new function() {
         "/catalog/stages/list/":                [ "id", "chain", "readiness_shortcut", "readiness_color", "weight", "title", "shortcut", "description", "members" ],
         "/catalog/stages/principals-mapping/":  [ "id", "type", "catalog", "stage", "principal", "title", "description", "catalog_shortcut", "stage_shortcut" ],
         "/catalog/principals/list/":            [ "id", "type", "title", "description" ],
+        "/catalog/transfer/list/":              [ "id", "type", "title", "description" ],
 
 
         "" : []
@@ -73,7 +74,9 @@ Inprint.factory.Store = new function() {
         "/documents/combos/rubrics/",
         "/documents/combos/holders/",
         "/documents/combos/managers/",
-        "/documents/combos/progress/"
+        "/documents/combos/progress/",
+
+        "/options/combos/capture-destination/"
 
     );
 

@@ -1,10 +1,9 @@
-Inprint.cmp.AddDocumentWindow = Ext.extend(Ext.Window, {
+Inprint.cmp.CreateDocumentWindow = Ext.extend(Ext.Window, {
 
     initComponent: function() {
 
         this.formPanel = new Ext.FormPanel({
             url: "/documents/add/",
-            frame:false,
             border:false,
             labelWidth: 100,
             defaults: {
@@ -106,13 +105,28 @@ Inprint.cmp.AddDocumentWindow = Ext.extend(Ext.Window, {
                 }
             ],
             keys: [ _KEY_ENTER_SUBMIT ],
-            buttons: [ _BTN_SAVE,_BTN_CLOSE ]
+            buttons:[
+                {
+                    text: _("Create"),
+                    scope:this,
+                    handler: function() {
+                        this.form.getForm().submit();
+                    }
+                },
+                {
+                    text: _("Close"),
+                    scope:this,
+                    handler: function() {
+                        this.hide();
+                    }
+                }
+            ]
         });
 
         Ext.apply(this, {
-            title: _("To add a document"),
+            title: _("Create"),
             layout: "fit",
-            closeAction: "hide",
+            modal:true,
             width:800, height:400,
             items: this.formPanel
         });
@@ -122,13 +136,13 @@ Inprint.cmp.AddDocumentWindow = Ext.extend(Ext.Window, {
                 this.hide();
         });
 
-        Inprint.cmp.AddDocumentWindow.superclass.initComponent.apply(this, arguments);
+        Inprint.cmp.CreateDocumentWindow.superclass.initComponent.apply(this, arguments);
 
-        Inprint.cmp.AddDocumentWindow.Interaction(this.panels);
+        Inprint.cmp.CreateDocumentWindow.Interaction(this.panels);
     },
 
     onRender: function() {
-        Inprint.cmp.AddDocumentWindow.superclass.onRender.apply(this, arguments);
+        Inprint.cmp.CreateDocumentWindow.superclass.onRender.apply(this, arguments);
     }
 
 });

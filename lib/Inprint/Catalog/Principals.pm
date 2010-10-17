@@ -54,7 +54,8 @@ sub list {
     my @data2 = ($i_node);
 
     if ($i_filter) {
-        $sql2 .= " AND (t2.shortcut LIKE ? OR t2.position LIKE ?) ";
+        $sql2 .= " AND (t1.login ILIKE ? OR t2.shortcut ILIKE ? OR t2.position ILIKE ?) ";
+        push @data2, "%$i_filter%";
         push @data2, "%$i_filter%";
         push @data2, "%$i_filter%";
     }

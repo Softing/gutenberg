@@ -82,7 +82,7 @@ Inprint.catalog.organization.Grid = Ext.extend(Ext.grid.GridPanel, {
                 },
                 {
                     xtype: 'buttongroup',
-                    title: _("Membership in group"),
+                    title: _("Membership"),
                     defaults: { scale: 'small' },
                     items: [
                         {
@@ -103,7 +103,7 @@ Inprint.catalog.organization.Grid = Ext.extend(Ext.grid.GridPanel, {
                 },
                 {
                     xtype: 'buttongroup',
-                    title: _("Profile of the employee"),
+                    title: _("Profile"),
                     defaults: { scale: 'small' },
                     items: [
                         {

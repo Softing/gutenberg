@@ -33,6 +33,7 @@ Inprint.cmp.memberSettingsForm.Window = Ext.extend(Ext.Window, {
             if (action.type == "submit") {
                 this.hide();
                 this.fireEvent("actioncomplete");
+                Inprint.updateSession(false);
             }
         }, this);
 

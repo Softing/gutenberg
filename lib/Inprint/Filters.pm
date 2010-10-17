@@ -52,6 +52,7 @@ sub mysession
 {
     my $c = shift;
     my $sid = $c->session("sid");
+
     if ($sid) {
         my $session = $c->sql->Q("SELECT * FROM sessions WHERE id=?", [ $sid ])->Hash;
         if ($session) {
@@ -62,6 +63,25 @@ sub mysession
     } else {
         $c->redirect_to('/login');
     }
+
+    if ($c->session("sid")) {
+
+        my $member = $c->sql->Q("
+            SELECT t2.id, t2.login, t3.title, t3.shortcut, t3.position
+            FROM sessions t1, members t2 LEFT JOIN profiles t3 ON (t3.id = t2.id) WHERE t1.id=? AND t1.member = t2.id
+        ", [ $c->session("sid") ])->Hash || {};
+
+        $c->QuerySessionSet("member.id",  $member->{id});
+
+        my $options = $c->sql->Q(" SELECT option_name, option_value FROM options WHERE member=? ", [ $member->{id} ])->Hashes || [];
+        foreach my $item (@$options) {
+            $c->QuerySessionSet("options.". $item->{option_name}, $item->{option_value});
+        }
+
+    }
+
+
+    return $c;
 }
 
 1;

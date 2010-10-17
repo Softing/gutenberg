@@ -183,20 +183,6 @@ sub menu
     push @result, '->';
 
     #
-    # Settings
-    #
-    my $settings = {
-        id => "settings"
-    };
-
-    push @{ $settings->{menu} }, { id => "settings-organization" };
-    push @{ $settings->{menu} }, { id => "settings-editions" };
-    push @{ $settings->{menu} }, { id => "settings-roles" };
-    push @{ $settings->{menu} }, { id => "settings-readiness" };
-
-    push @result, $settings;
-
-    #
     # Employee
     #
     my $employee = {
@@ -214,6 +200,20 @@ sub menu
 
     push @result, $employee;
 
+    #
+    # Settings
+    #
+    my $settings = {
+        id => "settings"
+    };
+
+    push @{ $settings->{menu} }, { id => "settings-organization" };
+    push @{ $settings->{menu} }, { id => "settings-editions" };
+    push @{ $settings->{menu} }, { id => "settings-roles" };
+    push @{ $settings->{menu} }, { id => "settings-readiness" };
+
+    push @result, $settings;
+
     $c->render_json({ data => \@result });
 }
 
@@ -221,13 +221,22 @@ sub appsession {
 
     my $c = shift;
 
-    my $member = $c->sql->Q("
-        SELECT t1.* FROM members t1, sessions t2 WHERE t2.id = ? AND t2.member = t1.id
-    ", [ $c->session("sid") ])->Hash;
+    my $result = {};
 
-    my $result = {
-        member => $member->{id}
-    };
+    my $member = $c->sql->Q("
+        SELECT t2.id, t2.login, t3.title, t3.shortcut, t3.position
+        FROM sessions t1, members t2 LEFT JOIN profiles t3 ON (t3.id = t2.id) WHERE t1.id=? AND t1.member = t2.id
+    ", [ $c->session("sid") ])->Hash || {};
+
+    $result->{member} = $member;
+
+    $c->QuerySessionSet("member.id",  $result->{member}->{id});
+
+    my $options = $c->sql->Q(" SELECT option_name, option_value FROM options WHERE member=? ", [ $member->{id} ])->Hashes || [];
+    foreach my $item (@$options) {
+        $result->{options}->{$item->{option_name}} = $item->{option_value};
+        $c->QuerySessionSet("options.". $item->{option_name}, $item->{option_value});
+    }
 
     $c->render_json($result);
 }

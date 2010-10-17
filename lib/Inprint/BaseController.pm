@@ -52,6 +52,21 @@ sub Do {
     return $c->app->{sql}->Do;
 }
 
+# Query session
+
+sub QuerySessionGet () {
+    my $c = shift;
+    my $param_name = shift;
+    return $c->app->{querySession}->{$param_name} || undef;
+}
+sub QuerySessionSet () {
+    my $c = shift;
+    my $param_name = shift;
+    my $param_value = shift;
+    $c->app->{querySession}->{$param_name} = $param_value;
+    return $c;
+}
+
 # UUID utils
 
 sub uuid {

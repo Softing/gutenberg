@@ -17,6 +17,10 @@ sub image {
 
     my $i_id = $c->param("id");
 
+    if ($i_id eq "self") {
+        $i_id = $c->QuerySessionGet("member.id");
+    }
+
     my $body = '';
 
     my $path = $c->config->get("store.path");
@@ -33,19 +37,27 @@ sub image {
 }
 
 sub read {
+
     my $c = shift;
 
-    my $result = [];
+    my $result = {};
     my $success = $c->json->false;
     my $i_id = $c->param("id");
+
+    if ($i_id eq "self") {
+        $i_id = $c->session("member");
+    }
 
     if ($i_id) {
         $result = $c->sql->Q("
             SELECT distinct t1.id, t1.login, t2.title, t2.shortcut, t2.position
-            FROM members t1 LEFT JOIN profiles t2 ON t1.id = t2.id,
-                map_member_to_catalog m1
-            WHERE m1.member = t1.id AND t1.id = ?
-        ", [ $i_id ])->Hash;
+            FROM members t1
+            LEFT JOIN profiles t2 ON t1.id = t2.id
+            WHERE t1.id = ?
+        ", [ $i_id ])->Hash || {};
+
+        print STDERR $i_id;
+
         $success = $c->json->true;
     }
 
@@ -76,24 +88,21 @@ sub update {
         my $path = $c->config->get("store.path");
         my $upload_max_size = 3 * 1024 * 1024;
 
-        #if ($image->size > $upload_max_size) {
+        my $image_type = $i_image->headers->content_type;
+        my %valid_types = map {$_ => 1} qw(image/gif image/jpeg image/png);
 
-            my $image_type = $i_image->headers->content_type;
-            my %valid_types = map {$_ => 1} qw(image/gif image/jpeg image/png);
+        # Content type is wrong
+        if ($valid_types{$image_type}) {
 
-            # Content type is wrong
-            if ($valid_types{$image_type}) {
-
-                unless (-d "$path/profiles/$i_id/") {
-                    make_path "$path/profiles/$i_id/";
-                }
-
-                if (-d -w "$path/profiles/$i_id/") {
-                    $i_image->move_to("$path/profiles/$i_id/profile.new");
-                    system("convert -resize 200 $path/profiles/$i_id/profile.new $path/profiles/$i_id/profile.png");
-                }
+            unless (-d "$path/profiles/$i_id/") {
+                make_path "$path/profiles/$i_id/";
             }
-        #}
+
+            if (-d -w "$path/profiles/$i_id/") {
+                $i_image->move_to("$path/profiles/$i_id/profile.new");
+                system("convert -resize 200 $path/profiles/$i_id/profile.new $path/profiles/$i_id/profile.png");
+            }
+        }
     }
 
     # save result to DB

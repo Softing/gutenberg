@@ -7,20 +7,11 @@ Ext.form.ComboBox.prototype.resetValue = function(baseParams) {
     this.store.baseParams = baseParams || {};
 };
 
-Ext.form.ComboBox.prototype.setValueById = function(value, params) {
-
+Ext.form.ComboBox.prototype.loadValue = function(value, params) {
     if (value) {
-
         this.getStore().on("load", function() {
-
             this.setValue(value);
-
-            //this.fireEvent('select', this, this.getStore().getById( this.getValue() ) );
-            //    if (this.clearable) this.triggers[0].show();
-            //}, this, { single: true });
-
         }, this, { single: true });
-
         this.getStore().load({ params: params });
     }
 };

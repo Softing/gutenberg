@@ -39,20 +39,23 @@ Inprint.Registry = function() {
             }
         },
 
+        "document-profile": {
+            icon: "document--pencil",
+            text: _("Document profile")
+        },
+
         "documents": {
             icon: "document-word",
             text: _("Documents")
         },
+
         "documents-create": {
             modal: false,
             icon: "plus-button",
             text:  _("Create document"),
             menutext:  _("Create"),
-            //xobject: Inprint.documents.create.Panel
             handler: function() {
-                new Inprint.cmp.AddDocumentWindow({
-                    closeAction: "close"
-                }).show();
+                new Inprint.cmp.CreateDocumentWindow().show();
             }
         },
         "documents-todo": {
@@ -154,12 +157,16 @@ Inprint.Registry = function() {
         "employee-card": {
             icon: "card",
             text: _("Card"),
-            xobject: Inprint.employee.card.Panel
+            handler: function () {
+                new Inprint.cmp.memberProfileForm.Window().show().cmpFill("self");
+            }
         },
         "employee-settings": {
             icon: "wrench",
             text: _("Settings"),
-            xobject: Inprint.employee.settings.Panel
+            handler: function () {
+                new Inprint.cmp.memberSettingsForm.Window().show().cmpFill("self");
+            }
         },
         "employee-access": {
             icon: "key",

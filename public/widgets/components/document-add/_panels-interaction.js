@@ -1,3 +1,3 @@
-Inprint.cmp.AddDocumentWindow.Interaction = function(panels) {
+Inprint.cmp.CreateDocumentWindow.Interaction = function(panels) {
 
 }

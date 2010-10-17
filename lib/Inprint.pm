@@ -92,13 +92,20 @@ sub startup {
     $self->createRoutes($sessionBridge, "catalog/readiness",    [ "create", "read", "update", "delete", "list" ]);
     $self->createRoutes($sessionBridge, "catalog/roles",        [ "create", "read", "update", "delete", "list", "map", "mapping" ]);
     $self->createRoutes($sessionBridge, "catalog/rules",        [ "list" ]);
-    $self->createRoutes($sessionBridge, "catalog/members",      [ "create", "delete", "list", "map", "mapping" ]);
+    $self->createRoutes($sessionBridge, "catalog/members",      [ "create", "delete", "list", "map", "mapping", "setup" ]);
     $self->createRoutes($sessionBridge, "catalog/stages",       [ "create", "read", "update", "delete", "list", "map-principals", "unmap-principals", "principals-mapping" ]);
     $self->createRoutes($sessionBridge, "catalog/principals",   [ "list" ]);
+
+    $self->createRoutes($sessionBridge, "catalog/transfer",     [ "editions", "branches", "list" ]);
+
 
     # Profile routes
     $self->createRoutes($sessionBridge, "profile", [ "read", "update" ]);
     $sessionBridge->route('/profile/image/:id')->to('profile#image', id => "00000000-0000-0000-0000-000000000000");
+
+    # Options routes
+    $self->createRoutes($sessionBridge, "options", [ "update" ]);
+    $self->createRoutes($sessionBridge, "options/combos",       [ "capture-destination" ]);
 
     # State route
     $self->createRoutes($sessionBridge, "state", [ "index", "read", "update" ]);
@@ -135,7 +142,7 @@ sub createRoutes {
         $croute = "$croute#$route";
 
         $bridge->route($cprefix)->to( $croute );
-        #say STDERR "$bridge->route($cprefix)->to( $croute );";
+        say STDERR "$bridge->route($cprefix)->to( $croute );";
     }
 
     return 1;
