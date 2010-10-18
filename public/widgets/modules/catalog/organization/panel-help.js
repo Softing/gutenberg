@@ -4,7 +4,7 @@ Inprint.catalog.organization.HelpPanel = Ext.extend(Ext.Panel, {
         this.oid = "Inprint.catalog.organization";
 
         Ext.apply(this, {
-            title: "Help",
+            title: _("Help"),
             border:false,
             bodyCssClass: "help-panel",
             preventBodyReset: true

@@ -49,6 +49,7 @@ Inprint.factory.Store = new function() {
         "/catalog/roles/list/":                 [ "id", "title", "shortcut", "description", "rules" ],
         "/catalog/rules/list/":                 [ "id", "rule",  "title", "shortcut", "groupby", "limit", "selection" ],
         "/catalog/members/list/":               [ "id", "login", "password", "position", "email", "title", "shortcut", createDateField("created"), createDateField("updated") ],
+        "/catalog/members/rules/":              [ "id", "binding", "binding_shortcut", "area", "area_shortcut", "rules" ],
         "/catalog/stages/list/":                [ "id", "chain", "readiness_shortcut", "readiness_color", "weight", "title", "shortcut", "description", "members" ],
         "/catalog/stages/principals-mapping/":  [ "id", "type", "catalog", "stage", "principal", "title", "description", "catalog_shortcut", "stage_shortcut" ],
         "/catalog/principals/list/":            [ "id", "type", "title", "description" ],

@@ -91,8 +91,8 @@ sub startup {
     $self->createRoutes($sessionBridge, "catalog/organization", [ "create", "read", "update", "delete", "tree", "map", "unmap" ]);
     $self->createRoutes($sessionBridge, "catalog/readiness",    [ "create", "read", "update", "delete", "list" ]);
     $self->createRoutes($sessionBridge, "catalog/roles",        [ "create", "read", "update", "delete", "list", "map", "mapping" ]);
-    $self->createRoutes($sessionBridge, "catalog/rules",        [ "list" ]);
-    $self->createRoutes($sessionBridge, "catalog/members",      [ "create", "delete", "list", "map", "mapping", "setup" ]);
+    $self->createRoutes($sessionBridge, "catalog/rules",        [ "list", "mapping", "map" ]);
+    $self->createRoutes($sessionBridge, "catalog/members",      [ "create", "delete", "list", "rules", "setup" ]); #"map", "mapping",
     $self->createRoutes($sessionBridge, "catalog/stages",       [ "create", "read", "update", "delete", "list", "map-principals", "unmap-principals", "principals-mapping" ]);
     $self->createRoutes($sessionBridge, "catalog/principals",   [ "list" ]);
 

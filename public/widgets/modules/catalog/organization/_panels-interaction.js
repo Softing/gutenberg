@@ -138,13 +138,9 @@ Inprint.catalog.organization.Interaction = function(panels) {
     },
 
     grid.btnManageRules.handler = function() {
-        var win = grid.components["manage-rules-window"];
-        if (!win) {
-            win = new Inprint.cmp.memberRulesForm.Window();
-            grid.components["manage-rules-window"] = win;
-
-        }
-        //win.cmpFill(grid.getValue("id"));
+        var win = new Inprint.cmp.memberRulesForm.Window({
+            memberId: grid.getValue("id")
+        });
         win.show();
     }
 
@@ -168,7 +164,9 @@ Inprint.catalog.organization.Interaction = function(panels) {
         _disable( grid.btnViewProfile, grid.btnUpdateProfile, grid.btnManageRules);
 
         if (count > 0) {
+
             _enable( grid.btnDelete, grid.btnDeleteFromGroup );
+
             if (count == 1) {
                 _enable( grid.btnViewProfile, grid.btnUpdateProfile, grid.btnManageRules);
             }

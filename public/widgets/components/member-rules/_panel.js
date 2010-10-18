@@ -1,54 +1,25 @@
-Inprint.cmp.memberRules.Window = Ext.extend(Ext.Window, {
+Inprint.cmp.memberRules = Ext.extend(Ext.Window, {
 
     initComponent: function() {
 
-        this.formPanel = new Ext.FormPanel({
-            url: "/dumb/",
-            frame:false,
-            border:false,
-            labelWidth: 100,
-            defaults: {
-                anchor: "100%",
-                allowBlank:false
-            },
-            bodyStyle: "padding: 20px 10px",
-            //items: [
-            //
-            //],
-            keys: [ _KEY_ENTER_SUBMIT ],
-            buttons: [
-                _BTN_SAVE,
-                {
-                    text: _("Close"),
-                    scope:this,
-                    handler: function() {
-                        this.hide();
-                    }
-                }
-
-            ]
-        });
+        this.panels = {};
+        this.panels["grid"] = new Inprint.cmp.memberRules.Grid();
 
         Ext.apply(this, {
             title: _("Review of access rights"),
             layout: "fit",
             closeAction: "hide",
             width:800, height:400,
-            items: this.formPanel
+            items: this.panels["grid"]
         });
 
-        this.formPanel.on("actioncomplete", function (form, action) {
-            if (action.type == "submit")
-                this.hide();
-        });
+        Inprint.cmp.memberRules.superclass.initComponent.apply(this, arguments);
+        Inprint.cmp.memberRules.Interaction(this, this.panels);
 
-        Inprint.cmp.memberRules.Window.superclass.initComponent.apply(this, arguments);
-
-        Inprint.cmp.memberRules.Interaction(this.panels);
     },
 
     onRender: function() {
-        Inprint.cmp.memberRules.Window.superclass.onRender.apply(this, arguments);
+        Inprint.cmp.memberRules.superclass.onRender.apply(this, arguments);
     }
 
 });

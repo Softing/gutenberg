@@ -23,7 +23,7 @@ Inprint.cmp.PrincipalsBrowser.Tree = Ext.extend(Ext.tree.TreePanel, {
             }
         });
 
-        Inprint.catalog.organization.Tree.superclass.initComponent.apply(this, arguments);
+        Inprint.cmp.PrincipalsBrowser.Tree.superclass.initComponent.apply(this, arguments);
 
         this.on("beforeappend", function(tree, parent, node) {
 
@@ -43,7 +43,7 @@ Inprint.cmp.PrincipalsBrowser.Tree = Ext.extend(Ext.tree.TreePanel, {
 
     onRender: function() {
 
-        Inprint.catalog.organization.Tree.superclass.onRender.apply(this, arguments);
+        Inprint.cmp.PrincipalsBrowser.Tree.superclass.onRender.apply(this, arguments);
 
         this.on("beforeload", function() {
             this.body.mask(_("Please wait..."));

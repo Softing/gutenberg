@@ -171,7 +171,9 @@ Inprint.Registry = function() {
         "employee-access": {
             icon: "key",
             text: _("Access"),
-            xobject: Inprint.employee.access.Panel
+            handler: function() {
+                new Inprint.cmp.memberRules().show();
+            }
         },
         "employee-logs": {
             icon: "card-address",

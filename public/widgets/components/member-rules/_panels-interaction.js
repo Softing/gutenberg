@@ -1,3 +1,3 @@
-Inprint.cmp.memberRules.Interaction = function(panels) {
+Inprint.cmp.memberRules.Interaction = function(parent, panels) {
 
 }

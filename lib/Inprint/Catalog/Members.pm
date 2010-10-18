@@ -142,6 +142,43 @@ sub delete {
     $c->render_json( { success => 1 } );
 }
 
+sub rules {
+
+    my $c = shift;
+
+    my $i_member = $c->param("member") || $c->QuerySessionGet("member.id");;
+
+    my $result = $c->sql->Q("
+        (
+            SELECT t1.area, t1.binding, t2.shortcut as binding_shortcut
+            FROM map_member_to_rule t1, editions t2
+            WHERE t1.member=? AND t1.area = 'edition' AND t2.id = t1.binding
+            GROUP BY area, binding, shortcut )
+        UNION ALL
+        (
+            SELECT t1.area, t1.binding, t2.shortcut as binding_shortcut
+            FROM map_member_to_rule t1, catalog t2
+            WHERE t1.member=? AND t1.area = 'group' AND t2.id = t1.binding
+            GROUP BY area, binding, shortcut)
+        UNION ALL
+        (
+            SELECT t1.area, t1.binding, t2.shortcut as binding_shortcut
+            FROM map_member_to_rule t1, catalog t2
+            WHERE t1.member=? AND t1.area = 'member' AND t2.id = t1.binding
+            GROUP BY area, binding, shortcut)
+    ", [$i_member, $i_member, $i_member])->Hashes;
+
+    foreach my $item (@$result) {
+        $item->{rules} = $c->sql->Q("
+            SELECT t2.shortcut
+            FROM map_member_to_rule t1, rules t2
+            WHERE t1.member=? AND t1.area=? AND binding=? AND t2.id=t1.rule
+        ",[ $i_member, $item->{area}, $item->{binding} ])->Array;
+    }
+
+    $c->render_json( { data => $result } );
+}
+
 sub setup {
     my $c = shift;
 
@@ -215,97 +252,99 @@ sub setup {
     $c->render_json( $result );
 }
 
-sub map {
-    my $c = shift;
 
-    my $i_member      = $c->param("member");
-    my $i_catalog     = $c->param("catalog");
-    my @i_rules       = $c->param("rules");
-    my $i_recursive   = $c->param("recursive");
 
-    $c->sql->Do(
-        " DELETE FROM map_member_to_rule WHERE member=? AND catalog=? ",
-        [ $i_member, $i_catalog ]);
-
-    foreach my $string (@i_rules) {
-        my ($rule, $mode) = split "::", $string;
-        $c->sql->Do("
-            INSERT INTO map_member_to_rule(member, catalog, rule, mode)
-                VALUES (?, ?, ?, ?);
-        ", [$i_member, $i_catalog, $rule, $mode]);
-    }
-
-    if ($i_recursive) {
-
-        my $groups = $c->sql->Q(
-            " SELECT id FROM catalog WHERE path LIKE ? ",
-            ["%$i_catalog%"])->Hashes;
-
-        foreach my $item (@$groups) {
-
-            $c->sql->Do(
-                " DELETE FROM map_member_to_rule WHERE member=? AND catalog=? ",
-                [ $i_member, $item->{id} ]);
-
-            foreach my $string (@i_rules) {
-                my ($rule, $mode) = split "::", $string;
-                $c->sql->Do("
-                    INSERT INTO map_member_to_rule(member, catalog, rule, mode)
-                        VALUES (?, ?, ?, ?);
-                ", [$i_member, $item->{id}, $rule, $mode]);
-            }
-
-        }
-    }
-
-    $c->render_json( { success => $c->json->true } );
-}
-
-sub unmap {
-    my $c = shift;
-
-    my $i_member      = $c->param("member");
-    my $i_catalog     = $c->param("catalog");
-    my @i_rules       = $c->param("rules");
-    my $i_recursive   = $c->param("recursive");
-
-    $c->sql->Do(
-        " DELETE FROM map_member_to_rule WHERE member=? AND catalog=? ",
-        [ $i_member, $i_catalog ]);
-
-    foreach my $string (@i_rules) {
-        my ($rule, $mode) = split "::", $string;
-        $c->sql->Do("
-            INSERT INTO map_member_to_rule(member, catalog, rule, mode)
-                VALUES (?, ?, ?, ?);
-        ", [$i_member, $i_catalog, $rule, $mode]);
-    }
-
-    if ($i_recursive) {
-
-        my $groups = $c->sql->Q(
-            " SELECT id FROM catalog WHERE path LIKE ? ",
-            ["%$i_catalog%"])->Hashes;
-
-        foreach my $item (@$groups) {
-
-            $c->sql->Do(
-                " DELETE FROM map_member_to_rule WHERE member=? AND catalog=? ",
-                [ $i_member, $item->{id} ]);
-
-            foreach my $string (@i_rules) {
-                my ($rule, $mode) = split "::", $string;
-                $c->sql->Do("
-                    INSERT INTO map_member_to_rule(member, catalog, rule, mode)
-                        VALUES (?, ?, ?, ?);
-                ", [$i_member, $item->{id}, $rule, $mode]);
-            }
-
-        }
-    }
-
-    $c->render_json( { success => $c->json->true } );
-}
+#sub map {
+#    my $c = shift;
+#
+#    my $i_member      = $c->param("member");
+#    my $i_catalog     = $c->param("catalog");
+#    my @i_rules       = $c->param("rules");
+#    my $i_recursive   = $c->param("recursive");
+#
+#    $c->sql->Do(
+#        " DELETE FROM map_member_to_rule WHERE member=? AND catalog=? ",
+#        [ $i_member, $i_catalog ]);
+#
+#    foreach my $string (@i_rules) {
+#        my ($rule, $mode) = split "::", $string;
+#        $c->sql->Do("
+#            INSERT INTO map_member_to_rule(member, catalog, rule, mode)
+#                VALUES (?, ?, ?, ?);
+#        ", [$i_member, $i_catalog, $rule, $mode]);
+#    }
+#
+#    if ($i_recursive) {
+#
+#        my $groups = $c->sql->Q(
+#            " SELECT id FROM catalog WHERE path LIKE ? ",
+#            ["%$i_catalog%"])->Hashes;
+#
+#        foreach my $item (@$groups) {
+#
+#            $c->sql->Do(
+#                " DELETE FROM map_member_to_rule WHERE member=? AND catalog=? ",
+#                [ $i_member, $item->{id} ]);
+#
+#            foreach my $string (@i_rules) {
+#                my ($rule, $mode) = split "::", $string;
+#                $c->sql->Do("
+#                    INSERT INTO map_member_to_rule(member, catalog, rule, mode)
+#                        VALUES (?, ?, ?, ?);
+#                ", [$i_member, $item->{id}, $rule, $mode]);
+#            }
+#
+#        }
+#    }
+#
+#    $c->render_json( { success => $c->json->true } );
+#}
+#
+#sub unmap {
+#    my $c = shift;
+#
+#    my $i_member      = $c->param("member");
+#    my $i_catalog     = $c->param("catalog");
+#    my @i_rules       = $c->param("rules");
+#    my $i_recursive   = $c->param("recursive");
+#
+#    $c->sql->Do(
+#        " DELETE FROM map_member_to_rule WHERE member=? AND catalog=? ",
+#        [ $i_member, $i_catalog ]);
+#
+#    foreach my $string (@i_rules) {
+#        my ($rule, $mode) = split "::", $string;
+#        $c->sql->Do("
+#            INSERT INTO map_member_to_rule(member, catalog, rule, mode)
+#                VALUES (?, ?, ?, ?);
+#        ", [$i_member, $i_catalog, $rule, $mode]);
+#    }
+#
+#    if ($i_recursive) {
+#
+#        my $groups = $c->sql->Q(
+#            " SELECT id FROM catalog WHERE path LIKE ? ",
+#            ["%$i_catalog%"])->Hashes;
+#
+#        foreach my $item (@$groups) {
+#
+#            $c->sql->Do(
+#                " DELETE FROM map_member_to_rule WHERE member=? AND catalog=? ",
+#                [ $i_member, $item->{id} ]);
+#
+#            foreach my $string (@i_rules) {
+#                my ($rule, $mode) = split "::", $string;
+#                $c->sql->Do("
+#                    INSERT INTO map_member_to_rule(member, catalog, rule, mode)
+#                        VALUES (?, ?, ?, ?);
+#                ", [$i_member, $item->{id}, $rule, $mode]);
+#            }
+#
+#        }
+#    }
+#
+#    $c->render_json( { success => $c->json->true } );
+#}
 
 
 1;
