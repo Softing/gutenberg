@@ -24,11 +24,11 @@ sub list {
     my $mode     = $c->param("gridmode")     || "all";
 
     # Sorting
-    my $dir      = $c->param("dir")          || undef;
-    my $sort     = $c->param("sort")         || undef;
+    my $dir      = $c->param("dir")          || "DESC";
+    my $sort     = $c->param("sort")         || "created";
 
     # Filters
-    my $edition  = $c->param("flt_edition")    || undef;
+    my $edition  = $c->param("flt_edition")  || undef;
     my $group    = $c->param("flt_group")    || undef;
     my $title    = $c->param("flt_title")    || undef;
     my $fascicle = $c->param("flt_fascicle") || undef;
@@ -48,8 +48,8 @@ sub list {
             dcm.headline, dcm.headline_shortcut,
             dcm.rubric, dcm.rubric_shortcut,
 
-            dcm.maingroup, dcm.maingroup_shortcut,
-            dcm.ingroups, dcm.copygroup,
+            dcm.workgroup, dcm.workgroup_shortcut,
+            dcm.inworkgroups, dcm.copygroup,
 
             dcm.holder,  dcm.holder_shortcut,
             dcm.creator, dcm.creator_shortcut,
@@ -120,7 +120,7 @@ sub list {
     }
 
     if ($group && $group ne "clear") {
-        $sql_filters .= " AND ? = ANY(dcm.ingroups) ";
+        $sql_filters .= " AND ? = ANY(dcm.inworkgroups) ";
         push @params, $group;
     }
 
@@ -162,7 +162,7 @@ sub list {
 
     if ($dir && $sort) {
         if ( $dir ~~ ["ASC", "DESC"] ) {
-            if ( $sort ~~ ["title", "maingroup_shortcut", "fascicle_shortcut", "headline_shortcut",
+            if ( $sort ~~ ["title", "maingroup_shortcut", "fascicle_shortcut", "headline_shortcut", "created",
                            "rubric_shortcut", "pages", "manager_shortcut", "progress", "holder_shortcut", "images", "rsize" ] ) {
                 $sql_query .= " ORDER BY $sort $dir ";
             }

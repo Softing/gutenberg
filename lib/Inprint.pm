@@ -79,11 +79,13 @@ sub startup {
     my $sessionBridge  = $postinitBridge->bridge->to('filters#mysession');
 
     # Calendar routes
-    $self->createRoutes($sessionBridge, "calendar", [ "create", "read", "update", "delete", "list", "enable", "disable", "combogroups" ]);
+    $self->createRoutes($sessionBridge, "calendar",             [ "create", "read", "update", "delete", "list", "enable", "disable", "combogroups" ]);
 
     # Documents routes
-    $self->createRoutes($sessionBridge, "documents", [ "create", "read", "update", "delete", "list" ]);
-    $self->createRoutes($sessionBridge, "documents/combos", [ "editions", "groups", "fascicles", "headlines", "rubrics", "holders", "managers", "progress" ]);
+    $self->createRoutes($sessionBridge, "documents",            [ "create", "read", "update", "delete", "list" ]);
+    $self->createRoutes($sessionBridge, "documents/combos",     [ "editions", "stages", "assignments", "fascicles", "headlines", "rubrics" ]);
+    $self->createRoutes($sessionBridge, "documents/filters",    [ "editions", "groups", "fascicles", "headlines", "rubrics", "holders", "managers", "progress" ]);
+
 
     # Catalog routes
     $self->createRoutes($sessionBridge, "catalog/combos",       [ "editions", "groups", "fascicles", "roles", "readiness" ]);
@@ -142,7 +144,7 @@ sub createRoutes {
         $croute = "$croute#$route";
 
         $bridge->route($cprefix)->to( $croute );
-        say STDERR "$bridge->route($cprefix)->to( $croute );";
+        #say STDERR "$bridge->route($cprefix)->to( $croute );";
     }
 
     return 1;

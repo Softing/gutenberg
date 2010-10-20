@@ -2,9 +2,6 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
 
     initComponent: function() {
 
-        this.stateHash = {};
-        this.filterParams = {};
-
         this.border = false;
         this.layout = "column";
 
@@ -15,165 +12,233 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                 width:180,
                 xtype: 'textfield',
                 emptyText: _("Title") + "...",
-                listeners: {
-                    scope: this,
-                    blur: function(field) {
-                        this.filterParams["flt_title"] = field.getValue();
-                    }
-                }
+                name: "title"
             },
             xc.getConfig("/documents/filters/editions/", {
                 columnWidth:.125,
                 cacheQuery: false,
                 listeners: {
                     scope: this,
-                    select: function(combo, record, indx) {
-                        this.setFilterParam("edition", record.get("id"), record.get("title"));
-                    },
                     beforequery: function(qe) {
+                        qe.combo.getStore().baseParams = this.getFilterParams();
                         delete qe.combo.lastQuery;
                     }
                 }
-            }, { baseParams: { gridmode: this.gridmode } }),
+            }),
             xc.getConfig("/documents/filters/groups/", {
                 columnWidth:.125,
                 cacheQuery: false,
                 listeners: {
                     scope: this,
-                    select: function(combo, record, indx) {
-                        this.setFilterParam("group", record.get("id"), record.get("title"));
-                    },
                     beforequery: function(qe) {
+                        qe.combo.getStore().baseParams = this.getFilterParams();
                         delete qe.combo.lastQuery;
                     }
                 }
-            }, { baseParams: { gridmode: this.gridmode } }),
+            }),
             xc.getConfig("/documents/filters/fascicles/", {
                 columnWidth:.125,
                 cacheQuery: false,
                 listeners: {
                     scope: this,
-                    select: function(combo, record, indx) {
-                        this.setFilterParam("fascicle", record.get("id"), record.get("title"));
-                        this.getForm().findField("headline").enable();
+                    render: function(combo) {
+                        this.getForm().findField("edition").on("select", function() {
+                            combo.enable();
+                            combo.reset();
+                            //combo.getStore().baseParams["flt_edition"] = this.getForm().findField("edition").getValue();
+                        }, this);
                     },
                     beforequery: function(qe) {
+                        qe.combo.getStore().baseParams = this.getFilterParams();
                         delete qe.combo.lastQuery;
-                        qe.combo.getStore().baseParams["flt_edition"] = this.filterParams["flt_edition"];
                     }
                 }
-            }, { baseParams: { gridmode: this.gridmode } }),
+            }),
             xc.getConfig("/documents/filters/headlines/", {
                 disabled: true,
                 columnWidth:.125,
                 cacheQuery: false,
                 listeners: {
                     scope: this,
-                    select: function(combo, record, indx) {
-                        this.setFilterParam("headline", record.get("id"), record.get("title"));
-                        this.getForm().findField("rubric").enable();
+                    render: function(combo) {
+                        this.getForm().findField("edition").on("select", function() {
+                            combo.disable();
+                            combo.reset();
+                        }, this);
+                        this.getForm().findField("fascicle").on("select", function() {
+                            combo.enable();
+                            combo.reset();
+                            //combo.getStore().baseParams["flt_fascicle"] = this.getForm().findField("fascicle").getValue();
+                        }, this);
                     },
                     beforequery: function(qe) {
+                        qe.combo.getStore().baseParams = this.getFilterParams();
                         delete qe.combo.lastQuery;
-                        qe.combo.getStore().baseParams["flt_fascicle"] = this.filterParams["flt_fascicle"];
                     }
                 }
-            }, { baseParams: { gridmode: this.gridmode } }),
+            }),
             xc.getConfig("/documents/filters/rubrics/", {
                 disabled: true,
                 columnWidth:.125,
                 cacheQuery: false,
                 listeners: {
                     scope: this,
-                    select: function(combo, record, indx) {
-                        this.setFilterParam("rubric", record.get("id"), record.get("title"));
+                    render: function(combo) {
+                        this.getForm().findField("edition").on("select", function() {
+                            combo.disable();
+                            combo.reset();
+                        }, this);
+                        this.getForm().findField("fascicle").on("select", function() {
+                            combo.disable();
+                            combo.reset();
+                        }, this);
+                        this.getForm().findField("headline").on("select", function() {
+                            combo.enable();
+                            combo.reset();
+                            //combo.getStore().baseParams["flt_headline"] = this.getForm().findField("headline").getValue();
+                        }, this);
                     },
                     beforequery: function(qe) {
+                        qe.combo.getStore().baseParams = this.getFilterParams();
                         delete qe.combo.lastQuery;
-                        qe.combo.getStore().baseParams["flt_headline"] = this.filterParams["flt_headline"];
                     }
                 }
-            }, { baseParams: { gridmode: this.gridmode } }),
+            }),
             xc.getConfig("/documents/filters/managers/",  {
                 editable:true,
                 columnWidth:.125,
                 cacheQuery: false,
                 listeners: {
                     scope: this,
-                    select: function(combo, record, indx) {
-                        this.setFilterParam("manager", record.get("id"), record.get("title"));
-                    },
+                    //render: function(combo) {
+                    //    this.getForm().findField("group").on("select", function() {
+                    //        //combo.getStore().baseParams["flt_group"] = this.getForm().findField("group").getValue();
+                    //        combo.getStore().baseParams = this.getFilterParams();
+                    //    }, this);
+                    //},
                     beforequery: function(qe) {
+                        qe.combo.getStore().baseParams = this.getFilterParams();
                         delete qe.combo.lastQuery;
-                        qe.combo.getStore().baseParams["flt_group"] = this.filterParams["flt_group"];
                     }
                 }
-            }, { baseParams: { gridmode: this.gridmode } }),
+            }),
             xc.getConfig("/documents/filters/progress/",  {
                 columnWidth:.125,
                 cacheQuery: false,
                 listeners: {
                     scope: this,
-                    select: function(combo, record, indx) {
-                        this.setFilterParam("progress", record.get("id"), record.get("title"));
-                    },
+                    //render: function(combo) {
+                    //    this.getForm().findField("edition").on("select", function() {
+                    //        combo.getStore().baseParams["flt_edition"] = this.getForm().findField("edition").getValue();
+                    //    }, this);
+                    //},
                     beforequery: function(qe) {
+                        qe.combo.getStore().baseParams = this.getFilterParams();
                         delete qe.combo.lastQuery;
                     }
                 }
-            }, { baseParams: { gridmode: this.gridmode } }),
+            }),
             xc.getConfig("/documents/filters/holders/",   {
                 editable:true,
                 columnWidth:.125,
                 cacheQuery: false,
                 listeners: {
                     scope: this,
-                    select: function(combo, record, indx) {
-                        this.setFilterParam("holder", record.get("id"), record.get("title"));
-                    },
+                    //render: function(combo) {
+                    //    this.getForm().findField("group").on("select", function() {
+                    //        combo.getStore().baseParams["flt_group"] = this.getForm().findField("group").getValue();
+                    //    }, this);
+                    //},
                     beforequery: function(qe) {
+                        qe.combo.getStore().baseParams = this.getFilterParams();
                         delete qe.combo.lastQuery;
-                        qe.combo.getStore().baseParams["flt_group"] = this.filterParams["flt_group"];
                     }
                 }
-            }, { baseParams: { gridmode: this.gridmode } }),
+            }),
+
             {
                 xtype: 'button',
                 icon: _ico('magnifier'),
                 cls: 'x-btn-icon',
                 scope:this,
-                handler: function() {
-                    Ext.state.Manager.set(this.stateId + "-filter", this.stateHash);
-                    this.fireEvent('filter', this, this.filterParams);
-                }
+                handler: this.doSearch
             }
+
         ];
 
         Inprint.documents.GridFilter.superclass.initComponent.apply(this, arguments);
 
-        this.addEvents('ready', 'filter');
-
+        this.addEvents('restore', 'filter');
     },
 
     onRender: function() {
-
         Inprint.documents.GridFilter.superclass.onRender.apply(this, arguments);
-
-        this.stateHash = Ext.state.Manager.get(this.stateId + "-filter", {});
-        for (var i in this.stateHash) {
-            var field = this.getForm().findField(i);
-            if (field) {
-                field.setValue(this.stateHash[i].name);
-                this.filterParams["flt_"+i] = this.stateHash[i].value;
-            }
-        }
-        this.fireEvent('ready', this, this.filterParams);
-
+        var params = this.restoreFilterState();
+        this.fireEvent('restore', this, params);
     },
 
-    setFilterParam: function(param, value, title) {
-        this.filterParams["flt_"+param] = value;
-        this.stateHash[param] = { name:  title, value: value };
+    doSearch: function() {
+        var form = this.getForm();
+        var params = this.getFilterParams();
+        this.saveFilterState();
+        this.fireEvent('filter', this, params);
+    },
+
+    getFilterParams: function() {
+        var form = this.getForm();
+        var params = {};
+        params["gridmode"]      = this.gridmode;
+        params["flt_title"]     = form.findField("title").getValue();
+        params["flt_edition"]   = form.findField("edition").hiddenField.value;
+        params["flt_group"]     = form.findField("group").hiddenField.value;
+        params["flt_fascicle"]  = form.findField("fascicle").hiddenField.value;
+        params["flt_headline"]  = form.findField("headline").hiddenField.value;
+        params["flt_rubric"]    = form.findField("rubric").hiddenField.value;
+        params["flt_manager"]   = form.findField("manager").hiddenField.value;
+        params["flt_progress"]  = form.findField("progress").hiddenField.value;
+        params["flt_holder"]    = form.findField("holder").hiddenField.value;
+        return params;
+    },
+
+    saveFilterState: function() {
+        var form = this.getForm();
+        var params = {};
+        params["editon"]    = { id: form.findField("edition").hiddenField.value,  text: form.findField("edition").getRawValue()  };
+        params["group"]     = { id: form.findField("group").hiddenField.value,    text: form.findField("group").getRawValue()    };
+        params["fascicle"]  = { id: form.findField("fascicle").hiddenField.value, text: form.findField("fascicle").getRawValue() };
+        //params["headline"]  = { id: form.findField("headline").hiddenField.value, text: form.findField("headline").getRawValue() };
+        //params["rubric"]    = { id: form.findField("rubric").hiddenField.value,   text: form.findField("rubric").getRawValue()   };
+        //params["manager"]   = { id: form.findField("manager").hiddenField.value,  text: form.findField("manager").getRawValue()  };
+        //params["progress"]  = { id: form.findField("progress").hiddenField.value, text: form.findField("progress").getRawValue() };
+        //params["holder"]    = { id: form.findField("holder").hiddenField.value,   text: form.findField("holder").getRawValue()   };
+        Ext.state.Manager.set(this.stateId + "-filter", params);
+    },
+
+    restoreFilterState: function() {
+        var params = {};
+        var state = Ext.state.Manager.get(this.stateId + "-filter", {});
+
+        if (state["fascicle"]) {
+            this.getForm().findField("headline").enable();
+        }
+
+        if (state["headline"]) {
+            this.getForm().findField("rubric").enable();
+        }
+
+        for (var i in state) {
+            if (state[i].id) {
+                var field = this.getForm().findField(i);
+                if (field) {
+                    params["flt_"+i] = state[i].id;
+                    field.on("afterrender", function(combo){
+                        combo.setValue(this.text);
+                        combo.hiddenField.value=this.id;
+                    }, state[i]);
+                }
+            }
+        }
+        return params;
     }
 
 });

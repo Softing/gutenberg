@@ -290,7 +290,7 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
 
     onRender: function() {
         Inprint.documents.Grid.superclass.onRender.apply(this, arguments);
-        this.filter.on("ready", function(filter, params) {
+        this.filter.on("restore", function(filter, params) {
             this.store.load({ params: Ext.apply({start:0, limit:60}, params) });
         }, this);
 

@@ -55,9 +55,8 @@ my $documents = $sql2->Q("
         created, updated, isopen, fascicle_name, edition_name, edition_sname,
         department_name, section_name, rubric_name, owner_nick, manager_nick,
         image_count, file_count, calibr_real, page,
-        ( SELECT card.stitle
-           FROM views.\"passport.owners\" card
-          WHERE card.uuid = creator) AS creator_nick
+        ( SELECT card.stitle FROM views.\"passport.owners\" card WHERE card.uuid = creator) AS creator_nick,
+        to_char(created, 'YYYY/MM') as filepath
     FROM views.documents
     -- WHERE uuid = 'e009789c-7da2-47a5-b9d3-0dfae34515df'
     -- WHERE trash = 1
@@ -252,58 +251,14 @@ foreach my $item( @{ $documents } ) {
     }
     die unless $Rubric;
 
-
-    #if ($item->{section} && $item->{section_name}) {
-    #    $Section = $sql->Q(" SELECT * FROM headlines WHERE id=? AND fascicle=?", [ $item->{section}, $item->{fascicle} ])->Hash;
-    #    unless ($Section) {
-    #        $Section = $sql->Q(" SELECT * FROM headlines WHERE fascicle=? AND (title=? OR shortcut=?) ", [ $item->{fascicle}, $item->{section_name}, $item->{section_name} ])->Hash;
-    #    }
-    #    unless ($Section) {
-    #        my $idSection = $ug->create_str();
-    #        $sql->Do("
-    #            INSERT INTO headlines(id, fascicle, title, shortcut, description, created, updated)
-    #            VALUES (?, ?, ?, ?, ?, now(), now());
-    #        ", [ $idSection, $item->{fascicle}, $item->{section_name}, $item->{section_name}, $item->{section_name} ]);
-    #        $Section = $sql->Q(" SELECT * FROM headlines WHERE id=? ", [ $idSection ])->Hash;
-    #    }
-    #    die "Cant find Section" unless $Section;
-    #} else {
-    #    $Section = {
-    #        id => $rootnode,
-    #        title => "Not found"
-    #    };
-    #}
-    #
-    #if ($item->{rubric} && $item->{rubric_name}) {
-    #    $Rubric = $sql->Q(" SELECT * FROM rubrics WHERE id=? AND fascicle=? AND parent=?", [ $item->{rubric}, $item->{fascicle}, $Section->{id} ])->Hash;
-    #    unless ($Rubric) {
-    #        $Rubric = $sql->Q(" SELECT * FROM rubrics WHERE fascicle=? AND parent=? AND ( title=? OR shortcut=?) ", [ $item->{fascicle}, $Section->{id}, $item->{rubric_name}, $item->{rubric_name} ])->Hash;
-    #    }
-    #    unless ($Rubric) {
-    #        my $idRubric = $ug->create_str();
-    #        $sql->Do("
-    #            INSERT INTO rubrics(id, fascicle, parent, title, shortcut, description, created, updated)
-    #            VALUES (?, ?, ?, ?, ?, ?, now(), now());
-    #        ", [ $idRubric, $item->{fascicle}, $Section->{id}, $item->{rubric_name}, $item->{rubric_name}, $item->{rubric_name} ]);
-    #        $Rubric = $sql->Q(" SELECT * FROM rubrics WHERE id=? ", [ $idRubric ])->Hash;
-    #    }
-    #    die "Cant find Rubric" unless $Rubric;
-    #
-    #} else {
-    #    $Rubric = {
-    #        id => $rootnode,
-    #        title => "Not found"
-    #    };
-    #}
-
     # do insert
     $sql->Do("
         INSERT INTO documents(
             id,
             edition, edition_shortcut, ineditions,
-            maingroup, maingroup_shortcut, ingroups,
+            workgroup, workgroup_shortcut, inworkgroups,
             holder, creator, manager, holder_shortcut, creator_shortcut, manager_shortcut,
-            fascicle, fascicle_shortcut, infascicles,
+            fascicle, fascicle_shortcut,
             headline, headline_shortcut,
             rubric, rubric_shortcut,
             islooked, isopen,
@@ -311,7 +266,7 @@ foreach my $item( @{ $documents } ) {
             readiness, readiness_shortcut, color, progress,
             title, author,
             pdate, psize, rdate, rsize,
-            images, files,
+            filepath, images, files,
             created, updated
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
     ",
@@ -320,7 +275,7 @@ foreach my $item( @{ $documents } ) {
         $Edition->{id}, $Edition->{shortcut}, @$Editions[0],
         $catalog_folder, $catalog_shortcut, @$groups[0],
         $item->{theowner}, $item->{creator}, $item->{manager}, $item->{owner_nick}, $item->{creator_nick}, $item->{manager_nick},
-        $item->{fascicle}, $item->{fascicle_name}, [],
+        $item->{fascicle}, $item->{fascicle_name},
         $Headline->{id}, $Tag1->{title},
         $Rubric->{id}, $Tag2->{title},
         $item->{look}, $item->{isopen},
@@ -328,7 +283,7 @@ foreach my $item( @{ $documents } ) {
         $Readiness->{id}, $Readiness->{shortcut}, $Readiness->{color}, $Readiness->{weight},
         $item->{title}, $item->{author},
         $item->{planned_date}, $item->{planned_size}, $item->{real_date}, $item->{calibr_real},
-        $item->{image_count}, $item->{file_count},
+        "/". $item->{filepath} ."/". $item->{uuid}, $item->{image_count}, $item->{file_count},
         $item->{created}, $item->{updated}
     ]);
 

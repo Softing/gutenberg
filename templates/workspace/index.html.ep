@@ -12,8 +12,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
     <meta HTTP-EQUIV="Pragma" CONTENT="no-cache"></meta>
 
-    <link rel="icon" href="/favicon.gif" type="image/gif" />
-    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link href="/favicon.ico" rel="icon" type="image/x-icon" />
 
     <link type="text/css" rel="stylesheet" href="/ext-3.3.0/resources/css/ext-all.css">
     <link type="text/css" rel="stylesheet" href="/ext-3.3.0/resources/css/xtheme-gray.css">
