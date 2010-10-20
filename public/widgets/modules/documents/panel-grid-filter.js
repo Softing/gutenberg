@@ -218,16 +218,16 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
         var params = {};
         var state = Ext.state.Manager.get(this.stateId + "-filter", {});
 
-        if (state["fascicle"]) {
+        if (state["fascicle"] && state["fascicle"].id != "clear") {
             this.getForm().findField("headline").enable();
         }
 
-        if (state["headline"]) {
+        if (state["headline"] && state["headline"].id != "clear") {
             this.getForm().findField("rubric").enable();
         }
 
         for (var i in state) {
-            if (state[i].id) {
+            if (state[i].id && state[i].id != "clear") {
                 var field = this.getForm().findField(i);
                 if (field) {
                     params["flt_"+i] = state[i].id;

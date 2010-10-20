@@ -63,8 +63,6 @@ sub fascicles {
         $sql .= " AND t1.enabled = true ";
     }
 
-    print STDERR $sql;
-
     $sql .= " ORDER BY t1.enddate DESC, t2.shortcut, t1.title ";
 
     my $result = $c->sql->Q($sql, \@data)->Hashes;
