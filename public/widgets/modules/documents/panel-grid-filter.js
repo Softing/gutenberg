@@ -22,7 +22,7 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                     }
                 }
             },
-            xc.getConfig("/documents/combos/editions/", {
+            xc.getConfig("/documents/filters/editions/", {
                 columnWidth:.125,
                 cacheQuery: false,
                 listeners: {
@@ -35,7 +35,7 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                     }
                 }
             }, { baseParams: { gridmode: this.gridmode } }),
-            xc.getConfig("/documents/combos/groups/", {
+            xc.getConfig("/documents/filters/groups/", {
                 columnWidth:.125,
                 cacheQuery: false,
                 listeners: {
@@ -48,7 +48,7 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                     }
                 }
             }, { baseParams: { gridmode: this.gridmode } }),
-            xc.getConfig("/documents/combos/fascicles/", {
+            xc.getConfig("/documents/filters/fascicles/", {
                 columnWidth:.125,
                 cacheQuery: false,
                 listeners: {
@@ -63,7 +63,7 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                     }
                 }
             }, { baseParams: { gridmode: this.gridmode } }),
-            xc.getConfig("/documents/combos/headlines/", {
+            xc.getConfig("/documents/filters/headlines/", {
                 disabled: true,
                 columnWidth:.125,
                 cacheQuery: false,
@@ -79,7 +79,7 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                     }
                 }
             }, { baseParams: { gridmode: this.gridmode } }),
-            xc.getConfig("/documents/combos/rubrics/", {
+            xc.getConfig("/documents/filters/rubrics/", {
                 disabled: true,
                 columnWidth:.125,
                 cacheQuery: false,
@@ -94,7 +94,7 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                     }
                 }
             }, { baseParams: { gridmode: this.gridmode } }),
-            xc.getConfig("/documents/combos/managers/",  {
+            xc.getConfig("/documents/filters/managers/",  {
                 editable:true,
                 columnWidth:.125,
                 cacheQuery: false,
@@ -109,7 +109,7 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                     }
                 }
             }, { baseParams: { gridmode: this.gridmode } }),
-            xc.getConfig("/documents/combos/progress/",  {
+            xc.getConfig("/documents/filters/progress/",  {
                 columnWidth:.125,
                 cacheQuery: false,
                 listeners: {
@@ -122,7 +122,7 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                     }
                 }
             }, { baseParams: { gridmode: this.gridmode } }),
-            xc.getConfig("/documents/combos/holders/",   {
+            xc.getConfig("/documents/filters/holders/",   {
                 editable:true,
                 columnWidth:.125,
                 cacheQuery: false,

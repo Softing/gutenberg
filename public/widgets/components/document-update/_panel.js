@@ -6,14 +6,14 @@ Inprint.cmp.UpdateDocument = Ext.extend(Ext.Window, {
         this.form = new Inprint.cmp.UpdateDocument.Form();
 
         Ext.apply(this, {
-            title: _("Create a new document"),
+            title: _("Document profile update"),
             modal:true,
             layout: "fit",
             width:700, height:380,
             items: this.form,
             buttons:[
                 {
-                    text: _("Create"),
+                    text: _("Save"),
                     scope:this,
                     handler: function() {
                         this.form.getForm().submit();
@@ -30,12 +30,13 @@ Inprint.cmp.UpdateDocument = Ext.extend(Ext.Window, {
         });
 
         this.form.on("actioncomplete", function (form, action) {
-            if (action.type == "submit")
+            if (action.type == "submit") {
                 this.hide();
+                this.fireEvent("actioncomplete", this, this.form);
+            }
         });
 
         Inprint.cmp.UpdateDocument.superclass.initComponent.apply(this, arguments);
-
         Inprint.cmp.UpdateDocument.Interaction(this.panels);
     },
 

@@ -148,7 +148,7 @@ Ext.onReady(function() {
                 Inprint.session = Ext.util.JSON.decode( response.responseText );
                 if (Inprint.session && Inprint.session.member && Inprint.session.member.id ){
                     Inprint.checkSettings();
-                    if (defer) Inprint.updateSession.defer( 5000, this, [ true, true ]);
+                    if (defer) Inprint.updateSession.defer( 10000, this, [ true, true ]);
                 } else {
                     Ext.MessageBox.alert(
                     _("Your session is closed"),
@@ -178,7 +178,7 @@ Ext.onReady(function() {
         }
     };
 
-    Inprint.updateSession(false, true);
+    Inprint.updateSession(true, true);
 
     // Enable registry and layout
     Inprint.registry = new Inprint.Registry();

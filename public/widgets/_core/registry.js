@@ -55,7 +55,7 @@ Inprint.Registry = function() {
             text:  _("Create document"),
             menutext:  _("Create"),
             handler: function() {
-                new Inprint.cmp.CreateDocumentWindow().show();
+                new Inprint.cmp.CreateDocument().show();
             }
         },
         "documents-todo": {

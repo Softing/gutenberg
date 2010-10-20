@@ -63,20 +63,25 @@ Inprint.factory.Combo = new function() {
             emptyText: _("Edition") + "..."
         },
 
-        // Documents
+        // Combos for documents dialogs
         "/documents/combos/editions/": {
             hiddenName: "edition",
             icon: "toggle-small",
             fieldLabel: _("Edition"),
             emptyText: _("Edition") + "..."
         },
-        "/documents/combos/groups/": {
-            hiddenName: "group",
+        "/documents/combos/stages/": {
+            hiddenName: "stage",
             icon: "toggle-small",
-            fieldLabel: _("Group"),
-            emptyText: _("Group") + "..."
+            fieldLabel: _("Stage"),
+            emptyText: _("Stage") + "..."
         },
-
+        "/documents/combos/assignments/": {
+            hiddenName: "assignment",
+            icon: "toggle-small",
+            fieldLabel: _("Assignment"),
+            emptyText: _("Assignment") + "..."
+        },
         "/documents/combos/fascicles/": {
             hiddenName: "fascicle",
             icon:"folder",
@@ -92,25 +97,54 @@ Inprint.factory.Combo = new function() {
         "/documents/combos/rubrics/": {
             hiddenName: "rubric",
             icon: "tag-label-pink",
-            fieldLabel: _("rubric"),
+            fieldLabel: _("Rubric"),
             emptyText: _("Rubric") + "..."
         },
 
-        "/documents/combos/holders/": {
+        // Combos for document grid filters
+        "/documents/filters/editions/": {
+            hiddenName: "edition",
+            icon: "toggle-small",
+            fieldLabel: _("Edition"),
+            emptyText: _("Edition") + "..."
+        },
+        "/documents/filters/groups/": {
+            hiddenName: "group",
+            icon: "toggle-small",
+            fieldLabel: _("Group"),
+            emptyText: _("Group") + "..."
+        },
+        "/documents/filters/fascicles/": {
+            hiddenName: "fascicle",
+            icon:"folder",
+            fieldLabel: _("Fascicle"),
+            emptyText: _("Fascicle") + "..."
+        },
+        "/documents/filters/headlines/": {
+            hiddenName: "headline",
+            icon: "tag-label",
+            fieldLabel: _("Headline"),
+            emptyText: _("Headline") + "..."
+        },
+        "/documents/filters/rubrics/": {
+            hiddenName: "rubric",
+            icon: "tag-label-pink",
+            fieldLabel: _("Rubric"),
+            emptyText: _("Rubric") + "..."
+        },
+        "/documents/filters/holders/": {
             hiddenName: "holder",
             icon: "user-business",
             fieldLabel: _("Holder"),
             emptyText: _("Holder") + "..."
         },
-
-        "/documents/combos/managers/": {
+        "/documents/filters/managers/": {
             hiddenName: "manager",
             icon: "user-business",
             fieldLabel: _("Manager"),
             emptyText: _("Manager") + "..."
         },
-
-        "/documents/combos/progress/": {
+        "/documents/filters/progress/": {
             hiddenName: "progress",
             fieldLabel: _("Progress"),
             emptyText: _("Progress") + "..."

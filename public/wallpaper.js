@@ -27,4 +27,4 @@ else {
     mywallpaper = '1920x1200';
 }
 
-document.body.style.background = mycolor +" url(/images/wallpapers/"+ mywallpaper +".png) no-repeat";
+document.body.style.background = mycolor +" url(/images/wallpapers/"+ mywallpaper +".jpg) no-repeat";

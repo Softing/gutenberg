@@ -69,13 +69,20 @@ Inprint.factory.Store = new function() {
         "/catalog/combos/roles/",
 
         "/documents/combos/editions/",
-        "/documents/combos/groups/",
+        "/documents/combos/stages/",
+        "/documents/combos/assignments/",
         "/documents/combos/fascicles/",
         "/documents/combos/headlines/",
         "/documents/combos/rubrics/",
-        "/documents/combos/holders/",
-        "/documents/combos/managers/",
-        "/documents/combos/progress/",
+
+        "/documents/filters/editions/",
+        "/documents/filters/groups/",
+        "/documents/filters/fascicles/",
+        "/documents/filters/headlines/",
+        "/documents/filters/rubrics/",
+        "/documents/filters/holders/",
+        "/documents/filters/managers/",
+        "/documents/filters/progress/",
 
         "/options/combos/capture-destination/"
 

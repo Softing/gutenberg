@@ -30,8 +30,10 @@ Inprint.cmp.CreateDocument = Ext.extend(Ext.Window, {
         });
 
         this.form.on("actioncomplete", function (form, action) {
-            if (action.type == "submit")
+            if (action.type == "submit") {
                 this.hide();
+                this.fireEvent("actioncomplete", this, this.form);
+            }
         });
 
         Inprint.cmp.CreateDocument.superclass.initComponent.apply(this, arguments);

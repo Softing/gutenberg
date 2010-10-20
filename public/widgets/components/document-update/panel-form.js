@@ -4,7 +4,7 @@ Inprint.cmp.UpdateDocument.Form = Ext.extend(Ext.FormPanel, {
         var xc = Inprint.factory.Combo;
 
         Ext.apply(this, {
-            url: _url("/documents/add/"),
+            url: _url("/documents/create/"),
             border:false,
             layout:'column',
             autoScroll:true,
@@ -32,7 +32,8 @@ Inprint.cmp.UpdateDocument.Form = Ext.extend(Ext.FormPanel, {
                             items :[
                                 {
                                     fieldLabel: _("Title"),
-                                    name: 'title'
+                                    name: 'title',
+                                    allowBlank:false
                                 },
                                 {
                                     fieldLabel: _("Author"),
@@ -63,19 +64,62 @@ Inprint.cmp.UpdateDocument.Form = Ext.extend(Ext.FormPanel, {
                             xtype:'fieldset',
                             border:false,
                             title: _("Tracking"),
-                            //autoHeight:true,
                             defaults: {
                                 anchor: "100%"
                             },
                             defaultType: 'textfield',
                             items :[
-                                xc.getConfig("/documents/combos/editions/"),
-                                xc.getConfig("/documents/combos/stages/", {
-                                    disabled: true
+
+                                xc.getConfig("/documents/combos/editions/", {
+                                    allowBlank:false,
+                                    listeners: {
+                                        scope: this,
+                                        beforequery: function(qe) {
+                                            delete qe.combo.lastQuery;
+                                        }
+                                    }
                                 }),
+
+                                xc.getConfig("/documents/combos/stages/", {
+                                    disabled: true,
+                                    allowBlank:false,
+                                    listeners: {
+                                        scope: this,
+                                        render: function(combo) {
+                                            this.getForm().findField("edition").on("select", function() {
+                                                combo.enable();
+                                                combo.reset();
+                                                combo.getStore().baseParams["flt_edition"] = this.getForm().findField("edition").getValue();
+                                            }, this);
+                                        },
+                                        beforequery: function(qe) {
+                                            delete qe.combo.lastQuery;
+                                        }
+                                    }
+                                }),
+
                                 xc.getConfig("/documents/combos/assignments/", {
-                                    disabled: true
+                                    disabled: true,
+                                    allowBlank:false,
+                                    listeners: {
+                                        scope: this,
+                                        render: function(combo) {
+                                            this.getForm().findField("edition").on("select", function() {
+                                                combo.disable();
+                                                combo.reset();
+                                            }, this);
+                                            this.getForm().findField("stage").on("select", function() {
+                                                combo.enable();
+                                                combo.reset();
+                                                combo.getStore().baseParams["flt_stage"] = this.getForm().findField("stage").getValue();
+                                            }, this);
+                                        },
+                                        beforequery: function(qe) {
+                                            delete qe.combo.lastQuery;
+                                        }
+                                    }
                                 })
+
                             ]
                         },
                         {
@@ -87,21 +131,80 @@ Inprint.cmp.UpdateDocument.Form = Ext.extend(Ext.FormPanel, {
                             },
                             //autoHeight:true,
                             items :[
+
                                 {
                                     xtype: 'xdatefield',
                                     name: 'enddate',
                                     format:'F j, Y',
                                     submitFormat:'Y-m-d',
+                                    minValue: new Date(),
                                     allowBlank:false,
                                     fieldLabel: _("Date")
                                 },
-                                xc.getConfig("/documents/combos/fascicles/"),
-                                xc.getConfig("/documents/combos/headlines/", {
-                                    disabled: true
+
+                                xc.getConfig("/documents/combos/fascicles/", {
+                                    disabled: true,
+                                    listeners: {
+                                        scope: this,
+                                        render: function(combo) {
+                                            this.getForm().findField("edition").on("select", function() {
+                                                combo.enable();
+                                                combo.reset();
+                                                combo.getStore().baseParams["flt_edition"] = this.getForm().findField("edition").getValue();
+                                            }, this);
+                                        },
+                                        beforequery: function(qe) {
+                                            delete qe.combo.lastQuery;
+                                        }
+                                    }
                                 }),
+
+                                xc.getConfig("/documents/combos/headlines/", {
+                                    disabled: true,
+                                    listeners: {
+                                        scope: this,
+                                        render: function(combo) {
+                                            this.getForm().findField("edition").on("select", function() {
+                                                combo.disable();
+                                                combo.reset();
+                                            }, this);
+                                            this.getForm().findField("fascicle").on("select", function() {
+                                                combo.enable();
+                                                combo.reset();
+                                                combo.getStore().baseParams["flt_fascicle"] = this.getForm().findField("fascicle").getValue();
+                                            }, this);
+                                        },
+                                        beforequery: function(qe) {
+                                            delete qe.combo.lastQuery;
+                                        }
+                                    }
+                                }),
+
                                 xc.getConfig("/documents/combos/rubrics/", {
-                                    disabled: true
+                                    disabled: true,
+                                    listeners: {
+                                        scope: this,
+                                        render: function(combo) {
+                                            this.getForm().findField("edition").on("select", function() {
+                                                combo.disable();
+                                                combo.reset();
+                                            }, this);
+                                            this.getForm().findField("fascicle").on("select", function() {
+                                                combo.disable();
+                                                combo.reset();
+                                            }, this);
+                                            this.getForm().findField("headline").on("select", function() {
+                                                combo.enable();
+                                                combo.reset();
+                                                combo.getStore().baseParams["flt_headline"] = this.getForm().findField("headline").getValue();
+                                            }, this);
+                                        },
+                                        beforequery: function(qe) {
+                                            delete qe.combo.lastQuery;
+                                        }
+                                    }
                                 })
+
                             ]
                         }
                     ]

@@ -299,11 +299,11 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
     // Grid buttons
 
     cmpCreate: function() {
-        new Inprint.cmp.CreateDocumentWindow().show();
+        new Inprint.cmp.CreateDocument().show();
     },
 
     cmpUpdate: function() {
-        new Inprint.cmp.UpdateDocumentWindow().show();
+        new Inprint.cmp.UpdateDocument().show();
     },
 
     cmpCapture: function() {
@@ -323,7 +323,7 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
     },
 
     cmpTransfer: function() {
-        
+
         new Inprint.cmp.ExcahngeBrowser().show();
     },
 
