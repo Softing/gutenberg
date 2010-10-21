@@ -1,3 +1,3 @@
-Inprint.cmp.DuplicateDocumentWindow.Interaction = function(panels) {
+Inprint.cmp.DuplicateDocument.Interaction = function(panels) {
 
 }

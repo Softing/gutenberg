@@ -1,4 +1,4 @@
-Inprint.cmp.DuplicateDocumentWindow = Ext.extend(Ext.Window, {
+Inprint.cmp.DuplicateDocument = Ext.extend(Ext.Window, {
 
     initComponent: function() {
 
@@ -122,13 +122,13 @@ Inprint.cmp.DuplicateDocumentWindow = Ext.extend(Ext.Window, {
                 this.hide();
         });
 
-        Inprint.cmp.DuplicateDocumentWindow.superclass.initComponent.apply(this, arguments);
+        Inprint.cmp.DuplicateDocument.superclass.initComponent.apply(this, arguments);
 
-        Inprint.cmp.DuplicateDocumentWindow.Interaction(this.panels);
+        Inprint.cmp.DuplicateDocument.Interaction(this.panels);
     },
 
     onRender: function() {
-        Inprint.cmp.DuplicateDocumentWindow.superclass.onRender.apply(this, arguments);
+        Inprint.cmp.DuplicateDocument.superclass.onRender.apply(this, arguments);
     }
 
 });

@@ -1,4 +1,4 @@
-Inprint.cmp.CopyDocumentWindow = Ext.extend(Ext.Window, {
+Inprint.cmp.MoveDocument = Ext.extend(Ext.Window, {
 
     initComponent: function() {
 
@@ -122,13 +122,13 @@ Inprint.cmp.CopyDocumentWindow = Ext.extend(Ext.Window, {
                 this.hide();
         });
 
-        Inprint.cmp.CopyDocumentWindow.superclass.initComponent.apply(this, arguments);
+        Inprint.cmp.MoveDocument.superclass.initComponent.apply(this, arguments);
 
-        Inprint.cmp.CopyDocumentWindow.Interaction(this.panels);
+        Inprint.cmp.MoveDocument.Interaction(this.panels);
     },
 
     onRender: function() {
-        Inprint.cmp.CopyDocumentWindow.superclass.onRender.apply(this, arguments);
+        Inprint.cmp.MoveDocument.superclass.onRender.apply(this, arguments);
     }
 
 });
