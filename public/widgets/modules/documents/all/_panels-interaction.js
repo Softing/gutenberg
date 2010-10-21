@@ -9,8 +9,12 @@ Inprint.documents.all.Interaction = function(panels) {
     });
 
     grid.getSelectionModel().on("selectionchange", function(sm) {
+
+        _disable(grid.btnUpdate, grid.btnCapture, grid.btnTransfer, grid.btnMove, grid.btnBriefcase, grid.btnCopy,
+                    grid.btnDuplicate, grid.btnRecycle, grid.btnRestore, grid.btnDelete);
+
         if (sm.getCount() > 0 ) {
-            _enable(grid.btnUpdate, grid.btnCapture, grid.btnTransfer, grid.btnBriefcase, grid.btnCopy,
+            _enable(grid.btnCapture, grid.btnTransfer, grid.btnMove, grid.btnBriefcase, grid.btnCopy,
                     grid.btnDuplicate, grid.btnRecycle, grid.btnRestore, grid.btnDelete);
         }
 
@@ -19,10 +23,6 @@ Inprint.documents.all.Interaction = function(panels) {
                     grid.btnDuplicate, grid.btnRecycle, grid.btnRestore, grid.btnDelete);
         }
 
-        if (sm.getCount() == 0 ) {
-            _disable(grid.btnUpdate, grid.btnCapture, grid.btnTransfer, grid.btnBriefcase, grid.btnCopy,
-                    grid.btnDuplicate, grid.btnRecycle, grid.btnRestore, grid.btnDelete);
-        }
     });
 
 };

@@ -144,6 +144,7 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                             icon: _ico("plus-button"),
                             cls: "x-btn-text-icon",
                             text: _("Add"),
+                            tooltip : _("Adding of the new document"),
                             disabled:true,
                             ref: "../../btnCreate",
                             scope:this,
@@ -176,6 +177,16 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                             ref: "../../btnTransfer",
                             scope:this,
                             handler: this.cmpTransfer
+                        },
+                        '-',
+                        {
+                            icon: _ico("arrow-transition"),
+                            cls: "x-btn-text-icon",
+                            text: _("Moving"),
+                            disabled:true,
+                            ref: "../../btnMove",
+                            scope:this,
+                            handler: this.cmpMove
                         },
                         {
                             icon: _ico("briefcase"),
