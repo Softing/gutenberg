@@ -1,13 +1,13 @@
-Inprint.cmp.DuplicateDocument = Ext.extend(Ext.Window, {
+Inprint.cmp.CopyDocument = Ext.extend(Ext.Window, {
 
     initComponent: function() {
 
         this.panels = {};
-        this.panels.tree = new Inprint.cmp.DuplicateDocument.Tree();
-        this.panels.grid = new Inprint.cmp.DuplicateDocument.Grid();
+        this.panels.tree = new Inprint.cmp.CopyDocument.Tree();
+        this.panels.grid = new Inprint.cmp.CopyDocument.Grid();
 
         Ext.apply(this, {
-            title: _("Duplicate documents"),
+            title: _("Copy documents"),
             border:false,
             modal:true,
             layout: "hbox",
@@ -37,7 +37,7 @@ Inprint.cmp.DuplicateDocument = Ext.extend(Ext.Window, {
             ],
             buttons:[
                 {
-                    text: _("Duplicate"),
+                    text: _("Copy"),
                     scope:this,
                     disabled:true,
                     handler: function() {
@@ -54,13 +54,13 @@ Inprint.cmp.DuplicateDocument = Ext.extend(Ext.Window, {
             ]
         });
 
-        Inprint.cmp.DuplicateDocument.superclass.initComponent.apply(this, arguments);
-        Inprint.cmp.DuplicateDocument.Interaction(this.panels);
+        Inprint.cmp.CopyDocument.superclass.initComponent.apply(this, arguments);
+        Inprint.cmp.CopyDocument.Interaction(this.panels);
 
     },
 
     onRender: function() {
-        Inprint.cmp.DuplicateDocument.superclass.onRender.apply(this, arguments);
+        Inprint.cmp.CopyDocument.superclass.onRender.apply(this, arguments);
     }
 
 });

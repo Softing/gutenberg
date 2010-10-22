@@ -41,6 +41,7 @@ Inprint.factory.Store = new function() {
             'images','files',
             'created','updated'
         ],
+        '/documents/common/fascicles/':         [ 'id', 'title', 'shortcut', 'description', "headline", "headline_shortcut", "rubric", "rubric_shortcut" ],
 
         // System
 

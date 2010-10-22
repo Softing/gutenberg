@@ -1,7 +1,7 @@
 Inprint.cmp.ExcahngeBrowser.Interaction = function(parent, panels) {
 
     var editions = panels.editions;
-    var branches = panels.branches;
+    var stages = panels.stages;
     var principals = panels.principals;
 
     // Tree
@@ -9,12 +9,12 @@ Inprint.cmp.ExcahngeBrowser.Interaction = function(parent, panels) {
         //principals.enable();
         if (node) {
             //principals.cmpLoad({ node: node.id });
-            branches.getRootNode().id = node.id;
-            branches.getRootNode().reload();
+            stages.getRootNode().id = node.id;
+            stages.getRootNode().reload();
         }
     });
-    
-    branches.getSelectionModel().on("selectionchange", function(sm, node) {
+
+    stages.getSelectionModel().on("selectionchange", function(sm, node) {
         principals.enable();
         if (node) {
             principals.cmpLoad({ node: node.id });

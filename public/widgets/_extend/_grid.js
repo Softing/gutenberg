@@ -8,6 +8,10 @@ Ext.grid.GridPanel.prototype.viewConfig = {
     deferEmptyText  : false
 };
 
+Ext.grid.GridPanel.prototype.getRecord = function() {
+    return this.getSelectionModel().getSelected();
+};
+
 Ext.grid.GridPanel.prototype.getValue = function(value) {
     return this.getSelectionModel().getSelected().get(value);
 };

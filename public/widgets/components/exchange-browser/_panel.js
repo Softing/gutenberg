@@ -4,7 +4,7 @@ Inprint.cmp.ExcahngeBrowser = Ext.extend(Ext.Window, {
 
         this.panels = {};
         this.panels.editions = new Inprint.cmp.ExcahngeBrowser.TreeEditions();
-        this.panels.branches = new Inprint.cmp.ExcahngeBrowser.TreeBranches();
+        this.panels.stages = new Inprint.cmp.ExcahngeBrowser.TreeStages();
         this.panels.principals = new Inprint.cmp.ExcahngeBrowser.Principals();
 
         Ext.apply(this, {
@@ -34,7 +34,7 @@ Inprint.cmp.ExcahngeBrowser = Ext.extend(Ext.Window, {
                     width: 160,
                     collapsible: false,
                     split: true,
-                    items: this.panels.branches
+                    items: this.panels.stages
                 },
                 {
                     flex:3,

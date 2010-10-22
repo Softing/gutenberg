@@ -5,7 +5,12 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
         this.components = {};
 
         this.urls = {
-            list:    "/documents/list/"
+            "list":       "/documents/list/",
+            "briefcase":  "/documents/briefcase/",
+            "capture":    "/documents/capture/",
+            "recycle":    "/documents/recycle/",
+            "restore":    "/documents/restore/",
+            "delete":     "/documents/delete/"
         }
 
         this.store = Inprint.factory.Store.json(this.urls.list, {
@@ -180,9 +185,9 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                         },
                         '-',
                         {
-                            icon: _ico("arrow-transition"),
+                            icon: _ico("blue-folder-import"),
                             cls: "x-btn-text-icon",
-                            text: _("Moving"),
+                            text: _("Move"),
                             disabled:true,
                             ref: "../../btnMove",
                             scope:this,
@@ -323,18 +328,17 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
             _("You really want to do this?"),
             function(btn) {
                 if (btn == "yes") {
-                    //Ext.Ajax.request({
-                    //    url: this.urls.remove,
-                    //    scope:this,
-                    //    success: this.cmpReload,
-                    //    params: { id: this.getValues("id") }
-                    //});
+                    Ext.Ajax.request({
+                        url: this.urls.capture,
+                        scope:this,
+                        success: this.cmpReload,
+                        params: { id: this.getValues("id") }
+                    });
                 }
             }, this).setIcon(Ext.MessageBox.WARNING);
     },
 
     cmpTransfer: function() {
-
         new Inprint.cmp.ExcahngeBrowser().show();
     },
 
@@ -344,22 +348,36 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
             _("You really want to do this?"),
             function(btn) {
                 if (btn == "yes") {
-                    //Ext.Ajax.request({
-                    //    url: this.urls.remove,
-                    //    scope:this,
-                    //    success: this.cmpReload,
-                    //    params: { id: this.getValues("id") }
-                    //});
+                    Ext.Ajax.request({
+                        url: this.urls.briefcase,
+                        scope:this,
+                        success: this.cmpReload,
+                        params: { id: this.getValues("id") }
+                    });
                 }
             }, this).setIcon(Ext.MessageBox.WARNING);
     },
 
     cmpCopy: function() {
-        new Inprint.cmp.CopyDocumentWindow().show();
+        new Inprint.cmp.CopyDocument().show();
     },
 
     cmpDuplicate: function() {
-        new Inprint.cmp.DuplicateDocumentWindow().show();
+        new Inprint.cmp.DuplicateDocument().show();
+    },
+
+    cmpMove: function() {
+        var record = this.getRecord();
+        var cmp = new Inprint.cmp.MoveDocument({
+            initialValues: {
+                edition:  record.get("edition"),
+                fascicle: record.get("fascicle"),
+                headline: record.get("headline"),
+                rubric: record.get("rubric")
+            }
+        });
+        cmp.show();
+
     },
 
     cmpRecycle: function() {
@@ -368,12 +386,12 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
             _("You really want to do this?"),
             function(btn) {
                 if (btn == "yes") {
-                    //Ext.Ajax.request({
-                    //    url: this.urls.remove,
-                    //    scope:this,
-                    //    success: this.cmpReload,
-                    //    params: { id: this.getValues("id") }
-                    //});
+                    Ext.Ajax.request({
+                        url: this.urls.recycle,
+                        scope:this,
+                        success: this.cmpReload,
+                        params: { id: this.getValues("id") }
+                    });
                 }
             }, this).setIcon(Ext.MessageBox.WARNING);
     },
@@ -384,12 +402,12 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
             _("You really want to do this?"),
             function(btn) {
                 if (btn == "yes") {
-                    //Ext.Ajax.request({
-                    //    url: this.urls.remove,
-                    //    scope:this,
-                    //    success: this.cmpReload,
-                    //    params: { id: this.getValues("id") }
-                    //});
+                    Ext.Ajax.request({
+                        url: this.urls.restore,
+                        scope:this,
+                        success: this.cmpReload,
+                        params: { id: this.getValues("id") }
+                    });
                 }
             }, this).setIcon(Ext.MessageBox.WARNING);
     },
@@ -400,12 +418,12 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
             _("You can't cancel this action!"),
             function(btn) {
                 if (btn == "yes") {
-                    //Ext.Ajax.request({
-                    //    url: this.urls.remove,
-                    //    scope:this,
-                    //    success: this.cmpReload,
-                    //    params: { id: this.getValues("id") }
-                    //});
+                    Ext.Ajax.request({
+                        url: this.urls.delete,
+                        scope:this,
+                        success: this.cmpReload,
+                        params: { id: this.getValues("id") }
+                    });
                 }
             }, this).setIcon(Ext.MessageBox.WARNING);
     },
@@ -427,7 +445,7 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                 color = 'gray';
 
             value = String.format(
-                '<a style="color:{2}" href="/?part=documents&page=formular&oid={0}&text={1}" '+
+                '<a style="color:{2}" href="/?aid=document-profile&oid={0}&text={1}" '+
                     'onClick="'+
                         "Inprint.ObjectResolver.resolve({aid:'document-profile',oid:'{0}',text:'{1}'});"+
                     'return false;">{1}'+

@@ -1,4 +1,4 @@
-Inprint.cmp.DuplicateDocument.Interaction = function(panels) {
+Inprint.cmp.CopyDocument.Interaction = function(panels) {
 
     var tree = panels.tree;
     var grid = panels.grid;

@@ -41,7 +41,8 @@ Inprint.Registry = function() {
 
         "document-profile": {
             icon: "document--pencil",
-            text: _("Document profile")
+            text: _("Document profile"),
+            xobject: Inprint.documents.Profile
         },
 
         "documents": {
@@ -100,7 +101,7 @@ Inprint.Registry = function() {
         },
 
         "fascicle": {
-            icon: "table",
+            icon: "blue-folder",
             text: _("Unknown fascicle")
         },
         "fascicle-plan": {

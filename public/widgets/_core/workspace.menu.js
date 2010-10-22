@@ -2,22 +2,22 @@
  * Inprint Content 4.5
  * Copyright(c) 2001-2010, Softing, LLC.
  * licensing@softing.ru
- * 
- * http://softing.ru/license    
+ *
+ * http://softing.ru/license
  */
 
 Inprint.Menu = Ext.extend(Ext.Toolbar,{
-    
+
     initComponent: function(){
         Ext.apply(this, {});
         Inprint.Menu.superclass.initComponent.apply(this, arguments);
     },
-    
+
     // Override other inherited methods
     onRender: function(){
         Inprint.Menu.superclass.onRender.apply(this, arguments);
         this.CmpQuery();
-        
+
         // Start a simple clock task that updates a div once per second
         var task = {
             run: function() {
@@ -45,7 +45,7 @@ Inprint.Menu = Ext.extend(Ext.Toolbar,{
 
         // Обрабатываем все пункты меню
         Ext.each(result, function(item) {
-            
+
             if (item == '->') {
                 this.add(item);
                 return;
@@ -53,43 +53,44 @@ Inprint.Menu = Ext.extend(Ext.Toolbar,{
                 var btn = this.CmpCreateBtn(item);
                 this.add(btn);
             }
-            
+
         }, this);
-        
+
         this.add("-");
+
+        //this.add({
+        //    id:"menu-mail-search",
+        //    icon: _ico("magnifier-medium")
+        //});
+        //
+        //this.add("-");
+        //
+        //this.add({
+        //    id:"menu-mail-alert",
+        //    icon: _ico("mail")
+        //});
         
-        this.add({
-            id:"menu-mail-search",
-            icon: _ico("magnifier-medium")
-        });
-        
-        this.add("-");
-        
-        this.add({
-            id:"menu-mail-alert",
-            icon: _ico("mail")
-        });
         var clock = this.add({ id: "menu-clock", xtype: 'tbtext', text: '00:00:00 --' });
-        
+
         this.doLayout();
     },
-    
+
     CmpCreateBtn: function (item) {
-        
+
         if ( Inprint.registry[item.id] ) {
-            
+
             var btn = {};
-            
+
             btn.aid     = item.id;
             btn.oid     = item.oid;
             btn.icon    = Inprint.registry[btn.aid].icon;
             btn.icon    = _ico(btn.icon);
-            
+
             btn.text    = item.menutext || Inprint.registry[btn.aid].menutext || item.text || Inprint.registry[btn.aid].text;
             btn.tooltip = item.tooltip || Inprint.registry[btn.aid].tooltip;
-            
+
             btn.description = item.description;
-            
+
             // Обрабатываем подменю
             if (item.menu) {
                 btn.menu = new Ext.menu.Menu();
@@ -98,7 +99,7 @@ Inprint.Menu = Ext.extend(Ext.Toolbar,{
                     btn.menu.add(btn2);
                 }, this);
             }
-            
+
             // Обрабатываем кнопку
             else {
                 btn.scope = this;
@@ -115,11 +116,11 @@ Inprint.Menu = Ext.extend(Ext.Toolbar,{
                     };
                 }
             }
-            
+
             return btn;
         }
-        
+
         return item;
     }
-    
+
 });

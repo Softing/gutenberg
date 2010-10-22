@@ -72,6 +72,7 @@ Inprint.ObjectResolver = function() {
             config.title += "&nbsp;<a href=\"?aid="+ item.aid +"";
 
             if (item.oid) {
+                config.oid = item.oid;
                 config.title += "&oid=" + item.oid;
             }
 
@@ -112,7 +113,7 @@ Inprint.ObjectResolver = function() {
                 config.items = new Inprint.registry[item.aid]["object"]();
             }
             else if (Inprint.registry[item.aid]["xobject"]) {
-                config.items = { xtype: item.aid };
+                config.items = { xtype: item.aid, oid: item.oid };
             } else {
                 config.items = new Ext.Panel({
                     html:"<h1>" + _("Not implemented") + "</h1>"

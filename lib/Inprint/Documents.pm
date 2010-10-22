@@ -207,11 +207,7 @@ sub read {
     my $id = $c->param("id");
 
     my $result = $c->sql->Q("
-        SELECT t1.id, t1.name, t1.shortcut, t1.description,
-            t2.id as catalog_id, t2.name as catalog_name, t2.shortcut as catalog_shortcut
-        FROM roles t1, catalog t2
-        WHERE t1.id =? AND t1.catalog = t2.id
-        ORDER BY t2.shortcut, t1.shortcut
+        SELECT * FROM documents WHERE id=?
     ", [ $id ])->Hash;
 
     $c->render_json( { success => $c->json->true, data => $result } );

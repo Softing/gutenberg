@@ -197,9 +197,9 @@ Ext.onReady(function() {
     }
 
     // Remove loading mask
-    setTimeout(function(){
+    //setTimeout(function(){
         Ext.get('loading').remove();
         Ext.get('loading-mask').fadeOut({remove:true});
-    }, 50);
+    //}, 0);
 
 });
