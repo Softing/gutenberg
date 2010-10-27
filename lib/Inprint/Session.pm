@@ -74,12 +74,17 @@ sub login
                     [ $sid, $member->{id} ]
                 );
 
-                $c->session( sid=>$sid );
-                $c->session( member=>$member->{id} );
+                $c->session( sid => $sid );
+                $c->session( member => $member->{id} );
+
+                $c->events->Create("system", undef, "login", "The user with login %1 was logged into the program", [ $i_login ]);
 
                 $json->{success}   = 'true';
 
             } else {
+
+                $c->events->Create("system", undef, "login", "The user with login %1 has entered the wrong password", [ $i_login ]);
+
                 $json->{success} = 'false';
                 push @{ $json->{errors} }, { msg => 'Wrong password' }
             }
@@ -92,6 +97,9 @@ sub login
 
 sub logout {
     my $c = shift;
+
+    $c->events->Create("system", undef, "logout", "The user has quitted the program", []);
+
     $c->sql->Do("DELETE FROM sessions WHERE id=?", [ $c->session("sid") ] );
     $c->redirect_to("/");
 }

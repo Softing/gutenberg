@@ -7,6 +7,11 @@ Ext.form.ComboBox.prototype.resetValue = function(baseParams) {
     this.store.baseParams = baseParams || {};
 };
 
+Ext.form.ComboBox.prototype.setHiddenValue = function(id, value) {
+    this.setValue(value);
+    this.hiddenField.value=id;
+};
+
 Ext.form.ComboBox.prototype.loadValue = function(value, params) {
     if (value) {
         this.getStore().on("load", function() {

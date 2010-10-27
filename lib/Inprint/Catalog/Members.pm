@@ -146,7 +146,7 @@ sub rules {
 
     my $c = shift;
 
-    my $i_member = $c->param("member") || $c->QuerySessionGet("member.id");;
+    my $i_member = $c->param("member") || $c->QuerySessionGet("member.id");
 
     my $result = $c->sql->Q("
         (

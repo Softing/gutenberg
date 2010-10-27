@@ -82,7 +82,7 @@ sub update {
     my @errors;
     my $result = {};
 
-    # upload image
+    # Upload image
     if ($i_image) {
 
         my $path = $c->config->get("store.path");
@@ -105,22 +105,22 @@ sub update {
         }
     }
 
-    # save result to DB
+    # Process profile
     if ($i_login) {
-
+        # Do nothing
     }
 
     if ($i_password) {
-        $c->sql->Do(
-            "UPDATE members SET password=encode( digest(?, 'sha256'), 'hex') WHERE id=?",[
-                $i_password, $i_id
-        ]);
+        $c->sql->Do("UPDATE members SET password=encode( digest(?, 'sha256'), 'hex') WHERE id=?",[ $i_password, $i_id ]);
     }
 
-    $c->sql->Do(
-        "UPDATE profiles SET title=?, shortcut=?, position=? WHERE id=?",[
-            $i_title, $i_shortcut, $i_position, $i_id
-    ]);
+    # Update Profile
+    $c->sql->Do("UPDATE profiles SET title=?, shortcut=?, position=? WHERE id=?",[$i_title, $i_shortcut, $i_position, $i_id]);
+
+    # Update Documents
+    $c->sql->Do("UPDATE documents SET creator_shortcut=? WHERE creator=?", [ $i_shortcut, $i_id ]);
+    $c->sql->Do("UPDATE documents SET manager_shortcut=? WHERE manager=?",  [ $i_shortcut, $i_id ]);
+    $c->sql->Do("UPDATE documents SET holder_shortcut=? WHERE holder=?",    [ $i_shortcut, $i_id ]);
 
     unless (@errors) {
         $result->{success} = 1;

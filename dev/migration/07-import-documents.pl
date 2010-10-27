@@ -60,7 +60,7 @@ my $documents = $sql2->Q("
     FROM views.documents
     -- WHERE uuid = 'e009789c-7da2-47a5-b9d3-0dfae34515df'
     -- WHERE trash = 1
-    LIMIT 3000000
+    -- LIMIT 30
  ")->Hashes;
 
 my $counter=0;
@@ -178,6 +178,8 @@ foreach my $item( @{ $documents } ) {
     $item->{look}   = 'false' unless ($item->{look});
     $item->{isopen} = 'false' unless ($item->{isopen});
 
+    # Process Tags
+
     my $Tag1;
     my $Tag2;
     my $Headline;
@@ -195,7 +197,7 @@ foreach my $item( @{ $documents } ) {
         ", [ "headline", $item->{section_name}, $item->{section_name}, "" ]);
 
         $Tag1 = $sql->Q("
-            SELECT * FROM tags WHERE title =? AND mtype='headline'
+            SELECT * FROM tags WHERE title=? AND mtype='headline'
         ", [$item->{section_name} ])->Hash;
     }
 
@@ -216,8 +218,6 @@ foreach my $item( @{ $documents } ) {
         ", [ $item->{fascicle}, $Tag1->{id} ])->Hash;
     }
     die unless $Headline;
-
-
 
     $Tag2 = $sql->Q("
         SELECT * FROM tags WHERE title =? AND mtype='rubric'
@@ -276,8 +276,8 @@ foreach my $item( @{ $documents } ) {
         $catalog_folder, $catalog_shortcut, @$groups[0],
         $item->{theowner}, $item->{creator}, $item->{manager}, $item->{owner_nick}, $item->{creator_nick}, $item->{manager_nick},
         $item->{fascicle}, $item->{fascicle_name},
-        $Headline->{id}, $Tag1->{title},
-        $Rubric->{id}, $Tag2->{title},
+        $Headline->{tag}, $Tag1->{title},
+        $Rubric->{tag}, $Tag2->{title},
         $item->{look}, $item->{isopen},
         $Branch->{id}, $Branch->{title}, $Stage->{id}, $Stage->{title},
         $Readiness->{id}, $Readiness->{shortcut}, $Readiness->{color}, $Readiness->{weight},

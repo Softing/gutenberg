@@ -54,12 +54,12 @@ my $fascicles = $sql2->Q(" SELECT id, edition, ownedby, title, dt_started, dt_cl
 $sql->Do("
     INSERT INTO fascicles(id, issystem, edition, title, shortcut, description, enabled, created, updated)
     VALUES (?, true, ?, ?, ?, ?, true, now(), now());
-", [ '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', "Портфель", "Портфель документов", "" ]);
+", [ '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', "Портфель", "Портфель", "Портфель материалов" ]);
 
 $sql->Do("
     INSERT INTO fascicles(id, issystem, edition, title, shortcut, description, enabled, created, updated)
     VALUES (?, true, ?, ?, ?, ?, true, now(), now());
-", [ '99999999-9999-9999-9999-999999999999', '00000000-0000-0000-0000-000000000000', "Корзина", "Корзина для удаления", "" ]);
+", [ '99999999-9999-9999-9999-999999999999', '00000000-0000-0000-0000-000000000000', "Корзина", "Корзина", "Корзина материалов" ]);
 
 
 $sql->Do("
@@ -133,7 +133,7 @@ foreach my $item( @{ $fascicles } ) {
         }
 
         $Headline = $sql->Q("
-            SELECT * FROM tags WHERE title =? AND mtype='headline'
+            SELECT * FROM tags WHERE title=? AND mtype='headline'
         ", [$item2->{title} ])->Hash;
 
         $sql->Do("
@@ -142,7 +142,6 @@ foreach my $item( @{ $fascicles } ) {
         ", [ $item->{id}, $Headline->{id} ]);
 
     }
-
 
     # Import rubrics
     my $rubrics = $sql2->Q("

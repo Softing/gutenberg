@@ -1,1 +1,1 @@
-./start.pl daemon --reload
+./inprint.pl daemon --reload

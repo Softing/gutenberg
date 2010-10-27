@@ -72,17 +72,18 @@ sub startup {
 
     # Add routes
     $postinitBridge->route('/login/')->to('session#login');
-    $postinitBridge->route('/logout/')->to('session#logout');
     $postinitBridge->route('/locale/')->to('locale#index');
 
     # Add sessionable routes
     my $sessionBridge  = $postinitBridge->bridge->to('filters#mysession');
 
+    $sessionBridge->route('/logout/')->to('session#logout');
+
     # Calendar routes
     $self->createRoutes($sessionBridge, "calendar",             [ "create", "read", "update", "delete", "list", "enable", "disable", "combogroups" ]);
 
     # Documents routes
-    $self->createRoutes($sessionBridge, "documents",            [ "create", "read", "update", "delete", "list" ]);
+    $self->createRoutes($sessionBridge, "documents",            [ "create", "read", "update", "delete", "list", "capture", "transfer", "briefcase", "recycle" ]);
     $self->createRoutes($sessionBridge, "documents/common",     [ "fascicles" ]);
     $self->createRoutes($sessionBridge, "documents/combos",     [ "editions", "stages", "assignments", "fascicles", "headlines", "rubrics" ]);
     $self->createRoutes($sessionBridge, "documents/filters",    [ "editions", "groups", "fascicles", "headlines", "rubrics", "holders", "managers", "progress" ]);
@@ -103,18 +104,21 @@ sub startup {
 
 
     # Profile routes
-    $self->createRoutes($sessionBridge, "profile", [ "read", "update" ]);
+    $self->createRoutes($sessionBridge, "profile",              [ "read", "update" ]);
     $sessionBridge->route('/profile/image/:id')->to('profile#image', id => "00000000-0000-0000-0000-000000000000");
 
     # Options routes
-    $self->createRoutes($sessionBridge, "options", [ "update" ]);
+    $self->createRoutes($sessionBridge, "options",              [ "update" ]);
     $self->createRoutes($sessionBridge, "options/combos",       [ "capture-destination" ]);
 
     # State route
-    $self->createRoutes($sessionBridge, "state", [ "index", "read", "update" ]);
+    $self->createRoutes($sessionBridge, "state",                [ "index", "read", "update" ]);
+
+    # System routess
+    $self->createRoutes($sessionBridge, "system/events",        [ "list" ]);
 
     # Workspace routess
-    $self->createRoutes($sessionBridge, "workspace", [ "index", "menu", "state", "online", "appsession" ]);
+    $self->createRoutes($sessionBridge, "workspace",            [ "index", "menu", "state", "online", "appsession" ]);
 
     # Main route
     $sessionBridge->route('/')->to('workspace#index');

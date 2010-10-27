@@ -49,7 +49,8 @@ Inprint.cmp.ExcahngeBrowser = Ext.extend(Ext.Window, {
                     scope:this,
                     disabled:true,
                     handler: function() {
-                        this.fireEvent('selected', this, this.panels.principals.getValue("id"));
+                        this.fireEvent('complete', this.panels.principals.getValue("id"));
+                        this.hide();
                     }
                 },
                 {
@@ -63,7 +64,8 @@ Inprint.cmp.ExcahngeBrowser = Ext.extend(Ext.Window, {
         });
         Inprint.cmp.ExcahngeBrowser.superclass.initComponent.apply(this, arguments);
         Inprint.cmp.ExcahngeBrowser.Interaction(this, this.panels);
-        this.addEvents('selected');
+
+        this.addEvents('complete');
     },
 
     onRender: function() {

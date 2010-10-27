@@ -3,11 +3,14 @@ Inprint.documents.recycle.Interaction = function(panels) {
     var grid = panels.grid;
 
     grid.on("render", function() {
-        var flt_fascicle = grid.getHeaderFilterField("flt_fascicle");
-        flt_fascicle.setValue("99999999-9999-9999-9999-999999999999");
-        flt_fascicle.setRawValue(_("Recycle bin"));
-        flt_fascicle.disable();
-        grid.applyHeaderFilters(false);
+        grid.filter.getForm().findField("fascicle").on("afterrender", function(combo) {
+            combo.setValue(_("Recycle bin"));
+            combo.hiddenField.value = "99999999-9999-9999-9999-999999999999";
+            combo.disable();
+        });
+        grid.filter.getForm().findField("headline").on("render", function(combo) {
+            combo.enable();
+        });
     });
 
     grid.on("afterrender", function(grid) {

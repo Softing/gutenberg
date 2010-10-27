@@ -14,6 +14,7 @@ use Mojo::JSON;
 no warnings 'redefine';
 
 use Inprint::Frameworks::Access;
+use Inprint::Frameworks::Events;
 
 use base 'Mojolicious::Controller';
 
@@ -57,13 +58,14 @@ sub Do {
 sub QuerySessionGet () {
     my $c = shift;
     my $param_name = shift;
-    return $c->app->{querySession}->{$param_name} || undef;
+    return $c->stash( "querySession.$param_name" );
 }
+
 sub QuerySessionSet () {
     my $c = shift;
     my $param_name = shift;
     my $param_value = shift;
-    $c->app->{querySession}->{$param_name} = $param_value;
+    $c->stash( "querySession.$param_name" => $param_value );
     return $c;
 }
 
@@ -110,14 +112,20 @@ sub l {
 
 sub access {
     my $c = shift;
-
     $Cache{Access} = new Inprint::Frameworks::Access($c) unless ($Cache{Access});
-
     return $Cache{Access};
-
 }
 
-# Logging
+# Events
+
+sub events {
+    my $c = shift;
+    $Cache{Events} = new Inprint::Frameworks::Events($c) unless ($Cache{Events});
+    $Cache{Events}->SetHandler($c);
+    return $Cache{Events};
+}
+
+# Logs
 
 sub log {
     my $c = shift;

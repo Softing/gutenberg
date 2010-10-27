@@ -102,7 +102,7 @@ sub fascicles {
 sub headlines {
     my $c = shift;
     my $i_fascicle = $c->param("flt_fascicle") || undef;
-    my $sql = " SELECT headline as id, headline_shortcut as title FROM documents WHERE fascicle = ? ORDER BY headline_shortcut ";
+    my $sql = " SELECT DISTINCT headline as id, headline_shortcut as title FROM documents WHERE fascicle = ? ORDER BY headline_shortcut ";
     my $result = $c->sql->Q($sql, [ $i_fascicle ])->Hashes;
     $c->render_json( { data => $result } );
 }

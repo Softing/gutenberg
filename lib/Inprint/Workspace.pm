@@ -71,7 +71,7 @@ sub index
 sub menu
 {
     my $c = shift;
-
+    
     sub AddItem {
         my ($id, $icon, $text, $path, $type) = @_;
         my $result = {};

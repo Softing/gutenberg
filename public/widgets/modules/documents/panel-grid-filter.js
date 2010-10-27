@@ -45,7 +45,6 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                         this.getForm().findField("edition").on("select", function() {
                             combo.enable();
                             combo.reset();
-                            //combo.getStore().baseParams["flt_edition"] = this.getForm().findField("edition").getValue();
                         }, this);
                     },
                     beforequery: function(qe) {
@@ -68,7 +67,6 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                         this.getForm().findField("fascicle").on("select", function() {
                             combo.enable();
                             combo.reset();
-                            //combo.getStore().baseParams["flt_fascicle"] = this.getForm().findField("fascicle").getValue();
                         }, this);
                     },
                     beforequery: function(qe) {
@@ -95,7 +93,6 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                         this.getForm().findField("headline").on("select", function() {
                             combo.enable();
                             combo.reset();
-                            //combo.getStore().baseParams["flt_headline"] = this.getForm().findField("headline").getValue();
                         }, this);
                     },
                     beforequery: function(qe) {
@@ -110,12 +107,6 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                 cacheQuery: false,
                 listeners: {
                     scope: this,
-                    //render: function(combo) {
-                    //    this.getForm().findField("group").on("select", function() {
-                    //        //combo.getStore().baseParams["flt_group"] = this.getForm().findField("group").getValue();
-                    //        combo.getStore().baseParams = this.getFilterParams();
-                    //    }, this);
-                    //},
                     beforequery: function(qe) {
                         qe.combo.getStore().baseParams = this.getFilterParams();
                         delete qe.combo.lastQuery;
@@ -127,11 +118,6 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                 cacheQuery: false,
                 listeners: {
                     scope: this,
-                    //render: function(combo) {
-                    //    this.getForm().findField("edition").on("select", function() {
-                    //        combo.getStore().baseParams["flt_edition"] = this.getForm().findField("edition").getValue();
-                    //    }, this);
-                    //},
                     beforequery: function(qe) {
                         qe.combo.getStore().baseParams = this.getFilterParams();
                         delete qe.combo.lastQuery;
@@ -144,11 +130,6 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                 cacheQuery: false,
                 listeners: {
                     scope: this,
-                    //render: function(combo) {
-                    //    this.getForm().findField("group").on("select", function() {
-                    //        combo.getStore().baseParams["flt_group"] = this.getForm().findField("group").getValue();
-                    //    }, this);
-                    //},
                     beforequery: function(qe) {
                         qe.combo.getStore().baseParams = this.getFilterParams();
                         delete qe.combo.lastQuery;

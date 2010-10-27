@@ -51,8 +51,11 @@ sub database
 sub mysession
 {
     my $c = shift;
+
+    # Get session ID
     my $sid = $c->session("sid");
 
+    # Check session
     if ($sid) {
         my $session = $c->sql->Q("SELECT * FROM sessions WHERE id=?", [ $sid ])->Hash;
         if ($session) {
@@ -64,6 +67,7 @@ sub mysession
         $c->redirect_to('/login');
     }
 
+    # Create session object
     if ($c->session("sid")) {
 
         my $member = $c->sql->Q("
@@ -71,7 +75,12 @@ sub mysession
             FROM sessions t1, members t2 LEFT JOIN profiles t3 ON (t3.id = t2.id) WHERE t1.id=? AND t1.member = t2.id
         ", [ $c->session("sid") ])->Hash || {};
 
-        $c->QuerySessionSet("member.id",  $member->{id});
+        $c->stash( "member.id" =>       $member->{id});
+
+        $c->QuerySessionSet("member.id",       $member->{id});
+        $c->QuerySessionSet("member.login",    $member->{login});
+        $c->QuerySessionSet("member.shortcut", $member->{shortcut});
+        $c->QuerySessionSet("member.position", $member->{position});
 
         my $options = $c->sql->Q(" SELECT option_name, option_value FROM options WHERE member=? ", [ $member->{id} ])->Hashes || [];
         foreach my $item (@$options) {
@@ -79,7 +88,6 @@ sub mysession
         }
 
     }
-
 
     return $c;
 }

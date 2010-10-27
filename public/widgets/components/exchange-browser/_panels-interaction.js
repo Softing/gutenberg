@@ -6,9 +6,7 @@ Inprint.cmp.ExcahngeBrowser.Interaction = function(parent, panels) {
 
     // Tree
     editions.getSelectionModel().on("selectionchange", function(sm, node) {
-        //principals.enable();
         if (node) {
-            //principals.cmpLoad({ node: node.id });
             stages.getRootNode().id = node.id;
             stages.getRootNode().reload();
         }

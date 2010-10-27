@@ -1,13 +1,16 @@
 Inprint.documents.briefcase.Interaction = function(panels) {
 
     var grid = panels.grid;
-
+    
     grid.on("render", function() {
-        var flt_fascicle = grid.getHeaderFilterField("flt_fascicle");
-        flt_fascicle.setValue("00000000-0000-0000-0000-000000000000");
-        flt_fascicle.setRawValue(_("Briefcase"));
-        flt_fascicle.disable();
-        grid.applyHeaderFilters(false);
+        grid.filter.getForm().findField("fascicle").on("afterrender", function(combo) {
+            combo.setValue(_("Briefcase"));
+            combo.hiddenField.value = "00000000-0000-0000-0000-000000000000";
+            combo.disable();
+        });
+        grid.filter.getForm().findField("headline").on("render", function(combo) {
+            combo.enable();
+        });
     });
 
     grid.on("afterrender", function(grid) {

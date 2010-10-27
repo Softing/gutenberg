@@ -8,6 +8,7 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
             "list":       "/documents/list/",
             "briefcase":  "/documents/briefcase/",
             "capture":    "/documents/capture/",
+            "transfer":   "/documents/transfer/",
             "recycle":    "/documents/recycle/",
             "restore":    "/documents/restore/",
             "delete":     "/documents/delete/"
@@ -96,8 +97,8 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                 renderer : this.renderers.progress
             },
             {
-                id:"maingroup",
-                dataIndex: "maingroup_shortcut",
+                id:"workgroup",
+                dataIndex: "workgroup_shortcut",
                 header: _("Group"),
                 width: 90,
                 sortable: true
@@ -305,9 +306,15 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
     },
 
     onRender: function() {
+
         Inprint.documents.Grid.superclass.onRender.apply(this, arguments);
+
         this.filter.on("restore", function(filter, params) {
             this.store.load({ params: Ext.apply({start:0, limit:60}, params) });
+        }, this);
+
+        this.on("dblclick", function(e){
+            Inprint.ObjectResolver.resolve({ aid:'document-profile', oid:this.getValue("id"), text:this.getValue("title") });
         }, this);
 
     },
@@ -315,11 +322,17 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
     // Grid buttons
 
     cmpCreate: function() {
-        new Inprint.cmp.CreateDocument().show();
+        var panel = new Inprint.cmp.CreateDocument();
+        panel.show();
+        panel.on("complete", function() { this.cmpReload(); }, this);
     },
 
     cmpUpdate: function() {
-        new Inprint.cmp.UpdateDocument().show();
+        var panel = new Inprint.cmp.UpdateDocument({
+            document: this.getValue("id")
+        });
+        panel.show();
+        panel.on("complete", function() { this.cmpReload(); }, this);
     },
 
     cmpCapture: function() {
@@ -339,7 +352,15 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
     },
 
     cmpTransfer: function() {
-        new Inprint.cmp.ExcahngeBrowser().show();
+        var panel = new Inprint.cmp.ExcahngeBrowser().show();
+        panel.on("complete", function(id){
+            Ext.Ajax.request({
+                url: this.urls.transfer,
+                scope:this,
+                success: this.cmpReload,
+                params: { id: this.getValues("id"), transfer: id }
+            });
+        }, this);
     },
 
     cmpBriefcase: function() {
@@ -352,18 +373,12 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                         url: this.urls.briefcase,
                         scope:this,
                         success: this.cmpReload,
-                        params: { id: this.getValues("id") }
+                        params: {
+                            id: this.getValues("id")
+                        }
                     });
                 }
             }, this).setIcon(Ext.MessageBox.WARNING);
-    },
-
-    cmpCopy: function() {
-        new Inprint.cmp.CopyDocument().show();
-    },
-
-    cmpDuplicate: function() {
-        new Inprint.cmp.DuplicateDocument().show();
     },
 
     cmpMove: function() {
@@ -377,7 +392,14 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
             }
         });
         cmp.show();
+    },
 
+    cmpCopy: function() {
+        new Inprint.cmp.CopyDocument().show();
+    },
+
+    cmpDuplicate: function() {
+        new Inprint.cmp.DuplicateDocument().show();
     },
 
     cmpRecycle: function() {
@@ -431,10 +453,11 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
     // Grid renderers
 
     renderers: {
+
         viewed: function(value, p, record) {
-           if (record.data.islooked)
-               return '<img title="Материал был просмотрен текущим владельцем" src="'+ _ico("eye") +'">';
-           return '';
+            if (record.data.islooked)
+                return '<img title="Материал был просмотрен текущим владельцем" src="'+ _ico("eye") +'">';
+            return '';
         },
 
         title: function(value, p, record){
@@ -473,7 +496,6 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
 
             var style = '';
             var textClass = (v < 55) ? 'x-progress-text-back' : 'x-progress-text-front' + (Ext.isIE6 ? '-ie6' : '');
-
 
             // ugly hack to deal with IE6 issue
             var text = String.format('<div><div class="x-progress-text {0}" style="width:100%;" id="{1}">{2}</div></div>', textClass, Ext.id(), string);

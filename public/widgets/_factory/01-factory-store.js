@@ -13,7 +13,7 @@ Inprint.factory.Store = new function() {
         return {
             name: field,
             type: "date",
-            dateFormat: "U000"
+            dateFormat: "c"
         };
     }
 
@@ -33,7 +33,7 @@ Inprint.factory.Store = new function() {
             'copygroup',
 
             'holder','creator','manager','holder_shortcut','creator_shortcut','manager_shortcut',
-            'maingroup','maingroup_shortcut','ingroups',
+            'workgroup','workgroup_shortcut','ingroups',
             'islooked','isopen',
             'branch','branch_shortcut','stage','stage_shortcut','color','progress',
             'title','author',
@@ -42,8 +42,6 @@ Inprint.factory.Store = new function() {
             'created','updated'
         ],
         '/documents/common/fascicles/':         [ 'id', 'title', 'shortcut', 'description', "headline", "headline_shortcut", "rubric", "rubric_shortcut" ],
-
-        // System
 
         // Catalog
         "/catalog/readiness/list/":             [ "id", "color", "percent", "title", "shortcut", "description" ],
@@ -55,6 +53,9 @@ Inprint.factory.Store = new function() {
         "/catalog/stages/principals-mapping/":  [ "id", "type", "catalog", "stage", "principal", "title", "description", "catalog_shortcut", "stage_shortcut" ],
         "/catalog/principals/list/":            [ "id", "type", "title", "description" ],
         "/catalog/transfer/list/":              [ "id", "type", "title", "description" ],
+
+        // System
+        "/system/events/list/":                 [ "id", "initiator", "initiator_login", "initiator_shortcut", "initiator_position", "entity", "entity_type", "message", "message_type", "message_variables", createDateField("created") ],
 
 
         "" : []
