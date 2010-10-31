@@ -1,0 +1,1 @@
+perl inprint.pl daemon --reload
