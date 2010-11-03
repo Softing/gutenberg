@@ -9,14 +9,11 @@ Inprint.catalog.roles.Panel = Ext.extend(Ext.Panel, {
         this.panels.help    = new Inprint.catalog.roles.HelpPanel({ oid: this.oid });
 
         Ext.apply(this, {
-
             layout: "border",
-
             defaults: {
                 collapsible: false,
                 split: true
             },
-
             items: [
                 {   region: "center",
                     margins: "3 0 3 3",

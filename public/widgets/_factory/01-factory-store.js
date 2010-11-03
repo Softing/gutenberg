@@ -107,7 +107,8 @@ Inprint.factory.Store = new function() {
 
         array: function(myclass, config) {
             if (items[myclass]) {
-                var configuration = defaults;
+                var configuration = {};
+                configuration = Ext.apply(configuration, defaults);
                 configuration = Ext.apply(configuration, items[myclass]);
                 configuration = Ext.apply(configuration, config);
                 return new Ext.data.ArrayStore(configuration);
@@ -120,7 +121,8 @@ Inprint.factory.Store = new function() {
         json: function(myclass, config) {
             if (items[myclass]) {
 
-                var configuration = defaults;
+                var configuration = {};
+                configuration = Ext.apply(configuration, defaults);
                 configuration = Ext.apply(configuration, items[myclass]);
                 configuration = Ext.apply(configuration, config);
 
@@ -132,31 +134,34 @@ Inprint.factory.Store = new function() {
         },
 
         group: function(myclass, storeconfig, readerconfig) {
+            
             if (items[myclass]) {
-
-                var configuration = defaults;
-
+                
+                var configuration = {};
+                configuration = Ext.apply(configuration, defaults);
+                
                 var configuration2 = {
                     idProperty: 'id',
                     root: 'data',
                     fields: items[myclass].fields
                 };
-
+                
                 Ext.apply(configuration2, readerconfig);
-
+                
                 var reader = new Ext.data.JsonReader(configuration2);
-
+                
                 configuration = Ext.apply(configuration, {
                     reader: reader,
                     remoteSort: true,
-                    //sortInfo:{field: 'name', direction: "ASC"},
                     groupField:'groupby'
                 });
 
                 configuration = Ext.apply(configuration, { url: items[myclass].url });
                 configuration = Ext.apply(configuration, storeconfig);
 
-                return new Ext.data.GroupingStore(configuration);
+                var store = new Ext.data.GroupingStore(configuration);
+                
+                return store;
             } else {
                 alert("Can't find group store <" + myclass + ">");
             }

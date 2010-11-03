@@ -8,18 +8,15 @@ Inprint.catalog.roles.Interaction = function(panels) {
     grid.btnCreate.enable();
 
     grid.getSelectionModel().on("selectionchange", function(sm) {
-        // Select
-        if (sm.getCount()) {
-            _enable(grid.btnDelete);
-        } else {
-            _disable(grid.btnDelete);
-        }
-        // Single select
+        
+        _disable(grid.btnUpdate, grid.btnManageRules, grid.btnDelete);
+
         if (sm.getCount() == 1) {
-            _enable(grid.btnManageRules);
-        } else {
-            _disable(grid.btnManageRules);
+            _enable(grid.btnUpdate, grid.btnManageRules, grid.btnDelete);
+        } else if (sm.getCount() > 1) {
+            _enable(grid.btnDelete);
         }
+        
     });
 
 }

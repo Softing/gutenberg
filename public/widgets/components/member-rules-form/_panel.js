@@ -3,9 +3,15 @@ Inprint.cmp.memberRulesForm.Window = Ext.extend(Ext.Window, {
     initComponent: function() {
 
         this.panels = {};
+        
+        this.panels["domain"] = new Inprint.cmp.memberRulesForm.Domain({
+            memberId: this.memberId
+        });
+        
         this.panels["editions"] = new Inprint.cmp.memberRulesForm.Editions({
             memberId: this.memberId
         });
+        
         this.panels["organization"] = new Inprint.cmp.memberRulesForm.Organization({
             memberId: this.memberId
         });
@@ -14,8 +20,9 @@ Inprint.cmp.memberRulesForm.Window = Ext.extend(Ext.Window, {
             border:false,
             activeTab: 0,
             items:[
-                this.panels["organization"],
-                this.panels["editions"]
+                this.panels["domain"],
+                this.panels["editions"],
+                this.panels["organization"]
             ]
         });
 

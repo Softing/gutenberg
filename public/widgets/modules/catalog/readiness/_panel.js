@@ -6,43 +6,29 @@ Inprint.catalog.readiness.Panel = Ext.extend(Ext.Panel, {
 
         this.panels.grid = new Inprint.catalog.readiness.Grid();
         this.panels.help = new Inprint.catalog.readiness.HelpPanel();
-        this.panels.edit = new Inprint.catalog.readiness.UpdateForm();
-
-        this.panels.tab = new Ext.TabPanel({
-            border:false,
-            activeItem: 0,
-            items: [
-                this.panels.help,
-                this.panels.edit
-            ]
-        });
 
         Ext.apply(this, {
-
             layout: "border",
-
             defaults: {
                 collapsible: false,
                 split: true
             },
-
             items: [
                 {
-                    region: "center",
                     layout:"fit",
-                    margins: "3 0 3 0",
-                    border:false,
+                    region: "center",
+                    margins: "3 0 3 3",
                     items: this.panels.grid
                 },
                 {
+                    layout:"fit",
                     region:"east",
                     margins: "3 3 3 0",
                     width: 400,
                     minSize: 200,
                     maxSize: 600,
                     collapseMode: 'mini',
-                    layout:"fit",
-                    items: this.panels.tab
+                    items: this.panels.help
                 }
             ]
         });

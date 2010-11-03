@@ -14,14 +14,13 @@ Inprint.catalog.organization.Grid = Ext.extend(Ext.grid.GridPanel, {
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
 
         Ext.apply(this, {
+            border:false,
             stripeRows: true,
             columnLines: true,
             sm: this.selectionModel,
             autoExpandColumn: "name",
-
             enableDragDrop: true,
             ddGroup:'member2catalog',
-
             columns: [
                 this.selectionModel,
                 {

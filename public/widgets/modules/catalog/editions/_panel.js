@@ -22,7 +22,6 @@ Inprint.catalog.editions.Panel = Ext.extend(Ext.Panel, {
                     region: "center",
                     layout:"fit",
                     margins: "3 0 3 0",
-                    border:false,
                     items: this.panels.grid
                 },
                 {

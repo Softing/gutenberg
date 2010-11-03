@@ -72,6 +72,8 @@ sub menu
 {
     my $c = shift;
     
+    $c->access->In("domain.control.all");
+    
     sub AddItem {
         my ($id, $icon, $text, $path, $type) = @_;
         my $result = {};

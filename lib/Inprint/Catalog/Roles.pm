@@ -54,9 +54,9 @@ sub read {
     my $i_id = $c->param("id");
 
     my $result = $c->sql->Q("
-        SELECT id, title, shortcut, description,
+        SELECT id, title, shortcut, description
         FROM roles
-        WHERE t1.id =?
+        WHERE id =?
     ", [ $i_id ])->Hash;
 
     $c->render_json( { success => $c->json->true, data => $result } );

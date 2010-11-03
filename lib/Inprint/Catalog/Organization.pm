@@ -61,6 +61,25 @@ sub tree {
     $c->render_json( $result );
 }
 
+
+sub read {
+    my $c = shift;
+    my $i_id            = $c->param("id");
+    my $result = {
+        success => $c->json->false,
+        errors => []
+    };
+    push @{ $result->{errors} }, { id => "id", msg => "" } unless $i_id;
+    $result->{data} = $c->sql->Q("
+        SELECT t1.*,
+            subpath(path, -2,1) as parent,
+            (select shortcut from catalog where subpath(path, -1,1) = subpath(t1.path, -2,1) ) as parent_shortcut
+        FROM catalog t1 WHERE t1.id = ?
+    ", [ $i_id ])->Hash;
+    $result->{success} = $c->json->true if $result->{data};
+    $c->render_json( $result );
+}
+
 sub create {
     my $c = shift;
 
@@ -99,25 +118,6 @@ sub create {
 
     $result->{success} = $c->json->true if $count;
 
-    $c->render_json( $result );
-}
-
-
-sub read {
-    my $c = shift;
-    my $i_id            = $c->param("id");
-    my $result = {
-        success => $c->json->false,
-        errors => []
-    };
-    push @{ $result->{errors} }, { id => "id", msg => "" } unless $i_id;
-    $result->{data} = $c->sql->Q("
-        SELECT t1.*,
-            subpath(path, -2,1) as parent,
-            (select shortcut from catalog where subpath(path, -1,1) = subpath(t1.path, -2,1) ) as parent_shortcut
-        FROM catalog t1 WHERE t1.id = ?
-    ", [ $i_id ])->Hash;
-    $result->{success} = $c->json->true if $result->{data};
     $c->render_json( $result );
 }
 

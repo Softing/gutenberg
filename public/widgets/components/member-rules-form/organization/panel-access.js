@@ -17,85 +17,77 @@ Inprint.cmp.memberRulesForm.Organization.Restrictions = Ext.extend(Ext.grid.Edit
             checkOnly:true
         });
 
-        this.store = Inprint.factory.Store.group(this.urls.list, {
-            autoLoad: false
+        this.store = Inprint.factory.Store.json(this.urls.list, {
+            autoLoad: false,
+            baseParams: {
+                section: 'catalog'
+            }
         });
 
-        this.view = new Ext.grid.GroupingView({
-            forceFit:true,
-            showGroupName:false,
-            hideGroupedColumn:true
-        });
+        this.columns = [
+            this.sm,
+            {
+                id:"shortcut",
+                header: _("Rule"),
+                width: 120,
+                sortable: true,
+                dataIndex: "shortcut"
+            },
+            {
+                id: "limit",
+                width: 120,
+                header: _("Limit"),
+                dataIndex: 'limit',
+                renderer: function(value, metadata, record, row, col, store) {
+                    if (value == undefined || value == "") {
+                        return _("Employee");
+                    }
+                    return value;
+                },
+                editor: new Ext.form.ComboBox({
+                    lazyRender : true,
+                    store: new Ext.data.ArrayStore({
+                        fields: ['id', 'name'],
+                        data : [
+                            [ 'member', _("Employee")],
+                            [ 'group', _("Group")]
+                        ]
+                    }),
+                    hiddenName: "id",
+                    valueField: "id",
+                    displayField:'name',
+                    mode: 'local',
+                    forceSelection: true,
+                    editable:false,
+                    emptyText:_("Limitation...")
+                })
+            }
+        ];
+
+        this.tbar = [
+            {
+                icon: _ico("disk-black"),
+                cls: "x-btn-text-icon",
+                text: _("Save"),
+                ref: "../btnSave",
+                scope:this,
+                handler: this.cmpSave
+            },
+            '->',
+            {
+                icon: _ico("arrow-circle-double"),
+                cls: "x-btn-icon",
+                scope:this,
+                handler: function() { this.cmpFill(this.memberId, this.nodeId); }
+            }
+        ];
 
         Ext.apply(this, {
             disabled:true,
             stripeRows: true,
             columnLines: true,
             clicksToEdit: 1,
-            columns: [
-                this.sm,
-                {
-                    id:"shortcut",
-                    header: _("Rule"),
-                    width: 120,
-                    sortable: true,
-                    dataIndex: "shortcut"
-                },
-                {
-                    id:"groupby",
-                    header: _("Group by"),
-                    width: 120,
-                    sortable: true,
-                    dataIndex: "groupby"
-                },
-                {
-                    id: "limit",
-                    header: _("Limit"),
-                    width: 50,
-                    dataIndex: 'limit',
-                    renderer: function(value, metadata, record, row, col, store) {
-                        if (value == undefined || value == "") {
-                            return _("Employee");
-                        }
-                        return value;
-                    },
-                    editor: new Ext.form.ComboBox({
-                            lazyRender : true,
-                            store: new Ext.data.ArrayStore({
-                                fields: ['id', 'name'],
-                                data : [
-                                    [ 'member', _("Employee")],
-                                    [ 'group', _("Group")]
-                                ]
-                            }),
-                            hiddenName: "id",
-                            valueField: "id",
-                            displayField:'name',
-                            mode: 'local',
-                            forceSelection: true,
-                            editable:false,
-                            emptyText:_("Limitation...")
-                        })
-                }
-            ],
-
-            tbar: [
-                {
-                    icon: _ico("disk-black"),
-                    cls: "x-btn-text-icon",
-                    text: _("Save"),
-                    ref: "../btnSave",
-                    scope:this,
-                    handler: this.cmpSave
-                },
-                '->',
-                {
-                    icon: _ico("arrow-circle-double"),
-                    cls: "x-btn-icon",
-                    scope:this,
-                    handler: function() { this.cmpFill(this.memberId, this.nodeId); }
-                }
-            ]
+            autoExpandColumn: "shortcut"
         });
 
         Inprint.cmp.memberRulesForm.Organization.Restrictions.superclass.initComponent.apply(this, arguments);
@@ -127,37 +119,31 @@ Inprint.cmp.memberRulesForm.Organization.Restrictions = Ext.extend(Ext.grid.Edit
             url: this.urls.fill,
             scope:this,
             params: {
+                binding: node,
                 member: member,
-                binding: node
+                section: "catalog"
             },
             callback: function() {
                 this.body.unmask();
             },
             success: function(responce) {
-
                 var result = Ext.util.JSON.decode(responce.responseText);
-
                 var store = this.getStore();
-
                 for (var i in result.data) {
                     var rule = i;
                     var mode = result.data[i];
                     var record = store.getById(rule);
-
                     if (record) {
                         this.getSelectionModel().selectRecords([ record ], true);
                     }
-
                     if (mode == 'member') {
                         record.set("limit", _("Employee"));
                         record.set("selection", "member");
                     }
-
                     if (mode == 'group') {
                         record.set("limit", _("Group"));
                         record.set("selection", "group");
                     }
-
                 }
             }
         });
@@ -176,6 +162,7 @@ Inprint.cmp.memberRulesForm.Organization.Restrictions = Ext.extend(Ext.grid.Edit
             success: this.cmpReload,
             params: {
                 rules: data,
+                section: "catalog",
                 member: this.memberId,
                 binding: this.nodeId
             }

@@ -113,6 +113,8 @@ sub l {
 sub access {
     my $c = shift;
     $Cache{Access} = new Inprint::Frameworks::Access($c) unless ($Cache{Access});
+    $Cache{Access}->SetHandler($c);
+    $Cache{Access}->ExtractRules($c);
     return $Cache{Access};
 }
 

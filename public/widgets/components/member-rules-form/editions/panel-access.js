@@ -17,56 +17,48 @@ Inprint.cmp.memberRulesForm.Editions.Restrictions = Ext.extend(Ext.grid.EditorGr
             checkOnly:true
         });
 
-        this.store = Inprint.factory.Store.group(this.urls.list, {
-            autoLoad: false
+        this.store = Inprint.factory.Store.json(this.urls.list, {
+            autoLoad: false,
+            baseParams: {
+                section: 'editions'
+            }
         });
 
-        this.view = new Ext.grid.GroupingView({
-            forceFit:true,
-            showGroupName:false,
-            hideGroupedColumn:true
-        });
+        this.columns = [
+            this.sm,
+            {
+                id:"shortcut",
+                header: _("Rule"),
+                width: 120,
+                sortable: true,
+                dataIndex: "shortcut"
+            }
+        ];
+
+        this.tbar = [
+            {
+                icon: _ico("disk-black"),
+                cls: "x-btn-text-icon",
+                text: _("Save"),
+                ref: "../btnSave",
+                scope:this,
+                handler: this.cmpSave
+            },
+            '->',
+            {
+                icon: _ico("arrow-circle-double"),
+                cls: "x-btn-icon",
+                scope:this,
+                handler: function() { this.cmpFill(this.memberId, this.nodeId); }
+            }
+        ];
 
         Ext.apply(this, {
             disabled: true,
             stripeRows: true,
             columnLines: true,
             clicksToEdit: 1,
-            columns: [
-                this.sm,
-                {
-                    id:"shortcut",
-                    header: _("Rule"),
-                    width: 120,
-                    sortable: true,
-                    dataIndex: "shortcut"
-                },
-                {
-                    id:"groupby",
-                    header: _("Group by"),
-                    width: 120,
-                    sortable: true,
-                    dataIndex: "groupby"
-                }
-            ],
-
-            tbar: [
-                {
-                    icon: _ico("disk-black"),
-                    cls: "x-btn-text-icon",
-                    text: _("Save"),
-                    ref: "../btnSave",
-                    scope:this,
-                    handler: this.cmpSave
-                },
-                '->',
-                {
-                    icon: _ico("arrow-circle-double"),
-                    cls: "x-btn-icon",
-                    scope:this,
-                    handler: function() { this.cmpFill(this.memberId, this.nodeId); }
-                }
-            ]
+            autoExpandColumn: "shortcut"
         });
 
         Inprint.cmp.memberRulesForm.Editions.Restrictions.superclass.initComponent.apply(this, arguments);
@@ -92,37 +84,21 @@ Inprint.cmp.memberRulesForm.Editions.Restrictions = Ext.extend(Ext.grid.EditorGr
             url: this.urls.fill,
             scope:this,
             params: {
+                binding: node,
                 member: member,
-                binding: node
+                section: "editions"
             },
             callback: function() {
                 this.body.unmask();
             },
             success: function(responce) {
-
                 var result = Ext.util.JSON.decode(responce.responseText);
-
                 var store = this.getStore();
-
                 for (var i in result.data) {
-                    var rule = i;
-                    var mode = result.data[i];
-                    var record = store.getById(rule);
-
+                    var record = store.getById(i);
                     if (record) {
                         this.getSelectionModel().selectRecords([ record ], true);
                     }
-
-                    if (mode == 'member') {
-                        record.set("limit", _("Employee"));
-                        record.set("selection", "member");
-                    }
-
-                    if (mode == 'group') {
-                        record.set("limit", _("Group"));
-                        record.set("selection", "group");
-                    }
-
                 }
             }
         });
@@ -131,20 +107,19 @@ Inprint.cmp.memberRulesForm.Editions.Restrictions = Ext.extend(Ext.grid.EditorGr
     cmpSave: function() {
         var data = [];
         Ext.each(this.getSelectionModel().getSelections(), function(record) {
-            var id = record.get("id");
-            var mode = "edition";
-            data.push( id + "::" + mode );
+            data.push( record.get("id") + "::edition");
         });
         Ext.Ajax.request({
-            url: this.urls.save,
             scope:this,
+            url: this.urls.save,
             success: this.cmpReload,
             params: {
                 rules: data,
+                section: "editions",
                 member: this.memberId,
                 binding: this.nodeId
             }
         });
     }
-
+    
 });

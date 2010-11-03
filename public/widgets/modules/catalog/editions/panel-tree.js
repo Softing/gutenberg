@@ -17,11 +17,8 @@ Inprint.catalog.editions.Tree = Ext.extend(Ext.tree.TreePanel, {
             dataUrl: this.urls.tree,
             border:false,
             rootVisible: false,
-
-            // DD
-            enableDD:true,
-            ddGroup:'member2catalog',
-
+            //enableDD:true,
+            //ddGroup:'member2catalog',
             root: {
                 id:'root-node',
                 nodeType: 'async',
@@ -76,6 +73,8 @@ Inprint.catalog.editions.Tree = Ext.extend(Ext.tree.TreePanel, {
         }, this);
 
     },
+
+    // Create new Edition
 
     cmpCreate: function(node) {
 
@@ -154,7 +153,7 @@ Inprint.catalog.editions.Tree = Ext.extend(Ext.tree.TreePanel, {
                     _FLD_TITLE,
                     _FLD_SHORTCUT,
                     _FLD_DESCRIPTION,
-                    Inprint.factory.Combo.create("/catalog/combos/groups/", {
+                    Inprint.factory.Combo.create("/catalog/combos/editions/", {
                         scope:this,
                         listeners: {
                             select: function(combo, record, indx) {
@@ -206,12 +205,12 @@ Inprint.catalog.editions.Tree = Ext.extend(Ext.tree.TreePanel, {
 
                 form.findField("id").setValue(action.result.data.id);
                 form.findField("path").setValue(action.result.data.parent);
-                form.findField("catalog").setValue(action.result.data.parent_shortcut);
+                form.findField("edition").setValue(action.result.data.parent_shortcut);
 
                 if (action.result.data.id == '00000000-0000-0000-0000-000000000000') {
-                    form.findField("catalog").disable();
+                    form.findField("edition").disable();
                 } else {
-                    form.findField("catalog").enable();
+                    form.findField("edition").enable();
                 }
 
             },

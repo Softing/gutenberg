@@ -152,6 +152,12 @@ sub rules {
         (
             SELECT t1.area, t1.binding, t2.shortcut as binding_shortcut
             FROM map_member_to_rule t1, editions t2
+            WHERE t1.member=? AND t1.area = 'domain' AND t2.id = t1.binding
+            GROUP BY area, binding, shortcut )
+        UNION ALL
+        (
+            SELECT t1.area, t1.binding, t2.shortcut as binding_shortcut
+            FROM map_member_to_rule t1, editions t2
             WHERE t1.member=? AND t1.area = 'edition' AND t2.id = t1.binding
             GROUP BY area, binding, shortcut )
         UNION ALL
@@ -166,14 +172,14 @@ sub rules {
             FROM map_member_to_rule t1, catalog t2
             WHERE t1.member=? AND t1.area = 'member' AND t2.id = t1.binding
             GROUP BY area, binding, shortcut)
-    ", [$i_member, $i_member, $i_member])->Hashes;
-
+    ", [ $i_member, $i_member, $i_member, $i_member ])->Hashes;
+    
     foreach my $item (@$result) {
         $item->{rules} = $c->sql->Q("
-            SELECT t2.shortcut
+            SELECT t2.title
             FROM map_member_to_rule t1, rules t2
-            WHERE t1.member=? AND t1.area=? AND binding=? AND t2.id=t1.rule
-        ",[ $i_member, $item->{area}, $item->{binding} ])->Array;
+            WHERE t1.member=? AND t1.area=? AND binding=? AND t2.id=t1.term
+        ",[ $i_member, $item->{area}, $item->{binding} ])->Values;
     }
 
     $c->render_json( { data => $result } );

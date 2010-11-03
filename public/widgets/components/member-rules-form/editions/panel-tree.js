@@ -43,7 +43,19 @@ Inprint.cmp.memberRulesForm.Editions.Tree = Ext.extend(Ext.tree.TreePanel, {
         this.on("load", function() {
             this.body.unmask();
         });
+        
+        this.on("afterrender", function() {
 
+            this.getRootNode().expand();
+            this.getRootNode().on("expand", function(node) {
+                node.firstChild.expand();
+                node.firstChild.select();
+            });
+
+            this.getLoader().on("beforeload", function() { this.body.mask(_("Loading")); }, this);
+            this.getLoader().on("load", function() { this.body.unmask(); }, this);
+
+        }, this);
     }
 
 });
