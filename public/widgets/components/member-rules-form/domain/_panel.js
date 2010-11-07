@@ -20,6 +20,14 @@ Inprint.cmp.memberRulesForm.Domain = Ext.extend(Ext.Panel, {
         this.grid.getStore().on("load", function(){
             this.grid.cmpFill(this.memberId);
         }, this);
+    },
+    
+    cmpReload: function() {
+        this.grid.cmpReload();
+    },
+    
+    cmpSave: function() {
+        this.grid.cmpSave();
     }
 
 });

@@ -83,10 +83,10 @@ sub redirect_to {
     my $c = shift;
 
     $c->res->code(302);
-    my $url = $c->url_for(@_)->to_abs;
+    my $url = $c->url_for(@_)->to_rel;
     $url =~ s/\/index.pl//;
+    
     $c->res->headers->location($url);
-
     return $c;
 }
 

@@ -14,8 +14,6 @@ sub new {
     my $class = shift;
     my $c = shift;
     my $self     = bless {}, $class;
-    
-    
     bless($self, $class);
     return $self;
 }
@@ -27,58 +25,115 @@ sub SetHandler {
 }
 
 sub ExtractRules {
-    
     my $c = shift;
-    
-    $c->{handler}->{SessionRules} = $c->{handler}->sql->Q("
-        SELECT t2.id, t2.section ||'.'|| t2.subsection ||'.'|| t2.term as term, t1.member, t1.area, t1.binding, ARRAY( select id from editions where path @> ( select path from editions where id=t1.binding) ) as path
-        FROM map_member_to_rule t1, rules t2
-        WHERE t1.section = 'editions' AND t2.id = t1.term
-            AND t1.member=?
-        
-        UNION 
-        
-        SELECT t2.id, t2.section ||'.'|| t2.subsection ||'.'|| t2.term as term, t1.member, t1.area, t1.binding, ARRAY( select id from catalog where path @> ( select path from catalog where id=t1.binding) ) as path
-        FROM map_member_to_rule t1, rules t2
-        WHERE t1.section = 'catalog' AND t2.id = t1.term
-            AND t1.member=?
-        
-        UNION 
-        
-        SELECT t2.id, t2.section ||'.'|| t2.subsection ||'.'|| t2.term as term, t1.member, t1.area, t1.binding, ARRAY['00000000-0000-0000-0000-000000000000'::uuid] as path
-        FROM map_member_to_rule t1, rules t2
-        WHERE t1.section = 'domain' AND t2.id = t1.term
-            AND t1.member=?
-    ", [
-        $c->{handler}->QuerySessionGet("member.id"),
-        $c->{handler}->QuerySessionGet("member.id"),
-        $c->{handler}->QuerySessionGet("member.id")
-    ])->Hashes;
-    
     return $c;
 }
 
 sub One {
     my $c = shift;
-    my $term = shift;
+    my $term    = shift;
+    my $binding = shift;
+    my $member  = shift;
     
+    my $result = 0;
     
+    my ($section, $subsection, $action) = split /\./, $term;
     
+    unless ($member) {
+        $member = $c->{handler}->QuerySessionGet("member.id");
+    }
+    
+    if ($section && $subsection && $action && $member) {
+        
+        my @data;
+        
+        my $sql = "
+            SELECT count(*) FROM view_rules WHERE
+                section=? AND subsection=? AND term=? AND member=?
+        ";
+        
+        push @data, $section;
+        push @data, $subsection;
+        push @data, $action;
+        push @data, $member;
+        
+        if ($binding) {
+            $sql .= " AND (binding=? OR ? = ANY (childrens)) ";
+            push @data, $binding;
+            push @data, $binding;
+        }
+        
+        $result = $c->{handler}->sql->Q($sql, \@data)->Value();
+    }
+    
+    return $result;
 }
 
-sub In {
+sub GetBindingsByTerm {
+    
     my $c = shift;
-    my $term = shift;
-    my $path = shift;
+    my $term    = shift;
+    my $member  = shift;
     
-    return undef unless $term;
+    my $result = [];
     
-    foreach my $rule (@{ $c->{handler}->{SessionRules} }) {
-        if ( $rule->{term} eq "domain.control.all") {
-            #die @{ $rule->{path} }
+    unless ($member) {
+        $member = $c->{handler}->QuerySessionGet("member.id");
+    }
+    
+    my ($section, $subsection, $action) = split /\./, $term;
+    
+    if ($section && $subsection && $action) {
+        
+        my $termid = $c->{handler}->sql->Q("
+            SELECT id FROM rules WHERE section =? AND subsection=? AND term=? LIMIT 1
+        ", [$section, $subsection, $action])->Value;
+        
+        if ($termid) {
+            $result = $c->{handler}->sql->Q("
+                SELECT binding FROM map_member_to_rule
+                WHERE member=? AND term=? 
+            ", [ $member, $termid ])->Values();
         }
     }
+    
+    return $result;
 }
 
+sub GetEditionsByTerm {
+    
+    my $c = shift;
+    my $term    = shift;
+    my $member  = shift;
+    
+    my $result = [];
+    
+    unless ($member) {
+        $member = $c->{handler}->QuerySessionGet("member.id");
+    }
+    
+    my ($section, $subsection, $action) = split /\./, $term;
+    
+    if ($section && $subsection && $action) {
+        
+        my $termid = $c->{handler}->sql->Q("
+            SELECT id FROM rules WHERE section =? AND subsection=? AND term=? LIMIT 1
+        ", [$section, $subsection, $action])->Value;
+        
+        if ($termid) {
+            $result = $c->{handler}->sql->Q("
+                SELECT t1.id FROM editions t1
+                WHERE
+                (
+                    ARRAY(SELECT editions.id FROM editions WHERE editions.path ~ ((t1.path::text || '.*'::text)::lquery)) 
+                    &&
+                    ARRAY(select binding from map_member_to_rule where member=? and term=? )
+                )
+            ", [ $member, $termid ])->Values();
+        }
+    }
+    
+    return $result;
+}
 
 1;

@@ -43,6 +43,19 @@ _FLD_HDN_PATH = {
     allowBlank:false
 };
 
+_FLD_HDN_EDITION = {
+    xtype: "hidden",
+    name: "edition",
+    allowBlank:false
+};
+
+_FLD_HDN_FASCICLE = {
+    xtype: "hidden",
+    name: "fascicle",
+    allowBlank:false
+};
+
+
 _FLD_NAME = {
     xtype: "textfield",
     allowBlank:false,

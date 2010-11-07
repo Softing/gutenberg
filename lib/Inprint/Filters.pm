@@ -57,9 +57,20 @@ sub mysession
 
     # Check session
     if ($sid) {
+        
         my $session = $c->sql->Q("SELECT * FROM sessions WHERE id=?", [ $sid ])->Hash;
-        if ($session) {
-            $c->sql->Do(" UPDATE sessions SET updated=now() WHERE id=? ", [ $sid ] );
+        if ($session->{member}) {
+            my $access  = $c->sql->Q("
+                SELECT true
+                FROM map_member_to_rule
+                WHERE member = ? AND term='2fde426b-ed30-4376-9a7b-25278e8f104a'
+            ", [ $session->{member} ])->Value;
+            
+            if ($access) {
+                $c->sql->Do(" UPDATE sessions SET updated=now() WHERE id=? ", [ $sid ] );
+            } else {
+                $c->redirect_to('/login');
+            }
         } else {
             $c->redirect_to('/login');
         }

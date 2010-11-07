@@ -27,29 +27,22 @@ Inprint.cmp.memberRulesForm.Domain.Restrictions = Ext.extend(Ext.grid.EditorGrid
         this.columns = [
             this.sm,
             {
-                id:"shortcut",
+                id:"icon",
+                width: 30,
+                dataIndex: "icon",
+                renderer: function (value, meta, record) {
+                    return '<img src="'+ _ico(value) +'"/>';
+                }
+            },
+            {
+                id:"title",
                 header: _("Rule"),
                 width: 120,
                 sortable: true,
-                dataIndex: "shortcut"
-            }
-        ];
-        
-        this.tbar = [
-            {
-                icon: _ico("disk-black"),
-                cls: "x-btn-text-icon",
-                text: _("Save"),
-                ref: "../btnSave",
-                scope:this,
-                handler: this.cmpSave
-            },
-            '->',
-            {
-                icon: _ico("arrow-circle-double"),
-                cls: "x-btn-icon",
-                scope:this,
-                handler: function() { this.cmpFill(this.memberId, this.nodeId); }
+                dataIndex: "title",
+                renderer: function (value, meta, record) {
+                    return _(value);
+                }
             }
         ];
 
@@ -58,7 +51,7 @@ Inprint.cmp.memberRulesForm.Domain.Restrictions = Ext.extend(Ext.grid.EditorGrid
             stripeRows: true,
             columnLines: true,
             clicksToEdit: 1,
-            autoExpandColumn: "shortcut"
+            autoExpandColumn: "title"
         });
 
         Inprint.cmp.memberRulesForm.Domain.Restrictions.superclass.initComponent.apply(this, arguments);
@@ -110,12 +103,19 @@ Inprint.cmp.memberRulesForm.Domain.Restrictions = Ext.extend(Ext.grid.EditorGrid
         Ext.Ajax.request({
             scope:this,
             url: this.urls.save,
-            success: this.cmpReload,
             params: {
                 rules: data,
                 section: "domain",
                 member: this.memberId,
                 binding: '00000000-0000-0000-0000-000000000000'
+            },
+            success: function() {
+                this.cmpReload;
+                new Ext.ux.Notification({
+                    iconCls: 'event',
+                    title: _("System event"),
+                    html: _("Changes have been saved")
+                }).show(document);
             }
         });
     }

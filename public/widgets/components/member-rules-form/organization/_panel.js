@@ -10,12 +10,10 @@ Inprint.cmp.memberRulesForm.Organization = Ext.extend(Ext.Panel, {
             border:false,
             title: _("Organization"),
             layout: "border",
-
             defaults: {
                 collapsible: false,
                 split: true
             },
-
             items: [
                 {
                     region: "center",
@@ -40,6 +38,14 @@ Inprint.cmp.memberRulesForm.Organization = Ext.extend(Ext.Panel, {
 
     onRender: function() {
         Inprint.cmp.memberRulesForm.Organization.superclass.onRender.apply(this, arguments);
+    },
+    
+    cmpReload: function() {
+        this.panels["grid"].cmpReload();
+    },
+    
+    cmpSave: function() {
+        this.panels["grid"].cmpSave();
     }
 
 });

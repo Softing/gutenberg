@@ -27,11 +27,22 @@ Inprint.cmp.memberRulesForm.Organization.Restrictions = Ext.extend(Ext.grid.Edit
         this.columns = [
             this.sm,
             {
-                id:"shortcut",
+                id:"icon",
+                width: 30,
+                dataIndex: "icon",
+                renderer: function (value, meta, record) {
+                    return '<img src="'+ _ico(value) +'"/>';
+                }
+            },
+            {
+                id:"title",
                 header: _("Rule"),
                 width: 120,
                 sortable: true,
-                dataIndex: "shortcut"
+                dataIndex: "title",
+                renderer: function (value, meta, record) {
+                    return _(value);
+                }
             },
             {
                 id: "limit",
@@ -64,30 +75,12 @@ Inprint.cmp.memberRulesForm.Organization.Restrictions = Ext.extend(Ext.grid.Edit
             }
         ];
 
-        this.tbar = [
-            {
-                icon: _ico("disk-black"),
-                cls: "x-btn-text-icon",
-                text: _("Save"),
-                ref: "../btnSave",
-                scope:this,
-                handler: this.cmpSave
-            },
-            '->',
-            {
-                icon: _ico("arrow-circle-double"),
-                cls: "x-btn-icon",
-                scope:this,
-                handler: function() { this.cmpFill(this.memberId, this.nodeId); }
-            }
-        ];
-
         Ext.apply(this, {
             disabled:true,
             stripeRows: true,
             columnLines: true,
             clicksToEdit: 1,
-            autoExpandColumn: "shortcut"
+            autoExpandColumn: "title"
         });
 
         Inprint.cmp.memberRulesForm.Organization.Restrictions.superclass.initComponent.apply(this, arguments);
@@ -135,14 +128,14 @@ Inprint.cmp.memberRulesForm.Organization.Restrictions = Ext.extend(Ext.grid.Edit
                     var record = store.getById(rule);
                     if (record) {
                         this.getSelectionModel().selectRecords([ record ], true);
-                    }
-                    if (mode == 'member') {
-                        record.set("limit", _("Employee"));
-                        record.set("selection", "member");
-                    }
-                    if (mode == 'group') {
-                        record.set("limit", _("Group"));
-                        record.set("selection", "group");
+                        if (mode == 'member') {
+                            record.set("limit", _("Employee"));
+                            record.set("selection", "member");
+                        }
+                        if (mode == 'group') {
+                            record.set("limit", _("Group"));
+                            record.set("selection", "group");
+                        }
                     }
                 }
             }
@@ -159,12 +152,19 @@ Inprint.cmp.memberRulesForm.Organization.Restrictions = Ext.extend(Ext.grid.Edit
         Ext.Ajax.request({
             url: this.urls.save,
             scope:this,
-            success: this.cmpReload,
             params: {
                 rules: data,
                 section: "catalog",
                 member: this.memberId,
                 binding: this.nodeId
+            },
+            success: function() {
+                this.cmpReload;
+                new Ext.ux.Notification({
+                    iconCls: 'event',
+                    title: _("System event"),
+                    html: _("Changes have been saved")
+                }).show(document);
             }
         });
     }

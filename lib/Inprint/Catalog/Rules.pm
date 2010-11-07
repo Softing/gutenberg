@@ -20,10 +20,10 @@ sub list {
     
     if ($i_section) {
         $result = $c->sql->Q("
-            SELECT t1.id, t1.section ||'.'|| t1.term ||'.'|| t1.subsection as term, t1.title, t1.title as shortcut, t1.subsection as groupby
+            SELECT t1.id, t1.section ||'.'|| t1.term ||'.'|| t1.subsection as term, t1.icon, t1.title, t1.description, t1.subsection as groupby
             FROM rules t1
             WHERE t1.section=?
-            ORDER BY t1.sortorder, t1.shortcut, t1.title
+            ORDER BY t1.sortorder, t1.title
         ", [ $i_section ])->Hashes;
     }
 
@@ -54,10 +54,12 @@ sub map {
         
         foreach my $string (@i_rules) {
             my ($rule, $mode) = split "::", $string;
-            $c->sql->Do("
-                INSERT INTO map_member_to_rule(member, section, binding, area, term)
-                    VALUES (?, ?, ?, ?, ?);
-            ", [$i_member, $i_section, $i_binding, $mode, $rule]);
+            if ($rule && $mode) {
+                $c->sql->Do("
+                    INSERT INTO map_member_to_rule(member, section, binding, area, term)
+                        VALUES (?, ?, ?, ?, ?);
+                ", [$i_member, $i_section, $i_binding, $mode, $rule]);
+            }
         }
         
         $success = $c->json->true;

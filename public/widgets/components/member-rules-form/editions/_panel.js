@@ -40,6 +40,14 @@ Inprint.cmp.memberRulesForm.Editions = Ext.extend(Ext.Panel, {
 
     onRender: function() {
         Inprint.cmp.memberRulesForm.Editions.superclass.onRender.apply(this, arguments);
+    },
+    
+    cmpReload: function() {
+        this.panels["grid"].cmpReload();
+    },
+    
+    cmpSave: function() {
+        this.panels["grid"].cmpSave();
     }
 
 });

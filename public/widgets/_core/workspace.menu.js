@@ -32,7 +32,7 @@ Inprint.Menu = Ext.extend(Ext.Toolbar,{
 
     CmpQuery: function(){
         Ext.Ajax.request({
-            url: _url("/workspace/menu/"),
+            url: _url("/menu/"),
             scope: this,
             success: function (response) {
                 var result = Ext.util.JSON.decode(response.responseText);
@@ -45,7 +45,6 @@ Inprint.Menu = Ext.extend(Ext.Toolbar,{
 
         // Обрабатываем все пункты меню
         Ext.each(result, function(item) {
-
             if (item == '->') {
                 this.add(item);
                 return;
@@ -53,25 +52,9 @@ Inprint.Menu = Ext.extend(Ext.Toolbar,{
                 var btn = this.CmpCreateBtn(item);
                 this.add(btn);
             }
-
         }, this);
-
         this.add("-");
-
-        //this.add({
-        //    id:"menu-mail-search",
-        //    icon: _ico("magnifier-medium")
-        //});
-        //
-        //this.add("-");
-        //
-        //this.add({
-        //    id:"menu-mail-alert",
-        //    icon: _ico("mail")
-        //});
-        
         var clock = this.add({ id: "menu-clock", xtype: 'tbtext', text: '00:00:00 --' });
-
         this.doLayout();
     },
 

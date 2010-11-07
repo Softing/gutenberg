@@ -68,7 +68,7 @@ Inprint.catalog.organization.Interaction = function(panels) {
         grid.enable();
         if (node) {
             grid.cmpLoad({ node: node.id });
-            grid.setTitle(_("Members") +' - '+ node.text);
+            grid.setTitle(_("Employees") +' - '+ node.text);
         }
     });
 
@@ -153,7 +153,7 @@ Inprint.catalog.organization.Interaction = function(panels) {
 
     grid.getStore().on("load", function(store) {
         if (tree.cmpCurrentNode())
-            grid.setTitle(_("Members") +' - '+ tree.cmpCurrentNode().text +' ('+ store.getCount() +')');
+            grid.setTitle(_("Employees") +' - '+ tree.cmpCurrentNode().text +' ('+ store.getCount() +')');
     });
 
     grid.getSelectionModel().on("selectionchange", function(sm) {

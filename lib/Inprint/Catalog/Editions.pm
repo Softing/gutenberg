@@ -15,32 +15,39 @@ sub tree {
     my $c = shift;
 
     my $i_node = $c->param("node");
-
-    my $data = [];
-
+    my $i_term = $c->param("term");
+    
+    my $sql;
+    my @data;
+    
+    unless ($i_node) {
+        $i_node = '00000000-0000-0000-0000-000000000000';
+    }
+    
     if ($i_node eq "root-node") {
-        $data = $c->sql->Q("
-            SELECT *, ( SELECT count(*) FROM editions c2 WHERE c2.path ~ ('00000000000000000000000000000000.*{1}')::lquery ) as have_childs
-            FROM editions
-            WHERE
-                id = '00000000-0000-0000-0000-000000000000'
-            ORDER BY shortcut
-        ")->Hashes;
-    } else {
-        $data = $c->sql->Q("
-            SELECT *, ( SELECT count(*) FROM editions c2 WHERE c2.path ~ ('*.' || replace(?, '-', '')::text || '.*{2}')::lquery ) as have_childs
-            FROM editions
-            WHERE
-                id <> '00000000-0000-0000-0000-000000000000'
-                AND subpath(path, nlevel(path) - 2, 1)::text = replace(?, '-', '')::text
-            ORDER BY shortcut
-        ", [ $i_node, $i_node ])->Hashes;
+        $i_node = '00000000-0000-0000-0000-000000000000';
+    }
+    
+    $sql = "
+        SELECT *, ( SELECT count(*) FROM editions c2 WHERE c2.path ~ ('*.' || replace(?, '-', '')::text || '.*{2}')::lquery ) as have_childs
+        FROM editions
+        WHERE
+            id <> '00000000-0000-0000-0000-000000000000'
+            AND subpath(path, nlevel(path) - 2, 1)::text = replace(?, '-', '')::text
+    ";
+    push @data, $i_node;
+    push @data, $i_node;
+    
+    if ($i_term) {
+        my $access = $c->access->GetEditionsByTerm($i_term);
+        $sql .= " AND id = ANY(?) ";
+        push @data, $access;
     }
 
+    my $data = $c->sql->Q("$sql ORDER BY shortcut", \@data)->Hashes;
+    
     my $result = [];
-
     foreach my $item (@$data) {
-
         my $record = {
             id   => $item->{id},
             text => $item->{shortcut},
@@ -48,14 +55,9 @@ sub tree {
             icon => "book",
             data => $item
         };
-
         if ( $item->{have_childs} ) {
             $record->{leaf} = $c->json->false;
-            if ($i_node eq "root-node") {
-                #$record->{expanded} = $c->json->true;
-            }
         }
-
         push @$result, $record;
     }
 

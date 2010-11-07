@@ -1,0 +1,10 @@
+.x-notification .error{
+    background-image:url(/icons/minus-circle.png);
+}
+.x-notification .event{
+    background-image:url(/icons/information-button.png) ! important;
+}
+
+.x-notification .x-window-body {
+    
+}

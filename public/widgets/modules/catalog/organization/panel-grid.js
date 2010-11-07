@@ -13,6 +13,127 @@ Inprint.catalog.organization.Grid = Ext.extend(Ext.grid.GridPanel, {
         this.store = Inprint.factory.Store.json(this.urls.list);
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
 
+        this.columns = [
+            this.selectionModel,
+            {
+                id:"login",
+                header: _("Login"),
+                width: 80,
+                sortable: true,
+                dataIndex: "login"
+            },
+            {
+                id:"position",
+                header: _("Position"),
+                width: 160,
+                sortable: true,
+                dataIndex: "position"
+            },
+            {
+                id:"shortcut",
+                header: _("Shortcut"),
+                width: 120,
+                sortable: true,
+                dataIndex: "shortcut"
+            },
+            {
+                id:"name",
+                header: _("Title"),
+                width: 120,
+                sortable: true,
+                dataIndex: "title"
+            }
+        ];
+
+        this.tbar = [
+            {
+                xtype: 'buttongroup',
+                title: _("Organization"),
+                defaults: { scale: 'small' },
+                items: [
+                    {
+                        icon: _ico("user--plus"),
+                        cls: "x-btn-text-icon",
+                        text: _("Add"),
+                        disabled:true,
+                        ref: "../../btnAdd",
+                        scope:this,
+                        handler: this.cmpAddToOrganization
+                    },
+                    {
+                        icon: _ico("user--minus"),
+                        cls: "x-btn-text-icon",
+                        text: _("Remove"),
+                        disabled:true,
+                        ref: "../../btnDelete",
+                        scope:this,
+                        handler: this.cmpDeleteFromOrganization
+                    }
+                ]
+            },
+            {
+                xtype: 'buttongroup',
+                title: _("Membership"),
+                defaults: { scale: 'small' },
+                items: [
+                    {
+                        icon: _ico("plug"),
+                        cls: "x-btn-text-icon",
+                        text: _("Add"),
+                        disabled:true,
+                        ref: "../../btnAddToGroup"
+                    },
+                    {
+                        icon: _ico("plug-disconnect"),
+                        cls: "x-btn-text-icon",
+                        text: _("Remove"),
+                        disabled:true,
+                        ref: "../../btnDeleteFromGroup"
+                    }
+                ]
+            },
+            {
+                xtype: 'buttongroup',
+                title: _("Profile"),
+                defaults: { scale: 'small' },
+                items: [
+                    {
+                        disabled:true,
+                        icon: _ico("card"),
+                        cls: "x-btn-text-icon",
+                        text: _("View"),
+                        ref: "../../btnViewProfile"
+                    },
+                    {
+                        disabled:true,
+                        icon: _ico("card--pencil"),
+                        cls: "x-bt  n-text-icon",
+                        text: _("Edit"),
+                        ref: "../../btnUpdateProfile"
+                    },
+                    {
+                        disabled:true,
+                        icon: _ico("key-solid"),
+                        cls: "x-bt  n-text-icon",
+                        text: _("Rights"),
+                        ref: "../../btnManageRules"
+                    }
+                ]
+            },
+            {
+                xtype: 'buttongroup',
+                title: _("Filter"),
+                defaults: { scale: 'small' },
+                items: [
+                    {
+                        xtype:"searchfield",
+                        width:200,
+                        store: this.store
+                    }
+                ]
+            }
+        ];
+
         Ext.apply(this, {
             border:false,
             stripeRows: true,
@@ -20,127 +141,7 @@ Inprint.catalog.organization.Grid = Ext.extend(Ext.grid.GridPanel, {
             sm: this.selectionModel,
             autoExpandColumn: "name",
             enableDragDrop: true,
-            ddGroup:'member2catalog',
-            columns: [
-                this.selectionModel,
-                {
-                    id:"login",
-                    header: _("Login"),
-                    width: 80,
-                    sortable: true,
-                    dataIndex: "login"
-                },
-                {
-                    id:"position",
-                    header: _("Position"),
-                    width: 160,
-                    sortable: true,
-                    dataIndex: "position"
-                },
-                {
-                    id:"shortcut",
-                    header: _("Shortcut"),
-                    width: 120,
-                    sortable: true,
-                    dataIndex: "shortcut"
-                },
-                {
-                    id:"name",
-                    header: _("Title"),
-                    width: 120,
-                    sortable: true,
-                    dataIndex: "title"
-                }
-            ],
-
-            tbar: [
-                {
-                    xtype: 'buttongroup',
-                    title: _("Organization"),
-                    defaults: { scale: 'small' },
-                    items: [
-                        {
-                            icon: _ico("user--plus"),
-                            cls: "x-btn-text-icon",
-                            text: _("Add"),
-                            disabled:true,
-                            ref: "../../btnAdd",
-                            scope:this,
-                            handler: this.cmpAddToOrganization
-                        },
-                        {
-                            icon: _ico("user--minus"),
-                            cls: "x-btn-text-icon",
-                            text: _("Remove"),
-                            disabled:true,
-                            ref: "../../btnDelete",
-                            scope:this,
-                            handler: this.cmpDeleteFromOrganization
-                        }
-                    ]
-                },
-                {
-                    xtype: 'buttongroup',
-                    title: _("Membership"),
-                    defaults: { scale: 'small' },
-                    items: [
-                        {
-                            icon: _ico("plug"),
-                            cls: "x-btn-text-icon",
-                            text: _("Add"),
-                            disabled:true,
-                            ref: "../../btnAddToGroup"
-                        },
-                        {
-                            icon: _ico("plug-disconnect"),
-                            cls: "x-btn-text-icon",
-                            text: _("Remove"),
-                            disabled:true,
-                            ref: "../../btnDeleteFromGroup"
-                        }
-                    ]
-                },
-                {
-                    xtype: 'buttongroup',
-                    title: _("Profile"),
-                    defaults: { scale: 'small' },
-                    items: [
-                        {
-                            disabled:true,
-                            icon: _ico("card"),
-                            cls: "x-btn-text-icon",
-                            text: _("View"),
-                            ref: "../../btnViewProfile"
-                        },
-                        {
-                            disabled:true,
-                            icon: _ico("card--pencil"),
-                            cls: "x-bt  n-text-icon",
-                            text: _("Edit"),
-                            ref: "../../btnUpdateProfile"
-                        },
-                        {
-                            disabled:true,
-                            icon: _ico("key-solid"),
-                            cls: "x-bt  n-text-icon",
-                            text: _("Rights"),
-                            ref: "../../btnManageRules"
-                        }
-                    ]
-                },
-                {
-                    xtype: 'buttongroup',
-                    title: _("Filter"),
-                    defaults: { scale: 'small' },
-                    items: [
-                        {
-                            xtype:"searchfield",
-                            width:200,
-                            store: this.store
-                        }
-                    ]
-                }
-            ]
+            ddGroup:'member2catalog'
         });
 
         Inprint.catalog.organization.Grid.superclass.initComponent.apply(this, arguments);

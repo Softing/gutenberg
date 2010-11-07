@@ -118,7 +118,9 @@ sub startup {
     $self->createRoutes($sessionBridge, "system/events",        [ "list" ]);
 
     # Workspace routess
-    $self->createRoutes($sessionBridge, "workspace",            [ "index", "menu", "state", "online", "appsession" ]);
+    $self->createRoutes($sessionBridge, "access",               [ "index" ]);
+    $self->createRoutes($sessionBridge, "menu",                 [ "index" ]);
+    $self->createRoutes($sessionBridge, "workspace",            [ "index", "access", "state", "online", "appsession" ]);
 
     # Main route
     $sessionBridge->route('/')->to('workspace#index');

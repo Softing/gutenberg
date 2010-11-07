@@ -226,17 +226,6 @@ Inprint.factory.Combo = new function() {
                 }
             );
 
-
-            //if ( config.cacheQuery == false ) {
-            //    Ext.apply(config, {
-            //        listeners: {
-            //            beforequery: function(qe){
-            //                delete qe.combo.lastQuery;
-            //            }
-            //        }
-            //    });
-            //}
-
             Ext.apply(combo, {
                 tpl: tpl,
                 itemSelector: "div.x-combo-list-item"
@@ -250,9 +239,9 @@ Inprint.factory.Combo = new function() {
 
         },
 
-        create: function(url, config) {
+        create: function(url, config, storeconfig) {
             if (combos[url]) {
-                var combo = this.getConfig(url, config);
+                var combo = this.getConfig(url, config, storeconfig);
                 return combo;
             }
             alert("Can't find combobox <" + url + ">");

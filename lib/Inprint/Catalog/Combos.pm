@@ -34,13 +34,27 @@ sub groups {
 
 sub fascicles {
     my $c = shift;
-    my $result = $c->sql->Q("
+    
+    my $i_term = $c->param("term") || undef;
+    
+    my @data;
+    my $sql = "
         SELECT t1.id, t2.shortcut || '/' || t1.shortcut as title, t1.shortcut, t1.description,
             CASE WHEN enabled is true THEN  'rocket-fly' ELSE 'book' END as icon
         FROM fascicles t1, editions t2
         WHERE t2.id = t1.edition AND issystem = false
+    ";
+    
+    if ($i_term) {
+        my $access = $c->access->GetBindingsByTerm($i_term);
+        $sql .= " AND edition = ANY(?) ";
+        push @data, $access;
+    }
+    
+    my $result = $c->sql->Q("
+        $sql
         ORDER BY enabled DESC, t2.shortcut, t1.shortcut
-    ")->Hashes;
+    ", \@data)->Hashes;
     $c->render_json( { data => $result } );
 }
 

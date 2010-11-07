@@ -9,7 +9,7 @@ Inprint.cmp.memberRulesForm.Organization.Tree = Ext.extend(Ext.tree.TreePanel, {
         };
 
         Ext.apply(this, {
-            title:_("Organization"),
+            title:_("Departments"),
             autoScroll:true,
             dataUrl: this.urls.tree,
             border:false,

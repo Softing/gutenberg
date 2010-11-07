@@ -113,7 +113,7 @@ sub create {
         $count = $c->sql->Do("
             INSERT INTO catalog (id, title, shortcut, description, path, type, capables)
                 VALUES (?, ?, ?, ?, replace(?, '-',  '')::ltree, ?, ?)
-        ", [ $id, $i_title, $i_shortcut, $i_description, "$path.$id", 'default', [] ]);
+        ", [ $id, $i_title, $i_shortcut, $i_description, "$path", 'default', [] ]);
     }
 
     $result->{success} = $c->json->true if $count;

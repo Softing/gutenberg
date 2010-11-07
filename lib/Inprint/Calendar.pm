@@ -14,11 +14,13 @@ sub list {
 
     my $c = shift;
 
+    my @params;
+
     my $edition     = $c->param("edition") || undef;
     my $showArchive = $c->param("showArchive") || "false";
 
-    my @params;
-
+    my $accessCalendarView = $c->access->GetEditionsByTerm("editions.calendar.view");
+    
     my $sql1 = "
         SELECT
             t1.id, t1.issystem, t1.edition, t2.shortcut as edition_shortcut,
@@ -30,7 +32,8 @@ sub list {
             EXTRACT( DAY FROM now()-t1.begindate) as passeddays
         FROM fascicles t1, editions t2
         WHERE
-            t1.issystem = false AND t1.edition = t2.id AND t1.enabled = true
+            t1.edition = ANY (?)
+            AND t1.issystem = false AND t1.edition = t2.id AND t1.enabled = true
     ";
 
     my $sql2 = "
@@ -44,8 +47,11 @@ sub list {
             EXTRACT( DAY FROM now()-t1.begindate) as passeddays
         FROM fascicles t1, editions t2
         WHERE
-            t1.issystem = false AND t1.edition = t2.id AND t1.enabled = false
+            t1.edition = ANY (?)
+            AND t1.issystem = false AND t1.edition = t2.id 
     ";
+
+    push @params, $accessCalendarView;
 
     if ($edition && $edition ne "00000000-0000-0000-0000-000000000000") {
         $sql1 .= " AND edition=? ";
@@ -53,11 +59,8 @@ sub list {
     }
 
     if ($showArchive eq 'true') {
-        if ($edition) {
-            $sql2 .= " AND edition=? ";
-            push @params, $edition;
-        }
         $sql1 = " ($sql1) UNION ($sql2) ";
+        push @params, $accessCalendarView;
     }
 
     $sql1 .= " ORDER BY enabled desc, edition_shortcut, begindate ";
@@ -72,15 +75,20 @@ sub create {
 
     my $id = $c->uuid();
 
-    my $i_name        = $c->param("name");
     my $i_edition     = $c->param("edition");
+    my $i_title       = $c->param("title");
     my $i_shortcut    = $c->param("shortcut");
     my $i_description = $c->param("description");
-
+    
+    my $i_begindate   = $c->param("begindate");
+    my $i_enddate     = $c->param("enddate");
+    
     $c->sql->Do("
-        INSERT INTO roles(id, edition, name, shortcut, description, created, updated)
-        VALUES (?, ?, ?, ?, ?, now(), now());
-    ", [ $id, $i_edition, $i_name, $i_shortcut, $i_description ]);
+        INSERT INTO fascicles (
+            id, issystem, edition, title, shortcut, description, begindate, enddate,
+            enabled, created, updated)
+            VALUES (?, false, ?, ?, ?, ?, ?, ?, true, now(), now());
+    ", [ $id, $i_edition, $i_title, $i_title, $i_title, $i_begindate, $i_enddate ]);
 
     $c->render_json( { success => $c->json->true} );
 }
@@ -92,11 +100,10 @@ sub read {
     my $id = $c->param("id");
 
     my $result = $c->sql->Q("
-        SELECT t1.id, t1.name, t1.shortcut, t1.description,
-            t2.id as edition_id, t2.shortcut as edition_shortcut
-        FROM roles t1, editions t2
-        WHERE t1.id =? AND t1.edition = t2.id
-        ORDER BY t2.shortcut, t1.shortcut
+        SELECT id, issystem, edition, title, shortcut, description, begindate, enddate,
+            enabled, created, updated
+        FROM fascicles
+        WHERE id=? ORDER shortcut
     ", [ $id ])->Hash;
 
     $c->render_json( { success => $c->json->true, data => $result } );
@@ -107,16 +114,19 @@ sub update {
     my $c = shift;
 
     my $i_id          = $c->param("id");
-    my $i_name        = $c->param("name");
+    my $i_title       = $c->param("name");
     my $i_edition     = $c->param("edition");
     my $i_shortcut    = $c->param("shortcut");
     my $i_description = $c->param("description");
+    
+    my $i_begindate   = $c->param("begindate");
+    my $i_enddate     = $c->param("enddate");
 
     $c->sql->Do("
-        UPDATE roles
-            SET edition=?, name=?, shortcut=?, description=?, updated=now()
+        UPDATE fascicles
+            SET title=?, shortcut=?, description=?, begindate=?, enddate=?
         WHERE id =?;
-    ", [ $i_edition, $i_name, $i_shortcut, $i_description, $i_id ]);
+    ", [ $i_title, $i_title, $i_title, $i_begindate, $i_enddate, $i_id ]);
 
     $c->render_json( { success => $c->json->true} );
 }
@@ -125,7 +135,7 @@ sub delete {
     my $c = shift;
     my @ids = $c->param("id");
     foreach my $id (@ids) {
-        $c->sql->Do(" DELETE FROM roles WHERE id=? ", [ $id ]);
+        $c->sql->Do(" DELETE FROM fascicles WHERE id=? ", [ $id ]);
     }
     $c->render_json( { success => $c->json->true } );
 }
