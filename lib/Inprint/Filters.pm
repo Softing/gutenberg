@@ -66,11 +66,11 @@ sub mysession
                 WHERE member = ? AND term='2fde426b-ed30-4376-9a7b-25278e8f104a'
             ", [ $session->{member} ])->Value;
             
-            if ($access) {
+            #if ($access) {
                 $c->sql->Do(" UPDATE sessions SET updated=now() WHERE id=? ", [ $sid ] );
-            } else {
-                $c->redirect_to('/login');
-            }
+            #} else {
+            #    $c->redirect_to('/login');
+            #}
         } else {
             $c->redirect_to('/login');
         }
