@@ -46,10 +46,7 @@ sub map {
 
         $c->sql->Do("
             DELETE FROM map_member_to_rule
-            WHERE
-                member=?
-                AND section=?
-                AND binding=?
+            WHERE member=? AND section=? AND binding=?
         ", [ $i_member, $i_section, $i_binding ]);
         
         foreach my $string (@i_rules) {

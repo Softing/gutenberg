@@ -7,6 +7,7 @@ Inprint.cmp.membersList.Window = Ext.extend(Ext.Window, {
 
         Ext.apply(this, {
             title: _("Employeers list"),
+            modal: true,
             layout: "fit",
             closeAction: "hide",
             width:800, height:400,

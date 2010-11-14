@@ -1,12 +1,11 @@
 Inprint.cmp.memberProfileForm.Window = Ext.extend(Ext.Window, {
 
     initComponent: function() {
-
         this.addEvents('actioncomplete');
         this.form = new Inprint.cmp.memberProfileForm.Form();
-
         Ext.apply(this, {
             title: _("Edit profile"),
+            modal: true,
             layout: "fit",
             closeAction: "hide",
             width:600, height:320,
@@ -28,17 +27,14 @@ Inprint.cmp.memberProfileForm.Window = Ext.extend(Ext.Window, {
                 }
             ]
         });
-
         this.form.on("actioncomplete", function (form, action) {
             if (action.type == "submit") {
                 this.hide();
                 this.fireEvent("actioncomplete");
             }
         }, this);
-
         Inprint.cmp.memberProfileForm.Window.superclass.initComponent.apply(this, arguments);
         Inprint.cmp.memberProfileForm.Interaction(this.panels);
-
     },
 
     onRender: function() {

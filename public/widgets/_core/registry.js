@@ -94,11 +94,11 @@ Inprint.Registry = function() {
             text:  _("Calendar"),
             xobject: Inprint.edition.calendar.Panel
         },
-        "composition-archive": {
-            icon: "folders-stack",
-            text:  _("Archive"),
-            xobject: Inprint.edition.archive.Panel
-        },
+        //"composition-archive": {
+        //    icon: "folders-stack",
+        //    text:  _("Archive"),
+        //    xobject: Inprint.edition.archive.Panel
+        //},
 
         "fascicle": {
             icon: "blue-folder",

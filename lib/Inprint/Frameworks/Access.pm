@@ -29,7 +29,7 @@ sub ExtractRules {
     return $c;
 }
 
-sub One {
+sub Check {
     my $c = shift;
     my $term    = shift;
     my $binding = shift;
@@ -37,39 +37,35 @@ sub One {
     
     my $result = 0;
     
-    my ($section, $subsection, $action) = split /\./, $term;
-    
     unless ($member) {
         $member = $c->{handler}->QuerySessionGet("member.id");
     }
     
-    if ($section && $subsection && $action && $member) {
+    if ($member && $term) {
         
         my @data;
         
         my $sql = "
-            SELECT count(*) FROM view_rules WHERE
-                section=? AND subsection=? AND term=? AND member=?
+            SELECT true FROM cache_access WHERE
+                member=? AND ? = ANY(terms)
         ";
         
-        push @data, $section;
-        push @data, $subsection;
-        push @data, $action;
         push @data, $member;
+        push @data, $term;
         
         if ($binding) {
-            $sql .= " AND (binding=? OR ? = ANY (childrens)) ";
-            push @data, $binding;
+            $sql .= " AND binding=?";
             push @data, $binding;
         }
         
-        $result = $c->{handler}->sql->Q($sql, \@data)->Value();
+        $result = $c->{handler}->sql->Q("
+            SELECT EXISTS ($sql)", \@data)->Value();
     }
     
     return $result;
 }
 
-sub GetBindingsByTerm {
+sub GetBindings {
     
     my $c = shift;
     my $term    = shift;
@@ -81,59 +77,13 @@ sub GetBindingsByTerm {
         $member = $c->{handler}->QuerySessionGet("member.id");
     }
     
-    my ($section, $subsection, $action) = split /\./, $term;
-    
-    if ($section && $subsection && $action) {
-        
-        my $termid = $c->{handler}->sql->Q("
-            SELECT id FROM rules WHERE section =? AND subsection=? AND term=? LIMIT 1
-        ", [$section, $subsection, $action])->Value;
-        
-        if ($termid) {
-            $result = $c->{handler}->sql->Q("
-                SELECT binding FROM map_member_to_rule
-                WHERE member=? AND term=? 
-            ", [ $member, $termid ])->Values();
-        }
+    if ($term && $member) {
+        $result = $c->{handler}->sql->Q("
+            SELECT parents FROM cache_visibility WHERE member=? AND term=? 
+        ", [ $member, $term ])->Value();
     }
     
-    return $result;
-}
-
-sub GetEditionsByTerm {
-    
-    my $c = shift;
-    my $term    = shift;
-    my $member  = shift;
-    
-    my $result = [];
-    
-    unless ($member) {
-        $member = $c->{handler}->QuerySessionGet("member.id");
-    }
-    
-    my ($section, $subsection, $action) = split /\./, $term;
-    
-    if ($section && $subsection && $action) {
-        
-        my $termid = $c->{handler}->sql->Q("
-            SELECT id FROM rules WHERE section =? AND subsection=? AND term=? LIMIT 1
-        ", [$section, $subsection, $action])->Value;
-        
-        if ($termid) {
-            $result = $c->{handler}->sql->Q("
-                SELECT t1.id FROM editions t1
-                WHERE
-                (
-                    ARRAY(SELECT editions.id FROM editions WHERE editions.path ~ ((t1.path::text || '.*'::text)::lquery)) 
-                    &&
-                    ARRAY(select binding from map_member_to_rule where member=? and term=? )
-                )
-            ", [ $member, $termid ])->Values();
-        }
-    }
-    
-    return $result;
+    return $result || [];
 }
 
 1;

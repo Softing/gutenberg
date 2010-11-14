@@ -1,13 +1,12 @@
 Inprint.cmp.memberSettingsForm.Window = Ext.extend(Ext.Window, {
-
+    
     initComponent: function() {
-
         this.addEvents('actioncomplete');
         this.form = new Inprint.cmp.memberSettingsForm.Form();
-
         Ext.apply(this, {
             title: _("Employee settings"),
             layout: "fit",
+            modal: true,
             closeAction: "hide",
             width:600, height:320,
             items: this.form,
@@ -28,7 +27,6 @@ Inprint.cmp.memberSettingsForm.Window = Ext.extend(Ext.Window, {
                 }
             ]
         });
-
         this.form.on("actioncomplete", function (form, action) {
             if (action.type == "submit") {
                 this.hide();
@@ -36,10 +34,8 @@ Inprint.cmp.memberSettingsForm.Window = Ext.extend(Ext.Window, {
                 Inprint.updateSession(false);
             }
         }, this);
-
         Inprint.cmp.memberSettingsForm.Window.superclass.initComponent.apply(this, arguments);
         Inprint.cmp.memberSettingsForm.Interaction(this.panels);
-
     },
 
     onRender: function() {

@@ -46,32 +46,42 @@ sub index
     };
     push @result, $portal;
 
+    #
     # Documents menu items
-    my $documents = {
-        id => "documents"
-    };
-
-    #if ( Inprint::Core::Check::rules_or( 'document.edition.view', 'document.department.view', 'document.owner.view' ) ) {
-    push @{ $documents->{menu} }, { id => "documents-create" };
-    push @{ $documents->{menu} }, { id => "documents-todo" };
-    push @{ $documents->{menu} }, '-';
-    push @{ $documents->{menu} }, { id => "documents-all" };
-    push @{ $documents->{menu} }, { id => "documents-archive" };
-    push @{ $documents->{menu} }, { id => "documents-briefcase" };
-
-    #if ( Inprint::Core::Check::rules_or( 'document.edition.restore', 'document.department.restore', 'document.owner.restore' ) ) {
-    push @{ $documents->{menu} }, { id => "documents-recycle" };
-
-    push @result, $documents;
-    push @result, "-";
+    #
+    
+    my $accessViewDocuments = $c->access->Check("catalog.documents.view");
+    my $accessCreateDocuments = $c->access->Check("catalog.documents.create");
+    
+    if ($accessViewDocuments) {
+        
+        my $documents = {
+            id => "documents"
+        };
+    
+        if ($accessCreateDocuments) {
+            push @{ $documents->{menu} }, { id => "documents-create" };
+        }
+        
+        push @{ $documents->{menu} }, { id => "documents-todo" };
+        push @{ $documents->{menu} }, '-';
+        push @{ $documents->{menu} }, { id => "documents-all" };
+        push @{ $documents->{menu} }, { id => "documents-archive" };
+        push @{ $documents->{menu} }, { id => "documents-briefcase" };
+        
+        push @{ $documents->{menu} }, { id => "documents-recycle" };
+    
+        push @result, $documents;
+        push @result, "-";
+    }
 
 
     # Fascicles and Composition
     
-    my $accessCalendarEditions = $c->access->GetEditionsByTerm("editions.calendar.view");
-    my $accessLayoutEditions   = $c->access->GetEditionsByTerm("editions.layouts.view");
+    my $accessCalendarEditions = $c->access->Check("editions.calendar.view");
+    my $accessLayoutEditions   = $c->access->GetBindings("editions.layouts.view");
     
-    if ( @{ $accessCalendarEditions } ) {
+    if ( $accessCalendarEditions ) {
         push @result, { id => 'composition-calendar' };
     }
 
@@ -87,16 +97,16 @@ sub index
             AND t1.edition = ANY (?)
         ORDER BY t2.shortcut, t1.shortcut
     ", [ $accessLayoutEditions ])->Hashes;
-
+    
     my $composition  = {
         id => "composition"
     };
     
     foreach my $fascicle (@$fascicles) {
 
-        my $accessLayoutView     = $c->access->One("editions.layouts.view",   $fascicle->{edition});
-        my $accessLayoutManage   = $c->access->One("editions.layouts.manage", $fascicle->{edition});
-        my $accessAdvertManage   = $c->access->One("editions.advert.manage",  $fascicle->{edition});
+        my $accessLayoutView     = $c->access->Check("editions.layouts.view",   $fascicle->{edition});
+        my $accessLayoutManage   = $c->access->Check("editions.layouts.manage", $fascicle->{edition});
+        my $accessAdvertManage   = $c->access->Check("editions.advert.manage",  $fascicle->{edition});
 
         my $fascicle = {
             id   => "fascicle",
@@ -151,20 +161,25 @@ sub index
     push @{ $employee->{menu} }, { id => "employee-logout" };
 
     push @result, $employee;
-
+    
     #
     # Settings
     #
-    my $settings = {
-        id => "settings"
-    };
-
-    push @{ $settings->{menu} }, { id => "settings-organization" };
-    push @{ $settings->{menu} }, { id => "settings-editions" };
-    push @{ $settings->{menu} }, { id => "settings-roles" };
-    push @{ $settings->{menu} }, { id => "settings-readiness" };
-
-    push @result, $settings;
+    
+    my $accessViewSettings = $c->access->Check("domain.configuration.view");
+    
+    if ($accessViewSettings) {
+        my $settings = {
+            id => "settings"
+        };
+        
+        push @{ $settings->{menu} }, { id => "settings-organization" };
+        push @{ $settings->{menu} }, { id => "settings-editions" };
+        push @{ $settings->{menu} }, { id => "settings-roles" };
+        push @{ $settings->{menu} }, { id => "settings-readiness" };
+        
+        push @result, $settings;
+    }
 
     $c->render_json({ data => \@result });
 }

@@ -1,19 +1,16 @@
 Inprint.cmp.memberProfile.Window = Ext.extend(Ext.Window, {
 
     initComponent: function() {
-
         this.panel = new Inprint.cmp.memberProfile.Panel();
-
         Ext.apply(this, {
             title: _("Profile of the employee"),
+            modal: true,
             layout: "fit",
             closeAction: "hide",
             width:600, height:400,
             items: this.panel
         });
-
         Inprint.cmp.memberProfile.Window.superclass.initComponent.apply(this, arguments);
-
         Inprint.cmp.memberProfile.Interaction(this.panels);
     },
 
@@ -22,7 +19,6 @@ Inprint.cmp.memberProfile.Window = Ext.extend(Ext.Window, {
     },
 
     cmpFill: function(id) {
-
         Ext.Ajax.request({
             scope:this,
             params: { id: id },
@@ -32,7 +28,6 @@ Inprint.cmp.memberProfile.Window = Ext.extend(Ext.Window, {
                 this.panel.tpl.overwrite(this.panel.body, jsonData.data);
             }
         });
-
     }
 
 });

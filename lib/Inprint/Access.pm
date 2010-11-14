@@ -13,19 +13,27 @@ use base 'Inprint::BaseController';
 
 sub index {
     my $c = shift;
-    my $term     = $c->param("term");
+    my @terms     = $c->param("term");
     my $binding  = $c->param("binding");
     
-    my $success = $c->json->false;
+    if ($binding eq 'domain') {
+        $binding = '00000000-0000-0000-0000-000000000000';
+    }
     
-    my $count = $c->access->One($term, $binding);
+    my $result = {};
     
-    if ( $count ) {
-        $success = $c->json->true;
+    foreach my $term (@terms) {
+        my $exists = $c->access->Check($term, $binding);
+        if ( $exists ) {
+            $result->{$term} = $c->json->true;
+        } else {
+            $result->{$term} = $c->json->false;
+        }
     }
     
     return $c->render_json({
-        success => $success
+        success => $c->json->true,
+        result  => $result
     });
 }
 

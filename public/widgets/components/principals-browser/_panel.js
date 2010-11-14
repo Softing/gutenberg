@@ -8,6 +8,7 @@ Inprint.cmp.PrincipalsBrowser = Ext.extend(Ext.Window, {
 
         Ext.apply(this, {
             title: _("Principals list"),
+            modal: true,
             layout: "border",
             closeAction: "hide",
             width:800, height:400,

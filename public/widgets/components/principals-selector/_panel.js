@@ -11,6 +11,7 @@ Inprint.cmp.PrincipalsSelector = Ext.extend(Ext.Window, {
 
         Ext.apply(this, {
             title: _("Principals list"),
+            modal: true,
             layout: "border",
             width:800, height:500,
             items: [
