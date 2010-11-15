@@ -75,25 +75,50 @@ sub mapping {
 
     my @data;
     my $result = {};
-    my $sql = " SELECT member, section, area, term FROM map_member_to_rule WHERE member=? AND section=? ";
-
+    
     if ($i_section ~~ [ "domain", "editions", "catalog" ]) {
-
+        
+        my $sql1 = " SELECT member, section, area, term FROM map_member_to_rule WHERE member=? AND section=? ";
+        my $sql2 = " SELECT terms FROM cache_access WHERE member=? AND type=? ";
+        
         push @data, $i_member;
         push @data, $i_section;
         
         if ($i_binding) {
-            $sql .= " AND binding=? ";
+            $sql1 .= " AND binding=? ";
+            $sql2 .= " AND binding=? ";
+            
             push @data, $i_binding;
         }
     
-        my $data = $c->sql->Q($sql, \@data)->Hashes;
+        my $data1 = $c->sql->Q($sql1, \@data)->Hashes;
+        foreach my $item (@$data1) {
+            $result->{ $item->{term} } = {
+                area => $item->{area},
+                icon => "key"
+            };
+        }
         
-        foreach my $item (@$data) {
-            $result->{ $item->{term} } = $item->{area};
+        my $data2 = $c->sql->Q($sql2, \@data)->Values;
+        foreach my $item (@$data2) {
+            foreach my $term (@$item) {
+                
+                my ($term, $area) = split /:/, $term;
+                
+                my $term_obj = $c->sql->Q(
+                    "SELECT * FROM rules WHERE section||'.'||subsection||'.'||term=?", [ $term ])->Hash;
+                
+                next if $result->{ $term_obj->{id} };
+                $result->{ $term_obj->{id} } = {
+                    area => $area || $i_section,
+                    icon => "key--arrow"
+                }
+            }
         }
         
     }
+    
+    
 
     $c->render_json( { data => $result || {} } );
 }

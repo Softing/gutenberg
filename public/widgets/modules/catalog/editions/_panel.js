@@ -2,6 +2,7 @@ Inprint.catalog.editions.Panel = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
 
+        this.access = {};
         this.panels = {};
 
         this.panels.tree = new Inprint.catalog.editions.Tree();
@@ -47,17 +48,15 @@ Inprint.catalog.editions.Panel = Ext.extend(Ext.Panel, {
         });
 
         Inprint.catalog.editions.Panel.superclass.initComponent.apply(this, arguments);
-
-        Inprint.catalog.editions.Actions(this.panels);
-        Inprint.catalog.editions.Interaction(this.panels);
-        Inprint.catalog.editions.Context(this.panels);
         
     },
 
     onRender: function() {
         Inprint.catalog.editions.Panel.superclass.onRender.apply(this, arguments);
-
-
+        Inprint.catalog.editions.Access(this, this.panels);
+        Inprint.catalog.editions.Actions(this, this.panels);
+        Inprint.catalog.editions.Interaction(this, this.panels);
+        Inprint.catalog.editions.Context(this, this.panels);
     },
 
     getRow: function() {

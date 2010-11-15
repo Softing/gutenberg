@@ -34,11 +34,13 @@ Inprint.catalog.readiness.Panel = Ext.extend(Ext.Panel, {
         });
 
         Inprint.catalog.readiness.Panel.superclass.initComponent.apply(this, arguments);
-        Inprint.catalog.readiness.Interaction(this.panels);
     },
 
     onRender: function() {
         Inprint.catalog.readiness.Panel.superclass.onRender.apply(this, arguments);
+        
+        Inprint.catalog.readiness.Access(this, this.panels);
+        Inprint.catalog.readiness.Interaction(this, this.panels);
     },
 
     getRow: function() {

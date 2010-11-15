@@ -10,75 +10,138 @@ use warnings;
 
 use base 'Inprint::BaseController';
 
+sub read {
+    my $c = shift;
+    my $i_id = $c->param("id");
+    
+    my @errors;
+    my $success = $c->json->false;
+
+    push @errors, { id => "id", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_id));
+    
+    my $result = [];
+    
+    unless (@errors) {
+        $result = $c->sql->Q("
+            SELECT t1.*,
+                subpath(path, -2,1) as parent,
+                (select shortcut from catalog where subpath(path, -1,1) = subpath(t1.path, -2,1) ) as parent_shortcut
+            FROM catalog t1 WHERE t1.id = ?
+        ", [ $i_id ])->Hash;
+    }
+    
+    $success = $c->json->true unless (@errors);
+    $c->render_json( { success => $success, errors => \@errors, data => $result } );
+}
+
 sub tree {
 
     my $c = shift;
 
     my $i_node = $c->param("node");
-
-    my $data = [];
-
-    if ($i_node eq "root-node") {
-        $data = $c->sql->Q("
-            SELECT *, ( SELECT count(*) FROM catalog c2 WHERE c2.path ~ ('00000000000000000000000000000000.*{1}')::lquery ) as have_childs
-            FROM catalog
-            WHERE
-                id = '00000000-0000-0000-0000-000000000000'
-            ORDER BY shortcut
-        ")->Hashes;
-    } else {
-        $data = $c->sql->Q("
+    $i_node = '00000000-0000-0000-0000-000000000000' unless ($i_node);
+    $i_node = '00000000-0000-0000-0000-000000000000' if ($i_node eq "root-node");
+    
+    my @errors;
+    my $success = $c->json->false;
+    
+    push @errors, { id => "id", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_node));
+    
+    my @result;
+    
+    unless (@errors) {
+        my $sql;
+        my @data;
+        
+        $sql = "
             SELECT *, ( SELECT count(*) FROM catalog c2 WHERE c2.path ~ ('*.' || replace(?, '-', '')::text || '.*{2}')::lquery ) as have_childs
             FROM catalog
             WHERE
                 id <> '00000000-0000-0000-0000-000000000000'
                 AND subpath(path, nlevel(path) - 2, 1)::text = replace(?, '-', '')::text
-            ORDER BY shortcut
-        ", [ $i_node, $i_node ])->Hashes;
-    }
-
-    my $result = [];
-
-    foreach my $item (@$data) {
-
-        my $record = {
-            id   => $item->{id},
-            text => $item->{shortcut},
-            leaf => $c->json->true,
-            data => $item
-        };
-
-        if ( $item->{have_childs} ) {
-            $record->{leaf} = $c->json->false;
-            if ($i_node eq "root-node") {
-                #$record->{expanded} = $c->json->true;
+        ";
+        push @data, $i_node;
+        push @data, $i_node;
+        
+        my $data = $c->sql->Q("$sql ORDER BY shortcut", \@data)->Hashes;
+        
+        foreach my $item (@$data) {
+            my $record = {
+                id   => $item->{id},
+                text => $item->{shortcut},
+                leaf => $c->json->true,
+                data => $item
+            };
+            if ( $item->{have_childs} ) {
+                $record->{leaf} = $c->json->false;
             }
+            push @result, $record;
         }
-
-        push @$result, $record;
     }
 
-    $c->render_json( $result );
+    $success = $c->json->true unless (@errors);
+    
+    $c->render_json( \@result );
 }
 
-
-sub read {
-    my $c = shift;
-    my $i_id            = $c->param("id");
-    my $result = {
-        success => $c->json->false,
-        errors => []
-    };
-    push @{ $result->{errors} }, { id => "id", msg => "" } unless $i_id;
-    $result->{data} = $c->sql->Q("
-        SELECT t1.*,
-            subpath(path, -2,1) as parent,
-            (select shortcut from catalog where subpath(path, -1,1) = subpath(t1.path, -2,1) ) as parent_shortcut
-        FROM catalog t1 WHERE t1.id = ?
-    ", [ $i_id ])->Hash;
-    $result->{success} = $c->json->true if $result->{data};
-    $c->render_json( $result );
-}
+#sub tree {
+#
+#    my $c = shift;
+#
+#    my $i_node = $c->param("node");
+#
+#    my @errors;
+#    my $success = $c->json->false;
+#    
+#    push @errors, { id => "id", msg => "Incorrectly filled field"}
+#        unless ($c->is_uuid($i_node));
+#
+#    my @result;
+#
+#    unless (@errors) {
+#
+#        my $data = [];
+#    
+#        if ($i_node eq "root-node") {
+#            $data = $c->sql->Q("
+#                SELECT *, ( SELECT count(*) FROM catalog c2 WHERE c2.path ~ ('00000000000000000000000000000000.*{1}')::lquery ) as have_childs
+#                FROM catalog
+#                WHERE
+#                    id = '00000000-0000-0000-0000-000000000000'
+#                ORDER BY shortcut
+#            ")->Hashes;
+#        } else {
+#            $data = $c->sql->Q("
+#                SELECT *, ( SELECT count(*) FROM catalog c2 WHERE c2.path ~ ('*.' || replace(?, '-', '')::text || '.*{2}')::lquery ) as have_childs
+#                FROM catalog
+#                WHERE
+#                    id <> '00000000-0000-0000-0000-000000000000'
+#                    AND subpath(path, nlevel(path) - 2, 1)::text = replace(?, '-', '')::text
+#                ORDER BY shortcut
+#            ", [ $i_node, $i_node ])->Hashes;
+#        }
+#    
+#        foreach my $item (@$data) {
+#    
+#            my $record = {
+#                id   => $item->{id},
+#                text => $item->{shortcut},
+#                leaf => $c->json->true,
+#                data => $item
+#            };
+#    
+#            if ( $item->{have_childs} ) {
+#                $record->{leaf} = $c->json->false;
+#            }
+#    
+#            push @result, $record;
+#        }
+#    }
+#
+#    $c->render_json( \@result );
+#}
 
 sub create {
     my $c = shift;
@@ -90,35 +153,40 @@ sub create {
     my $i_shortcut    = $c->param("shortcut");
     my $i_description = $c->param("description");
 
-    my $result = {
-        success => $c->json->false,
-        errors => []
-    };
-
-    push @{ $result->{errors} }, { id => "path", msg => "" } unless $i_path;
-    push @{ $result->{errors} }, { id => "title", msg => "" } unless $i_title;
-    push @{ $result->{errors} }, { id => "shortcut", msg => "" } unless $i_shortcut;
-
-    my $path;
-    my $count = 0;
-
-    unless (@{ $result->{errors} }) {
-        $path = $c->sql->Q(" SELECT path FROM catalog WHERE id =? ",
-        [ $i_path ])->Value;
+    my @errors;
+    my $success = $c->json->false;
+    
+    push @errors, { id => "path", msg => "Incorrectly filled field"}
+        unless ($c->is_path($i_path));
+    
+    push @errors, { id => "title", msg => "Incorrectly filled field"}
+        unless ($c->is_text($i_title));
+        
+    push @errors, { id => "shortcut", msg => "Incorrectly filled field"}
+        unless ($c->is_text($i_shortcut));
+        
+    push @errors, { id => "description", msg => "Incorrectly filled field"}
+        unless ($c->is_text($i_description));
+        
+    push @errors, { id => "access", msg => "Not enough permissions"}
+        unless ($c->access->Check("domain.departments.manage"));
+    
+    unless (@errors) {
+        my $path = $c->sql->Q(" SELECT path FROM catalog WHERE id =? ", [ $i_path ])->Value;
+        
+        push @errors, { id => "path", msg => "Incorrectly filled field"}
+            unless ($c->is_path($path));
+    
+        unless (@errors) {
+            $c->sql->Do("
+                INSERT INTO catalog (id, title, shortcut, description, path, type, capables)
+                    VALUES (?, ?, ?, ?, replace(?, '-',  '')::ltree, ?, ?)
+            ", [ $id, $i_title, $i_shortcut, $i_description, $path, 'default', [] ]);
+        }
     }
-
-    push @{ $result->{errors} }, { id => "path", msg => "" } unless $path;
-
-    unless (@{ $result->{errors} }) {
-        $count = $c->sql->Do("
-            INSERT INTO catalog (id, title, shortcut, description, path, type, capables)
-                VALUES (?, ?, ?, ?, replace(?, '-',  '')::ltree, ?, ?)
-        ", [ $id, $i_title, $i_shortcut, $i_description, "$path", 'default', [] ]);
-    }
-
-    $result->{success} = $c->json->true if $count;
-
-    $c->render_json( $result );
+    
+    $success = $c->json->true unless (@errors);
+    $c->render_json({ success => $success, errors => \@errors });
 }
 
 sub update {
@@ -130,34 +198,41 @@ sub update {
     my $i_shortcut    = $c->param("shortcut");
     my $i_description = $c->param("description");
 
-    my $result = {
-        success => $c->json->false,
-        errors => []
-    };
+    my @errors;
+    my $success = $c->json->false;
+    
+    push @errors, { id => "id", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_id));
+    
+    push @errors, { id => "path", msg => "Incorrectly filled field"}
+        unless ($c->is_path($i_path));
+    
+    push @errors, { id => "title", msg => "Incorrectly filled field"}
+        unless ($c->is_text($i_title));
+        
+    push @errors, { id => "shortcut", msg => "Incorrectly filled field"}
+        unless ($c->is_text($i_shortcut));
+        
+    push @errors, { id => "description", msg => "Incorrectly filled field"}
+        unless ($c->is_text($i_description));
+        
+    push @errors, { id => "access", msg => "Not enough permissions"}
+        unless ($c->access->Check("domain.departments.manage"));
 
-    push @{ $result->{errors} }, { id => "id", msg => "" } unless $i_id;
-    push @{ $result->{errors} }, { id => "path", msg => "" } unless $i_path;
-    push @{ $result->{errors} }, { id => "title", msg => "" } unless $i_title;
-    push @{ $result->{errors} }, { id => "shortcut", msg => "" } unless $i_shortcut;
+    unless (@errors) {
+        my $path = $c->sql->Q(" SELECT path FROM catalog WHERE id =? ", [ $i_path ])->Value;
+    
+        push @errors, { id => "path", msg => "Incorrectly filled field"}
+            unless ($c->is_path($path));
 
-    my $path;
-    my $count = 0;
-
-    unless (@{ $result->{errors} }) {
-        $path = $c->sql->Q(" SELECT path FROM catalog WHERE id =? ",
-        [ $i_path ])->Value;
+        unless (@errors) {
+            $c->sql->Do(" UPDATE catalog SET title=?, shortcut=?, description=?, path=replace(?, '-',  '')::ltree WHERE id=? ",
+                [ $i_title, $i_shortcut, $i_description, "$path.$i_id", $i_id ]);
+        }
     }
 
-    push @{ $result->{errors} }, { id => "path", msg => "" } unless $path;
-
-    unless (@{ $result->{errors} }) {
-        $count = $c->sql->Do(" UPDATE catalog SET title=?, shortcut=?, description=?, path=replace(?, '-',  '')::ltree WHERE id=? ",
-            [ $i_title, $i_shortcut, $i_description, "$path.$i_id", $i_id ]);
-    }
-
-    $result->{success} = $c->json->true if $count;
-
-    $c->render_json( $result );
+    $success = $c->json->true unless (@errors);
+    $c->render_json({ success => $success, errors => \@errors });
 }
 
 sub map {
@@ -166,19 +241,26 @@ sub map {
     my @i_members = $c->param("members");
     my $i_group   = $c->param("group") || undef;
 
-    my $result = {
-        success => $c->json->false
-    };
+    my @errors;
+    my $success = $c->json->false;
 
-    push @{ $result->{errors} }, { id => "group", msg => "" } unless $i_group;
+    push @errors, { id => "group", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_group));
 
-    foreach my $member (@i_members) {
-        $c->sql->Do(" DELETE FROM map_member_to_catalog WHERE id=? AND catalog=? ", [ $member, $i_group ]);
-        $c->sql->Do(" INSERT INTO map_member_to_catalog( member, catalog) VALUES (?, ?) ", [ $member, $i_group ]);
-        $result->{success} = $c->json->true;
+    push @errors, { id => "access", msg => "Not enough permissions"}
+        unless ($c->access->Check("domain.departments.manage"));
+
+    unless (@errors) {
+        foreach my $member (@i_members) {
+            if ($c->is_uuid($member)) {
+                $c->sql->Do(" DELETE FROM map_member_to_catalog WHERE id=? AND catalog=? ", [ $member, $i_group ]);
+                $c->sql->Do(" INSERT INTO map_member_to_catalog( member, catalog) VALUES (?, ?) ", [ $member, $i_group ]);
+            }
+        }
     }
 
-    $c->render_json( $result );
+    $success = $c->json->true unless (@errors);
+    $c->render_json({ success => $success, errors => \@errors });
 }
 
 sub unmap {
@@ -187,28 +269,47 @@ sub unmap {
     my @i_members = $c->param("members");
     my $i_group   = $c->param("group") || undef;
 
-    my $result = {
-        success => $c->json->false
-    };
+    my @errors;
+    my $success = $c->json->false;
 
-    push @{ $result->{errors} }, { id => "group", msg => "" } unless $i_group;
+    push @errors, { id => "group", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_group));
 
-    foreach my $member (@i_members) {
-        $c->sql->Do(" DELETE FROM map_member_to_catalog WHERE member=? AND catalog=? ", [ $member, $i_group ]);
-        $result->{success} = $c->json->true;
+    push @errors, { id => "access", msg => "Not enough permissions"}
+        unless ($c->access->Check("domain.departments.manage"));
+
+    unless (@errors) {
+        foreach my $member (@i_members) {
+            if ($c->is_uuid($member)) {
+                $c->sql->Do(" DELETE FROM map_member_to_catalog WHERE member=? AND catalog=? ", [ $member, $i_group ]);
+            }
+        }
     }
 
-    $c->render_json( $result );
+    $success = $c->json->true unless (@errors);
+    $c->render_json({ success => $success, errors => \@errors });
 }
 
 sub delete {
     my $c = shift;
+    my $i_id = $c->param("id");
 
-    my $id = $c->param("id");
+    my @errors;
+    my $success = $c->json->false;
 
-    $c->sql->Do(" DELETE FROM catalog WHERE id =? ", [ $id ]);
+    push @errors, { id => "id", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_id));
 
-    $c->render_json( { } );
+    push @errors, { id => "access", msg => "Not enough permissions"}
+        unless ($c->access->Check("domain.departments.manage"));
+
+    unless (@errors) {
+        $c->sql->Do(" DELETE FROM catalog WHERE id =? ", [ $i_id ]);
+    }
+
+    $success = $c->json->true unless (@errors);
+    $c->render_json({ success => $success, errors => \@errors });
+    
 }
 
 1;

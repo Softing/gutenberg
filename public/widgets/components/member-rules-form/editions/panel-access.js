@@ -87,12 +87,20 @@ Inprint.cmp.memberRulesForm.Editions.Restrictions = Ext.extend(Ext.grid.EditorGr
             success: function(responce) {
                 var result = Ext.util.JSON.decode(responce.responseText);
                 var store = this.getStore();
+                
+                store.each(function(record) {
+                    record.set("icon", "key");
+                });
+                
                 for (var i in result.data) {
                     var record = store.getById(i);
                     if (record) {
+                        record.set("icon", result.data[i].icon);
                         this.getSelectionModel().selectRecords([ record ], true);
                     }
                 }
+                
+                store.commitChanges();
             }
         });
     },

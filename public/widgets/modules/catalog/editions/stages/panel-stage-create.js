@@ -43,7 +43,7 @@ Inprint.catalog.editions.CreateStagePanel = function () {
         width:400, height:260,
         items: form
     });
-
+    
     win.relayEvents(form, ["actioncomplete"]);
 
     return win;

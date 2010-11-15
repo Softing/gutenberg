@@ -31,8 +31,19 @@ function _disable() {
     });
 }
 
-function _a(icon) {
-    return true;
+function _a(terms, binding, accessfunction) {
+    Ext.Ajax.request({
+        url: _url("/access/"),
+        params: {
+            term: terms,
+            binding: binding
+        },
+        scope: this,
+        success: function(result) {
+            var data = Ext.util.JSON.decode(result.responseText);
+            accessfunction(data.result);
+        }
+    });
 }
 
 function _ico24(icon) {

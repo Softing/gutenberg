@@ -1,4 +1,4 @@
-Inprint.catalog.editions.Interaction = function(panels) {
+Inprint.catalog.editions.Interaction = function(parent, panels) {
 
     var tree = panels.tree;
     var grid = panels.grid;
@@ -14,24 +14,6 @@ Inprint.catalog.editions.Interaction = function(panels) {
             grid.cmpLoad({ branch: node.id });
         } else {
             grid.disable();
-        }
-    });
-
-    // Grid
-
-    grid.btnCreateStage.enable();
-
-    grid.getSelectionModel().on("selectionchange", function(sm) {
-        if (sm.getCount()) {
-            _enable(grid.btnRemoveStage);
-        } else {
-            _disable(grid.btnRemoveStage);
-        }
-        if (sm.getCount() == 1) {
-            currentStage = grid.getValue("id");
-           _enable(grid.btnChangeStage, grid.btnSelectMembers, grid.btnManagePrincipals);
-        } else {
-           _disable(grid.btnChangeStage, grid.btnSelectMembers, grid.btnManagePrincipals);
         }
     });
 

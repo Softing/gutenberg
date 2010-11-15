@@ -1,11 +1,9 @@
-Inprint.catalog.editions.Actions = function(panels) {
-
+Inprint.catalog.editions.Actions = function(parent, panels) {
 
     var tree = panels.tree;
     var grid = panels.grid;
 
     var components = {};
-
     grid.actions = {};
 
     // Stages
@@ -13,6 +11,12 @@ Inprint.catalog.editions.Actions = function(panels) {
         var win = components["create-stage-window"];
         if (!win) {
             win = Inprint.catalog.editions.CreateStagePanel();
+            win.on("actioncomplete", function (form, action) {
+                if (action.type == "submit") {
+                    win.hide();
+                    grid.cmpReload();
+                }
+            });
             components["create-stage-window"] = win;
         }
         var form = win.items.first().getForm();
@@ -28,6 +32,12 @@ Inprint.catalog.editions.Actions = function(panels) {
         var win = components["change-stage-window"];
         if (!win) {
             win = Inprint.catalog.editions.ChangeStagePanel();
+            win.on("actioncomplete", function (form, action) {
+                if (action.type == "submit") {
+                    win.hide();
+                    grid.cmpReload();
+                }
+            });
             components["change-stage-window"] = win;
         }
         win.show();

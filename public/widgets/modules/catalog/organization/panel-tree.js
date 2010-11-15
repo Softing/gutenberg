@@ -17,32 +17,29 @@ Inprint.catalog.organization.Tree = Ext.extend(Ext.tree.TreePanel, {
             autoScroll:true,
             dataUrl: this.urls.tree,
             border:false,
-            rootVisible: false,
+            //rootVisible: false,
 
             // DD
             enableDD:true,
             ddGroup:'member2catalog',
 
             root: {
-                id:'root-node',
+                id:'00000000-0000-0000-0000-000000000000',
                 nodeType: 'async',
                 expanded: true,
                 draggable: false,
-                icon: _ico("node"),
-                text: _("Root node")
+                icon: _ico("folder-open"),
+                text: _("Publishing House")
             }
         });
 
         Inprint.catalog.organization.Tree.superclass.initComponent.apply(this, arguments);
 
         this.on("beforeappend", function(tree, parent, node) {
-
             if (node.attributes.icon == undefined) {
                 node.attributes.icon = 'folder-open';
             }
-
             node.attributes.icon = _ico(node.attributes.icon);
-
             if (node.attributes.color) {
                 node.text = "<span style=\"color:#"+ node.attributes.color +"\">" + node.attributes.text + "</span>";
             }
@@ -54,28 +51,19 @@ Inprint.catalog.organization.Tree = Ext.extend(Ext.tree.TreePanel, {
     onRender: function() {
 
         Inprint.catalog.organization.Tree.superclass.onRender.apply(this, arguments);
-
-        this.on("beforeload", function() {
-            this.body.mask(_("Please wait..."));
-        });
-
+        
         this.on("load", function() {
             this.body.unmask();
         });
+        
+        this.getRootNode().expand();
+        this.getRootNode().on("expand", function(node) {
+            node.select();
+        });
 
-        this.on("afterrender", function() {
-
-            this.getRootNode().expand();
-            this.getRootNode().on("expand", function(node) {
-                node.firstChild.expand();
-                node.firstChild.select();
-            });
-
-            this.getLoader().on("beforeload", function() { this.body.mask(_("Loading")); }, this);
-            this.getLoader().on("load", function() { this.body.unmask(); }, this);
-
-        }, this);
-
+        this.getLoader().on("beforeload", function() { this.body.mask(_("Loading")); }, this);
+        this.getLoader().on("load", function() { this.body.unmask(); }, this);
+        
     },
 
     cmpCreate: function(node) {

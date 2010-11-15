@@ -2,6 +2,7 @@ Inprint.catalog.organization.Panel = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
 
+        this.access = {};
         this.panels = {};
 
         this.panels.tree = new Inprint.catalog.organization.Tree();
@@ -49,11 +50,13 @@ Inprint.catalog.organization.Panel = Ext.extend(Ext.Panel, {
         });
 
         Inprint.catalog.organization.Panel.superclass.initComponent.apply(this, arguments);
-        Inprint.catalog.organization.Interaction(this.panels);
     },
 
     onRender: function() {
         Inprint.catalog.organization.Panel.superclass.onRender.apply(this, arguments);
+        Inprint.catalog.organization.Access(this, this.panels);
+        Inprint.catalog.organization.Context(this, this.panels);
+        Inprint.catalog.organization.Interaction(this, this.panels);
     },
 
     getRow: function() {

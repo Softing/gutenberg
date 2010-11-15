@@ -91,7 +91,6 @@ Inprint.catalog.roles.Grid = Ext.extend(Ext.grid.GridPanel, {
         ];
 
         Ext.apply(this, {
-            disabled:true,
             border:false,
             stripeRows: true,
             columnLines: true,
@@ -174,7 +173,7 @@ Inprint.catalog.roles.Grid = Ext.extend(Ext.grid.GridPanel, {
 
     cmpUpdate: function() {
 
-        var win = this.components["create-window"];
+        var win = this.components["update-window"];
         if (!win) {
 
             var form = new Ext.FormPanel({
@@ -210,7 +209,7 @@ Inprint.catalog.roles.Grid = Ext.extend(Ext.grid.GridPanel, {
                 this.getStore().load();
             }, this);
 
-            this.components["create-window"] = win;
+            this.components["update-window"] = win;
         }
 
         var form = win.items.first().getForm();

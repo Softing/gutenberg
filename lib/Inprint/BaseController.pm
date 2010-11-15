@@ -5,11 +5,13 @@ package Inprint::BaseController;
 # licensing@softing.ru
 # http://softing.ru/license
 
+use utf8;
 use strict;
 use warnings;
 
 use Data::UUID;
 use Mojo::JSON;
+use Validator::Custom;
 
 no warnings 'redefine';
 
@@ -20,6 +22,14 @@ use base 'Mojolicious::Controller';
 
 our %Cache;
 our $JSON;
+
+my $ug = new Data::UUID;
+
+sub vc {
+    my $c = shift;
+    my $vc = Validator::Custom->new;
+    return $vc;
+}
 
 sub config {
     my $c = shift;
@@ -72,7 +82,6 @@ sub QuerySessionSet () {
 # UUID utils
 
 sub uuid {
-    my $ug = new Data::UUID;
     return $ug->create_str();
 }
 
@@ -163,5 +172,34 @@ sub fatal {
     return $c->app->log->fatal($message);
 }
 
+# Validation
+
+sub is_uuid {
+    my $c = shift;
+    my $text = shift;
+    return 1 if (length($text) > 0 && $text =~ m/^[a-z|0-9]{8}(-[a-z|0-9]{4}){3}-[a-z|0-9]{12}+$/);
+    return 0;
+}
+
+sub is_int {
+    my $c = shift;
+    my $text = shift;
+    return 1 if (length($text) > 0 && $text =~ /^\-?[\d]+$/);
+    return 0;
+}
+
+sub is_text {
+    my $c = shift;
+    my $text = shift;
+    return 1 if (length($text) > 0 && $text =~ m/^[\w|\d|\s|\\|\/|"|'|#|-]+$/);
+    return 0;
+}
+
+sub is_path {
+    my $c = shift;
+    my $text = shift;
+    return 1 if (length($text) > 0 && $text =~ m/^[\w|\d|\.]+$/);
+    return 0;
+}
 
 1;
