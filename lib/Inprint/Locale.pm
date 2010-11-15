@@ -9,8 +9,6 @@ use utf8;
 use strict;
 use warnings;
 
-#use base 'Inprint::BaseController';
-
 use base 'Mojolicious::Controller';
 
 sub index {
@@ -18,9 +16,14 @@ sub index {
     my $c = shift;
     
     my $json   = Mojo::JSON->new;
-    
-    my $string = $c->stash->{i18n}->{_handle}->getAll;
-    
+
+    my $string = {};
+    unless ($c->stash->{i18n}->{_handle}->can('getAll')) {
+        $string->{failcode} = $c->stash->{i18n}->{_handle}->{fail};
+    } else {
+        $string = $c->stash->{i18n}->{_handle}->getAll;
+    }
+
     my $jsonString = $json->encode($string);
     
     $jsonString = "

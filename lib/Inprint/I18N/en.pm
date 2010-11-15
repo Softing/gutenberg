@@ -10,7 +10,7 @@ use base 'Inprint::I18N';
 use utf8;
 
 our %Lexicon = (
-  test => "test"
+    '_AUTO' => 1,
 );
 
 sub get {
