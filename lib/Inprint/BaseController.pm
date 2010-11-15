@@ -11,7 +11,6 @@ use warnings;
 
 use Data::UUID;
 use Mojo::JSON;
-use Validator::Custom;
 
 no warnings 'redefine';
 

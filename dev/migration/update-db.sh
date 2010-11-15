@@ -1,3 +1,3 @@
-dropdb inprint-4.5 -U inprint -W -h localhost
-createdb inprint-4.5 -U inprint -W -h localhost
-psql inprint-4.5 -U inprint -W -h localhost < inprint-4.5.sql
+sudo -u postgres dropdb inprint-4.5 
+sudo -u postgres createdb inprint-4.5 -O inprint -E utf8 
+sudo -u postgres psql inprint-4.5 < inprint-4.5.sql
