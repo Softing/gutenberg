@@ -86,63 +86,6 @@ sub tree {
     $c->render_json( \@result );
 }
 
-#sub tree {
-#
-#    my $c = shift;
-#
-#    my $i_node = $c->param("node");
-#
-#    my @errors;
-#    my $success = $c->json->false;
-#    
-#    push @errors, { id => "id", msg => "Incorrectly filled field"}
-#        unless ($c->is_uuid($i_node));
-#
-#    my @result;
-#
-#    unless (@errors) {
-#
-#        my $data = [];
-#    
-#        if ($i_node eq "root-node") {
-#            $data = $c->sql->Q("
-#                SELECT *, ( SELECT count(*) FROM catalog c2 WHERE c2.path ~ ('00000000000000000000000000000000.*{1}')::lquery ) as have_childs
-#                FROM catalog
-#                WHERE
-#                    id = '00000000-0000-0000-0000-000000000000'
-#                ORDER BY shortcut
-#            ")->Hashes;
-#        } else {
-#            $data = $c->sql->Q("
-#                SELECT *, ( SELECT count(*) FROM catalog c2 WHERE c2.path ~ ('*.' || replace(?, '-', '')::text || '.*{2}')::lquery ) as have_childs
-#                FROM catalog
-#                WHERE
-#                    id <> '00000000-0000-0000-0000-000000000000'
-#                    AND subpath(path, nlevel(path) - 2, 1)::text = replace(?, '-', '')::text
-#                ORDER BY shortcut
-#            ", [ $i_node, $i_node ])->Hashes;
-#        }
-#    
-#        foreach my $item (@$data) {
-#    
-#            my $record = {
-#                id   => $item->{id},
-#                text => $item->{shortcut},
-#                leaf => $c->json->true,
-#                data => $item
-#            };
-#    
-#            if ( $item->{have_childs} ) {
-#                $record->{leaf} = $c->json->false;
-#            }
-#    
-#            push @result, $record;
-#        }
-#    }
-#
-#    $c->render_json( \@result );
-#}
-
 sub create {
     my $c = shift;
 
@@ -157,7 +100,7 @@ sub create {
     my $success = $c->json->false;
     
     push @errors, { id => "path", msg => "Incorrectly filled field"}
-        unless ($c->is_path($i_path));
+        unless ($c->is_uuid($i_path));
     
     push @errors, { id => "title", msg => "Incorrectly filled field"}
         unless ($c->is_text($i_title));

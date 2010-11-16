@@ -31,6 +31,7 @@ function _disable() {
     });
 }
 
+/* Access functions */
 function _a(terms, binding, accessfunction) {
     Ext.Ajax.request({
         url: _url("/access/"),
@@ -45,6 +46,28 @@ function _a(terms, binding, accessfunction) {
         }
     });
 }
+
+function _accessCheck(terms, binding, accessfunction){
+    _a(terms, binding, accessfunction);
+}
+
+function _arrayAccessCheck(records, fields){
+    var result = {};
+    for (var r=0; r<records.length;r++) {
+        var access = records[r].get("access");
+        for (var f=0; f<fields.length;f++) {
+            var field = fields[f];
+            if (access[field] && result[field] != 'disabled') {
+                result[field] = 'enabled';
+            } else {
+                result[field] = 'disabled';
+            }
+        }
+    }
+    return result;
+}
+
+/* Icons functions */
 
 function _ico24(icon) {
    return "/icons-24/" + icon + ".png";

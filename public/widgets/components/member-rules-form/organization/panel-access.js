@@ -122,20 +122,13 @@ Inprint.cmp.memberRulesForm.Organization.Restrictions = Ext.extend(Ext.grid.Edit
             success: function(responce) {
                 var result = Ext.util.JSON.decode(responce.responseText);
                 var store = this.getStore();
-                
-                store.each(function(record) {
-                    record.set("icon", "key");
-                });
-                
                 for (var i in result.data) {
-                    
-                    var rule = i;
                     var mode = result.data[i].area;
-                    
-                    var record = store.getById(rule);
+                    var record = store.getById(i);
                     if (record) {
                         record.set("icon", result.data[i].icon);
-                        this.getSelectionModel().selectRecords([ record ], true);
+                        if (result.data[i].type == "obtained")
+                            this.getSelectionModel().selectRecords([ record ], true);
                         if (mode == 'member') {
                             record.set("limit", _("Employee"));
                             record.set("selection", "member");
@@ -146,7 +139,6 @@ Inprint.cmp.memberRulesForm.Organization.Restrictions = Ext.extend(Ext.grid.Edit
                         }
                     }
                 }
-                
                 store.commitChanges();
             }
         });

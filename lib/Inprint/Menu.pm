@@ -50,8 +50,8 @@ sub index
     # Documents menu items
     #
     
-    my $accessViewDocuments = $c->access->Check("catalog.documents.view");
-    my $accessCreateDocuments = $c->access->Check("catalog.documents.create");
+    my $accessViewDocuments   = $c->access->Check(["catalog.documents.view:*"]);
+    my $accessCreateDocuments = $c->access->Check(["catalog.documents.create:*"]);
     
     if ($accessViewDocuments) {
         

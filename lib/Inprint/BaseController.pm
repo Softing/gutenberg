@@ -201,4 +201,11 @@ sub is_path {
     return 0;
 }
 
+sub is_rule {
+    my $c = shift;
+    my $text = shift;
+    return 1 if (length($text) > 0 && $text =~ m/^[a-z|:|*|\.]+$/);
+    return 0;
+}
+
 1;

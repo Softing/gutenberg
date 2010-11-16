@@ -14,28 +14,68 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                 emptyText: _("Title") + "...",
                 name: "title"
             },
-            xc.getConfig("/documents/filters/editions/", {
-                columnWidth:.125,
-                cacheQuery: false,
-                listeners: {
-                    scope: this,
-                    beforequery: function(qe) {
-                        qe.combo.getStore().baseParams = this.getFilterParams();
-                        delete qe.combo.lastQuery;
-                    }
+            {
+                xtype: "treecombo",
+                name: "edition",
+                fieldLabel: _("Edition"),
+                emptyText: _("Edition") + "...",
+                minListWidth: 250,
+                url: _url('/documents/trees/editions/'),
+                baseParams: {
+                    term: 'editions.documents.work'
+                },
+                root: {
+                    id:'00000000-0000-0000-0000-000000000000',
+                    nodeType: 'async',
+                    expanded: true,
+                    draggable: false,
+                    icon: _ico("book"),
+                    text: _("All editions")
                 }
-            }),
-            xc.getConfig("/documents/filters/groups/", {
-                columnWidth:.125,
-                cacheQuery: false,
-                listeners: {
-                    scope: this,
-                    beforequery: function(qe) {
-                        qe.combo.getStore().baseParams = this.getFilterParams();
-                        delete qe.combo.lastQuery;
-                    }
+            },
+            {
+                xtype: "treecombo",
+                name: "group",
+                fieldLabel: _("Group"),
+                emptyText: _("Group") + "...",
+                minListWidth: 250,
+                url: _url('/documents/trees/workgroups/'),
+                baseParams: {
+                    term: 'catalog.documents.view:*'
+                },
+                root: {
+                    id:'00000000-0000-0000-0000-000000000000',
+                    nodeType: 'async',
+                    expanded: true,
+                    draggable: false,
+                    icon: _ico("folder-open"),
+                    text: _("All departments")
                 }
-            }),
+            },
+            
+            //xc.getConfig("/documents/filters/editions/", {
+            //    columnWidth:.125,
+            //    cacheQuery: false,
+            //    listeners: {
+            //        scope: this,
+            //        beforequery: function(qe) {
+            //            qe.combo.getStore().baseParams = this.getFilterParams();
+            //            delete qe.combo.lastQuery;
+            //        }
+            //    }
+            //}),
+            //xc.getConfig("/documents/filters/groups/", {
+            //    columnWidth:.125,
+            //    cacheQuery: false,
+            //    listeners: {
+            //        scope: this,
+            //        beforequery: function(qe) {
+            //            qe.combo.getStore().baseParams = this.getFilterParams();
+            //            delete qe.combo.lastQuery;
+            //        }
+            //    }
+            //}),
+            
             xc.getConfig("/documents/filters/fascicles/", {
                 columnWidth:.125,
                 cacheQuery: false,
@@ -184,35 +224,31 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
     saveFilterState: function() {
         var form = this.getForm();
         var params = {};
-        params["editon"]    = { id: form.findField("edition").hiddenField.value,  text: form.findField("edition").getRawValue()  };
+        params["edition"]    = { id: form.findField("edition").hiddenField.value,  text: form.findField("edition").getRawValue()  };
         params["group"]     = { id: form.findField("group").hiddenField.value,    text: form.findField("group").getRawValue()    };
         params["fascicle"]  = { id: form.findField("fascicle").hiddenField.value, text: form.findField("fascicle").getRawValue() };
-        //params["headline"]  = { id: form.findField("headline").hiddenField.value, text: form.findField("headline").getRawValue() };
-        //params["rubric"]    = { id: form.findField("rubric").hiddenField.value,   text: form.findField("rubric").getRawValue()   };
-        //params["manager"]   = { id: form.findField("manager").hiddenField.value,  text: form.findField("manager").getRawValue()  };
-        //params["progress"]  = { id: form.findField("progress").hiddenField.value, text: form.findField("progress").getRawValue() };
-        //params["holder"]    = { id: form.findField("holder").hiddenField.value,   text: form.findField("holder").getRawValue()   };
         Ext.state.Manager.set(this.stateId + "-filter", params);
     },
 
     restoreFilterState: function() {
+        var form = this.getForm();
         var params = {};
         var state = Ext.state.Manager.get(this.stateId + "-filter", {});
 
         if (state["fascicle"] && state["fascicle"].id != "clear") {
-            this.getForm().findField("headline").enable();
+            form.findField("headline").enable();
         }
 
         if (state["headline"] && state["headline"].id != "clear") {
-            this.getForm().findField("rubric").enable();
+            form.findField("rubric").enable();
         }
-
+        
         for (var i in state) {
             if (state[i].id && state[i].id != "clear") {
-                var field = this.getForm().findField(i);
+                var field = form.findField(i);
                 if (field) {
                     params["flt_"+i] = state[i].id;
-                    field.on("afterrender", function(combo){
+                    field.on("render", function(combo){
                         combo.setValue(this.text);
                         combo.hiddenField.value=this.id;
                     }, state[i]);

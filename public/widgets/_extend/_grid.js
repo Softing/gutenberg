@@ -13,7 +13,11 @@ Ext.grid.GridPanel.prototype.getRecord = function() {
 };
 
 Ext.grid.GridPanel.prototype.getValue = function(value) {
-    return this.getSelectionModel().getSelected().get(value);
+    var result;
+    if (this.getSelectionModel().getSelected()) {
+        result = this.getSelectionModel().getSelected().get(value);
+    }
+    return result;
 };
 
 Ext.grid.GridPanel.prototype.getValues = function(field) {

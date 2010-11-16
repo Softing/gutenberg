@@ -10,18 +10,6 @@ use warnings;
 
 use base 'Inprint::BaseController';
 
-sub editions {
-    my $c = shift;
-    my $result = $c->sql->Q("
-        SELECT t1.id, t1.shortcut as title, nlevel(path) as nlevel, '' as description,
-            array_to_string( ARRAY( select shortcut FROM catalog where path @> t1.path ORDER BY nlevel(path) ), '.') as title_path
-        FROM editions t1
-        ORDER BY title_path
-    ")->Hashes;
-    $c->render_json( { data => $result } );
-}
-
-
 sub stages {
     my $c = shift;
 
@@ -65,38 +53,50 @@ sub fascicles {
 
     my $i_edition  = $c->param("flt_edition") || undef;
 
-    my $sql = "
-        SELECT t1.id, t2.shortcut ||'/'|| t1.title as title, t1.description
-        FROM fascicles t1, editions t2
-        WHERE
-            t1.edition = t2.id
-            AND t1.issystem = false
-            AND t1.enabled = true
-            AND t1.edition IN (
-                SELECT id FROM editions WHERE path ~ ('*.' || replace(?, '-', '')::text || '.*')::lquery
-            )
-        ORDER BY t1.enddate DESC, t2.shortcut, t1.title ";
+    my @errors;
+    my $success = $c->json->false;
+    
+    push @errors, { id => "edition", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_edition));
 
-    my $result = $c->sql->Q($sql, [ $i_edition ])->Hashes;
+    my $result;
 
-    unshift @$result, {
-        id => "99999999-9999-9999-9999-999999999999",
-        icon => "bin",
-        spacer => $c->json->true,
-        bold => $c->json->true,
-        title => $c->l("Recycle Bin"),
-        description => $c->l("Removed documents")
-    };
+    unless (@errors) {
+        my $sql = "
+            SELECT t1.id, t2.shortcut ||'/'|| t1.title as title, t1.description
+            FROM fascicles t1, editions t2
+            WHERE
+                t1.edition = t2.id
+                AND edition = ANY(?)
+                AND t1.issystem = false
+                AND t1.enabled = true
+                AND t1.edition IN (
+                    SELECT id FROM editions WHERE path ~ ('*.' || replace(?, '-', '')::text || '.*')::lquery
+                )
+            ORDER BY t1.enddate DESC, t2.shortcut, t1.title ";
+        
+        my $editions = $c->access->GetChildrens("editions.documents.work");
+        $result = $c->sql->Q($sql, [ $editions, $i_edition ])->Hashes;
+        
+        unshift @$result, {
+            id => "99999999-9999-9999-9999-999999999999",
+            icon => "bin",
+            spacer => $c->json->true,
+            bold => $c->json->true,
+            title => $c->l("Recycle Bin"),
+            description => $c->l("Removed documents")
+        };
+        unshift @$result, {
+            id => "00000000-0000-0000-0000-000000000000",
+            icon => "briefcase",
+            bold => $c->json->true,
+            title => $c->l("Briefcase"),
+            description => $c->l("Briefcase for reserved documents")
+        };
+    }
 
-    unshift @$result, {
-        id => "00000000-0000-0000-0000-000000000000",
-        icon => "briefcase",
-        bold => $c->json->true,
-        title => $c->l("Briefcase"),
-        description => $c->l("Briefcase for reserved documents")
-    };
-
-    $c->render_json( { data => $result } );
+    $success = $c->json->true unless (@errors);
+    $c->render_json({ success => $success, errors => \@errors, data => $result || [] });
 }
 
 sub headlines {

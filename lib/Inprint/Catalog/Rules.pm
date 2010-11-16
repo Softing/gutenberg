@@ -94,6 +94,7 @@ sub mapping {
         my $data1 = $c->sql->Q($sql1, \@data)->Hashes;
         foreach my $item (@$data1) {
             $result->{ $item->{term} } = {
+                type => "obtained",
                 area => $item->{area},
                 icon => "key"
             };
@@ -110,6 +111,7 @@ sub mapping {
                 
                 next if $result->{ $term_obj->{id} };
                 $result->{ $term_obj->{id} } = {
+                    type => "inherited",
                     area => $area || $i_section,
                     icon => "key--arrow"
                 }
@@ -118,8 +120,6 @@ sub mapping {
         
     }
     
-    
-
     $c->render_json( { data => $result || {} } );
 }
 

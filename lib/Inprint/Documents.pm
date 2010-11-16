@@ -76,11 +76,20 @@ sub list {
         FROM documents dcm
     ";
 
-    # Set filters
     my $sql_filters = " WHERE 1=1 ";
 
-    # Set mode
+    # Set Restrictions
 
+    my $editions = $c->access->GetChildrens("editions.documents.work");
+    $sql_filters .= " AND dcm.edition = ANY(?) ";
+    push @params, $editions;
+
+    my $departments = $c->access->GetChildrens("catalog.documents.view:*");
+    $sql_filters .= " AND dcm.workgroup = ANY(?) ";
+    push @params, $departments;
+
+    # Set Filters
+    
     if ($mode eq "todo") {
         $sql_filters .= " AND holder=? ";
         push @params, $c->QuerySessionGet("member.id");
@@ -176,8 +185,26 @@ sub list {
     push @params, $start;
     my $result = $c->sql->Q($sql_query, \@params)->Hashes;
 
-    #print STDERR $sql_query;
-
+    my $member = $c->QuerySessionGet("member.id");
+    foreach my $document (@$result) {
+        
+        $document->{access} = {};
+        my @rules = qw(delete restore edit capture move transfer briefcase);
+        
+        foreach (@rules) {
+            if ($document->{manager} eq $member) {
+                if ($c->access->Check("catalog.documents.$_:member", $document->{workgroup})) {
+                    $document->{access}->{delete} = $c->json->true;
+                }
+            }
+            if ($document->{manager} ne $member) {
+                if ($c->access->Check("catalog.documents.$_:group", $document->{workgroup})) {
+                    $document->{access}->{delete} = $c->json->true;
+                }
+            }
+        }
+    }
+    
     # Create result
     $c->render_json( { "data" => $result, "total" => $total } );
 }

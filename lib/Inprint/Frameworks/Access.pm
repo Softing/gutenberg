@@ -31,35 +31,41 @@ sub ExtractRules {
 
 sub Check {
     my $c = shift;
-    my $term    = shift;
+    my $terms   = shift;
     my $binding = shift;
     my $member  = shift;
     
+    my @rules;
     my $result = 0;
     
     unless ($member) {
         $member = $c->{handler}->QuerySessionGet("member.id");
     }
     
-    if ($member && $term) {
-        
+    if (ref $terms eq "ARRAY") {
+        @rules = @$terms;
+    } else {
+        push @rules, $terms;
+    }
+    
+    for (my $i=0; $i <= $#rules; $i++) {
+        my ($term, $area) = split /:/, $rules[$i];
+        if ($area eq "*") {
+            splice @rules, $i, $i, "$term:member", "$term:group";
+        }
+    }
+    my %seen;@rules = grep { ! $seen{$_}++ } @rules;
+    
+    if ($member && @rules) {
         my @data;
-        
-        my $sql = "
-            SELECT true FROM cache_access WHERE
-                member=? AND ? = ANY(terms)
-        ";
-        
+        my $sql = " SELECT true FROM cache_access WHERE member=? AND ? && terms ";
         push @data, $member;
-        push @data, $term;
-        
+        push @data, \@rules;
         if ($binding) {
             $sql .= " AND binding=?";
             push @data, $binding;
         }
-        
-        $result = $c->{handler}->sql->Q("
-            SELECT EXISTS ($sql)", \@data)->Value();
+        $result = $c->{handler}->sql->Q("SELECT EXISTS ($sql)", \@data)->Value();
     }
     
     return $result;
@@ -68,7 +74,7 @@ sub Check {
 sub GetBindings {
     
     my $c = shift;
-    my $term    = shift;
+    my $terms    = shift;
     my $member  = shift;
     
     my $result = [];
@@ -77,10 +83,67 @@ sub GetBindings {
         $member = $c->{handler}->QuerySessionGet("member.id");
     }
     
-    if ($term && $member) {
+    my @rules;
+    
+    if (ref $terms eq "ARRAY") {
+        @rules = @$terms;
+    } else {
+        push @rules, $terms;
+    }
+    
+    for (my $i=0; $i <= $#rules; $i++) {
+        my ($term, $area) = split /:/, $rules[$i];
+        if ($area eq "*") {
+            splice @rules, $i, $i, "$term:member", "$term:group";
+        }
+    }
+    
+    my %seen;
+    @rules = grep { ! $seen{$_}++ } @rules;
+    
+    if (@rules && $member) {
         $result = $c->{handler}->sql->Q("
-            SELECT parents FROM cache_visibility WHERE member=? AND term=? 
-        ", [ $member, $term ])->Value();
+            SELECT parents FROM cache_visibility WHERE member=? AND term = ANY(?)
+        ", [ $member, \@rules ])->Value();
+    }
+    
+    return $result || [];
+}
+
+sub GetChildrens {
+    
+    my $c = shift;
+    my $terms    = shift;
+    my $member  = shift;
+    
+    my $result = [];
+    
+    unless ($member) {
+        $member = $c->{handler}->QuerySessionGet("member.id");
+    }
+    
+    my @rules;
+    
+    if (ref $terms eq "ARRAY") {
+        @rules = @$terms;
+    } else {
+        push @rules, $terms;
+    }
+    
+    for (my $i=0; $i <= $#rules; $i++) {
+        my ($term, $area) = split /:/, $rules[$i];
+        if ($area eq "*") {
+            splice @rules, $i, $i, "$term:member", "$term:group";
+        }
+    }
+    
+    my %seen;
+    @rules = grep { ! $seen{$_}++ } @rules;
+    
+    if (@rules && $member) {
+        $result = $c->{handler}->sql->Q("
+            SELECT childrens FROM cache_visibility WHERE member=? AND term = ANY(?)
+        ", [ $member, \@rules ])->Value();
     }
     
     return $result || [];

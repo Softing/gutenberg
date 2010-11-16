@@ -47,8 +47,11 @@ sub fascicles {
     my $sql = "
         SELECT t1.id, t2.shortcut ||'/'|| t1.title as title, t1.description
         FROM fascicles t1, editions t2
-        WHERE t1.edition = t2.id AND t1.issystem = false
+        WHERE t1.edition = t2.id AND t1.issystem = false AND edition = ANY(?)
     ";
+
+    my $editions = $c->access->GetChildrens("editions.documents.work");
+    push @data, $editions;
 
     if ($i_edition) {
         $sql .= " AND t1.edition IN (

@@ -24,7 +24,7 @@ Inprint.factory.Store = new function() {
 
         // Documents
         '/documents/list/':         [
-            'id',
+            'id', 'access',
 
             'edition',  'edition_shortcut',
             'fascicle', 'fascicle_shortcut',

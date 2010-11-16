@@ -265,29 +265,29 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
             store: this.store,
             displayInfo: true,
             displayMsg: _("Displaying documents {0} - {1} of {2}"),
-            emptyMsg: _("No documents to display"),
-            items:[
-                '-',
-                {
-                    xtype:'slider',
-                    stateful: true,
-                    stateId: 'documents.grid.slider',
-                    width: 214,
-                    value:60,
-                    increment: 30,
-                    minValue: 60,
-                    maxValue: 120,
-                    listeners: {
-                        scope:this,
-                        statesave: function (field, state) {
-                            alert(state);
-                        },
-                        changecomplete: function(field, value) {
-                            this.store.load({params:{start:0, limit:value}});
-                        }
-                    }
-                }
-            ]
+            emptyMsg: _("No documents to display")
+            //items:[
+            //    '-',
+            //    {
+            //        xtype:'slider',
+            //        stateful: true,
+            //        stateId: 'documents.grid.slider',
+            //        width: 214,
+            //        value:60,
+            //        increment: 30,
+            //        minValue: 60,
+            //        maxValue: 120,
+            //        listeners: {
+            //            scope:this,
+            //            statesave: function (field, state) {
+            //                alert(state);
+            //            },
+            //            changecomplete: function(field, value) {
+            //                this.store.load({params:{start:0, limit:value}});
+            //            }
+            //        }
+            //    }
+            //]
         });
 
         Ext.apply(this, {
