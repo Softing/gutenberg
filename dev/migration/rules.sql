@@ -39,37 +39,40 @@ INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, descrip
 VALUES ('ee992171-d275-4d24-8def-7ff02adec408', 'catalog', 'documents', 'create', 20, 'Can create materials', 'key', '');
 
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
-VALUES ('6033984a-a762-4392-b086-a8d2cdac4221', 'catalog', 'documents', 'assign', 30, 'Can assign the editor', 'key', '');
+VALUES ('6033984a-a762-4392-b086-a8d2cdac4221', 'catalog', 'documents', 'assign-manager', 30, 'Can assign the editor', 'key', '');
 
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
-VALUES ('3040f8e1-051c-4876-8e8e-0ca4910e7e45', 'catalog', 'documents', 'delete', 40, 'Can delete materials', 'key', '');
+VALUES ('52dc7f72-2057-43c0-831d-55e458d84f39', 'catalog', 'documents', 'assign-fascicle', 40, 'Can assign the fascicle', 'key', '');
 
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
-VALUES ('beba3e8d-86e5-4e98-b3eb-368da28dba5f', 'catalog', 'documents', 'recover', 50, 'Can recover materials', 'key', '');
+VALUES ('3040f8e1-051c-4876-8e8e-0ca4910e7e45', 'catalog', 'documents', 'delete', 50, 'Can delete materials', 'key', '');
 
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
-VALUES ('5b27108a-2108-4846-a0a8-3c369f873590', 'catalog', 'profile', 'edit', 60, 'Can edit the profile', 'key', '');
+VALUES ('beba3e8d-86e5-4e98-b3eb-368da28dba5f', 'catalog', 'documents', 'recover', 60, 'Can recover materials', 'key', '');
 
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
-VALUES ('bff78ebf-2cba-466e-9e3c-89f13a0882fc', 'catalog', 'files', 'work', 70, 'Can work with files', 'key', '');
+VALUES ('5b27108a-2108-4846-a0a8-3c369f873590', 'catalog', 'documents', 'update', 70, 'Can edit the profile', 'key', '');
 
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
-VALUES ('f4ad42ed-b46b-4b4e-859f-1b69b918a64a', 'catalog', 'files', 'add', 80, 'Can add files', 'key', '');
+VALUES ('bff78ebf-2cba-466e-9e3c-89f13a0882fc', 'catalog', 'files', 'work', 80, 'Can work with files', 'key', '');
 
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
-VALUES ('fe9cd446-2f4b-4844-9b91-5092c0cabece', 'catalog', 'files', 'delete', 90, 'Can delete files', 'key', '');
+VALUES ('f4ad42ed-b46b-4b4e-859f-1b69b918a64a', 'catalog', 'files', 'add', 90, 'Can add files', 'key', '');
 
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
-VALUES ('d782679e-3f0a-4499-bda6-8c2600a3e761', 'catalog', 'documents', 'capture', 100, 'Can capture materials', 'key', '');
+VALUES ('fe9cd446-2f4b-4844-9b91-5092c0cabece', 'catalog', 'files', 'delete', 100, 'Can delete files', 'key', '');
 
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
-VALUES ('b946bd84-93fc-4a70-b325-d23c2804b2e9', 'catalog', 'documents', 'transfer', 110, 'Can transfer materials', 'key', '');
+VALUES ('d782679e-3f0a-4499-bda6-8c2600a3e761', 'catalog', 'documents', 'capture', 110, 'Can capture materials', 'key', '');
 
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
-VALUES ('b7adafe9-2d5b-44f3-aa87-681fd48466fa', 'catalog', 'documents', 'move', 120, 'Can move materials', 'key', '');
+VALUES ('b946bd84-93fc-4a70-b325-d23c2804b2e9', 'catalog', 'documents', 'transfer', 120, 'Can transfer materials', 'key', '');
 
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
-VALUES ('6d590a90-58a1-447f-b5ad-e3c62f80a2ef', 'catalog', 'documents', 'briefcase', 130, 'Can put in a briefcase', 'key', '');
+VALUES ('b7adafe9-2d5b-44f3-aa87-681fd48466fa', 'catalog', 'documents', 'move', 130, 'Can move materials', 'key', '');
+
+INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
+VALUES ('6d590a90-58a1-447f-b5ad-e3c62f80a2ef', 'catalog', 'documents', 'briefcase', 140, 'Can put in a briefcase', 'key', '');
 
 
 -------------------------------------------------------------------------------------------------

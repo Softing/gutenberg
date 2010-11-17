@@ -35,7 +35,6 @@ Inprint.cmp.memberSettingsForm.Window = Ext.extend(Ext.Window, {
             }
         }, this);
         Inprint.cmp.memberSettingsForm.Window.superclass.initComponent.apply(this, arguments);
-        Inprint.cmp.memberSettingsForm.Interaction(this.panels);
     },
 
     onRender: function() {

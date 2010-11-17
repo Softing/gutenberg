@@ -195,7 +195,14 @@ sub setup {
     my $i_position    = $c->param("position");
     my $i_image       = $c->req->upload('image');
 
-    my $i_destination = $c->param("capture.destination");
+    my $i_edition            = $c->param("edition");
+    my $i_edition_shortcut   = $c->param("edition-shortcut");
+    
+    my $i_workgroup          = $c->param("workgroup");
+    my $i_workgroup_shortcut = $c->param("workgroup-shortcut");
+
+    my @errors;
+    my $success = $c->json->false;
 
     if ($i_image) {
 
@@ -219,43 +226,46 @@ sub setup {
         }
     }
 
-    my $result = {
-        success => $c->json->false,
-        errors  => []
-    };
-
-    push @{ $result->{errors} }, { id => "title", msg => "" }
-        unless $i_title;
-
-    push @{ $result->{errors} }, { id => "shortcut", msg => "" }
-        unless $i_shortcut;
-
-    push @{ $result->{errors} }, { id => "position", msg => "" }
-        unless $i_position;
-
-    push @{ $result->{errors} }, { id => "destination", msg => "" }
-        unless $i_destination;
-
-    unless (@{ $result->{errors} }) {
-
+    push @errors, { id => "title", msg => "Incorrectly filled field"}
+        unless ($c->is_text($i_title));
+        
+    push @errors, { id => "shortcut", msg => "Incorrectly filled field"}
+        unless ($c->is_text($i_shortcut));
+        
+    push @errors, { id => "position", msg => "Incorrectly filled field"}
+        unless ($c->is_text($i_position));
+        
+    push @errors, { id => "edition", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_edition));
+        
+    push @errors, { id => "edition", msg => "Incorrectly filled field"}
+        unless ($c->is_text($i_edition_shortcut));
+        
+    push @errors, { id => "workgroup", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_workgroup));
+        
+    push @errors, { id => "workgroup", msg => "Incorrectly filled field"}
+        unless ($c->is_text($i_workgroup_shortcut));
+    
+    unless (@errors) {
         $c->sql->Do("DELETE FROM profiles WHERE id=?", [ $member_id ]);
         $c->sql->Do("INSERT INTO profiles (id, title, shortcut, position) VALUES (?, ?, ?, ?)",[
             $member_id, $i_title, $i_shortcut, $i_position
         ]);
-
-        $c->sql->Do(
-            "DELETE FROM options WHERE option_name=? AND member=?", [
-                "transfer.capture.destination", $member_id
-        ]);
-        $c->sql->Do(
-            "INSERT INTO OPTIONS (member, option_name, option_value) VALUES (?, ?, ?)", [
-                $member_id, "transfer.capture.destination", $i_destination
-        ]);
-
-        $result->{success} = $c->json->true;
+        
+        $c->sql->Do("DELETE FROM options WHERE option_name=? AND member=?", ["default.edition", $member_id]);
+        $c->sql->Do("INSERT INTO OPTIONS (member, option_name, option_value) VALUES (?, ?, ?)", [$member_id, "default.edition", $i_edition]);
+        $c->sql->Do("DELETE FROM options WHERE option_name=? AND member=?", ["default.edition.name", $member_id]);
+        $c->sql->Do("INSERT INTO OPTIONS (member, option_name, option_value) VALUES (?, ?, ?)", [$member_id, "default.edition.name", $i_edition_shortcut]);
+        
+        $c->sql->Do("DELETE FROM options WHERE option_name=? AND member=?", ["default.workgroup", $member_id]);
+        $c->sql->Do("INSERT INTO OPTIONS (member, option_name, option_value) VALUES (?, ?, ?)", [$member_id, "default.workgroup", $i_workgroup]);
+        $c->sql->Do("DELETE FROM options WHERE option_name=? AND member=?", ["default.workgroup.name", $member_id]);
+        $c->sql->Do("INSERT INTO OPTIONS (member, option_name, option_value) VALUES (?, ?, ?)", [$member_id, "default.workgroup.name", $i_workgroup_shortcut]);
     }
 
-    $c->render_json( $result );
+    $success = $c->json->true unless (@errors);
+    $c->render_json({ success => $success, errors => \@errors });
 }
 
 1;

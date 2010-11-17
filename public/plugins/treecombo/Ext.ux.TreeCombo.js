@@ -2,11 +2,11 @@ Ext.ns('Ext.ux','Ext.ux.form');
 
 Ext.ux.form.TreeCombo = Ext.extend(Ext.form.TriggerField, {
     
+    defaultAutoCreate : {tag: "input", type: "text", size: "24", autocomplete: "off"},
     triggerClass: 'x-form-tree-trigger',
     
     initComponent : function(){
         
-        this.hiddenField = {};
         this.editable = false;
         
         this.isExpanded = false;
@@ -22,34 +22,28 @@ Ext.ux.form.TreeCombo = Ext.extend(Ext.form.TriggerField, {
             }
         }, this);
         
-        this.on('show',function() {
-            //this.setRawValue('');
-            this.getTree();
-            if (this.treePanel.loader.isLoading()) {
-                this.treePanel.loader.on('load',function(c,n) {
-                    n.expandChildNodes(true);
-                    if (this.setValueToTree()) this.getValueFromTree();
-                },this);
-            } else {
-                if (this.setValueToTree()) this.getValueFromTree();
-            }
-        });
+    },
+    
+    onRender : function(ct, position){
+        Ext.ux.form.TreeCombo.superclass.onRender.call(this, ct, position);
+        this.hiddenField = this.el.insertSibling({tag:'input', type:'hidden', name: this.hiddenName,
+                    id: (this.hiddenId || Ext.id())}, 'before', true);
     },
     
     onTriggerClick: function() {
-        if (this.isExpanded) {
-            this.collapse();
-        } else {
-            this.expand();
+        if (this.disabled == false) {
+            if (this.isExpanded) {
+                this.collapse();
+            } else {
+                this.expand();
+            }
         }
-    } ,
+    },
         
     // was called combobox was collapse
     collapse: function() {
         this.isExpanded=false;
         this.getTree().hide();
-        if (this.resizer)this.resizer.resizeTo(this.treeWidth, this.treeHeight);
-            this.getValueFromTree();
     },
         
     // was called combobox was expand
@@ -57,83 +51,34 @@ Ext.ux.form.TreeCombo = Ext.extend(Ext.form.TriggerField, {
         this.isExpanded=true;
         this.getTree().show();
         this.getTree().getEl().alignTo(this.wrap, 'tl-bl?');
-        this.setValueToTree();
     },
     
     getName: function(){
-        return this.name ;
+        return this.hiddenName || this.name;
     },
 
     getValue: function() {
-        if (!this.value) { 
-                return '';
+        return this.hiddenField.value;
+    },
+    
+    setValue: function (id, v) {
+        if (v) {
+            
+            this.value = v;
+            this.setRawValue(v);
+            this.hiddenField.value = id;
+            
         } else {
-                return this.value;
+            this.setRawValue(id);
         }
+        
+        if(this.rendered) {
+            this.validate();
+        }
+        
+        return this;
     },
 
-    setValue: function (v) {
-        this.value=v;
-        this.setRawValue(v);
-        //this.setValueToTree();
-    },
-
-    setValueToTree: function () {
-        //// check for tree ist exist
-        //if (!this.treePanel) return false;
-        //
-        //// split this.value to array with sepperate value-elements
-        //var arrVal=new Array();
-        //try {
-        //        arrVal = this.value.split(this.sepperator);
-        //} catch (e) {};
-        
-        // find root-element of treepanel, and expand all childs
-        //var node=this.treePanel.getRootNode();
-        //node.expandChildNodes(true);
-        
-        // search all tree-children and check it, when value in this.value
-        //node.cascade(function (n) {
-        //    var nodeCompareVal='';
-        //    if (Ext.isDefined(n.attributes.value)) {
-        //        // in node-element a value-property was used
-        //        nodeCompareVal=String.trim(n.attributes.value);
-        //    } else {
-        //        // in node-element can't find a value-property, for compare with this.value will be use node-element.text
-        //        nodeCompareVal=String.trim(n.attributes.text);
-        //    }
-        //    // uncheck node
-        //    n.getUI().toggleCheck(false);
-        //    
-        //    Ext.each(arrVal,function(arrVal_Item) {
-        //        if (String.trim(arrVal_Item) == nodeCompareVal) {
-        //            // check node
-        //            n.getUI().toggleCheck(true);
-        //        }
-        //    },this);
-        //},this);
-        
-        return true;
-    },
-
-    getValueFromTree: function () {
-        this.ArrVal= new Array();
-        this.ArrDesc= new Array();
-
-        Ext.each(this.treePanel.getChecked(),function(item) {
-            if (!item.attributes.value) {
-                    this.ArrVal.push(item.attributes.text);
-            } else {
-                    this.ArrVal.push(item.attributes.value);
-            }
-            this.ArrDesc.push(item.attributes.text);
-        },this);
-
-        this.value=this.ArrVal.join(this.sepperator);
-        this.valueText=this.ArrDesc.join(this.sepperator);
-        //this.setRawValue(this.valueText);
-    },
-        
     validateBlur : function(){
         return !this.treePanel || !this.treePanel.isVisible();
     },
@@ -161,7 +106,7 @@ Ext.ux.form.TreeCombo = Ext.extend(Ext.form.TriggerField, {
                     baseParams: this.baseParams
                 }),
                 root: this.root,
-                rootVisible: true,
+                rootVisible: this.rootVisible,
                 floating: true,
                 autoScroll: true,
                 minWidth: 250,
@@ -241,9 +186,7 @@ Ext.ux.form.TreeCombo = Ext.extend(Ext.form.TriggerField, {
     },
 
     onTreeNodeClick: function(node, e) {
-        this.setRawValue(node.text);
-        this.value = node.id;
-        this.hiddenField.value = node.id;
+        this.setValue(node.id, node.text);
         this.fireEvent('select', this, node);
         this.collapse();
     }

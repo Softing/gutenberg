@@ -30,6 +30,64 @@ sub stages {
     $c->render_json( { data => $result || [] } );
 }
 
+sub managers {
+
+    my $c = shift;
+    
+    my $i_term      = $c->param("term") || undef;
+    my $i_workgroup = $c->param("workgroup") || undef;
+    
+    my $sql = "
+        SELECT DISTINCT
+            t1.manager as id,
+            t2.shortcut as title,
+            t2.description as description,
+            'user' as icon
+        FROM documents t1, view_principals t2, map_member_to_catalog t3
+        WHERE
+            t2.id = t1.manager
+            AND t3.member = t1.manager
+            AND t2.type = 'member'
+    ";
+    
+    my @data;
+    my @errors;
+    my $success = $c->json->false;
+
+    if ($i_term) {
+        push @errors, { id => "term", msg => "Incorrectly filled field"}
+            unless ($c->is_rule($i_term));
+            
+        unless (@errors) {
+            my $bindings = $c->access->GetChildrens($i_term);
+            #die @$bindings;
+            #$sql .= " AND t3.catalog = ANY(?) ";
+            #push @data, $bindings;
+        }
+    }
+    
+    if ($i_workgroup) {
+        push @errors, { id => "workgroup", msg => "Incorrectly filled field"}
+            unless ($c->is_uuid($i_workgroup));
+        
+        my $bindings = $c->sql->Q("
+            SELECT id FROM catalog WHERE path ~ ('*.'|| replace(?, '-', '')::text ||'.*')::lquery
+        ", [$i_workgroup])->Values;
+        
+        unless (@errors) {
+            $sql .= " AND t3.catalog = ANY(?) ";
+            push @data, $bindings;
+        }
+    }
+    
+    $sql .= " ORDER BY icon, t2.shortcut; ";
+
+    my $result = $c->sql->Q($sql, \@data)->Hashes;
+
+    $success = $c->json->true unless (@errors);
+    $c->render_json({ success => $success, errors => \@errors, data => $result });
+    
+}
 
 sub assignments {
     my $c = shift;

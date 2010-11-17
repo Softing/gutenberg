@@ -24,6 +24,7 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                 baseParams: {
                     term: 'editions.documents.work'
                 },
+                rootVisible:true,
                 root: {
                     id:'00000000-0000-0000-0000-000000000000',
                     nodeType: 'async',
@@ -43,6 +44,7 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                 baseParams: {
                     term: 'catalog.documents.view:*'
                 },
+                rootVisible:true,
                 root: {
                     id:'00000000-0000-0000-0000-000000000000',
                     nodeType: 'async',
@@ -52,29 +54,6 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                     text: _("All departments")
                 }
             },
-            
-            //xc.getConfig("/documents/filters/editions/", {
-            //    columnWidth:.125,
-            //    cacheQuery: false,
-            //    listeners: {
-            //        scope: this,
-            //        beforequery: function(qe) {
-            //            qe.combo.getStore().baseParams = this.getFilterParams();
-            //            delete qe.combo.lastQuery;
-            //        }
-            //    }
-            //}),
-            //xc.getConfig("/documents/filters/groups/", {
-            //    columnWidth:.125,
-            //    cacheQuery: false,
-            //    listeners: {
-            //        scope: this,
-            //        beforequery: function(qe) {
-            //            qe.combo.getStore().baseParams = this.getFilterParams();
-            //            delete qe.combo.lastQuery;
-            //        }
-            //    }
-            //}),
             
             xc.getConfig("/documents/filters/fascicles/", {
                 columnWidth:.125,
@@ -249,8 +228,8 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                 if (field) {
                     params["flt_"+i] = state[i].id;
                     field.on("render", function(combo){
-                        combo.setValue(this.text);
-                        combo.hiddenField.value=this.id;
+                        combo.setValue(this.id, this.text);
+                        //combo.hiddenField.value=this.id;
                     }, state[i]);
                 }
             }

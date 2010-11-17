@@ -1,6 +1,7 @@
 Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
     initComponent: function() {
 
+        this.access = {};
         var xc = Inprint.factory.Combo;
 
         Ext.apply(this, {
@@ -8,7 +9,6 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
             border:false,
             layout:'column',
             autoScroll:true,
-            labelWidth: 80,
             bodyStyle: "padding: 20px 10px 20px 10px",
             defaults: {
                 anchor: "100%",
@@ -16,9 +16,10 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
             },
             items: [
                 {
-                    columnWidth:.6,
+                    columnWidth:.55,
                     layout: 'form',
                     border:false,
+                    labelWidth: 90,
                     items: [
                         {
                             xtype:'fieldset',
@@ -56,66 +57,99 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                     ]
                 },
                 {
-                    columnWidth:.4,
+                    columnWidth:.45,
                     layout: 'form',
                     border:false,
+                    labelWidth: 80,
                     items: [
                         {
                             xtype:'fieldset',
                             border:false,
-                            title: _("Tracking"),
+                            title: _("Appointment"),
                             defaults: {
                                 anchor: "100%"
                             },
                             defaultType: 'textfield',
                             items :[
-
-                                xc.getConfig("/documents/combos/editions/", {
+                                {
                                     allowBlank:false,
+                                    xtype: "treecombo",
+                                    name: "edition-shortcut",
+                                    hiddenName: "edition",
+                                    fieldLabel: _("Edition"),
+                                    emptyText: _("Edition") + "...",
+                                    minListWidth: 250,
+                                    url: _url('/documents/trees/editions/'),
+                                    baseParams: {
+                                        term: 'editions.documents.work'
+                                    },
+                                    root: {
+                                        id:'00000000-0000-0000-0000-000000000000',
+                                        nodeType: 'async',
+                                        expanded: true,
+                                        draggable: false,
+                                        icon: _ico("book"),
+                                        text: _("All editions")
+                                    },
                                     listeners: {
                                         scope: this,
-                                        beforequery: function(qe) {
-                                            delete qe.combo.lastQuery;
+                                        render: function(field) {
+                                            var options = Inprint.session.options;
+                                            if (options && options["default.edition"])
+                                                field.setValue(options["default.edition"], options["default.edition.name"]);
+                                        },
+                                        select: function(field) {
+                                            this.getForm().findField("fascicle").reset();
+                                            this.getForm().findField("headline").reset();
+                                            this.getForm().findField("rubric").reset();
+                                            this.getForm().findField("headline").disable();
+                                            this.getForm().findField("rubric").disable();
                                         }
                                     }
-                                }),
-
-                                xc.getConfig("/documents/combos/stages/", {
+                                },
+                                
+                                {
                                     disabled: true,
-                                    allowBlank:false,
+                                    xtype: "treecombo",
+                                    name: "workgroup-shortcut",
+                                    hiddenName: "workgroup",
+                                    fieldLabel: _("Department"),
+                                    emptyText: _("Department") + "...",
+                                    minListWidth: 250,
+                                    url: _url('/documents/trees/workgroups/'),
+                                    baseParams: {
+                                        term: 'catalog.documents.view:*'
+                                    },
+                                    root: {
+                                        id:'00000000-0000-0000-0000-000000000000',
+                                        nodeType: 'async',
+                                        expanded: true,
+                                        draggable: false,
+                                        icon: _ico("folder-open"),
+                                        text: _("All departments")
+                                    },
+                                    listeners: {
+                                        scope: this,
+                                        render: function(field) {
+                                            var options = Inprint.session.options;
+                                            if (options && options["default.workgroup"])
+                                                field.setValue(options["default.workgroup"], options["default.workgroup.name"]);
+                                        }
+                                    }
+                                },
+
+                                xc.getConfig("/documents/combos/managers/", {
+                                    disabled: true,
                                     listeners: {
                                         scope: this,
                                         render: function(combo) {
-                                            this.getForm().findField("edition").on("select", function() {
-                                                combo.enable();
-                                                combo.reset();
-                                                combo.getStore().baseParams["flt_edition"] = this.getForm().findField("edition").getValue();
-                                            }, this);
+                                            var options = Inprint.session.member;
+                                            combo.setValue(options["id"], options["title"]);
                                         },
                                         beforequery: function(qe) {
                                             delete qe.combo.lastQuery;
-                                        }
-                                    }
-                                }),
-
-                                xc.getConfig("/documents/combos/assignments/", {
-                                    disabled: true,
-                                    allowBlank:false,
-                                    listeners: {
-                                        scope: this,
-                                        render: function(combo) {
-                                            this.getForm().findField("edition").on("select", function() {
-                                                combo.disable();
-                                                combo.reset();
-                                            }, this);
-                                            this.getForm().findField("stage").on("select", function() {
-                                                combo.enable();
-                                                combo.reset();
-                                                combo.getStore().baseParams["flt_stage"] = this.getForm().findField("stage").getValue();
-                                            }, this);
-                                        },
-                                        beforequery: function(qe) {
-                                            delete qe.combo.lastQuery;
+                                            qe.combo.getStore().baseParams["term"] = "catalog.documents.create:*";
+                                            qe.combo.getStore().baseParams["workgroup"] = this.getForm().findField("workgroup").getValue();
                                         }
                                     }
                                 })
@@ -146,15 +180,9 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                     disabled: true,
                                     listeners: {
                                         scope: this,
-                                        render: function(combo) {
-                                            this.getForm().findField("edition").on("select", function() {
-                                                combo.enable();
-                                                combo.reset();
-                                                combo.getStore().baseParams["flt_edition"] = this.getForm().findField("edition").getValue();
-                                            }, this);
-                                        },
                                         beforequery: function(qe) {
                                             delete qe.combo.lastQuery;
+                                            qe.combo.getStore().baseParams["flt_edition"] = this.getForm().findField("edition").getValue();
                                         }
                                     }
                                 }),

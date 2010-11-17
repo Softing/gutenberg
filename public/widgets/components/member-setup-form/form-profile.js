@@ -6,7 +6,7 @@ Inprint.cmp.memberSetupWindow.Form = Ext.extend(Ext.FormPanel, {
 
         Ext.apply(this,
         {
-            fileUpload: true,
+            //fileUpload: true,
             border:false,
             bodyStyle: "padding: 10px 10px",
             autoScroll:true,
@@ -71,10 +71,49 @@ Inprint.cmp.memberSetupWindow.Form = Ext.extend(Ext.FormPanel, {
                         {
                             labelWidth: 120,
                             xtype:'fieldset',
-                            title: _("Transfer settings"),
+                            title: _("Defaults"),
                             defaults: { anchor: "100%", allowBlank:false },
                             items :[
-                                Inprint.factory.Combo.create("/options/combos/capture-destination/")
+                                {
+                                    xtype: "treecombo",
+                                    name: "edition-shortcut",
+                                    hiddenName: "edition",
+                                    fieldLabel: _("Edition"),
+                                    emptyText: _("Edition") + "...",
+                                    minListWidth: 250,
+                                    url: _url('/documents/trees/editions/'),
+                                    baseParams: {
+                                        term: 'editions.documents.work'
+                                    },
+                                    root: {
+                                        id:'00000000-0000-0000-0000-000000000000',
+                                        nodeType: 'async',
+                                        expanded: true,
+                                        draggable: false,
+                                        icon: _ico("book"),
+                                        text: _("All editions")
+                                    }
+                                },
+                                {
+                                    xtype: "treecombo",
+                                    name: "workgroup-shortcut",
+                                    hiddenName: "workgroup",
+                                    fieldLabel: _("Group"),
+                                    emptyText: _("Group") + "...",
+                                    minListWidth: 250,
+                                    url: _url('/documents/trees/workgroups/'),
+                                    baseParams: {
+                                        term: 'catalog.documents.view:*'
+                                    },
+                                    root: {
+                                        id:'00000000-0000-0000-0000-000000000000',
+                                        nodeType: 'async',
+                                        expanded: true,
+                                        draggable: false,
+                                        icon: _ico("folder-open"),
+                                        text: _("All departments")
+                                    }
+                                }
                             ]
                         }
                     ]
@@ -89,19 +128,24 @@ Inprint.cmp.memberSetupWindow.Form = Ext.extend(Ext.FormPanel, {
     },
 
     onRender: function() {
-
+        
         Inprint.cmp.memberSetupWindow.Form.superclass.onRender.apply(this, arguments);
-
+        
+        var form = this.getForm();
+        
         if (Inprint.session.member) {
-            this.getForm().findField("title").setValue(Inprint.session.member.title);
-            this.getForm().findField("alias").setValue(Inprint.session.member.shortcut);
-            this.getForm().findField("position").setValue(Inprint.session.member.position);
+            form.findField("title").setValue(Inprint.session.member.title);
+            form.findField("shortcut").setValue(Inprint.session.member.shortcut);
+            form.findField("position").setValue(Inprint.session.member.position);
         }
-
-        if (Inprint.session.options && Inprint.session.options["transfer.capture.destination"]) {
-            this.getForm().findField("capture.destination").loadValue(Inprint.session.options["transfer.capture.destination"]);
+        
+        if (Inprint.session.options) {
+            //if (Inprint.session.options["default.edition"])
+            //    this.getForm().findField("edition").loadValue(Inprint.session.options["transfer.capture.destination"]);
+            //if (Inprint.session.options["default.workgroup"])
+            //    this.getForm().findField("edition").loadValue(Inprint.session.options["transfer.capture.destination"]);
         }
-
+        
     }
 
 });

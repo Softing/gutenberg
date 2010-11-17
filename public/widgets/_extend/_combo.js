@@ -1,15 +1,34 @@
 // Extend Comboboxes
 
-Ext.form.ComboBox.prototype.resetValue = function(baseParams) {
-    this.reset();
-    this.store.removeAll();
-    this.lastQuery = null;
-    this.store.baseParams = baseParams || {};
+Ext.form.ComboBox.prototype.setValue = function(v, t){
+    if (t) {
+        this.displayText = t;
+    }
+    
+    var text = this.displayText || v;
+    
+    if(this.valueField){
+        var r = this.findRecord(this.valueField, v);
+        if(r){
+            text = r.data[this.displayField];
+        }else if(Ext.isDefined(this.valueNotFoundText)){
+            text = this.valueNotFoundText;
+        }
+    }
+    this.lastSelectionText = text;
+    if(this.hiddenField){
+        this.hiddenField.value = Ext.value(v, '');
+    }
+    
+    Ext.form.ComboBox.superclass.setValue.call(this, text);
+    
+    this.value = v;
+    return this;
 };
 
 Ext.form.ComboBox.prototype.setHiddenValue = function(id, value) {
-    this.setValue(value);
-    this.hiddenField.value=id;
+    this.setValue(id, value);
+    return this;
 };
 
 Ext.form.ComboBox.prototype.loadValue = function(value, params) {
@@ -19,6 +38,13 @@ Ext.form.ComboBox.prototype.loadValue = function(value, params) {
         }, this, { single: true });
         this.getStore().load({ params: params });
     }
+};
+
+Ext.form.ComboBox.prototype.resetValue = function(baseParams) {
+    this.reset();
+    this.store.removeAll();
+    this.lastQuery = null;
+    this.store.baseParams = baseParams || {};
 };
 
 // Create XCombobox

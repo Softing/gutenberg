@@ -100,7 +100,7 @@ sub list {
     if ($mode eq "all") {
         $sql_filters .= " AND isopen = true ";
         $sql_filters .= " AND fascicle <> '99999999-9999-9999-9999-999999999999' ";
-        $sql_filters .= " AND fascicle <> '00000000-0000-0000-0000-000000000000' ";
+        #$sql_filters .= " AND fascicle <> '00000000-0000-0000-0000-000000000000' ";
     }
 
     if ($mode eq "archive") {
@@ -184,22 +184,22 @@ sub list {
     push @params, $limit;
     push @params, $start;
     my $result = $c->sql->Q($sql_query, \@params)->Hashes;
-
+    
     my $member = $c->QuerySessionGet("member.id");
     foreach my $document (@$result) {
         
         $document->{access} = {};
-        my @rules = qw(delete restore edit capture move transfer briefcase);
+        my @rules = qw(update capture move transfer briefcase delete recover);
         
         foreach (@rules) {
             if ($document->{manager} eq $member) {
-                if ($c->access->Check("catalog.documents.$_:member", $document->{workgroup})) {
-                    $document->{access}->{delete} = $c->json->true;
+                if ($c->access->Check(["catalog.documents.$_:*"], $document->{workgroup})) {
+                    $document->{access}->{$_} = $c->json->true;
                 }
             }
             if ($document->{manager} ne $member) {
                 if ($c->access->Check("catalog.documents.$_:group", $document->{workgroup})) {
-                    $document->{access}->{delete} = $c->json->true;
+                    $document->{access}->{$_} = $c->json->true;
                 }
             }
         }
@@ -221,10 +221,11 @@ sub create {
     my $id = $c->uuid();
     my $copyid = $c->uuid();
     my $success = $c->json->false;
+    my $member = $c->QuerySessionGet("member.id");
 
     my $i_edition    = $c->param("edition");
-    my $i_stage      = $c->param("stage");
-    my $i_assignment = $c->param("assignment");
+    my $i_workgroup  = $c->param("workgroup");
+    my $i_manager    = $c->param("manager");
 
     my $i_enddate    = $c->param("enddate");
     my $i_fascicle   = $c->param("fascicle") || "00000000-0000-0000-0000-000000000000";
@@ -236,12 +237,24 @@ sub create {
     my $i_size       = $c->param("size");
     my $i_comment    = $c->param("comment");
 
-    push @errors, { id => "title",      msg => "" } unless $i_title;
-    push @errors, { id => "enddate",    msg => "" } unless $i_enddate;
-    push @errors, { id => "edition",    msg => "" } unless $i_edition;
-    push @errors, { id => "fascicle",   msg => "" } unless $i_fascicle;
-    push @errors, { id => "assignment", msg => "" } unless $i_assignment;
-
+    push @errors, { id => "title", msg => "Incorrectly filled field"}
+        unless ($c->is_text($i_title));
+    
+    push @errors, { id => "enddate", msg => "Incorrectly filled field"}
+        unless ($c->is_date($i_enddate));
+    
+    push @errors, { id => "edition", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_edition));
+    
+    push @errors, { id => "workgroup", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_workgroup));
+    
+    push @errors, { id => "manager", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_manager));
+    
+    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_fascicle));
+    
     unless ( @errors ) {
 
         push @fields, "id";
@@ -292,12 +305,6 @@ sub create {
         push @fields, "filepath";
         push @data, "/$year/$mon/$id";
 
-        # Creator
-        push @fields, "creator";
-        push @fields, "creator_shortcut";
-        push @data, $c->QuerySessionGet("member.id");
-        push @data, $c->QuerySessionGet("member.shortcut");
-
         # Set edition
         my $edition = $c->sql->Q(" SELECT id, shortcut FROM editions WHERE id = ?", [ $i_edition ])->Hash;
         if ($edition->{id} && $edition->{shortcut}) {
@@ -305,86 +312,116 @@ sub create {
             push @fields, "edition_shortcut";
             push @data, $edition->{id};
             push @data, $edition->{shortcut};
-
             # Set ineditions[]
             my $editions = $c->sql->Q("
                 SELECT ARRAY( select id from editions where path @> ( select path from editions where id = ? ) )
             ", [ $edition->{id} ])->Array;
             push @fields, "ineditions";
             push @data, $editions;
-
         }
+
+        push @errors, { id => "edition", msg => "Object not found"}
+            unless ($edition);
+
+        # Set Workgroup
+        my $workgroup = $c->sql->Q(" SELECT id, shortcut FROM catalog WHERE id = ?", [ $i_workgroup ])->Hash;
+        push @fields, "workgroup";
+        push @fields, "workgroup_shortcut";
+        push @data, $workgroup->{id};
+        push @data, $workgroup->{shortcut};
+        
+        push @errors, { id => "workgroup", msg => "Object not found"}
+            unless ($workgroup);
+        
+        # Set Inworkgroups[]
+        my $workgroups = $c->sql->Q("
+            SELECT ARRAY( select id from catalog where path @> ( select path from catalog where id = ? ) )
+        ", [ $workgroup->{id} ])->Array;
+        push @fields, "inworkgroups";
+        push @data, $workgroups;
+        
+        push @errors, { id => "workgroups", msg => "Object not found"}
+            unless ($workgroups);
+
+        # Creator
+        push @fields, "creator";
+        push @fields, "creator_shortcut";
+        push @data, $c->QuerySessionGet("member.id");
+        push @data, $c->QuerySessionGet("member.shortcut");
+
+        # Set manager
+        my $manager = $c->sql->Q(" SELECT id, shortcut FROM profiles WHERE id = ?", [ $i_manager ])->Hash;
+        push @fields, "manager";
+        push @fields, "manager_shortcut";
+        push @data, $manager->{id};
+        push @data, $manager->{shortcut};
+        
+        push @errors, { id => "manager", msg => "Object not found"}
+            unless ($manager);
+
+        # Set Holder
+        my $holder = $c->sql->Q(" SELECT id, shortcut FROM profiles WHERE id = ?", [ $manager->{id} || $member ])->Hash;
+        push @fields, "holder";
+        push @fields, "holder_shortcut";
+        push @data, $holder->{id};
+        push @data, $holder->{shortcut};
+        
+        push @errors, { id => "holder", msg => "Object not found"}
+            unless ($holder);
+        
+        
 
         # Set Assignmnent
 
-        my $assignment = $c->sql->Q("
+        my $stage = $c->sql->Q("
             SELECT
-                id,
-                catalog, catalog_shortcut,
-                principal_type, principal, principal_shortcut,
-                branch, branch_shortcut,
-                stage, stage_shortcut,
-                readiness, readiness_shortcut, progress, color
-            FROM view_assignments WHERE id=?
-        ", [ $i_assignment ])->Hash;
+                t1.id as branch, t1.shortcut as branch_shortcut,
+                t2.id as stage, t2.shortcut as stage_shortcut,
+                t3.id as readiness, t3.shortcut as readiness_shortcut, t3.color, t3.weight as progress
+                FROM branches t1, stages t2, readiness t3
+            WHERE edition = ? AND t2.branch = t1.id AND t3.id = t2.readiness
+            ORDER BY t2.weight LIMIT 1
+        ", [ $i_edition ])->Hash;
 
-        if ($assignment->{id}) {
-
-            # Set Workgroup
-            push @fields, "workgroup";
-            push @fields, "workgroup_shortcut";
-            push @data, $assignment->{catalog};
-            push @data, $assignment->{catalog_shortcut};
-
-            # Set Inworkgroups[]
-            my $catalogs = $c->sql->Q("
-                SELECT ARRAY( select id from catalog where path @> ( select path from catalog where id = ? ) )
-            ", [ $assignment->{catalog} ])->Array;
-            push @fields, "inworkgroups";
-            push @data, $catalogs;
+        push @errors, { id => "stage", msg => "Object not found"}
+            unless ($stage);
+            
+        if ($stage->{stage}) {
 
             # Set Branch
             push @fields, "branch";
             push @fields, "branch_shortcut";
-            push @data, $assignment->{branch};
-            push @data, $assignment->{branch_shortcut};
-
+            push @data, $stage->{branch};
+            push @data, $stage->{branch_shortcut};
+            
             # Set Stage
             push @fields, "stage";
             push @fields, "stage_shortcut";
-            push @data, $assignment->{stage};
-            push @data, $assignment->{stage_shortcut};
+            push @data, $stage->{stage};
+            push @data, $stage->{stage_shortcut};
 
             # Set Readiness
             push @fields, "readiness";
             push @fields, "readiness_shortcut";
-            push @data, $assignment->{readiness};
-            push @data, $assignment->{readiness_shortcut};
+            push @data, $stage->{readiness};
+            push @data, $stage->{readiness_shortcut};
 
             # Set Color
             push @fields, "color";
-            push @data, $assignment->{color};
+            push @data, $stage->{color};
 
             # Set Progress
             push @fields, "progress";
-            push @data, $assignment->{progress};
-
-            # Set Holder
-            push @fields, "holder";
-            push @fields, "holder_shortcut";
-            push @data, $assignment->{principal};
-            push @data, $assignment->{principal_shortcut};
-
-            # Set manager
-            push @fields, "manager";
-            push @fields, "manager_shortcut";
-            push @data, $assignment->{principal};
-            push @data, $assignment->{principal_shortcut};
+            push @data, $stage->{progress};
 
         }
 
         # Fascicle, && Headline && Rubric
         my $fascicle = $c->sql->Q(" SELECT id, shortcut FROM fascicles WHERE id = ?", [ $i_fascicle ])->Hash;
+        
+        push @errors, { id => "fascicle", msg => "Object not found"}
+            unless ($fascicle);
+        
         if ($fascicle->{id} && $fascicle->{shortcut}) {
 
             push @fields, "fascicle";
@@ -412,15 +449,15 @@ sub create {
                     }
                 }
             }
-
         }
-
+    }
+    
+    unless (@errors) {
         my @placeholders;
         foreach (@data) { push @placeholders, "?"; }
-
         $sql = " INSERT INTO documents (" . ( join ",", @fields ) .") VALUES (". ( join ",", @placeholders ) .") ";
         $c->sql->Do($sql, \@data);
-
+        
         $success = $c->json->true;
     }
 

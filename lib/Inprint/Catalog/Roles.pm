@@ -85,7 +85,6 @@ sub create {
     }
     
     $success = $c->json->true unless (@errors);
-    
     $c->render_json({ success => $success, errors => \@errors });
 }
 
@@ -124,7 +123,6 @@ sub update {
     }
     
     $success = $c->json->true unless (@errors);
-
     $c->render_json({ success => $success, errors => \@errors });
 }
 
@@ -147,7 +145,6 @@ sub delete {
     }
     
     $success = $c->json->true unless (@errors);
-    
     $c->render_json({ success => $success, errors => \@errors });
 }
 
@@ -176,7 +173,6 @@ sub map {
     }
     
     $success = $c->json->true unless (@errors);
-    
     $c->render_json({ success => $success, errors => \@errors });
 }
 

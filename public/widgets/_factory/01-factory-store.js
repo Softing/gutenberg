@@ -73,6 +73,7 @@ Inprint.factory.Store = new function() {
         "/documents/combos/editions/",
         "/documents/combos/stages/",
         "/documents/combos/assignments/",
+        "/documents/combos/managers/",
         "/documents/combos/fascicles/",
         "/documents/combos/headlines/",
         "/documents/combos/rubrics/",

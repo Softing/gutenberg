@@ -173,6 +173,13 @@ sub fatal {
 
 # Validation
 
+sub is_date {
+    my $c = shift;
+    my $text = shift;
+    return 1 if (length($text) > 0 && $text =~ m/^[0-9]{4}-[0-9]{2}-[0-9]{2}+$/);
+    return 0;
+}
+
 sub is_uuid {
     my $c = shift;
     my $text = shift;
@@ -190,7 +197,7 @@ sub is_int {
 sub is_text {
     my $c = shift;
     my $text = shift;
-    return 1 if (length($text) > 0 && $text =~ m/^[\w|\d|\s|\\|\/|"|'|#|-]+$/);
+    return 1 if (length($text) > 0 && $text =~ m/^[\w|\d|\s|\\|\/|"|'|#|-|.]+$/);
     return 0;
 }
 
@@ -204,7 +211,7 @@ sub is_path {
 sub is_rule {
     my $c = shift;
     my $text = shift;
-    return 1 if (length($text) > 0 && $text =~ m/^[a-z|:|*|\.]+$/);
+    return 1 if (length($text) > 0 && $text =~ m/^[a-z|:|*|-|\.]+$/);
     return 0;
 }
 

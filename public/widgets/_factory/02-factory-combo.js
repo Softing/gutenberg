@@ -7,9 +7,7 @@ Inprint.factory.Combo = new function() {
 
         editable:false,
         forceSelection: true,
-        //typeAhead: true,
         triggerAction: "all",
-        //hideOnSelect:false,
 
         minChars:2,
         queryDelay: 50,
@@ -27,19 +25,19 @@ Inprint.factory.Combo = new function() {
 
         // Catalog
         "/catalog/combos/editions/": {
-            name: "edition",
+            hiddenName: "edition",
             icon: "building",
             fieldLabel: _("Edition"),
             emptyText: _("Select") + "..."
         },
         "/catalog/combos/groups/": {
-            name: "catalog",
+            hiddenName: "catalog",
             icon: "building",
             fieldLabel: _("Group"),
             emptyText: _("Select") + "..."
         },
         "/catalog/combos/fascicles/": {
-            name: "catalog",
+            hiddenName: "catalog",
             icon: "book",
             fieldLabel: _("Fascic;e"),
             emptyText: _("Select") + "..."
@@ -50,7 +48,7 @@ Inprint.factory.Combo = new function() {
             emptyText: _("Select") + "..."
         },
         "/catalog/combos/roles/": {
-            name: "role",
+            hiddenName: "role",
             fieldLabel: _("Role"),
             emptyText: _("Select") + "..."
         },
@@ -58,7 +56,7 @@ Inprint.factory.Combo = new function() {
 
         // Fascicles
         "/calendar/combo/groups/": {
-            name: "calendar-group",
+            hiddenName: "calendar-group",
             fieldLabel: _("Edition"),
             emptyText: _("Edition") + "..."
         },
@@ -81,6 +79,13 @@ Inprint.factory.Combo = new function() {
             icon: "toggle-small",
             fieldLabel: _("Assignment"),
             emptyText: _("Assignment") + "..."
+        },
+        "/documents/combos/managers/": {
+            name: "manager-shortcut",
+            hiddenName: "manager",
+            icon: "user-business",
+            fieldLabel: _("Manager"),
+            emptyText: _("Manager") + "..."
         },
         "/documents/combos/fascicles/": {
             hiddenName: "fascicle",

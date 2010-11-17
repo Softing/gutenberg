@@ -188,7 +188,6 @@ sub update {
     }
 
     $success = $c->json->true unless (@errors);
-    
     $c->render_json({ success => $success, errors => \@errors });
 }
 

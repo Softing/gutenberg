@@ -6,15 +6,16 @@ Inprint.cmp.CreateDocument = Ext.extend(Ext.Window, {
         this.form = new Inprint.cmp.CreateDocument.Form();
 
         Ext.apply(this, {
-            title: _("Create a new document"),
             modal:true,
             layout: "fit",
-            width:700, height:380,
             items: this.form,
+            width:700, height:380,
+            title: _("Create a new document"),
             buttons:[
                 {
-                    text: _("Create"),
                     scope:this,
+                    disabled:true,
+                    text: _("Create"),
                     handler: function() {
                         this.form.getForm().submit();
                     }
@@ -38,11 +39,11 @@ Inprint.cmp.CreateDocument = Ext.extend(Ext.Window, {
 
         Inprint.cmp.CreateDocument.superclass.initComponent.apply(this, arguments);
 
-        Inprint.cmp.CreateDocument.Interaction(this.panels);
     },
 
     onRender: function() {
         Inprint.cmp.CreateDocument.superclass.onRender.apply(this, arguments);
+        Inprint.cmp.CreateDocument.Access(this, this.form);
     }
 
 });

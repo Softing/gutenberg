@@ -201,7 +201,10 @@ Ext.onReady(function() {
             !Inprint.session.member.shortcut ||
             !Inprint.session.member.position ||
             !Inprint.session.options ||
-            !Inprint.session.options["transfer.capture.destination"]
+            !Inprint.session.options["default.edition"] ||
+            !Inprint.session.options["default.edition.name"] ||
+            !Inprint.session.options["default.workgroup"] ||
+            !Inprint.session.options["default.workgroup.name"] 
         ) {
             Inprint.checkInProgress = true;
             var setupWindow = new Inprint.cmp.memberSetupWindow();

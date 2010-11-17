@@ -65,6 +65,7 @@ sub Check {
             $sql .= " AND binding=?";
             push @data, $binding;
         }
+        
         $result = $c->{handler}->sql->Q("SELECT EXISTS ($sql)", \@data)->Value();
     }
     
