@@ -656,44 +656,36 @@ sub capture {
 
     my $success = $c->json->false;
 
-    my $assignment = $c->sql->Q("
-        SELECT
-            id,
-            catalog, catalog_shortcut,
-            principal_type, principal, principal_shortcut,
-            branch, branch_shortcut,
-            stage, stage_shortcut,
-            readiness, readiness_shortcut,
-            progress, color
-        FROM view_assignments
-        WHERE id = (
-            SELECT option_value
-            FROM options
-            WHERE option_name = 'transfer.capture.destination' AND member=?
-        )::uuid
-    ", [ $c->QuerySessionGet("member.id") ])->Hash;
+    my $current_user      = $c->QuerySessionGet("member.id");
+    my $default_edition   = $c->QuerySessionGet("options.default.edition");
+    my $default_workgroup = $c->QuerySessionGet("options.default.workgroup");
 
-    if ($assignment) {
-        $success = $c->json->true;
-        foreach my $id (@ids) {
+    my $member    = $c->sql->Q(" SELECT id, shortcut FROM profiles WHERE id=? ", [ $current_user ])->Hash;
+    my $edition   = $c->sql->Q(" SELECT id, shortcut FROM editions WHERE id=? ", [ $default_edition ])->Hash;
+    my $workgroup = $c->sql->Q(" SELECT id, shortcut FROM catalog WHERE id=? ", [ $default_workgroup ])->Hash;
 
-            my $workgroups = $c->sql->Q("
-                SELECT ARRAY( select id from catalog where path @> ( select path from catalog where id = ? ) )
-            ", [ $assignment->{catalog} ])->Array;
-
-            $c->sql->Do("
-                UPDATE documents SET
-                    holder=?, holder_shortcut=?,
-                    workgroup=?, workgroup_shortcut=?, inworkgroups=?,
-                    readiness=?, readiness_shortcut=?, color=?, progress=?, rdate=now()
-                WHERE id=?
-            ", [
-                $assignment->{principal}, $assignment->{principal_shortcut},
-                $assignment->{catalog}, $assignment->{catalog_shortcut}, $workgroups,
-                $assignment->{readiness}, $assignment->{readiness_shortcut},
-                $assignment->{color}, $assignment->{progress},
-                $id
-            ]);
+    if ($member->{id}, $edition->{id}, $workgroup->{id} ) {
+        if ($member->{shortcut}, $edition->{shortcut}, $workgroup->{shortcut} ) {
+            foreach my $id (@ids) {
+                
+                $success = $c->json->true;
+                
+                my $workgroups = $c->sql->Q("
+                    SELECT ARRAY( select id from catalog where path @> ( select path from catalog where id = ? ) )
+                ", [ $workgroup->{id} ])->Array;
+                
+                $c->sql->Do("
+                    UPDATE documents SET
+                        holder=?, holder_shortcut=?,
+                        workgroup=?, workgroup_shortcut=?, inworkgroups=?,
+                        rdate=now()
+                    WHERE id=?
+                ", [
+                    $member->{id}, $member->{shortcut},
+                    $workgroup->{id}, $workgroup->{shortcut}, $workgroups,
+                    $id
+                ]);
+            }
         }
     }
 

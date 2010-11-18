@@ -47,14 +47,21 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                 id:"edition",
                 dataIndex: "edition_shortcut",
                 header: _("Edition"),
-                width: 50,
+                width: 60,
+                sortable: true
+            },
+            {
+                id:"workgroup",
+                dataIndex: "workgroup_shortcut",
+                header: _("Group"),
+                width: 55,
                 sortable: true
             },
             {
                 id:"fascicle",
                 dataIndex: "fascicle_shortcut",
                 header: _("Fascicle"),
-                width: 90,
+                width: 65,
                 sortable: true,
                 renderer : this.renderers.fascicle
             },
@@ -62,21 +69,21 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                 id:"headline",
                 dataIndex: "headline_shortcut",
                 header: _("Headline"),
-                width: 100,
+                width: 90,
                 sortable: true
             },
             {
                 id:"rubric",
                 dataIndex: "rubric_shortcut",
                 header: _("Rubric"),
-                width: 100,
+                width: 80,
                 sortable: true
             },
             {
                 id:"pages",
                 dataIndex: "pages",
                 header: _("Pages"),
-                width: 50,
+                width: 55,
                 sortable: true
             },
 
@@ -93,15 +100,8 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                 dataIndex: "progress",
                 header: _("Progress"),
                 sortable: true,
-                width: 80,
+                width: 75,
                 renderer : this.renderers.progress
-            },
-            {
-                id:"workgroup",
-                dataIndex: "workgroup_shortcut",
-                header: _("Group"),
-                width: 90,
-                sortable: true
             },
             {
                 id:"holder",

@@ -9,12 +9,13 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
 
         this.items = [
             {
-                width:180,
+                width:140,
                 xtype: 'textfield',
                 emptyText: _("Title") + "...",
                 name: "title"
             },
             {
+                columnWidth:.125,
                 xtype: "treecombo",
                 name: "edition",
                 fieldLabel: _("Edition"),
@@ -35,6 +36,7 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                 }
             },
             {
+                columnWidth:.125,
                 xtype: "treecombo",
                 name: "group",
                 fieldLabel: _("Group"),
@@ -77,16 +79,6 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                 cacheQuery: false,
                 listeners: {
                     scope: this,
-                    //render: function(combo) {
-                    //    this.getForm().findField("edition").on("select", function() {
-                    //        combo.disable();
-                    //        combo.reset();
-                    //    }, this);
-                    //    this.getForm().findField("fascicle").on("select", function() {
-                    //        combo.enable();
-                    //        combo.reset();
-                    //    }, this);
-                    //},
                     beforequery: function(qe) {
                         qe.combo.getStore().baseParams = this.getFilterParams();
                         delete qe.combo.lastQuery;
