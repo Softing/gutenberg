@@ -43,3 +43,9 @@
 .x-grid3-progresscol .x-progress-wrap {
    border:0px !important;
 }
+
+/**/
+
+.x-grid3-body .inprint-document-grid-current-user-bg {
+    background-color: #F2FFE5;
+}

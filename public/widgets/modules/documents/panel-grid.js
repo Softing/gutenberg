@@ -87,7 +87,6 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                 sortable: true
             },
 
-
             {
                 id:"manager",
                 dataIndex: "manager_shortcut",
@@ -266,28 +265,6 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
             displayInfo: true,
             displayMsg: _("Displaying documents {0} - {1} of {2}"),
             emptyMsg: _("No documents to display")
-            //items:[
-            //    '-',
-            //    {
-            //        xtype:'slider',
-            //        stateful: true,
-            //        stateId: 'documents.grid.slider',
-            //        width: 214,
-            //        value:60,
-            //        increment: 30,
-            //        minValue: 60,
-            //        maxValue: 120,
-            //        listeners: {
-            //            scope:this,
-            //            statesave: function (field, state) {
-            //                alert(state);
-            //            },
-            //            changecomplete: function(field, value) {
-            //                this.store.load({params:{start:0, limit:value}});
-            //            }
-            //        }
-            //    }
-            //]
         });
 
         Ext.apply(this, {
@@ -298,7 +275,15 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
             sm: this.sm,
             tbar: this.tbar,
             columns: this.columns,
-            bbar: this.bbar
+            bbar: this.bbar,
+            viewConfig: {
+                getRowClass: function(record, rowIndex, rp, ds) {
+                    if (Inprint.session.member && record.get("holder") == Inprint.session.member.id) {
+                        return 'inprint-document-grid-current-user-bg';
+                    }
+                    return '';
+                }
+            }
         });
 
         Inprint.documents.Grid.superclass.initComponent.apply(this, arguments);
@@ -308,7 +293,7 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
     onRender: function() {
 
         Inprint.documents.Grid.superclass.onRender.apply(this, arguments);
-
+        
         this.filter.on("restore", function(filter, params) {
             this.store.load({ params: Ext.apply({start:0, limit:60}, params) });
         }, this);
