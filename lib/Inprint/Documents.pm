@@ -141,6 +141,8 @@ sub list {
     ";
 
     my $sql_filters = " WHERE 1=1 ";
+    
+    #$sql_filters .= " AND id = '296f7e02-9728-46a4-9dc1-b38f8d9e1335' ";
 
     # Set Restrictions
 
@@ -260,12 +262,12 @@ sub list {
         my @rules = qw(update capture move transfer briefcase delete recover);
         
         foreach (@rules) {
-            if ($document->{manager} eq $current_member) {
+            if ($document->{holder} eq $current_member) {
                 if ($c->access->Check(["catalog.documents.$_:*"], $document->{workgroup})) {
                     $document->{access}->{$_} = $c->json->true;
                 }
             }
-            if ($document->{manager} ne $current_member) {
+            if ($document->{holder} ne $current_member) {
                 if ($c->access->Check("catalog.documents.$_:group", $document->{workgroup})) {
                     $document->{access}->{$_} = $c->json->true;
                 }
