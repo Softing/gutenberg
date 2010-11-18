@@ -10,31 +10,31 @@ use warnings;
 
 use base 'Inprint::BaseController';
 
-sub editions {
-    my $c = shift;
-
-    my $result = $c->sql->Q("
-        SELECT t1.id, t1.shortcut as title, nlevel(path) as nlevel, '' as description,
-            array_to_string( ARRAY( select shortcut FROM catalog where path @> t1.path ORDER BY nlevel(path) ), '.') as title_path
-        FROM editions t1
-        ORDER BY title_path
-    ")->Hashes;
-
-    $c->render_json( { data => $result } );
-}
-
-sub groups {
-    my $c = shift;
-
-    my $result = $c->sql->Q("
-        SELECT t1.id, t1.shortcut as title, nlevel(path) as nlevel, '' as description,
-            array_to_string( ARRAY( select shortcut FROM catalog where path @> t1.path ORDER BY nlevel(path) ), '.') as title_path
-        FROM catalog t1
-        ORDER BY title_path
-    ")->Hashes;
-
-    $c->render_json( { data => $result } );
-}
+#sub editions {
+#    my $c = shift;
+#
+#    my $result = $c->sql->Q("
+#        SELECT t1.id, t1.shortcut as title, nlevel(path) as nlevel, '' as description,
+#            array_to_string( ARRAY( select shortcut FROM catalog where path @> t1.path ORDER BY nlevel(path) ), '.') as title_path
+#        FROM editions t1
+#        ORDER BY title_path
+#    ")->Hashes;
+#
+#    $c->render_json( { data => $result } );
+#}
+#
+#sub groups {
+#    my $c = shift;
+#
+#    my $result = $c->sql->Q("
+#        SELECT t1.id, t1.shortcut as title, nlevel(path) as nlevel, '' as description,
+#            array_to_string( ARRAY( select shortcut FROM catalog where path @> t1.path ORDER BY nlevel(path) ), '.') as title_path
+#        FROM catalog t1
+#        ORDER BY title_path
+#    ")->Hashes;
+#
+#    $c->render_json( { data => $result } );
+#}
 
 sub fascicles {
 
@@ -107,13 +107,16 @@ sub headlines {
 
     my $cgi_fascicle = $c->param("flt_fascicle") || undef;
 
-    my $sql = " SELECT DISTINCT headline as id, headline_shortcut as title FROM documents WHERE 1=1 ";
+    my $sql = " SELECT DISTINCT headline as id, headline_shortcut as title FROM documents WHERE edition=ANY(?) ";
+
+    my $editions = $c->access->GetChildrens("editions.documents.work");
+    push @data, $editions;
 
     if ($cgi_fascicle &&  $cgi_fascicle ne "clear") {
         $sql .= " AND fascicle = ? ";
         push @data, $cgi_fascicle;
     }
-
+    
     $sql .= " ORDER BY headline_shortcut ";
 
     my $result = $c->sql->Q($sql, \@data)->Hashes;
@@ -139,7 +142,10 @@ sub rubrics {
     my $cgi_fascicle = $c->param("flt_fascicle") || undef;
     my $cgi_headline = $c->param("flt_headline") || undef;
 
-    my $sql = " SELECT DISTINCT rubric as id, rubric_shortcut as title FROM documents WHERE 1=1 ";
+    my $sql = " SELECT DISTINCT rubric as id, rubric_shortcut as title FROM documents WHERE edition=ANY(?) ";
+
+    my $editions = $c->access->GetChildrens("editions.documents.work");
+    push @data, $editions;
 
     if ($cgi_fascicle &&  $cgi_fascicle ne "clear") {
         $sql .= " AND fascicle = ? ";
@@ -182,7 +188,7 @@ sub managers {
             FROM documents t1, view_principals t2 WHERE t2.id = t1.manager
         ",
         " ORDER BY icon, t2.shortcut; ");
-
+    
     my $result = $c->sql->Q($sql->{sql}, $sql->{params})->Hashes;
 
     unshift @$result, {
@@ -274,11 +280,11 @@ sub createSqlFilter {
     my $group    = $c->param("flt_group")    || undef;
     my $title    = $c->param("flt_title")    || undef;
     my $fascicle = $c->param("flt_fascicle") || undef;
-    #my $headline = $c->param("flt_headline") || undef;
-    #my $rubric   = $c->param("flt_rubric")   || undef;
-    #my $manager  = $c->param("flt_manager")  || undef;
-    #my $holder   = $c->param("flt_holder")   || undef;
-    #my $progress = $c->param("flt_progress") || undef;
+    
+    my $editions = $c->access->GetChildrens("editions.documents.work");
+    push @params, $editions;
+    
+    $sql .= " AND t1.edition = ANY (?)";
 
     # Modes
 
