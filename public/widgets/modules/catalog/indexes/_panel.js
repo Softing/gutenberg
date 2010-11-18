@@ -1,18 +1,15 @@
-Inprint.catalog.indexes.Panel = Ext.extend(Ext.Window, {
+Inprint.catalog.indexes.Panel = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
 
         this.panels = {};
-        this.panels.editions    = new Inprint.catalog.indexes.Panel.TreeEditions();
-        this.panels.stages      = new Inprint.catalog.indexes.Panel.TreeStages();
-        this.panels.principals  = new Inprint.catalog.indexes.Panel.Principals();
+        this.panels["editions"]  = new Inprint.catalog.indexes.TreeEditions();
+        this.panels["headlines"] = new Inprint.catalog.indexes.TreeHeadlines();
+        this.panels["rubrics"]   = new Inprint.catalog.indexes.Rubrics();
 
         Ext.apply(this, {
-            title: _("Transfer browser"),
             border:false,
-            modal:true,
             layout: "hbox",
-            width:800, height:400,
             layoutConfig: {
                 align : 'stretch',
                 pack  : 'start'
@@ -22,60 +19,40 @@ Inprint.catalog.indexes.Panel = Ext.extend(Ext.Window, {
                     flex:1,
                     layout:"fit",
                     margins: "0 0 0 0",
-                    width: 100,
+                    width: 130,
                     collapsible: false,
                     split: true,
-                    items: this.panels.editions
+                    items: this.panels["editions"]
                 },
                 {
                     flex:2,
                     layout:"fit",
                     margins: "0 3 0 3",
-                    width: 160,
+                    width: 200,
                     collapsible: false,
                     split: true,
-                    items: this.panels.stages
+                    items: this.panels["headlines"]
                 },
                 {
                     flex:3,
                     layout:"fit",
                     margins: "0 0 0 0",
-                    items: this.panels.principals
-                }
-            ],
-            buttons:[
-                {
-                    text: _("Transfer"),
-                    scope:this,
-                    disabled:true,
-                    handler: function() {
-                        this.fireEvent('complete', this.panels.principals.getValue("id"));
-                        this.hide();
-                    }
-                },
-                {
-                    text: _("Close"),
-                    scope:this,
-                    handler: function() {
-                        this.hide();
-                    }
+                    items: this.panels["rubrics"]
                 }
             ]
         });
         Inprint.catalog.indexes.Panel.superclass.initComponent.apply(this, arguments);
-        Inprint.catalog.indexes.Panel.Interaction(this, this.panels);
-
-        this.addEvents('complete');
     },
 
     onRender: function() {
         Inprint.catalog.indexes.Panel.superclass.onRender.apply(this, arguments);
+        Inprint.catalog.indexes.Interaction(this, this.panels);
     }
 
 });
 
 Inprint.registry.register("settings-indexes", {
-    icon: "category",
-    text: _("Readiness"),
+    icon: "marker",
+    text: _("Index"),
     xobject: Inprint.catalog.indexes.Panel
 });

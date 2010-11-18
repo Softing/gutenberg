@@ -1,11 +1,10 @@
-Inprint.catalog.indexes.Panel.Principals = Ext.extend(Ext.grid.GridPanel, {
+Inprint.catalog.indexes.Rubrics = Ext.extend(Ext.grid.GridPanel, {
 
     initComponent: function() {
 
-        this.store = Inprint.factory.Store.json("/common/transfer/list/");
-        this.selectionModel = new Ext.grid.CheckboxSelectionModel({
-            singleSelect:true
-        });
+        this.store = Inprint.factory.Store.json("/catalog/indexes/rubrics/");
+        
+        this.selectionModel = new Ext.grid.CheckboxSelectionModel();
 
         Ext.apply(this, {
             border: false,
@@ -16,40 +15,11 @@ Inprint.catalog.indexes.Panel.Principals = Ext.extend(Ext.grid.GridPanel, {
             columns: [
                 this.selectionModel,
                 {
-                    id:"icon",
-                    width: 28,
-                    dataIndex: "type",
-                    renderer: function(v) {
-                        var icon;
-                        switch (v) {
-                            case "group":
-                                icon = _ico("folder");
-                            break;
-                            case "member":
-                                icon = _ico("user");
-                            break;
-                        }
-                        return "<img src=\""+ icon +"\">";
-                    }
-                },
-                {
                     id:"name",
-                    header: _("Title"),
+                    header: _("Shortcut"),
                     width: 160,
                     sortable: true,
-                    dataIndex: "title",
-                    renderer: function(v, p, record) {
-                        var text;
-                        switch (record.data.type) {
-                            case "group":
-                                text = "<b>" + v +"</b>";
-                            break;
-                            case "member":
-                                text = v;
-                            break;
-                        }
-                        return text;
-                    }
+                    dataIndex: "shortcut"
                 },
                 {
                     id:"description",
@@ -68,12 +38,12 @@ Inprint.catalog.indexes.Panel.Principals = Ext.extend(Ext.grid.GridPanel, {
             ]
         });
 
-        Inprint.catalog.indexes.Panel.Principals.superclass.initComponent.apply(this, arguments);
+        Inprint.catalog.indexes.Rubrics.superclass.initComponent.apply(this, arguments);
 
     },
 
     onRender: function() {
-        Inprint.catalog.indexes.Panel.Principals.superclass.onRender.apply(this, arguments);
+        Inprint.catalog.indexes.Rubrics.superclass.onRender.apply(this, arguments);
     }
 
 });
