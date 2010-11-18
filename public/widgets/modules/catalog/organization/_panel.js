@@ -68,3 +68,9 @@ Inprint.catalog.organization.Panel = Ext.extend(Ext.Panel, {
     }
 
 });
+
+Inprint.registry.register("settings-organization", {
+    icon: "building",
+    text: _("Organization"),
+    xobject: Inprint.catalog.organization.Panel
+});

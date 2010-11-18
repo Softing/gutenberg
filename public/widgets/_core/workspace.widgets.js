@@ -35,15 +35,7 @@ Inprint.About = function(conf){
 Inprint.Help = Ext.extend(Ext.Panel, {
    
     initComponent:function() {
-      
-        //var config = {
-        //    items: {
-        //        xtype: 'iframepanel',
-        //        defaultSrc: '/help/' + this.link,
-        //        loadMask: true
-        //    }
-        //};
-            
+        
         Ext.apply(this, {
             title: _("Help center")
         });
@@ -71,19 +63,17 @@ Inprint.Logout = function(btn) {
     }
 };
 
-//            if (item.id == "portal"){
-//                Inprint.layout.CardPanel.layout.setActiveItem(0);
-//            }
-//
-//            if (item.id == "inprint-user-card"){
-//                var cmp = new Inprint.widgets.UserCard();
-//                cmp.show();
-//            }
-//
-//            if (item.id == "inprint-user-settings"){
-//                var cmp = new Inprint.widgets.UserSettings();
-//                cmp.show();
-//            }
-//            if (item.id == "inprint-about"){
-//                Inprint.widgets.about();
-//            }
+Inprint.registry.register("core-help", {
+    icon: "lifebuoy",
+    text: _("Help"),
+    tooltip: "Help center",
+    xobject: "Inprint.Help"
+});
+
+Inprint.registry.register("core-about", {
+    icon: "information",
+    text: _("About"),
+    handler: function() {
+        Inprint.About()
+    }
+});

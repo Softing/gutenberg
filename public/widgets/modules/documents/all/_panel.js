@@ -38,5 +38,12 @@ Inprint.documents.all.Panel = Ext.extend(Ext.Panel, {
     
     cmpReload: function() {
         this.panels.grid.cmpReload();
-    },
+    }
+    
+});
+
+Inprint.registry.register("documents-all", {
+    icon: "documents-stack",
+    text:  _("All"),
+    xobject: Inprint.documents.all.Panel
 });

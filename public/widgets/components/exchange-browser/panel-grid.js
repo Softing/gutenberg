@@ -2,12 +2,13 @@ Inprint.cmp.ExcahngeBrowser.Principals = Ext.extend(Ext.grid.GridPanel, {
 
     initComponent: function() {
 
-        this.store = Inprint.factory.Store.json("/catalog/transfer/list/");
+        this.store = Inprint.factory.Store.json("/common/transfer/list/");
         this.selectionModel = new Ext.grid.CheckboxSelectionModel({
             singleSelect:true
         });
 
         Ext.apply(this, {
+            border: false,
             stripeRows: true,
             columnLines: true,
             sm: this.selectionModel,

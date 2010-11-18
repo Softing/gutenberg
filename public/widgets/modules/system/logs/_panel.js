@@ -76,3 +76,9 @@ Inprint.system.logs.Panel = Ext.extend(Ext.grid.GridPanel, {
     }
 
 });
+
+Inprint.registry.register("core-logs", {
+    icon: "lifebuoy",
+    text: _("Logs"),
+    xobject: Inprint.system.logs.Panel
+});

@@ -5,7 +5,7 @@ Inprint.cmp.ExcahngeBrowser.TreeStages = Ext.extend(Ext.tree.TreePanel, {
         this.components = {};
 
         this.urls = {
-            "tree":    _url("/catalog/transfer/branches/")
+            "tree":    _url("/common/transfer/branches/")
         };
 
         Ext.apply(this, {

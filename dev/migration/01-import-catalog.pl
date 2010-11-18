@@ -80,23 +80,21 @@ foreach my $item( @{ $editions } ) {
         INSERT INTO editions (id, path, title, shortcut, description)
         VALUES (?, ?, ?, ?, ?)
     ", [ $idEdition, cleanUUID($rootnode), $item->{name}, $item->{sname}, $item->{description} ]);
-
+    
     $sql->Do("
         INSERT INTO catalog (id, path, title, shortcut, description, type, capables)
         VALUES (?, ?, ?, ?, ?, 'ou', '{default}')
     ", [ $idCatalog, cleanUUID($rootnode), $item->{name}, $item->{sname}, $item->{description} ]);
-
+    
     # Import Departments
-
-    my $departments = $sql2->Q("
-        SELECT * FROM passport.department WHERE edition = ?
-    ", [ $item->{uuid} ])->Hashes();
-
+    
+    my $path = $sql->Q(" SELECT path FROM catalog WHERE id = ? ", [ $idCatalog ])->Value;
+    my $departments = $sql2->Q(" SELECT * FROM passport.department WHERE edition = ? ", [ $item->{uuid} ])->Hashes();
     foreach my $item2 ( @{ $departments } ) {
         $sql->Do("
             INSERT INTO catalog (id, path, title, shortcut, description, type, capables)
             VALUES (?, ?, ?, ?, ?, 'ou', '{default}')
-        ", [ $item2->{uuid}, cleanUUID($idCatalog), $item2->{title}, $item->{sname}."/".$item2->{title}, $item2->{description} ]);
+        ", [ $item2->{uuid}, $path, $item2->{title}, $item->{sname}."/".$item2->{title}, $item2->{description} ]);
     }
 
 }

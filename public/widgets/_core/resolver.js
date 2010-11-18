@@ -89,7 +89,7 @@ Inprint.ObjectResolver = function() {
             config.title += "</div>";
 
             var tools = [];
-            //tools.push("Inprint 5.0");
+
             tools.push({
                 id: "refresh",
                 qtip: _("Refresh this panel"),
@@ -108,11 +108,8 @@ Inprint.ObjectResolver = function() {
             });
 
             config.tools = tools;
-
-            if (Inprint.registry[item.aid]["object"]) {
-                config.items = new Inprint.registry[item.aid]["object"]();
-            }
-            else if (Inprint.registry[item.aid]["xobject"]) {
+            var xobject = Inprint.registry[item.aid]["xobject"];
+            if (xobject && typeof(xobject) == "function") {
                 config.items = { xtype: item.aid, oid: item.oid };
             } else {
                 config.items = new Ext.Panel({

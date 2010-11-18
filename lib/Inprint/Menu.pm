@@ -39,12 +39,7 @@ sub index
         ]
     };
     push @result, $about;
-
-    # Portal
-    my $portal = {
-        id   => "portal"
-    };
-    push @result, $portal;
+    push @result, "-";
 
     #
     # Documents menu items
@@ -177,6 +172,7 @@ sub index
         push @{ $settings->{menu} }, { id => "settings-editions" };
         push @{ $settings->{menu} }, { id => "settings-roles" };
         push @{ $settings->{menu} }, { id => "settings-readiness" };
+        push @{ $settings->{menu} }, { id => "settings-indexes" };
         
         push @result, $settings;
     }

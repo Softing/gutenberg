@@ -45,3 +45,9 @@ Inprint.catalog.roles.Panel = Ext.extend(Ext.Panel, {
     }
 
 });
+
+Inprint.registry.register("settings-roles", {
+    icon: "user-silhouette",
+    text: _("Roles"),
+    xobject: Inprint.catalog.roles.Panel
+});

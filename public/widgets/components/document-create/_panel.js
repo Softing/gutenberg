@@ -47,3 +47,13 @@ Inprint.cmp.CreateDocument = Ext.extend(Ext.Window, {
     }
 
 });
+
+Inprint.registry.register("documents-create", {
+    modal: false,
+    icon: "plus-button",
+    text:  _("Create document"),
+    menutext:  _("Create"),
+    handler: function() {
+        new Inprint.cmp.CreateDocument().show();
+    }
+});

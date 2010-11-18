@@ -44,3 +44,9 @@ Inprint.documents.archive.Panel = Ext.extend(Ext.Panel, {
         Inprint.documents.archive.Panel.superclass.onRender.apply(this, arguments);
     }
 });
+
+Inprint.registry.register("documents-archive", {
+    icon: "folders-stack",
+    text:  _("Archive"),
+    xobject: Inprint.documents.archive.Panel
+});

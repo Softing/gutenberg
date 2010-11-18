@@ -43,30 +43,10 @@ Inprint.cmp.memberRulesForm.Organization.Tree = Ext.extend(Ext.tree.TreePanel, {
     },
 
     onRender: function() {
-
         Inprint.cmp.memberRulesForm.Organization.Tree.superclass.onRender.apply(this, arguments);
-
-        this.on("beforeload", function() {
-            this.body.mask(_("Please wait..."));
-        });
-
-        this.on("load", function() {
-            this.body.unmask();
-        });
-
-        this.on("afterrender", function() {
-
-            this.getRootNode().expand();
-            this.getRootNode().on("expand", function(node) {
-                node.firstChild.expand();
-                node.firstChild.select();
-            });
-
-            this.getLoader().on("beforeload", function() { this.body.mask(_("Loading")); }, this);
-            this.getLoader().on("load", function() { this.body.unmask(); }, this);
-
-        }, this);
-
+        this.getRootNode().expand();
+        this.getLoader().on("beforeload", function() { this.body.mask(_("Loading")); }, this);
+        this.getLoader().on("load", function() { this.body.unmask(); }, this);
     }
 
 });

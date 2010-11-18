@@ -82,6 +82,9 @@ sub startup {
     # Calendar routes
     $self->createRoutes($sessionBridge, "calendar",             [ "create", "read", "update", "delete", "list", "enable", "disable", "combogroups" ]);
 
+    # Common routes
+    $self->createRoutes($sessionBridge, "common/transfer",      [ "editions", "branches", "list" ]);
+
     # Documents routes
     $self->createRoutes($sessionBridge, "documents",            [ "create", "read", "update", "delete", "list", "capture", "transfer", "briefcase", "recycle" ]);
     $self->createRoutes($sessionBridge, "documents/common",     [ "fascicles" ]);
@@ -100,10 +103,7 @@ sub startup {
     $self->createRoutes($sessionBridge, "catalog/members",      [ "create", "delete", "list", "rules", "setup" ]); #"map", "mapping",
     $self->createRoutes($sessionBridge, "catalog/stages",       [ "create", "read", "update", "delete", "list", "map-principals", "unmap-principals", "principals-mapping" ]);
     $self->createRoutes($sessionBridge, "catalog/principals",   [ "list" ]);
-
-    $self->createRoutes($sessionBridge, "catalog/transfer",     [ "editions", "branches", "list" ]);
-
-
+    
     # Profile routes
     $self->createRoutes($sessionBridge, "profile",              [ "read", "update" ]);
     $sessionBridge->route('/profile/image/:id')->to('profile#image', id => "00000000-0000-0000-0000-000000000000");

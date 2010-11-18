@@ -66,3 +66,9 @@ Inprint.documents.Profile = Ext.extend(Ext.Panel, {
     }
 
 });
+
+Inprint.registry.register("document-profile", {
+    icon: "document--pencil",
+    text: _("Document profile"),
+    xobject: Inprint.documents.Profile
+});

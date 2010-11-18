@@ -83,10 +83,10 @@ Inprint.cmp.memberSettingsForm.Form = Ext.extend(Ext.FormPanel, {
         var form = this.getForm();
         var options = Inprint.session.options;
 
-        if (options && options["default.edition"])
-            form.findField("edition-shortcut").on("render", function(field) { field.setValue(options["default.edition"], options["default.edition.name"]); });
-        if (options && options["default.workgroup"])
-            form.findField("workgroup-shortcut").on("render", function(field) { field.setValue(options["default.workgroup"], options["default.workgroup.name"]); });
+        //if (options && options["default.edition"])
+            //form.findField("edition-shortcut").on("render", function(field) { field.setValue(options["default.edition"], options["default.edition.name"]); });
+        //if (options && options["default.workgroup"])
+            //form.findField("workgroup-shortcut").on("render", function(field) { field.setValue(options["default.workgroup"], options["default.workgroup.name"]); });
     }
 
 });

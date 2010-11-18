@@ -52,3 +52,9 @@ Inprint.catalog.readiness.Panel = Ext.extend(Ext.Panel, {
     }
 
 });
+
+Inprint.registry.register("settings-readiness", {
+    icon: "category",
+    text: _("Readiness"),
+    xobject: Inprint.catalog.readiness.Panel
+});

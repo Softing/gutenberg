@@ -44,3 +44,9 @@ Inprint.documents.recycle.Panel = Ext.extend(Ext.Panel, {
         Inprint.documents.recycle.Panel.superclass.onRender.apply(this, arguments);
     }
 });
+
+Inprint.registry.register("documents-recycle", {
+    icon: "bin",
+    text:  _("Recycle"),
+    xobject: Inprint.documents.recycle.Panel
+});

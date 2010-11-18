@@ -180,12 +180,15 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                     disabled: true,
                                     listeners: {
                                         scope: this,
+                                        render: function(combo) {
+                                            combo.setValue("00000000-0000-0000-0000-000000000000", _("Briefcase"));
+                                        },
                                         beforequery: function(qe) {
                                             delete qe.combo.lastQuery;
                                             qe.combo.getStore().baseParams["flt_edition"] = this.getForm().findField("edition").getValue();
                                         }
                                     }
-                                }),
+                                }, { baseParams: { term: 'editions.documents.assign' } }),
 
                                 xc.getConfig("/documents/combos/headlines/", {
                                     disabled: true,
@@ -199,11 +202,12 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                             this.getForm().findField("fascicle").on("select", function() {
                                                 combo.enable();
                                                 combo.reset();
-                                                combo.getStore().baseParams["flt_fascicle"] = this.getForm().findField("fascicle").getValue();
                                             }, this);
                                         },
                                         beforequery: function(qe) {
                                             delete qe.combo.lastQuery;
+                                            qe.combo.getStore().baseParams["flt_edition"]  = this.getForm().findField("edition").getValue();
+                                            qe.combo.getStore().baseParams["flt_fascicle"] = this.getForm().findField("fascicle").getValue();
                                         }
                                     }
                                 }),

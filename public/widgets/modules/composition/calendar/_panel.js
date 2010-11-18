@@ -65,3 +65,9 @@ Inprint.edition.calendar.Panel = Ext.extend(Ext.Panel, {
     }
 
 });
+
+Inprint.registry.register("composition-calendar", {
+    icon: "calendar-day",
+    text:  _("Calendar"),
+    xobject: Inprint.edition.calendar.Panel
+});

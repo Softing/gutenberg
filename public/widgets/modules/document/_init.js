@@ -1,1 +1,1 @@
-Ext.namespace("Inprint.document");
+//Ext.namespace("Inprint.document");

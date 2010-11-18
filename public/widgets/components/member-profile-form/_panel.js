@@ -60,3 +60,11 @@ Inprint.cmp.memberProfileForm.Window = Ext.extend(Ext.Window, {
     }
 
 });
+
+Inprint.registry.register("employee-card", {
+    icon: "card",
+    text: _("Card"),
+    handler: function () {
+        new Inprint.cmp.memberProfileForm.Window().show().cmpFill("self");
+    }
+});

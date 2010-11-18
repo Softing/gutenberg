@@ -68,3 +68,9 @@ Inprint.catalog.editions.Panel = Ext.extend(Ext.Panel, {
     }
 
 });
+
+Inprint.registry.register("settings-editions", {
+    icon: "books",
+    text: _("Editions"),
+    xobject: Inprint.catalog.editions.Panel
+});

@@ -19,8 +19,12 @@ Inprint.factory.Store = new function() {
 
     var source = {
 
+        "/common/transfer/list/":               [ "id", "type", "title", "description" ],
+
         // Calendar
-        '/calendar/list/':          [ 'id', 'edition', 'edition_shortcut', 'enabled', 'title', 'shortcut', 'description', 'begindate', 'enddate', 'totaldays', 'passeddays' ],
+        '/calendar/list/':                      [ 'id', 'edition', 'edition_shortcut', 'enabled', 'title', 'shortcut', 'description', 'begindate', 'enddate', 'totaldays', 'passeddays' ],
+
+        
 
         // Documents
         '/documents/list/':         [
@@ -52,7 +56,7 @@ Inprint.factory.Store = new function() {
         "/catalog/stages/list/":                [ "id", "chain", "readiness_shortcut", "readiness_color", "weight", "title", "shortcut", "description", "members" ],
         "/catalog/stages/principals-mapping/":  [ "id", "type", "catalog", "stage", "principal", "title", "description", "catalog_shortcut", "stage_shortcut" ],
         "/catalog/principals/list/":            [ "id", "type", "title", "description" ],
-        "/catalog/transfer/list/":              [ "id", "type", "title", "description" ],
+        
 
         // System
         "/system/events/list/":                 [ "id", "initiator", "initiator_login", "initiator_shortcut", "initiator_position", "entity", "entity_type", "message", "message_type", "message_variables", createDateField("created") ],

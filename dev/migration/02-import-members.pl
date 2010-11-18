@@ -37,29 +37,29 @@ $sql2->SetConnection($conn2);
 
 my $rootnode = '00000000-0000-0000-0000-000000000000';
 
-$sql->Do("DELETE FROM members WHERE login <> 'ilyas'");
+#$sql->Do("DELETE FROM members WHERE login <> 'ilyas'");
 $sql->Do("DELETE FROM map_member_to_catalog");
-$sql->Do("DELETE FROM profiles");
+#$sql->Do("DELETE FROM profiles");
 
 # Import Members and Cards
 
-my $members = $sql2->Q("
-        SELECT * FROM passport.member t1
-            LEFT JOIN passport.card t2 ON t1.uuid = t2.uuid ")->Hashes();
-
-foreach my $item( @{ $members } ) {
-
-    $sql->Do("
-        INSERT INTO members (id, login, password, created, updated)
-        VALUES (?, ?, ?, ?, now())
-    ", [ $item->{uuid}, $item->{uid}, $item->{secret}, $item->{created} ]);
-
-    $sql->Do("
-        INSERT INTO profiles (id, title, shortcut, position)
-        VALUES (?, ?, ?, ?)
-    ", [ $item->{uuid}, $item->{title}, $item->{stitle}, $item->{position} ]);
-
-}
+#my $members = $sql2->Q("
+#        SELECT * FROM passport.member t1
+#            LEFT JOIN passport.card t2 ON t1.uuid = t2.uuid ")->Hashes();
+#
+#foreach my $item( @{ $members } ) {
+#
+#    $sql->Do("
+#        INSERT INTO members (id, login, password, created, updated)
+#        VALUES (?, ?, ?, ?, now())
+#    ", [ $item->{uuid}, $item->{uid}, $item->{secret}, $item->{created} ]);
+#
+#    $sql->Do("
+#        INSERT INTO profiles (id, title, shortcut, position)
+#        VALUES (?, ?, ?, ?)
+#    ", [ $item->{uuid}, $item->{title}, $item->{stitle}, $item->{position} ]);
+#
+#}
 
 # Import members to department mapping
 
@@ -80,10 +80,5 @@ my $mtodep = $sql2->Q("
     ")->Hashes();
 
 foreach my $item( @{ $mtodep } ) {
-
-    $sql->Do("
-        INSERT INTO map_member_to_catalog (member, catalog)
-        VALUES (?, ?)
-    ", [ $item->{member}, $item->{department} ]);
-
+    $sql->Do(" INSERT INTO map_member_to_catalog (member, catalog) VALUES (?, ?) ", [ $item->{member}, $item->{department} ]);
 }

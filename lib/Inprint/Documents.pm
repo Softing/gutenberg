@@ -10,6 +10,70 @@ use warnings;
 
 use base 'Inprint::BaseController';
 
+sub read {
+
+    my $c = shift;
+
+    my $i_id = $c->param("id");
+
+    my @errors;
+    my $success = $c->json->false;
+    
+    push @errors, { id => "id", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_id));
+
+    my $document;
+    unless (@errors) {
+        $document = $c->sql->Q("
+            SELECT
+                dcm.id,
+                dcm.edition, dcm.edition_shortcut,
+                dcm.fascicle, dcm.fascicle_shortcut,
+                dcm.headline, dcm.headline_shortcut,
+                dcm.rubric, dcm.rubric_shortcut,
+                dcm.workgroup, dcm.workgroup_shortcut,
+                dcm.inworkgroups, dcm.copygroup,
+                dcm.holder,  dcm.holder_shortcut,
+                dcm.creator, dcm.creator_shortcut,
+                dcm.manager, dcm.manager_shortcut,
+                dcm.islooked, dcm.isopen,
+                dcm.branch, dcm.branch_shortcut,
+                dcm.stage, stage_shortcut,
+                dcm.color, dcm.progress,
+                dcm.title, dcm.author,
+                to_char(dcm.pdate, 'YYYY-MM-DD HH24:MI:SS') as pdate,
+                to_char(dcm.rdate, 'YYYY-MM-DD HH24:MI:SS') as rdate,
+                dcm.psize, dcm.rsize,
+                dcm.images, dcm.files,
+                to_char(dcm.created, 'YYYY-MM-DD HH24:MI:SS') as created,
+                to_char(dcm.updated, 'YYYY-MM-DD HH24:MI:SS') as updated
+            FROM documents dcm WHERE dcm.id=?
+        ", [ $i_id ])->Hash;
+        
+        
+        $document->{access} = {};
+        my @rules = qw(update capture move transfer briefcase delete recover);
+        
+        my $current_member = $c->QuerySessionGet("member.id");
+        foreach (@rules) {
+            if ($document->{manager} eq $current_member) {
+                if ($c->access->Check(["catalog.documents.$_:*"], $document->{workgroup})) {
+                    $document->{access}->{$_} = $c->json->true;
+                }
+            }
+            if ($document->{manager} ne $current_member) {
+                if ($c->access->Check("catalog.documents.$_:group", $document->{workgroup})) {
+                    $document->{access}->{$_} = $c->json->true;
+                }
+            }
+        }
+        
+    }
+
+    $success = $c->json->true unless (@errors);
+    $c->render_json({ success => $success, errors => \@errors, data => $document || {} });
+}
+
 sub list {
 
     my $c = shift;
@@ -83,11 +147,11 @@ sub list {
     my $editions = $c->access->GetChildrens("editions.documents.work");
     $sql_filters .= " AND dcm.edition = ANY(?) ";
     push @params, $editions;
-
+    
     my $departments = $c->access->GetChildrens("catalog.documents.view:*");
     $sql_filters .= " AND dcm.workgroup = ANY(?) ";
     push @params, $departments;
-
+    
     # Set Filters
     
     if ($mode eq "todo") {
@@ -96,69 +160,73 @@ sub list {
         $sql_filters .= " AND isopen = true ";
         $sql_filters .= " AND fascicle <> '99999999-9999-9999-9999-999999999999' ";
     }
-
+    
     if ($mode eq "all") {
-        $sql_filters .= " AND isopen = true ";
-        $sql_filters .= " AND fascicle <> '99999999-9999-9999-9999-999999999999' ";
-        #$sql_filters .= " AND fascicle <> '00000000-0000-0000-0000-000000000000' ";
+        $sql_filters .= " AND isopen is true ";
+        if ($fascicle && $fascicle ne '99999999-9999-9999-9999-999999999999') {
+            $sql_filters .= " AND fascicle <> '99999999-9999-9999-9999-999999999999' ";
+        }
+        if ($fascicle && $fascicle ne '00000000-0000-0000-0000-000000000000') {
+            $sql_filters .= " AND fascicle <> '00000000-0000-0000-0000-000000000000' ";
+        }
     }
-
+    
     if ($mode eq "archive") {
         $sql_filters .= " AND isopen = false ";
         $sql_filters .= " AND fascicle <> '99999999-9999-9999-9999-999999999999' ";
         $sql_filters .= " AND fascicle <> '00000000-0000-0000-0000-000000000000' ";
     }
-
+    
     if ($mode eq "briefcase") {
         $sql_filters .= " AND fascicle = '00000000-0000-0000-0000-000000000000' ";
     }
-
+    
     if ($mode eq "recycle") {
         $sql_filters .= " AND fascicle = '99999999-9999-9999-9999-999999999999' ";
     }
 
     # Set Filters
-
+    
     if ($title) {
         $sql_filters .= " AND title LIKE ? ";
         push @params, "%$title%";
     }
-
+    
     if ($edition && $edition ne "clear") {
         $sql_filters .= " AND ? = ANY(dcm.ineditions) ";
         push @params, $edition;
     }
-
+    
     if ($group && $group ne "clear") {
         $sql_filters .= " AND ? = ANY(dcm.inworkgroups) ";
         push @params, $group;
     }
-
+    
     if ($fascicle && $fascicle ne "clear") {
         $sql_filters .= " AND fascicle = ? ";
         push @params, $fascicle;
     }
-
+    
     if ($headline && $headline ne "clear") {
         $sql_filters .= " AND headline = ? ";
         push @params, $headline;
     }
-
+    
     if ($rubric && $rubric ne "clear") {
         $sql_filters .= " AND rubric = ? ";
         push @params, $rubric;
     }
-
+    
     if ($manager && $manager ne "clear") {
         $sql_filters .= " AND manager=? ";
         push @params, $manager;
     }
-
+    
     if ($holder && $holder ne "clear") {
         $sql_filters .= " AND holder=? ";
         push @params, $holder;
     }
-
+    
     if ($progress && $progress ne "clear") {
         $sql_filters .= " AND readiness=? ";
         push @params, $progress;
@@ -185,19 +253,19 @@ sub list {
     push @params, $start;
     my $result = $c->sql->Q($sql_query, \@params)->Hashes;
     
-    my $member = $c->QuerySessionGet("member.id");
+    my $current_member = $c->QuerySessionGet("member.id");
     foreach my $document (@$result) {
         
         $document->{access} = {};
         my @rules = qw(update capture move transfer briefcase delete recover);
         
         foreach (@rules) {
-            if ($document->{manager} eq $member) {
+            if ($document->{manager} eq $current_member) {
                 if ($c->access->Check(["catalog.documents.$_:*"], $document->{workgroup})) {
                     $document->{access}->{$_} = $c->json->true;
                 }
             }
-            if ($document->{manager} ne $member) {
+            if ($document->{manager} ne $current_member) {
                 if ($c->access->Check("catalog.documents.$_:group", $document->{workgroup})) {
                     $document->{access}->{$_} = $c->json->true;
                 }
@@ -209,19 +277,20 @@ sub list {
     $c->render_json( { "data" => $result, "total" => $total } );
 }
 
-
 sub create {
     my $c = shift;
 
     my $sql;
     my @fields;
     my @data;
+    
     my @errors;
-
-    my $id = $c->uuid();
-    my $copyid = $c->uuid();
     my $success = $c->json->false;
-    my $member = $c->QuerySessionGet("member.id");
+
+    my $id      = $c->uuid();
+    my $copyid  = $id;
+    
+    my $current_member = $c->QuerySessionGet("member.id");
 
     my $i_edition    = $c->param("edition");
     my $i_workgroup  = $c->param("workgroup");
@@ -254,6 +323,23 @@ sub create {
     
     push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_fascicle));
+    
+    # Check user access to this function
+    unless ( @errors ) {
+        
+        if ( $i_workgroup ) {
+            push @errors, { id => "access", msg => "Access denied"}
+                unless ($c->access->Check("catalog.documents.create:*",  $i_workgroup));
+        }
+        if ( $i_fascicle ) {
+            push @errors, { id => "access", msg => "Access denied"}
+                unless ($c->access->Check("editions.documents.assign", $i_edition));
+        }
+        if ($current_member ne $i_manager) {
+            push @errors, { id => "access", msg => "Access denied"}
+                unless ($c->access->Check("catalog.documents.assign:*",  $i_workgroup));
+        }
+    }
     
     unless ( @errors ) {
 
@@ -305,12 +391,15 @@ sub create {
         push @fields, "filepath";
         push @data, "/$year/$mon/$id";
 
+    }
+
+    unless ( @errors ) {
         # Set edition
         my $edition = $c->sql->Q(" SELECT id, shortcut FROM editions WHERE id = ?", [ $i_edition ])->Hash;
         if ($edition->{id} && $edition->{shortcut}) {
             push @fields, "edition";
-            push @fields, "edition_shortcut";
             push @data, $edition->{id};
+            push @fields, "edition_shortcut";
             push @data, $edition->{shortcut};
             # Set ineditions[]
             my $editions = $c->sql->Q("
@@ -322,35 +411,45 @@ sub create {
 
         push @errors, { id => "edition", msg => "Object not found"}
             unless ($edition);
-
+    }
+    
+    my $workgroup;
+    unless ( @errors ) {
         # Set Workgroup
-        my $workgroup = $c->sql->Q(" SELECT id, shortcut FROM catalog WHERE id = ?", [ $i_workgroup ])->Hash;
+        $workgroup = $c->sql->Q(" SELECT id, shortcut FROM catalog WHERE id = ?", [ $i_workgroup ])->Hash;
+        
         push @fields, "workgroup";
-        push @fields, "workgroup_shortcut";
         push @data, $workgroup->{id};
+        
+        push @fields, "workgroup_shortcut";
         push @data, $workgroup->{shortcut};
         
         push @errors, { id => "workgroup", msg => "Object not found"}
             unless ($workgroup);
-        
+    }
+    
+    unless ( @errors ) {
         # Set Inworkgroups[]
-        my $workgroups = $c->sql->Q("
-            SELECT ARRAY( select id from catalog where path @> ( select path from catalog where id = ? ) )
-        ", [ $workgroup->{id} ])->Array;
+        my $workgroups = $c->sql->Q(" SELECT ARRAY( select id from catalog where path @> ( select path from catalog where id = ? ) ) ", [ $workgroup->{id} ])->Array;
         push @fields, "inworkgroups";
         push @data, $workgroups;
         
         push @errors, { id => "workgroups", msg => "Object not found"}
             unless ($workgroups);
-
+    }
+    
+    unless ( @errors ) {
         # Creator
         push @fields, "creator";
         push @fields, "creator_shortcut";
         push @data, $c->QuerySessionGet("member.id");
         push @data, $c->QuerySessionGet("member.shortcut");
-
+    }
+    
+    my $manager;
+    unless ( @errors ) {
         # Set manager
-        my $manager = $c->sql->Q(" SELECT id, shortcut FROM profiles WHERE id = ?", [ $i_manager ])->Hash;
+        $manager = $c->sql->Q(" SELECT id, shortcut FROM profiles WHERE id = ?", [ $i_manager ])->Hash;
         push @fields, "manager";
         push @fields, "manager_shortcut";
         push @data, $manager->{id};
@@ -358,9 +457,11 @@ sub create {
         
         push @errors, { id => "manager", msg => "Object not found"}
             unless ($manager);
-
+    }
+    
+    unless ( @errors ) {
         # Set Holder
-        my $holder = $c->sql->Q(" SELECT id, shortcut FROM profiles WHERE id = ?", [ $manager->{id} || $member ])->Hash;
+        my $holder = $c->sql->Q(" SELECT id, shortcut FROM profiles WHERE id = ?", [ $manager->{id} || $current_member ])->Hash;
         push @fields, "holder";
         push @fields, "holder_shortcut";
         push @data, $holder->{id};
@@ -368,11 +469,9 @@ sub create {
         
         push @errors, { id => "holder", msg => "Object not found"}
             unless ($holder);
-        
-        
-
-        # Set Assignmnent
-
+    }
+    
+    unless ( @errors ) {
         my $stage = $c->sql->Q("
             SELECT
                 t1.id as branch, t1.shortcut as branch_shortcut,
@@ -413,10 +512,12 @@ sub create {
             # Set Progress
             push @fields, "progress";
             push @data, $stage->{progress};
-
         }
+    }
+    
+    # Fascicle, && Headline && Rubric
+    unless ( @errors ) {
 
-        # Fascicle, && Headline && Rubric
         my $fascicle = $c->sql->Q(" SELECT id, shortcut FROM fascicles WHERE id = ?", [ $i_fascicle ])->Hash;
         
         push @errors, { id => "fascicle", msg => "Object not found"}
@@ -452,53 +553,15 @@ sub create {
         }
     }
     
+    # Create document
     unless (@errors) {
-        my @placeholders;
-        foreach (@data) { push @placeholders, "?"; }
-        $sql = " INSERT INTO documents (" . ( join ",", @fields ) .") VALUES (". ( join ",", @placeholders ) .") ";
-        $c->sql->Do($sql, \@data);
-        
-        $success = $c->json->true;
+        my @placeholders; foreach (@data) { push @placeholders, "?"; }
+        $c->sql->Do(" INSERT INTO documents (" . ( join ",", @fields ) .") VALUES (". ( join ",", @placeholders ) .") ", \@data);
     }
 
+    $success = $c->json->true unless (@errors);
     $c->render_json( { success => $success, errors => \@errors } );
 }
-
-sub read {
-
-    my $c = shift;
-
-    my $id = $c->param("id");
-
-    my $result = $c->sql->Q("
-        SELECT
-            dcm.id,
-            dcm.edition, dcm.edition_shortcut,
-            dcm.fascicle, dcm.fascicle_shortcut,
-            dcm.headline, dcm.headline_shortcut,
-            dcm.rubric, dcm.rubric_shortcut,
-            dcm.workgroup, dcm.workgroup_shortcut,
-            dcm.inworkgroups, dcm.copygroup,
-            dcm.holder,  dcm.holder_shortcut,
-            dcm.creator, dcm.creator_shortcut,
-            dcm.manager, dcm.manager_shortcut,
-            dcm.islooked, dcm.isopen,
-            dcm.branch, dcm.branch_shortcut,
-            dcm.stage, stage_shortcut,
-            dcm.color, dcm.progress,
-            dcm.title, dcm.author,
-            to_char(dcm.pdate, 'YYYY-MM-DD HH24:MI:SS') as pdate,
-            to_char(dcm.rdate, 'YYYY-MM-DD HH24:MI:SS') as rdate,
-            dcm.psize, dcm.rsize,
-            dcm.images, dcm.files,
-            to_char(dcm.created, 'YYYY-MM-DD HH24:MI:SS') as created,
-            to_char(dcm.updated, 'YYYY-MM-DD HH24:MI:SS') as updated
-        FROM documents dcm WHERE dcm.id=?
-    ", [ $id ])->Hash;
-
-    $c->render_json( { success => $c->json->true, data => $result } );
-}
-
 
 sub update {
     my $c = shift;
@@ -509,20 +572,70 @@ sub update {
     my $i_size    = $c->param("size") || 0;
     my $i_enddate = $c->param("enddate");
 
-    $c->sql->Do("
-        UPDATE documents
-            SET title=?, author=?, psize=?, pdate=?
-        WHERE id=?;
-    ", [ $i_title, $i_author, $i_size, $i_enddate, $i_id ]);
+    my @errors;
+    my $success = $c->json->false;
 
-    $c->render_json( { success => $c->json->true} );
+    push @errors, { id => "id", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_id));
+    
+    push @errors, { id => "title", msg => "Incorrectly filled field"}
+        unless ($c->is_text($i_title));
+    
+    if ($i_author) {
+        push @errors, { id => "author", msg => "Incorrectly filled field"}
+            unless ($c->is_text($i_author));
+    }
+    
+    if ($i_size) {
+        push @errors, { id => "size", msg => "Incorrectly filled field"}
+            unless ($c->is_int($i_size));
+    }
+    
+    if ($i_enddate) {
+        push @errors, { id => "enddate", msg => "Incorrectly filled field"}
+            unless ($c->is_date($i_enddate));
+    }
+    
+    unless (@errors) {
+        my $document = $c->sql->Q(" SELECT id, workgroup FROM documents WHERE id=? ", [ $i_id ])->Hash;
+    
+        push @errors, { id => "access", msg => "Not enough permissions"}
+            unless ($c->access->Check("catalog.documents.update:*", $document->{workgroup}));
+    }
+    
+    unless (@errors) {
+        $c->sql->Do(" UPDATE documents SET title=?, author=?, psize=?, pdate=? WHERE id=?; ",
+            [ $i_title, $i_author, $i_size, $i_enddate, $i_id ]);
+    }
+    
+    $success = $c->json->true unless (@errors);
+    $c->render_json({ success => $success, errors => \@errors });
+}
+
+sub recycle {
+    my $c = shift;
+    my @ids = $c->param("id");
+    foreach my $id (@ids) {
+        if ($c->is_uuid($id)) {
+            my $document = $c->sql->Q(" SELECT id, workgroup FROM documents WHERE id=? ", [ $id ])->Hash;
+            if ($c->access->Check("catalog.documents.delete:*", $document->{workgroup})) {
+                $c->sql->Do(" UPDATE documents SET fascicle='99999999-9999-9999-9999-999999999999' WHERE id=? ", [ $document->{id} ]);
+            }
+        }
+    }
+    $c->render_json( { success => $c->json->true } );
 }
 
 sub delete {
     my $c = shift;
     my @ids = $c->param("id");
     foreach my $id (@ids) {
-        $c->sql->Do(" DELETE FROM roles WHERE id=? ", [ $id ]);
+        if ($c->is_uuid($id)) {
+            my $document = $c->sql->Q(" SELECT id, workgroup FROM documents WHERE id=? ", [ $id ])->Hash;
+            if ($c->access->Check("catalog.documents.delete:*", $document->{workgroup})) {
+                $c->sql->Do(" UPDATE documents SET fascicle='99999999-9999-9999-9999-999999999999' WHERE id=? ", [ $document->{id} ]);
+            }
+        }
     }
     $c->render_json( { success => $c->json->true } );
 }
@@ -637,26 +750,11 @@ sub briefcase {
     if ($fascicle) {
         $success = $c->json->true;
         foreach my $id (@ids) {
-
-            #my $tags     = $c->sql->Q(" SELECT headline, headline_shortcut, rubric, rubric_shortcut FROM documents WHERE id=? ", [ $id ])->Hash;
-            #my $headline = $c->sql->Q(" SELECT * FROM headlines WHERE tag=? ", [ $tags->{headline} ])->Hash;
-            #my $rubric   = $c->sql->Q(" SELECT * FROM rubrics   WHERE tag=? ", [ $tags->{rubric} ])->Hash;
-
             $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $id ]);
         }
     }
 
     $c->render_json( { success => $success } );
 }
-
-sub recycle {
-    my $c = shift;
-    my @ids = $c->param("id");
-    foreach my $id (@ids) {
-        #$c->sql->Do(" DELETE FROM roles WHERE id=? ", [ $id ]);
-    }
-    $c->render_json( { success => $c->json->true } );
-}
-
 
 1;

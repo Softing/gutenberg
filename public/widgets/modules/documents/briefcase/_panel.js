@@ -44,3 +44,9 @@ Inprint.documents.briefcase.Panel = Ext.extend(Ext.Panel, {
         Inprint.documents.briefcase.Panel.superclass.onRender.apply(this, arguments);
     }
 });
+
+Inprint.registry.register("documents-briefcase", {
+    icon: "briefcase",
+    text:  _("Briefcase"),
+    xobject: Inprint.documents.briefcase.Panel
+});

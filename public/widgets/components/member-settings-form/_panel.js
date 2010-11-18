@@ -59,3 +59,11 @@ Inprint.cmp.memberSettingsForm.Window = Ext.extend(Ext.Window, {
     }
 
 });
+
+Inprint.registry.register("employee-settings", {
+    icon: "wrench",
+    text: _("Settings"),
+    handler: function () {
+        new Inprint.cmp.memberSettingsForm.Window().show().cmpFill("self");
+    }
+});

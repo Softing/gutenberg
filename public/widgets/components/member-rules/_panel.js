@@ -20,3 +20,11 @@ Inprint.cmp.memberRules = Ext.extend(Ext.Window, {
     }
 
 });
+
+Inprint.registry.register("employee-access", {
+    icon: "key",
+    text: _("Access"),
+    handler: function() {
+        new Inprint.cmp.memberRules().show();
+    }
+});

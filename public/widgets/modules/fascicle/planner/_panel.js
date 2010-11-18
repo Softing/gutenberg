@@ -10,3 +10,9 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
         Inprint.fascicle.planner.Panel.superclass.onRender.apply(this, arguments);
     }
 });
+
+Inprint.registry.register("fascicle-planner", {
+    icon: "clock",
+    text: _("Planning"),
+    xobject: Inprint.fascicle.planner.Panel
+});

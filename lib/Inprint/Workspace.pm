@@ -88,6 +88,16 @@ sub appsession {
         $result->{options}->{$item->{option_name}} = $item->{option_value};
         $c->QuerySessionSet("options.". $item->{option_name}, $item->{option_value});
     }
+    
+    my $edition   = $c->sql->Q(" SELECT id, shortcut FROM editions WHERE id=? ", [$result->{options}->{"default.edition"}])->Hash;
+    
+    $result->{options}->{"default.edition"} = $edition->{id};
+    $result->{options}->{"default.edition.name"} = $edition->{shortcut};
+    
+    my $workgroup = $c->sql->Q(" SELECT id, shortcut FROM catalog WHERE id=? ", [$result->{options}->{"default.workgroup"}])->Hash;
+    
+    $result->{options}->{"default.workgroup"} = $workgroup->{id};
+    $result->{options}->{"default.workgroup.name"} = $workgroup->{shortcut};
 
     $c->render_json($result);
 }

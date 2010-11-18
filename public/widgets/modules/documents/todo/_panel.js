@@ -44,3 +44,9 @@ Inprint.documents.todo.Panel = Ext.extend(Ext.Panel, {
         Inprint.documents.todo.Panel.superclass.onRender.apply(this, arguments);
     }
 });
+
+Inprint.registry.register("documents-todo", {
+    icon: "document-share",
+    text:  _("Todo"),
+    xobject: Inprint.documents.todo.Panel
+});

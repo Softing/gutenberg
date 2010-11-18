@@ -63,11 +63,17 @@ Inprint.Menu = Ext.extend(Ext.Toolbar,{
         if ( Inprint.registry[item.id] ) {
 
             var btn = {};
-
+            
             btn.aid     = item.id;
             btn.oid     = item.oid;
             btn.icon    = Inprint.registry[btn.aid].icon;
             btn.icon    = _ico(btn.icon);
+
+            if (Inprint.registry[btn.aid]) {
+                if (Inprint.registry[btn.aid].xtype) {
+                    btn.xtype = Inprint.registry[btn.aid].xtype;
+                }
+            }
 
             btn.text    = item.menutext || Inprint.registry[btn.aid].menutext || item.text || Inprint.registry[btn.aid].text;
             btn.tooltip = item.tooltip || Inprint.registry[btn.aid].tooltip;

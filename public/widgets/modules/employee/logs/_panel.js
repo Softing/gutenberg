@@ -73,3 +73,9 @@ Inprint.employee.logs.Panel = Ext.extend(Ext.grid.GridPanel, {
     }
 
 });
+
+Inprint.registry.register("employee-logs", {
+    icon: "card-address",
+    text: _("Logs"),
+    xobject: Inprint.employee.logs.Panel
+});

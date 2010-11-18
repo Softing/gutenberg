@@ -218,7 +218,7 @@ Ext.onReady(function() {
     Inprint.updateSession(true, true);
 
     // Enable registry and layout
-    Inprint.registry = new Inprint.Registry();
+    //Inprint.registry = new Inprint.Registry();
     Inprint.layout   = new Inprint.Workspace();
 
     // Resolve url

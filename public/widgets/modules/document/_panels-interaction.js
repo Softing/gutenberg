@@ -1,5 +1,5 @@
-Inprint.document.Interaction = function(panels) {
-
-    var grid = panels.grid;
-
-};
+//Inprint.document.Interaction = function(panels) {
+//
+//    var grid = panels.grid;
+//
+//};

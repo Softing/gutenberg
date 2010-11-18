@@ -5,7 +5,7 @@ Inprint.cmp.memberRulesForm.Editions.Tree = Ext.extend(Ext.tree.TreePanel, {
         this.components = {};
 
         this.urls = {
-            "tree":    _url("/catalog/transfer/editions/")
+            "tree":    _url("/catalog/editions/tree/")
         };
 
         Ext.apply(this, {
@@ -33,29 +33,10 @@ Inprint.cmp.memberRulesForm.Editions.Tree = Ext.extend(Ext.tree.TreePanel, {
     },
 
     onRender: function() {
-
         Inprint.cmp.memberRulesForm.Editions.Tree.superclass.onRender.apply(this, arguments);
-
-        this.on("beforeload", function() {
-            this.body.mask(_("Please wait..."));
-        });
-
-        this.on("load", function() {
-            this.body.unmask();
-        });
-        
-        this.on("afterrender", function() {
-
-            this.getRootNode().expand();
-            this.getRootNode().on("expand", function(node) {
-                node.firstChild.expand();
-                node.firstChild.select();
-            });
-
-            this.getLoader().on("beforeload", function() { this.body.mask(_("Loading")); }, this);
-            this.getLoader().on("load", function() { this.body.unmask(); }, this);
-
-        }, this);
+        this.getRootNode().expand();
+        this.getLoader().on("beforeload", function() { this.body.mask(_("Loading")); }, this);
+        this.getLoader().on("load", function() { this.body.unmask(); }, this);
     }
 
 });
