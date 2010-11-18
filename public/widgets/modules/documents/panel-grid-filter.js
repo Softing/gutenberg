@@ -73,21 +73,20 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                 }
             }),
             xc.getConfig("/documents/filters/headlines/", {
-                disabled: true,
                 columnWidth:.125,
                 cacheQuery: false,
                 listeners: {
                     scope: this,
-                    render: function(combo) {
-                        this.getForm().findField("edition").on("select", function() {
-                            combo.disable();
-                            combo.reset();
-                        }, this);
-                        this.getForm().findField("fascicle").on("select", function() {
-                            combo.enable();
-                            combo.reset();
-                        }, this);
-                    },
+                    //render: function(combo) {
+                    //    this.getForm().findField("edition").on("select", function() {
+                    //        combo.disable();
+                    //        combo.reset();
+                    //    }, this);
+                    //    this.getForm().findField("fascicle").on("select", function() {
+                    //        combo.enable();
+                    //        combo.reset();
+                    //    }, this);
+                    //},
                     beforequery: function(qe) {
                         qe.combo.getStore().baseParams = this.getFilterParams();
                         delete qe.combo.lastQuery;
