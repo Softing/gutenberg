@@ -56,8 +56,10 @@ Inprint.factory.Store = new function() {
         "/catalog/stages/list/":                [ "id", "chain", "readiness_shortcut", "readiness_color", "weight", "title", "shortcut", "description", "members" ],
         "/catalog/stages/principals-mapping/":  [ "id", "type", "catalog", "stage", "principal", "title", "description", "catalog_shortcut", "stage_shortcut" ],
         "/catalog/principals/list/":            [ "id", "type", "title", "description" ],
+        "/catalog/indexes/rubrics/":            [ "id", "title", "shortcut", "description" ],
         
-        "/catalog/indexes/rubrics/":          [ "id", "title", "shortcut", "description" ],
+        // Fascicles
+        "/fascicle/indexes/rubrics/":           [ "id", "title", "shortcut", "description" ],
         
         // System
         "/system/events/list/":                 [ "id", "initiator", "initiator_login", "initiator_shortcut", "initiator_position", "entity", "entity_type", "message", "message_type", "message_variables", createDateField("created") ],

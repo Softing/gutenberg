@@ -98,42 +98,42 @@ sub index
     };
     
     foreach my $fascicle (@$fascicles) {
-
+        
         my $accessLayoutView     = $c->access->Check("editions.layouts.view",   $fascicle->{edition});
         my $accessLayoutManage   = $c->access->Check("editions.layouts.manage", $fascicle->{edition});
         my $accessAdvertManage   = $c->access->Check("editions.advert.manage",  $fascicle->{edition});
 
-        my $fascicle = {
+        my $fascicle_menu = {
             id   => "fascicle",
             text => $fascicle->{edition_shortcut} . '/'. $fascicle->{shortcut},
             menu => []
         };
 
-        push @{ $fascicle->{menu} }, {
+        push @{ $fascicle_menu->{menu} }, {
             id   => "fascicle-plan",
             oid  => $fascicle->{id},
             description => $fascicle->{shortcut}
         } if $accessLayoutView;
 
-        push @{ $fascicle->{menu} }, {
+        push @{ $fascicle_menu->{menu} }, {
             id   => "fascicle-planner",
             oid  => $fascicle->{id},
             description => $fascicle->{shortcut}
         } if $accessLayoutManage;
         
-        push @{ $fascicle->{menu} }, {
+        push @{ $fascicle_menu->{menu} }, {
             id  => "fascicle-advert",
             oid => $fascicle->{id},
             description => $fascicle->{shortcut}
         } if $accessAdvertManage;
         
-        push @{ $fascicle->{menu} }, {
-            id  => "fascicle-catchword",
+        push @{ $fascicle_menu->{menu} }, {
+            id  => "fascicle-indexes",
             oid => $fascicle->{id},
             description => $fascicle->{shortcut}
         } if $accessLayoutManage;
 
-        push @result, $fascicle;
+        push @result, $fascicle_menu;
 
     }
 

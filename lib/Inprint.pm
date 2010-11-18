@@ -105,6 +105,7 @@ sub startup {
     $self->createRoutes($sessionBridge, "catalog/principals",   [ "list" ]);
     $self->createRoutes($sessionBridge, "catalog/indexes",      [ "editions", "headlines", "rubrics", "create", "update", "delete" ]);
     
+    $self->createRoutes($sessionBridge, "fascicle/indexes",      [ "editions", "headlines", "rubrics", "create", "update", "delete" ]);
     
     # Profile routes
     $self->createRoutes($sessionBridge, "profile",              [ "read", "update" ]);
