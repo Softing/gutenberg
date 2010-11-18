@@ -107,9 +107,9 @@ sub headlines {
 
     my $cgi_fascicle = $c->param("flt_fascicle") || undef;
 
-    my $sql = " SELECT headline as id, headline_shortcut as title FROM documents WHERE 1=1 ";
+    my $sql = " SELECT DISTINCT headline as id, headline_shortcut as title FROM documents WHERE 1=1 ";
 
-    if ($cgi_fascicle) {
+    if ($cgi_fascicle &&  $cgi_fascicle ne "clear") {
         $sql .= " AND fascicle = ? ";
         push @data, $cgi_fascicle;
     }
@@ -139,14 +139,14 @@ sub rubrics {
     my $cgi_fascicle = $c->param("flt_fascicle") || undef;
     my $cgi_headline = $c->param("flt_headline") || undef;
 
-    my $sql = " SELECT rubric as id, rubric_shortcut as title FROM documents WHERE 1=1 ";
+    my $sql = " SELECT DISTINCT rubric as id, rubric_shortcut as title FROM documents WHERE 1=1 ";
 
-    if ($cgi_fascicle) {
+    if ($cgi_fascicle &&  $cgi_fascicle ne "clear") {
         $sql .= " AND fascicle = ? ";
         push @data, $cgi_fascicle;
     }
 
-    if ($cgi_headline) {
+    if ($cgi_headline &&  $cgi_headline ne "clear") {
         $sql .= " AND headline = ? ";
         push @data, $cgi_headline;
     }

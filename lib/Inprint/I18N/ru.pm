@@ -103,6 +103,7 @@ our %Lexicon = (
     "Help center"                 => "Справочный центр",
     "Holder"                      => "Держатель",
     "ID"                          => "",
+    "Index"                       => "Рубрикатор",
     "Inprint"                     => "Инпринт",
     "Irreversible removal"        => "",
     "Items"                       => "",
