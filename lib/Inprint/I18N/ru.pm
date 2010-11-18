@@ -21,6 +21,7 @@ our %Lexicon = (
     "Advertising"                 => "Реклама",
     "Alias"                       => "",
     "All"                         => "Все",
+    "All available"               => "Все доступные",
     "Appointment"                 => "Назначение",
     "Archive"                     => "Архив",
     "Are you want to logout?"     => "",
@@ -234,7 +235,6 @@ our %Lexicon = (
     "Can view layouts"                  => "Может просматривать макеты",
     "Can manage layouts"                => "Может управлять макетами",
     "Can work with documents"           => "Может работать с материалами издания",
-
     
 );
 

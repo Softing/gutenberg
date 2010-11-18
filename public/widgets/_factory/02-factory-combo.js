@@ -127,13 +127,13 @@ Inprint.factory.Combo = new function() {
         },
         "/documents/filters/headlines/": {
             hiddenName: "headline",
-            icon: "tag-label",
+            icon: "marker",
             fieldLabel: _("Headline"),
             emptyText: _("Headline") + "..."
         },
         "/documents/filters/rubrics/": {
             hiddenName: "rubric",
-            icon: "tag-label-pink",
+            icon: "marker",
             fieldLabel: _("Rubric"),
             emptyText: _("Rubric") + "..."
         },
@@ -189,8 +189,8 @@ Inprint.factory.Combo = new function() {
                     '{[ this.haveIcon(values) ]}'+
                     '<tpl if="nlevel"> padding-left:{nlevel*10+8}px; </tpl>'+
                     '<tpl if="!nlevel && !color"> padding-left:20px; </tpl>'+
-                    '<tpl if="spacer"> padding-bottom:4px;margin-bottom:4px;border-bottom:1px solid silver; </tpl>'+
-                    '<tpl if="bold"> font-weight:bold; </tpl>'+
+                    '<tpl if="bold"> font-weight:bold;padding-top:4px;padding-bottom:4px;</tpl>'+
+                    '<tpl if="spacer"> padding-bottom:8px;margin-bottom:4px;border-bottom:1px solid silver; </tpl>'+
                     '">'+
                         '<tpl if="color"><div style="width:10px;height:10px;margin:2px 5px 2px 3px;float:left;background:#{color};">&nbsp;</div></tpl>'+
                         '{title}'+
@@ -201,7 +201,7 @@ Inprint.factory.Combo = new function() {
                     haveIcon: function(values) {
 
                         var src = '';
-                        var hpadding = 2;
+                        var hpadding = 3;
                         var vpadding = 1;
 
                         if (combo.icon) {

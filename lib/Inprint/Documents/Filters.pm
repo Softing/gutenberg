@@ -10,32 +10,6 @@ use warnings;
 
 use base 'Inprint::BaseController';
 
-#sub editions {
-#    my $c = shift;
-#
-#    my $result = $c->sql->Q("
-#        SELECT t1.id, t1.shortcut as title, nlevel(path) as nlevel, '' as description,
-#            array_to_string( ARRAY( select shortcut FROM catalog where path @> t1.path ORDER BY nlevel(path) ), '.') as title_path
-#        FROM editions t1
-#        ORDER BY title_path
-#    ")->Hashes;
-#
-#    $c->render_json( { data => $result } );
-#}
-#
-#sub groups {
-#    my $c = shift;
-#
-#    my $result = $c->sql->Q("
-#        SELECT t1.id, t1.shortcut as title, nlevel(path) as nlevel, '' as description,
-#            array_to_string( ARRAY( select shortcut FROM catalog where path @> t1.path ORDER BY nlevel(path) ), '.') as title_path
-#        FROM catalog t1
-#        ORDER BY title_path
-#    ")->Hashes;
-#
-#    $c->render_json( { data => $result } );
-#}
-
 sub fascicles {
 
     my $c = shift;
@@ -75,25 +49,22 @@ sub fascicles {
         icon => "bin",
         spacer => $c->json->true,
         bold => $c->json->true,
-        title => $c->l("Recycle Bin"),
-        description => $c->l("Removed documents")
+        title => $c->l("Recycle Bin")
     };
 
     unshift @$result, {
         id => "00000000-0000-0000-0000-000000000000",
         icon => "briefcase",
         bold => $c->json->true,
-        title => $c->l("Briefcase"),
-        description => $c->l("Briefcase for reserved documents")
+        title => $c->l("Briefcase")
     };
 
     unshift @$result, {
         id => "clear",
-        icon => "arrow-return-180-left",
+        icon => "folders",
         spacer => $c->json->true,
         bold => $c->json->true,
-        title => $c->l("Any fascicles"),
-        description => "Select all fascicles"
+        title => $c->l("All available")
     };
 
     $c->render_json( { data => $result } );
@@ -123,11 +94,10 @@ sub headlines {
 
     unshift @$result, {
         id => "clear",
-        icon => "arrow-return-180-left",
+        icon => "marker",
         spacer => $c->json->true,
         bold => $c->json->true,
-        title => $c->l("Any headlines"),
-        description => "Select all headlines"
+        title => $c->l("All available")
     };
 
     $c->render_json( { data => $result } );
@@ -163,11 +133,10 @@ sub rubrics {
 
     unshift @$result, {
         id => "clear",
-        icon => "arrow-return-180-left",
+        icon => "marker",
         spacer => $c->json->true,
         bold => $c->json->true,
-        title => $c->l("Any rubrics"),
-        description => "Select all rubrics"
+        title => $c->l("All available")
     };
 
     $c->render_json( { data => $result } );
@@ -193,11 +162,10 @@ sub managers {
 
     unshift @$result, {
         id => "clear",
-        icon => "arrow-return-180-left",
+        icon => "user-silhouette",
         spacer => $c->json->true,
         bold => $c->json->true,
-        title => $c->l("Any managers"),
-        description => "Select all managers"
+        title => $c->l("All available")
     };
 
     $c->render_json( { data => $result } );
@@ -207,17 +175,7 @@ sub managers {
 sub holders {
 
     my $c = shift;
-
-    my @data;
-
-    #my $cgi_query = $c->param("query")     || undef;
-
-    #if ($cgi_query) {
-    #    $sql .= " AND ( shortcut ILIKE ? OR position ILIKE ?) ";
-    #    push @data, "%$cgi_query%";
-    #    push @data, "%$cgi_query%";
-    #}
-
+    
     my $sql = $c->createSqlFilter([],
         "   SELECT DISTINCT
                 t1.holder as id,
@@ -232,11 +190,10 @@ sub holders {
 
     unshift @$result, {
         id => "clear",
-        icon => "arrow-return-180-left",
+        icon => "user-silhouette",
         spacer => $c->json->true,
         bold => $c->json->true,
-        title => $c->l("Any holders"),
-        description => "Select all holders"
+        title => $c->l("All available")
     };
 
     $c->render_json( { data => $result } );
@@ -255,11 +212,10 @@ sub progress {
 
     unshift @$result, {
         id => "clear",
-        icon => "arrow-return-180-left",
+        icon => "category",
         spacer => $c->json->true,
         bold => $c->json->true,
-        title => $c->l("Clear selection"),
-        description => "Select all readiness"
+        title => $c->l("All available")
     };
 
     $c->render_json( { data => $result } );
