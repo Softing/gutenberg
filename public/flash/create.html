@@ -1,0 +1,54 @@
+<html>
+    <head></head>
+     <body onload="pageInit();">
+        
+         <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+                 id="ExternalInterfaceExample" width="250" height="300"
+                 codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab">
+             <param name="movie" value="Create.swf" />
+             <param name="quality" value="high" />
+             <param name="bgcolor" value="#f5f5f5" />
+             <param name="allowScriptAccess" value="sameDomain" />
+             <embed src="Create.swf" quality="high" bgcolor="#f5f5f5"
+                 width="250" height="300" name="ExternalInterfaceExample" align="middle"
+                 play="true" loop="false" quality="high" allowScriptAccess="sameDomain"
+                 type="application/x-shockwave-flash"
+                 pluginspage="http://www.macromedia.com/go/getflashplayer">
+             </embed>
+         </object>
+         
+        <script>
+            
+            function getFlashMovieObject(movieName) {
+                if (window.document[movieName]){
+                    return window.document[movieName];
+                }
+                if (navigator.appName.indexOf("Microsoft Internet")==-1){
+                    if (document.embeds && document.embeds[movieName])
+                        return document.embeds[movieName]; 
+                }
+                else // if (navigator.appName.indexOf("Microsoft Internet")!=-1)
+                {
+                    return document.getElementById(movieName);
+                }
+            }
+            
+            function pageInit() {
+                setTimeout("flashInit()", 500);
+            }
+            function flashInit() {
+                var flash = getFlashMovieObject("ExternalInterfaceExample");
+                flash.init("id-11-22", "letter", 10, 10);
+                flash.set( 2, 2 );
+            }
+            function flashGet() {
+                var flash = getFlashMovieObject("ExternalInterfaceExample");
+                flash.get("getParams");
+            }
+            function getParams (id, w, h) {
+                alert(id +', '+ w +', '+ h);
+            }
+        </script>
+        <button onClick="flashGet();">Get Value</button>
+    </body>
+</html>
