@@ -45,11 +45,18 @@
                 var flash = getFlashMovieObject("ExternalInterfaceExample");
                 flash.get("getParams");
             }
+            function flashSelect(id) {
+                var flash = getFlashMovieObject("ExternalInterfaceExample");
+                flash.select(id);
+            }
             function getParams (id, arr) {
                 alert( id +', '+ arr[0].id +', '+ arr[0].x +', '+ arr[0].y +', '+ arr[0].w +', '+ arr[0].h );
             }
             
         </script>
-        <button onClick="flashGet();">Get Value</button>
+        <button onClick="flashSelect();">Get Value</button>
+        <button onClick="flashSelect(123);">Select 1</button>
+        <button onClick="flashSelect('tt');">Select 2</button>
+        <button onClick="flashSelect(3215);">Select 3</button>
     </body>
 </html>
