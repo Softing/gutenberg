@@ -2,6 +2,7 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
 
     initComponent: function() {
 
+        var actions = new Inprint.documents.Actions();
         this.components = {};
 
         this.urls = {
@@ -153,7 +154,7 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                             disabled:true,
                             ref: "../../btnCreate",
                             scope:this,
-                            handler: this.cmpCreate
+                            handler: actions.Create
                         },
                         {
                             icon: _ico("pencil"),
@@ -162,7 +163,7 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                             disabled:true,
                             ref: "../../btnUpdate",
                             scope:this,
-                            handler: this.cmpUpdate
+                            handler: actions.Update
                         },
                         '-',
                         {
@@ -172,7 +173,7 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                             disabled:true,
                             ref: "../../btnCapture",
                             scope:this,
-                            handler: this.cmpCapture
+                            handler: actions.Capture
                         },
                         {
                             icon: _ico("arrow"),
@@ -181,7 +182,7 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                             disabled:true,
                             ref: "../../btnTransfer",
                             scope:this,
-                            handler: this.cmpTransfer
+                            handler: actions.Transfer
                         },
                         '-',
                         {
@@ -191,7 +192,7 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                             disabled:true,
                             ref: "../../btnMove",
                             scope:this,
-                            handler: this.cmpMove
+                            handler: actions.Move
                         },
                         {
                             icon: _ico("briefcase"),
@@ -200,7 +201,7 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                             disabled:true,
                             ref: "../../btnBriefcase",
                             scope:this,
-                            handler: this.cmpBriefcase
+                            handler: actions.Briefcase
                         },
                         "-",
                         {
@@ -210,7 +211,7 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                             disabled:true,
                             ref: "../../btnCopy",
                             scope:this,
-                            handler: this.cmpCopy
+                            handler: actions.Copy
                         },
                         {
                             icon: _ico("documents"),
@@ -219,7 +220,7 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                             disabled:true,
                             ref: "../../btnDuplicate",
                             scope:this,
-                            handler: this.cmpDuplicate
+                            handler: actions.Duplicate
                         },
                         "-",
                         {
@@ -229,7 +230,7 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                             disabled:true,
                             ref: "../../btnRecycle",
                             scope:this,
-                            handler: this.cmpRecycle
+                            handler: actions.Recycle
                         },
                         {
                             icon: _ico("bin--arrow"),
@@ -238,7 +239,7 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                             disabled:true,
                             ref: "../../btnRestore",
                             scope:this,
-                            handler: this.cmpRestore
+                            handler: actions.Restore
                         },
                         {
                             icon: _ico("minus-button"),
@@ -247,7 +248,7 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                             disabled:true,
                             ref: "../../btnDelete",
                             scope:this,
-                            handler: this.cmpDelete
+                            handler: actions.Delete
                         }
 
                     ]
@@ -302,137 +303,6 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
             Inprint.ObjectResolver.resolve({ aid:'document-profile', oid:this.getValue("id"), text:this.getValue("title") });
         }, this);
 
-    },
-
-    // Grid buttons
-
-    cmpCreate: function() {
-        var panel = new Inprint.cmp.CreateDocument();
-        panel.show();
-        panel.on("complete", function() { this.cmpReload(); }, this);
-    },
-
-    cmpUpdate: function() {
-        var panel = new Inprint.cmp.UpdateDocument({
-            document: this.getValue("id")
-        });
-        panel.show();
-        panel.on("complete", function() { this.cmpReload(); }, this);
-    },
-
-    cmpCapture: function() {
-        Ext.MessageBox.confirm(
-            _("Document capture"),
-            _("You really want to do this?"),
-            function(btn) {
-                if (btn == "yes") {
-                    Ext.Ajax.request({
-                        url: this.urls.capture,
-                        scope:this,
-                        success: this.cmpReload,
-                        params: { id: this.getValues("id") }
-                    });
-                }
-            }, this).setIcon(Ext.MessageBox.WARNING);
-    },
-
-    cmpTransfer: function() {
-        var panel = new Inprint.cmp.ExcahngeBrowser().show();
-        panel.on("complete", function(id){
-            Ext.Ajax.request({
-                url: this.urls.transfer,
-                scope:this,
-                success: this.cmpReload,
-                params: { id: this.getValues("id"), transfer: id }
-            });
-        }, this);
-    },
-
-    cmpBriefcase: function() {
-        Ext.MessageBox.confirm(
-            _("Moving to the briefcase"),
-            _("You really want to do this?"),
-            function(btn) {
-                if (btn == "yes") {
-                    Ext.Ajax.request({
-                        url: this.urls.briefcase,
-                        scope:this,
-                        success: this.cmpReload,
-                        params: {
-                            id: this.getValues("id")
-                        }
-                    });
-                }
-            }, this).setIcon(Ext.MessageBox.WARNING);
-    },
-
-    cmpMove: function() {
-        var record = this.getRecord();
-        var cmp = new Inprint.cmp.MoveDocument({
-            initialValues: {
-                edition:  record.get("edition"),
-                fascicle: record.get("fascicle"),
-                headline: record.get("headline"),
-                rubric: record.get("rubric")
-            }
-        });
-        cmp.show();
-    },
-
-    cmpCopy: function() {
-        new Inprint.cmp.CopyDocument().show();
-    },
-
-    cmpDuplicate: function() {
-        new Inprint.cmp.DuplicateDocument().show();
-    },
-
-    cmpRecycle: function() {
-        Ext.MessageBox.confirm(
-            _("Moving to the recycle bin"),
-            _("You really want to do this?"),
-            function(btn) {
-                if (btn == "yes") {
-                    Ext.Ajax.request({
-                        url: this.urls.recycle,
-                        scope:this,
-                        success: this.cmpReload,
-                        params: { id: this.getValues("id") }
-                    });
-                }
-            }, this).setIcon(Ext.MessageBox.WARNING);
-    },
-
-    cmpRestore: function() {
-        Ext.MessageBox.confirm(
-            _("Document restoration"),
-            _("You really want to do this?"),
-            function(btn) {
-                if (btn == "yes") {
-                    Ext.Ajax.request({
-                        url: this.urls.restore,
-                        scope:this,
-                        success: this.cmpReload,
-                        params: { id: this.getValues("id") }
-                    });
-                }
-            }, this).setIcon(Ext.MessageBox.WARNING);
-    },
-
-    cmpDelete: function() {
-        Ext.MessageBox.confirm(
-            _("Irreversible removal"),
-            _("You can't cancel this action!"),
-            function(btn) {
-                if (btn == "yes") {
-                    Ext.Ajax.request({
-                        url: this.urls.delete,
-                        scope:this,
-                        success: this.cmpReload,
-                        params: { id: this.getValues("id") }
-                    });
-                }
-            }, this).setIcon(Ext.MessageBox.WARNING);
     },
 
     // Grid renderers

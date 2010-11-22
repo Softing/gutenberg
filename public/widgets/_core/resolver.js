@@ -41,9 +41,7 @@ Inprint.ObjectResolver = function() {
             if (item.oid) {
                 panelId += "-" + item.oid;
             }
-
-
-
+            
             var panel = objectHash[panelId];
             if (!panel) {
                 panel = this.create(item, panelId);
@@ -74,6 +72,10 @@ Inprint.ObjectResolver = function() {
             if (item.oid) {
                 config.oid = item.oid;
                 config.title += "&oid=" + item.oid;
+            }
+            
+            if (item.text) {
+                config.title += "&text=" + item.text;
             }
 
             if (item.description) {
@@ -118,9 +120,9 @@ Inprint.ObjectResolver = function() {
             }
 
             var panel = new Ext.Panel(config);
-
+            
             // Регистрируем панель
-
+            
             Inprint.layout.getPanel().add(panel);
             panel.taskBtn = Inprint.layout.getTaskbar().addButton({
                 panel: panel,

@@ -1,13 +1,13 @@
 <html>
 <head>
     <!--
-     * Inprint Content 4.5
+     * Inprint Content 5.0
      * Copyright(c) 2001-2009, Softing, LLC.
      * licensing@softing.ru
      *
      * http://softing.ru/license
     -->
-    <title>Inprint Content 4.5</title>
+    <title>Inprint Content 5.0</title>
 
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
     <meta HTTP-EQUIV="Pragma" CONTENT="no-cache"></meta>
@@ -23,6 +23,8 @@
     <!-- Ext 3.3.0 -->
     <script type="text/javascript" src="/ext-3.3.0/adapter/ext/ext-base-debug.js"></script>
     <script type="text/javascript" src="/ext-3.3.0/ext-all-debug.js"></script>
+    
+    <script type="text/javascript" src="/plupload/js/plupload.full.min.js"></script>
 
     <!-- Locale support -->
     <script type="text/javascript" src="/ext-3.3.0/src/locale/ext-lang-ru.js"></script>
@@ -34,7 +36,7 @@
     <div id="loading-mask" style=""></div>
     <div id="loading">
         <img  id="loading-indicator" src="/images/ajax-loader.gif"/>
-        Inprint Content 4.5
+        Inprint Content 5.0
     </div>
 
     <script>
@@ -47,7 +49,7 @@
         <iframe id="x-history-frame"></iframe>
     </form>
 
-    <!-- div class="footer">inprint.content 4.5.0</div -->
+    <!-- div class="footer">inprint.content 5.0.0</div -->
 </body>
 </html>
 

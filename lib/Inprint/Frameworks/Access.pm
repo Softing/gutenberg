@@ -56,6 +56,8 @@ sub Check {
     }
     my %seen;@rules = grep { ! $seen{$_}++ } @rules;
     
+    #die $member;
+    
     if ($member && @rules) {
         my @data;
         my $sql = " SELECT true FROM cache_access WHERE member=? AND ? && terms ";
@@ -68,7 +70,7 @@ sub Check {
         
         $result = $c->{handler}->sql->Q("SELECT EXISTS ($sql)", \@data)->Value();
     }
-    
+
     return $result;
 }
 

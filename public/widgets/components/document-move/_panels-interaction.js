@@ -1,3 +1,3 @@
-Inprint.cmp.MoveDocument.Interaction = function(panels) {
+Inprint.cmp.MoveDocument.Interaction = function(parent, panels) {
 
 }

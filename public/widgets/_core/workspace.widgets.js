@@ -8,7 +8,7 @@
 
 Inprint.About = function(conf){
 
-    var html =  '<div><b>Inprint Content 4.5</b></div><br>'+
+    var html =  '<div><b>Inprint Content 5.0</b></div><br>'+
                 '<div>'+ "" +'</div><br>'+
                 '<div>'+ "" +'</div>'+
                 '<div>'+ "" +'</div>';

@@ -18,13 +18,23 @@ function _fmtDate(str, format, inputFormat) {
 
 };
 
-function _enable() {
+// Helpers
+function _show() {
     Ext.each(arguments, function(c) {
-        if (c && c.enable)
-            c.enable();
+        if (c && c.show) c.show();
+    });
+}
+function _hide() {
+    Ext.each(arguments, function(c) {
+        if (c && c.hide) c.hide();
     });
 }
 
+function _enable() {
+    Ext.each(arguments, function(c) {
+        if (c && c.enable) c.enable();
+    });
+}
 function _disable() {
     Ext.each(arguments, function(c) {
         if (c && c.disable) c.disable();

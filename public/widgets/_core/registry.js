@@ -10,7 +10,7 @@ Inprint.registry = function() {
     
     var registr = {
 
-        register : function(id, item) {
+        "register": function(id, item) {
             this[id] = item;
             if (item['xobject'])
                 Ext.reg(id, item['xobject']);
@@ -26,30 +26,33 @@ Inprint.registry = function() {
         },
         
         "documents": {
-            icon: "document-word",
-            text: _("Documents")
+            text: _("Documents"),
+            icon: "document-word"
+        },
+        "advertising": {
+            text: _("Advertising"),
+            icon: "document-excel"
         },
         "composition": {
-            icon: "newspapers",
-            text:  _("Composition")
+            text:  _("Composition"),
+            icon: "newspapers"
         },
         "fascicle": {
-            icon: "blue-folder",
-            text: _("Unknown fascicle")
+            text: _("Unknown fascicle"),
+            icon: "blue-folder"
         },
         "settings": {
-            icon: "switch",
-            text: _("Settings")
+            text: _("Settings"),
+            icon: "switch"
         },
 
         "employee": {
-            icon: "dummy",
-            text: _("Employee")
+            text: _("Employee"),
+            icon: "dummy"
         },
-        
         "employee-logout": {
-            icon: "door-open",
             text: _("Logout"),
+            icon: "door-open",
             handler: function () {
                 Inprint.Logout();
             }

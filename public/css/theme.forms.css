@@ -5,39 +5,39 @@
  *
  * http://softing.ru/license
  */
-
-.x-form-label-left .inprint-form-warning {
-    padding:5px 8px;
-    margin-bottom:10px;
-    background: #D6AA18;
-    color:white;
-    -moz-border-radius:3px;
-    -webkit-border-radius:3px;
-}
-
-.x-form-label-left .inprint-form-helpbox {
-    padding:5px 18px;
-    margin-bottom:10px;
-    background: #008000;
-    color:white;
-    -moz-border-radius:3px;
-    -webkit-border-radius:3px;
-}
-
-.inprint-form-message {
-    padding:3px 5px;
-    margin-top:10px;
-    margin-bottom:5px;
-    background: gray;
-    color:white;
-    -moz-border-radius:2px;
-    -webkit-border-radius:2px;
-}
-
-.inprint-form-error {
-    padding:5px;
-    background: #9E0000;
-    color:white;
-    -moz-border-radius:3px;
-    -webkit-border-radius:3px;
-}
+/**/
+/*.x-form-label-left .inprint-form-warning {*/
+/*    padding:5px 8px;*/
+/*    margin-bottom:10px;*/
+/*    background: #D6AA18;*/
+/*    color:white;*/
+/*    -moz-border-radius:3px;*/
+/*    -webkit-border-radius:3px;*/
+/*}*/
+/**/
+/*.x-form-label-left .inprint-form-helpbox {*/
+/*    padding:5px 18px;*/
+/*    margin-bottom:10px;*/
+/*    background: #008000;*/
+/*    color:white;*/
+/*    -moz-border-radius:3px;*/
+/*    -webkit-border-radius:3px;*/
+/*}*/
+/**/
+/*.inprint-form-message {*/
+/*    padding:3px 5px;*/
+/*    margin-top:10px;*/
+/*    margin-bottom:5px;*/
+/*    background: gray;*/
+/*    color:white;*/
+/*    -moz-border-radius:2px;*/
+/*    -webkit-border-radius:2px;*/
+/*}*/
+/**/
+/*.inprint-form-error {*/
+/*    padding:5px;*/
+/*    background: #9E0000;*/
+/*    color:white;*/
+/*    -moz-border-radius:3px;*/
+/*    -webkit-border-radius:3px;*/
+/*}*/

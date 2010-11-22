@@ -27,29 +27,29 @@ Inprint.Portal = Ext.extend(Ext.ux.Portal, {
         
         Ext.apply(this, {
             border:false,
-            bodyBorder: false,
-            items: [{
-                columnWidth:.70,
-                style:'padding:8px 6px 0 8px',
-                items:[{
-                    title: _("Company news"),
-                    layout:'fit',
-                    tools: tools,
-                    html: "test"
-                },{
-                    title: _("My alerts"),
-                    tools: tools,
-                    html: "test"
-                }]
-            },{
-                columnWidth:.30,
-                style:'padding:8px 8px 0 6px',
-                items:[{
-                    title: _("Empoyees online"),
-                    tools: tools,
-                    html: "test"
-                }]
-            }]
+            bodyBorder: false
+            //items: [{
+            //    columnWidth:.70,
+            //    style:'padding:8px 6px 0 8px',
+            //    items:[{
+            //        title: _("Company news"),
+            //        layout:'fit',
+            //        tools: tools,
+            //        html: "test"
+            //    },{
+            //        title: _("My alerts"),
+            //        tools: tools,
+            //        html: "test"
+            //    }]
+            //},{
+            //    columnWidth:.30,
+            //    style:'padding:8px 8px 0 6px',
+            //    items:[{
+            //        title: _("Empoyees online"),
+            //        tools: tools,
+            //        html: "test"
+            //    }]
+            //}]
             
         });
         

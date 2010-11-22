@@ -1,15 +1,22 @@
 Inprint.documents.Profile = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
-
+        
         this.panels = {};
-        this.panels["view"]     = new Inprint.documents.Profile.View(this);
-        this.panels["comments"] = new Inprint.documents.Profile.Comments(this);
-        this.panels["files"]    = new Inprint.documents.Profile.Files(this);
+        this.panels["profile"]  = new Inprint.documents.Profile.View({
+            oid: this.oid,
+            parent: this
+        });
+        this.panels["files"]    = new Inprint.documents.Profile.Files({
+            oid: this.oid,
+            parent: this
+        });
+        this.panels["comments"] = new Inprint.documents.Profile.Comments({
+            oid: this.oid,
+            parent: this
+        });
 
         Ext.apply(this, {
-
-            disabled: true,
             border:true,
             layout: "border",
             defaults: {
@@ -22,7 +29,7 @@ Inprint.documents.Profile = Ext.extend(Ext.Panel, {
                     layout:"fit",
                     split:true,
                     height:200,
-                    items: this.panels["view"]
+                    items: this.panels["profile"]
                 },
                 {   region: "center",
                     layout:"fit",
@@ -31,7 +38,7 @@ Inprint.documents.Profile = Ext.extend(Ext.Panel, {
                 {   region: "east",
                     layout:"fit",
                     split:true,
-                    width:200,
+                    width:400,
                     items: this.panels["comments"]
                 }
 
@@ -39,36 +46,31 @@ Inprint.documents.Profile = Ext.extend(Ext.Panel, {
         });
 
         Inprint.documents.Profile.superclass.initComponent.apply(this, arguments);
-        Inprint.documents.Profile.Interaction(this.panels);
-
     },
 
     onRender: function() {
         Inprint.documents.Profile.superclass.onRender.apply(this, arguments);
-        this.cmpReload();
+        Inprint.documents.Profile.Access(this, this.panels);
+        Inprint.documents.Profile.Interaction(this, this.panels);
+    },
+
+    getValues: function() {
+        return [ this.oid ];
+    },
+    
+    getValue: function() {
+        return this.oid;
     },
 
     cmpReload: function() {
-
-        this.disable();
-
-        Ext.Ajax.request({
-            url: "/documents/read/",
-            scope:this,
-            success: function () {
-                this.enable();
-            },
-            failure: function () {
-                this.enable();
-            },
-            params: { id: this.oid }
-        });
+        alert(1);
     }
 
 });
 
 Inprint.registry.register("document-profile", {
-    icon: "document--pencil",
+    icon: "folder-open-document",
     text: _("Document profile"),
+    description: _("Document profile"),
     xobject: Inprint.documents.Profile
 });

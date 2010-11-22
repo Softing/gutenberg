@@ -1,13 +1,13 @@
 <html>
 <head>
     <!--
-    * Inprint Content 4.5
+    * Inprint Content 5.0
     * Copyright(c) 2001-2009, Softing, LLC.
     * licensing@softing.ru
     *
     * http://softing.ru/license
    -->
-    <title>Inprint Content 4.5</title>
+    <title>Inprint Content 5.0</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
     <meta HTTP-EQUIV="Pragma" CONTENT="no-cache"></meta>
     <link type="text/css" rel="stylesheet" href="/login-page.css">
@@ -27,6 +27,6 @@
 </head>
 <body>
     <script type="text/javascript" src="/wallpaper.js"></script>
-    <div class="footer">inprint.content 4.5.0</div>
+    <div class="footer">inprint.content 5.0.0</div>
 </body>
 </html>

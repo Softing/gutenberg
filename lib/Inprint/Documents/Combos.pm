@@ -78,9 +78,11 @@ sub fascicles {
     
     push @errors, { id => "edition", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_edition));
-        
-    push @errors, { id => "term", msg => "Incorrectly filled field"}
-        unless ($c->is_rule($i_term));
+    
+    if ($i_term) {
+        push @errors, { id => "term", msg => "Incorrectly filled field"}
+            unless ($c->is_rule($i_term));
+    }
     
     unless (@errors) {
         
@@ -93,24 +95,17 @@ sub fascicles {
                     AND t1.issystem = false AND t1.enabled = true
         ";
         
-        my $bindings = $c->access->GetChildrens($i_term);
-        $sql .= " AND t1.edition = ANY(?) ";
-        push @params, $bindings;
+        if ($i_term) {
+            my $bindings = $c->access->GetChildrens($i_term);
+            $sql .= " AND t1.edition = ANY(?) ";
+            push @params, $bindings;
+        }
         
         my $editions = $c->sql->Q(" SELECT id FROM editions WHERE path ~ ('*.' || replace(?, '-', '')::text || '.*')::lquery ", [$i_edition])->Values;
         $sql .= " AND t1.edition = ANY(?) ";
         push @params, $editions;
         
         $result = $c->sql->Q(" $sql ORDER BY t1.enddate DESC, t2.shortcut, t1.title ", \@params)->Hashes;
-        
-        #unshift @$result, {
-        #    id => "99999999-9999-9999-9999-999999999999",
-        #    icon => "bin",
-        #    spacer => $c->json->true,
-        #    bold => $c->json->true,
-        #    title => $c->l("Recycle Bin"),
-        #    description => $c->l("Removed documents")
-        #};
         
         if ($c->access->Check($i_term, $i_edition)) {
             unshift @$result, {
@@ -137,18 +132,23 @@ sub headlines {
     my @errors;
     my $success = $c->json->false;
     
-    push @errors, { id => "edition", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_edition));
+    #push @errors, { id => "edition", msg => "Incorrectly filled field"}
+    #    unless ($c->is_uuid($i_edition));
     
     push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_fascicle));
     
     unless (@errors) {
+        #$result = $c->sql->Q("
+        #    SELECT DISTINCT t1.id, t1.shortcut as title FROM index t1, index_mapping t2
+        #    WHERE t1.edition=? AND t2.parent=? AND t1.id = t2.child
+        #    ORDER BY t1.shortcut
+        #", [ $i_edition, $i_fascicle ])->Hashes;
         $result = $c->sql->Q("
             SELECT DISTINCT t1.id, t1.shortcut as title FROM index t1, index_mapping t2
-            WHERE t1.edition=? AND t2.parent=? AND t1.id = t2.child
+            WHERE t2.parent=? AND t1.id = t2.child
             ORDER BY t1.shortcut
-        ", [ $i_edition, $i_fascicle ])->Hashes;
+        ", [ $i_fascicle ])->Hashes;
     }
     
     $success = $c->json->true unless (@errors);

@@ -4,7 +4,7 @@ Inprint.cmp.MoveDocument = Ext.extend(Ext.Window, {
 
         this.addEvents('actioncomplete');
         this.form = new Inprint.cmp.MoveDocument.Form({
-            initialValues: this.initialValues
+            oid: this.oid
         });
 
         Ext.apply(this, {
@@ -36,15 +36,21 @@ Inprint.cmp.MoveDocument = Ext.extend(Ext.Window, {
                 this.hide();
                 this.fireEvent("actioncomplete", this, this.form);
             }
-        });
+        }, this);
 
         Inprint.cmp.MoveDocument.superclass.initComponent.apply(this, arguments);
-
-        Inprint.cmp.MoveDocument.Interaction(this.panels);
+        
     },
 
     onRender: function() {
         Inprint.cmp.MoveDocument.superclass.onRender.apply(this, arguments);
+        Inprint.cmp.MoveDocument.Interaction(this, this.panels);
+    },
+    
+    setId: function(data) {
+        this.form.getForm().baseParams = {
+            id: data
+        }
     }
 
 });

@@ -42,7 +42,11 @@ sub fascicles {
 
     $sql .= " ORDER BY t1.enddate ASC, t2.shortcut, t1.title ";
 
-    my $result = $c->sql->Q($sql, \@data)->Hashes;
+    my $result;
+    
+    if ( $i_gridmode ne "briefcase" ){
+        $result = $c->sql->Q($sql, \@data)->Hashes;
+    }
 
     #unshift @$result, {
     #    id => "99999999-9999-9999-9999-999999999999",
@@ -52,21 +56,25 @@ sub fascicles {
     #    title => $c->l("Recycle Bin")
     #};
 
-    unshift @$result, {
-        id => "00000000-0000-0000-0000-000000000000",
-        icon => "briefcase",
-        spacer => $c->json->true,
-        bold => $c->json->true,
-        title => $c->l("Briefcase")
-    };
+    if ( $i_gridmode ne "archive" ){
+        unshift @$result, {
+            id => "00000000-0000-0000-0000-000000000000",
+            icon => "briefcase",
+            spacer => $c->json->true,
+            bold => $c->json->true,
+            title => $c->l("Briefcase")
+        };
+    }
 
-    unshift @$result, {
-        id => "clear",
-        icon => "folders",
-        spacer => $c->json->true,
-        bold => $c->json->true,
-        title => $c->l("All available")
-    };
+    if ( $i_gridmode ne "briefcase" ){
+        unshift @$result, {
+            id => "clear",
+            icon => "folders",
+            spacer => $c->json->true,
+            bold => $c->json->true,
+            title => $c->l("All available")
+        };
+    }
 
     $c->render_json( { data => $result } );
 }

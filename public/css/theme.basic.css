@@ -21,7 +21,6 @@ body {
     font-size:12px;
 }
 
-
 .ext-mb-content {
    max-height:100px !important;
    overflow:auto !important;
@@ -30,22 +29,6 @@ body {
     background-image: url(/icons-32/exclamation.png) !important;
 }
 
-
-/*a {*/
-/*   color:#15428B;*/
-/*}*/
-/**/
-/*a:link, a:visited {*/
-/*   text-decoration: none;*/
-/*}*/
-/**/
-/*a:hover {*/
-/*   text-decoration: underline;*/
-/*}*/
-/*.hover {*/
-/*   cursor:hand;*/
-/*   cursor:pointer;*/
-/*}*/
 
 /* Safari override fixes */
 .ext-safari .x-date-picker {
@@ -77,4 +60,25 @@ body {
 /*}*/
 .x-grid3-hd-row td {
    vertical-align:top;
+}
+
+/* Documents profile */
+
+.inprint-document-profile table {
+    border:1px solid silver;
+    border-collapse:collapse;
+    margin-top:10px;
+    font-size:11px;
+}
+
+.inprint-document-profile th {
+    border:1px solid silver;
+    background:#f5f5f5;
+    font-weight:bold;
+    padding:2px 4px;
+}
+
+.inprint-document-profile td {
+    border:1px solid silver;
+    padding:2px 4px;
 }

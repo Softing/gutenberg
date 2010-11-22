@@ -70,6 +70,18 @@ sub index
         push @result, "-";
     }
 
+    # Advertising
+    
+    my $advertising = {
+        id => "advertising"
+    };
+    push @{ $advertising->{menu} }, { id => "advert-requests" };
+    push @{ $advertising->{menu} }, { id => "advert-advertisers" };
+    push @{ $advertising->{menu} }, { id => "advert-modules" };
+    push @{ $advertising->{menu} }, { id => "advert-archive" };
+    
+    push @result, $advertising;
+    push @result, "-";
 
     # Fascicles and Composition
     

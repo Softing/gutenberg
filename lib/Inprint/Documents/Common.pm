@@ -20,7 +20,8 @@ sub fascicles {
 
     my $sql = "
         SELECT
-            t1.id, t1.issystem, t1.edition, t2.shortcut as edition_shortcut,
+            t1.id, t1.issystem, 
+            t2.id as edition, t2.shortcut as edition_shortcut, 
             t1.title, t1.shortcut, t1.description,
             to_char(t1.begindate, 'YYYY-MM-DD HH24:MI:SS') as begindate,
             to_char(t1.enddate, 'YYYY-MM-DD HH24:MI:SS') as enddate,
@@ -31,6 +32,10 @@ sub fascicles {
         WHERE
             t1.issystem = false AND t1.edition = t2.id AND t1.enabled = true
     ";
+
+    my $editions = $c->access->GetChildrens("editions.documents.work");
+    $sql .= " AND t1.edition = ANY(?) ";
+    push @params, $editions;
 
     if ($edition) {
         $sql .= " AND edition=? ";

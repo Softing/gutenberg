@@ -8,10 +8,11 @@ Inprint.cmp.CopyDocument.Grid = Ext.extend(Ext.grid.EditorGridPanel, {
 
         this.sm = new Ext.grid.CheckboxSelectionModel();
 
-        this.store = Inprint.factory.Store.json("/documents/common/fascicles/");
+        this.store = Inprint.factory.Store.json("/documents/common/fascicles/", {
+            autoLoad:true
+        });
 
         Ext.apply(this, {
-            disabled: true,
             border: false,
             title: _("Fascicles"),
             stripeRows: true,
@@ -21,16 +22,23 @@ Inprint.cmp.CopyDocument.Grid = Ext.extend(Ext.grid.EditorGridPanel, {
             columns: [
                 this.sm,
                 {
+                    id:"edition",
+                    header: _("Edition"),
+                    width: 80,
+                    sortable: true,
+                    dataIndex: "edition_shortcut"
+                },
+                {
                     id:"shortcut",
                     header: _("Shortcut"),
-                    width: 120,
+                    width: 100,
                     sortable: true,
                     dataIndex: "shortcut"
                 },
                 {
                     id: "headline",
                     header: _("Headline"),
-                    width: 150,
+                    width: 100,
                     dataIndex: 'headline_shortcut',
                     editor: xc.getConfig("/documents/combos/headlines/", {
                         listeners: {
@@ -65,6 +73,9 @@ Inprint.cmp.CopyDocument.Grid = Ext.extend(Ext.grid.EditorGridPanel, {
                             },
                             focus: function(combo) {
                                 combo.getStore().baseParams["flt_headline"] = this.currentRecord.get("headline");
+                            },
+                            select: function(combo, record) {
+                                this.currentRecord.set("rubric", record.get("id"));
                             },
                             beforequery: function(qe) {
                                 delete qe.combo.lastQuery;

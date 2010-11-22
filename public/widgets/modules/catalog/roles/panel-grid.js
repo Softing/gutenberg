@@ -167,7 +167,7 @@ Inprint.catalog.roles.Grid = Ext.extend(Ext.grid.GridPanel, {
         var form = win.items.first().getForm();
         form.reset();
 
-        win.show(this);
+        win.show();
 
     },
 

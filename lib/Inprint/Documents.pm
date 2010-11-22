@@ -52,19 +52,31 @@ sub read {
         
         
         $document->{access} = {};
-        my @rules = qw(update capture move transfer briefcase delete recover);
-        
         my $current_member = $c->QuerySessionGet("member.id");
+
+        my @rules = qw(
+            documents.update documents.capture documents.move documents.transfer
+            documents.briefcase documents.delete documents.recover documents.discuss
+            files.add files.delete files.work
+        );
         foreach (@rules) {
-            if ($document->{manager} eq $current_member) {
-                if ($c->access->Check(["catalog.documents.$_:*"], $document->{workgroup})) {
+            if ($document->{holder} eq $current_member) {
+                if ($c->access->Check(["catalog.$_:member"], $document->{workgroup})) {
                     $document->{access}->{$_} = $c->json->true;
                 }
             }
-            if ($document->{manager} ne $current_member) {
-                if ($c->access->Check("catalog.documents.$_:group", $document->{workgroup})) {
+            if ($document->{holder} ne $current_member) {
+                if ($c->access->Check("catalog.$_:group", $document->{workgroup})) {
                     $document->{access}->{$_} = $c->json->true;
                 }
+            }
+            
+            if ($_ eq 'documents.capture' && $document->{holder} eq $current_member) {
+                $document->{access}->{$_} = $c->json->false;
+            }
+            
+            if ($_ eq 'documents.briefcase' && $document->{fascicle} eq '00000000-0000-0000-0000-000000000000') {
+                $document->{access}->{$_} = $c->json->false;
             }
         }
         
@@ -624,33 +636,7 @@ sub update {
     $c->render_json({ success => $success, errors => \@errors });
 }
 
-sub recycle {
-    my $c = shift;
-    my @ids = $c->param("id");
-    foreach my $id (@ids) {
-        if ($c->is_uuid($id)) {
-            my $document = $c->sql->Q(" SELECT id, workgroup FROM documents WHERE id=? ", [ $id ])->Hash;
-            if ($c->access->Check("catalog.documents.delete:*", $document->{workgroup})) {
-                $c->sql->Do(" UPDATE documents SET fascicle='99999999-9999-9999-9999-999999999999' WHERE id=? ", [ $document->{id} ]);
-            }
-        }
-    }
-    $c->render_json( { success => $c->json->true } );
-}
 
-sub delete {
-    my $c = shift;
-    my @ids = $c->param("id");
-    foreach my $id (@ids) {
-        if ($c->is_uuid($id)) {
-            my $document = $c->sql->Q(" SELECT id, workgroup FROM documents WHERE id=? ", [ $id ])->Hash;
-            if ($c->access->Check("catalog.documents.delete:*", $document->{workgroup})) {
-                $c->sql->Do(" UPDATE documents SET fascicle='99999999-9999-9999-9999-999999999999' WHERE id=? ", [ $document->{id} ]);
-            }
-        }
-    }
-    $c->render_json( { success => $c->json->true } );
-}
 
 sub capture {
     my $c = shift;
@@ -752,7 +738,6 @@ sub briefcase {
     my $fascicle = $c->sql->Q(" SELECT id, shortcut FROM fascicles WHERE id='00000000-0000-0000-0000-000000000000' ")->Hash;
 
     if ($fascicle) {
-        $success = $c->json->true;
         foreach my $id (@ids) {
             $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $id ]);
         }
@@ -761,4 +746,115 @@ sub briefcase {
     $c->render_json( { success => $success } );
 }
 
+sub move {
+    my $c = shift;
+    
+    my @ids = $c->param("id");
+    
+    my $i_edition  = $c->param("edition");
+    my $i_fascicle = $c->param("fascicle");
+    my $i_headline = $c->param("headline");
+    my $i_rubric   = $c->param("rubric");
+    my $i_change   = $c->param("ch-rub");
+    
+    my @errors;
+    my $success = $c->json->false;
+    
+    my $fascicle;
+    $fascicle = $c->sql->Q(" SELECT id, shortcut FROM fascicles WHERE id=? AND edition=? ", [ $i_fascicle, $i_edition ])->Hash;
+    
+    my $headline;
+    $headline = $c->sql->Q("
+        SELECT t1.id, t1.shortcut FROM index t1, index_mapping t2
+        WHERE t2.parent=? AND t1.id = t2.child AND t1.id=?
+    ", [ $i_fascicle, $i_headline ])->Hash;
+    
+    my $rubric;
+    $rubric = $c->sql->Q("
+            SELECT t1.id, t1.shortcut FROM index t1, index_mapping t2
+            WHERE t2.parent=? AND t1.id = t2.child AND t1.id=?
+    ", [ $i_headline, $i_rubric ])->Hash;
+    
+    if ($fascicle) {
+        
+        foreach my $id (@ids) {
+            
+            # Change fascicle
+            $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $id ]);
+            
+            # Change indexation
+            if ($i_change && $headline) {
+                $c->sql->Do(" UPDATE documents SET headline=?, headline_shortcut=? WHERE id=? ", [ $headline->{id}, $headline->{shortcut}, $id ]);
+            }
+            
+            if ($i_change && $headline && $rubric) {
+                $c->sql->Do(" UPDATE documents SET rubric=?, rubric_shortcut=? WHERE id=? ", [ $rubric->{id}, $rubric->{shortcut}, $id ]);
+            }
+            
+        }
+    }
+    
+    $success = $c->json->true unless (@errors);
+    $c->render_json( { success => $success } );
+}
+
+sub copy {
+    my $c = shift;
+    
+    my @errors;
+    my $success = $c->json->false;
+    
+    my @ids = $c->param("id");
+    $c->render_json( { success => $success } );
+}
+
+sub duplicate {
+    my $c = shift;
+    
+    my @errors;
+    my $success = $c->json->false;
+    
+    my @ids = $c->param("id");
+    $c->render_json( { success => $success } );
+}
+
+sub recycle {
+    my $c = shift;
+    my @ids = $c->param("id");
+    foreach my $id (@ids) {
+        if ($c->is_uuid($id)) {
+            my $document = $c->sql->Q(" SELECT id, workgroup FROM documents WHERE id=? ", [ $id ])->Hash;
+            if ($c->access->Check("catalog.documents.delete:*", $document->{workgroup})) {
+                $c->sql->Do(" UPDATE documents SET fascicle='99999999-9999-9999-9999-999999999999' WHERE id=? ", [ $document->{id} ]);
+            }
+        }
+    }
+    $c->render_json( { success => $c->json->true } );
+}
+
+sub restore {
+    my $c = shift;
+    
+    my @errors;
+    my $success = $c->json->false;
+    
+    my @ids = $c->param("id");
+    $c->render_json( { success => $success } );
+}
+
+
+sub delete {
+    my $c = shift;
+    my @ids = $c->param("id");
+    foreach my $id (@ids) {
+        if ($c->is_uuid($id)) {
+            my $document = $c->sql->Q(" SELECT id, workgroup FROM documents WHERE id=? ", [ $id ])->Hash;
+            if ($c->access->Check("catalog.documents.delete:*", $document->{workgroup})) {
+                $c->sql->Do(" UPDATE documents SET fascicle='99999999-9999-9999-9999-999999999999' WHERE id=? ", [ $document->{id} ]);
+            }
+        }
+    }
+    $c->render_json( { success => $c->json->true } );
+}
 1;
+

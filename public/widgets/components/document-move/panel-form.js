@@ -4,50 +4,49 @@ Inprint.cmp.MoveDocument.Form = Ext.extend(Ext.FormPanel, {
         var xc = Inprint.factory.Combo;
 
         Ext.apply(this, {
-            url: _url("/documents/create/"),
+            url: _url("/documents/move/"),
             border:false,
             autoScroll:true,
             labelWidth: 80,
             bodyStyle: "padding: 10px 10px",
-            defaults: {
-                anchor: "100%",
-                allowBlank:false
-            },
             items: [
-
                 {
                     xtype: 'fieldset',
                     title: _("Fascicles"),
                     autoHeight: true,
+                    defaults: {
+                        anchor: "100%",
+                        allowBlank:false
+                    },
                     items: [
 
-                        xc.getConfig("/documents/combos/editions/", {
-                            allowBlank:false,
-                            listeners: {
-                                scope: this,
-                                render: function(combo) {
-                                    if (this.initialValues.edition) {
-                                        combo.loadValue(this.initialValues.edition);
-                                    }
-                                },
-                                beforequery: function(qe) {
-                                    delete qe.combo.lastQuery;
-                                }
+                        {
+                            columnWidth:.125,
+                            xtype: "treecombo",
+                            hiddenName: "edition",
+                            fieldLabel: _("Edition"),
+                            emptyText: _("Edition") + "...",
+                            minListWidth: 250,
+                            url: _url('/documents/trees/editions/'),
+                            baseParams: {
+                                term: 'editions.documents.work'
+                            },
+                            rootVisible:true,
+                            root: {
+                                id:'00000000-0000-0000-0000-000000000000',
+                                nodeType: 'async',
+                                expanded: true,
+                                draggable: false,
+                                icon: _ico("book"),
+                                text: _("All editions")
                             }
-                        }),
+                        },
 
                         xc.getConfig("/documents/combos/fascicles/", {
                             disabled: true,
                             listeners: {
                                 scope: this,
                                 render: function(combo) {
-
-                                    if (this.initialValues.edition, this.initialValues.fascicle) {
-                                        combo.loadValue(this.initialValues.fascicle, {
-                                            flt_edition: this.initialValues.edition
-                                        });
-                                        combo.enable();
-                                    }
 
                                     this.getForm().findField("edition").on("select", function() {
                                         combo.enable();
@@ -69,6 +68,10 @@ Inprint.cmp.MoveDocument.Form = Ext.extend(Ext.FormPanel, {
                     xtype: 'fieldset',
                     title: _("Rubrication"),
                     autoHeight: true,
+                    defaults: {
+                        anchor: "100%",
+                        allowBlank:false
+                    },
                     items: [
                         {
                             xtype: 'radiogroup',
@@ -76,7 +79,7 @@ Inprint.cmp.MoveDocument.Form = Ext.extend(Ext.FormPanel, {
                             columns: 1,
                             items: [
                                 {boxLabel: 'Оставить рубрику', name: 'ch-rub', inputValue: "no", checked: true},
-                                {boxLabel: 'Заменить рубрику', name: 'ch-rub', inputValue: "yes"}
+                                {boxLabel: 'Заменить на рубрику', name: 'ch-rub', inputValue: "yes"}
                             ],
                             listeners: {
                                 scope: this,
@@ -88,23 +91,11 @@ Inprint.cmp.MoveDocument.Form = Ext.extend(Ext.FormPanel, {
                                         this.getForm().findField("rubric").reset();
                                     }
                                     if (value == "no") {
-                                        this.getForm().findField("headline").disable();
                                         this.getForm().findField("headline").reset();
-                                        this.getForm().findField("rubric").disable();
+                                        this.getForm().findField("headline").disable();
+                                        
                                         this.getForm().findField("rubric").reset();
-
-                                        if (this.initialValues.fascicle, this.initialValues.headline) {
-                                            this.getForm().findField("headline").loadValue(this.initialValues.headline, {
-                                                flt_fascicle: this.initialValues.fascicle
-                                            });
-                                        }
-
-                                        if (this.initialValues.headline, this.initialValues.rubric) {
-                                            this.getForm().findField("rubric").loadValue(this.initialValues.rubric, {
-                                                flt_headline: this.initialValues.headline
-                                            });
-                                        }
-
+                                        this.getForm().findField("rubric").disable();
                                     }
                                 }
                             }
@@ -115,23 +106,11 @@ Inprint.cmp.MoveDocument.Form = Ext.extend(Ext.FormPanel, {
                             listeners: {
                                 scope: this,
                                 render: function(combo) {
-
-                                    if (this.initialValues.fascicle, this.initialValues.headline) {
-                                        combo.loadValue(this.initialValues.headline, {
-                                            flt_fascicle: this.initialValues.fascicle
-                                        });
-                                    }
-
-                                    //this.getForm().findField("edition").on("select", function() {
-                                    //    combo.disable();
-                                    //    combo.reset();
-                                    //}, this);
-
-                                    //this.getForm().findField("fascicle").on("select", function() {
-                                    //    combo.enable();
-                                    //    combo.reset();
-                                    //    combo.getStore().baseParams["flt_fascicle"] = this.getForm().findField("fascicle").getValue();
-                                    //}, this);
+                                    this.getForm().findField("fascicle").on("select", function() {
+                                        combo.reset();
+                                        combo.getStore().baseParams["flt_edition"] = this.getForm().findField("edition").getValue();
+                                        combo.getStore().baseParams["flt_fascicle"] = this.getForm().findField("fascicle").getValue();
+                                    }, this);
                                 },
                                 beforequery: function(qe) {
                                     delete qe.combo.lastQuery;
@@ -144,26 +123,11 @@ Inprint.cmp.MoveDocument.Form = Ext.extend(Ext.FormPanel, {
                             listeners: {
                                 scope: this,
                                 render: function(combo) {
-
-                                    if (this.initialValues.headline, this.initialValues.rubric) {
-                                        combo.loadValue(this.initialValues.rubric, {
-                                            flt_headline: this.initialValues.headline
-                                        });
-                                    }
-
-                                    //this.getForm().findField("edition").on("select", function() {
-                                    //    combo.disable();
-                                    //    combo.reset();
-                                    //}, this);
-                                    //this.getForm().findField("fascicle").on("select", function() {
-                                    //    combo.disable();
-                                    //    combo.reset();
-                                    //}, this);
-                                    //this.getForm().findField("headline").on("select", function() {
-                                    //    combo.enable();
-                                    //    combo.reset();
-                                    //    combo.getStore().baseParams["flt_headline"] = this.getForm().findField("headline").getValue();
-                                    //}, this);
+                                    this.getForm().findField("headline").on("select", function() {
+                                        combo.enable();
+                                        combo.reset();
+                                        combo.getStore().baseParams["flt_headline"] = this.getForm().findField("headline").getValue();
+                                    }, this);
                                 },
                                 beforequery: function(qe) {
                                     delete qe.combo.lastQuery;
@@ -178,9 +142,7 @@ Inprint.cmp.MoveDocument.Form = Ext.extend(Ext.FormPanel, {
         });
 
         Inprint.cmp.MoveDocument.Form.superclass.initComponent.apply(this, arguments);
-
         this.getForm().url = this.url;
-
     },
 
     onRender: function() {

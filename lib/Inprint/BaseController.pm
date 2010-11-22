@@ -12,7 +12,7 @@ use warnings;
 use Data::UUID;
 use Mojo::JSON;
 
-no warnings 'redefine';
+#no warnings 'redefine';
 
 use Inprint::Frameworks::Access;
 use Inprint::Frameworks::Events;

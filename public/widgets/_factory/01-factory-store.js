@@ -45,7 +45,7 @@ Inprint.factory.Store = new function() {
             'images','files',
             'created','updated'
         ],
-        '/documents/common/fascicles/':         [ 'id', 'title', 'shortcut', 'description', "headline", "headline_shortcut", "rubric", "rubric_shortcut" ],
+        '/documents/common/fascicles/':         [ "id", "edition", "edition_shortcut", "title", "shortcut", 'description', "headline", "headline_shortcut", "rubric", "rubric_shortcut" ],
 
         // Catalog
         "/catalog/readiness/list/":             [ "id", "color", "percent", "title", "shortcut", "description" ],

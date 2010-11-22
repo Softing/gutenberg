@@ -31,18 +31,18 @@ Inprint.documents.recycle.Panel = Ext.extend(Ext.Panel, {
         });
 
         Inprint.documents.recycle.Panel.superclass.initComponent.apply(this, arguments);
-
-        Inprint.documents.recycle.Interaction(this.panels);
-
-    },
-
-    cmpReload: function() {
-        this.panels.grid.cmpReload();
     },
 
     onRender: function() {
         Inprint.documents.recycle.Panel.superclass.onRender.apply(this, arguments);
+        Inprint.documents.recycle.Access(this, this.panels);
+        Inprint.documents.recycle.Interaction(this, this.panels);
+    },
+
+    cmpReload: function() {
+        this.panels.grid.cmpReload();
     }
+    
 });
 
 Inprint.registry.register("documents-recycle", {

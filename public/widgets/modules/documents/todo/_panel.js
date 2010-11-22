@@ -31,17 +31,16 @@ Inprint.documents.todo.Panel = Ext.extend(Ext.Panel, {
         });
 
         Inprint.documents.todo.Panel.superclass.initComponent.apply(this, arguments);
-
-        Inprint.documents.todo.Interaction(this.panels);
-
-    },
-
-    cmpReload: function() {
-        this.panels.grid.cmpReload();
     },
 
     onRender: function() {
         Inprint.documents.todo.Panel.superclass.onRender.apply(this, arguments);
+        Inprint.documents.todo.Access(this, this.panels);
+        Inprint.documents.todo.Interaction(this, this.panels);
+    },
+
+    cmpReload: function() {
+        this.panels.grid.cmpReload();
     }
 });
 

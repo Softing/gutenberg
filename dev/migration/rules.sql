@@ -71,6 +71,8 @@ VALUES ('b7adafe9-2d5b-44f3-aa87-681fd48466fa', 'catalog', 'documents', 'move', 
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
 VALUES ('6d590a90-58a1-447f-b5ad-e3c62f80a2ef', 'catalog', 'documents', 'briefcase', 130, 'Can put in a briefcase', 'key', '');
 
+INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
+VALUES ('6d590a90-58a1-447f-b5ad-b0582b64571a', 'catalog', 'documents', 'discuss', 140, 'Can discuss the materials', 'key', '');
 
 -------------------------------------------------------------------------------------------------
 -- Editions
