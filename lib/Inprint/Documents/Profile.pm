@@ -87,11 +87,13 @@ sub read {
         # Get co-documents
         $document->{fascicles} = $c->sql->Q("
             SELECT
+                dcm.edition,  dcm.edition_shortcut,
                 dcm.fascicle, dcm.fascicle_shortcut,
                 dcm.headline, dcm.headline_shortcut,
                 dcm.rubric, dcm.rubric_shortcut
-            FROM documents dcm WHERE dcm.filepath=? AND edition=? AND id <> ?
-        ", [ $document->{filepath}, $document->{edition}, $document->{id} ])->Hashes;
+            FROM documents dcm WHERE dcm.copygroup=? 
+            ORDER BY edition_shortcut, fascicle_shortcut
+        ", [ $document->{copygroup} ])->Hashes;
         
     }
     

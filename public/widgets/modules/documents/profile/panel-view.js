@@ -136,7 +136,7 @@ Inprint.documents.Profile.View = Ext.extend(Ext.Panel, {
             '<th>Название</th>',
             '<th width="70">Издание</th>',
             '<th width="70">Выпуск</td>',
-            '<th width="90">Секция</th>',
+            '<th width="90">Раздел</th>',
             '<th width="90">Рубрика</th>',
             '<th width="50">Объем</th>',
             '<th width="80">Отдел</td>',
@@ -172,16 +172,16 @@ Inprint.documents.Profile.View = Ext.extend(Ext.Panel, {
         '<tpl if="fascicles">', 
             '<table width="99%" align="center">',
             '<tr style="background:#f5f5f5;">',
-                '<th>Издание</th>',
-                '<th>Выпуск</td>',
-                '<th>Раздел</th>',
-                '<th width="100%">Рубрика</th>',
+                '<th width="70">Издание</th>',
+                '<th width="70">Выпуск</td>',
+                '<th width="90">Раздел</th>',
+                '<th>Рубрика</th>',
             '</tr>',
             '<tpl for="fascicles">', 
                 '<tr>',
                     '<td>{edition_shortcut}</td>',
                     '<td>{fascicle_shortcut}</td>',
-                    '<td>{section_shortcut}</td>',
+                    '<td>{headline_shortcut}</td>',
                     '<td>{rubric_shortcut}</td>',
                 '</tr>',
             '</tpl>', 
@@ -210,16 +210,12 @@ Inprint.documents.Profile.View = Ext.extend(Ext.Panel, {
     
     cmpFill: function(record) {
         if (record) {
-
             if (record.access) {
                 this.cmpAccess(record.fascicle, record.access);
             }
-            
             this.items.get(0).update(record);
             this.items.get(1).update(record);
-            
             this.items.get(2).hide();
-            
             if (record.fascicles.length > 0) {
                 this.items.get(2).show();
                 this.items.get(2).update(record);

@@ -8,6 +8,8 @@ package Inprint::Documents;
 use strict;
 use warnings;
 
+use Inprint::Utils;
+
 use base 'Inprint::BaseController';
 
 sub read {
@@ -177,9 +179,9 @@ sub list {
     
     if ($mode eq "all") {
         $sql_filters .= " AND isopen is true ";
-        if ($fascicle && $fascicle ne '99999999-9999-9999-9999-999999999999') {
+        #if ($fascicle && $fascicle ne '99999999-9999-9999-9999-999999999999') {
             $sql_filters .= " AND fascicle <> '99999999-9999-9999-9999-999999999999' ";
-        }
+        #}
         if ($fascicle && $fascicle ne '00000000-0000-0000-0000-000000000000') {
             $sql_filters .= " AND fascicle <> '00000000-0000-0000-0000-000000000000' ";
         }
@@ -269,6 +271,11 @@ sub list {
     
     my $current_member = $c->QuerySessionGet("member.id");
     foreach my $document (@$result) {
+        
+        my $copy_count = $c->sql->Q(" SELECT count(*) FROM documents WHERE copygroup=? ", [ $document->{copygroup} ])->Value;
+        if ($copy_count > 1) {
+            $document->{title} = $document->{title} . " ($copy_count)";
+        }
         
         $document->{access} = {};
         my @rules = qw(update capture move transfer briefcase delete recover);
@@ -628,8 +635,8 @@ sub update {
     }
     
     unless (@errors) {
-        $c->sql->Do(" UPDATE documents SET title=?, author=?, psize=?, pdate=? WHERE id=?; ",
-            [ $i_title, $i_author, $i_size, $i_enddate, $i_id ]);
+        $c->sql->Do(" UPDATE documents SET title=?, author=?, psize=?, pdate=? WHERE id=? OR copygroup=?; ",
+            [ $i_title, $i_author, $i_size, $i_enddate, $i_id, $i_id ]);
     }
     
     $success = $c->json->true unless (@errors);
@@ -760,20 +767,9 @@ sub move {
     my @errors;
     my $success = $c->json->false;
     
-    my $fascicle;
-    $fascicle = $c->sql->Q(" SELECT id, shortcut FROM fascicles WHERE id=? AND edition=? ", [ $i_fascicle, $i_edition ])->Hash;
-    
-    my $headline;
-    $headline = $c->sql->Q("
-        SELECT t1.id, t1.shortcut FROM index t1, index_mapping t2
-        WHERE t2.parent=? AND t1.id = t2.child AND t1.id=?
-    ", [ $i_fascicle, $i_headline ])->Hash;
-    
-    my $rubric;
-    $rubric = $c->sql->Q("
-            SELECT t1.id, t1.shortcut FROM index t1, index_mapping t2
-            WHERE t2.parent=? AND t1.id = t2.child AND t1.id=?
-    ", [ $i_headline, $i_rubric ])->Hash;
+    my $fascicle = Inprint::Utils::GetFascicleById($c, id => $i_fascicle);
+    my $headline = Inprint::Utils::GetHeadlineById($c, id => $i_headline, fascicle => $i_fascicle);
+    my $rubric   = Inprint::Utils::GetRubricById($c,   id => $i_rubric,   headline=> $i_headline);
     
     if ($fascicle) {
         
@@ -801,31 +797,222 @@ sub move {
 sub copy {
     my $c = shift;
     
+    my @ids = $c->param("id");
+    my @copies = $c->param("copyto");
+    
     my @errors;
     my $success = $c->json->false;
     
-    my @ids = $c->param("id");
+    foreach my $copyid (@copies) {
+        
+        my ($fascicle_id, $headline_id, $rubric_id) = split '::', $copyid;
+        
+        my $fascicle = Inprint::Utils::GetFascicleById($c, id => $fascicle_id);
+        my $headline = Inprint::Utils::GetHeadlineById($c, id => $headline_id, fascicle => $fascicle_id);
+        my $rubric   = Inprint::Utils::GetRubricById($c,   id => $rubric_id,   headline=> $headline_id);
+        
+        foreach my $document_id (@ids) {
+            
+            my $document = $c->sql->Q("SELECT * FROM documents WHERE id=?", [ $document_id ])->Hash;
+            my $exist = $c->sql->Q("SELECT true FROM documents WHERE copygroup=? AND fascicle=?", [ $document->{id}, $fascicle->{id} ])->Value;
+            
+            if ( $document->{id} ) {
+                
+                unless ($exist) {
+                
+                    my $new_id = $c->uuid();
+                    
+                    $c->sql->bt();
+                    
+                    $c->sql->Do("
+                        INSERT INTO documents(
+                            id,
+                            creator, creator_shortcut,
+                            holder, holder_shortcut,
+                            manager, manager_shortcut,
+                            edition, edition_shortcut, ineditions,
+                            copygroup, 
+                            workgroup, workgroup_shortcut, inworkgroups,
+                            fascicle, fascicle_shortcut, 
+                            headline, headline_shortcut,
+                            rubric, rubric_shortcut,
+                            branch, branch_shortcut,
+                            stage, stage_shortcut,
+                            readiness, readiness_shortcut, 
+                            color, progress,
+                            title, author,
+                            pdate, psize,
+                            rdate, rsize,
+                            filepath, 
+                            images, files,
+                            islooked, isopen,
+                            created, updated
+                        )
+                        VALUES (
+                            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now()
+                        );
+                    ", [
+                        $new_id,
+                            $document->{creator}, $document->{creator_shortcut},
+                            $document->{holder},  $document->{holder_shortcut},
+                            $document->{manager}, $document->{manager_shortcut},
+                            $document->{edition}, $document->{edition_shortcut}, $document->{ineditions},
+                            $document->{copygroup},
+                            $document->{workgroup}, $document->{workgroup_shortcut}, $document->{inworkgroups},
+                        $fascicle->{id}, $fascicle->{shortcut}, 
+                            $document->{headline}, $document->{headline_shortcut},
+                            $document->{rubric}, $document->{rubric_shortcut},
+                            $document->{branch}, $document->{branch_shortcut},
+                            $document->{stage}, $document->{stage_shortcut},
+                            $document->{readiness}, $document->{readiness_shortcut}, $document->{color}, $document->{progress},
+                            $document->{title}, $document->{author},
+                            $document->{pdate}, $document->{psize},
+                            $document->{rdate}, $document->{rsize},
+                            $document->{filepath}, 
+                            $document->{images}, $document->{files},
+                            $document->{islooked}, $document->{isopen}
+                    ]);
+                    
+                    if ( $headline->{id} ) {
+                        $c->sql->Do(" UPDATE documents SET headline=?, headline_shortcut=? WHERE id=? ", [ $headline->{id}, $headline->{shortcut}, $new_id ]);
+                    }
+                    
+                    if ( $rubric->{id} ) {
+                        $c->sql->Do(" UPDATE documents SET rubric=?, rubric_shortcut=? WHERE id=? ", [ $rubric->{id}, $rubric->{shortcut}, $new_id ]);
+                    }
+                    
+                    $c->sql->et();
+                }
+            }
+        }
+    }
+    
+    $success = $c->json->true unless (@errors);
     $c->render_json( { success => $success } );
 }
 
 sub duplicate {
+
     my $c = shift;
+    
+    my @ids = $c->param("id");
+    my @copies = $c->param("copyto");
     
     my @errors;
     my $success = $c->json->false;
     
-    my @ids = $c->param("id");
+    foreach my $copyid (@copies) {
+        
+        my ($fascicle_id, $headline_id, $rubric_id) = split '::', $copyid;
+        
+        my $fascicle = Inprint::Utils::GetFascicleById($c, id => $fascicle_id);
+        my $headline = Inprint::Utils::GetHeadlineById($c, id => $headline_id, fascicle => $fascicle_id);
+        my $rubric   = Inprint::Utils::GetRubricById($c,   id => $rubric_id,   headline=> $headline_id);
+        
+        foreach my $document_id (@ids) {
+            
+            my $document = $c->sql->Q("SELECT * FROM documents WHERE id=?", [ $document_id ])->Hash;
+            my $exist = $c->sql->Q("SELECT true FROM documents WHERE copygroup=? AND fascicle=?", [ $document->{id}, $fascicle->{id} ])->Value;
+            
+            if ( $document->{id} ) {
+                
+                unless ($exist) {
+                
+                    my $new_id = $c->uuid();
+                    
+                    $c->sql->Do("
+                        INSERT INTO documents(
+                            id,
+                            creator, creator_shortcut,
+                            holder, holder_shortcut,
+                            manager, manager_shortcut,
+                            edition, edition_shortcut, ineditions,
+                            copygroup, 
+                            workgroup, workgroup_shortcut, inworkgroups,
+                            fascicle, fascicle_shortcut, 
+                            headline, headline_shortcut,
+                            rubric, rubric_shortcut,
+                            branch, branch_shortcut,
+                            stage, stage_shortcut,
+                            readiness, readiness_shortcut, 
+                            color, progress,
+                            title, author,
+                            pdate, psize,
+                            rdate, rsize,
+                            filepath, 
+                            images, files,
+                            islooked, isopen,
+                            created, updated
+                        )
+                        VALUES (
+                            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now()
+                        );
+                    ", [
+                        $new_id,
+                            $document->{creator}, $document->{creator_shortcut},
+                            $document->{holder},  $document->{holder_shortcut},
+                            $document->{manager}, $document->{manager_shortcut},
+                            $document->{edition}, $document->{edition_shortcut}, $document->{ineditions},
+                        $new_id,
+                            $document->{workgroup}, $document->{workgroup_shortcut}, $document->{inworkgroups},
+                        $fascicle->{id}, $fascicle->{shortcut}, 
+                            $document->{headline}, $document->{headline_shortcut},
+                            $document->{rubric}, $document->{rubric_shortcut},
+                            $document->{branch}, $document->{branch_shortcut},
+                            $document->{stage}, $document->{stage_shortcut},
+                            $document->{readiness}, $document->{readiness_shortcut}, $document->{color}, $document->{progress},
+                            $document->{title}, $document->{author},
+                            $document->{pdate}, $document->{psize},
+                            $document->{rdate}, $document->{rsize},
+                            $document->{filepath}, 
+                            $document->{images}, $document->{files},
+                            $document->{islooked}, $document->{isopen}
+                    ]);
+                    
+                    # Indexation
+                    if ( $headline->{id} ) {
+                        $c->sql->Do(" UPDATE documents SET headline=?, headline_shortcut=? WHERE id=? ", [ $headline->{id}, $headline->{shortcut}, $new_id ]);
+                    }
+                    
+                    if ( $rubric->{id} ) {
+                        $c->sql->Do(" UPDATE documents SET rubric=?, rubric_shortcut=? WHERE id=? ", [ $rubric->{id}, $rubric->{shortcut}, $new_id ]);
+                    }
+                    
+                    # Datastore
+                    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+                    
+                    $year += 1900;
+                    $mon += 1;
+                    
+                    $c->sql->Do(" UPDATE documents SET filepath=? WHERE id=? ", [ "/$year/$mon/$new_id", $new_id ]);
+                    
+                }
+            }
+        }
+    }
+    
+    $success = $c->json->true unless (@errors);
     $c->render_json( { success => $success } );
 }
+
 
 sub recycle {
     my $c = shift;
     my @ids = $c->param("id");
-    foreach my $id (@ids) {
-        if ($c->is_uuid($id)) {
-            my $document = $c->sql->Q(" SELECT id, workgroup FROM documents WHERE id=? ", [ $id ])->Hash;
-            if ($c->access->Check("catalog.documents.delete:*", $document->{workgroup})) {
-                $c->sql->Do(" UPDATE documents SET fascicle='99999999-9999-9999-9999-999999999999' WHERE id=? ", [ $document->{id} ]);
+    
+    my $fascicle = Inprint::Utils::GetFascicleById($c, id => '99999999-9999-9999-9999-999999999999');
+    
+    if ($fascicle) {
+        foreach my $id (@ids) {
+            if ($c->is_uuid($id)) {
+                my $document = Inprint::Utils::GetDocumentById($c, id => $id);
+                if ($document->{workgroup}){
+                    if ($c->access->Check("catalog.documents.delete:*", $document->{workgroup})) {
+                        $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $document->{id} ]);
+                    }
+                }
             }
         }
     }
@@ -856,5 +1043,6 @@ sub delete {
     }
     $c->render_json( { success => $c->json->true } );
 }
+
 1;
 

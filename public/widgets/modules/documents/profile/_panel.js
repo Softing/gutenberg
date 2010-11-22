@@ -63,7 +63,21 @@ Inprint.documents.Profile = Ext.extend(Ext.Panel, {
     },
 
     cmpReload: function() {
-        alert(1);
+        Ext.Ajax.request({
+            url: "/documents/profile/read/",
+            scope:this,
+            params: { id: this.oid },
+            success: function(result) {
+                var response = Ext.util.JSON.decode(result.responseText);
+                
+                this.panels["profile"].cmpFill(response.data);
+                this.panels["files"].cmpFill(response.data);
+                this.panels["comments"].cmpFill(response.data);
+            },
+            failure: function () {
+                
+            }
+        });
     }
 
 });

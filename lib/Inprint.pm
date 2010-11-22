@@ -143,7 +143,9 @@ sub createRoutes {
     my $routes = shift;
 
     foreach my $route (@$routes) {
+        
         my $cprefix = "/$prefix/$route/";
+        
         if ($route eq "index") {
             $cprefix = "/$prefix/";
         }

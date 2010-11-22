@@ -89,22 +89,22 @@ sub lock_table {
     $c->Do({ query => "LOCK TABLE $table IN ACCESS $access;" });
 }
 
-sub start_t{
+sub bt{
     my $c = shift;
     say STDERR "BEGIN;" if ( $c->{trace} );
-    $c->{DBH}->begin_work;
+    $c->{conn}->dbh->begin_work;
 }
 
-sub rollback_t {
+sub rt {
     my $c = shift;
     say STDERR "ROLLBACK;" if ( $c->{trace} );
-    $c->{DBH}->rollback;
+    $c->{conn}->dbh->rollback;
 }
 
-sub stop_t {
+sub et {
     my $c = shift;
     say STDERR "COMMIT;" if ( $c->{trace} );
-    $c->{DBH}->commit;
+    $c->{conn}->dbh->commit;
 }
 
 1;
