@@ -8,6 +8,7 @@ sub GetEditionById {
     my $sql = " SELECT id, shortcut FROM editions WHERE id=? ";
     
     my $result = $c->sql->Q($sql, \@params)->Hash;
+    
     return $result || undef;
 }
 
@@ -16,7 +17,7 @@ sub GetFascicleById {
     my %params = ( @_ );
     
     my @params = ($params{id});
-    my $sql = " SELECT id, shortcut FROM fascicles WHERE id=? ";
+    my $sql = " SELECT id, edition, shortcut FROM fascicles WHERE id=? ";
     
     if ($params{edition}) {
         $sql .= " AND edition=? ";

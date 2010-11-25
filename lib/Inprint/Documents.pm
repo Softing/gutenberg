@@ -808,8 +808,13 @@ sub copy {
         my ($fascicle_id, $headline_id, $rubric_id) = split '::', $copyid;
         
         my $fascicle = Inprint::Utils::GetFascicleById($c, id => $fascicle_id);
-        my $headline = Inprint::Utils::GetHeadlineById($c, id => $headline_id, fascicle => $fascicle_id);
-        my $rubric   = Inprint::Utils::GetRubricById($c,   id => $rubric_id,   headline=> $headline_id);
+        next unless $fascicle->{id};
+        
+        my $edition  = Inprint::Utils::GetEditionById($c, id => $fascicle->{edition});
+        next unless $edition->{id};
+        
+        my $headline = Inprint::Utils::GetHeadlineById($c, id => $headline_id);
+        my $rubric   = Inprint::Utils::GetRubricById($c,   id => $rubric_id);
         
         foreach my $document_id (@ids) {
             
@@ -857,10 +862,10 @@ sub copy {
                             $document->{creator}, $document->{creator_shortcut},
                             $document->{holder},  $document->{holder_shortcut},
                             $document->{manager}, $document->{manager_shortcut},
-                            $document->{edition}, $document->{edition_shortcut}, $document->{ineditions},
-                            $document->{copygroup},
+                            $document->{edition}, $document->{edition_shortcut},  $document->{ineditions},
+                        $new_id,
                             $document->{workgroup}, $document->{workgroup_shortcut}, $document->{inworkgroups},
-                        $fascicle->{id}, $fascicle->{shortcut}, 
+                            $document->{fascicle}, $document->{fascicle_shortcut}, 
                             $document->{headline}, $document->{headline_shortcut},
                             $document->{rubric}, $document->{rubric_shortcut},
                             $document->{branch}, $document->{branch_shortcut},
@@ -874,10 +879,21 @@ sub copy {
                             $document->{islooked}, $document->{isopen}
                     ]);
                     
+                    # Change Edition
+                    my $editions = $c->sql->Q("
+                        SELECT ARRAY( select id from editions where path @> ( select path from editions where id = ? ) )
+                    ", [ $edition->{id} ])->Array;
+                    $c->sql->Do(" UPDATE documents SET edition=?, edition_shortcut=?, ineditions=? WHERE id=? ", [ $edition->{id}, $edition->{shortcut}, $editions, $new_id ]);
+                    
+                    # Change Fascicle
+                    $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $new_id ]);
+                    
+                    # Change Headline
                     if ( $headline->{id} ) {
                         $c->sql->Do(" UPDATE documents SET headline=?, headline_shortcut=? WHERE id=? ", [ $headline->{id}, $headline->{shortcut}, $new_id ]);
                     }
                     
+                    # Change Rubric
                     if ( $rubric->{id} ) {
                         $c->sql->Do(" UPDATE documents SET rubric=?, rubric_shortcut=? WHERE id=? ", [ $rubric->{id}, $rubric->{shortcut}, $new_id ]);
                     }
@@ -907,8 +923,13 @@ sub duplicate {
         my ($fascicle_id, $headline_id, $rubric_id) = split '::', $copyid;
         
         my $fascicle = Inprint::Utils::GetFascicleById($c, id => $fascicle_id);
-        my $headline = Inprint::Utils::GetHeadlineById($c, id => $headline_id, fascicle => $fascicle_id);
-        my $rubric   = Inprint::Utils::GetRubricById($c,   id => $rubric_id,   headline=> $headline_id);
+        next unless $fascicle->{id};
+        
+        my $edition  = Inprint::Utils::GetEditionById($c, id => $fascicle->{edition});
+        next unless $edition->{id};
+        
+        my $headline = Inprint::Utils::GetHeadlineById($c, id => $headline_id);
+        my $rubric   = Inprint::Utils::GetRubricById($c,   id => $rubric_id);
         
         foreach my $document_id (@ids) {
             
@@ -920,6 +941,8 @@ sub duplicate {
                 unless ($exist) {
                 
                     my $new_id = $c->uuid();
+                    
+                    $c->sql->bt;
                     
                     $c->sql->Do("
                         INSERT INTO documents(
@@ -954,10 +977,10 @@ sub duplicate {
                             $document->{creator}, $document->{creator_shortcut},
                             $document->{holder},  $document->{holder_shortcut},
                             $document->{manager}, $document->{manager_shortcut},
-                            $document->{edition}, $document->{edition_shortcut}, $document->{ineditions},
-                        $new_id,
+                            $document->{edition}, $document->{edition_shortcut},  $document->{ineditions},
+                            $new_id,
                             $document->{workgroup}, $document->{workgroup_shortcut}, $document->{inworkgroups},
-                        $fascicle->{id}, $fascicle->{shortcut}, 
+                            $document->{fascicle}, $document->{fascicle_shortcut}, 
                             $document->{headline}, $document->{headline_shortcut},
                             $document->{rubric}, $document->{rubric_shortcut},
                             $document->{branch}, $document->{branch_shortcut},
@@ -970,6 +993,15 @@ sub duplicate {
                             $document->{images}, $document->{files},
                             $document->{islooked}, $document->{isopen}
                     ]);
+                    
+                    # Change Edition
+                    my $editions = $c->sql->Q("
+                        SELECT ARRAY( select id from editions where path @> ( select path from editions where id = ? ) )
+                    ", [ $edition->{id} ])->Array;
+                    $c->sql->Do(" UPDATE documents SET edition=?, edition_shortcut=?, ineditions=? WHERE id=? ", [ $edition->{id}, $edition->{shortcut}, $editions, $new_id ]);
+                    
+                    # Change Fascicle
+                    $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $new_id ]);
                     
                     # Indexation
                     if ( $headline->{id} ) {
@@ -987,6 +1019,8 @@ sub duplicate {
                     $mon += 1;
                     
                     $c->sql->Do(" UPDATE documents SET filepath=? WHERE id=? ", [ "/$year/$mon/$new_id", $new_id ]);
+                    
+                    $c->sql->et;
                     
                 }
             }
