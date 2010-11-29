@@ -4,6 +4,7 @@ Inprint.advert.modules.Grid = Ext.extend(Ext.grid.GridPanel, {
 
         this.params = {};
         this.components = {};
+        
         this.urls = {
             "create": _url("/advertising/modules/create/"),
             "read":   _url("/advertising/modules/read/"),
@@ -168,9 +169,10 @@ Inprint.advert.modules.Grid = Ext.extend(Ext.grid.GridPanel, {
             });
 
             form.on("actioncomplete", function (form, action) {
-                if (action.type == "submit")
+                if (action.type == "submit") {
                     win.hide();
-                this.cmpReload();
+                    this.cmpReload();
+                }
             }, this);
 
             this.components["create-window"] = win;

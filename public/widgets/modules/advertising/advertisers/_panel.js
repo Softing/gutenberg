@@ -2,9 +2,11 @@ Inprint.advert.advertisers.Main = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
 
+        this.currentEdition = null;
+
         this.panels = {};
-        this.panels["tree"]  = new Inprint.advert.advertisers.Tree();
-        this.panels["grid"]  = new Inprint.advert.advertisers.Grid();
+        this.panels["tree"]  = new Inprint.advert.advertisers.Tree({ parent: this });
+        this.panels["grid"]  = new Inprint.advert.advertisers.Grid({ parent: this });
 
         Ext.apply(this, {
             layout: "border",
