@@ -178,40 +178,5 @@ sub rubrics {
     $c->render_json({ success => $success, errors => \@errors, data => $result || [] });
 }
 
-#sub stages {
-#    my $c = shift;
-#
-#    my $i_edition  = $c->param("flt_edition") || undef;
-#
-#    my $branchID = $c->sql->Q(" SELECT id FROM branches WHERE edition=?", [ $i_edition ])->Value;
-#    my $result = [];
-#
-#    if ($branchID) {
-#        $result = $c->sql->Q("
-#            SELECT t1.id, t1.shortcut as title, t2.color
-#            FROM stages t1, readiness t2
-#            WHERE branch=? AND t2.id = t1.readiness
-#            ORDER BY t2.weight, t1.shortcut
-#        ", [$branchID])->Hashes;
-#    }
-#
-#    $c->render_json( { data => $result || [] } );
-#}
-
-#sub assignments {
-#    my $c = shift;
-#
-#    my $i_stage = $c->param("flt_stage") || undef;
-#
-#    my $result = $c->sql->Q("
-#        SELECT t1.id, t2.type, t2.shortcut as title, t2.description,
-#            CASE WHEN t2.type='group' THEN 'folders' ELSE 'user' END as icon
-#        FROM map_principals_to_stages t1, view_principals t2
-#        WHERE t2.id = t1.principal AND t1.stage=?
-#        ORDER BY t2.type, t2.shortcut
-#    ", [ $i_stage ])->Hashes;
-#
-#    $c->render_json( { data => $result } );
-#}
 
 1;

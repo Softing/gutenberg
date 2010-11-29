@@ -86,19 +86,21 @@ sub fascicles {
         
         $sql = "
             (
-                SELECT id, 'edition' as type, shortcut as text, 'blue-folders-stack' as icon,
-                    EXISTS( SELECT true FROM editions c2 WHERE c2.path ~ ('*.' || replace(?, '-', '')::text || '.*{2}')::lquery ) as have_childs
+                SELECT id, 'edition' as type, id as edition, null as fascicle, shortcut as text, 'blue-folders-stack' as icon,
+                    EXISTS(
+                        SELECT true FROM fascicles WHERE fascicles.edition = editions.id AND issystem = false AND enabled = true 
+                    ) as have_childs
                 FROM editions
                 WHERE id <> '00000000-0000-0000-0000-000000000000' AND subpath(path, nlevel(path) - 2, 1)::text = replace(?, '-', '')::text
                 ORDER BY shortcut
             ) UNION ALL (
-                SELECT id, 'fascicle' as type, shortcut as text, 'blue-folder' as icon, false as have_childs
+                SELECT id, 'fascicle' as type, edition, id as fascicle, shortcut as text, 'blue-folder' as icon,
+                    false as have_childs
                 FROM fascicles
                 WHERE issystem = false AND enabled = true AND edition = ?
                 ORDER BY shortcut
             )
         ";
-        push @data, $i_node;
         push @data, $i_node;
         push @data, $i_node;
         
@@ -108,8 +110,12 @@ sub fascicles {
             my $record = {
                 id   => $item->{id},
                 text => $item->{text},
+                leaf => $item->{have_childs},
                 icon => $item->{icon},
                 type => $item->{type},
+                
+                edition  => $item->{edition},
+                fascicle => $item->{fascicle},
             };
             if ( $item->{have_childs} ) {
                 $record->{leaf} = $c->json->false;

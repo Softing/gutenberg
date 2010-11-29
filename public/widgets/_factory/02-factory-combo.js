@@ -53,6 +53,32 @@ Inprint.factory.Combo = new function() {
             emptyText: _("Select") + "..."
         },
 
+        // Advertising
+        "/advertising/combo/managers/": {
+            hiddenName: "manager",
+            fieldLabel: _("Manager"),
+            emptyText: _("Manager") + "..."
+        },
+        "/advertising/combo/advertisers/": {
+            hiddenName: "advertiser",
+            fieldLabel: _("Advertiser"),
+            emptyText: _("Advertiser") + "..."
+        },
+        "/advertising/combo/fascicles/": {
+            hiddenName: "fascicle",
+            fieldLabel: _("Fascicle"),
+            emptyText: _("Fascicle") + "..."
+        },
+        "/advertising/combo/places/": {
+            hiddenName: "place",
+            fieldLabel: _("Place"),
+            emptyText: _("Place") + "..."
+        },
+        "/advertising/combo/modules/": {
+            hiddenName: "module",
+            fieldLabel: _("Module"),
+            emptyText: _("Module") + "..."
+        },
 
         // Fascicles
         "/calendar/combo/groups/": {

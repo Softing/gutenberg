@@ -46,10 +46,10 @@ my $rootnode = '00000000-0000-0000-0000-000000000000';
 #$sql_new->Do(" DELETE FROM fascicles_map_documents ");
 
 #$sql_new->Do(" DELETE FROM ad_places ");
-$sql_new->Do(" DELETE FROM ad_advertisers ");
+#$sql_new->Do(" DELETE FROM ad_advertisers ");
 #$sql_new->Do(" SELECT setval('ad_advertisers_serialnum_seq', 1); ");
-#$sql_new->Do(" DELETE FROM ad_requests ");
-#$sql_new->Do(" SELECT setval('ad_requests_serialnum_seq', 1); ");
+$sql_new->Do(" DELETE FROM ad_requests ");
+$sql_new->Do(" SELECT setval('ad_requests_serialnum_seq', 1); ");
 #$sql_new->Do(" DELETE FROM ad_modules ");
 #$sql_new->Do(" DELETE FROM fascicles_map_holes ");
 
@@ -150,54 +150,54 @@ $sql_new->Do(" DELETE FROM ad_advertisers ");
 
 
 
-################################################################################
-$count = 0;
-say("Import advertisers");
-my $advertisers = $sql_old->Q(" SELECT uuid, edition, title, stitle FROM adv.advertiser; ")->Hashes;
-foreach my $item( @{ $advertisers } ) {
-    
-    #say $count++;
-    
-    my $edition = $sql_new->Q(" SELECT t1.* FROM editions t1, migration t2 WHERE t1.id = t2.newid AND t2.oldid=? ", [ $item->{edition} ])->Hash;
-    
-    if( $edition ) {
-        say "Import advertiser $item->{uuid}";
-        $sql_new->Do("
-            INSERT INTO ad_advertisers(id, edition, title, shortcut, created, updated)
-            VALUES (?, ?, ?, ?, now(), now());
-        ", [ $item->{uuid}, $edition->{id}, $item->{title}, $item->{stitle} ]);
-    } else {
-        say $item->{edition};
-    }
-}
-
-
-
 #################################################################################
 #$count = 0;
-#say("Import requests");
-#my $requests = $sql_old->Q(" SELECT uuid, advertiser, fascicle, page, place, size, description FROM adv.request; ")->Hashes;
-#foreach my $item( @{ $requests } ) {
+#say("Import advertisers");
+#my $advertisers = $sql_old->Q(" SELECT uuid, edition, title, stitle FROM adv.advertiser; ")->Hashes;
+#foreach my $item( @{ $advertisers } ) {
 #    
 #    #say $count++;
 #    
-#    my $fascicle   = $sql_new->Q(" SELECT * FROM fascicles WHERE id=? ", [ $item->{fascicle} ])->Hash;
-#    my $edition    = $sql_new->Q(" SELECT * FROM editions WHERE id=? ", [ $fascicle->{edition} ])->Hash;
-#    my $place      = $sql_new->Q(" SELECT * FROM ad_places WHERE id=? ", [ $item->{place} ])->Hash;
-#    my $advertiser = $sql_new->Q(" SELECT * FROM ad_advertisers WHERE id=? ", [ $item->{advertiser} ])->Hash;
+#    my $edition = $sql_new->Q(" SELECT t1.* FROM editions t1, migration t2 WHERE t1.id = t2.newid AND t2.oldid=? ", [ $item->{edition} ])->Hash;
 #    
-#    if ($fascicle && $edition && $advertiser) {
-#        say "Import request $item->{uuid}";
-#        my $title = "Заявка от <$advertiser->{title}> в выпуск <$fascicle->{title}>";
-#        my $shortcut = "<$advertiser->{title}> в <$fascicle->{title}>";
+#    if( $edition ) {
+#        say "Import advertiser $item->{uuid}";
 #        $sql_new->Do("
-#            INSERT INTO ad_requests (id, advertiser, edition, fascicle, place, title, shortcut, manager, manager_shortcut, status, payment, readiness, created, updated) 
-#            VALUES (?, ?, ?, ?, ?, ?, ?, null, null, 0, 0, 0, now(), now());
-#        ", [ $item->{uuid}, $advertiser->{id}, $edition->{id}, $fascicle->{id}, $place->{id}, $title, $shortcut ]);
+#            INSERT INTO ad_advertisers(id, edition, title, shortcut, created, updated)
+#            VALUES (?, ?, ?, ?, now(), now());
+#        ", [ $item->{uuid}, $edition->{id}, $item->{title}, $item->{stitle} ]);
 #    } else {
-#        say $item->{advertiser};
+#        say $item->{edition};
 #    }
 #}
+
+
+
+################################################################################
+$count = 0;
+say("Import requests");
+my $requests = $sql_old->Q(" SELECT uuid, advertiser, fascicle, page, place, size, description FROM adv.request; ")->Hashes;
+foreach my $item( @{ $requests } ) {
+    
+    #say $count++;
+    
+    my $fascicle   = $sql_new->Q(" SELECT * FROM fascicles WHERE id=? ", [ $item->{fascicle} ])->Hash;
+    my $edition    = $sql_new->Q(" SELECT * FROM editions WHERE id=? ", [ $fascicle->{edition} ])->Hash;
+    my $place      = $sql_new->Q(" SELECT * FROM ad_places WHERE id=? ", [ $item->{place} ])->Hash;
+    my $advertiser = $sql_new->Q(" SELECT * FROM ad_advertisers WHERE id=? ", [ $item->{advertiser} ])->Hash;
+    
+    if ($fascicle && $edition && $advertiser) {
+        say "Import request $item->{uuid}";
+        my $title = "Заявка от <$advertiser->{title}> в выпуск <$fascicle->{title}>";
+        my $shortcut = "<$advertiser->{title}> в <$fascicle->{title}>";
+        $sql_new->Do("
+            INSERT INTO ad_requests (id, edition,  advertiser, fascicle, place, title, shortcut, manager, status, payment, readiness, created, updated) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, null, 0, 0, 0, now(), now());
+        ", [ $item->{uuid}, $edition->{id}, $advertiser->{id}, $fascicle->{id}, $place->{id}, $title, $shortcut ]);
+    } else {
+        say $item->{advertiser};
+    }
+}
 
 
 #################################################################################

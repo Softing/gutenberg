@@ -76,6 +76,12 @@ Inprint.factory.Store = new function() {
 
     var combos = new Array(
 
+        "/advertising/combo/managers/",
+        "/advertising/combo/advertisers/",
+        "/advertising/combo/fascicles/",
+        "/advertising/combo/places/",
+        "/advertising/combo/modules/",
+
         "/catalog/combos/groups/",
         "/catalog/combos/editions/",
         "/catalog/combos/fascicles/",
