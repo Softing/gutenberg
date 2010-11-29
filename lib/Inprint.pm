@@ -83,6 +83,13 @@ sub startup {
 
     $sessionBridge->route('/logout/')->to('session#logout');
 
+    # Advertising
+    
+    $self->createRoutes($sessionBridge, "advertising/common",       [ "editions", "fascicles", "places" ]);
+    $self->createRoutes($sessionBridge, "advertising/requests",     [ "list", "create", "read", "update", "delete" ]);
+    $self->createRoutes($sessionBridge, "advertising/advertisers",  [ "list", "create", "read", "update", "delete" ]);
+    $self->createRoutes($sessionBridge, "advertising/archive",      [ "list" ]);
+
     # Calendar routes
     $self->createRoutes($sessionBridge, "calendar",             [ "create", "read", "update", "delete", "list", "enable", "disable", "combogroups" ]);
 
@@ -96,6 +103,7 @@ sub startup {
     $self->createRoutes($sessionBridge, "documents/trees",      [ "editions", "workgroups" ]);
     $self->createRoutes($sessionBridge, "documents/filters",    [ "editions", "groups", "fascicles", "headlines", "rubrics", "holders", "managers", "progress" ]);
     $self->createRoutes($sessionBridge, "documents/profile",    [ "read" ]);
+    $self->createRoutes($sessionBridge, "documents/files",      [ "list", "create", "read", "update", "delete", "upload" ]);
 
     # Catalog routes
     $self->createRoutes($sessionBridge, "catalog/combos",       [ "editions", "groups", "fascicles", "roles", "readiness" ]);
@@ -108,7 +116,6 @@ sub startup {
     $self->createRoutes($sessionBridge, "catalog/stages",       [ "create", "read", "update", "delete", "list", "map-principals", "unmap-principals", "principals-mapping" ]);
     $self->createRoutes($sessionBridge, "catalog/principals",   [ "list" ]);
     $self->createRoutes($sessionBridge, "catalog/indexes",      [ "editions", "headlines", "rubrics", "create", "update", "delete" ]);
-    
     $self->createRoutes($sessionBridge, "fascicle/indexes",     [ "editions", "headlines", "rubrics", "create", "update", "delete" ]);
     $self->createRoutes($sessionBridge, "fascicle/image",       [ "view" ]);
     

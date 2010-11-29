@@ -90,7 +90,8 @@ sub GetDocumentById {
             t1.workgroup,
             t1.filepath,
             t1.edition, t1.fascicle, t1.headline, t1.rubric,
-            t1.manager, t1.holder
+            t1.manager, t1.holder,
+            t1.filepath
         FROM documents t1 WHERE 1=1 ";
     
     if ($params{id}) {

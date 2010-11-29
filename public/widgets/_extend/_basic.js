@@ -67,21 +67,24 @@ _FLD_TITLE = {
     xtype: "textfield",
     allowBlank:false,
     name: "title",
-    fieldLabel: _("Title")
+    fieldLabel: _("Title"),
+    emptyText: _("Title")
 };
 
 _FLD_SHORTCUT = {
     xtype: "textfield",
     allowBlank:false,
     name: "shortcut",
-    fieldLabel: _("Shortcut")
+    fieldLabel: _("Shortcut"),
+    emptyText: _("Shortcut")
 };
 
 _FLD_DESCRIPTION = {
     xtype: "textarea",
     allowBlank:true,
     name: "description",
-    fieldLabel: _("Description")
+    fieldLabel: _("Description"),
+    emptyText: _("Description")
 };
 
 _FLD_COLOR = {

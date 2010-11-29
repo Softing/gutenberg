@@ -1,8 +1,21 @@
-Inprint.documents.Profile.Files = Ext.extend(Ext.Panel, {
+Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
 
     initComponent: function() {
 
         this.record = {};
+        this.urls = {
+            "list":        "/documents/files/list/",
+            "create": _url("/documents/files/create/"),
+            "read":   _url("/documents/files/read/"),
+            "update": _url("/documents/files/update/"),
+            "delete": _url("/documents/files/delete/")
+        }
+
+        this.store = Inprint.factory.Store.json(this.urls["list"], {
+            autoLoad:true
+        });
+        
+        this.selectionModel = new Ext.grid.CheckboxSelectionModel();
 
         this.tbar = [
             {
@@ -63,8 +76,38 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.Panel, {
             
         ];
 
+        // Column model
+        this.columns = [
+            this.selectionModel,
+            {
+                id:"title",
+                header: _("Title"),
+                width: 160,
+                sortable: true,
+                dataIndex: "title"
+            },
+            {
+                id:"shortcut",
+                header: _("Shortcut"),
+                width: 160,
+                sortable: true,
+                dataIndex: "shortcut"
+            },
+            {
+                id:"description",
+                header: _("Description"),
+                width: 200,
+                sortable: true,
+                dataIndex: "description"
+            }
+        ];
+
         Ext.apply(this, {
-            border: false
+            border:false,
+            stripeRows: true,
+            columnLines: true,
+            sm: this.selectionModel,
+            autoExpandColumn: "description"
         });
 
         // Call parent (required)
@@ -95,17 +138,23 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.Panel, {
     
     cmpCreate: function() {
 
-        var form = new Ext.FormPanel({
+        var form = new Ext.form.FormPanel({
+            baseCls: 'x-plain',
             border:false,
             labelWidth: 75,
             url: _url("/documents/files/create/"),
             bodyStyle: "padding:5px 5px",
             defaults: {
                 anchor: "100%",
-                allowBlank:false
+                allowBlank:false,
+                hideLabel: true
             },
             items: [
-                _FLD_HDN_ID,
+                {
+                    xtype: "hidden",
+                    name: "id",
+                    value: this.oid
+                },
                 _FLD_TITLE,
                 _FLD_DESCRIPTION
             ],
@@ -117,14 +166,15 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.Panel, {
             title: _("Add file"),
             layout: "fit",
             closeAction: "hide",
-            width:400, height:260,
+            width:400, height:200,
             items: form
         });
 
         form.on("actioncomplete", function (form, action) {
-            if (action.type == "submit")
+            if (action.type == "submit") {
                 win.hide();
-            this.getStore().load();
+                this.getStore().load();
+            }
         }, this);
 
         win.show();

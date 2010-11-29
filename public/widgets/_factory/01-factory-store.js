@@ -19,6 +19,9 @@ Inprint.factory.Store = new function() {
 
     var source = {
 
+        "/advertising/requests/list/":          [ "id", "serialnum", "title", "shortcut", "status", "payment", "readiness", "edition", "edition_shortcut",  "fascicle", "fascicle_shortcut", "advertiser", "advertiser_shortcut", "place", "place_shortcut", "manager", "manager_shortcut", "x", "y", "h", "w", "seqnum", createDateField("created"), createDateField("updated") ],
+        "/advertising/advertisers/list/":       [ "id", "serialnum", "edition", "edition_shortcut", "title", "shortcut", "address", "contact", "phones", "inn", "kpp", "bank", "rs", "ks", "bik", createDateField("created"), createDateField("updated") ],
+
         "/common/transfer/list/":               [ "id", "type", "title", "description" ],
 
         // Calendar
@@ -46,6 +49,7 @@ Inprint.factory.Store = new function() {
             'created','updated'
         ],
         '/documents/common/fascicles/':         [ "id", "edition", "edition_shortcut", "title", "shortcut", 'description', "headline", "headline_shortcut", "rubric", "rubric_shortcut" ],
+        '/documents/files/list/':               [ "id", "filename", "filesize", "mimetype", "isdraft", "description" ],
 
         // Catalog
         "/catalog/readiness/list/":             [ "id", "color", "percent", "title", "shortcut", "description" ],
