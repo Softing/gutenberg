@@ -55,6 +55,13 @@ _FLD_HDN_FASCICLE = {
     allowBlank:false
 };
 
+_FLD_HDN_PLACE = {
+    xtype: "hidden",
+    name: "place",
+    allowBlank:false
+};
+
+
 
 _FLD_NAME = {
     xtype: "textfield",

@@ -50,8 +50,8 @@ my $rootnode = '00000000-0000-0000-0000-000000000000';
 #$sql_new->Do(" SELECT setval('ad_advertisers_serialnum_seq', 1); ");
 #$sql_new->Do(" DELETE FROM ad_requests ");
 #$sql_new->Do(" SELECT setval('ad_requests_serialnum_seq', 1); ");
-#$sql_new->Do(" DELETE FROM ad_modules ");
-$sql_new->Do(" DELETE FROM fascicles_map_holes ");
+$sql_new->Do(" DELETE FROM ad_modules ");
+#$sql_new->Do(" DELETE FROM fascicles_map_holes ");
 
 
 #################################################################################
@@ -140,9 +140,9 @@ $sql_new->Do(" DELETE FROM fascicles_map_holes ");
 #    if( $edition && $fascicle ) {
 #        say "Import place $item->{uuid}";
 #        $sql_new->Do("
-#            INSERT INTO ad_places(id, edition, fascicle, title, shortcut, created, updated)
-#            VALUES (?, ?, ?, ?, ?, now(), now());
-#        ", [ $item->{uuid}, $edition->{id}, $fascicle->{id}, $item->{title}, $item->{stitle} ]);
+#            INSERT INTO ad_places(id, edition, fascicle, title, shortcut, description, created, updated)
+#            VALUES (?, ?, ?, ?, ?, ?, now(), now());
+#        ", [ $item->{uuid}, $edition->{id}, $fascicle->{id}, $item->{title}, $item->{stitle} || $item->{title}, "" ]);
 #    } else {
 #        say $item->{fascicle};
 #    }
@@ -198,118 +198,118 @@ $sql_new->Do(" DELETE FROM fascicles_map_holes ");
 #}
 
 
-#################################################################################
-#$count = 0;
-#say("Import modules");
-#
-#my $modsizes = {
-#    '1/32'              => { size => 0.03,  w=>1,  h=>1,  amount => 1 },
-#    '1/16'              => { size => 0.06,  w=>2,  h=>2,  amount => 1 },
-#    '1/12'              => { size => 0.083, w=>3,  h=>3,  amount => 1 },
-#    '1/8'               => { size => 0.12,  w=>4,  h=>4,  amount => 1 },
-#    '1/8 верт'          => { size => 0.12,  w=>4,  h=>4,  amount => 1 },
-#    '1/8 вертик'        => { size => 0.12,  w=>4,  h=>4,  amount => 1 },
-#    '1/8 гор'           => { size => 0.12,  w=>4,  h=>4,  amount => 1 },
-#    '1/8 гориз'         => { size => 0.12,  w=>4,  h=>4,  amount => 1 },
-#    '1/6 вер'           => { size => 0.16,  w=>5,  h=>5,  amount => 1 },
-#    '1/6 верт'          => { size => 0.16,  w=>5,  h=>5,  amount => 1 },
-#    '1/6 гор'           => { size => 0.16,  w=>5,  h=>5,  amount => 1 },
-#    '1/4'               => { size => 0.25,  w=>8,  h=>8,  amount => 1 },
-#    '1/4 вер'           => { size => 0.25,  w=>8,  h=>8,  amount => 1 },
-#    '1/4 верт'          => { size => 0.25,  w=>8,  h=>8,  amount => 1 },
-#    '1/4 гор'           => { size => 0.25,  w=>8,  h=>8,  amount => 1 },
-#    '1/4 квадр'         => { size => 0.25,  w=>8,  h=>8,  amount => 1 },
-#    '1/3'               => { size => 0.33,  w=>10, h=>10, amount => 1 },
-#    '1/3 вер'           => { size => 0.33,  w=>10, h=>10, amount => 1 },
-#    '1/3 верт'          => { size => 0.33,  w=>10, h=>10, amount => 1 },
-#    '1/3 гор'           => { size => 0.33,  w=>10, h=>10, amount => 1 },
-#    '1/2 вер'           => { size => 0.5,   w=>16, h=>16, amount => 1 },
-#    '1/2 вер б/п'       => { size => 0.5,   w=>16, h=>16, amount => 1 },
-#    '1/2 верт'          => { size => 0.5,   w=>16, h=>16, amount => 1 },
-#    '1/2 верт б/п'      => { size => 0.5,   w=>16, h=>16, amount => 1 },
-#    '1/2 верт.'         => { size => 0.5,   w=>16, h=>16, amount => 1 },
-#    '1/2 гор'           => { size => 0.5,   w=>16, h=>16, amount => 1 },
-#    '1/2 гор б/п'       => { size => 0.5,   w=>16, h=>16, amount => 1 },
-#    '1/2 гор.'          => { size => 0.5,   w=>16, h=>16, amount => 1 },
-#    '2/3 вер'           => { size => 0.66,  w=>21, h=>21, amount => 1 },
-#    '2/3 верт'          => { size => 0.66,  w=>21, h=>21, amount => 1 },
-#    '1/1'               => { size => 1,     w=>32, h=>32, amount => 1 },
-#    '2/1'               => { size => 2,     w=>32, h=>32, amount => 2 },
-#    'гейтфолдер'        => { size => 2,     w=>32, h=>32, amount => 2 },
-#    'ЖВ'                => { size => 2,     w=>32, h=>32, amount => 2 },
-#    'Клапан'            => { size => 2,     w=>32, h=>32, amount => 2 },
-#    'буклет'            => { size => 0,     w=>21, h=>21, amount => 1 },
-#    'Вложение'          => { size => 0,     w=>21, h=>21, amount => 1 },
-#    'Вложение (буклет)' => { size => 0,     w=>21, h=>21, amount => 1 },
-#    'гейтфолдер'        => { size => 0,     w=>21, h=>21, amount => 1 },
-#    'логотип'           => { size => 0,     w=>21, h=>21, amount => 1 },
-#};
-#
-#my $modules = $sql_old->Q("
-#    SELECT t2.uuid, t2.fascicle, t2.title, t2.description, t2.size, t2.deleted, t2.created, t1.place
-#    FROM edition.adv_matrix t1, edition.adv_sizes t2 WHERE t1.size = t2.uuid ORDER BY t2.size
-#")->Hashes;
-#foreach my $item( @{ $modules } ) {
-#    
-#    #say $count++;
-#    
-#    my $fascicle = $sql_new->Q(" SELECT * FROM fascicles WHERE id=? ", [ $item->{fascicle} ])->Hash;
-#    my $edition  = $sql_new->Q(" SELECT * FROM editions WHERE id=? ", [ $fascicle->{edition} ])->Hash;
-#    my $place    = $sql_new->Q(" SELECT * FROM ad_places WHERE id=? ", [ $item->{place} ])->Hash;
-#    
-#    my $amount = $modsizes->{$item->{title}}->{amount};
-#    my $volume = $modsizes->{$item->{title}}->{size};
-#    my $w = $modsizes->{$item->{title}}->{w};
-#    my $h = $modsizes->{$item->{title}}->{h};
-#    
-#    if( $edition && $fascicle && $place && $amount >= 0 && $volume >= 0 && $w >= 0 && $h >= 0 ) {
-#        say "Import module $item->{uuid}";
-#        $sql_new->Do("
-#            INSERT INTO ad_modules(edition, fascicle, place, shortcut, amount, volume, w, h, created, updated) 
-#            VALUES (?, ?, ?, ?, ?, ?, ?, ?, now(), now());
-#        ", [ $edition->{id}, $fascicle->{id}, $place->{id}, $item->{title}, $amount, $volume, $w, $h ]);
-#    } else {
-#        say "$fascicle && $amount && $volume && $w && $h";
-#    }
-#}
-
-
 ################################################################################
 $count = 0;
-say("Import holes");
-my $holes = $sql_old->Q(" select t1.*, t2.title, t2.size from edition.hole t1, edition.adv_sizes t2 where t1.size = t2.uuid  ")->Hashes;
-foreach my $item( @{ $holes } ) {
+say("Import modules");
+
+my $modsizes = {
+    '1/32'              => { size => 0.03,  w=>1,  h=>1,  amount => 1 },
+    '1/16'              => { size => 0.06,  w=>2,  h=>2,  amount => 1 },
+    '1/12'              => { size => 0.083, w=>3,  h=>3,  amount => 1 },
+    '1/8'               => { size => 0.12,  w=>4,  h=>4,  amount => 1 },
+    '1/8 верт'          => { size => 0.12,  w=>4,  h=>4,  amount => 1 },
+    '1/8 вертик'        => { size => 0.12,  w=>4,  h=>4,  amount => 1 },
+    '1/8 гор'           => { size => 0.12,  w=>4,  h=>4,  amount => 1 },
+    '1/8 гориз'         => { size => 0.12,  w=>4,  h=>4,  amount => 1 },
+    '1/6 вер'           => { size => 0.16,  w=>5,  h=>5,  amount => 1 },
+    '1/6 верт'          => { size => 0.16,  w=>5,  h=>5,  amount => 1 },
+    '1/6 гор'           => { size => 0.16,  w=>5,  h=>5,  amount => 1 },
+    '1/4'               => { size => 0.25,  w=>8,  h=>8,  amount => 1 },
+    '1/4 вер'           => { size => 0.25,  w=>8,  h=>8,  amount => 1 },
+    '1/4 верт'          => { size => 0.25,  w=>8,  h=>8,  amount => 1 },
+    '1/4 гор'           => { size => 0.25,  w=>8,  h=>8,  amount => 1 },
+    '1/4 квадр'         => { size => 0.25,  w=>8,  h=>8,  amount => 1 },
+    '1/3'               => { size => 0.33,  w=>10, h=>10, amount => 1 },
+    '1/3 вер'           => { size => 0.33,  w=>10, h=>10, amount => 1 },
+    '1/3 верт'          => { size => 0.33,  w=>10, h=>10, amount => 1 },
+    '1/3 гор'           => { size => 0.33,  w=>10, h=>10, amount => 1 },
+    '1/2 вер'           => { size => 0.5,   w=>16, h=>16, amount => 1 },
+    '1/2 вер б/п'       => { size => 0.5,   w=>16, h=>16, amount => 1 },
+    '1/2 верт'          => { size => 0.5,   w=>16, h=>16, amount => 1 },
+    '1/2 верт б/п'      => { size => 0.5,   w=>16, h=>16, amount => 1 },
+    '1/2 верт.'         => { size => 0.5,   w=>16, h=>16, amount => 1 },
+    '1/2 гор'           => { size => 0.5,   w=>16, h=>16, amount => 1 },
+    '1/2 гор б/п'       => { size => 0.5,   w=>16, h=>16, amount => 1 },
+    '1/2 гор.'          => { size => 0.5,   w=>16, h=>16, amount => 1 },
+    '2/3 вер'           => { size => 0.66,  w=>21, h=>21, amount => 1 },
+    '2/3 верт'          => { size => 0.66,  w=>21, h=>21, amount => 1 },
+    '1/1'               => { size => 1,     w=>32, h=>32, amount => 1 },
+    '2/1'               => { size => 2,     w=>32, h=>32, amount => 2 },
+    'гейтфолдер'        => { size => 2,     w=>32, h=>32, amount => 2 },
+    'ЖВ'                => { size => 2,     w=>32, h=>32, amount => 2 },
+    'Клапан'            => { size => 2,     w=>32, h=>32, amount => 2 },
+    'буклет'            => { size => 0,     w=>21, h=>21, amount => 1 },
+    'Вложение'          => { size => 0,     w=>21, h=>21, amount => 1 },
+    'Вложение (буклет)' => { size => 0,     w=>21, h=>21, amount => 1 },
+    'гейтфолдер'        => { size => 0,     w=>21, h=>21, amount => 1 },
+    'логотип'           => { size => 0,     w=>21, h=>21, amount => 1 },
+};
+
+my $modules = $sql_old->Q("
+    SELECT t2.uuid, t2.fascicle, t2.title, t2.description, t2.size, t2.deleted, t2.created, t1.place
+    FROM edition.adv_matrix t1, edition.adv_sizes t2 WHERE t1.size = t2.uuid ORDER BY t2.size
+")->Hashes;
+foreach my $item( @{ $modules } ) {
     
-    say $count++;
+    #say $count++;
     
     my $fascicle = $sql_new->Q(" SELECT * FROM fascicles WHERE id=? ", [ $item->{fascicle} ])->Hash;
     my $edition  = $sql_new->Q(" SELECT * FROM editions WHERE id=? ", [ $fascicle->{edition} ])->Hash;
-    
     my $place    = $sql_new->Q(" SELECT * FROM ad_places WHERE id=? ", [ $item->{place} ])->Hash;
-    my $page     = $sql_new->Q(" SELECT * FROM fascicles_pages WHERE id=? ", [ $item->{page} ])->Hash;
-    my $module   = $sql_new->Q(" SELECT * FROM ad_modules WHERE fascicle=? AND place=? AND shortcut=?", [ $item->{fascicle}, $place->{id}, $item->{title} ])->Hash;
     
-    unless ($module) {
-        my $module_any  = $sql_new->Q(" SELECT * FROM ad_modules WHERE shortcut=? LIMIT 1", [ $item->{title} ])->Hash;
-        if ($module_any) {
-            $sql_new->Do("
-                INSERT INTO ad_modules(edition, fascicle, place, shortcut, amount, volume, w, h, created, updated) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, now(), now());
-            ", [ $edition->{id}, $fascicle->{id}, $place->{id}, $item->{title}, $module_any->{amount}, $module_any->{volume}, $module_any->{w}, $module_any->{h} ]);
-            $module   = $sql_new->Q(" SELECT * FROM ad_modules WHERE fascicle=? AND place=? AND shortcut=?", [ $item->{fascicle}, $place->{id}, $item->{title} ])->Hash;
-        }
-    }
+    my $amount = $modsizes->{$item->{title}}->{amount};
+    my $volume = $modsizes->{$item->{title}}->{size};
+    my $w = $modsizes->{$item->{title}}->{w};
+    my $h = $modsizes->{$item->{title}}->{h};
     
-    if ($edition && $fascicle && $place && $page && $module) {
-        say "Import hole $item->{uuid}";
+    if( $edition && $fascicle && $place && $amount >= 0 && $volume >= 0 && $w >= 0 && $h >= 0 ) {
+        say "Import module $item->{uuid}";
         $sql_new->Do("
-            INSERT INTO fascicles_map_holes(id, edition, fascicle, place, module, page, entity, x, y, w, h, created, updated)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
-        ", [ $item->{uuid}, $edition->{id}, $fascicle->{id}, $place->{id}, $page->{id}, $module->{id}, undef, 0, 0, $module->{w}, $module->{h} ]);
+            INSERT INTO ad_modules(edition, fascicle, place, title, shortcut, description, amount, volume, w, h, created, updated) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
+        ", [ $edition->{id}, $fascicle->{id}, $place->{id}, $item->{title}, $item->{title}, "", $amount, $volume, $w, $h ]);
     } else {
-        say "$edition >> $fascicle >> $place >> $page >> $module";
+        say "$fascicle && $amount && $volume && $w && $h";
     }
 }
+
+
+#################################################################################
+#$count = 0;
+#say("Import holes");
+#my $holes = $sql_old->Q(" select t1.*, t2.title, t2.size from edition.hole t1, edition.adv_sizes t2 where t1.size = t2.uuid  ")->Hashes;
+#foreach my $item( @{ $holes } ) {
+#    
+#    say $count++;
+#    
+#    my $fascicle = $sql_new->Q(" SELECT * FROM fascicles WHERE id=? ", [ $item->{fascicle} ])->Hash;
+#    my $edition  = $sql_new->Q(" SELECT * FROM editions WHERE id=? ", [ $fascicle->{edition} ])->Hash;
+#    
+#    my $place    = $sql_new->Q(" SELECT * FROM ad_places WHERE id=? ", [ $item->{place} ])->Hash;
+#    my $page     = $sql_new->Q(" SELECT * FROM fascicles_pages WHERE id=? ", [ $item->{page} ])->Hash;
+#    my $module   = $sql_new->Q(" SELECT * FROM ad_modules WHERE fascicle=? AND place=? AND shortcut=?", [ $item->{fascicle}, $place->{id}, $item->{title} ])->Hash;
+#    
+#    unless ($module) {
+#        my $module_any  = $sql_new->Q(" SELECT * FROM ad_modules WHERE shortcut=? LIMIT 1", [ $item->{title} ])->Hash;
+#        if ($module_any) {
+#            $sql_new->Do("
+#                INSERT INTO ad_modules(edition, fascicle, place, shortcut, amount, volume, w, h, created, updated) 
+#                VALUES (?, ?, ?, ?, ?, ?, ?, ?, now(), now());
+#            ", [ $edition->{id}, $fascicle->{id}, $place->{id}, $item->{title}, $module_any->{amount}, $module_any->{volume}, $module_any->{w}, $module_any->{h} ]);
+#            $module   = $sql_new->Q(" SELECT * FROM ad_modules WHERE fascicle=? AND place=? AND shortcut=?", [ $item->{fascicle}, $place->{id}, $item->{title} ])->Hash;
+#        }
+#    }
+#    
+#    if ($edition && $fascicle && $place && $page && $module) {
+#        say "Import hole $item->{uuid}";
+#        $sql_new->Do("
+#            INSERT INTO fascicles_map_holes(id, edition, fascicle, place, module, page, entity, x, y, w, h, created, updated)
+#            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
+#        ", [ $item->{uuid}, $edition->{id}, $fascicle->{id}, $place->{id}, $page->{id}, $module->{id}, undef, 0, 0, $module->{w}, $module->{h} ]);
+#    } else {
+#        say "$edition >> $fascicle >> $place >> $page >> $module";
+#    }
+#}
 
 sub translit
 

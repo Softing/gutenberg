@@ -86,8 +86,11 @@ sub startup {
     # Advertising
     
     $self->createRoutes($sessionBridge, "advertising/common",       [ "editions", "fascicles", "places" ]);
+    $self->createRoutes($sessionBridge, "advertising/combo",        [ "editions", "fascicles", "places" ]);
     $self->createRoutes($sessionBridge, "advertising/requests",     [ "list", "create", "read", "update", "delete" ]);
     $self->createRoutes($sessionBridge, "advertising/advertisers",  [ "list", "create", "read", "update", "delete" ]);
+    $self->createRoutes($sessionBridge, "advertising/places",       [ "list", "create", "read", "update", "delete" ]);
+    $self->createRoutes($sessionBridge, "advertising/modules",      [ "list", "create", "read", "update", "delete" ]);
     $self->createRoutes($sessionBridge, "advertising/archive",      [ "list" ]);
 
     # Calendar routes

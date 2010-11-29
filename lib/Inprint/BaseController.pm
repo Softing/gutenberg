@@ -190,7 +190,14 @@ sub is_uuid {
 sub is_int {
     my $c = shift;
     my $text = shift;
-    return 1 if (length($text) > 0 && $text =~ /^\-?[\d]+$/);
+    return 1 if (length($text) > 0 && $text =~ m/^\-?[\d]+$/);
+    return 0;
+}
+
+sub is_float {
+    my $c = shift;
+    my $text = shift;
+    return 1 if (length($text) > 0 && $text =~ m/^(\d{1,7}|(\d{1,7})?\.\d{0,2}|(\d{0,7})?(\.\d{0,7})?[Ee]((\+?0*[1-7])|-0*\d{1,2}))$/);
     return 0;
 }
 
