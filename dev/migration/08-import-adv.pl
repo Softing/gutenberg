@@ -48,10 +48,10 @@ my $rootnode = '00000000-0000-0000-0000-000000000000';
 #$sql_new->Do(" DELETE FROM ad_places ");
 #$sql_new->Do(" DELETE FROM ad_advertisers ");
 #$sql_new->Do(" SELECT setval('ad_advertisers_serialnum_seq', 1); ");
-$sql_new->Do(" DELETE FROM ad_requests ");
-$sql_new->Do(" SELECT setval('ad_requests_serialnum_seq', 1); ");
+#$sql_new->Do(" DELETE FROM ad_requests ");
+#$sql_new->Do(" SELECT setval('ad_requests_serialnum_seq', 1); ");
 #$sql_new->Do(" DELETE FROM ad_modules ");
-#$sql_new->Do(" DELETE FROM fascicles_map_holes ");
+$sql_new->Do(" DELETE FROM fascicles_map_holes ");
 
 
 #################################################################################
@@ -99,8 +99,10 @@ $sql_new->Do(" SELECT setval('ad_requests_serialnum_seq', 1); ");
 #        say $item->{fascicle};
 #    }
 #}
-#
-#
+
+
+
+
 #################################################################################
 #$count = 0;
 #say("Import documents");
@@ -119,11 +121,13 @@ $sql_new->Do(" SELECT setval('ad_requests_serialnum_seq', 1); ");
 #        $sql_new->Do("
 #            INSERT INTO fascicles_map_documents(edition, fascicle, page, entity, created, updated)
 #            VALUES (?, ?, ?, ?, now(), now());
-#        ", [ $edition->{id}, $fascicle->{id}, $page->{id}, $item->{id} ]);
+#        ", [ $edition->{id}, $fascicle->{id}, $page->{id}, $item->{document} ]);
 #    } else {
 #        say "Cant find page $item->{page} for fascicle ". translit($fascicle->{shortcut});
 #    }
 #}
+
+
 
 
 #################################################################################
@@ -173,31 +177,31 @@ $sql_new->Do(" SELECT setval('ad_requests_serialnum_seq', 1); ");
 
 
 
-################################################################################
-$count = 0;
-say("Import requests");
-my $requests = $sql_old->Q(" SELECT uuid, advertiser, fascicle, page, place, size, description FROM adv.request; ")->Hashes;
-foreach my $item( @{ $requests } ) {
-    
-    #say $count++;
-    
-    my $fascicle   = $sql_new->Q(" SELECT * FROM fascicles WHERE id=? ", [ $item->{fascicle} ])->Hash;
-    my $edition    = $sql_new->Q(" SELECT * FROM editions WHERE id=? ", [ $fascicle->{edition} ])->Hash;
-    my $place      = $sql_new->Q(" SELECT * FROM ad_places WHERE id=? ", [ $item->{place} ])->Hash;
-    my $advertiser = $sql_new->Q(" SELECT * FROM ad_advertisers WHERE id=? ", [ $item->{advertiser} ])->Hash;
-    
-    if ($fascicle && $edition && $advertiser) {
-        say "Import request $item->{uuid}";
-        my $title = "Заявка от <$advertiser->{title}> в выпуск <$fascicle->{title}>";
-        my $shortcut = "<$advertiser->{title}> в <$fascicle->{title}>";
-        $sql_new->Do("
-            INSERT INTO ad_requests (id, edition,  advertiser, fascicle, place, title, shortcut, manager, status, payment, readiness, created, updated) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, null, 0, 0, 0, now(), now());
-        ", [ $item->{uuid}, $edition->{id}, $advertiser->{id}, $fascicle->{id}, $place->{id}, $title, $shortcut ]);
-    } else {
-        say $item->{advertiser};
-    }
-}
+#################################################################################
+#$count = 0;
+#say("Import requests");
+#my $requests = $sql_old->Q(" SELECT uuid, advertiser, fascicle, page, place, size, description FROM adv.request; ")->Hashes;
+#foreach my $item( @{ $requests } ) {
+#    
+#    #say $count++;
+#    
+#    my $fascicle   = $sql_new->Q(" SELECT * FROM fascicles WHERE id=? ", [ $item->{fascicle} ])->Hash;
+#    my $edition    = $sql_new->Q(" SELECT * FROM editions WHERE id=? ", [ $fascicle->{edition} ])->Hash;
+#    my $place      = $sql_new->Q(" SELECT * FROM ad_places WHERE id=? ", [ $item->{place} ])->Hash;
+#    my $advertiser = $sql_new->Q(" SELECT * FROM ad_advertisers WHERE id=? ", [ $item->{advertiser} ])->Hash;
+#    
+#    if ($fascicle && $edition && $advertiser) {
+#        say "Import request $item->{uuid}";
+#        my $title = "Заявка от <$advertiser->{title}> в выпуск <$fascicle->{title}>";
+#        my $shortcut = "<$advertiser->{title}> в <$fascicle->{title}>";
+#        $sql_new->Do("
+#            INSERT INTO ad_requests (id, edition,  advertiser, fascicle, place, title, shortcut, manager, status, payment, readiness, created, updated) 
+#            VALUES (?, ?, ?, ?, ?, ?, ?, null, 0, 0, 0, now(), now());
+#        ", [ $item->{uuid}, $edition->{id}, $advertiser->{id}, $fascicle->{id}, $place->{id}, $title, $shortcut ]);
+#    } else {
+#        say $item->{advertiser};
+#    }
+#}
 
 
 #################################################################################
@@ -276,42 +280,42 @@ foreach my $item( @{ $requests } ) {
 #}
 
 
-#################################################################################
-#$count = 0;
-#say("Import holes");
-#my $holes = $sql_old->Q(" select t1.*, t2.title, t2.size from edition.hole t1, edition.adv_sizes t2 where t1.size = t2.uuid  ")->Hashes;
-#foreach my $item( @{ $holes } ) {
-#    
-#    say $count++;
-#    
-#    my $fascicle = $sql_new->Q(" SELECT * FROM fascicles WHERE id=? ", [ $item->{fascicle} ])->Hash;
-#    my $edition  = $sql_new->Q(" SELECT * FROM editions WHERE id=? ", [ $fascicle->{edition} ])->Hash;
-#    
-#    my $place    = $sql_new->Q(" SELECT * FROM ad_places WHERE id=? ", [ $item->{place} ])->Hash;
-#    my $page     = $sql_new->Q(" SELECT * FROM fascicles_pages WHERE id=? ", [ $item->{page} ])->Hash;
-#    my $module   = $sql_new->Q(" SELECT * FROM ad_modules WHERE fascicle=? AND place=? AND shortcut=?", [ $item->{fascicle}, $place->{id}, $item->{title} ])->Hash;
-#    
-#    unless ($module) {
-#        my $module_any  = $sql_new->Q(" SELECT * FROM ad_modules WHERE shortcut=? LIMIT 1", [ $item->{title} ])->Hash;
-#        if ($module_any) {
-#            $sql_new->Do("
-#                INSERT INTO ad_modules(edition, fascicle, place, shortcut, amount, volume, w, h, created, updated) 
-#                VALUES (?, ?, ?, ?, ?, ?, ?, ?, now(), now());
-#            ", [ $edition->{id}, $fascicle->{id}, $place->{id}, $item->{title}, $module_any->{amount}, $module_any->{volume}, $module_any->{w}, $module_any->{h} ]);
-#            $module   = $sql_new->Q(" SELECT * FROM ad_modules WHERE fascicle=? AND place=? AND shortcut=?", [ $item->{fascicle}, $place->{id}, $item->{title} ])->Hash;
-#        }
-#    }
-#    
-#    if ($edition && $fascicle && $place && $page && $module) {
-#        say "Import hole $item->{uuid}";
-#        $sql_new->Do("
-#            INSERT INTO fascicles_map_holes(id, edition, fascicle, place, module, page, entity, x, y, w, h, created, updated)
-#            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
-#        ", [ $item->{uuid}, $edition->{id}, $fascicle->{id}, $place->{id}, $page->{id}, $module->{id}, undef, 0, 0, $module->{w}, $module->{h} ]);
-#    } else {
-#        say "$edition >> $fascicle >> $place >> $page >> $module";
-#    }
-#}
+################################################################################
+$count = 0;
+say("Import holes");
+my $holes = $sql_old->Q(" select t1.*, t2.title, t2.size from edition.hole t1, edition.adv_sizes t2 where t1.size = t2.uuid  ")->Hashes;
+foreach my $item( @{ $holes } ) {
+    
+    say $count++;
+    
+    my $fascicle = $sql_new->Q(" SELECT * FROM fascicles WHERE id=? ", [ $item->{fascicle} ])->Hash;
+    my $edition  = $sql_new->Q(" SELECT * FROM editions WHERE id=? ", [ $fascicle->{edition} ])->Hash;
+    
+    my $place    = $sql_new->Q(" SELECT * FROM ad_places WHERE id=? ", [ $item->{place} ])->Hash;
+    my $page     = $sql_new->Q(" SELECT * FROM fascicles_pages WHERE id=? ", [ $item->{page} ])->Hash;
+    my $module   = $sql_new->Q(" SELECT * FROM ad_modules WHERE fascicle=? AND place=? AND shortcut=?", [ $item->{fascicle}, $place->{id}, $item->{title} ])->Hash;
+    
+    unless ($module) {
+        my $module_any  = $sql_new->Q(" SELECT * FROM ad_modules WHERE shortcut=? LIMIT 1", [ $item->{title} ])->Hash;
+        if ($module_any) {
+            $sql_new->Do("
+                INSERT INTO ad_modules(edition, fascicle, place, title, shortcut, amount, volume, w, h, created, updated) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
+            ", [ $edition->{id}, $fascicle->{id}, $place->{id}, $item->{title}, $item->{title}, $module_any->{amount}, $module_any->{volume}, $module_any->{w}, $module_any->{h} ]);
+            $module   = $sql_new->Q(" SELECT * FROM ad_modules WHERE fascicle=? AND place=? AND shortcut=?", [ $item->{fascicle}, $place->{id}, $item->{title} ])->Hash;
+        }
+    }
+    
+    if ($edition && $fascicle && $place && $page && $module) {
+        say "Import hole $item->{uuid}";
+        $sql_new->Do("
+            INSERT INTO fascicles_map_holes(id, edition, fascicle, place, module, page, entity, x, y, w, h, created, updated)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
+        ", [ $item->{uuid}, $edition->{id}, $fascicle->{id}, $place->{id}, $module->{id}, $page->{id}, undef, 0, 0, $module->{w}, $module->{h} ]);
+    } else {
+        say "$edition >> $fascicle >> $place >> $page >> $module";
+    }
+}
 
 sub translit
 

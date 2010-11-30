@@ -119,8 +119,10 @@ sub startup {
     $self->createRoutes($sessionBridge, "catalog/stages",       [ "create", "read", "update", "delete", "list", "map-principals", "unmap-principals", "principals-mapping" ]);
     $self->createRoutes($sessionBridge, "catalog/principals",   [ "list" ]);
     $self->createRoutes($sessionBridge, "catalog/indexes",      [ "editions", "headlines", "rubrics", "create", "update", "delete" ]);
+    
     $self->createRoutes($sessionBridge, "fascicle/indexes",     [ "editions", "headlines", "rubrics", "create", "update", "delete" ]);
-    $self->createRoutes($sessionBridge, "fascicle/image",       [ "view" ]);
+    $self->createRoutes($sessionBridge, "fascicle/images",      [ "view" ]);
+    $self->createRoutes($sessionBridge, "fascicle/pages",       [ "view" ]);
     
     # Profile routes
     $self->createRoutes($sessionBridge, "profile",              [ "read", "update" ]);

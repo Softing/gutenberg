@@ -28970,7 +28970,6 @@ Ext.DataView = Ext.extend(Ext.BoxComponent, {
         this.clearSelections(false, true);
         var el = this.getTemplateTarget(),
             records = this.store.getRange();
-            
         el.update('');
         if(records.length < 1){
             if(!this.deferEmptyText || this.hasSkippedEmptyText){
@@ -29109,6 +29108,7 @@ Ext.DataView = Ext.extend(Ext.BoxComponent, {
         if(store){
             this.refresh();
         }
+        
     },
     
     

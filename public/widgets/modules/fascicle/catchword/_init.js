@@ -1,1 +1,1 @@
-Ext.namespace("Inprint.fascicle.catchword");
+//Ext.namespace("Inprint.fascicle.catchword");

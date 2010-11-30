@@ -1,1 +1,1 @@
-Ext.namespace("Inprint.fascicle.advert");
+//Ext.namespace("Inprint.fascicle.advert");
