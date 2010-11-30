@@ -95,8 +95,8 @@ sub list {
     my @params;
 
     # Pagination
-    my $start    = $c->param("start")        || 0;
-    my $limit    = $c->param("limit")        || 60;
+    my $start    = $c->param("start")        || undef;
+    my $limit    = $c->param("limit")        || undef;
 
     # Grid mode
     my $mode     = $c->param("gridmode")     || "all";
@@ -264,13 +264,26 @@ sub list {
     }
 
     # Select rows with pagination
-    $sql_query .= " LIMIT ? OFFSET ? ";
-    push @params, $limit;
-    push @params, $start;
+    if ($limit && $start) {
+        $sql_query .= " LIMIT ? OFFSET ? ";
+        push @params, $limit;
+        push @params, $start;
+    }
+    
     my $result = $c->sql->Q($sql_query, \@params)->Hashes;
     
     my $current_member = $c->QuerySessionGet("member.id");
     foreach my $document (@$result) {
+        
+        my $pages = $c->sql->Q("
+            SELECT t2.seqnum
+            FROM fascicles_map_documents t1, fascicles_pages t2
+            WHERE t2.id = t1.page AND t1.entity=? AND t1.fascicle=?
+        ", [ $document->{id}, $document->{fascicle} ])->Values;
+        
+        if (@$pages) {
+            $document->{pages} = Inprint::Utils::encodePagesArray($pages);
+        }
         
         my $copy_count = $c->sql->Q(" SELECT count(*) FROM documents WHERE copygroup=? ", [ $document->{copygroup} ])->Value;
         if ($copy_count > 1) {

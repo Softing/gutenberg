@@ -44,7 +44,7 @@ Inprint.factory.Store = new function() {
             'workgroup','workgroup_shortcut','ingroups',
             'islooked','isopen',
             'branch','branch_shortcut','stage','stage_shortcut','color','progress',
-            'title','author',
+            'title','author','pages',
             'pdate','psize','rdate','rsize',
             'images','files',
             'created','updated'

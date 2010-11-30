@@ -1,5 +1,5 @@
-Inprint.documents.Actions = function(parent, panels) {
-
+Inprint.documents.GridActions = function() {
+    
     return {
         
         // Create new document

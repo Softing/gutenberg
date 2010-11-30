@@ -50998,6 +50998,8 @@ Ext.grid.GroupingView = Ext.extend(Ext.grid.GridView, {
             groups = [],
             curGroup, i, len, gid;
 
+
+
         for(i = 0, len = rs.length; i < len; i++){
             var rowIndex = startRow + i,
                 r = rs[i],

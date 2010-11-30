@@ -114,4 +114,45 @@ sub UpdateRubric {
     my %params = ( @_ );
 }
 
+sub encodePagesArray {
+
+    my $data = shift;
+    
+    my @pages;
+    my @string;
+    
+    if (ref $data eq 'ARRAY') {
+        @pages = @$data;
+    } else {
+        @pages = split(/[^\d]+/, @$data );
+    }
+    
+    for ( my $i = 0; $i <= $#pages; $i++ ) {
+
+        my $cp = int( $pages[$i] );
+        my $pp = int( $pages[$i-1] );
+        my $fp = int( $pages[$i+1] );
+
+        next unless $cp;
+
+        if ( !$pp ) {
+                push @string, $cp;
+        } elsif (!$fp ) {
+                push @string, $cp;
+        } elsif ( $pp && $fp && $cp-1 == $pp && $cp+1 == $fp ) {
+                push @string, "-";
+        } else {
+                push @string, $cp;
+        }
+    };
+    
+    $string = join (',',@string);
+    $string =~ s/,-,/-/g;
+    $string =~ s/-,/-/g;
+    $string =~ s/-+/-/g;
+    $string =~ s/,/, /g;
+    
+    return $string;
+}
+
 1;

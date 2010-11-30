@@ -78,22 +78,30 @@ sub draw_page {
     
     $img->penSize($pen_size);
     
+    $img->moveTo(0+$displacement,0);
+    $img->lineTo($displacement,$grid_h-$line_height);
     $img->moveTo($grid_w+$displacement-1,0);
     $img->lineTo($grid_w+$displacement-1,$grid_h-$line_height);
     
+    $img->moveTo(0+$displacement, 0);
+    $img->lineTo($grid_w+$displacement-$line_height,0);
     $img->moveTo(0+$displacement,$grid_h-$line_height);
     $img->lineTo($grid_w+$displacement-$line_height,$grid_h-$line_height);
     
-    for (my $c=0;$c<$grid_y;$c++) {
-        my $px = $c * ($grid_h/$grid_y);
-        $img->moveTo(0+$displacement,$px);
-        $img->lineTo($grid_w+$displacement-$line_height, $px);
+    if ($grid_y < 10) {
+        for (my $c=0;$c<$grid_y;$c++) {
+            my $px = $c * ($grid_h/$grid_y);
+            $img->moveTo(0+$displacement,$px);
+            $img->lineTo($grid_w+$displacement-$line_height, $px);
+        }
     }
     
-    for (my $c=0;$c<$grid_x;$c++) {
-        my $px = $c * ($grid_w/$grid_x);
-        $img->moveTo($px+$displacement,0);
-        $img->lineTo($px+$displacement,$grid_h-$line_height);
+    if ($grid_x < 10 ) {
+        for (my $c=0;$c<$grid_x;$c++) {
+            my $px = $c * ($grid_w/$grid_x);
+            $img->moveTo($px+$displacement,0);
+            $img->lineTo($px+$displacement,$grid_h-$line_height);
+        }
     }
     
     my $block_pen_size = 2;
