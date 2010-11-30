@@ -197,12 +197,10 @@ Inprint.edition.calendar.Grid = Ext.extend(Ext.grid.GridPanel, {
                 }
             });
             
-            if (! thisGrid.rowCtxMenu) {
-                thisGrid.rowCtxMenu = new Ext.menu.Menu({
-                    items : rowCtxMenuItems
-                });
-            }
-     
+            thisGrid.rowCtxMenu = new Ext.menu.Menu({
+                items : rowCtxMenuItems
+            });
+            
             thisGrid.rowCtxMenu.showAt(evtObj.getXY());
         });
         
