@@ -19,7 +19,7 @@ sub list {
     my $edition     = $c->param("edition") || undef;
     my $showArchive = $c->param("showArchive") || "false";
 
-    my $accessCalendarView = $c->access->GetEditionsByTerm("editions.calendar.view");
+    my $editions = $c->access->GetChildrens("editions.documents.work");
     
     my $sql1 = "
         SELECT
@@ -33,25 +33,10 @@ sub list {
         FROM fascicles t1, editions t2
         WHERE
             t1.edition = ANY (?)
-            AND t1.issystem = false AND t1.edition = t2.id AND t1.enabled = true
+            AND t1.issystem = false AND t1.edition = t2.id
     ";
 
-    my $sql2 = "
-        SELECT
-            t1.id, t1.issystem, t1.edition, t2.shortcut as edition_shortcut,
-            t1.title, t1.shortcut, t1.description,
-            to_char(t1.begindate, 'YYYY-MM-DD HH24:MI:SS') as begindate,
-            to_char(t1.enddate, 'YYYY-MM-DD HH24:MI:SS') as enddate,
-            t1.enabled, t1.created, t1.updated,
-            EXTRACT( DAY FROM t1.enddate-t1.begindate) as totaldays,
-            EXTRACT( DAY FROM now()-t1.begindate) as passeddays
-        FROM fascicles t1, editions t2
-        WHERE
-            t1.edition = ANY (?)
-            AND t1.issystem = false AND t1.edition = t2.id 
-    ";
-
-    push @params, $accessCalendarView;
+    push @params, $editions;
 
     if ($edition && $edition ne "00000000-0000-0000-0000-000000000000") {
         $sql1 .= " AND edition=? ";
@@ -59,11 +44,12 @@ sub list {
     }
 
     if ($showArchive eq 'true') {
-        $sql1 = " ($sql1) UNION ($sql2) ";
-        push @params, $accessCalendarView;
+        
+    } else {
+        $sql1 .= " AND t1.enabled = true ";
     }
 
-    $sql1 .= " ORDER BY enabled desc, edition_shortcut, begindate ";
+    $sql1 .= " ORDER BY enddate DESC";
 
     my $result = $c->sql->Q($sql1, \@params)->Hashes;
 

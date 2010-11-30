@@ -40,7 +40,13 @@ Inprint.fascicle.plan.Panel = Ext.extend(Ext.Panel, {
 
     onRender: function() {
         Inprint.fascicle.plan.Panel.superclass.onRender.apply(this, arguments);
+    },
+    
+    cmpReload:  function() {
+        this.view.cmpReload();
     }
+    
+    
 });
 
 Inprint.registry.register("fascicle-plan", {

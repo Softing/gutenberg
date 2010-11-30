@@ -17,6 +17,7 @@ Inprint.ObjectResolver = function() {
         resolve: function(item) {
 
             if (!Inprint.registry[item.aid]) {
+                alert("Can't find Inprint.registry for item.aid");
                 return;
             }
 

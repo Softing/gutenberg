@@ -52,7 +52,7 @@
 }
 
 .inprint-plan-page-documents {
-    margin-bottom:10px;
+    --margin-bottom:10px;
 }
 .inprint-plan-page-document {
     padding:2px;
@@ -61,7 +61,7 @@
 }
 
 .inprint-plan-page-holes {
-    margin-bottom:10px;
+    --margin-bottom:10px;
 }
 .inprint-plan-page-hole {
     background:orange;

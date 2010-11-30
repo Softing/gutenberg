@@ -42,8 +42,8 @@ Inprint.edition.calendar.Grid = Ext.extend(Ext.grid.GridPanel, {
                 renderer: function(v,p,r) {
                     var id    = r.data.id;
                     var title = r.data.title;
-                    var url = "/?part=composite2&page=plan&oid="+id+"&text="+title;
-                    var jscript = "Inprint.objResolver('composite2', 'plan', {oid: '"+id+"', text: '"+title+"' });";
+                    var url = "/?aid=fascicle-plan&oid="+id+"&text="+title;
+                    var jscript = "Inprint.ObjectResolver.resolve({aid:'fascicle-plan', oid: '"+id+"', text: '"+title+"' });";
                     return '<a href="'+ url +'" onclick="'+jscript+';return false;">' + v + '</a>';
                 }
             },
@@ -173,6 +173,39 @@ Inprint.edition.calendar.Grid = Ext.extend(Ext.grid.GridPanel, {
 
     onRender: function() {
         Inprint.edition.calendar.Grid.superclass.onRender.apply(this, arguments);
+        
+        this.on("rowcontextmenu", function(thisGrid, rowIndex, evtObj) {
+            
+            thisGrid.selModel.selectRow(rowIndex);
+            evtObj.stopEvent();
+            
+            var rowCtxMenuItems = [];
+            
+            var record = thisGrid.getStore().getAt(rowIndex);
+            
+            rowCtxMenuItems.push({
+                text    : _('View plan'),
+                handler : function() {
+                    Inprint.ObjectResolver.resolve({ aid:'fascicle-plan', oid: record.get("id"), text: record.get("shortcut") });
+                }
+            });
+            
+            rowCtxMenuItems.push({
+                text    : _('View composer'),
+                handler : function() {
+                    //Inprint.ObjectResolver.resolve({aid:'fascile-plan', oid: 'a2c28625-fdd5-448f-a324-0b38bdaf7bac', text: '01-2011' });
+                }
+            });
+            
+            if (! thisGrid.rowCtxMenu) {
+                thisGrid.rowCtxMenu = new Ext.menu.Menu({
+                    items : rowCtxMenuItems
+                });
+            }
+     
+            thisGrid.rowCtxMenu.showAt(evtObj.getXY());
+        });
+        
     },
 
     cmpCreate: function() {

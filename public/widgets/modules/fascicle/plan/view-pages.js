@@ -39,8 +39,6 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
                             string += '<div><nobr>'+ page.num +' - '+ page.headline +'</nobr></div>';
                             string += '</div>';
                             
-                            
-                            
                             string += '<div class="inprint-plan-page-body"'+
                                 ' style="background:url(/fascicle/images/view/?page='+ page.id +'&w=110&h=138&rnd='+ Math.random() +') no-repeat;">';
                             
@@ -116,7 +114,6 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
             multiSelect: true,
             loadingText:'Загрузка',
             emptyText: 'Полосы не найдены',
-            //deferEmptyText: false,
             overClass:'inprint-plan-page-over',
             selectedClass: 'inprint-plan-page-selected',
             itemSelector:'div.inprint-plan-page'
