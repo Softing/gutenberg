@@ -2,11 +2,7 @@ Inprint.edition.calendar.Tree = Ext.extend(Ext.tree.TreePanel, {
     initComponent: function() {
         this.components = {};
         this.urls = {
-            "tree":    _url("/catalog/editions/tree/"),
-            "create":  _url("/catalog/editions/create/"),
-            "read":    _url("/catalog/editions/read/"),
-            "update":  _url("/catalog/editions/update/"),
-            "delete":  _url("/catalog/editions/delete/")
+            "tree":    _url("/calendar/tree/")
         };
         Ext.apply(this, {
             autoScroll:true,

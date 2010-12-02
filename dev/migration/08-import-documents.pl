@@ -43,7 +43,6 @@ $sql2->SetConnection($conn2);
 my $rootnode = '00000000-0000-0000-0000-000000000000';
 
 $sql->Do("DELETE FROM documents");
-$sql->Do("DELETE FROM map_documents_to_fascicles");
 
 # Import documents
 
@@ -108,29 +107,24 @@ foreach my $item( @{ $documents } ) {
     my $Branch = $sql->Q(" SELECT * FROM branches WHERE edition=? ", [ $EditionId ])->Hash;
     die "Cant found branch $EditionId" unless ($Branch);
 
-    my $Stage = {};
-    my $Readiness  = {};
-
+    # Select Stage
+    my $Stage;
     if ($oldstate) {
-
-        # Select stage
         my $StageId = $sql->Q(" SELECT newid FROM migration WHERE oldid=? AND mtype = 'stage' ", [ $oldstate->{status_uuid} ])->Value;
-        die "Cant found stage id $oldstate->{status_uuid}" unless ($StageId);
-
+        print "Cant found stage id $oldstate->{status_uuid}" unless ($StageId);
         $Stage = $sql->Q(" SELECT * FROM stages WHERE id=? ", [ $StageId ])->Hash;
-        die "Cant found stage object $StageId " unless ($Stage);
-
-    } else {
-
-        $Stage = $sql->Q(" SELECT * FROM stages WHERE branch=? ORDER BY weight LIMIT 1 ", [ $Branch->{id} ])->Hash;
-        die "Cant found stage object by Branch $Branch->{id}" unless ($Stage);
+        print "Cant found stage object $StageId " unless ($Stage);
     }
+    unless ($Stage) {
+        $Stage = $sql->Q(" SELECT * FROM stages WHERE branch=? ORDER BY weight LIMIT 1 ", [ $Branch->{id} ])->Hash;
+    }
+    die "Cant found stage object by Branch $Branch->{id}" unless ($Stage);
 
-    # Select readiness
-    $Readiness = $sql->Q(" SELECT * FROM readiness WHERE id=? ", [ $Stage->{readiness} ])->Hash;
+    # Select Readiness
+    my $Readiness = $sql->Q(" SELECT * FROM readiness WHERE id=? ", [ $Stage->{readiness} ])->Hash;
     die "Cant found readiness object $Stage->{readiness}" unless ($Readiness);
 
-    # Found catalog folder
+    # Select catalog folder
 
     my $CatalogID = $sql->Q(" SELECT newid FROM migration WHERE oldid=? AND mtype = 'catalog' ", [ $item->{edition} ])->Value;
     die "Cant find catalog id $item->{edition}" unless $CatalogID;

@@ -216,12 +216,14 @@ Ext.onReady(function() {
             !Inprint.session.options["default.workgroup"] ||
             !Inprint.session.options["default.workgroup.name"] 
         ) {
-            Inprint.checkInProgress = true;
-            var setupWindow = new Inprint.cmp.memberSetupWindow();
-            setupWindow.on("hide", function() {
-                Inprint.checkInProgress = false;
-            });
-            setupWindow.show();
+            if (Inprint.session.member.login != "root") {
+                Inprint.checkInProgress = true;
+                var setupWindow = new Inprint.cmp.memberSetupWindow();
+                setupWindow.on("hide", function() {
+                    Inprint.checkInProgress = false;
+                });
+                setupWindow.show();
+            }
         }
     };
 

@@ -5,7 +5,7 @@ Inprint.cmp.memberProfileForm.Form = Ext.extend(Ext.FormPanel, {
 
         Ext.apply(this,
         {
-            fileUpload: true,
+            //fileUpload: true,
             border:false,
             bodyStyle: "padding: 10px 10px",
             url: _url("/profile/update/"),

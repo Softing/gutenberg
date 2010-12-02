@@ -69,7 +69,7 @@ sub update {
     my $c = shift;
 
     my $i_id = $c->param("id");
-
+    
     my $i_login    = $c->param("login");
     my $i_password = $c->param("password");
 
@@ -109,16 +109,24 @@ sub update {
     if ($i_login) {
         # Do nothing
     }
-
     if ($i_password) {
         $c->sql->Do("UPDATE members SET password=encode( digest(?, 'sha256'), 'hex') WHERE id=?",[ $i_password, $i_id ]);
     }
 
     # Update Profile
-    $c->sql->Do("UPDATE profiles SET title=?, shortcut=?, position=? WHERE id=?",[$i_title, $i_shortcut, $i_position, $i_id]);
-
+    my $count = $c->sql->Q("SELECT count(*) FROM profiles WHERE id=?",[$i_id])->Value;
+    
+    if ($count) {
+        $c->sql->Do("UPDATE profiles SET title=?, shortcut=?, position=?, updated=now() WHERE id=?",[$i_title, $i_shortcut, $i_position, $i_id]);
+    } else {
+        $c->sql->Do("
+            INSERT INTO profiles(id, title, shortcut, position, created, updated)
+            VALUES (?, ?, ?, ?, now(), now());",
+        [ $i_id, $i_title, $i_shortcut, $i_position]);
+    }
+    
     # Update Documents
-    $c->sql->Do("UPDATE documents SET creator_shortcut=? WHERE creator=?", [ $i_shortcut, $i_id ]);
+    $c->sql->Do("UPDATE documents SET creator_shortcut=? WHERE creator=?",  [ $i_shortcut, $i_id ]);
     $c->sql->Do("UPDATE documents SET manager_shortcut=? WHERE manager=?",  [ $i_shortcut, $i_id ]);
     $c->sql->Do("UPDATE documents SET holder_shortcut=? WHERE holder=?",    [ $i_shortcut, $i_id ]);
 

@@ -102,7 +102,7 @@ sub index
             AND t1.enabled = true
             AND t1.edition = t2.id
             AND t1.edition = ANY (?)
-        ORDER BY t2.shortcut, t1.shortcut
+        ORDER BY t1.begindate, t2.shortcut, t1.shortcut
     ", [ $accessLayoutEditions ])->Hashes;
     
     my $composition  = {

@@ -184,6 +184,8 @@ Inprint.edition.calendar.Grid = Ext.extend(Ext.grid.GridPanel, {
             var record = thisGrid.getStore().getAt(rowIndex);
             
             rowCtxMenuItems.push({
+                icon: _ico("table"),
+                cls: 'x-btn-text-icon',
                 text    : _('View plan'),
                 handler : function() {
                     Inprint.ObjectResolver.resolve({ aid:'fascicle-plan', oid: record.get("id"), text: record.get("shortcut") });
@@ -191,9 +193,11 @@ Inprint.edition.calendar.Grid = Ext.extend(Ext.grid.GridPanel, {
             });
             
             rowCtxMenuItems.push({
+                icon: _ico("clock"),
+                cls: 'x-btn-text-icon',
                 text    : _('View composer'),
                 handler : function() {
-                    //Inprint.ObjectResolver.resolve({aid:'fascile-plan', oid: 'a2c28625-fdd5-448f-a324-0b38bdaf7bac', text: '01-2011' });
+                    Inprint.ObjectResolver.resolve({ aid:'fascicle-planner', oid: record.get("id"), text: record.get("shortcut") });
                 }
             });
             
@@ -405,7 +409,7 @@ Inprint.edition.calendar.Grid = Ext.extend(Ext.grid.GridPanel, {
             Ext.Ajax.request({
                 url: this.url["delete"],
                 params: {
-                    id: this.getValues("id")
+                    ids: this.getValues("id")
                 },
                 scope: this,
                 success: this.cmpReload,

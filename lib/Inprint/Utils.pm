@@ -114,9 +114,11 @@ sub UpdateRubric {
     my %params = ( @_ );
 }
 
-sub encodePagesArray {
+sub CollapsePagesToString {
 
     my $data = shift;
+    
+    return "" unless $data;
     
     my @pages;
     my @string;
@@ -124,7 +126,7 @@ sub encodePagesArray {
     if (ref $data eq 'ARRAY') {
         @pages = @$data;
     } else {
-        @pages = split(/[^\d]+/, @$data );
+        @pages = split(/[^\d]+/, $data );
     }
     
     for ( my $i = 0; $i <= $#pages; $i++ ) {

@@ -62,37 +62,15 @@ Inprint.ObjectResolver = function() {
                 icon: "/icon/layout.png"
             };
 
-            if (item.icon) {
-                config.icon = item.icon;
-            }
-
-            config.title = "<div style=\"padding-left:21px;background:url(" + config.icon + ") 0px -2px no-repeat;\">";
-            config.title += item.text;
-            config.title += "&nbsp;<a href=\"?aid="+ item.aid +"";
-
-            if (item.oid) {
-                config.oid = item.oid;
-                config.title += "&oid=" + item.oid;
-            }
+            // Create panel icon
+            if (item.icon) { config.icon = item.icon; }
+            if (item.oid) { config.oid = item.oid; }
+            if (item.aid) { config.aid = item.aid; }
             
-            if (item.text) {
-                config.title += "&text=" + item.text;
-            }
-
-            if (item.description) {
-                config.title += "&description=" + item.description;
-            }
-
-            config.title += "\" onClick=\"return false;\">[#]</a>";
-
-            if (item.description) {
-                config.title += "&nbsp;-&nbsp;" + item.description;
-            }
-
-            config.title += "</div>";
-
+            config.title = this.makeTitle(config.oid, config.aid, config.icon, item.text, item.description);
+            
+            // Create panel Tools
             var tools = [];
-
             tools.push({
                 id: "refresh",
                 qtip: _("Refresh this panel"),
@@ -121,8 +99,9 @@ Inprint.ObjectResolver = function() {
             }
 
             var panel = new Ext.Panel(config);
+            panel.items.first().parent = panel;
             
-            // Регистрируем панель
+            // Register the panel
             
             Inprint.layout.getPanel().add(panel);
             panel.taskBtn = Inprint.layout.getTaskbar().addButton({
@@ -138,6 +117,30 @@ Inprint.ObjectResolver = function() {
 
             return panel;
 
+        },
+
+        makeTitle: function(oid, aid, icon, text, description) {
+            
+            var title = "<div style=\"padding-left:21px;background:url(" + icon + ") 0px -2px no-repeat;\">";
+            title += text;
+            title += "&nbsp;<a href=\"?aid="+ aid +"";
+            title += "&oid=" + oid;
+    
+            if (text) {
+                title += "&text=" + text;
+            }
+            
+            if (description) {
+                title += "&description=" + description;
+            }
+            
+            title += "\" onClick=\"return false;\">[#]</a>";
+            if (description) {
+                title += "&nbsp;-&nbsp;" + description;
+            }
+            title += "</div>";
+            
+            return title;
         },
 
         show: function(panel) {

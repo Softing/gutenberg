@@ -95,6 +95,7 @@ our %Lexicon = (
     "Employees browser"           => "",
     "Empoyees online"             => "",
     "Enable"                      => "Включить",
+    "Enter"                       => "Войти",
     "Event"                       => "Событие",
     "Event type"                  => "",
     "Exchange"                    => "Обмен",

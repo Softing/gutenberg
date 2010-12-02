@@ -8,22 +8,23 @@ Inprint.fascicle.plan.Panel = Ext.extend(Ext.Panel, {
         });
         
         this.tbar = [
-            {
-                text: 'Печать А3',
-                icon: _ico("printer"),
-                cls: 'x-btn-text-icon',
-                scope:this, 
-                handler: function() {
-                    window.location = '/composite2/pdf/?fascicle='+ this.fascicle +'&mode=landscape&size=a3';
-                }
-            },
+            "->",
             {
                 text: 'Печать А4',
                 icon: _ico("printer"),
                 cls: 'x-btn-text-icon',
                 scope:this, 
                 handler: function() {
-                    window.location = '/composite2/pdf/?fascicle='+ this.fascicle +'&mode=landscape&size=a4';
+                    window.location = '/fascicle/pages/print/?fascicle='+ this.fascicle +'&mode=landscape&size=a4';
+                }
+            },
+            {
+                text: 'Печать А3',
+                icon: _ico("printer"),
+                cls: 'x-btn-text-icon',
+                scope:this, 
+                handler: function() {
+                    window.location = '/fascicle/pages/print/?fascicle='+ this.fascicle +'&mode=landscape&size=a3';
                 }
             }
         ];

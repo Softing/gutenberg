@@ -49,6 +49,7 @@ Inprint.factory.Store = new function() {
             'images','files',
             'created','updated'
         ],
+        
         '/documents/common/fascicles/':         [ "id", "edition", "edition_shortcut", "title", "shortcut", 'description', "headline", "headline_shortcut", "rubric", "rubric_shortcut" ],
         '/documents/files/list/':               [ "id", "filename", "filesize", "mimetype", "isdraft", "description" ],
 
@@ -65,6 +66,13 @@ Inprint.factory.Store = new function() {
         
         // Fascicles
         "/fascicle/indexes/rubrics/":           [ "id", "title", "shortcut", "description" ],
+        "/fascicle/summary/":                   [ "place", "place_shortcut", "module", "module_shortcut", "holes", "requests", "free" ],
+        "/fascicle/documents/list/":            [
+            'id', 'access',    'edition',  'edition_shortcut',    'fascicle',    'fascicle_shortcut',    'headline', 'headline_shortcut',
+            'rubric', 'rubric_shortcut',    'copygroup',    'holder','creator','manager','holder_shortcut','creator_shortcut','manager_shortcut',
+            'workgroup','workgroup_shortcut','ingroups',    'islooked','isopen',    'branch','branch_shortcut','stage','stage_shortcut','color','progress',
+            'title','author','pages',    'pdate','psize','rdate','rsize',    'images','files',    'created','updated'
+        ],
         
         // System
         "/system/events/list/":                 [ "id", "initiator", "initiator_login", "initiator_shortcut", "initiator_position", "entity", "entity_type", "message", "message_type", "message_variables", createDateField("created") ],

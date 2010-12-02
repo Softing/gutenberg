@@ -6,7 +6,7 @@ Inprint.fascicle.planner.Documents = Ext.extend(Ext.grid.EditorGridPanel, {
         var columns = new Inprint.documents.GridColumns();
         
         this.urls = {
-            "list":       "/documents/list/",
+            "list":       "/fascicle/documents/list/",
             "briefcase":  "/documents/briefcase/",
             "capture":    "/documents/capture/",
             "transfer":   "/documents/transfer/",
@@ -16,7 +16,6 @@ Inprint.fascicle.planner.Documents = Ext.extend(Ext.grid.EditorGridPanel, {
         }
 
         this.store = Inprint.factory.Store.group(this.urls.list, {
-            autoLoad: true,
             remoteSort: true,
             groupField:'headline_shortcut',
             remoteGroup:false,

@@ -6,10 +6,15 @@
  * http://softing.ru/license
  */
 
+.inprint-plan {
+    padding-bottom:10px;
+    padding-left:15px;
+}
+
 .inprint-plan-block {
     font-size:10px;
-    width:248px;height:160px;
-    padding:10px;
+    width:248px;height:170px;
+    margin:10px 15px 0px 0px;
     float:left;
 }
 
@@ -55,10 +60,14 @@
 .inprint-plan-page-documents {
     --margin-bottom:10px;
 }
+.inprint-plan-page-document a {
+    text-decoration:none;
+}
 .inprint-plan-page-document {
     padding:2px;
     background:white;
     opacity: 0.8;
+    line-height:9px;
 }
 
 .inprint-plan-page-holes {

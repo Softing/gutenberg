@@ -7,7 +7,8 @@
  */
 
 Ext.onReady(function() {
-    Ext.BLANK_IMAGE_URL = '/ext-3.2.1/resources/images/default/s.gif';
+
+    Ext.BLANK_IMAGE_URL = '/ext-3.3.1/resources/images/default/s.gif';
 
     Ext.data.Connection.prototype._handleFailure = Ext.data.Connection.prototype.handleFailure;
     Ext.data.Connection.prototype.handleFailure = function(response, e) {
@@ -96,7 +97,7 @@ var Passport =  function ()
     // creating window
     var win = new Ext.Window({
 
-        title : "Inprint Content 4.5",
+        title : "Inprint Content 5.0",
 
         width: 300,
         height:190,

@@ -138,6 +138,7 @@ sub list {
             dcm.stage, stage_shortcut,
             dcm.color, dcm.progress,
             dcm.title, dcm.author,
+            dcm.pages,
             to_char(dcm.pdate, 'YYYY-MM-DD HH24:MI:SS') as pdate,
             to_char(dcm.rdate, 'YYYY-MM-DD HH24:MI:SS') as rdate,
             dcm.psize, dcm.rsize,
@@ -275,15 +276,7 @@ sub list {
     my $current_member = $c->QuerySessionGet("member.id");
     foreach my $document (@$result) {
         
-        my $pages = $c->sql->Q("
-            SELECT t2.seqnum
-            FROM fascicles_map_documents t1, fascicles_pages t2
-            WHERE t2.id = t1.page AND t1.entity=? AND t1.fascicle=?
-        ", [ $document->{id}, $document->{fascicle} ])->Values;
-        
-        if (@$pages) {
-            $document->{pages} = Inprint::Utils::encodePagesArray($pages);
-        }
+        $document->{pages} = Inprint::Utils::CollapsePagesToString($document->{pages});
         
         my $copy_count = $c->sql->Q(" SELECT count(*) FROM documents WHERE copygroup=? ", [ $document->{copygroup} ])->Value;
         if ($copy_count > 1) {

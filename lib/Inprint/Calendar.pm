@@ -10,6 +10,58 @@ use warnings;
 
 use base 'Inprint::BaseController';
 
+sub tree {
+
+    my $c = shift;
+
+    my $i_node = $c->param("node");
+    $i_node = '00000000-0000-0000-0000-000000000000' unless ($i_node);
+    $i_node = '00000000-0000-0000-0000-000000000000' if ($i_node eq "root-node");
+    
+    my @errors;
+    my $success = $c->json->false;
+    
+    push @errors, { id => "id", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_node));
+    
+    my @result;
+    
+    unless (@errors) {
+        my $sql;
+        my @data;
+        
+        $sql = "
+            SELECT *, ( SELECT count(*) FROM editions c2 WHERE c2.path ~ ('*.' || replace(?, '-', '')::text || '.*{2}')::lquery ) as have_childs
+            FROM editions
+            WHERE
+                id <> '00000000-0000-0000-0000-000000000000'
+                AND subpath(path, nlevel(path) - 2, 1)::text = replace(?, '-', '')::text
+        ";
+        push @data, $i_node;
+        push @data, $i_node;
+        
+        my $data = $c->sql->Q("$sql ORDER BY shortcut", \@data)->Hashes;
+        
+        foreach my $item (@$data) {
+            my $record = {
+                id   => $item->{id},
+                text => $item->{shortcut},
+                leaf => $c->json->true,
+                icon => "book",
+                data => $item
+            };
+            if ( $item->{have_childs} ) {
+                $record->{leaf} = $c->json->false;
+            }
+            push @result, $record;
+        }
+    }
+
+    $success = $c->json->true unless (@errors);
+    
+    $c->render_json( \@result );
+}
+
 sub list {
 
     my $c = shift;
@@ -60,6 +112,7 @@ sub create {
     my $c = shift;
 
     my $id = $c->uuid();
+    my $version = $c->uuid();
 
     my $i_edition     = $c->param("edition");
     my $i_title       = $c->param("title");
@@ -71,10 +124,10 @@ sub create {
     
     $c->sql->Do("
         INSERT INTO fascicles (
-            id, issystem, edition, title, shortcut, description, begindate, enddate,
+            id, version, issystem, edition, title, shortcut, description, begindate, enddate,
             enabled, created, updated)
-            VALUES (?, false, ?, ?, ?, ?, ?, ?, true, now(), now());
-    ", [ $id, $i_edition, $i_title, $i_title, $i_title, $i_begindate, $i_enddate ]);
+            VALUES (?, ?, false, ?, ?, ?, ?, ?, ?, true, now(), now());
+    ", [ $id, $version, $i_edition, $i_title, $i_title, $i_title, $i_begindate, $i_enddate ]);
 
     $c->render_json( { success => $c->json->true} );
 }
@@ -119,51 +172,33 @@ sub update {
 
 sub delete {
     my $c = shift;
-    my @ids = $c->param("id");
+    my @ids = $c->param("ids");
     foreach my $id (@ids) {
         $c->sql->Do(" DELETE FROM fascicles WHERE id=? ", [ $id ]);
     }
     $c->render_json( { success => $c->json->true } );
 }
 
-
-sub map {
+sub enable {
     my $c = shift;
-
-    my $i_id          = $c->param("id");
-    my @i_rules       = $c->param("rules");
-    my $i_recursive   = $c->param("recursive");
-
-    $c->sql->Do(" DELETE FROM map_role_to_rule WHERE role=? ", [ $i_id ]);
-
-    foreach my $string (@i_rules) {
-        my ($rule, $mode) = split "::", $string;
-        $c->sql->Do("
-            INSERT INTO map_role_to_rule(role, rule, mode)
-                VALUES (?, ?, ?);
-        ", [$i_id, $rule, $mode]);
+    my @ids = $c->param("ids");
+    foreach my $id (@ids) {
+        
+        $c->sql->Do(" UPDATE fascicles SET enabled = true WHERE id=? ", [ $id ]);
+        $c->sql->Do(" UPDATE documents SET isopen = true WHERE fascicle=? ", [ $id ]);
+        
     }
-
     $c->render_json( { success => $c->json->true } );
 }
 
-sub mapping {
-
+sub disable {
     my $c = shift;
-
-    my $id = $c->param("id");
-
-    my $data = $c->sql->Q("
-        SELECT role, rule, mode FROM map_role_to_rule WHERE role =?
-    ", [ $id ])->Hashes;
-
-    my $result = {};
-
-    foreach my $item (@$data) {
-        $result->{ $item->{rule} } = $item->{mode};
+    my @ids = $c->param("ids");
+    foreach my $id (@ids) {
+        $c->sql->Do(" UPDATE fascicles SET enabled = false WHERE id=? ", [ $id ]);
+        $c->sql->Do(" UPDATE documents SET isopen = false WHERE fascicle=? ", [ $id ]);
     }
-
-    $c->render_json( { data => $result } );
+    $c->render_json( { success => $c->json->true } );
 }
 
 1;

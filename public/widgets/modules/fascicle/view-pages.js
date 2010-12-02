@@ -10,7 +10,8 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
                 renderPages: function(values){
                     var items = values[0];
                     
-                    var string = '<div class="inprint-plan-block">';
+                    var string = '<div class="inprint-plan">';
+                    string += '<div class="inprint-plan-block">';
                     
                     for (var c=0; c<items.pageorder.length; c++) {
                         
@@ -91,6 +92,8 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
                     
                     string += '<div style="clear:both"></div>';
                     string += '</div>';
+                    string += '<div style="clear:both"></div>';
+                    string += '</div>';
                     
                     return string;
                 }
@@ -126,17 +129,12 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
     onRender: function() {
         Inprint.fascicle.plan.View.superclass.onRender.apply(this, arguments);
         
-        //this.dataView.on("beforeselect", function() {
-        //    return false
-        //}, this);
-        //
         //this.getStore().on("load", function(){
         //    if (this.scrollTop && this.scrollHeight) {
         //        this.body.dom.scrollTop = this.scrollTop + (this.scrollTop == 0 ? 0 : this.body.dom.scrollHeight - this.scrollHeight);
         //    }
         //}, this);
         
-        this.cmpReload();
     },
     
     //cmpUpdateTitle: function(rsp) {
@@ -155,10 +153,17 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
     //    this.setTitle(titlestr);
     //},
     
-    cmpReload: function() {
-    
+    cmpLoad: function(data) {
         this.parent.body.mask("Обновление данных...");
-        
+        var rsp = Ext.util.JSON.decode(response.responseText)
+        this.scrollTop    = this.parent.body.dom.scrollTop;
+        this.scrollHeight = this.parent.body.dom.scrollHeight;
+        this.getStore().loadData(data);
+        this.parent.body.unmask();
+    },
+    
+    cmpReload: function() {
+        this.parent.body.mask("Обновление данных...");
         Ext.Ajax.request({
             url: this.url,
             scope: this,
@@ -175,7 +180,6 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
                 this.getStore().loadData(rsp);
             }
         });
-    
     }
     
 });
