@@ -121,9 +121,10 @@ sub startup {
     $self->createRoutes($sessionBridge, "catalog/indexes",      [ "editions", "headlines", "rubrics", "create", "update", "delete" ]);
     
     $self->createRoutes($sessionBridge, "fascicle",             [ "seance", "check", "open", "close", "save", "capture" ]);
+    $self->createRoutes($sessionBridge, "fascicle/combos",      [ "workgroups", "headlines", "rubrics" ]);
     $self->createRoutes($sessionBridge, "fascicle/indexes",     [ "editions", "headlines", "rubrics", "create", "update", "delete" ]);
     $self->createRoutes($sessionBridge, "fascicle/images",      [ "view" ]);
-    $self->createRoutes($sessionBridge, "fascicle/pages",       [ "view" ]);
+    $self->createRoutes($sessionBridge, "fascicle/pages",       [ "view", "create", "update", "delete" ]);
     $self->createRoutes($sessionBridge, "fascicle/documents",   [ "list" ]);
     
     # Profile routes

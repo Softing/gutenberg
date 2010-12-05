@@ -23,34 +23,25 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
         
         this.tbar = [
             {
-                ref: "../btnPageAdd",
+                ref: "../btnPageCreate",
                 disabled:true,
                 text: "Добавить полосу",
                 tooltip: 'Добавить новые полосы в этот выпуск',
                 icon: _ico("plus-button"),
                 cls: 'x-btn-text-icon',
-                scope: this,
-                handler: this.panels["pages"].cmpAdd
+                scope: this.panels["pages"],
+                handler: this.panels["pages"].cmpPageCreate
             },
             {
-                ref: "../btnPageEdit",
+                ref: "../btnPageUpdate",
                 disabled:true,
                 text:'Редактировать',
                 icon: _ico("pencil"),
                 cls: 'x-btn-text-icon',
-                scope: this,
-                handler: this.panels["pages"].cmpEdit
+                scope: this.panels["pages"],
+                handler: this.panels["pages"].cmpPageUpdate
             },
-            {
-                ref: "../btnPageRemove",
-                disabled:true,
-                text: 'Удалить',
-                tooltip: 'Удалить полосы',
-                icon: _ico("minus-button"),
-                cls: 'x-btn-text-icon',
-                scope:this,
-                handler: this.panels["pages"].cmpRemove
-            },
+            "-",
             {
                 ref: "../btnPageMove",
                 disabled:true,
@@ -58,8 +49,8 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                 tooltip: 'Перенести отмеченные полосы',
                 icon: _ico("navigation-000-button"),
                 cls: 'x-btn-text-icon',
-                scope:this,
-                handler: this.panels["pages"].cmpMove
+                scope:this.panels["pages"],
+                handler: this.panels["pages"].cmpPageMove
             },
             {
                 ref: "../btnPageClean",
@@ -68,8 +59,8 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                 tooltip: 'Очистить содержимое полос',
                 icon: _ico("eraser"),
                 cls: 'x-btn-text-icon',
-                scope:this,
-                handler: this.panels["pages"].cmpErase
+                scope:this.panels["pages"],
+                handler: this.panels["pages"].cmpPageClean
             },
             {
                 ref: "../btnPageResize",
@@ -78,8 +69,19 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                 tooltip: 'Добавить новые полосы скопировав содержимое',
                 icon: _ico("arrow-resize-045"),
                 cls: 'x-btn-text-icon',
-                scope:this,
-                handler: this.panels["pages"].cmpResize
+                scope:this.panels["pages"],
+                handler: this.panels["pages"].cmpPageResize
+            },
+            "-",
+            {
+                ref: "../btnPageDelete",
+                disabled:true,
+                text: 'Удалить',
+                tooltip: 'Удалить полосы',
+                icon: _ico("minus-button"),
+                cls: 'x-btn-text-icon',
+                scope:this.panels["pages"],
+                handler: this.panels["pages"].cmpPageDelete
             },
             '->',
             {

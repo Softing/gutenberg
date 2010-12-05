@@ -17,8 +17,6 @@ Inprint.catalog.editions.Tree = Ext.extend(Ext.tree.TreePanel, {
             dataUrl: this.urls.tree,
             border:false,
             rootVisible: false,
-            //enableDD:true,
-            //ddGroup:'member2catalog',
             root: {
                 id:'root-node',
                 nodeType: 'async',
@@ -96,20 +94,85 @@ Inprint.catalog.editions.Tree = Ext.extend(Ext.tree.TreePanel, {
                 },
                 bodyStyle: "padding:5px 5px",
                 items: [
+                    {
+                        xtype: "titlefield",
+                        value: _("Basic parameters")
+                    },
                     _FLD_HDN_PATH,
                     _FLD_TITLE,
                     _FLD_SHORTCUT,
-                    _FLD_DESCRIPTION
+                    _FLD_DESCRIPTION,
+                    {
+                        xtype: "titlefield",
+                        value: _("More options")
+                    },
+                    {
+                        xtype: "combo",
+                        mode: "local",
+                        hiddenName: "default.file.format.text",
+                        fieldLabel: _("Text format"),
+                        emptyText: _("Select a file extension"),
+                        editable:false,
+                        typeAhead: true,
+                        allowBlank:true,
+                        valueField: "id",
+                        displayField:"text",
+                        selectOnFocus:true,
+                        triggerAction: "all",
+                        forceSelection: true,
+                        store: {
+                            xtype: "arraystore",
+                            fields: ["id", "text"],
+                            data : [
+                                ["none", _("Without conversion")],
+                                ["doc",  _("Microsoft Word (doc)")],
+                                ["odt",  _("OpenOffice.org (odt)")],
+                                ["rtf",  _("Rich Text Format (rtf)")],
+                                ["txt",  _("Simple Text (txt)")]
+                            ]
+                        }
+                    },
+                    {
+                        xtype: "combo",
+                        mode: "local",
+                        hiddenName: "default.file.format.table",
+                        fieldLabel: _("Table format"),
+                        emptyText: _("Select a file extension"),
+                        editable:false,
+                        typeAhead: true,
+                        allowBlank:true,
+                        valueField: "id",
+                        displayField:"text",
+                        selectOnFocus:true,
+                        triggerAction: "all",
+                        forceSelection: true,
+                        store: {
+                            xtype: "arraystore",
+                            fields: ["id", "text"],
+                            data : [
+                                ["none", _("Without conversion")],
+                                ["doc",  _("Microsoft Excel (xls)")],
+                                ["ods",  _("OpenOffice.org (ods)")],
+                                ["txt",  _("Tabular text (txt)")]
+                            ]
+                        }
+                    },
+                    {
+                        xtype: "checkbox",
+                        fieldLabel: "",
+                        boxLabel: _("Apply to enclosed"),
+                        name: "applymode"
+                    }
                 ],
                 keys: [ _KEY_ENTER_SUBMIT ],
-                buttons: [ _BTN_SAVE,_BTN_CLOSE ]
+                buttons: [ _BTN_ADD,_BTN_CLOSE ]
             });
 
             win = new Ext.Window({
-                title: _("Catalog item creation"),
+                title: _("Adding a new edition"),
                 layout: "fit",
                 closeAction: "hide",
-                width:400, height:300,
+                width:400, height:350,
                 items: form
             });
 
@@ -150,9 +213,17 @@ Inprint.catalog.editions.Tree = Ext.extend(Ext.tree.TreePanel, {
                 items: [
                     _FLD_HDN_ID,
                     _FLD_HDN_PATH,
+                    {
+                        xtype: "titlefield",
+                        value: _("Basic parameters")
+                    },
                     _FLD_TITLE,
                     _FLD_SHORTCUT,
                     _FLD_DESCRIPTION,
+                    {
+                        xtype: "titlefield",
+                        value: _("Parent")
+                    },
                     Inprint.factory.Combo.create("/catalog/combos/editions/", {
                         scope:this,
                         listeners: {
@@ -160,7 +231,68 @@ Inprint.catalog.editions.Tree = Ext.extend(Ext.tree.TreePanel, {
                                 combo.ownerCt.getForm().findField("path").setValue(record.get("id"));
                             }
                         }
-                    })
+                    }),
+                    {
+                        xtype: "titlefield",
+                        value: _("More options")
+                    },
+                    {
+                        xtype: "combo",
+                        mode: "local",
+                        hiddenName: "default.file.format.text",
+                        fieldLabel: _("Text format"),
+                        emptyText: _("Select a file extension"),
+                        editable:false,
+                        typeAhead: true,
+                        allowBlank:true,
+                        valueField: "id",
+                        displayField:"text",
+                        selectOnFocus:true,
+                        triggerAction: "all",
+                        forceSelection: true,
+                        store: {
+                            xtype: "arraystore",
+                            fields: ["id", "text"],
+                            data : [
+                                ["none", _("Without conversion")],
+                                ["doc",  _("Microsoft Word (doc)")],
+                                ["odt",  _("OpenOffice.org (odt)")],
+                                ["rtf",  _("Rich Text Format (rtf)")],
+                                ["txt",  _("Simple Text (txt)")]
+                            ]
+                        }
+                    },
+                    {
+                        xtype: "combo",
+                        mode: "local",
+                        hiddenName: "default.file.format.table",
+                        fieldLabel: _("Table format"),
+                        emptyText: _("Select a file extension"),
+                        editable:false,
+                        typeAhead: true,
+                        allowBlank:true,
+                        valueField: "id",
+                        displayField:"text",
+                        selectOnFocus:true,
+                        triggerAction: "all",
+                        forceSelection: true,
+                        store: {
+                            xtype: "arraystore",
+                            fields: ["id", "text"],
+                            data : [
+                                ["none", _("Without conversion")],
+                                ["doc",  _("Microsoft Excel (xls)")],
+                                ["ods",  _("OpenOffice.org (ods)")],
+                                ["txt",  _("Tabular text (txt)")]
+                            ]
+                        }
+                    },
+                    {
+                        xtype: "checkbox",
+                        fieldLabel: "",
+                        boxLabel: _("Apply to enclosed"),
+                        name: "applymode"
+                    }
                 ],
                 keys: [ _KEY_ENTER_SUBMIT ],
                 buttons: [ _BTN_SAVE,_BTN_CLOSE ]
@@ -170,7 +302,7 @@ Inprint.catalog.editions.Tree = Ext.extend(Ext.tree.TreePanel, {
                 title: _("Catalog item creation"),
                 layout: "fit",
                 closeAction: "hide",
-                width:400, height:300,
+                width:400, height:400,
                 items: form
             });
 

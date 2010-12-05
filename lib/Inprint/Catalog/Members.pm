@@ -27,7 +27,7 @@ sub list {
     }
 
     my $sql = "
-        SELECT distinct t1.id, t1.login, t2.title, t2.shortcut, t2.position
+        SELECT distinct t1.id, t1.login, t2.title, t2.shortcut, t2.job_position as position
         FROM members t1
         LEFT JOIN profiles t2 ON t1.id = t2.id
         LEFT JOIN map_member_to_catalog m1 ON m1.member = t1.id
@@ -122,7 +122,7 @@ sub create {
 
 
         $c->sql->Do("
-            INSERT INTO profiles (id, title, shortcut, position)
+            INSERT INTO profiles (id, title, shortcut, job_position)
                 VALUES (?,?,?,?)
             ", [ $id, $i_title, $i_shortcut, $i_position ]);
 
@@ -249,7 +249,7 @@ sub setup {
     
     unless (@errors) {
         $c->sql->Do("DELETE FROM profiles WHERE id=?", [ $member_id ]);
-        $c->sql->Do("INSERT INTO profiles (id, title, shortcut, position) VALUES (?, ?, ?, ?)",[
+        $c->sql->Do("INSERT INTO profiles (id, title, shortcut, job_position) VALUES (?, ?, ?, ?)",[
             $member_id, $i_title, $i_shortcut, $i_position
         ]);
         

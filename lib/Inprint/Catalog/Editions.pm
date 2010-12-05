@@ -73,7 +73,7 @@ sub tree {
                 id   => $item->{id},
                 text => $item->{shortcut},
                 leaf => $c->json->true,
-                icon => "book",
+                icon => "blue-folders",
                 data => $item
             };
             if ( $item->{have_childs} ) {

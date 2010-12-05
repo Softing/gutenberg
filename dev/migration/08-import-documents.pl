@@ -227,7 +227,7 @@ foreach my $item( @{ $documents } ) {
             branch, branch_shortcut, stage, stage_shortcut,
             readiness, readiness_shortcut, color, progress,
             title, author,
-            pdate, psize, rdate, rsize,
+            pdate, fdate, psize, rsize,
             filepath, images, files,
             created, updated
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
@@ -245,7 +245,7 @@ foreach my $item( @{ $documents } ) {
         $Branch->{id}, $Branch->{title}, $Stage->{id}, $Stage->{title},
         $Readiness->{id}, $Readiness->{shortcut}, $Readiness->{color}, $Readiness->{weight},
         $item->{title}, $item->{author},
-        $item->{planned_date}, $item->{planned_size}, $item->{real_date}, $item->{calibr_real},
+        $item->{planned_date}, $item->{real_date}, $item->{planned_size}, $item->{calibr_real},
         "/". $item->{filepath} ."/". $item->{uuid}, $item->{image_count}, $item->{file_count},
         $item->{created}, $item->{updated}
     ]);

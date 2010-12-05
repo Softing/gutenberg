@@ -80,11 +80,28 @@ Inprint.factory.Combo = new function() {
             emptyText: _("Module") + "..."
         },
 
+        //// Calendar
+        //"/calendar/combo/groups/": {
+        //    hiddenName: "calendar-group",
+        //    fieldLabel: _("Edition"),
+        //    emptyText: _("Edition") + "..."
+        //},
+        
         // Fascicles
-        "/calendar/combo/groups/": {
-            hiddenName: "calendar-group",
-            fieldLabel: _("Edition"),
-            emptyText: _("Edition") + "..."
+        "/fascicle/combos/workgroups/": {
+            hiddenName: "workgroup",
+            fieldLabel: _("Workgroup"),
+            emptyText: _("Workgroup") + "..."
+        },
+        "/fascicle/combos/headlines/": {
+            hiddenName: "headline",
+            fieldLabel: _("Headline"),
+            emptyText: _("Headline") + "..."
+        },
+        "/fascicle/combos/rubrics/": {
+            hiddenName: "rubric",
+            fieldLabel: _("Rubric"),
+            emptyText: _("Rubric") + "..."
         },
 
         // Combos for documents dialogs
@@ -203,6 +220,12 @@ Inprint.factory.Combo = new function() {
                 Ext.apply(combo, combos[url]);
 
             // Add store
+            if (!storeconfig) {
+                storeconfig = {};
+            }
+            if (config.baseParams) {
+                storeconfig.baseParams = config.baseParams;
+            }
             Ext.apply(combo, {
                 store: Inprint.factory.Store.json( url, storeconfig )
             });

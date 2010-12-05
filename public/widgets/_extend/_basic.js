@@ -123,7 +123,52 @@ _FLD_WEIGHT = {
 };
 
 
-/* Buttons */
+/* Buttons for Window */
+
+var _BTN_WNDW_ADD = {
+    text: _("Add"),  handler: function() { this.findParentByType("window").findByType("form")[0].getForm().submit(); }
+};
+
+var _BTN_WNDW_SAVE = {
+    text: _("Save"), handler: function() { this.findParentByType("window").findByType("form")[0].getForm().submit(); }
+};
+
+var _BTN_WNDW_OK = {
+    text: _("Ok"),   handler: function()  { this.findParentByType("window").findByType("form")[0].getForm().submit(); }
+};
+
+var _BTN_WNDW_CLOSE = {
+    text: _("Close"), handler: function() { this.findParentByType("window").hide(); }
+};
+
+var _BTN_WNDW_CANCEL = {
+    text: _("Cancel"), handler: function() { this.findParentByType("window").hide(); }
+};
+
+/* Buttons for Forms in Window */
+
+var _BTN_WNDW_FORM_ADD = {
+    text: _("Add"), handler: function() { this.findParentByType("form").getForm().submit(); }
+};
+
+var _BTN_WNDW_FORM_SAVE = {
+    text: _("Save"), handler: function() { this.findParentByType("form").getForm().submit(); }
+};
+
+var _BTN_WNDW_FORM_OK = {
+    text: _("Ok"), handler: function() { this.findParentByType("form").getForm().submit(); }
+};
+
+var _BTN_WNDW_FORM_CLOSE = {
+    text: _("Close"), handler: function() { this.findParentByType("window").hide(); }
+};
+
+var _BTN_WNDW_FORM_CANCEL = {
+    text: _("Cancel"), handler: function() { this.findParentByType("window").hide(); }
+};
+
+
+/* Buttons for Form  */
 
 var _BTN_ADD = {
     text: _("Add"),

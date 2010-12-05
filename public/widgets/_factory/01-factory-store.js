@@ -95,7 +95,11 @@ Inprint.factory.Store = new function() {
         "/catalog/combos/fascicles/",
         "/catalog/combos/readiness/",
         "/catalog/combos/roles/",
-
+        
+        "/fascicle/combos/workgroups/",
+        "/fascicle/combos/headlines/",
+        "/fascicle/combos/rubrics/",
+        
         "/documents/combos/editions/",
         "/documents/combos/stages/",
         "/documents/combos/assignments/",

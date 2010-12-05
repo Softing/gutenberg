@@ -55,7 +55,7 @@ foreach my $item( @{ $members } ) {
     ", [ $item->{uuid}, $item->{uid}, $item->{secret}, $item->{created} ]);
 
     $sql->Do("
-        INSERT INTO profiles (id, title, shortcut, position)
+        INSERT INTO profiles (id, title, shortcut, job_position)
         VALUES (?, ?, ?, ?)
     ", [ $item->{uuid}, $item->{title}, $item->{stitle}, $item->{position} ]);
 

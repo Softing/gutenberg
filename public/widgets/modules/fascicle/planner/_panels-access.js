@@ -25,8 +25,8 @@ Inprint.fascicle.planner.Access = function(parent, panels, access) {
     }
     
     //Pages
-    _disable(parent.btnPageAdd, parent.btnPageEdit, parent.btnPageRemove, parent.btnPageMove, parent.btnPageClean, parent.btnPageResize);
+    _disable(parent.btnPageCreate, parent.btnPageUpdate, parent.btnPageDelete, parent.btnPageMove, parent.btnPageClean, parent.btnPageResize);
     if (access.manage) {
-        _enable(parent.btnPageAdd, parent.btnPageEdit, parent.btnPageRemove, parent.btnPageMove, parent.btnPageClean, parent.btnPageResize);
+        _enable(parent.btnPageCreate, parent.btnPageUpdate, parent.btnPageDelete, parent.btnPageMove, parent.btnPageClean, parent.btnPageResize);
     }
 }

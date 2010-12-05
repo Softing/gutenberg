@@ -43,7 +43,7 @@ sub list {
 
     my $sql2 = "
         SELECT distinct
-            t1.id, t2.shortcut as title, t2.position as description,
+            t1.id, t2.shortcut as title, t2.job_position as description,
             'member' as type
         FROM members t1
             LEFT JOIN profiles t2 ON t1.id = t2.id, map_member_to_catalog m1
@@ -54,7 +54,7 @@ sub list {
     my @data2 = ($i_node);
 
     if ($i_filter) {
-        $sql2 .= " AND (t1.login ILIKE ? OR t2.shortcut ILIKE ? OR t2.position ILIKE ?) ";
+        $sql2 .= " AND (t1.login ILIKE ? OR t2.shortcut ILIKE ? OR t2.job_position ILIKE ?) ";
         push @data2, "%$i_filter%";
         push @data2, "%$i_filter%";
         push @data2, "%$i_filter%";

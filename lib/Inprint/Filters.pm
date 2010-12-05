@@ -81,7 +81,7 @@ sub mysession
     if ($c->session("sid")) {
 
         my $member = $c->sql->Q("
-            SELECT t2.id, t2.login, t3.title, t3.shortcut, t3.position
+            SELECT t2.id, t2.login, t3.title, t3.shortcut, t3.job_position
             FROM sessions t1, members t2 LEFT JOIN profiles t3 ON (t3.id = t2.id) WHERE t1.id=? AND t1.member = t2.id
         ", [ $c->session("sid") ])->Hash || {};
 
@@ -90,7 +90,7 @@ sub mysession
         $c->QuerySessionSet("member.id",       $member->{id});
         $c->QuerySessionSet("member.login",    $member->{login});
         $c->QuerySessionSet("member.shortcut", $member->{shortcut});
-        $c->QuerySessionSet("member.position", $member->{position});
+        $c->QuerySessionSet("member.position", $member->{job_position});
 
         my $options = $c->sql->Q(" SELECT option_name, option_value FROM options WHERE member=? ", [ $member->{id} ])->Hashes || [];
         foreach my $item (@$options) {

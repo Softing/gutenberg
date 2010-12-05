@@ -189,6 +189,7 @@ sub open {
     
     unless (@errors) {
         $c->sql->Do(" UPDATE fascicles SET manager=? WHERE id=?", [ $current_member, $fascicle->{id} ]);
+        $c->sql->Do(" UPDATE documents SET fascicle_blocked=true WHERE fascicle=?", [ $fascicle->{id} ]);
     }
     
     $success = $c->json->true unless (@errors);
@@ -217,6 +218,7 @@ sub close {
     
     unless (@errors) {
         $c->sql->Do(" UPDATE fascicles SET manager=null WHERE manager=? AND id=?", [ $current_member, $fascicle->{id} ]);
+        $c->sql->Do(" UPDATE documents SET fascicle_blocked=false WHERE fascicle=?", [ $fascicle->{id} ]);
     }
     
     $success = $c->json->true unless (@errors);
@@ -248,6 +250,7 @@ sub capture {
     
     unless (@errors) {
         $c->sql->Do(" UPDATE fascicles SET manager=? WHERE id=?", [ $current_member, $fascicle->{id} ]);
+        $c->sql->Do(" UPDATE documents SET fascicle_blocked=true WHERE fascicle=?", [ $fascicle->{id} ]);
     }
     
     $success = $c->json->true unless (@errors);
@@ -439,7 +442,8 @@ sub getDocumens {
             dcm.title, dcm.author,
             dcm.pages,
             to_char(dcm.pdate, 'YYYY-MM-DD HH24:MI:SS') as pdate,
-            to_char(dcm.rdate, 'YYYY-MM-DD HH24:MI:SS') as rdate,
+            to_char(dcm.fdate, 'YYYY-MM-DD HH24:MI:SS') as fdate,
+            to_char(dcm.ldate, 'YYYY-MM-DD HH24:MI:SS') as ldate,
             dcm.psize, dcm.rsize,
             dcm.images, dcm.files,
             to_char(dcm.created, 'YYYY-MM-DD HH24:MI:SS') as created,

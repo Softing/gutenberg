@@ -15,7 +15,7 @@ Inprint.catalog.editions.Context = function(parent, panels) {
 
         items.push(
             {
-                icon: _ico("book--plus"),
+                icon: _ico("blue-folder--plus"),
                 cls: "x-btn-text-icon",
                 text: _("Create"),
                 disabled: disabled,
@@ -24,7 +24,7 @@ Inprint.catalog.editions.Context = function(parent, panels) {
                 handler: function() { this.cmpCreate(node); }
             },
             {
-                icon: _ico("book--pencil"),
+                icon: _ico("blue-folder--pencil"),
                 cls: "x-btn-text-icon",
                 text: _("Edit"),
                 disabled: disabled,
@@ -36,7 +36,7 @@ Inprint.catalog.editions.Context = function(parent, panels) {
 
         if (node.attributes.id != NULLID) {
             items.push({
-                icon: _ico("book--minus"),
+                icon: _ico("blue-folder--minus"),
                 cls: "x-btn-text-icon",
                 text: _("Remove"),
                 disabled: disabled,

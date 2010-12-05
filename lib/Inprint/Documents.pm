@@ -44,7 +44,8 @@ sub read {
                 dcm.color, dcm.progress,
                 dcm.title, dcm.author,
                 to_char(dcm.pdate, 'YYYY-MM-DD HH24:MI:SS') as pdate,
-                to_char(dcm.rdate, 'YYYY-MM-DD HH24:MI:SS') as rdate,
+                to_char(dcm.fdate, 'YYYY-MM-DD HH24:MI:SS') as fdate,
+                to_char(dcm.ldate, 'YYYY-MM-DD HH24:MI:SS') as ldate,
                 dcm.psize, dcm.rsize,
                 dcm.images, dcm.files,
                 to_char(dcm.created, 'YYYY-MM-DD HH24:MI:SS') as created,
@@ -140,7 +141,7 @@ sub list {
             dcm.title, dcm.author,
             dcm.pages,
             to_char(dcm.pdate, 'YYYY-MM-DD HH24:MI:SS') as pdate,
-            to_char(dcm.rdate, 'YYYY-MM-DD HH24:MI:SS') as rdate,
+            to_char(dcm.fdate, 'YYYY-MM-DD HH24:MI:SS') as fdate,
             dcm.psize, dcm.rsize,
             dcm.images, dcm.files,
             to_char(dcm.created, 'YYYY-MM-DD HH24:MI:SS') as created,
@@ -400,7 +401,7 @@ sub create {
         push @fields, "rsize";
         push @data, 0;
 
-        push @fields, "rdate";
+        push @fields, "fdate";
         push @data, undef;
 
         # Set Author
@@ -679,7 +680,7 @@ sub capture {
                     UPDATE documents SET
                         holder=?, holder_shortcut=?,
                         workgroup=?, workgroup_shortcut=?, inworkgroups=?,
-                        rdate=now()
+                        fdate=now()
                     WHERE id=?
                 ", [
                     $member->{id}, $member->{shortcut},
@@ -726,7 +727,7 @@ sub transfer {
                 UPDATE documents SET
                     holder=?, holder_shortcut=?,
                     workgroup=?, workgroup_shortcut=?, inworkgroups=?,
-                    readiness=?, readiness_shortcut=?, color=?, progress=?, rdate=now()
+                    readiness=?, readiness_shortcut=?, color=?, progress=?, fdate=now()
                 WHERE id=?
             ", [
                 $assignment->{principal}, $assignment->{principal_shortcut},
@@ -853,7 +854,7 @@ sub copy {
                             color, progress,
                             title, author,
                             pdate, psize,
-                            rdate, rsize,
+                            fdate, rsize,
                             filepath, 
                             images, files,
                             islooked, isopen,
@@ -879,7 +880,7 @@ sub copy {
                             $document->{readiness}, $document->{readiness_shortcut}, $document->{color}, $document->{progress},
                             $document->{title}, $document->{author},
                             $document->{pdate}, $document->{psize},
-                            $document->{rdate}, $document->{rsize},
+                            $document->{fdate}, $document->{rsize},
                             $document->{filepath}, 
                             $document->{images}, $document->{files},
                             $document->{islooked}, $document->{isopen}
@@ -968,7 +969,7 @@ sub duplicate {
                             color, progress,
                             title, author,
                             pdate, psize,
-                            rdate, rsize,
+                            fdate, rsize,
                             filepath, 
                             images, files,
                             islooked, isopen,
@@ -994,7 +995,7 @@ sub duplicate {
                             $document->{readiness}, $document->{readiness_shortcut}, $document->{color}, $document->{progress},
                             $document->{title}, $document->{author},
                             $document->{pdate}, $document->{psize},
-                            $document->{rdate}, $document->{rsize},
+                            $document->{fdate}, $document->{rsize},
                             $document->{filepath}, 
                             $document->{images}, $document->{files},
                             $document->{islooked}, $document->{isopen}

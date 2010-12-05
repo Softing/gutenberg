@@ -82,7 +82,7 @@ sub holders {
 
     my $sql;
     $sql = "
-        SELECT t1.id, t2.title, t2.shortcut, position as description
+        SELECT t1.id, t2.title, t2.shortcut, job_position as description
         FROM members t1, profiles t2
         WHERE t1.id = t2.id
         ORDER BY t2.title
@@ -99,7 +99,7 @@ sub managers {
 
     my $sql;
     $sql = "
-        SELECT t1.id, t2.title, t2.shortcut, position as description
+        SELECT t1.id, t2.title, t2.shortcut, job_position as description
         FROM members t1, profiles t2
         WHERE t1.id = t2.id
         ORDER BY t2.title

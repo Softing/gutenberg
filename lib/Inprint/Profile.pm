@@ -50,7 +50,7 @@ sub read {
 
     if ($i_id) {
         $result = $c->sql->Q("
-            SELECT distinct t1.id, t1.login, t2.title, t2.shortcut, t2.position
+            SELECT distinct t1.id, t1.login, t2.title, t2.shortcut, t2.job_position as position
             FROM members t1
             LEFT JOIN profiles t2 ON t1.id = t2.id
             WHERE t1.id = ?
@@ -117,10 +117,10 @@ sub update {
     my $count = $c->sql->Q("SELECT count(*) FROM profiles WHERE id=?",[$i_id])->Value;
     
     if ($count) {
-        $c->sql->Do("UPDATE profiles SET title=?, shortcut=?, position=?, updated=now() WHERE id=?",[$i_title, $i_shortcut, $i_position, $i_id]);
+        $c->sql->Do("UPDATE profiles SET title=?, shortcut=?, job_position=?, updated=now() WHERE id=?",[$i_title, $i_shortcut, $i_position, $i_id]);
     } else {
         $c->sql->Do("
-            INSERT INTO profiles(id, title, shortcut, position, created, updated)
+            INSERT INTO profiles(id, title, shortcut, job_position, created, updated)
             VALUES (?, ?, ?, ?, now(), now());",
         [ $i_id, $i_title, $i_shortcut, $i_position]);
     }

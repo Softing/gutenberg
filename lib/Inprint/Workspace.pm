@@ -75,7 +75,7 @@ sub appsession {
     my $result = {};
 
     my $member = $c->sql->Q("
-        SELECT t2.id, t2.login, t3.title, t3.shortcut, t3.position
+        SELECT t2.id, t2.login, t3.title, t3.shortcut, t3.job_position
         FROM sessions t1, members t2 LEFT JOIN profiles t3 ON (t3.id = t2.id) WHERE t1.id=? AND t1.member = t2.id
     ", [ $c->session("sid") ])->Hash || {};
 
@@ -110,7 +110,7 @@ sub online
  $data = $rh_data->{SqlDrive}->Query({
 	type	=> 'array_hashref',
         query 	=> "
-	SELECT DISTINCT t1.uuid, t1.updated, t2.title, t2.stitle, t2.position ,
+	SELECT DISTINCT t1.uuid, t1.updated, t2.title, t2.stitle, t2.job_position ,
 	(extract( epoch FROM now() - t1.updated )/60)::integer as isonline
 	FROM passport.session t1, passport.card t2
 	WHERE
