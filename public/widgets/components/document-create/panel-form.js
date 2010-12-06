@@ -96,7 +96,7 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                         render: function(field) {
                                             var id = Inprint.session.options["default.edition"];
                                             var title = Inprint.session.options["default.edition.name"] || _("Unknown edition");
-                                            if (id && title) combo.setValue(id, title);
+                                            if (id && title) field.setValue(id, title);
                                         },
                                         select: function(field) {
                                             this.getForm().findField("fascicle").reset();
@@ -133,7 +133,7 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                         render: function(field) {
                                             var id = Inprint.session.options["default.workgroup"];
                                             var title = Inprint.session.options["default.workgroup.name"] || _("Unknown department");
-                                            if (id && title) combo.setValue(id, title);
+                                            if (id && title) field.setValue(id, title);
                                         }
                                     }
                                 },
@@ -142,10 +142,10 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                     disabled: true,
                                     listeners: {
                                         scope: this,
-                                        render: function(combo) {
+                                        render: function(field) {
                                             var id = Inprint.session.member["id"];
                                             var title = Inprint.session.member["title"] || _("Unknown employee");
-                                            if (id && title) combo.setValue(id, title);
+                                            if (id && title) field.setValue(id, title);
                                         },
                                         beforequery: function(qe) {
                                             delete qe.combo.lastQuery;
@@ -182,8 +182,8 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                     disabled: true,
                                     listeners: {
                                         scope: this,
-                                        render: function(combo) {
-                                            combo.setValue("00000000-0000-0000-0000-000000000000", _("Briefcase"));
+                                        render: function(field) {
+                                            field.setValue("00000000-0000-0000-0000-000000000000", _("Briefcase"));
                                         },
                                         beforequery: function(qe) {
                                             delete qe.combo.lastQuery;
@@ -196,14 +196,14 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                     disabled: true,
                                     listeners: {
                                         scope: this,
-                                        render: function(combo) {
+                                        render: function(field) {
                                             this.getForm().findField("edition").on("select", function() {
-                                                combo.disable();
-                                                combo.reset();
+                                                field.disable();
+                                                field.reset();
                                             }, this);
                                             this.getForm().findField("fascicle").on("select", function() {
-                                                combo.enable();
-                                                combo.reset();
+                                                field.enable();
+                                                field.reset();
                                             }, this);
                                         },
                                         beforequery: function(qe) {

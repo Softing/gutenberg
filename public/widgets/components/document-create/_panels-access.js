@@ -1,4 +1,5 @@
 Inprint.cmp.CreateDocument.Access = function(parent, form) {
+
     _a(["catalog.documents.create:*", "catalog.documents.assign:*", "editions.documents.assign"], null, function(terms) {
         if(terms["catalog.documents.create"]) {
             parent.buttons[0].enable();
@@ -12,4 +13,5 @@ Inprint.cmp.CreateDocument.Access = function(parent, form) {
             form.getForm().findField("headline").enable();
         }
     });
+
 };

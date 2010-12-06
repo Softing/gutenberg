@@ -123,9 +123,8 @@ sub create {
     
     $c->sql->Do("
         INSERT INTO fascicles (
-            id, edition, base_edition, variation, is_system, is_enabled, is_blocked, title, shortcut, description, begindate, enddate,
-            is_enabled, created, updated)
-            VALUES (?, ?, ?, ?, false, true, false, ?, ?, ?, ?, ?, true, now(), now());
+            id, edition, base_edition, variation, is_system, is_enabled, is_blocked, title, shortcut, description, begindate, enddate, created, updated)
+            VALUES (?, ?, ?, ?, false, true, false, ?, ?, ?, ?, ?, now(), now());
     ", [ $id, $i_edition, $i_edition, $version, $i_title, $i_title, $i_title, $i_begindate, $i_enddate ]);
 
     $c->render_json( { success => $c->json->true} );
