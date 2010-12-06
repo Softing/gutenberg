@@ -130,7 +130,7 @@ sub create {
             $c->sql->Do("
                 INSERT INTO branches(edition, mtype, title, shortcut, description, created, updated)
                 VALUES (?, ?, ?, ?, ?, now(), now());
-             ", [ $edition->{id}, "document", $edition->{title}, $edition->{shortcut}, $edition->{description} ])->Value;
+             ", [ $edition->{id}, "document", $edition->{title}, $edition->{shortcut}, $edition->{description} ]);
             $idBranch = $c->sql->Q(" SELECT id FROM branches WHERE edition=? LIMIT 1 ", [$i_edition])->Value;
         }
         
