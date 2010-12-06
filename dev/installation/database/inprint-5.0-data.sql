@@ -1,4 +1,4 @@
-﻿-------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------
 -- Domain Rules
 -------------------------------------------------------------------------------------------------
 
@@ -99,16 +99,16 @@ VALUES ('52dc7f72-2057-43c0-831d-55e458d84f39', 'editions', 'documents', 'assign
 -------------------------------------------------------------------------------------------------
 
 INSERT INTO catalog (id, path, title, shortcut, description, type, capables, created, updated)
-    VALUES ('00000000-0000-0000-0000-000000000000', '00000000000000000000000000000000', 'Издательский Дом', 'ИД ЗР', 'Издательский дом', 'ou', '{default}', now(), now());
+    VALUES ('00000000-0000-0000-0000-000000000000', '00000000000000000000000000000000', 'Publishing House', 'Publishing House', 'Publishing House', 'ou', '{default}', now(), now());
 
 INSERT INTO editions (id, path, title, shortcut, description, created, updated)
-    VALUES ('00000000-0000-0000-0000-000000000000', '00000000000000000000000000000000', 'Все издания', 'Все издания', 'Все издания', now(), now());
+    VALUES ('00000000-0000-0000-0000-000000000000', '00000000000000000000000000000000', 'All editions', 'All editions', 'All editions', now(), now());
 	
 INSERT INTO fascicles(id, base_edition, edition, variation, title, shortcut, description, is_system, is_enabled, is_blocked, created, updated)
-    VALUES ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', 'Портфель', 'Портфель', 'Портфель материалов', true, true, false, now(), now());
+    VALUES ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', 'Briefcase', 'Briefcase', 'Briefcase', true, true, false, now(), now());
 
 INSERT INTO fascicles(id, base_edition, edition, variation, title, shortcut, description, is_system, is_enabled, is_blocked, created, updated)
-    VALUES ('99999999-9999-9999-9999-999999999999', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', 'Корзина', 'Корзина', 'Корзина материалов', true, true, false, now(), now());
+    VALUES ('99999999-9999-9999-9999-999999999999', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', 'Recycle bin', 'Recycle bin', 'Recycle bin', true, true, false, now(), now());
 
 INSERT INTO members(id, "login", "password", created, updated)
 	VALUES ('39d40812-fc54-4342-9b98-e1c1f4222d22','root','4813494d137e1631bba301d5acab6e7bb7aa74ce1185d456565ef51d737677b2', now(), now());

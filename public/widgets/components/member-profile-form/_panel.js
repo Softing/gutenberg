@@ -8,7 +8,7 @@ Inprint.cmp.memberProfileForm.Window = Ext.extend(Ext.Window, {
             modal: true,
             layout: "fit",
             closeAction: "hide",
-            width:600, height:320,
+            width:600, height:400,
             items: this.form,
             buttons:[
                 {

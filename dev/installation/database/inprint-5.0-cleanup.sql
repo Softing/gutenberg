@@ -1,4 +1,4 @@
-﻿DELETE FROM ad_advertisers;
+DELETE FROM ad_advertisers;
 DELETE FROM ad_modules;
 DELETE FROM ad_places;
 DELETE FROM ad_requests;

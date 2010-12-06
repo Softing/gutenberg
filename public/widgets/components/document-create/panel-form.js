@@ -94,9 +94,9 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                     listeners: {
                                         scope: this,
                                         render: function(field) {
-                                            var options = Inprint.session.options;
-                                            if (options && options["default.edition"])
-                                                field.setValue(options["default.edition"], options["default.edition.name"]);
+                                            var id = Inprint.session.options["default.edition"];
+                                            var title = Inprint.session.options["default.edition.name"] || _("Unknown edition");
+                                            if (id && title) combo.setValue(id, title);
                                         },
                                         select: function(field) {
                                             this.getForm().findField("fascicle").reset();
@@ -131,9 +131,9 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                     listeners: {
                                         scope: this,
                                         render: function(field) {
-                                            var options = Inprint.session.options;
-                                            if (options && options["default.workgroup"])
-                                                field.setValue(options["default.workgroup"], options["default.workgroup.name"]);
+                                            var id = Inprint.session.options["default.workgroup"];
+                                            var title = Inprint.session.options["default.workgroup.name"] || _("Unknown department");
+                                            if (id && title) combo.setValue(id, title);
                                         }
                                     }
                                 },
@@ -143,8 +143,9 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                     listeners: {
                                         scope: this,
                                         render: function(combo) {
-                                            var options = Inprint.session.member;
-                                            combo.setValue(options["id"], options["title"]);
+                                            var id = Inprint.session.member["id"];
+                                            var title = Inprint.session.member["title"] || _("Unknown employee");
+                                            if (id && title) combo.setValue(id, title);
                                         },
                                         beforequery: function(qe) {
                                             delete qe.combo.lastQuery;
