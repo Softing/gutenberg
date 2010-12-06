@@ -26,7 +26,7 @@ Inprint.factory.Store = new function() {
         "/common/transfer/list/":               [ "id", "type", "title", "description" ],
 
         // Calendar
-        '/calendar/list/':                      [ 'id', 'edition', 'edition_shortcut', 'enabled', 'title', 'shortcut', 'description', 'begindate', 'enddate', 'totaldays', 'passeddays' ],
+        '/calendar/list/':                      [ 'id', 'edition', 'edition_shortcut', 'is_enabled', 'title', 'shortcut', 'description', 'begindate', 'enddate', 'totaldays', 'passeddays' ],
 
         
 

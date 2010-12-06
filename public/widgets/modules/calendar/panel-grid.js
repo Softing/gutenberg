@@ -21,7 +21,7 @@ Inprint.edition.calendar.Grid = Ext.extend(Ext.grid.GridPanel, {
         this.cm = new Ext.grid.ColumnModel([
             this.sm,
             {
-                dataIndex: 'enabled',
+                dataIndex: 'is_enabled',
                 width: 24,
                 renderer: function(v,p,r) {
                     if (v == 1) {
