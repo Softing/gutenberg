@@ -117,6 +117,8 @@ sub list {
     my $holder   = $c->param("flt_holder")   || undef;
     my $progress = $c->param("flt_progress") || undef;
 
+    my $current_member = $c->QuerySessionGet("member.id");
+
     # Query headers
     my $sql_query = "
         SELECT
@@ -173,8 +175,19 @@ sub list {
     # Set Filters
     
     if ($mode eq "todo") {
-        $sql_filters .= " AND holder=? ";
-        push @params, $c->QuerySessionGet("member.id");
+        
+        my @holders;
+        $sql_filters .= " AND holder = ANY(?) ";
+        
+        my $departments = $c->sql->Q(" SELECT catalog FROM map_member_to_catalog WHERE member =? ", [ $current_member ])->Values;
+        
+        foreach (@$departments) {
+            push @holders, $_;
+        }
+        
+        push @holders, $current_member;
+        push @params, \@holders;
+        
         $sql_filters .= " AND isopen = true ";
         $sql_filters .= " AND fascicle <> '99999999-9999-9999-9999-999999999999' ";
     }
@@ -274,7 +287,6 @@ sub list {
     
     my $result = $c->sql->Q($sql_query, \@params)->Hashes;
     
-    my $current_member = $c->QuerySessionGet("member.id");
     foreach my $document (@$result) {
         
         $document->{pages} = Inprint::Utils::CollapsePagesToString($document->{pages});
@@ -486,7 +498,7 @@ sub create {
     my $manager_obj;
     unless ( @errors ) {
         # Set manager
-        $manager_obj = $c->sql->Q(" SELECT id, shortcut FROM profiles WHERE id = ?", [ $i_manager ])->Hash;
+        $manager_obj = $c->sql->Q(" SELECT id, shortcut FROM view_principals WHERE id = ?", [ $i_manager ])->Hash;
         
         push @fields, "manager";
         push @fields, "manager_shortcut";
@@ -499,7 +511,8 @@ sub create {
     
     unless ( @errors ) {
         # Set Holder
-        my $holder = $c->sql->Q(" SELECT id, shortcut FROM profiles WHERE id = ?", [ $manager_obj->{id} ])->Hash;
+        
+        my $holder = $c->sql->Q(" SELECT id, shortcut FROM view_principals WHERE id = ?", [ $manager_obj->{id} ])->Hash;
         push @fields, "holder";
         push @fields, "holder_shortcut";
         push @data, $holder->{id};

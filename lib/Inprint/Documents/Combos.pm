@@ -15,16 +15,20 @@ sub managers {
     my $c = shift;
     
     my $i_term      = $c->param("term") || undef;
+    my $i_edition   = $c->param("edition") || undef;
     my $i_workgroup = $c->param("workgroup") || undef;
     
     my $result;
     my @errors;
     my $success = $c->json->false;
     
+    push @errors, { id => "edition", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_edition));
+    
     push @errors, { id => "workgroup", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_workgroup));
     
-    push @errors, { id => "term", msg => "Access denide"}
+    push @errors, { id => "term", msg => "Incorrectly filled field"}
         unless ($c->is_rule($i_term));
     
     unless (@errors) {
@@ -57,6 +61,18 @@ sub managers {
         }
         
         $result = $c->sql->Q(" $sql ORDER BY icon, t1.shortcut; ", \@params)->Hashes;
+
+        if ($c->access->Check("editions.documents.assign", $i_edition)) {
+            
+            unshift @$result, {
+                "icon" => "users",
+                "title" => $c->l("Add to the department"),
+                "id" => $i_workgroup,
+                "description" => $c->l("Department")
+            };
+            
+        }
+        
     }
 
     $success = $c->json->true unless (@errors);

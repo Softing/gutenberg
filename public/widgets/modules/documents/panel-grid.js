@@ -195,9 +195,15 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
             bbar: this.bbar,
             viewConfig: {
                 getRowClass: function(record, rowIndex, rp, ds) {
+                    
                     if (Inprint.session.member && record.get("holder") == Inprint.session.member.id) {
                         return 'inprint-document-grid-current-user-bg';
                     }
+                    
+                    if (record.get("workgroup") == record.get("holder")) {
+                        return 'inprint-document-grid-current-department-bg';
+                    }
+                    
                     return '';
                 }
             }

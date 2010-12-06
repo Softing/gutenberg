@@ -90,7 +90,13 @@ Inprint.documents.GridColumns = function() {
             dataIndex: "manager_shortcut",
             header: _("Manager"),
             width: 100,
-            sortable: true
+            sortable: true,
+            renderer : function(v, p, record) {
+                if (record.data.workgroup == record.data.manager) {
+                    v = '<b>' +v+ '</b>';
+                }
+                return v;
+            }
         },
         progress:{
             id:"progress",
@@ -133,7 +139,13 @@ Inprint.documents.GridColumns = function() {
             dataIndex: "holder_shortcut",
             header: _("Holder"),
             width: 100,
-            sortable: true
+            sortable: true,
+            renderer : function(v, p, record) {
+                if (record.data.workgroup == record.data.holder) {
+                    v = '<b>' +v+ '</b>';
+                }
+                return v;
+            }
         },
         images:{
             id:"images",

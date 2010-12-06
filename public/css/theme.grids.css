@@ -65,3 +65,7 @@
 .x-grid3-body .inprint-document-grid-current-user-bg {
     background-color: #F2FFE5;
 }
+
+.x-grid3-body .inprint-document-grid-current-department-bg {
+    background-color: #FFFFE5;
+}

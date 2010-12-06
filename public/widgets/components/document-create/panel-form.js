@@ -150,6 +150,7 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                         beforequery: function(qe) {
                                             delete qe.combo.lastQuery;
                                             qe.combo.getStore().baseParams["term"] = "catalog.documents.create:*";
+                                            qe.combo.getStore().baseParams["edition"] = this.getForm().findField("edition").getValue();
                                             qe.combo.getStore().baseParams["workgroup"] = this.getForm().findField("workgroup").getValue();
                                         }
                                     }
