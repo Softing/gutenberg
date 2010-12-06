@@ -499,7 +499,7 @@ sub create {
     
     unless ( @errors ) {
         # Set Holder
-        my $holder = $c->sql->Q(" SELECT id, shortcut FROM profiles WHERE id = ?", [ $manager->{id} || $current_member ])->Hash;
+        my $holder = $c->sql->Q(" SELECT id, shortcut FROM profiles WHERE id = ?", [ $manager_obj->{id} ])->Hash;
         push @fields, "holder";
         push @fields, "holder_shortcut";
         push @data, $holder->{id};
