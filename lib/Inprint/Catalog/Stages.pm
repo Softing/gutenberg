@@ -118,16 +118,23 @@ sub create {
     push @errors, { id => "description", msg => "Incorrectly filled field"}
         unless ($c->is_text($i_description));
         
-    push @errors, { id => "access", msg => "Not enough permissions"}
+    push @errors, { id => "access", msg => "Not enough permissions [domain.exchange.manage]"}
         unless ($c->access->Check("domain.exchange.manage"));
 
     unless (@errors) {
         
-        my $idBranch = $c->sql->Q("
-            SELECT id FROM branches WHERE edition=? LIMIT 1
-        ", [$i_edition])->Value;
+        my $idBranch = $c->sql->Q(" SELECT id FROM branches WHERE edition=? LIMIT 1 ", [$i_edition])->Value;
         
-        push @errors, { id => "access", msg => "Not enough permissions"}
+        unless ($idBranch) {
+            my $edition = $c->sql->Q(" SELECT * FROM editions WHERE edition=? ", [$i_edition])->Hash;
+            $c->sql->Do("
+                INSERT INTO branches(edition, mtype, title, shortcut, description, created, updated)
+                VALUES (?, ?, ?, ?, ?, now(), now());
+             ", [ $edition->{id}, "document", $edition->{title}, $edition->{shortcut}, $edition->{description} ])->Value;
+            $idBranch = $c->sql->Q(" SELECT id FROM branches WHERE edition=? LIMIT 1 ", [$i_edition])->Value;
+        }
+        
+        push @errors, { id => "access", msg => "Not enough permissions <$idBranch>"}
             unless ($c->is_uuid($idBranch));
         
         unless (@errors) {
@@ -176,7 +183,7 @@ sub update {
     push @errors, { id => "description", msg => "Incorrectly filled field"}
         unless ($c->is_text($i_description));
         
-    push @errors, { id => "access", msg => "Not enough permissions"}
+    push @errors, { id => "access", msg => "Not enough permissions for [domain.exchange.manage]"}
         unless ($c->access->Check("domain.exchange.manage"));
 
     unless (@errors) {
