@@ -39,10 +39,12 @@ sub read {
 sub tree {
 
     my $c = shift;
-
+    
     my $i_node = $c->param("node");
     $i_node = '00000000-0000-0000-0000-000000000000' unless ($i_node);
     $i_node = '00000000-0000-0000-0000-000000000000' if ($i_node eq "root-node");
+    
+    my $i_show_briefcase = $c->param("show_briefcase");
     
     my @errors;
     my $success = $c->json->false;
@@ -81,6 +83,17 @@ sub tree {
             }
             push @result, $record;
         }
+        
+        if ($i_show_briefcase) {
+            my $record = {
+                id   => '00000000-0000-0000-0000-000000000000',
+                text => $c->l("Briefcase"),
+                leaf => $c->json->true,
+                icon => "briefcase"
+            };
+            unshift @result, $record;
+        }
+        
     }
 
     $success = $c->json->true unless (@errors);

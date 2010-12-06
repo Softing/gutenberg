@@ -372,7 +372,7 @@ sub create {
                 unless ($c->access->Check("editions.documents.assign", $i_edition));
         }
         
-        if ($current_member ne $i_manager) {
+        if ($current_member ne $manager) {
             push @errors, { id => "access", msg => "Access denied for [catalog.documents.assign:*]"}
                 unless ($c->access->Check("catalog.documents.assign:*",  $i_workgroup));
         }

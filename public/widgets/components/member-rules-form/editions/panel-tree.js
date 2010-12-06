@@ -9,7 +9,7 @@ Inprint.cmp.memberRulesForm.Editions.Tree = Ext.extend(Ext.tree.TreePanel, {
         };
 
         Ext.apply(this, {
-            title:_("Editions"),
+            title:_("Editions1"),
             autoScroll:true,
             dataUrl: this.urls.tree,
             border:false,
@@ -29,14 +29,19 @@ Inprint.cmp.memberRulesForm.Editions.Tree = Ext.extend(Ext.tree.TreePanel, {
         this.on("beforeappend", function(tree, parent, node) {
             node.attributes.icon = _ico(node.attributes.icon);
         });
-
+        
     },
 
     onRender: function() {
         Inprint.cmp.memberRulesForm.Editions.Tree.superclass.onRender.apply(this, arguments);
-        this.getRootNode().expand();
-        this.getLoader().on("beforeload", function() { this.body.mask(_("Loading")); }, this);
+
         this.getLoader().on("load", function() { this.body.unmask(); }, this);
+        this.getLoader().on("beforeload", function(treeLoader, node) {
+            this.body.mask(_("Loading"));
+            treeLoader.baseParams.show_briefcase = true;
+        }, this);
+        
+        this.getRootNode().expand();
     }
 
 });
