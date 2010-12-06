@@ -248,20 +248,21 @@ sub setup {
         unless ($c->is_text($i_workgroup_shortcut));
     
     unless (@errors) {
+
         $c->sql->Do("DELETE FROM profiles WHERE id=?", [ $member_id ]);
         $c->sql->Do("INSERT INTO profiles (id, title, shortcut, job_position) VALUES (?, ?, ?, ?)",[
             $member_id, $i_title, $i_shortcut, $i_position
         ]);
         
         $c->sql->Do("DELETE FROM options WHERE option_name=? AND member=?", ["default.edition", $member_id]);
-        $c->sql->Do("INSERT INTO OPTIONS (member, option_name, option_value) VALUES (?, ?, ?)", [$member_id, "default.edition", $i_edition]);
+        $c->sql->Do("INSERT INTO options (member, option_name, option_value) VALUES (?, ?, ?)", [$member_id, "default.edition", $i_edition]);
         $c->sql->Do("DELETE FROM options WHERE option_name=? AND member=?", ["default.edition.name", $member_id]);
-        $c->sql->Do("INSERT INTO OPTIONS (member, option_name, option_value) VALUES (?, ?, ?)", [$member_id, "default.edition.name", $i_edition_shortcut]);
+        $c->sql->Do("INSERT INTO options (member, option_name, option_value) VALUES (?, ?, ?)", [$member_id, "default.edition.name", $i_edition_shortcut]);
         
         $c->sql->Do("DELETE FROM options WHERE option_name=? AND member=?", ["default.workgroup", $member_id]);
-        $c->sql->Do("INSERT INTO OPTIONS (member, option_name, option_value) VALUES (?, ?, ?)", [$member_id, "default.workgroup", $i_workgroup]);
+        $c->sql->Do("INSERT INTO options (member, option_name, option_value) VALUES (?, ?, ?)", [$member_id, "default.workgroup", $i_workgroup]);
         $c->sql->Do("DELETE FROM options WHERE option_name=? AND member=?", ["default.workgroup.name", $member_id]);
-        $c->sql->Do("INSERT INTO OPTIONS (member, option_name, option_value) VALUES (?, ?, ?)", [$member_id, "default.workgroup.name", $i_workgroup_shortcut]);
+        $c->sql->Do("INSERT INTO options (member, option_name, option_value) VALUES (?, ?, ?)", [$member_id, "default.workgroup.name", $i_workgroup_shortcut]);
     }
 
     $success = $c->json->true unless (@errors);

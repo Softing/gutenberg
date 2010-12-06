@@ -75,7 +75,7 @@ sub appsession {
     my $result = {};
 
     my $member = $c->sql->Q("
-        SELECT t2.id, t2.login, t3.title, t3.shortcut, t3.job_position
+        SELECT t2.id, t2.login, t3.title, t3.shortcut, t3.job_position as position
         FROM sessions t1, members t2 LEFT JOIN profiles t3 ON (t3.id = t2.id) WHERE t1.id=? AND t1.member = t2.id
     ", [ $c->session("sid") ])->Hash || {};
 
