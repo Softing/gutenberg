@@ -334,8 +334,11 @@ sub create {
     my $i_size       = $c->param("size");
     my $i_comment    = $c->param("comment");
 
-    unless ($i_manager) {
-        $i_manager = $current_member;
+    my $manager;
+    if ($i_manager) {
+        $manager = $i_manager;
+    } else {
+        $manager = $current_member;
     }
     
     push @errors, { id => "title", msg => "Incorrectly filled field"}
@@ -351,7 +354,7 @@ sub create {
         unless ($c->is_uuid($i_workgroup));
     
     push @errors, { id => "manager", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_manager));
+        unless ($c->is_uuid($manager));
     
     push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_fascicle));
@@ -480,17 +483,18 @@ sub create {
         push @data, $c->QuerySessionGet("member.shortcut");
     }
     
-    my $manager;
+    my $manager_obj;
     unless ( @errors ) {
         # Set manager
-        $manager = $c->sql->Q(" SELECT id, shortcut FROM profiles WHERE id = ?", [ $i_manager ])->Hash;
+        $manager_obj = $c->sql->Q(" SELECT id, shortcut FROM profiles WHERE id = ?", [ $i_manager ])->Hash;
+        
         push @fields, "manager";
         push @fields, "manager_shortcut";
-        push @data, $manager->{id};
-        push @data, $manager->{shortcut};
+        push @data, $manager_obj->{id};
+        push @data, $manager_obj->{shortcut};
         
         push @errors, { id => "manager", msg => "Object not found"}
-            unless ($manager);
+            unless ($manager_obj);
     }
     
     unless ( @errors ) {
