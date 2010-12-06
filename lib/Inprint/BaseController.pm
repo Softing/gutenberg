@@ -204,7 +204,7 @@ sub is_float {
 sub is_text {
     my $c = shift;
     my $text = shift;
-    return 1 if (length($text) > 0 && $text =~ m/^[\w|\d|\s|\\|\/|"|'|#|-|.|,]+$/);
+    return 1 if (length($text) > 0 && $text =~ m/^[\w|\d|\s|\\|\/|"|'|#|\-|.|,]+$/);
     return 0;
 }
 

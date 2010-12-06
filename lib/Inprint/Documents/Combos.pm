@@ -24,7 +24,7 @@ sub managers {
     push @errors, { id => "workgroup", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_workgroup));
     
-    push @errors, { id => "term", msg => "Incorrectly filled field"}
+    push @errors, { id => "term", msg => "Access denide"}
         unless ($c->is_rule($i_term));
     
     unless (@errors) {
