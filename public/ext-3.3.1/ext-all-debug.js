@@ -14695,6 +14695,7 @@ Ext.layout.FormLayout = Ext.extend(Ext.layout.AnchorLayout, {
 
     
     renderItem : function(c, position, target){
+        
         if(c && (c.isFormField || c.fieldLabel) && c.inputType != 'hidden'){
             var args = this.getTemplateArgs(c);
             if(Ext.isNumber(position)){
@@ -14716,6 +14717,7 @@ Ext.layout.FormLayout = Ext.extend(Ext.layout.AnchorLayout, {
                 });
             }
             c.label = c.getItemCt().child('label.x-form-item-label');
+            
             if(!c.rendered){
                 c.render('x-form-el-' + c.id);
             }else if(!this.isValidParent(c, target)){
@@ -14735,6 +14737,7 @@ Ext.layout.FormLayout = Ext.extend(Ext.layout.AnchorLayout, {
         }else {
             Ext.layout.FormLayout.superclass.renderItem.apply(this, arguments);
         }
+        
     },
 
     
@@ -43419,14 +43422,13 @@ Ext.FormPanel = Ext.extend(Ext.Panel, {
 
     
     processRemove: function(c){
+    
         if(!this.destroying){
-            
             if(this.isField(c)){
                 this.form.remove(c);
             
             }else if (c.findBy){
                 Ext.each(c.findBy(this.isField), this.form.remove, this.form);
-                
                 this.form.cleanDestroyed();
             }
         }

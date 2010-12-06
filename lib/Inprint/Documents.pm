@@ -334,6 +334,10 @@ sub create {
     my $i_size       = $c->param("size");
     my $i_comment    = $c->param("comment");
 
+    unless ($i_manager) {
+        $i_manager = $current_member;
+    }
+    
     push @errors, { id => "title", msg => "Incorrectly filled field"}
         unless ($c->is_text($i_title));
     

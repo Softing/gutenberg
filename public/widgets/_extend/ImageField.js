@@ -22,6 +22,11 @@ Ext.form.TitleField = Ext.extend(Ext.form.Field, {
 
     autoCreate: { tag: 'div', style:'background:#f5f5f5;padding:4px;' },
 
+    initComponent: function() {
+        this.hideLabel = true;
+        Ext.form.TitleField.superclass.initComponent.apply(this);
+    },
+
     setValue: function(new_value) {
         if (new_value)
             this.el.dom.innerHTML = '<b>'+ new_value +'</b>';
@@ -30,10 +35,12 @@ Ext.form.TitleField = Ext.extend(Ext.form.Field, {
     initValue : function() {
         this.setValue(this.value);
     },
-
-    initComponent: function() {
-        this.hideLabel = true;
-        Ext.form.ImageField.superclass.initComponent.apply(this);
+    
+    //markInvalid: function() {},
+    //clearInvalid: function() {},
+    
+    onDestroy: function(){
+        Ext.form.TitleField.superclass.onDestroy.call(this);
     }
 });
 
