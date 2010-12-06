@@ -41,6 +41,7 @@ Inprint.catalog.editions.CreateStagePanel = function () {
         layout: "fit",
         closeAction: "hide",
         width:400, height:260,
+        modal:true,
         items: form
     });
     

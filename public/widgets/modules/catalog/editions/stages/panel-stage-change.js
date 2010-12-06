@@ -37,6 +37,7 @@ Inprint.catalog.editions.ChangeStagePanel = function () {
         layout: "fit",
         closeAction: "hide",
         width:400, height:260,
+        modal:true,
         items: form
     });
     
