@@ -367,7 +367,7 @@ sub create {
                 unless ($c->access->Check("catalog.documents.create:*",  $i_workgroup));
         }
         
-        if ( $i_fascicle ) {
+        if ( $i_fascicle && $i_fascicle ne "00000000-0000-0000-0000-000000000000") {
             push @errors, { id => "access", msg => "Access denied for [editions.documents.assign]"}
                 unless ($c->access->Check("editions.documents.assign", $i_edition));
         }

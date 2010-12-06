@@ -84,16 +84,6 @@ sub tree {
             push @result, $record;
         }
         
-        if ($i_show_briefcase) {
-            my $record = {
-                id   => '00000000-0000-0000-0000-000000000000',
-                text => $c->l("Briefcase"),
-                leaf => $c->json->true,
-                icon => "briefcase"
-            };
-            unshift @result, $record;
-        }
-        
     }
 
     $success = $c->json->true unless (@errors);

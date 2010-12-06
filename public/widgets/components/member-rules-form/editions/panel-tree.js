@@ -36,10 +36,7 @@ Inprint.cmp.memberRulesForm.Editions.Tree = Ext.extend(Ext.tree.TreePanel, {
         Inprint.cmp.memberRulesForm.Editions.Tree.superclass.onRender.apply(this, arguments);
 
         this.getLoader().on("load", function() { this.body.unmask(); }, this);
-        this.getLoader().on("beforeload", function(treeLoader, node) {
-            this.body.mask(_("Loading"));
-            treeLoader.baseParams.show_briefcase = true;
-        }, this);
+        this.getLoader().on("beforeload", function() { this.body.mask(_("Loading")); }, this);
         
         this.getRootNode().expand();
     }
