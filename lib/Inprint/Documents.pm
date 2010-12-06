@@ -360,15 +360,17 @@ sub create {
     unless ( @errors ) {
         
         if ( $i_workgroup ) {
-            push @errors, { id => "access", msg => "Access denied"}
+            push @errors, { id => "access", msg => "Access denied for this workgroup"}
                 unless ($c->access->Check("catalog.documents.create:*",  $i_workgroup));
         }
+        
         if ( $i_fascicle ) {
-            push @errors, { id => "access", msg => "Access denied"}
+            push @errors, { id => "access", msg => "Access denied for this fascicle"}
                 unless ($c->access->Check("editions.documents.assign", $i_edition));
         }
+        
         if ($current_member ne $i_manager) {
-            push @errors, { id => "access", msg => "Access denied"}
+            push @errors, { id => "access", msg => "Access denied for this member"}
                 unless ($c->access->Check("catalog.documents.assign:*",  $i_workgroup));
         }
     }
