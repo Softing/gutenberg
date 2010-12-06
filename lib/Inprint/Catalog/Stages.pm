@@ -126,7 +126,7 @@ sub create {
         my $idBranch = $c->sql->Q(" SELECT id FROM branches WHERE edition=? LIMIT 1 ", [$i_edition])->Value;
         
         unless ($idBranch) {
-            my $edition = $c->sql->Q(" SELECT * FROM editions WHERE edition=? ", [$i_edition])->Hash;
+            my $edition = $c->sql->Q(" SELECT * FROM editions WHERE id=? ", [$i_edition])->Hash;
             $c->sql->Do("
                 INSERT INTO branches(edition, mtype, title, shortcut, description, created, updated)
                 VALUES (?, ?, ?, ?, ?, now(), now());
