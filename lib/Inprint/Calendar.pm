@@ -118,16 +118,15 @@ sub create {
     my $i_title       = $c->param("title");
     my $i_shortcut    = $c->param("shortcut");
     my $i_description = $c->param("description");
-    
     my $i_begindate   = $c->param("begindate");
     my $i_enddate     = $c->param("enddate");
     
     $c->sql->Do("
         INSERT INTO fascicles (
-            id, version, is_system, edition, title, shortcut, description, begindate, enddate,
+            id, edition, base_edition, variation, is_system, is_enabled, is_blocked, title, shortcut, description, begindate, enddate,
             is_enabled, created, updated)
-            VALUES (?, ?, false, ?, ?, ?, ?, ?, ?, true, now(), now());
-    ", [ $id, $version, $i_edition, $i_title, $i_title, $i_title, $i_begindate, $i_enddate ]);
+            VALUES (?, ?, ?, ?, false, true, false, ?, ?, ?, ?, ?, true, now(), now());
+    ", [ $id, $i_edition, $i_edition, $version, $i_title, $i_title, $i_title, $i_begindate, $i_enddate ]);
 
     $c->render_json( { success => $c->json->true} );
 }
