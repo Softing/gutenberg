@@ -1,5 +1,5 @@
 INSERT INTO members(id, "login", "password", created, updated)
-	VALUES ('39d40812-fc54-4342-9b98-e1c1f4222d22','root','d3abe2a5e34f48d6e362606ca044f06e7fb77adb920a4b1a6845601b48443222', now(), now());
+	VALUES ('39d40812-fc54-4342-9b98-e1c1f4222d22','root','4813494d137e1631bba301d5acab6e7bb7aa74ce1185d456565ef51d737677b2', now(), now());
 
 INSERT INTO map_member_to_catalog(id, member, catalog)
     VALUES ('c293a89e-e044-41e6-a267-dbefba39a450', '39d40812-fc54-4342-9b98-e1c1f4222d22', '00000000-0000-0000-0000-000000000000');
