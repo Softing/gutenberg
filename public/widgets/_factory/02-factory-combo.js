@@ -220,9 +220,13 @@ Inprint.factory.Combo = new function() {
                 Ext.apply(combo, combos[url]);
 
             // Add store
+            if (!config) {
+                config = {};
+            }
             if (!storeconfig) {
                 storeconfig = {};
             }
+            
             if (config.baseParams) {
                 storeconfig.baseParams = config.baseParams;
             }
