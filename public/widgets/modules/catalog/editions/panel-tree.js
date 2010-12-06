@@ -16,14 +16,14 @@ Inprint.catalog.editions.Tree = Ext.extend(Ext.tree.TreePanel, {
             autoScroll:true,
             dataUrl: this.urls.tree,
             border:false,
-            rootVisible: false,
+            //rootVisible: false,
             root: {
-                id:'root-node',
+                id:'00000000-0000-0000-0000-000000000000',
                 nodeType: 'async',
                 expanded: true,
                 draggable: false,
-                icon: _ico("node"),
-                text: _("Root node")
+                icon: _ico("blue-folders"),
+                text: _("All editions")
             }
         });
 
@@ -32,7 +32,7 @@ Inprint.catalog.editions.Tree = Ext.extend(Ext.tree.TreePanel, {
         this.on("beforeappend", function(tree, parent, node) {
 
             if (node.attributes.icon == undefined) {
-                node.attributes.icon = 'folder-open';
+                node.attributes.icon = 'blue-folders';
             }
 
             node.attributes.icon = _ico(node.attributes.icon);
