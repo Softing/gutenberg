@@ -32,19 +32,18 @@ sub managers {
         my @params;
         my $sql = "
             SELECT DISTINCT
-                t1.manager as id,
-                t2.shortcut as title,
-                t2.description as description,
+                t1.id,
+                t1.shortcut as title,
+                t1.description as description,
                 'user' as icon
-            FROM documents t1, view_principals t2, map_member_to_catalog t3
+            FROM view_principals t1, map_member_to_catalog t2
             WHERE
-                t2.id = t1.manager
-                AND t3.member = t1.manager
-                AND t2.type = 'member'
+                t2.member = t1.id
+                AND t1.type = 'member'
         ";
 
         my $bindings = $c->access->GetChildrens($i_term);
-        $sql .= " AND t3.catalog = ANY(?) ";
+        $sql .= " AND t2.catalog = ANY(?) ";
         push @params, $bindings;
         
         if ($i_workgroup) {
@@ -53,11 +52,11 @@ sub managers {
                 SELECT id FROM catalog WHERE path ~ ('*.'|| replace(?, '-', '')::text ||'.*')::lquery
             ", [$i_workgroup])->Values;
             
-            $sql .= " AND t3.catalog = ANY(?) ";
+            $sql .= " AND t2.catalog = ANY(?) ";
             push @params, $bindings;
         }
         
-        $result = $c->sql->Q(" $sql ORDER BY icon, t2.shortcut; ", \@params)->Hashes;
+        $result = $c->sql->Q(" $sql ORDER BY icon, t1.shortcut; ", \@params)->Hashes;
     }
 
     $success = $c->json->true unless (@errors);

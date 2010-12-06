@@ -2,7 +2,7 @@ Inprint.documents.Profile.View = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
         
-        var actions = new Inprint.documents.Actions();
+        var actions = new Inprint.documents.GridActions();
         
         this.tbar = [
             {

@@ -23,7 +23,6 @@ Inprint.documents.Profile = Ext.extend(Ext.Panel, {
                 collapsible: false,
                 split: true
             },
-
             items: [
                 {   region: "north",
                     layout:"fit",
@@ -41,7 +40,6 @@ Inprint.documents.Profile = Ext.extend(Ext.Panel, {
                     width:400,
                     items: this.panels["comments"]
                 }
-
             ]
         });
 

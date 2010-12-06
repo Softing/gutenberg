@@ -124,7 +124,10 @@ Inprint.ObjectResolver = function() {
             var title = "<div style=\"padding-left:21px;background:url(" + icon + ") 0px -2px no-repeat;\">";
             title += text;
             title += "&nbsp;<a href=\"?aid="+ aid +"";
-            title += "&oid=" + oid;
+            
+            if (oid) {
+                title += "&oid=" + oid;
+            }
     
             if (text) {
                 title += "&text=" + text;
