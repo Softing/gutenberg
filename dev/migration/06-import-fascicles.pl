@@ -47,14 +47,14 @@ my $fascicles = $sql2->Q(" SELECT id, edition, ownedby, title, dt_started, dt_cl
 
 # Import default fascicles
 $sql->Do("
-    INSERT INTO fascicles(id, issystem, edition, version, title, shortcut, description, enabled, created, updated)
-    VALUES (?, true, ?, ?, ?, ?, ?, true, now(), now());
-", [ '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', "Портфель", "Портфель", "Портфель материалов" ]);
+    INSERT INTO fascicles(id, base_edition, edition, variation, title, shortcut, description, is_system, is_enabled, is_blocked, created, updated)
+    VALUES (?, ?, ?, ?, ?, ?, ?, true, true, false, now(), now());
+", [ '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', "Портфель", "Портфель", "Портфель материалов" ]);
 
 $sql->Do("
-    INSERT INTO fascicles(id, issystem, edition, version, title, shortcut, description, enabled, created, updated)
-    VALUES (?, true, ?, ?, ?, ?, ?, true, now(), now());
-", [ '99999999-9999-9999-9999-999999999999', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', "Корзина", "Корзина", "Корзина материалов" ]);
+    INSERT INTO fascicles(id, base_edition, edition, variation, title, shortcut, description, is_system, is_enabled, is_blocked, created, updated)
+    VALUES (?, ?, ?, ?, ?, ?, ?, true, true, false, now(), now());
+", [ '99999999-9999-9999-9999-999999999999', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', "Корзина", "Корзина", "Корзина материалов" ]);
 
 foreach my $item( @{ $fascicles } ) {
 
@@ -63,8 +63,8 @@ foreach my $item( @{ $fascicles } ) {
     die "Can't find edition id $item->{edition}" unless $EditionId;
     
     $sql->Do("
-        INSERT INTO fascicles(id, edition, version, title, shortcut, description, begindate, enddate, enabled, created, updated)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
-    ", [ $item->{id}, $EditionId, $item->{id}, $item->{title}, $item->{title}, $item->{title}, $item->{dt_started}, $item->{dt_closed}, $item->{enabled} ]);
+        INSERT INTO fascicles(id, base_edition, edition, variation, title, shortcut, description, begindate, enddate, is_system, is_enabled, is_blocked, created, updated)
+        VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, false, ?, false, now(), now());
+    ", [ $item->{id}, $EditionId, $EditionId, $item->{id}, $item->{title}, $item->{title}, $item->{title}, $item->{dt_started}, $item->{dt_closed}, $item->{enabled} ]);
     
 }

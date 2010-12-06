@@ -75,17 +75,17 @@ sub list {
     
     my $sql1 = "
         SELECT
-            t1.id, t1.issystem, t1.edition, t2.shortcut as edition_shortcut,
+            t1.id, t1.is_system, t1.edition, t2.shortcut as edition_shortcut,
             t1.title, t1.shortcut, t1.description,
             to_char(t1.begindate, 'YYYY-MM-DD HH24:MI:SS') as begindate,
             to_char(t1.enddate, 'YYYY-MM-DD HH24:MI:SS') as enddate,
-            t1.enabled, t1.created, t1.updated,
+            t1.is_enabled, t1.created, t1.updated,
             EXTRACT( DAY FROM t1.enddate-t1.begindate) as totaldays,
             EXTRACT( DAY FROM now()-t1.begindate) as passeddays
         FROM fascicles t1, editions t2
         WHERE
             t1.edition = ANY (?)
-            AND t1.issystem = false AND t1.edition = t2.id
+            AND t1.is_system = false AND t1.edition = t2.id
     ";
 
     push @params, $editions;
@@ -98,7 +98,7 @@ sub list {
     if ($showArchive eq 'true') {
         
     } else {
-        $sql1 .= " AND t1.enabled = true ";
+        $sql1 .= " AND t1.is_enabled = true ";
     }
 
     $sql1 .= " ORDER BY enddate DESC";
@@ -124,8 +124,8 @@ sub create {
     
     $c->sql->Do("
         INSERT INTO fascicles (
-            id, version, issystem, edition, title, shortcut, description, begindate, enddate,
-            enabled, created, updated)
+            id, version, is_system, edition, title, shortcut, description, begindate, enddate,
+            is_enabled, created, updated)
             VALUES (?, ?, false, ?, ?, ?, ?, ?, ?, true, now(), now());
     ", [ $id, $version, $i_edition, $i_title, $i_title, $i_title, $i_begindate, $i_enddate ]);
 
@@ -139,8 +139,8 @@ sub read {
     my $id = $c->param("id");
 
     my $result = $c->sql->Q("
-        SELECT id, issystem, edition, title, shortcut, description, begindate, enddate,
-            enabled, created, updated
+        SELECT id, is_system, edition, title, shortcut, description, begindate, enddate,
+            is_enabled, created, updated
         FROM fascicles
         WHERE id=? ORDER shortcut
     ", [ $id ])->Hash;
@@ -184,7 +184,7 @@ sub enable {
     my @ids = $c->param("ids");
     foreach my $id (@ids) {
         
-        $c->sql->Do(" UPDATE fascicles SET enabled = true WHERE id=? ", [ $id ]);
+        $c->sql->Do(" UPDATE fascicles SET is_enabled = true WHERE id=? ", [ $id ]);
         $c->sql->Do(" UPDATE documents SET isopen = true WHERE fascicle=? ", [ $id ]);
         
     }
@@ -195,7 +195,7 @@ sub disable {
     my $c = shift;
     my @ids = $c->param("ids");
     foreach my $id (@ids) {
-        $c->sql->Do(" UPDATE fascicles SET enabled = false WHERE id=? ", [ $id ]);
+        $c->sql->Do(" UPDATE fascicles SET is_enabled = false WHERE id=? ", [ $id ]);
         $c->sql->Do(" UPDATE documents SET isopen = false WHERE fascicle=? ", [ $id ]);
     }
     $c->render_json( { success => $c->json->true } );

@@ -92,7 +92,7 @@ sub fascicles {
                 FROM fascicles t1, editions t2
                 WHERE
                     t1.edition = t2.id
-                    AND t1.issystem = false AND t1.enabled = true
+                    AND t1.is_system = false AND t1.is_enabled = true
         ";
         
         if ($i_term) {

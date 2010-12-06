@@ -98,8 +98,8 @@ sub index
             t1.id, t1.edition, t1.shortcut, t2.shortcut as edition_shortcut
         FROM fascicles t1, editions t2
         WHERE
-            t1.issystem = false
-            AND t1.enabled = true
+            t1.is_system = false
+            AND t1.is_enabled = true
             AND t1.edition = t2.id
             AND t1.edition = ANY (?)
         ORDER BY t1.begindate, t2.shortcut, t1.shortcut

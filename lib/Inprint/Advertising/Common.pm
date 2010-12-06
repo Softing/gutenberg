@@ -88,7 +88,7 @@ sub fascicles {
             (
                 SELECT id, 'edition' as type, id as edition, null as fascicle, shortcut as text, 'blue-folders-stack' as icon,
                     EXISTS(
-                        SELECT true FROM fascicles WHERE fascicles.edition = editions.id AND issystem = false AND enabled = true 
+                        SELECT true FROM fascicles WHERE fascicles.edition = editions.id AND is_system = false AND is_enabled = true 
                     ) as have_childs
                 FROM editions
                 WHERE id <> '00000000-0000-0000-0000-000000000000' AND subpath(path, nlevel(path) - 2, 1)::text = replace(?, '-', '')::text
@@ -97,7 +97,7 @@ sub fascicles {
                 SELECT id, 'fascicle' as type, edition, id as fascicle, shortcut as text, 'blue-folder' as icon,
                     false as have_childs
                 FROM fascicles
-                WHERE issystem = false AND enabled = true AND edition = ?
+                WHERE is_system = false AND is_enabled = true AND edition = ?
                 ORDER BY shortcut
             )
         ";
@@ -155,7 +155,7 @@ sub places {
             (
                 SELECT id, 'edition' as type, id as edition, null as fascicle, shortcut as text, 'blue-folders-stack' as icon,
                     EXISTS(
-                        SELECT true FROM fascicles WHERE fascicles.edition = editions.id AND issystem = false AND enabled = true 
+                        SELECT true FROM fascicles WHERE fascicles.edition = editions.id AND is_system = false AND is_enabled = true 
                     ) as have_childs
                 FROM editions
                 WHERE id <> '00000000-0000-0000-0000-000000000000' AND subpath(path, nlevel(path) - 2, 1)::text = replace(?, '-', '')::text
@@ -166,7 +166,7 @@ sub places {
                         SELECT true FROM ad_places places WHERE places.fascicle=fascicles.id
                     ) as have_childs
                 FROM fascicles
-                WHERE issystem = false AND enabled = true AND edition = ?
+                WHERE is_system = false AND is_enabled = true AND edition = ?
                 ORDER BY shortcut
             ) UNION ALL (
                 SELECT id, 'module' as type, edition, fascicle, title as text, 'zone' as icon, false as have_childs

@@ -35,7 +35,7 @@ sub fascicles {
     
     my $sql = " SELECT id, title, shortcut, description FROM fascicles WHERE 1=1 ";
     
-    $sql .= " ORDER BY issystem DESC, enddate, title ";
+    $sql .= " ORDER BY is_system DESC, enddate, title ";
     
     my $result = $c->sql->Q($sql)->Hashes;
     

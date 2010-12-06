@@ -40,9 +40,9 @@ sub fascicles {
     my @data;
     my $sql = "
         SELECT t1.id, t2.shortcut || '/' || t1.shortcut as title, t1.shortcut, t1.description,
-            CASE WHEN enabled is true THEN  'rocket-fly' ELSE 'book' END as icon
+            CASE WHEN is_enabled is true THEN  'rocket-fly' ELSE 'book' END as icon
         FROM fascicles t1, editions t2
-        WHERE t2.id = t1.edition AND issystem = false
+        WHERE t2.id = t1.edition AND is_system = false
     ";
     
     if ($i_term) {
@@ -53,7 +53,7 @@ sub fascicles {
     
     my $result = $c->sql->Q("
         $sql
-        ORDER BY enabled DESC, t2.shortcut, t1.shortcut
+        ORDER BY is_enabled DESC, t2.shortcut, t1.shortcut
     ", \@data)->Hashes;
     $c->render_json( { data => $result } );
 }
@@ -71,7 +71,7 @@ sub readiness {
 sub roles {
     my $c = shift;
     my $sql = " SELECT id, title, shortcut, description FROM fascicles WHERE 1=1 ";
-    $sql .= " ORDER BY issystem DESC, enddate, title ";
+    $sql .= " ORDER BY is_system DESC, enddate, title ";
     my $result = $c->sql->Q($sql)->Hashes;
     $c->render_json( { data => $result } );
 }

@@ -21,7 +21,7 @@ sub fascicles {
     my $sql = "
         SELECT t1.id, t2.shortcut ||'/'|| t1.title as title, t1.description
         FROM fascicles t1, editions t2
-        WHERE t1.edition = t2.id AND t1.issystem = false AND edition = ANY(?)
+        WHERE t1.edition = t2.id AND t1.is_system = false AND edition = ANY(?)
     ";
 
     my $editions = $c->access->GetChildrens("editions.documents.work");
@@ -35,9 +35,9 @@ sub fascicles {
     }
 
     if ($i_gridmode eq "archive")  {
-        $sql .= " AND t1.enabled = false ";
+        $sql .= " AND t1.is_enabled = false ";
     } else {
-        $sql .= " AND t1.enabled = true ";
+        $sql .= " AND t1.is_enabled = true ";
     }
 
     $sql .= " ORDER BY t1.enddate ASC, t2.shortcut, t1.title ";

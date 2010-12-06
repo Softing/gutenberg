@@ -90,7 +90,7 @@ sub fascicles {
     my $sql = "
         SELECT t1.id, t2.shortcut || '/' || t1.shortcut as title, t1.shortcut, t1.description, 'blue-folder' as icon
         FROM fascicles t1, editions t2
-        WHERE t2.id = t1.edition AND issystem = false AND enabled = true
+        WHERE t2.id = t1.edition AND is_system = false AND is_enabled = true
     ";
     
     if ($i_term) {
@@ -106,7 +106,7 @@ sub fascicles {
     
     my $result = $c->sql->Q("
         $sql
-        ORDER BY enabled DESC, t2.shortcut, t1.shortcut
+        ORDER BY is_enabled DESC, t2.shortcut, t1.shortcut
     ", \@data)->Hashes;
     $c->render_json( { data => $result } );
 }

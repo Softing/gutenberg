@@ -49,7 +49,7 @@ sub read {
         
         , editions AS edition, fascicles AS fascicle, ad_advertisers AS advertiser
         
-        WHERE edition.id = t1.edition AND fascicle.id = t1.fascicle AND fascicle.enabled=true AND advertiser.id = t1.advertiser
+        WHERE edition.id = t1.edition AND fascicle.id = t1.fascicle AND fascicle.is_enabled=true AND advertiser.id = t1.advertiser
             AND t1.id = ?
         ", [ $i_id ])->Hash;
     }
@@ -95,7 +95,7 @@ sub list {
         
         , editions AS edition, fascicles AS fascicle, ad_advertisers AS advertiser
         
-        WHERE edition.id = t1.edition AND fascicle.id = t1.fascicle AND fascicle.enabled=true AND advertiser.id = t1.advertiser
+        WHERE edition.id = t1.edition AND fascicle.id = t1.fascicle AND fascicle.is_enabled=true AND advertiser.id = t1.advertiser
             AND 1=1 
     ";
     
@@ -105,7 +105,7 @@ sub list {
     }
     
     if ($i_type eq "fascicle") {
-        $sql .= " AND fascicle.id = ? AND fascicle.enabled=true";
+        $sql .= " AND fascicle.id = ? AND fascicle.is_enabled=true";
         push @data, $i_id;
     }
     
