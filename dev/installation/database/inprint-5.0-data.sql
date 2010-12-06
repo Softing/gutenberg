@@ -1,4 +1,4 @@
-INSERT INTO members(id, "login", "password", created, updated)
+п»їINSERT INTO members(id, "login", "password", created, updated)
 	VALUES ('39d40812-fc54-4342-9b98-e1c1f4222d22','root','4813494d137e1631bba301d5acab6e7bb7aa74ce1185d456565ef51d737677b2', now(), now());
 
 INSERT INTO map_member_to_catalog(id, member, catalog)
@@ -22,8 +22,8 @@ INSERT INTO map_member_to_rule(id, member, section, area, binding, term)
     VALUES ('72b48332-3ac3-4bed-bb51-34636d8eb47b', '39d40812-fc54-4342-9b98-e1c1f4222d22', 'domain', 'domain', '00000000-0000-0000-0000-000000000000', '9d057494-c2c6-41f5-9276-74b33b55c6e3');
 
 INSERT INTO fascicles(id, base_edition, edition, variation, title, shortcut, description, is_system, is_enabled, is_blocked, created, updated)
-    VALUES ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', "Портфель", "Портфель", "Портфель материалов", true, true, false, now(), now());
+    VALUES ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', "РџРѕСЂС‚С„РµР»СЊ", "РџРѕСЂС‚С„РµР»СЊ", "РџРѕСЂС‚С„РµР»СЊ РјР°С‚РµСЂРёР°Р»РѕРІ", true, true, false, now(), now());
 
 INSERT INTO fascicles(id, base_edition, edition, variation, title, shortcut, description, is_system, is_enabled, is_blocked, created, updated)
-    VALUES ('99999999-9999-9999-9999-999999999999', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', "Корзина", "Корзина", "Корзина материалов", true, true, false, now(), now());
+    VALUES ('99999999-9999-9999-9999-999999999999', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', "РљРѕСЂР·РёРЅР°", "РљРѕСЂР·РёРЅР°", "РљРѕСЂР·РёРЅР° РјР°С‚РµСЂРёР°Р»РѕРІ", true, true, false, now(), now());
 
