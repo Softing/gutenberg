@@ -218,6 +218,37 @@ our %Lexicon = (
     "You really wish to do this?" => "",
     "Your session is closed"      => "",
     "Сhange fascicle"             => "",
+	
+	"Can log in to the program"         => "Может входить в программу",
+    "Can view the configuration"        => "Может просматривать конфигурацию",
+    "Can manage departments"            => "Может управлять отделами",
+    "Can manage employees"              => "Может управлять сотрудниками",
+    "Can manage editions"               => "Может управлять изданиями",
+    "Can manage the exchange"           => "Может управлять таблицей движения",
+    "Can manage roles"                  => "Может управлять ролями",
+    "Can manage the readiness"          => "Может управлять готовностью",
+
+    "Can view materials"                => "Может просматривать материалы",
+    "Can create materials"              => "Может создавать материалы",
+    "Can assign the editor"             => "Может назначать редактора",
+    "Can delete materials"              => "Может удалять материалы",
+    "Can recover materials"             => "Может восстанавливать материалы",
+    "Can edit the profile"              => "Может редактировать профиль материала",
+    "Can work with files"               => "Может работать с файлами",
+    "Can add files"                     => "Может добавлять файлы",
+    "Can delete files"                  => "Может удалять файлы",
+    "Can capture materials"             => "Может захватывать материалы",
+    "Can transfer materials"            => "Может передавать материалы",
+    "Can move materials"                => "Может перемещать материалы",
+    "Can put in a briefcase"            => "Может перемещать материалы в портфель",
+
+    "Can view calendar"                 => "Может просматривать календарь",
+    "Can manage the calendar"           => "Может управлять календарем",
+    "Can view layouts"                  => "Может просматривать макеты",
+    "Can manage layouts"                => "Может управлять макетами",
+    "Can work with documents"           => "Может работать с материалами издания",
+
+	
 );
 
 sub get {
