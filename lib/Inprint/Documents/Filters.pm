@@ -262,7 +262,9 @@ sub createSqlFilter {
     if ($mode eq "all") {
         $sql .= " AND t1.isopen = true ";
         $sql .= " AND t1.fascicle <> '99999999-9999-9999-9999-999999999999' ";
-        $sql .= " AND t1.fascicle <> '00000000-0000-0000-0000-000000000000' ";
+        if ($fascicle && $fascicle ne 'clear' && $fascicle ne '00000000-0000-0000-0000-000000000000') {
+            $sql .= " AND t1.fascicle <> '00000000-0000-0000-0000-000000000000' ";
+        }
     }
 
     if ($mode eq "archive") {
@@ -329,7 +331,7 @@ sub createSqlFilter {
 
     $sql .= $order;
 
-    print STDERR $sql;
+    #die $sql;
 
     return { sql => $sql, params => \@params };
 }

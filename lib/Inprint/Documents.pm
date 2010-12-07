@@ -194,10 +194,8 @@ sub list {
     
     if ($mode eq "all") {
         $sql_filters .= " AND isopen is true ";
-        #if ($fascicle && $fascicle ne '99999999-9999-9999-9999-999999999999') {
-            $sql_filters .= " AND fascicle <> '99999999-9999-9999-9999-999999999999' ";
-        #}
-        if ($fascicle && $fascicle ne '00000000-0000-0000-0000-000000000000') {
+        $sql_filters .= " AND fascicle <> '99999999-9999-9999-9999-999999999999' ";
+        if ($fascicle && $fascicle ne 'clear' && $fascicle ne '00000000-0000-0000-0000-000000000000') {
             $sql_filters .= " AND fascicle <> '00000000-0000-0000-0000-000000000000' ";
         }
     }
@@ -286,7 +284,7 @@ sub list {
     }
     
     my $result = $c->sql->Q($sql_query, \@params)->Hashes;
-    
+
     foreach my $document (@$result) {
         
         $document->{pages} = Inprint::Utils::CollapsePagesToString($document->{pages});
@@ -498,7 +496,7 @@ sub create {
     my $manager_obj;
     unless ( @errors ) {
         # Set manager
-        $manager_obj = $c->sql->Q(" SELECT id, shortcut FROM view_principals WHERE id = ?", [ $i_manager ])->Hash;
+        $manager_obj = $c->sql->Q(" SELECT id, shortcut FROM view_principals WHERE id = ?", [ $manager ])->Hash;
         
         push @fields, "manager";
         push @fields, "manager_shortcut";
@@ -506,12 +504,11 @@ sub create {
         push @data, $manager_obj->{shortcut};
         
         push @errors, { id => "manager", msg => "Object not found"}
-            unless ($manager_obj);
+            unless ($manager_obj->{id});
     }
     
     unless ( @errors ) {
         # Set Holder
-        
         my $holder = $c->sql->Q(" SELECT id, shortcut FROM view_principals WHERE id = ?", [ $manager_obj->{id} ])->Hash;
         push @fields, "holder";
         push @fields, "holder_shortcut";
