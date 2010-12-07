@@ -303,35 +303,8 @@ sub createSqlFilter {
         $sql .= " AND t1.fascicle = ? ";
         push @params, $fascicle;
     }
-
-    #if ($headline && $headline ne "clear") {
-    #    $sql .= " AND t1.headline = ? ";
-    #    push @params, $headline;
-    #}
-    #
-    #if ($rubric && $rubric ne "clear") {
-    #    $sql .= " AND t1.rubric = ? ";
-    #    push @params, $rubric;
-    #}
-    #
-    #if ($manager && $manager ne "clear") {
-    #    $sql .= " AND t1.manager=? ";
-    #    push @params, $manager;
-    #}
-    #
-    #if ($holder && $holder ne "clear") {
-    #    $sql .= " AND t1.holder=? ";
-    #    push @params, $holder;
-    #}
-    #
-    #if ($progress && $progress ne "clear") {
-    #    $sql .= " AND t1.readiness=? ";
-    #    push @params, $progress;
-    #}
-
+    
     $sql .= $order;
-
-    #die $sql;
 
     return { sql => $sql, params => \@params };
 }
