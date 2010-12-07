@@ -37,10 +37,16 @@ Inprint.registry = function() {
             text:  _("Composition"),
             icon: "newspapers"
         },
+        
         "fascicle": {
             text: _("Unknown fascicle"),
             icon: "blue-folder"
         },
+        "fascicles": {
+            text: _("Fascicles"),
+            icon: "blue-folders"
+        },
+        
         "settings": {
             text: _("Settings"),
             icon: "switch"

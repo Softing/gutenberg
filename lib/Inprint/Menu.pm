@@ -89,7 +89,21 @@ sub index
     my $accessLayoutEditions   = $c->access->GetBindings("editions.layouts.view");
     
     if ( $accessCalendarEditions ) {
-        push @result, { id => 'composition-calendar' };
+        
+        push @result, {
+            id => 'fascicles',
+            menu => [
+                {
+                    id   => "composition-calendar"
+                },
+                {
+                    id   => "briefcase-index",
+                    oid  => "00000000-0000-0000-0000-000000000000"
+                }
+            ]
+        };
+        
+        
     }
 
     # Выбираем выпуски
@@ -140,7 +154,7 @@ sub index
         } if $accessAdvertManage;
         
         push @{ $fascicle_menu->{menu} }, {
-            id  => "fascicle-indexes",
+            id  => "fascicle-index",
             oid => $fascicle->{id},
             description => $fascicle->{shortcut}
         } if $accessLayoutManage;

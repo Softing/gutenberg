@@ -67,8 +67,14 @@ Inprint.catalog.indexes.Panel = Ext.extend(Ext.Panel, {
 
 });
 
-Inprint.registry.register("settings-indexes", {
+Inprint.registry.register("settings-index", {
     icon: "marker",
     text: _("Index"),
+    xobject: Inprint.catalog.indexes.Panel
+});
+
+Inprint.registry.register("briefcase-index", {
+    icon: "briefcase",
+    text: _("Briefcase index"),
     xobject: Inprint.catalog.indexes.Panel
 });

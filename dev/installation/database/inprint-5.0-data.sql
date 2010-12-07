@@ -116,6 +116,12 @@ INSERT INTO members(id, "login", "password", created, updated)
 INSERT INTO map_member_to_catalog(id, member, catalog)
     VALUES ('c293a89e-e044-41e6-a267-dbefba39a450', '39d40812-fc54-4342-9b98-e1c1f4222d22', '00000000-0000-0000-0000-000000000000');
 
+INSERT INTO index(edition, nature, parent, title, shortcut, description, created, updated)
+	VALUES ('00000000-0000-0000-0000-000000000000', 'headline', '00000000-0000-0000-0000-000000000000','--', '--', '--', now(), now());
+
+INSERT INTO index(edition, nature, parent, title, shortcut, description, created, updated)
+	VALUES ('00000000-0000-0000-0000-000000000000', 'rubric', '00000000-0000-0000-0000-000000000000','--', '--', '--', now(), now());
+	
 -------------------------------------------------------------------------------------------------
 -- Default user
 -------------------------------------------------------------------------------------------------
