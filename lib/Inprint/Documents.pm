@@ -164,13 +164,20 @@ sub list {
 
     # Set Restrictions
 
+    $sql_filters .= " ( ";
+
     my $editions = $c->access->GetChildrens("editions.documents.work");
-    $sql_filters .= " AND dcm.edition = ANY(?) ";
+    $sql_filters .= " AND ( dcm.edition = ANY(?) ";
     push @params, $editions;
     
     my $departments = $c->access->GetChildrens("catalog.documents.view:*");
-    $sql_filters .= " AND dcm.workgroup = ANY(?) ";
+    $sql_filters .= " AND dcm.workgroup = ANY(?) ) ";
     push @params, $departments;
+    
+    $sql_filters .= " OR manager=? ";
+    push @params, $current_member;
+    
+    $sql_filters .= " ) ";
     
     # Set Filters
     
@@ -198,8 +205,7 @@ sub list {
         if ($fascicle && $fascicle ne 'clear' && $fascicle ne '00000000-0000-0000-0000-000000000000') {
             $sql_filters .= " AND fascicle <> '00000000-0000-0000-0000-000000000000' ";
         }
-        $sql_filters .= " OR manager=? ";
-        push @params, $current_member;
+        
     }
     
     if ($mode eq "archive") {
