@@ -27,9 +27,7 @@ Inprint.factory.Store = new function() {
 
         // Calendar
         '/calendar/list/':                      [ 'id', 'edition', 'edition_shortcut', 'is_enabled', 'title', 'shortcut', 'description', 'begindate', 'enddate', 'totaldays', 'passeddays' ],
-
         
-
         // Documents
         '/documents/list/':         [
             'id', 'access',
@@ -62,7 +60,7 @@ Inprint.factory.Store = new function() {
         "/catalog/stages/list/":                [ "id", "chain", "readiness_shortcut", "readiness_color", "weight", "title", "shortcut", "description", "members" ],
         "/catalog/stages/principals-mapping/":  [ "id", "type", "catalog", "stage", "principal", "title", "description", "catalog_shortcut", "stage_shortcut" ],
         "/catalog/principals/list/":            [ "id", "type", "title", "description" ],
-        "/catalog/indexes/rubrics/":            [ "id", "title", "shortcut", "description" ],
+        "/catalog/rubrics/list/":               [ "id", "title", "shortcut", "description" ],
         
         // Fascicles
         "/fascicle/indexes/rubrics/":           [ "id", "title", "shortcut", "description" ],

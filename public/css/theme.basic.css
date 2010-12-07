@@ -62,6 +62,13 @@ body {
    vertical-align:top;
 }
 
+/* Tree icons hack */
+
+.x-tree-node-collapsed .x-tree-node-icon, .x-tree-node-expanded .x-tree-node-icon, .x-tree-node-leaf .x-tree-node-icon {
+  width: 16px;
+  height: 16px;
+}
+
 /* Documents profile */
 
 .inprint-document-profile table {

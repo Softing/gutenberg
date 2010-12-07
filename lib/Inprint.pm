@@ -118,7 +118,9 @@ sub startup {
     $self->createRoutes($sessionBridge, "catalog/members",      [ "create", "delete", "list", "rules", "setup" ]); #"map", "mapping",
     $self->createRoutes($sessionBridge, "catalog/stages",       [ "create", "read", "update", "delete", "list", "map-principals", "unmap-principals", "principals-mapping" ]);
     $self->createRoutes($sessionBridge, "catalog/principals",   [ "list" ]);
-    $self->createRoutes($sessionBridge, "catalog/indexes",      [ "editions", "headlines", "rubrics", "create", "update", "delete" ]);
+    $self->createRoutes($sessionBridge, "catalog/indexes",      [ "editions" ]);
+    $self->createRoutes($sessionBridge, "catalog/headlines",    [ "tree", "read", "create", "update", "delete" ]);
+    $self->createRoutes($sessionBridge, "catalog/rubrics",      [ "list", "read", "create", "update", "delete" ]);
     
     $self->createRoutes($sessionBridge, "fascicle",             [ "seance", "check", "open", "close", "save", "capture" ]);
     $self->createRoutes($sessionBridge, "fascicle/combos",      [ "workgroups", "headlines", "rubrics" ]);

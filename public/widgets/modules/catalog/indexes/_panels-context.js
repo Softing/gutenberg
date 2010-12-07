@@ -1,21 +1,21 @@
 Inprint.catalog.indexes.Context = function(parent, panels) {
 
-    var tree = panels.tree;
+    var headlines = panels["headlines"];
 
-    tree.on("contextmenu", function(node) {
+    headlines.on("contextmenu", function(node) {
         
         this.selection = node;
 
         var disabled = true;
         var items = [];
 
-        if (parent.access["editions"]) {
+        if (parent.access["manage"]) {
             disabled = false;
         }
 
         items.push(
             {
-                icon: _ico("book--plus"),
+                icon: _ico("marker--plus"),
                 cls: "x-btn-text-icon",
                 text: _("Create"),
                 disabled: disabled,
@@ -24,7 +24,7 @@ Inprint.catalog.indexes.Context = function(parent, panels) {
                 handler: function() { this.cmpCreate(node); }
             },
             {
-                icon: _ico("book--pencil"),
+                icon: _ico("marker--pencil"),
                 cls: "x-btn-text-icon",
                 text: _("Edit"),
                 disabled: disabled,
@@ -36,7 +36,7 @@ Inprint.catalog.indexes.Context = function(parent, panels) {
 
         if (node.attributes.id != NULLID) {
             items.push({
-                icon: _ico("book--minus"),
+                icon: _ico("marker--minus"),
                 cls: "x-btn-text-icon",
                 text: _("Remove"),
                 disabled: disabled,
@@ -56,6 +56,6 @@ Inprint.catalog.indexes.Context = function(parent, panels) {
 
         new Ext.menu.Menu({ items : items }).show(node.ui.getAnchor());
 
-    }, tree);
+    }, headlines);
 
 }

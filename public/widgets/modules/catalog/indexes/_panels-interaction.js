@@ -7,25 +7,31 @@ Inprint.catalog.indexes.Interaction = function(parent, panels) {
     // Tree
     editions.getSelectionModel().on("selectionchange", function(sm, node) {
         if (node) {
-            headlines.getRootNode().id = node.id;
+            parent.edition = node.id;
+            headlines.getRootNode().id = parent.edition;
             headlines.getRootNode().reload();
         }
     });
 
     headlines.getSelectionModel().on("selectionchange", function(sm, node) {
-        rubrics.enable();
         if (node) {
-            rubrics.cmpLoad({ node: node.id });
+            parent.headline = node.id;
+            rubrics.enable();
+            rubrics.cmpLoad({ headline: parent.headline });
+            rubrics.btnCreate.enable();
         }
     });
-
-    //Grids
+    
     rubrics.getSelectionModel().on("selectionchange", function(sm) {
-        if (sm.getCount() > 0) {
-            this.buttons[0].enable();
-        } else {
-            this.buttons[0].disable();
+        _disable(rubrics.btnDelete, rubrics.btnUpdate);
+        if (parent.access["manage"]) {
+            if (sm.getCount() == 1) {
+               _enable(rubrics.btnUpdate);
+            }
+            if (sm.getCount() > 0) {
+                _enable(rubrics.btnDelete);
+            }
         }
-    }, parent);
-
+    });
+    
 }
