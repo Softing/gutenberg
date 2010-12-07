@@ -1,28 +1,30 @@
-Inprint.fascicle.indexes.TreeHeadlines = Ext.extend(Ext.tree.TreePanel, {
+Inprint.catalog.indexes.TreeEditions = Ext.extend(Ext.tree.TreePanel, {
 
     initComponent: function() {
 
         this.components = {};
 
         this.urls = {
-            "tree":    _url("/fascicle/indexes/headlines/")
+            "tree":    _url("/catalog/indexes/editions/")
         };
 
         Ext.apply(this, {
-            title:_("Headlines"),
+            title:_("Editions"),
             autoScroll:true,
             dataUrl: this.urls.tree,
             border:false,
             rootVisible: false,
             root: {
-                id: this.oid,
+                id:'00000000-0000-0000-0000-000000000000',
                 nodeType: 'async',
-                expanded: false,
-                draggable: false
+                expanded: true,
+                draggable: false,
+                icon: _ico("book"),
+                text: _("Editions")
             }
         });
 
-        Inprint.fascicle.indexes.TreeHeadlines.superclass.initComponent.apply(this, arguments);
+        Inprint.catalog.indexes.TreeEditions.superclass.initComponent.apply(this, arguments);
 
         this.on("beforeappend", function(tree, parent, node) {
             node.attributes.icon = _ico(node.attributes.icon);
@@ -32,8 +34,10 @@ Inprint.fascicle.indexes.TreeHeadlines = Ext.extend(Ext.tree.TreePanel, {
 
     onRender: function() {
 
-        Inprint.fascicle.indexes.TreeHeadlines.superclass.onRender.apply(this, arguments);
-        
+        Inprint.catalog.indexes.TreeEditions.superclass.onRender.apply(this, arguments);
+
+        //this.getRootNode().expand();
+        //
         this.getRootNode().on("expand", function(node) {
             node.firstChild.expand();
             node.firstChild.select();
