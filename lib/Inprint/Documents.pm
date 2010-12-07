@@ -289,6 +289,8 @@ sub list {
         push @params, $start;
     }
     
+    #die $sql_query;
+
     my $result = $c->sql->Q($sql_query, \@params)->Hashes;
 
     foreach my $document (@$result) {
