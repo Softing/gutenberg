@@ -1,80 +1,70 @@
-Inprint.catalog.indexes.Panel = Ext.extend(Ext.Panel, {
+Inprint.fascicle.indexes.Panel = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
 
         this.access = {};
 
-        this.edition  = null;
+        this.fascicle = this.oid;
         this.headline = null;
         
+        alert(this.fascicle);
+        
         this.panels = {};
-        this.panels["editions"]  = new Inprint.catalog.indexes.TreeEditions({
+
+        this.panels["headlines"] = new Inprint.fascicle.indexes.TreeHeadlines({
             parent: this
         });
-        this.panels["headlines"] = new Inprint.catalog.indexes.TreeHeadlines({
-            parent: this
-        });
-        this.panels["rubrics"]   = new Inprint.catalog.indexes.Rubrics({
+        this.panels["rubrics"]   = new Inprint.fascicle.indexes.Rubrics({
             parent: this
         });
 
         Ext.apply(this, {
-            border:false,
-            layout: "hbox",
-            layoutConfig: {
-                align : 'stretch',
-                pack  : 'start'
+            layout: "border",
+            defaults: {
+                collapsible: false,
+                split: true
             },
             items: [
                 {
-                    flex:1,
-                    layout:"fit",
+                    region:"west",
                     margins: "3 0 3 3",
-                    width: 130,
-                    collapsible: false,
-                    split: true,
-                    items: this.panels["editions"]
-                },
-                {
-                    flex:2,
                     layout:"fit",
-                    margins: "3 3 3 3",
                     width: 200,
-                    collapsible: false,
-                    split: true,
+                    minSize: 100,
+                    maxSize: 600,
                     items: this.panels["headlines"]
                 },
                 {
-                    flex:3,
+                    region: "center",
                     layout:"fit",
-                    margins: "3 3 3 0",
+                    margins: "3 0 3 0",
                     items: this.panels["rubrics"]
                 }
             ]
         });
-        Inprint.catalog.indexes.Panel.superclass.initComponent.apply(this, arguments);
+        Inprint.fascicle.indexes.Panel.superclass.initComponent.apply(this, arguments);
         
     },
 
     onRender: function() {
         
-        Inprint.catalog.indexes.Panel.superclass.onRender.apply(this, arguments);
+        Inprint.fascicle.indexes.Panel.superclass.onRender.apply(this, arguments);
         
-        Inprint.catalog.indexes.Access(this, this.panels);
-        Inprint.catalog.indexes.Context(this, this.panels);
-        Inprint.catalog.indexes.Interaction(this, this.panels);
+        Inprint.fascicle.indexes.Access(this, this.panels);
+        Inprint.fascicle.indexes.Context(this, this.panels);
+        Inprint.fascicle.indexes.Interaction(this, this.panels);
     }
 
 });
 
-Inprint.registry.register("settings-index", {
+Inprint.registry.register("fascicle-index", {
     icon: "marker",
-    text: _("Index"),
-    xobject: Inprint.catalog.indexes.Panel
+    text: _("Fascicle index"),
+    xobject: Inprint.fascicle.indexes.Panel
 });
 
-Inprint.registry.register("fascicle-index", {
+Inprint.registry.register("briefcase-index", {
     icon: "briefcase",
     text: _("Briefcase index"),
-    xobject: Inprint.catalog.indexes.Panel
+    xobject: Inprint.fascicle.indexes.Panel
 });

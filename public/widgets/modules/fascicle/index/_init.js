@@ -1,3 +1,3 @@
-Ext.namespace("Inprint.catalog.indexes");
+Ext.namespace("Inprint.fascicle.indexes");
 
 

@@ -1,18 +1,11 @@
-Inprint.catalog.indexes.Interaction = function(parent, panels) {
+Inprint.fascicle.indexes.Interaction = function(parent, panels) {
 
-    var editions  = panels.editions;
+    
     var headlines = panels.headlines;
     var rubrics   = panels.rubrics;
 
     // Tree
-    editions.getSelectionModel().on("selectionchange", function(sm, node) {
-        if (node) {
-            parent.edition = node.id;
-            headlines.getRootNode().id = parent.edition;
-            headlines.getRootNode().reload();
-        }
-    });
-
+    
     headlines.getSelectionModel().on("selectionchange", function(sm, node) {
         if (node) {
             parent.headline = node.id;

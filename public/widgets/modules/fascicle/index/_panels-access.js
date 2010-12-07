@@ -1,4 +1,4 @@
-Inprint.catalog.indexes.Access = function(parent, panels) {
+Inprint.fascicle.indexes.Access = function(parent, panels) {
     
     _a(["domain.editions.manage"], null, function(terms) {
         

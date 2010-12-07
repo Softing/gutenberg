@@ -1,15 +1,15 @@
-Inprint.catalog.indexes.TreeHeadlines = Ext.extend(Ext.tree.TreePanel, {
+Inprint.fascicle.indexes.TreeHeadlines = Ext.extend(Ext.tree.TreePanel, {
 
     initComponent: function() {
 
         this.components = {};
 
         this.urls = {
-            "tree":    _url("/catalog/headlines/tree/"),
-            "create":  _url("/catalog/headlines/create/"),
-            "read":    _url("/catalog/headlines/read/"),
-            "update":  _url("/catalog/headlines/update/"),
-            "delete":  _url("/catalog/headlines/delete/")
+            "tree":    _url("/fascicle/headlines/tree/"),
+            "create":  _url("/fascicle/headlines/create/"),
+            "read":    _url("/fascicle/headlines/read/"),
+            "update":  _url("/fascicle/headlines/update/"),
+            "delete":  _url("/fascicle/headlines/delete/")
         };
 
         Ext.apply(this, {
@@ -25,7 +25,7 @@ Inprint.catalog.indexes.TreeHeadlines = Ext.extend(Ext.tree.TreePanel, {
             }
         });
 
-        Inprint.catalog.indexes.TreeHeadlines.superclass.initComponent.apply(this, arguments);
+        Inprint.fascicle.indexes.TreeHeadlines.superclass.initComponent.apply(this, arguments);
 
         this.on("beforeappend", function(tree, parent, node) {
             node.attributes.icon = _ico(node.attributes.icon);
@@ -35,7 +35,7 @@ Inprint.catalog.indexes.TreeHeadlines = Ext.extend(Ext.tree.TreePanel, {
 
     onRender: function() {
         
-        Inprint.catalog.indexes.TreeHeadlines.superclass.onRender.apply(this, arguments);
+        Inprint.fascicle.indexes.TreeHeadlines.superclass.onRender.apply(this, arguments);
         
         this.getLoader().on("beforeload", function() { this.body.mask(_("Loading")); }, this);
         this.getLoader().on("load", function() { this.body.unmask(); }, this);

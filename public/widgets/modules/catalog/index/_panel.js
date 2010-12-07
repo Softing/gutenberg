@@ -72,9 +72,3 @@ Inprint.registry.register("settings-index", {
     text: _("Index"),
     xobject: Inprint.catalog.indexes.Panel
 });
-
-Inprint.registry.register("fascicle-index", {
-    icon: "briefcase",
-    text: _("Briefcase index"),
-    xobject: Inprint.catalog.indexes.Panel
-});

@@ -128,6 +128,8 @@ sub startup {
     $self->createRoutes($sessionBridge, "fascicle/images",      [ "view" ]);
     $self->createRoutes($sessionBridge, "fascicle/pages",       [ "view", "create", "update", "delete" ]);
     $self->createRoutes($sessionBridge, "fascicle/documents",   [ "list" ]);
+    $self->createRoutes($sessionBridge, "fascicle/headlines",    [ "tree", "read", "create", "update", "delete" ]);
+    $self->createRoutes($sessionBridge, "fascicle/rubrics",      [ "list", "read", "create", "update", "delete" ]);
     
     # Profile routes
     $self->createRoutes($sessionBridge, "profile",              [ "read", "update" ]);

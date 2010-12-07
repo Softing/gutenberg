@@ -1,14 +1,14 @@
-Inprint.catalog.indexes.Rubrics = Ext.extend(Ext.grid.GridPanel, {
+Inprint.fascicle.indexes.Rubrics = Ext.extend(Ext.grid.GridPanel, {
 
     initComponent: function() {
 
         this.components = {};
 
         this.urls = {
-            "create":  _url("/catalog/rubrics/create/"),
-            "read":    _url("/catalog/rubrics/read/"),
-            "update":  _url("/catalog/rubrics/update/"),
-            "delete":  _url("/catalog/rubrics/delete/")
+            "create":  _url("/fascicle/rubrics/create/"),
+            "read":    _url("/fascicle/rubrics/read/"),
+            "update":  _url("/fascicle/rubrics/update/"),
+            "delete":  _url("/fascicle/rubrics/delete/")
         };
 
         this.store = Inprint.factory.Store.json("/catalog/rubrics/list/");
@@ -70,12 +70,12 @@ Inprint.catalog.indexes.Rubrics = Ext.extend(Ext.grid.GridPanel, {
             autoExpandColumn: "description"
         });
 
-        Inprint.catalog.indexes.Rubrics.superclass.initComponent.apply(this, arguments);
+        Inprint.fascicle.indexes.Rubrics.superclass.initComponent.apply(this, arguments);
 
     },
 
     onRender: function() {
-        Inprint.catalog.indexes.Rubrics.superclass.onRender.apply(this, arguments);
+        Inprint.fascicle.indexes.Rubrics.superclass.onRender.apply(this, arguments);
     },
     
     cmpCreate: function() {

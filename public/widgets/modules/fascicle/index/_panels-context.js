@@ -1,4 +1,4 @@
-Inprint.catalog.indexes.Context = function(parent, panels) {
+Inprint.fascicle.indexes.Context = function(parent, panels) {
 
     var headlines = panels["headlines"];
 

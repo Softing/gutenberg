@@ -1,7 +1,7 @@
 Inprint.catalog.indexes.TreeEditions = Ext.extend(Ext.tree.TreePanel, {
 
     initComponent: function() {
-
+        
         this.components = {};
 
         this.urls = {
@@ -35,13 +35,6 @@ Inprint.catalog.indexes.TreeEditions = Ext.extend(Ext.tree.TreePanel, {
     onRender: function() {
 
         Inprint.catalog.indexes.TreeEditions.superclass.onRender.apply(this, arguments);
-
-        //this.getRootNode().expand();
-        //
-        this.getRootNode().on("expand", function(node) {
-            node.firstChild.expand();
-            node.firstChild.select();
-        });
         
         this.getLoader().on("beforeload", function() { this.body.mask(_("Loading")); }, this);
         this.getLoader().on("load", function() { this.body.unmask(); }, this);

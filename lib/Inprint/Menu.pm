@@ -198,7 +198,7 @@ sub index
         push @{ $settings->{menu} }, { id => "settings-editions" };
         push @{ $settings->{menu} }, { id => "settings-roles" };
         push @{ $settings->{menu} }, { id => "settings-readiness" };
-        push @{ $settings->{menu} }, { id => "settings-indexes" };
+        push @{ $settings->{menu} }, { id => "settings-index" };
         
         push @result, $settings;
     }

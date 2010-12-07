@@ -44,7 +44,7 @@ Inprint.registry = function() {
         },
         "fascicles": {
             text: _("Fascicles"),
-            icon: "blue-folders"
+            icon: "blue-folders-stack"
         },
         
         "settings": {

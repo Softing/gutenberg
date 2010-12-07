@@ -63,7 +63,7 @@ Inprint.factory.Store = new function() {
         "/catalog/rubrics/list/":               [ "id", "title", "shortcut", "description" ],
         
         // Fascicles
-        "/fascicle/indexes/rubrics/":           [ "id", "title", "shortcut", "description" ],
+        "/fascicle/rubrics/list/":              [ "id", "title", "shortcut", "description" ],
         "/fascicle/summary/":                   [ "place", "place_shortcut", "module", "module_shortcut", "holes", "requests", "free" ],
         "/fascicle/documents/list/":            [
             'id', 'access',    'edition',  'edition_shortcut',    'fascicle',    'fascicle_shortcut',    'headline', 'headline_shortcut',
