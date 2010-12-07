@@ -193,12 +193,13 @@ sub list {
     }
     
     if ($mode eq "all") {
-        
         $sql_filters .= " AND isopen is true ";
         $sql_filters .= " AND fascicle <> '99999999-9999-9999-9999-999999999999' ";
         if ($fascicle && $fascicle ne 'clear' && $fascicle ne '00000000-0000-0000-0000-000000000000') {
             $sql_filters .= " AND fascicle <> '00000000-0000-0000-0000-000000000000' ";
         }
+        $sql_filters .= " OR manager=? ";
+        push @params, $current_member;
     }
     
     if ($mode eq "archive") {
