@@ -22,7 +22,7 @@ Inprint.cmp.ExcahngeBrowser = Ext.extend(Ext.Window, {
                     flex:1,
                     layout:"fit",
                     margins: "0 0 0 0",
-                    width: 100,
+                    width: 200,
                     collapsible: false,
                     split: true,
                     items: this.panels.editions
@@ -31,7 +31,7 @@ Inprint.cmp.ExcahngeBrowser = Ext.extend(Ext.Window, {
                     flex:2,
                     layout:"fit",
                     margins: "0 3 0 3",
-                    width: 160,
+                    width: 200,
                     collapsible: false,
                     split: true,
                     items: this.panels.stages
@@ -49,7 +49,7 @@ Inprint.cmp.ExcahngeBrowser = Ext.extend(Ext.Window, {
                     scope:this,
                     disabled:true,
                     handler: function() {
-                        this.fireEvent('complete', this.panels.principals.getValue("id"));
+                        this.fireEvent('complete', this.panels.principals.getValue("principal"));
                         this.hide();
                     }
                 },

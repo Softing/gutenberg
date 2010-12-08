@@ -27,6 +27,8 @@ Inprint.documents.all.Access = function(parent, panels) {
         if (sm.getCount() > 0 ) {
             if (access["update"]    == 'enabled') grid.btnCapture.enable();
             if (access["transfer"]  == 'enabled') grid.btnTransfer.enable();
+            if (access["capture"]   == 'enabled') grid.btnCapture.enable();
+            if (access["transfer"]  == 'enabled') grid.btnTransfer.enable();
             if (access["briefcase"] == 'enabled') grid.btnBriefcase.enable();
             if (access["move"]      == 'enabled') grid.btnMove.enable();
             if (access["move"]      == 'enabled') grid.btnCopy.enable();

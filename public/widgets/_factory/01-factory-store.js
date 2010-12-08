@@ -23,7 +23,7 @@ Inprint.factory.Store = new function() {
         "/advertising/advertisers/list/":       [ "id", "serialnum", "edition", "edition_shortcut", "title", "shortcut", "description", "address", "contact", "phones", "inn", "kpp", "bank", "rs", "ks", "bik", createDateField("created"), createDateField("updated") ],
         "/advertising/modules/list/":           [ "id", "edition", "edition_shortcut", "fascicle", "fascicle_shortcut", "title", "shortcut", "description", "amount", "volume", "w", "h", createDateField("created"), createDateField("updated") ],
 
-        "/common/transfer/list/":               [ "id", "type", "title", "description" ],
+        "/common/transfer/list/":               [ "id", "principal", "type", "title", "description" ],
 
         // Calendar
         '/calendar/list/':                      [ 'id', 'edition', 'edition_shortcut', 'is_enabled', 'title', 'shortcut', 'description', 'begindate', 'enddate', 'totaldays', 'passeddays' ],

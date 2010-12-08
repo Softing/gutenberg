@@ -51,6 +51,7 @@ sub editions {
                 id   => $item->{id},
                 text => $item->{shortcut},
                 leaf => $c->json->true,
+                singleClickExpand => $c->json->true,
                 icon => "book",
                 data => $item
             };

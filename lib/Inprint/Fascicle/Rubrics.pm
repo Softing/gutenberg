@@ -23,11 +23,11 @@ sub read {
     my $result = [];
     
     unless (@errors) {
-        $result = $c->sql->Q(" SELECT * FROM index WHERE id = ? ", [ $i_id ])->Hash;
+        $result = $c->sql->Q(" SELECT * FROM index_fascicles WHERE id = ? ", [ $i_id ])->Hash;
     }
     
     $success = $c->json->true unless (@errors);
-    $c->render_json( { success => $success, errors => \@errors, data => $result } );
+    $c->render_json( { success => $success, errors => \@errors, data => $result || {} } );
 }
 
 sub list {
