@@ -31,14 +31,14 @@ $(function() {
 		runtimes : 'flash',
 		url : 'upload.php',
 		max_file_size : '10mb',
-		chunk2_size : '1mb',
+		chunk_size : '1mb',
 		unique_names : true,
 		resize : {width : 320, height : 240, quality : 90},
 		filters : [
 			{title : "Image files", extensions : "jpg,gif,png"},
 			{title : "Zip files", extensions : "zip"}
 		],
-ref_up2load : true,
+
 		// Flash settings
 		flash_swf_url : '../js/plupload.flash.swf'
 	});

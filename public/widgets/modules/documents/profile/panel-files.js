@@ -80,25 +80,49 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
         this.columns = [
             this.selectionModel,
             {
-                id:"title",
-                header: _("Title"),
-                width: 160,
-                sortable: true,
-                dataIndex: "title"
+                id:"preview",
+                width: 100,
+                dataIndex: "preview",
+                sortable: false,
+                renderer: function(v) {
+                    return '<img src="'+ v +'" style="border:1px solid silver;"/>';
+                }
             },
             {
-                id:"shortcut",
-                header: _("Shortcut"),
-                width: 160,
+                id:"title",
+                header: _("File name"),
+                width: 200,
                 sortable: true,
-                dataIndex: "shortcut"
+                dataIndex: "filename"
             },
             {
                 id:"description",
                 header: _("Description"),
-                width: 200,
+                width: 300,
                 sortable: true,
                 dataIndex: "description"
+            },
+            
+            {
+                id:"size",
+                header: _("Size"),
+                width: 80,
+                sortable: true,
+                dataIndex: "size"
+            },
+            {
+                id:"created",
+                header: _("Created"),
+                width: 100,
+                sortable: true,
+                dataIndex: "created"
+            },
+            {
+                id:"updated",
+                header: _("Updated"),
+                width: 100,
+                sortable: true,
+                dataIndex: "updated"
             }
         ];
 
@@ -152,7 +176,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
             items: [
                 {
                     xtype: "hidden",
-                    name: "id",
+                    name: "document",
                     value: this.oid
                 },
                 _FLD_TITLE,
@@ -218,36 +242,70 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
     },
     
     cmpUpload: function() {
-
-        var panel = new Ext.ux.PluploadPanel({
-            runtimes: 'flash',
-            max_file_size: '10mb',
-            url: _url("/documents/files/upload/"),
-            flash_swf_url : '/plupload/js/plupload.flash.swf',
-            addBtnIcn: _ico("plus-button"),
-            addBtnTxt: _("Add files"),
-            uploadBtnIcn: _ico("arrow-skip-270"),
-            uploadBtnTxt: _("Upload"),
-            cancelBtnIcn: _ico("cross-button"),
-            cancelBtnTxt: _("Cancel"),
-            deleteBtnIcn: _ico("minus-button"),
-            deleteBtnTxt: _("Delete")
-        });
         
-        win = new Ext.Window({
-            title: _("Upload"),
-            layout: "fit",
-            width:640, height:380,
-            items: panel
-        });
-        
-        win.show();
-        
-        panel.on("uploadcomplete", function (panel, success, failures) {
-            if( success.length ) {
-                alert("uploadcomplete");
+        var AwesomeUploader = new Ext.Window({
+            title:'Awesome Uploader in a Window!',
+            frame:true,
+            width:500,
+            height:200,
+            items:{
+                    xtype:'awesomeuploader',
+                    gridHeight:100,
+                    height:160,
+                    flashUploadUrl:_url("/documents/files/upload/"),
+                    standardUploadUrl:_url("/documents/files/upload/"),
+                    xhrUploadUrl:_url("/documents/files/upload/"),
+                    awesomeUploaderRoot: "/plugins/uploader/",
+                    listeners:{
+                            scope:this,
+                            fileupload:function(uploader, success, result){
+                                    if(success){
+                                            Ext.Msg.alert('File Uploaded!','A file has been uploaded!');
+                                    }
+                            }
+                    }
             }
-        }, this);
+        });
+        
+        AwesomeUploader.show();
+        
+        //var panel = new Ext.ux.PluploadPanel({
+        //    runtimes: 'flash,gears,silverlight,html5,browserplus,html4',
+        //    max_file_size: '20mb',
+        //    
+        //    //multipart: true,
+        //    //multipart_params: {
+        //    //    document: this.parent.document
+        //    //},
+        //    
+        //    url: _url("/documents/files/upload/"),
+        //    flash_swf_url : '/plupload/js/plupload.flash.swf',
+        //    silverlight_xap_url: '/plupload/js/plupload.silverlight.xap',
+        //    
+        //    addBtnIcn: _ico("plus-button"),
+        //    addBtnTxt: _("Add files"),
+        //    uploadBtnIcn: _ico("arrow-skip-270"),
+        //    uploadBtnTxt: _("Upload"),
+        //    cancelBtnIcn: _ico("cross-button"),
+        //    cancelBtnTxt: _("Cancel"),
+        //    deleteBtnIcn: _ico("minus-button"),
+        //    deleteBtnTxt: _("Delete")
+        //});
+        //
+        //win = new Ext.Window({
+        //    title: _("Upload"),
+        //    layout: "fit",
+        //    width:640, height:380,
+        //    items: panel
+        //});
+        //
+        //win.show();
+        //
+        //panel.on("uploadcomplete", function (panel, success, failures) {
+        //    if( success.length ) {
+        //        alert("uploadcomplete");
+        //    }
+        //}, this);
         
     },
     
@@ -261,7 +319,10 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                         url: _url("/documents/files/delete/"),
                         scope:this,
                         success: this.cmpReload,
-                        params: { id: this.getValues("id") }
+                        params: {
+                            document: this.parent.document,
+                            files: this.getValues("id")
+                        }
                     });
                 }
             }, this).setIcon(Ext.MessageBox.WARNING);

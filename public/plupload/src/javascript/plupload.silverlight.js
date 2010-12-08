@@ -201,7 +201,7 @@
 				width : '100px',
 				height : '100px',
 				overflow : 'hidden',
-				opacity : uploader.settings.shim_bgcolor ? '' : 0.01 // Force transparent if bgcolor is undefined
+				opacity : uploader.settings.shim_bgcolor || document.documentMode > 8 ? '' : 0.01 // Force transparent if bgcolor is undefined
 			});
 
 			silverlightContainer.className = 'plupload silverlight';
@@ -222,6 +222,7 @@
 				'<param name="source" value="' + uploader.settings.silverlight_xap_url + '"/>' +
 				'<param name="background" value="Transparent"/>' +
 				'<param name="windowless" value="true"/>' +
+				'<param name="enablehtmlaccess" value="true"/>' +
 				'<param name="initParams" value="id=' + uploader.id + ',filter=' + filter + '"/>' +
 				'</object>';
 
@@ -339,8 +340,10 @@
 
 					getSilverlightObj().UploadFile(
 						lookup[file.id],
-						plupload.buildUrl(up.settings.url, {name : file.target_name || file.name}),
+						up.settings.url,
 						jsonSerialize({
+							name : file.target_name || file.name,
+							mime : plupload.mimeTypes[file.name.replace(/^.+\.([^.]+)/, '$1')] || 'application/octet-stream',
 							chunk_size : settings.chunk_size,
 							image_width : resize.width,
 							image_height : resize.height,

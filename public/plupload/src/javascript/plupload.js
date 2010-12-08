@@ -14,7 +14,7 @@
 (function() {
 	var count = 0, runtimes = [], i18n = {}, mimes = {},
 		xmlEncodeChars = {'<' : 'lt', '>' : 'gt', '&' : 'amp', '"' : 'quot', '\'' : '#39'},
-		xmlEncodeRegExp = /[<>&\"\']/g, undef;
+		xmlEncodeRegExp = /[<>&\"\']/g, undef, delay = window.setTimeout;
 
 	// IE W3C like event funcs
 	function preventDefault() {
@@ -601,6 +601,7 @@
 				file = files[fileIndex++];
 
 				if (file.status == plupload.QUEUED) {
+					file.status = plupload.UPLOADING;
 					this.trigger('BeforeUpload', file);
 					this.trigger("UploadFile", file);
 				} else {
@@ -708,6 +709,14 @@
 			init : function() {
 				var self = this, i, runtimeList, a, runTimeIndex = 0, items;
 
+				if (typeof(settings.preinit) == "function") {
+					settings.preinit(self);
+				} else {
+					plupload.each(settings.preinit, function(func, name) {
+						self.bind(name, func);
+					});
+				}
+
 				settings.page_url = settings.page_url || document.location.pathname.replace(/\/[^\/]+$/g, '/');
 
 				// If url is relative force it absolute to the current page
@@ -771,8 +780,12 @@
 
 					// Only trigger QueueChanged event if any files where added
 					if (count) {
-						self.trigger("QueueChanged");
-						self.refresh();
+						delay(function() {
+							self.trigger("QueueChanged");
+							self.refresh();
+						});
+					} else {
+						return false; // Stop the FilesAdded event from immediate propagation
 					}
 				});
 
@@ -790,10 +803,6 @@
 				}
 
 				self.bind('UploadProgress', function(up, file) {
-					if (file.status == plupload.QUEUED) {
-						file.status = plupload.UPLOADING;
-					}
-
 					file.percent = file.size > 0 ? Math.ceil(file.loaded / file.size * 100) : 100;
 					calc();
 				});
@@ -815,7 +824,7 @@
 
 						// Upload next file but detach it from the error event
 						// since other custom listeners might want to stop the queue
-						window.setTimeout(function() {
+						delay(function() {
 							uploadNext.call(self);
 						});
 					}
@@ -825,7 +834,12 @@
 					file.status = plupload.DONE;
 					file.loaded = file.size;
 					up.trigger('UploadProgress', file);
-					uploadNext.call(self);
+
+					// Upload next file but detach it from the error event
+					// since other custom listeners might want to stop the queue
+					delay(function() {
+						uploadNext.call(self);
+					});
 				});
 
 				// Setup runtimeList
@@ -885,6 +899,14 @@
 				}
 
 				callNextInit();
+
+				if (typeof(settings.init) == "function") {
+					settings.init(self);
+				} else {
+					plupload.each(settings.init, function(func, name) {
+						self.bind(name, func);
+					});
+				}
 			},
 
 			/**
@@ -968,9 +990,9 @@
 			 */
 			splice : function(start, length) {
 				var removed;
-	
+
 				// Splice and trigger events
-				removed = files.splice(start, length);
+				removed = files.splice(start === undef ? 0 : start, length === undef ? files.length : length);
 
 				this.trigger("FilesRemoved", removed);
 				this.trigger("QueueChanged");

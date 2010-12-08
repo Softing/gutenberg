@@ -20,9 +20,7 @@ sub image {
     if ($i_id eq "self") {
         $i_id = $c->QuerySessionGet("member.id");
     }
-
-    my $body = '';
-
+    
     my $path = $c->config->get("store.path");
 
     if ( -r "$path/profiles/$i_id/profile.png") {

@@ -1,3 +1,23 @@
+Version 1.3.0 (2010-11-24)
+	Added new jQuery UI widget that supports jQuery UI themes.
+	Added new multiple_queues option that enables you to upload multiple times in the queue widgets.
+	Added support for crossdomain loading of the XAP and SWF files and crossdomain upload.
+	Added new multiple_queues option that enables you to upload multiple times in the queue widgets.
+	Added support for crossdomain loading of the XAP and SWF files and crossdomain upload.
+	Added preinit/init options to to ease up the binding of custom events to queueWidget and the Uploader class.
+	Added drag/drop support for Safari until they fix the broken drag/drop support on Windows.
+	Added events example file that show how to bind all events and display event specific data.
+	Added support for retaining Exif data on images when they where resized using the HTML5 runtime.
+	Fixed logic issue with the upload.php example file. Chunking wasn't working correctly.
+	Fixed issue with HTML4 not handling the form encoding correctly on older IE versions. Patch contributed by jinxdone.
+	Fixed so the HTML4 runtime only submits the defined multipart_params arguments.
+	Fixes issue where it wasn't possible to dynamically override url or mutlipart_params for the HTML4 runtime.
+	Fixed so all runtimes pass the name, chunk and chunks parameters as multipart parameters instead of querystring parameters.
+	Fixed so files are read using the newer FileReader class if it's available if not it tries the older getAsXXX on Gecko.
+	Fixed bug where IE 9 beta 1 wouldn't render Silverlight properly.
+	Fixed bug where Flash would do extra empty requests if images below a specific size would be uploaded.
+	Fixed bug where Google Gears would resize and re-encode images even if the it wasn't changed in scale.
+	Fixed bug where the HTML5 runtime wouldn't free memory after each request on Gecko.
 Version 1.2.4 (2010-09-08)
 	Added new BeforeUpload event to make it easier to override settings before a file is uploaded.
 	Added new automatic usage of FileReference in Flash if it's possible. Contributed by Marcel Jackwerth.

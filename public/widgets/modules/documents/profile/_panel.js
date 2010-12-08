@@ -2,6 +2,8 @@ Inprint.documents.Profile = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
         
+        this.document = null;
+        
         this.panels = {};
         this.panels["profile"]  = new Inprint.documents.Profile.View({
             oid: this.oid,
@@ -68,14 +70,18 @@ Inprint.documents.Profile = Ext.extend(Ext.Panel, {
             success: function(result) {
                 var response = Ext.util.JSON.decode(result.responseText);
                 
-                this.panels["profile"].cmpFill(response.data);
-                this.panels["files"].cmpFill(response.data);
-                this.panels["comments"].cmpFill(response.data);
-            },
-            failure: function () {
-                
+                if (response.data) {
+                    this.document = response.data.id;
+                    
+                    this.panels["profile"].cmpFill(response.data);
+                    this.panels["files"].cmpFill(response.data);
+                    this.panels["comments"].cmpFill(response.data);
+                }
             }
         });
+        
+        this.panels["files"].cmpReload();
+        
     }
 
 });

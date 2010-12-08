@@ -98,58 +98,61 @@ sub startup {
     $self->createRoutes($sessionBridge, "calendar/combos",          [ "copypages", "copyindex" ]);
 
     # Common routes
-    $self->createRoutes($sessionBridge, "common/transfer",      [ "editions", "branches", "list" ]);
+    $self->createRoutes($sessionBridge, "common/transfer",          [ "editions", "branches", "list" ]);
 
     # Documents routes
-    $self->createRoutes($sessionBridge, "documents",            [ "create", "read", "update", "delete", "list", "capture", "transfer", "briefcase", "move", "copy", "duplicate", "recycle", "restore" ]);
-    $self->createRoutes($sessionBridge, "documents/common",     [ "fascicles" ]);
-    $self->createRoutes($sessionBridge, "documents/combos",     [ "stages", "assignments", "managers", "fascicles", "headlines", "rubrics" ]);
-    $self->createRoutes($sessionBridge, "documents/trees",      [ "editions", "workgroups" ]);
-    $self->createRoutes($sessionBridge, "documents/filters",    [ "editions", "groups", "fascicles", "headlines", "rubrics", "holders", "managers", "progress" ]);
-    $self->createRoutes($sessionBridge, "documents/profile",    [ "read" ]);
-    $self->createRoutes($sessionBridge, "documents/files",      [ "list", "create", "read", "update", "delete", "upload" ]);
-
-    # Catalog routes
-    $self->createRoutes($sessionBridge, "catalog/combos",       [ "editions", "groups", "fascicles", "roles", "readiness" ]);
-    $self->createRoutes($sessionBridge, "catalog/editions",     [ "create", "read", "update", "delete", "tree" ]);
-    $self->createRoutes($sessionBridge, "catalog/organization", [ "create", "read", "update", "delete", "tree", "map", "unmap" ]);
-    $self->createRoutes($sessionBridge, "catalog/readiness",    [ "create", "read", "update", "delete", "list" ]);
-    $self->createRoutes($sessionBridge, "catalog/roles",        [ "create", "read", "update", "delete", "list", "map", "mapping" ]);
-    $self->createRoutes($sessionBridge, "catalog/rules",        [ "list", "mapping", "map" ]);
-    $self->createRoutes($sessionBridge, "catalog/members",      [ "create", "delete", "list", "rules", "setup" ]); #"map", "mapping",
-    $self->createRoutes($sessionBridge, "catalog/stages",       [ "create", "read", "update", "delete", "list", "map-principals", "unmap-principals", "principals-mapping" ]);
-    $self->createRoutes($sessionBridge, "catalog/principals",   [ "list" ]);
-    $self->createRoutes($sessionBridge, "catalog/indexes",      [ "editions" ]);
-    $self->createRoutes($sessionBridge, "catalog/headlines",    [ "tree", "read", "create", "update", "delete" ]);
-    $self->createRoutes($sessionBridge, "catalog/rubrics",      [ "list", "read", "create", "update", "delete" ]);
+    $self->createRoutes($sessionBridge, "documents",                [ "create", "read", "update", "delete", "list", "capture", "transfer", "briefcase", "move", "copy", "duplicate", "recycle", "restore" ]);
+    $self->createRoutes($sessionBridge, "documents/common",         [ "fascicles" ]);
+    $self->createRoutes($sessionBridge, "documents/combos",         [ "stages", "assignments", "managers", "fascicles", "headlines", "rubrics" ]);
+    $self->createRoutes($sessionBridge, "documents/trees",          [ "editions", "workgroups" ]);
+    $self->createRoutes($sessionBridge, "documents/filters",        [ "editions", "groups", "fascicles", "headlines", "rubrics", "holders", "managers", "progress" ]);
+    $self->createRoutes($sessionBridge, "documents/profile",        [ "read" ]);
+    $self->createRoutes($sessionBridge, "documents/files",          [ "list", "create", "read", "update", "delete", "upload" ]);
     
-    $self->createRoutes($sessionBridge, "fascicle",             [ "seance", "check", "open", "close", "save", "capture" ]);
-    $self->createRoutes($sessionBridge, "fascicle/combos",      [ "workgroups", "headlines", "rubrics" ]);
-    $self->createRoutes($sessionBridge, "fascicle/indexes",     [ "editions", "headlines", "rubrics", "create", "update", "delete" ]);
-    $self->createRoutes($sessionBridge, "fascicle/images",      [ "view" ]);
-    $self->createRoutes($sessionBridge, "fascicle/pages",       [ "view", "create", "update", "delete" ]);
-    $self->createRoutes($sessionBridge, "fascicle/documents",   [ "list" ]);
-    $self->createRoutes($sessionBridge, "fascicle/headlines",    [ "tree", "read", "create", "update", "delete" ]);
-    $self->createRoutes($sessionBridge, "fascicle/rubrics",      [ "list", "read", "create", "update", "delete" ]);
+    $sessionBridge->route('/documents/files/preview/:document/:file')->to('documents-files#preview', document => "", file => "");
+    #$sessionBridge->route('/documents/files/upload/:document')->to('documents-files#upload', document => "");
+    
+    # Catalog routes
+    $self->createRoutes($sessionBridge, "catalog/combos",           [ "editions", "groups", "fascicles", "roles", "readiness" ]);
+    $self->createRoutes($sessionBridge, "catalog/editions",         [ "create", "read", "update", "delete", "tree" ]);
+    $self->createRoutes($sessionBridge, "catalog/organization",     [ "create", "read", "update", "delete", "tree", "map", "unmap" ]);
+    $self->createRoutes($sessionBridge, "catalog/readiness",        [ "create", "read", "update", "delete", "list" ]);
+    $self->createRoutes($sessionBridge, "catalog/roles",            [ "create", "read", "update", "delete", "list", "map", "mapping" ]);
+    $self->createRoutes($sessionBridge, "catalog/rules",            [ "list", "mapping", "map" ]);
+    $self->createRoutes($sessionBridge, "catalog/members",          [ "create", "delete", "list", "rules", "setup" ]); #"map", "mapping",
+    $self->createRoutes($sessionBridge, "catalog/stages",           [ "create", "read", "update", "delete", "list", "map-principals", "unmap-principals", "principals-mapping" ]);
+    $self->createRoutes($sessionBridge, "catalog/principals",       [ "list" ]);
+    $self->createRoutes($sessionBridge, "catalog/indexes",          [ "editions" ]);
+    $self->createRoutes($sessionBridge, "catalog/headlines",        [ "tree", "read", "create", "update", "delete" ]);
+    $self->createRoutes($sessionBridge, "catalog/rubrics",          [ "list", "read", "create", "update", "delete" ]);
+    
+    $self->createRoutes($sessionBridge, "fascicle",                 [ "seance", "check", "open", "close", "save", "capture" ]);
+    $self->createRoutes($sessionBridge, "fascicle/combos",          [ "workgroups", "headlines", "rubrics" ]);
+    $self->createRoutes($sessionBridge, "fascicle/indexes",         [ "editions", "headlines", "rubrics", "create", "update", "delete" ]);
+    $self->createRoutes($sessionBridge, "fascicle/images",          [ "view" ]);
+    $self->createRoutes($sessionBridge, "fascicle/pages",           [ "view", "create", "update", "delete" ]);
+    $self->createRoutes($sessionBridge, "fascicle/documents",       [ "list" ]);
+    $self->createRoutes($sessionBridge, "fascicle/headlines",       [ "tree", "read", "create", "update", "delete" ]);
+    $self->createRoutes($sessionBridge, "fascicle/rubrics",         [ "list", "read", "create", "update", "delete" ]);
     
     # Profile routes
-    $self->createRoutes($sessionBridge, "profile",              [ "read", "update" ]);
+    $self->createRoutes($sessionBridge, "profile",                  [ "read", "update" ]);
     $sessionBridge->route('/profile/image/:id')->to('profile#image', id => "00000000-0000-0000-0000-000000000000");
 
     # Options routes
-    $self->createRoutes($sessionBridge, "options",              [ "update" ]);
-    $self->createRoutes($sessionBridge, "options/combos",       [ "capture-destination" ]);
+    $self->createRoutes($sessionBridge, "options",                  [ "update" ]);
+    $self->createRoutes($sessionBridge, "options/combos",           [ "capture-destination" ]);
 
     # State route
-    $self->createRoutes($sessionBridge, "state",                [ "index", "read", "update" ]);
+    $self->createRoutes($sessionBridge, "state",                    [ "index", "read", "update" ]);
 
     # System routess
-    $self->createRoutes($sessionBridge, "system/events",        [ "list" ]);
+    $self->createRoutes($sessionBridge, "system/events",            [ "list" ]);
 
     # Workspace routess
-    $self->createRoutes($sessionBridge, "access",               [ "index" ]);
-    $self->createRoutes($sessionBridge, "menu",                 [ "index" ]);
-    $self->createRoutes($sessionBridge, "workspace",            [ "index", "access", "state", "online", "appsession" ]);
+    $self->createRoutes($sessionBridge, "access",                   [ "index" ]);
+    $self->createRoutes($sessionBridge, "menu",                     [ "index" ]);
+    $self->createRoutes($sessionBridge, "workspace",                [ "index", "access", "state", "online", "appsession" ]);
 
     # Main route
     $sessionBridge->route('/')->to('workspace#index');
