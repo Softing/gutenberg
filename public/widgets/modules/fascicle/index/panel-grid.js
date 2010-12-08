@@ -98,7 +98,7 @@ Inprint.fascicle.indexes.Rubrics = Ext.extend(Ext.grid.GridPanel, {
                 },
                 bodyStyle: "padding:5px 5px",
                 items: [
-                    _FLD_HDN_EDITION,
+                    _FLD_HDN_FASCICLE,
                     _FLD_HDN_HEADLINE,
                     _FLD_TITLE,
                     _FLD_SHORTCUT,
@@ -127,8 +127,8 @@ Inprint.fascicle.indexes.Rubrics = Ext.extend(Ext.grid.GridPanel, {
 
         var form = win.items.first().getForm();
         form.reset();
-
-        form.findField("edition").setValue(this.parent.edition);
+        
+        form.findField("fascicle").setValue(this.parent.fascicle);
         form.findField("headline").setValue(this.parent.headline);
 
         win.show(this);

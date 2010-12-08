@@ -187,10 +187,15 @@ sub create {
                 
                 my $headline_id = $c->uuid();
                 
+                my $headline_entity = $headline->{id};
+                if ($headline->{parent} eq "00000000-0000-0000-0000-000000000000") {
+                    $headline_entity = "00000000-0000-0000-0000-000000000000";
+                }
+                
                 $c->sql->Do("
                     INSERT INTO index_fascicles(id, edition, fascicle, entity, nature, parent, title, shortcut, description, created, updated)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
-                ", [ $headline_id, $edition->{id}, $id, $headline->{id}, 'headline', $headline_id, $headline->{title}, $headline->{shortcut}, $headline->{description} ]);
+                ", [ $headline_id, $edition->{id}, $id, $headline_entity, 'headline', $headline_id, $headline->{title}, $headline->{shortcut}, $headline->{description} ]);
                 
                 my $rubrics = $c->sql->Q("
                     SELECT id, edition, nature, parent, title, shortcut, description, created, updated
@@ -200,10 +205,16 @@ sub create {
                 
                 foreach my $rubric (@$rubrics) {
                     my $rubric_id = $c->uuid();
+                    
+                    my $rubric_entity = $rubric->{id};
+                    if ($rubric->{parent} eq "00000000-0000-0000-0000-000000000000") {
+                        $rubric_entity = "00000000-0000-0000-0000-000000000000";
+                    }
+                    
                     $c->sql->Do("
                         INSERT INTO index_fascicles(id, edition, fascicle, entity, nature, parent, title, shortcut, description, created, updated)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
-                    ", [ $rubric_id, $edition->{id}, $id, $rubric->{id}, 'rubric', $headline_id, $rubric->{title}, $rubric->{shortcut}, $rubric->{description} ]);
+                    ", [ $rubric_id, $edition->{id}, $id, $rubric_entity, 'rubric', $rubric_id, $rubric->{title}, $rubric->{shortcut}, $rubric->{description} ]);
                 }
                 
             }

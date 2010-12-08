@@ -72,7 +72,7 @@ Inprint.fascicle.indexes.TreeHeadlines = Ext.extend(Ext.tree.TreePanel, {
                 },
                 bodyStyle: "padding:5px 5px",
                 items: [
-                    _FLD_HDN_EDITION,
+                    _FLD_HDN_FASCICLE,
                     _FLD_TITLE,
                     _FLD_SHORTCUT,
                     _FLD_DESCRIPTION
@@ -101,7 +101,7 @@ Inprint.fascicle.indexes.TreeHeadlines = Ext.extend(Ext.tree.TreePanel, {
         var form = win.items.first().getForm();
         form.reset();
 
-        form.findField("edition").setValue(this.parent.edition);
+        form.findField("fascicle").setValue(this.parent.fascicle);
 
         win.show(this);
         this.components["add-window"] = win;
@@ -143,12 +143,16 @@ Inprint.fascicle.indexes.TreeHeadlines = Ext.extend(Ext.tree.TreePanel, {
 
             form.on("actioncomplete", function (form, action) {
                 if (action.type == "submit") {
+                    
                     win.hide();
+                    
                     if (node.parentNode) {
                         node.parentNode.reload();
-                    } else {
+                    }
+                    else if (node.reload) {
                         node.reload();
                     }
+                    
                 }
             }, this);
         }
