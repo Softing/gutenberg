@@ -23,6 +23,21 @@ Inprint.factory.Combo = new function() {
 
     var combos = {
 
+        //Calendar
+        
+        "/calendar/combos/copypages/": {
+            hiddenName: "copypages",
+            icon: "building",
+            fieldLabel: _("Copy pages"),
+            emptyText: _("Select") + "..."
+        },
+        "/calendar/combos/copyindex/": {
+            hiddenName: "copyindex",
+            icon: "building",
+            fieldLabel: _("Copy index"),
+            emptyText: _("Select") + "..."
+        },
+
         // Catalog
         "/catalog/combos/editions/": {
             hiddenName: "edition",

@@ -266,14 +266,21 @@ Inprint.edition.calendar.Grid = Ext.extend(Ext.grid.GridPanel, {
                             }
                         },
                         Inprint.factory.Combo.create(
-                            "/catalog/combos/fascicles/",
+                            "/calendar/combos/copypages/",
                             {
-                                width: 150,
-                                fieldLabel: _("Copy from"),
-                                hiddenName: 'copyfrom'
-                            }, {
-                                baseParams: {
-                                    term: "editions.calendar.view"
+                                listeners: {
+                                    beforequery: function(qe) {
+                                        delete qe.combo.lastQuery;
+                                    }
+                                }
+                            }),
+                        Inprint.factory.Combo.create(
+                            "/calendar/combos/copyindex/",
+                            {
+                                listeners: {
+                                    beforequery: function(qe) {
+                                        delete qe.combo.lastQuery;
+                                    }
                                 }
                             })
                     ],

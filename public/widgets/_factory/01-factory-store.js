@@ -88,6 +88,9 @@ Inprint.factory.Store = new function() {
         "/advertising/combo/places/",
         "/advertising/combo/modules/",
 
+        "/calendar/combos/copypages/",
+        "/calendar/combos/copyindex/",
+
         "/catalog/combos/groups/",
         "/catalog/combos/editions/",
         "/catalog/combos/fascicles/",

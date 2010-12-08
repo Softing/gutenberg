@@ -34,7 +34,7 @@ Inprint.edition.calendar.Interaction = function(panels) {
             scope: this,
             success: function(result) {
                 var data = Ext.util.JSON.decode(result.responseText);
-                if (data.success == true) {
+                if (data.result["editions.calendar.manage"] == true) {
                     managed = true;
                     grid.btnCreate.enable();
                 }

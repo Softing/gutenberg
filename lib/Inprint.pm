@@ -95,6 +95,7 @@ sub startup {
 
     # Calendar routes
     $self->createRoutes($sessionBridge, "calendar",                 [ "create", "read", "update", "delete", "list", "tree", "enable", "disable" ]);
+    $self->createRoutes($sessionBridge, "calendar/combos",          [ "copypages", "copyindex" ]);
 
     # Common routes
     $self->createRoutes($sessionBridge, "common/transfer",      [ "editions", "branches", "list" ]);
