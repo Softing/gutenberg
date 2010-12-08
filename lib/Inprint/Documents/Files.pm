@@ -113,16 +113,21 @@ sub create {
     # Create preview
     unless (@errors) {
         
-        my $ua  = LWP::UserAgent->new();
-        my $url = "http://localhost:9999/api/thumbnail/";
+        my $host = $c->config->get("openoffice.host");
+        my $port = $c->config->get("openoffice.port");
+        my $timeout = $c->config->get("openoffice.timeout");
         
+        my $url = "http://$host:$port/api/thumbnail/";
+        
+        my $ua  = LWP::UserAgent->new();
         my $request = POST "$url", Content_Type => 'form-data',
             Content => [
                 inputDocument =>  [ "$storePath/$fileName" ]
             ];
-            
+        
+        $ua->timeout($timeout);
         my $response = $ua->request($request);
-            
+        
         if ($response->is_success()) {
             open FILE, "> $storePath/.thumbnails/$fileId.png" or die "Can't open $storePath/.thumbnails/$fileId.png : $!";
                 binmode FILE;

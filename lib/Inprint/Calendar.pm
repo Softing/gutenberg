@@ -304,6 +304,10 @@ sub delete {
     foreach my $id (@ids) {
         $c->sql->Do(" DELETE FROM fascicles WHERE id=? ", [ $id ]);
         $c->sql->Do(" DELETE FROM index_fascicles WHERE fascicle=? ", [ $id ]);
+        $c->sql->Do("
+            UPDATE documents
+            SET fascicle = null, fascicle_shortcut = null, fascicle_blocked = false, pages = null, firstpage = null
+            WHERE fascicle=? ", [ $id ]);
     }
     $c->render_json( { success => $c->json->true } );
 }
