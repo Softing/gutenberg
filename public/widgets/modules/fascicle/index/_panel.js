@@ -7,8 +7,6 @@ Inprint.fascicle.indexes.Panel = Ext.extend(Ext.Panel, {
         this.fascicle = this.oid;
         this.headline = null;
         
-        alert(this.fascicle);
-        
         this.panels = {};
 
         this.panels["headlines"] = new Inprint.fascicle.indexes.TreeHeadlines({

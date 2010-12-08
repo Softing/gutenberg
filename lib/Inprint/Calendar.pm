@@ -121,13 +121,90 @@ sub create {
     my $i_begindate   = $c->param("begindate");
     my $i_enddate     = $c->param("enddate");
     
-    $c->sql->Do("
-        INSERT INTO fascicles (
-            id, edition, base_edition, variation, is_system, is_enabled, is_blocked, title, shortcut, description, begindate, enddate, created, updated)
-            VALUES (?, ?, ?, ?, false, true, false, ?, ?, ?, ?, ?, now(), now());
-    ", [ $id, $i_edition, $i_edition, $version, $i_title, $i_title, $i_title, $i_begindate, $i_enddate ]);
+    my $i_copypages     = $c->param("copypages");
+    my $i_copyindex     = $c->param("copyindex");
+    
+    my @errors;
+    my $success = $c->json->false;
+    
+    push @errors, { id => "id", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_edition));
+        
+    push @errors, { id => "title", msg => "Incorrectly filled field"}
+        unless ($c->is_text($i_title));
+    
+    if ($i_shortcut) {
+        push @errors, { id => "shortcut", msg => "Incorrectly filled field"}
+            unless ($c->is_text($i_shortcut));
+    }
+    
+    if ($i_description) {
+        push @errors, { id => "description", msg => "Incorrectly filled field"}
+            unless ($c->is_text($i_description));
+    }
+    
+    #TODO: add date checks
+    
+    my $edition;
+    unless (@errors) {
+        $edition = $c->sql->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
+        push @errors, { id => "edition", msg => "Incorrectly filled field"}
+            unless ($edition->{id});
+    }
+    
+    unless (@errors) {
+        $c->sql->bt;
+    
+        $c->sql->Do("
+            INSERT INTO fascicles (
+                id, edition, base_edition, variation, is_system, is_enabled, is_blocked, title, shortcut, description, begindate, enddate, created, updated)
+                VALUES (?, ?, ?, ?, false, true, false, ?, ?, ?, ?, ?, now(), now());
+        ", [ $id, $i_edition, $i_edition, $version, $i_title, $i_title, $i_title, $i_begindate, $i_enddate ]);
+        
+        if ($i_copyindex eq "common") {
+            
+            my $editions = $c->sql->Q("
+                SELECT id FROM editions WHERE path @> ? order by path asc; 
+            ", [ $edition->{path} ])->Values;
+            
+            my $headlines = $c->sql->Q("
+                SELECT id, edition, nature, parent, title, shortcut, description, created, updated
+                FROM index
+                WHERE nature = 'headline' AND edition = ANY(?)
+            ", [ $editions ])->Hashes;
+            
+            foreach my $headline (@$headlines) {
+                
+                my $headline_id = $c->uuid();
+                
+                $c->sql->Do("
+                    INSERT INTO index_fascicles(id, edition, fascicle, entity, nature, parent, title, shortcut, description, created, updated)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
+                ", [ $headline_id, $edition->{id}, $id, $headline->{id}, 'headline', $headline_id, $headline->{title}, $headline->{shortcut}, $headline->{description} ]);
+                
+                my $rubrics = $c->sql->Q("
+                    SELECT id, edition, nature, parent, title, shortcut, description, created, updated
+                    FROM index
+                    WHERE nature = 'rubric' AND edition = ? AND parent = ?
+                ", [ $edition->{id}, $headline->{id} ])->Hashes;
+                
+                foreach my $rubric (@$rubrics) {
+                    my $rubric_id = $c->uuid();
+                    $c->sql->Do("
+                        INSERT INTO index_fascicles(id, edition, fascicle, entity, nature, parent, title, shortcut, description, created, updated)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
+                    ", [ $rubric_id, $edition->{id}, $id, $rubric->{id}, 'rubric', $headline_id, $rubric->{title}, $rubric->{shortcut}, $rubric->{description} ]);
+                }
+                
+            }
+            
+        }
+        
+        $c->sql->et;
+    }
 
-    $c->render_json( { success => $c->json->true} );
+    $success = $c->json->true unless (@errors);
+    $c->render_json( { success => $success, errors => \@errors } );
 }
 
 sub read {
@@ -173,6 +250,7 @@ sub delete {
     my @ids = $c->param("ids");
     foreach my $id (@ids) {
         $c->sql->Do(" DELETE FROM fascicles WHERE id=? ", [ $id ]);
+        $c->sql->Do(" DELETE FROM index_fascicles WHERE fascicle=? ", [ $id ]);
     }
     $c->render_json( { success => $c->json->true } );
 }

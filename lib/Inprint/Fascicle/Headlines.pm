@@ -12,6 +12,7 @@ use base 'Inprint::BaseController';
 
 sub read {
     my $c = shift;
+    
     my $i_id = $c->param("id");
     
     my @errors;
@@ -23,7 +24,7 @@ sub read {
     my $result = [];
     
     unless (@errors) {
-        $result = $c->sql->Q(" SELECT * FROM index WHERE id = ? ", [ $i_id ])->Hash;
+        $result = $c->sql->Q(" SELECT * FROM fascicle_index WHERE id = ? ", [ $i_id ])->Hash;
     }
     
     $success = $c->json->true unless (@errors);
@@ -34,42 +35,33 @@ sub tree {
 
     my $c = shift;
 
-    my $i_edition = $c->param("node");
+    my $i_fasclce = $c->param("fascicle");
     
+    my @result;
     my @errors;
     my $success = $c->json->false;
     
     push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_edition));
+        unless ($c->is_uuid($i_fasclce));
     
-    my $edition = $c->sql->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
-    push @errors, { id => "edition", msg => "Incorrectly filled field"}
-        unless ($edition->{id});
+    my $fascicle;
+    unless (@errors) {
+        $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fasclce ])->Hash;
+        push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
+            unless ($fascicle->{id});
+    }
     
-    my @result;
     unless (@errors) {
         
         my $sql;
         my @data;
         
-        my $editions = $c->sql->Q("
-                SELECT id FROM editions WHERE path @> ? order by path asc; 
-            ", [ $edition->{path} ])->Values;
-        
         $sql = "
-            (
-                SELECT t1.id, t1.shortcut, 'marker' as icon, 'current' as status
-                FROM index t1 WHERE t1.edition = ? AND nature = 'headline'
-                ORDER BY t1.shortcut ASC
-            ) UNION ALL (
-                SELECT t1.id, t1.shortcut, 'marker--arrow' as icon, 'child' as status
-                FROM index t1 WHERE t1.edition = ANY(?) AND t1.edition <> ? AND nature = 'headline'
-                ORDER BY t1.shortcut ASC
-            )
+            SELECT t1.id, t1.shortcut, 'marker' as icon, 'current' as status
+            FROM index_fascicles t1 WHERE t1.fascicle = ? AND nature = 'headline'
+            ORDER BY t1.shortcut ASC
         ";
-        push @data, $edition->{id};
-        push @data, $editions;
-        push @data, $edition->{id};
+        push @data, $fascicle->{id};
         
         my $data = $c->sql->Q($sql, \@data)->Hashes;
         

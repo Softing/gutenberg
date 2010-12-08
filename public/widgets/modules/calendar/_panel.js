@@ -2,6 +2,7 @@ Inprint.edition.calendar.Panel = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
 
+        
         this.panels = {};
 
         this.panels.tree = new Inprint.edition.calendar.Tree();

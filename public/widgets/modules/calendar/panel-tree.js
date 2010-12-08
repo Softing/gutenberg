@@ -1,8 +1,11 @@
 Inprint.edition.calendar.Tree = Ext.extend(Ext.tree.TreePanel, {
     initComponent: function() {
+
         this.components = {};
+
         this.urls = {
             "tree":    _url("/calendar/tree/")
+
         };
         Ext.apply(this, {
             autoScroll:true,
@@ -21,6 +24,7 @@ Inprint.edition.calendar.Tree = Ext.extend(Ext.tree.TreePanel, {
                 text: _("Root node")
             }
         });
+
         Inprint.edition.calendar.Tree.superclass.initComponent.apply(this, arguments);
         this.on("beforeappend", function(tree, parent, node) {
             if (node.attributes.icon == undefined) {

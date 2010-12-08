@@ -12,10 +12,17 @@ Inprint.fascicle.indexes.TreeHeadlines = Ext.extend(Ext.tree.TreePanel, {
             "delete":  _url("/fascicle/headlines/delete/")
         };
 
+        var treeLoader = new Ext.tree.TreeLoader({
+            dataUrl: this.urls["tree"],
+            baseParams: {
+                fascicle: this.parent.fascicle
+            }
+        });
+
         Ext.apply(this, {
             title:_("Headlines"),
             autoScroll:true,
-            dataUrl: this.urls.tree,
+            loader: treeLoader,
             border:false,
             rootVisible: false,
             root: {
@@ -37,7 +44,10 @@ Inprint.fascicle.indexes.TreeHeadlines = Ext.extend(Ext.tree.TreePanel, {
         
         Inprint.fascicle.indexes.TreeHeadlines.superclass.onRender.apply(this, arguments);
         
-        this.getLoader().on("beforeload", function() { this.body.mask(_("Loading")); }, this);
+        this.getLoader().on("beforeload", function() {
+            
+            this.body.mask(_("Loading"));
+        }, this);
         this.getLoader().on("load", function() { this.body.unmask(); }, this);
         
     },

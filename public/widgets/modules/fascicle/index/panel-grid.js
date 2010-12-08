@@ -11,7 +11,7 @@ Inprint.fascicle.indexes.Rubrics = Ext.extend(Ext.grid.GridPanel, {
             "delete":  _url("/fascicle/rubrics/delete/")
         };
 
-        this.store = Inprint.factory.Store.json("/catalog/rubrics/list/");
+        this.store = Inprint.factory.Store.json("/fascicle/rubrics/list/");
         
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
 

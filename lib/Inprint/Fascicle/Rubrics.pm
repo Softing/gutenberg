@@ -45,7 +45,7 @@ sub list {
     unless (@errors) {
         $result = $c->sql->Q("
             SELECT t1.id, t1.shortcut
-            FROM index t1 WHERE t1.parent = ? AND nature = 'rubric'
+            FROM index_fascicles t1 WHERE t1.parent = ? AND nature = 'rubric'
             ORDER BY t1.shortcut ASC
         ", [ $i_headline ] )->Hashes;
     }
