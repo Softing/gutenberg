@@ -11,16 +11,17 @@ use warnings;
 use DBI;
 
 use Digest::file qw(digest_file_hex);
-use YAML qw(DumpFile LoadFile);
 
+#use utf8;
+use Text::Iconv;
 use Image::Magick;
 
 use File::Basename;
-use File::Spec;
+#use File::Spec;
 use File::Copy qw(copy move);
 use File::Path qw(make_path remove_tree);
 
-use File::Type;
+#use File::Type;
 use File::Util;
 
 use POSIX qw(strftime);
@@ -47,9 +48,13 @@ sub list {
     my $storePath = $c->getDocumentPath($document->{filepath}, \@errors);
     
     my @dir;
+    
+    use Encode;
+    
     if (-r $storePath) {
         opendir DIR, $storePath or die "read dir $storePath - $!";
         @dir = grep !/^\./, readdir DIR;
+        
         closedir DIR;
     }
     
@@ -69,6 +74,11 @@ sub list {
             my $filesize = $c->getFileSize($filepath);
             my $created  = $c->getFileChangedDate($filepath);
             my $updated  = $c->getFileModifiedDate($filepath);
+            
+            if ($^O eq "MSWin32") {
+                #my $converter = Text::Iconv->new("UTF-16LE", "utf-8");
+                #$file = $converter->convert($file);
+            }
             
             my $sth  = $sqlite->prepare("SELECT * FROM files WHERE filename = ?");
             $sth->execute( $file );
@@ -184,8 +194,8 @@ sub upload {
     my $c = shift;
     
     my $i_document = $c->param("document");
-    my $i_name = $c->param("Filename");
-    my $upload = $c->req->upload("Upload");
+    my $i_filename = $c->param("Filename");
+    my $upload = $c->req->upload("Filedata");
     
     my @errors;
     my $success = $c->json->false;
@@ -193,34 +203,41 @@ sub upload {
     my $document = Inprint::Utils::GetDocumentById($c, $i_document);
     my $storePath = $c->getDocumentPath($document->{filepath}, \@errors);
     
-    print STDERR "<<";
-    print STDERR $c->req->upload("Upload");
-    print STDERR $c->req->upload("Filename");
-    print STDERR ">";
     
-    #my ($name,$path,$suffix) = fileparse($i_filename, qr/(\.[^.]+){1}?/);
+    my ($name,$path,$suffix) = fileparse("$storePath/$i_filename", qr/(\.[^.]+){1}?/);
     
-    #if (-e "$storePath/$i_filename") {
-    #    for (1..100) {
-    #        $i_filename = "$name($_)$suffix";
-    #        unless (-e "$storePath/$i_filename") {
-    #            last;
-    #        }
-    #    }
-    #}
+    if ($^O eq "MSWin32") {
+        my $converter = Text::Iconv->new("utf-8", "windows-1251");
+        $name = $converter->convert($name);
+        $suffix = $converter->convert($suffix);
+    }
     
-    my $p = $c->req->params->to_hash;
-    while( my ( $k, $v ) = each( %$p ) ) {
-        print STDERR "\n==$k";
-    } 
+    $i_filename = "$name$suffix";
     
-    #$upload->move_to("$storePath/$i_filename");
+    if (-e "$storePath/$i_filename") {
+        for (1..100) {
+            $i_filename = "$name($_)$suffix";
+            unless (-e "$storePath/$i_filename") {
+                last;
+            }
+        }
+    }
     
-    #my $sqlite = $c->getSQLiteHandler($storePath);
-    #$sqlite->commit;
-    #$sqlite->disconnect;
+    $upload->move_to("$storePath/$i_filename");
     
-    #print STDERR ">>$i_document >> $i_filename >> $name >> $suffix";
+        my $id = $c->uuid;
+        my $digest   = $c->getDigest("$storePath/$i_filename");
+        my $mimetype = $c->getMimeType("$storePath/$i_filename");
+        my $filesize = $c->getFileSize("$storePath/$i_filename");
+        my $created  = $c->getFileChangedDate("$storePath/$i_filename");
+        my $updated  = $c->getFileModifiedDate("$storePath/$i_filename");
+        
+        my $sqlite = $c->getSQLiteHandler($storePath);
+        $sqlite->do("INSERT INTO files (id, filename, description, digest, mimetype, draft, created, updated) VALUES (?,?,?,?,?,?,?,?)", undef, 
+            $id, $i_filename, "", $digest, $mimetype, 1, $created, $updated
+        );
+        $sqlite->commit;
+        $sqlite->disconnect;
     
     $c->render_json( {"jsonrpc" => "2.0", "result" => 'null', success=> $c->json->true, "id" => "id"} );
 }
