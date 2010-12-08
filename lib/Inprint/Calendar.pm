@@ -182,9 +182,9 @@ sub create {
                 FROM index
                 WHERE nature = 'headline' AND edition = ANY(?)
             ", [ $editions ])->Hashes;
-            
+
             foreach my $headline (@$headlines) {
-                
+
                 my $headline_id = $c->uuid();
                 
                 my $headline_entity = $headline->{id};
@@ -200,12 +200,12 @@ sub create {
                 my $rubrics = $c->sql->Q("
                     SELECT id, edition, nature, parent, title, shortcut, description, created, updated
                     FROM index
-                    WHERE nature = 'rubric' AND edition = ? AND parent = ?
-                ", [ $edition->{id}, $headline->{id} ])->Hashes;
-                
+                    WHERE nature = 'rubric' AND parent = ?
+                ", [ $headline->{id} ])->Hashes;
+
                 foreach my $rubric (@$rubrics) {
                     my $rubric_id = $c->uuid();
-                    
+
                     my $rubric_entity = $rubric->{id};
                     if ($rubric->{parent} eq "00000000-0000-0000-0000-000000000000") {
                         $rubric_entity = "00000000-0000-0000-0000-000000000000";
@@ -214,11 +214,11 @@ sub create {
                     $c->sql->Do("
                         INSERT INTO index_fascicles(id, edition, fascicle, entity, nature, parent, title, shortcut, description, created, updated)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
-                    ", [ $rubric_id, $edition->{id}, $id, $rubric_entity, 'rubric', $rubric_id, $rubric->{title}, $rubric->{shortcut}, $rubric->{description} ]);
+                    ", [ $rubric_id, $edition->{id}, $id, $rubric_entity, 'rubric', $headline_id, $rubric->{title}, $rubric->{shortcut}, $rubric->{description} ]);
                 }
-                
+
             }
-            
+
         }
         
         if ($i_copyindex && $i_copyindex ne "00000000-0000-0000-0000-000000000000") {
