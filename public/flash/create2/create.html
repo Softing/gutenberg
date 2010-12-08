@@ -38,17 +38,95 @@
             }
             function flashInit() {
                 var flash = getFlashMovieObject("ExternalInterfaceExample");
-                flash.init("flashid", "letter", 0, 0);
-                flash.set( ["1/3", "2/3"], ["1/6", "5/6"] );
+                flash.init("flash1", "letter", 0, 0);
+                flash.setGrid(  ["3/5", "1/5", "4/5", "2/5", "9/10" ], ["4/6", "3/6", "2/6", "1/6", "5/6" ] );
+				//setBlock( id: String, x: String, y: String, w: String, h: String )
             }
-            function flashGet() {
+            
+			function flashLoad() {
                 var flash = getFlashMovieObject("ExternalInterfaceExample");
-                flash.get("getParams");
+                flash.setBlocks( [ 
+					{ id: "blck1", x: "0/5", y: "0/6", w: "1/1", h: "1/6" }, 
+					{ id: "blck2", x: "2/5", y: "2/6", w: "2/5", h: "2/6" }
+					//{ id: "blck3", x: "0/1", y: "0/1", w: "0/1", h: "0/1" }
+					//{ id: "blck4", x: "0/1", y: "0/1", w: "0/1", h: "0/1" } 
+				] );
+            }
+			
+			function flashClearAll() {
+                var flash = getFlashMovieObject("ExternalInterfaceExample");
+                flash.clearAll();
+            }
+			
+			function flashGetBlock(blk) {
+                var flash = getFlashMovieObject("ExternalInterfaceExample");
+                flash.getBlock("getParams");
+            }
+			
+			function flashGetBlocks() {
+                var flash = getFlashMovieObject("ExternalInterfaceExample");
+                flash.getBlocks("getParams");
             }
             function getParams (id, w, h) {
                 alert(id +', '+ w +', '+ h);
             }
+			
+			function flashCreateBlock(blck) {
+				var flash = getFlashMovieObject("ExternalInterfaceExample");
+				flash.setBlock( blck, "0/1", "0/1", "0/1", "0/1" );
+			}
+			function flashEditBlock(blck) {
+				var flash = getFlashMovieObject("ExternalInterfaceExample");
+				flash.editBlock( blck );
+			}
+			function flashDeleteBlock(blck) {
+				var flash = getFlashMovieObject("ExternalInterfaceExample");
+				flash.deleteBlock( blck );
+			}
+			
         </script>
-        <button onClick="flashGet();">Get Value</button>
+		<hr>
+		<table>
+		<tr>
+			<td>blck1</td>
+			<td>
+				<button onClick="flashGetBlock('blck1');">Get Value</button>
+				<button onClick="flashCreateBlock('blck1');">CreateBlock</button>
+				<button onClick="flashEditBlock('blck1');">EditBlock</button>
+				<button onClick="flashDeleteBlock('blck1');">DeleteBlock</button>
+			</td>
+		</tr>
+		<tr>
+			<td>blck2</td>
+			<td>
+				<button onClick="flashGetBlock('blck2');">Get Value</button>
+				<button onClick="flashCreateBlock('blck2');">CreateBlock</button>
+				<button onClick="flashEditBlock('blck2');">EditBlock</button>
+				<button onClick="flashDeleteBlock('blck2');">DeleteBlock</button>
+			</td>
+		</tr>
+		<tr>
+			<td>blck3</td>
+			<td>
+				<button onClick="flashGetBlock('blck3');">Get Value</button>
+				<button onClick="flashCreateBlock('blck3');">CreateBlock</button>
+				<button onClick="flashEditBlock('blck3');">EditBlock</button>
+				<button onClick="flashDeleteBlock('blck3');">DeleteBlock</button>
+			</td>
+		</tr>
+		<tr>
+			<td>blck4</td>
+			<td>
+				<button onClick="flashGetBlock('blck4');">Get Value</button>
+				<button onClick="flashCreateBlock('blck4');">CreateBlock</button>
+				<button onClick="flashEditBlock('blck4');">EditBlock</button>
+				<button onClick="flashDeleteBlock('blck4');">DeleteBlock</button>
+			</td>
+		</tr>
+		</table>
+		<hr>
+		<button onClick="flashLoad();">Load</button>
+		<button onClick="flashGetBlocks();">Get Values</button>
+		<button onClick="flashClearAll();">ClearAll</button>
     </body>
 </html>
