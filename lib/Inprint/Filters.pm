@@ -53,7 +53,9 @@ sub mysession
     my $c = shift;
 
     # Get session ID
-    my $sid = $c->session("sid");
+    my $sid = $c->session("sid") || $c->param("sid");
+    
+    $c->cookie(sid => $sid);
 
     # Check session
     if ($sid) {
@@ -91,7 +93,7 @@ sub mysession
         $c->QuerySessionSet("member.login",    $member->{login});
         $c->QuerySessionSet("member.shortcut", $member->{shortcut});
         $c->QuerySessionSet("member.position", $member->{job_position});
-
+        
         my $options = $c->sql->Q(" SELECT option_name, option_value FROM options WHERE member=? ", [ $member->{id} ])->Hashes || [];
         foreach my $item (@$options) {
             $c->QuerySessionSet("options.". $item->{option_name}, $item->{option_value});

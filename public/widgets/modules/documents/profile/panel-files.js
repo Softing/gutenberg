@@ -243,6 +243,17 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
     
     cmpUpload: function() {
         
+        var cookies = document.cookie.split(";");
+        var Session;
+        Ext.each(cookies, function(cookie)
+        {
+            var nvp = cookie.split("=");
+            if (nvp[0].trim() == 'sid')
+            {
+                Session = nvp[1];
+            }
+        });
+        
         var AwesomeUploader = new Ext.Window({
             title:'Awesome Uploader in a Window!',
             frame:true,
@@ -252,6 +263,10 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                     xtype:'awesomeuploader',
                     gridHeight:100,
                     height:160,
+                    extraPostData: {
+                        sid: Session,
+                        document: this.parent.document
+                    },
                     flashUploadUrl:_url("/documents/files/upload/"),
                     standardUploadUrl:_url("/documents/files/upload/"),
                     xhrUploadUrl:_url("/documents/files/upload/"),

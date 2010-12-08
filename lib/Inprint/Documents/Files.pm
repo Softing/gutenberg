@@ -193,7 +193,10 @@ sub upload {
     my $document = Inprint::Utils::GetDocumentById($c, $i_document);
     my $storePath = $c->getDocumentPath($document->{filepath}, \@errors);
     
-    print STDERR "\n>>$upload\n";
+    print STDERR "<<";
+    print STDERR $c->req->upload("Upload");
+    print STDERR $c->req->upload("Filename");
+    print STDERR ">";
     
     #my ($name,$path,$suffix) = fileparse($i_filename, qr/(\.[^.]+){1}?/);
     
@@ -208,7 +211,7 @@ sub upload {
     
     my $p = $c->req->params->to_hash;
     while( my ( $k, $v ) = each( %$p ) ) {
-        print STDERR "\n==$k\n";
+        print STDERR "\n==$k";
     } 
     
     #$upload->move_to("$storePath/$i_filename");
