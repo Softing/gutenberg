@@ -57,7 +57,7 @@ sub copyindex {
     ", \@data)->Hashes;
     
     unshift @$result, {
-        id=> "common",
+        id=> "00000000-0000-0000-0000-000000000000",
         icon => "marker",
         title=> $c->l("From index"),
         shortcut=> $c->l("From index"),

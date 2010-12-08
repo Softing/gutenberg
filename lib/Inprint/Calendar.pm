@@ -143,6 +143,16 @@ sub create {
             unless ($c->is_text($i_description));
     }
     
+    if ($i_copypages) {
+        push @errors, { id => "copypages", msg => "Incorrectly filled field"}
+            unless ($c->is_uuid($i_copypages));
+    }
+    
+    if ($i_copyindex) {
+        push @errors, { id => "copyindex", msg => "Incorrectly filled field"}
+            unless ($c->is_uuid($i_copyindex));
+    }
+    
     #TODO: add date checks
     
     my $edition;
@@ -161,7 +171,7 @@ sub create {
                 VALUES (?, ?, ?, ?, false, true, false, ?, ?, ?, ?, ?, now(), now());
         ", [ $id, $i_edition, $i_edition, $version, $i_title, $i_title, $i_title, $i_begindate, $i_enddate ]);
         
-        if ($i_copyindex eq "common") {
+        if ($i_copyindex && $i_copyindex eq "00000000-0000-0000-0000-000000000000") {
             
             my $editions = $c->sql->Q("
                 SELECT id FROM editions WHERE path @> ? order by path asc; 
@@ -196,6 +206,38 @@ sub create {
                     ", [ $rubric_id, $edition->{id}, $id, $rubric->{id}, 'rubric', $headline_id, $rubric->{title}, $rubric->{shortcut}, $rubric->{description} ]);
                 }
                 
+            }
+            
+        }
+        
+        if ($i_copyindex && $i_copyindex ne "00000000-0000-0000-0000-000000000000") {
+            
+            my $headlines = $c->sql->Q("
+                SELECT id, edition, fascicle, entity, nature, parent, title, shortcut, description, created, updated
+                FROM index_fascicles WHERE nature = 'headline' AND fascicle = ?;
+            ", [ $i_copyindex ])->Hashes;
+            
+            foreach my $headline (@$headlines) {
+                
+                my $headline_id = $c->uuid();
+                
+                $c->sql->Do("
+                    INSERT INTO index_fascicles(id, edition, fascicle, entity, nature, parent, title, shortcut, description, created, updated)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
+                ", [ $headline_id, $headline->{edition}, $id, $headline->{entity}, $headline->{nature}, $headline_id, $headline->{title}, $headline->{shortcut}, $headline->{description} ]);
+                
+                my $rubrics = $c->sql->Q("
+                    SELECT id, edition, fascicle, entity, nature, parent, title, shortcut, description, created, updated
+                    FROM index_fascicles WHERE nature = 'rubric' AND parent = ?
+                ", [ $headline->{id} ])->Hashes;
+                
+                foreach my $rubric (@$rubrics) {
+                    my $rubric_id = $c->uuid();
+                    $c->sql->Do("
+                            INSERT INTO index_fascicles(id, edition, fascicle, entity, nature, parent, title, shortcut, description, created, updated)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
+                        ", [ $rubric_id, $rubric->{edition}, $rubric->{fascicle}, $rubric->{entity}, $rubric->{nature}, $headline_id, $rubric->{title}, $rubric->{shortcut}, $rubric->{description} ]);
+                }
             }
             
         }
