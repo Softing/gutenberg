@@ -58,7 +58,7 @@
 			
 			function flashClearAll() {
                 var flash = getFlashMovieObject("ExternalInterfaceExample");
-                flash.clearAll();
+                flash.deleteAllBlocks();
             }
 			
 			function flashGetBlock(blk) {
@@ -97,14 +97,19 @@
 			}
 			function flashDeleteBlock(blck) {
 				var flash = getFlashMovieObject("ExternalInterfaceExample");
-				flash.deleteBlock( blck );
+				flash.deleteBlock(blck);
+			}
+			
+			function flashSelectBlock(blck) {
+				var flash = getFlashMovieObject("ExternalInterfaceExample");
+				flash.selectBlock(blck);
 			}
 			
         </script>
 		<hr>
 		<table>
 		<tr>
-			<td>blck1</td>
+			<td onMouseOver="flashSelectBlock('blck1')">blck1</td>
 			<td>
 				<button onClick="flashGetBlock('blck1');">Get Value</button>
 				<button onClick="flashCreateBlock('blck1');">CreateBlock</button>
@@ -113,7 +118,7 @@
 			</td>
 		</tr>
 		<tr>
-			<td>blck2</td>
+			<td onMouseOver="flashSelectBlock('blck2')">blck2</td>
 			<td>
 				<button onClick="flashGetBlock('blck2');">Get Value</button>
 				<button onClick="flashCreateBlock('blck2');">CreateBlock</button>
@@ -122,7 +127,7 @@
 			</td>
 		</tr>
 		<tr>
-			<td>blck3</td>
+			<td onMouseOver="flashSelectBlock('blck3')">blck3</td>
 			<td>
 				<button onClick="flashGetBlock('blck3');">Get Value</button>
 				<button onClick="flashCreateBlock('blck3');">CreateBlock</button>
@@ -131,7 +136,7 @@
 			</td>
 		</tr>
 		<tr>
-			<td>blck4</td>
+			<td onMouseOver="flashSelectBlock('blck4')">blck4</td>
 			<td>
 				<button onClick="flashGetBlock('blck4');">Get Value</button>
 				<button onClick="flashCreateBlock('blck4');">CreateBlock</button>
