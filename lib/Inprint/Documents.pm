@@ -165,16 +165,17 @@ sub list {
     # Set Restrictions
 
     $sql_filters .= " AND ( ";
-
     my $editions = $c->access->GetChildrens("editions.documents.work");
     my $departments = $c->access->GetChildrens("catalog.documents.view:*");
-    $sql_filters .= " ( dcm.edition = ANY(?) AND dcm.workgroup = ANY(?) ) ";
+
+    $sql_filters .= " ( ";
+    $sql_filters .= "    dcm.edition = ANY(?) ";
+    $sql_filters .= "    AND dcm.workgroup = ANY(?) ";
+    $sql_filters .= " ) ";
     push @params, $editions;
     push @params, $departments;
-    
     $sql_filters .= " OR manager=? ";
     push @params, $current_member;
-    
     $sql_filters .= " ) ";
     
     # Set Filters

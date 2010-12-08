@@ -242,7 +242,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
     },
     
     cmpUpload: function() {
-        
+
         var cookies = document.cookie.split(";");
         var Session;
         Ext.each(cookies, function(cookie)

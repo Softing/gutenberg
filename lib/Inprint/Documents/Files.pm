@@ -79,7 +79,11 @@ sub list {
                 #my $converter = Text::Iconv->new("UTF-16LE", "utf-8");
                 #$file = $converter->convert($file);
             }
-            
+
+            if ($^O eq "linux") {
+                $file = Encode::decode("utf8", $file);
+            }
+
             my $sth  = $sqlite->prepare("SELECT * FROM files WHERE filename = ?");
             $sth->execute( $file );
             my $record = $sth->fetchrow_hashref;
@@ -381,7 +385,7 @@ sub getSQLiteHandler {
     my $c = shift;
     my $filepath = shift;
     
-    my $dbargs = {AutoCommit => 0, RaiseError => 1, sqlite_unicode => 1, };
+    my $dbargs = { AutoCommit => 0, RaiseError => 1, sqlite_unicode => 1};
 
     my $dbh = DBI->connect("dbi:SQLite:dbname=$filepath/.database/store.db","","",$dbargs);
     
