@@ -1,24 +1,7 @@
 <html>
-    <head></head>
-     <body onload="pageInit();">
-        
-         <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
-                 id="ExternalInterfaceExample" width="380" height="360"
-                 codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab">
-             <param name="movie" value="Create.swf" />
-             <param name="quality" value="high" />
-             <param name="bgcolor" value="#f5f5f5" />
-             <param name="allowScriptAccess" value="sameDomain" />
-             <embed src="Create.swf" quality="high" bgcolor="#f5f5f5"
-                 width="380" height="360" name="ExternalInterfaceExample" align="middle"
-                 play="true" loop="false" quality="high" allowScriptAccess="sameDomain"
-                 type="application/x-shockwave-flash"
-                 pluginspage="http://www.macromedia.com/go/getflashplayer">
-             </embed>
-         </object>
-         
-        <script>
-            
+    <head>
+	
+		<script>
             function getFlashMovieObject(movieName) {
                 if (window.document[movieName]){
                     return window.document[movieName];
@@ -34,10 +17,29 @@
             }
             
             function pageInit() {
-                setTimeout("flashInit()", 1000);
+				setTimeout("flash1Init()", 1000);
+                setTimeout("flash2Init()", 1000);
             }
-            function flashInit() {
-                var flash = getFlashMovieObject("ExternalInterfaceExample");
+		</script>
+		
+		<script>
+            function flash1Init() {
+                var flash = getFlashMovieObject("flashMovie1");
+                flash.init("flashid", "letter", 0, 0);
+                flash.set( ["1/3", "2/3"], ["1/6", "5/6"] );
+            }
+            function flash1Get() {
+                var flash = getFlashMovieObject("flashMovie1");
+                flash.get("flash1GetParams");
+            }
+            function flash1GetParams (id, w, h) {
+                alert(id +', '+ w +', '+ h);
+            }
+        </script>
+		
+		<script>
+            function flash2Init() {
+                var flash = getFlashMovieObject("flashMovie2");
                 flash.init("flash1", "letter", 0, 0);
                 flash.setGrid(  
 					["1/5", "2/5", "3/5", "4/5", "9/10" ], 
@@ -45,8 +47,8 @@
 				);
             }
             
-			function flashLoad() {
-                var flash = getFlashMovieObject("ExternalInterfaceExample");
+			function flash2Load() {
+                var flash = getFlashMovieObject("flashMovie2");
                 flash.setBlocks( [ 
 					{ id: "blck1", x: "0/5", y: "0/6", w: "1/1", h: "1/6" }, 
 					{ id: "blck2", x: "2/5", y: "2/6", w: "2/5", h: "2/6" }
@@ -56,21 +58,22 @@
 				] );
             }
 			
-			function flashClearAll() {
-                var flash = getFlashMovieObject("ExternalInterfaceExample");
+			function flash2ClearAll() {
+                var flash = getFlashMovieObject("flashMovie2");
                 flash.deleteAllBlocks();
             }
 			
-			function flashGetBlock(blk) {
-                var flash = getFlashMovieObject("ExternalInterfaceExample");
-                flash.getBlock("getParams");
+			function flash2GetBlock(blk) {
+                var flash = getFlashMovieObject("flashMovie2");
+                flash.getBlock("flash2GetParams");
             }
 			
-			function flashGetBlocks() {
-                var flash = getFlashMovieObject("ExternalInterfaceExample");
-                flash.getBlocks("getParams");
+			function flash2GetBlocks() {
+                var flash = getFlashMovieObject("flashMovie2");
+                flash.getBlocks('flash2GetParams');
             }
-            function getParams (id, array) {
+			
+            function flash2GetParams (id, array) {
                 
 				var string = '';
 				
@@ -87,67 +90,109 @@
 				alert(id +', '+ string);
             }
 			
-			function flashCreateBlock(blck) {
-				var flash = getFlashMovieObject("ExternalInterfaceExample");
+			function flash2CreateBlock(blck) {
+				var flash = getFlashMovieObject("flashMovie2");
 				flash.setBlock( blck, "0/1", "0/1", "0/1", "0/1" );
 			}
-			function flashEditBlock(blck) {
-				var flash = getFlashMovieObject("ExternalInterfaceExample");
+			function flash2EditBlock(blck) {
+				var flash = getFlashMovieObject("flashMovie2");
 				flash.editBlock( blck );
 			}
-			function flashDeleteBlock(blck) {
-				var flash = getFlashMovieObject("ExternalInterfaceExample");
+			function flash2DeleteBlock(blck) {
+				var flash = getFlashMovieObject("flashMovie2");
 				flash.deleteBlock(blck);
 			}
 			
-			function flashSelectBlock(blck) {
-				var flash = getFlashMovieObject("ExternalInterfaceExample");
+			function flash2SelectBlock(blck) {
+				var flash = getFlashMovieObject("flashMovie2");
 				flash.selectBlock(blck);
 			}
 			
         </script>
-		<hr>
-		<table>
-		<tr>
-			<td onMouseOver="flashSelectBlock('blck1')">blck1</td>
-			<td>
-				<button onClick="flashGetBlock('blck1');">Get Value</button>
-				<button onClick="flashCreateBlock('blck1');">CreateBlock</button>
-				<button onClick="flashEditBlock('blck1');">EditBlock</button>
-				<button onClick="flashDeleteBlock('blck1');">DeleteBlock</button>
-			</td>
-		</tr>
-		<tr>
-			<td onMouseOver="flashSelectBlock('blck2')">blck2</td>
-			<td>
-				<button onClick="flashGetBlock('blck2');">Get Value</button>
-				<button onClick="flashCreateBlock('blck2');">CreateBlock</button>
-				<button onClick="flashEditBlock('blck2');">EditBlock</button>
-				<button onClick="flashDeleteBlock('blck2');">DeleteBlock</button>
-			</td>
-		</tr>
-		<tr>
-			<td onMouseOver="flashSelectBlock('blck3')">blck3</td>
-			<td>
-				<button onClick="flashGetBlock('blck3');">Get Value</button>
-				<button onClick="flashCreateBlock('blck3');">CreateBlock</button>
-				<button onClick="flashEditBlock('blck3');">EditBlock</button>
-				<button onClick="flashDeleteBlock('blck3');">DeleteBlock</button>
-			</td>
-		</tr>
-		<tr>
-			<td onMouseOver="flashSelectBlock('blck4')">blck4</td>
-			<td>
-				<button onClick="flashGetBlock('blck4');">Get Value</button>
-				<button onClick="flashCreateBlock('blck4');">CreateBlock</button>
-				<button onClick="flashEditBlock('blck4');">EditBlock</button>
-				<button onClick="flashDeleteBlock('blck4');">DeleteBlock</button>
-			</td>
-		</tr>
+	
+	</head>
+     <body onload="pageInit();">
+		<table width="100%">
+		<td width="33%" valign="top">
+			<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+					id="flashMovie1" width="380" height="360"
+					codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab">
+				<param name="movie" value="Grid.swf" />
+				<param name="quality" value="high" />
+				<param name="bgcolor" value="#f5f5f5" />
+				<param name="allowScriptAccess" value="sameDomain" />
+				<embed src="Grid.swf" quality="high" bgcolor="#f5f5f5"
+					width="380" height="360" name="flashMovie1" align="middle"
+					play="true" loop="false" quality="high" allowScriptAccess="sameDomain"
+					type="application/x-shockwave-flash"
+					pluginspage="http://www.macromedia.com/go/getflashplayer">
+				</embed>
+			</object>
+			<hr>
+			<button onClick="flash1Get();">Get Value</button>
+		</td>
+		<td width="33%" valign="top">
+		
+			<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+					id="flashMovie2" width="380" height="360"
+					codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab">
+				<param name="movie" value="Create.swf" />
+				<param name="quality" value="high" />
+				<param name="bgcolor" value="#f5f5f5" />
+				<param name="allowScriptAccess" value="sameDomain" />
+				<embed src="Create.swf" quality="high" bgcolor="#f5f5f5"
+					width="380" height="360" name="flashMovie2" align="middle"
+					play="true" loop="false" quality="high" allowScriptAccess="sameDomain"
+					type="application/x-shockwave-flash"
+					pluginspage="http://www.macromedia.com/go/getflashplayer">
+				</embed>
+			</object>
+			
+			<hr>
+			<table>
+			<tr>
+				<td onMouseOver="flash2SelectBlock('blck1')">blck1</td>
+				<td>
+					<button onClick="flash2GetBlock('blck1');">Get Value</button>
+					<button onClick="flash2CreateBlock('blck1');">CreateBlock</button>
+					<button onClick="flash2EditBlock('blck1');">EditBlock</button>
+					<button onClick="flash2DeleteBlock('blck1');">DeleteBlock</button>
+				</td>
+			</tr>
+			<tr>
+				<td onMouseOver="flash2SelectBlock('blck2')">blck2</td>
+				<td>
+					<button onClick="flash2GetBlock('blck2');">Get Value</button>
+					<button onClick="flash2CreateBlock('blck2');">CreateBlock</button>
+					<button onClick="flash2EditBlock('blck2');">EditBlock</button>
+					<button onClick="flash2DeleteBlock('blck2');">DeleteBlock</button>
+				</td>
+			</tr>
+			<tr>
+				<td onMouseOver="flash2SelectBlock('blck3')">blck3</td>
+				<td>
+					<button onClick="flash2GetBlock('blck3');">Get Value</button>
+					<button onClick="flash2CreateBlock('blck3');">CreateBlock</button>
+					<button onClick="flash2EditBlock('blck3');">EditBlock</button>
+					<button onClick="flash2DeleteBlock('blck3');">DeleteBlock</button>
+				</td>
+			</tr>
+			<tr>
+				<td onMouseOver="flash2SelectBlock('blck4')">blck4</td>
+				<td>
+					<button onClick="flash2GetBlock('blck4');">Get Value</button>
+					<button onClick="flash2CreateBlock('blck4');">CreateBlock</button>
+					<button onClick="flash2EditBlock('blck4');">EditBlock</button>
+					<button onClick="flash2DeleteBlock('blck4');">DeleteBlock</button>
+				</td>
+			</tr>
+			</table>
+			<hr>
+			<button onClick="flash2Load();">Load</button>
+			<button onClick="flash2GetBlocks();">Get Values</button>
+			<button onClick="flash2ClearAll();">ClearAll</button>
+		</td>
+		<td width="33%" valign="top">&nbsp;</td>
 		</table>
-		<hr>
-		<button onClick="flashLoad();">Load</button>
-		<button onClick="flashGetBlocks();">Get Values</button>
-		<button onClick="flashClearAll();">ClearAll</button>
     </body>
 </html>
