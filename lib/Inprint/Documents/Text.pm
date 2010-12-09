@@ -88,6 +88,10 @@ sub get {
                     $data = Encode::decode_utf8( $data );
                 }
                 
+                if ($^O eq "MSWin32") {
+                    $data = Encode::decode("windows-1251",$data);
+                }
+                
                 $data = $c->scrub($data);
                 
             } else {
@@ -167,9 +171,18 @@ sub set {
         }
         
         if ($extension ~~ [".doc", ".odt", ".rtf"]) {
-            open VERSION, ">$storePath/.versions/$baseName$suffix$baseExtension.html";
-            print VERSION $i_text;
+            
+            #my $converter = Text::Iconv->new("utf-8", "windows-1251");
+            #my $text = $converter->convert($i_text);
+            
+            my $text = $i_text;
+            
+            $text =~ s/charset=windows-1251/charset=utf8/;
+            
+            open VERSION, ">:utf8", "$storePath/.versions/$baseName$suffix$baseExtension.html";
+            print VERSION $text;
             close VERSION;
+            
         }
         if ($extension ~~ [".txt"]) {
             

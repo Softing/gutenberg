@@ -38,8 +38,6 @@ Inprint.documents.Editor.FormPanel = Ext.extend( Ext.form.FormPanel,
             oid: this.oid
         };
         
-        
-        
         this.on('actioncomplete', function() {
         
             this.body.unmask();
