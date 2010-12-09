@@ -5,11 +5,9 @@ Inprint.documents.Editor.FormPanel = Ext.extend( Ext.form.FormPanel,
     {
         var cmp = new Inprint.documents.Editor.Form();
       
-        // Create FormPanel
-        Ext.apply(this, 
-        {
-            layout:'fit',
+        Ext.apply(this,  {
             border:false,
+            layout:'fit',
             items: cmp
         });
         
@@ -58,33 +56,23 @@ Inprint.documents.Editor.FormPanel = Ext.extend( Ext.form.FormPanel,
             this.body.mask('Идет загрузка текста');
             
             Ext.Ajax.request({
-               async : false,
-               url : '/document/file/get-text/',
-               scope : this,
-               params : {
-                 file : this.oid
+                async : false,
+                url : '/documents/text/get/',
+                scope : this,
+                params : {
+                    oid : this.oid
+                },
+                success : function(response, options) 
+                {
+                    var rspns = Ext.util.JSON.decode(response.responseText);
+                    this.body.unmask();
+                    
+                    cmp.setValue(rspns.data);
+                    
+                    //this.getBottomToolbar().items.get('save').enable();
+                    
                },
-               success : function(response, options) 
-               {
-                  var data = Ext.util.JSON.decode(response.responseText);
-
-                  if (data.success == 0 && data.errors) {
-                     Ext.MessageBox.alert('Ошибка!', 'Операция не удалась, текст не получен');
-                     
-                  }
-                  else if (data.text) 
-                  {
-                     var t = data.text;
-                     t = t.replace(/^\s/, "");
-                     cmp.CmpInsertText(t);
-                  }
-                  
-                  this.getBottomToolbar().items.get('save').enable();
-                  this.body.unmask();
-                  
-               },
-               failure : function(response, options) 
-               {
+               failure : function(response, options) {
                   this.body.unmask();
                   this.getBottomToolbar().items.get('save').enable();
                   Ext.MessageBox.alert('Ошибка!', 'Операция не удалась, текст не получен');
@@ -103,9 +91,9 @@ Inprint.documents.Editor.FormPanel = Ext.extend( Ext.form.FormPanel,
         Inprint.documents.Editor.FormPanel.superclass.onRender.apply(this, arguments);
         
         this.getForm().timeout = 5;
-        this.getForm().url = '/document/file/save-text/';
+        this.getForm().url = '/documents/text/get/';
         this.getForm().baseParams = {
-            file : this.oid
+            oid: this.oid
          };
     },
     

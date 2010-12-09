@@ -108,6 +108,7 @@ sub startup {
     $self->createRoutes($sessionBridge, "documents/filters",        [ "editions", "groups", "fascicles", "headlines", "rubrics", "holders", "managers", "progress" ]);
     $self->createRoutes($sessionBridge, "documents/profile",        [ "read" ]);
     $self->createRoutes($sessionBridge, "documents/files",          [ "list", "create", "read", "update", "delete", "upload" ]);
+    $self->createRoutes($sessionBridge, "documents/text",           [ "get", "set" ]);
     
     $sessionBridge->route('/documents/files/preview/:document/:file')->to('documents-files#preview', document => "", file => "");
     #$sessionBridge->route('/documents/files/upload/:document')->to('documents-files#upload', document => "");

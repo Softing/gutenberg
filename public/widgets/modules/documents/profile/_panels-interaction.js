@@ -11,12 +11,19 @@ Inprint.documents.Profile.Interaction = function(parent, panels) {
     });
     
     
-    files.on("rowdblclick", function(grid, index, e) {
+    files.on("rowdblclick", function(thisGrid, rowIndex, evtObj) {
+        
+        thisGrid.selModel.selectRow(rowIndex);
+        evtObj.stopEvent();
+        
+        var record = thisGrid.getStore().getAt(rowIndex);
+        
         Inprint.ObjectResolver.resolve({
             aid: "document-editor",
-            oid: this.oid,
-            text: this.record.title,
+            oid:  parent.document +"::"+ record.get("id"),
+            text: record.get("filename"),
             description: _("Text editing")
         });
+        
     }, this);
 };

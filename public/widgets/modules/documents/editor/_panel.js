@@ -1,7 +1,7 @@
 Inprint.documents.Editor = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
-
+        
         this.panels = {};
         this.panels["form"]     = new Inprint.documents.Editor.FormPanel({
             oid: this.oid
