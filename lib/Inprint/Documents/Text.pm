@@ -31,59 +31,79 @@ sub get {
     
     my ($document, $file) = split '::', $i_oid;
     
+    my $sth;
+    my $data;
     my @errors;
     my $success = $c->json->false;
-    
     
     $document = Inprint::Utils::GetDocumentById($c, $document);
     my $storePath = $c->getDocumentPath($document->{filepath}, \@errors);
     my $sqlite = $c->getSQLiteHandler($storePath);
 
+    $sth  = $sqlite->prepare("SELECT * FROM files WHERE id = ?");
+    $sth->execute( $file );
+    my $record_unicode = $sth->fetchrow_hashref;
+    $sth->finish();
+
     $sqlite->{sqlite_unicode} = 0;
     
-    my $sth  = $sqlite->prepare("SELECT * FROM files WHERE id = ?");
+    $sth  = $sqlite->prepare("SELECT * FROM files WHERE id = ?");
     $sth->execute( $file );
-    my $record = $sth->fetchrow_hashref;
+    my $record_ascii = $sth->fetchrow_hashref;
     $sth->finish();
     
     if ($^O eq "MSWin32") {
         my $converter = Text::Iconv->new("utf-8", "windows-1251");
-        $record->{filename} = $converter->convert($record->{filename});
+        $record_ascii->{filename} = $converter->convert($record_ascii->{filename});
     }
     
-    my $data;
-    
-    if ($record->{id} && -r "$storePath/$record->{filename}") {
+    if ($record_ascii->{id} && -r "$storePath/$record_ascii->{filename}") {
         
-        my $host = $c->config->get("openoffice.host");
-        my $port = $c->config->get("openoffice.port");
-        my $timeout = $c->config->get("openoffice.timeout");
+        my ($name,$path,$extension) = fileparse("$storePath/$record_ascii->{filename}", qr/(\.[^.]+){1}?/);
         
-        my $url = "http://$host:$port/api/converter/";
-        
-        my $ua  = LWP::UserAgent->new();
-        
-        my $filepath = "$storePath/$record->{filename}";
-        
-        my $request = POST "$url", Content_Type => 'form-data',
-            Content => [
-                outputFormat => "html",
-                inputDocument =>  [  "$storePath/$record->{filename}" ]
-            ];
-        
-        my $response = $ua->request($request);
-        if ($response->is_success()) {
+        if ($extension ~~ [".doc", ".odt", ".rtf"]) {
             
-            $data = $response->content ;
+            my $host = $c->config->get("openoffice.host");
+            my $port = $c->config->get("openoffice.port");
+            my $timeout = $c->config->get("openoffice.timeout");
             
-            if ($^O eq "linux") {
-                $data = Encode::decode_utf8( $data );
+            my $url = "http://$host:$port/api/converter/";
+            
+            my $ua  = LWP::UserAgent->new();
+            
+            my $filepath = "$storePath/$record_ascii->{filename}";
+            
+            my $request = POST "$url", Content_Type => 'form-data',
+                Content => [
+                    outputFormat => "html",
+                    inputDocument =>  [  "$storePath/$record_ascii->{filename}" ]
+                ];
+            
+            my $response = $ua->request($request);
+            if ($response->is_success()) {
+                
+                $data = $response->content ;
+                
+                if ($^O eq "linux") {
+                    $data = Encode::decode_utf8( $data );
+                }
+                
+                $data = $c->scrub($data);
+                
+            } else {
+                print $response->as_string;
             }
+        }
+        
+        if ($extension ~~ [".txt"]) {
             
-            $data = $c->scrub($data);
+            open FILE, "<", "$storePath/$record_ascii->{filename}";
+            while (<FILE>) { $data .= $_; }
+            close FILE;
             
-        } else {
-            print $response->as_string;
+            $data = Encode::decode("windows-1251",$data);
+            
+            $data =~ s/\r?\n/<br>/g; 
         }
         
     }
@@ -100,6 +120,7 @@ sub set {
     
     my ($document, $file) = split '::', $i_oid;
     
+    my $sth;
     my @errors;
     my $success = $c->json->false;
     
@@ -107,27 +128,30 @@ sub set {
     my $storePath = $c->getDocumentPath($document->{filepath}, \@errors);
     my $sqlite = $c->getSQLiteHandler($storePath);
 
+    $sth  = $sqlite->prepare("SELECT * FROM files WHERE id = ?");
+    $sth->execute( $file );
+    my $record_unicode = $sth->fetchrow_hashref;
+    $sth->finish();
+
     $sqlite->{sqlite_unicode} = 0;
     
-    my $sth  = $sqlite->prepare("SELECT * FROM files WHERE id = ?");
+    $sth  = $sqlite->prepare("SELECT * FROM files WHERE id = ?");
     $sth->execute( $file );
-    my $dbrecord = $sth->fetchrow_hashref;
+    my $record_ascii = $sth->fetchrow_hashref;
     $sth->finish();
-    
-    my $filerecord = $dbrecord;
     
     if ($^O eq "MSWin32") {
         my $converter = Text::Iconv->new("utf-8", "windows-1251");
-        $filerecord->{filename} = $converter->convert($filerecord->{filename});
+        $record_ascii->{filename} = $converter->convert($record_ascii->{filename});
     }
     
     my $data;
     
-    if ($filerecord->{id} && -r "$storePath/$filerecord->{filename}") {
+    if ($record_ascii->{id} && -r "$storePath/$record_ascii->{filename}") {
         
         my $version_id = $c->uuid();
         
-        my ($name,$path,$extension) = fileparse("$storePath/$filerecord->{filename}", qr/(\.[^.]+){1}?/);
+        my ($name,$path,$extension) = fileparse("$storePath/$record_ascii->{filename}", qr/(\.[^.]+){1}?/);
         
         my $baseName = $name;
         my $baseExtension = $extension;
@@ -146,53 +170,69 @@ sub set {
         print VERSION $i_text;
         close VERSION;
         
-        my $version_digest = $c->getDigest("$storePath/$filerecord->{filename}");
+        my $version_digest = $c->getDigest("$storePath/$record_ascii->{filename}");
         
         $sqlite->do("
             INSERT INTO versions (id, fileid, filename, filedigest, version, created)
                 VALUES (?,?,?,?,?,?)
-        ", undef, $version_id, $dbrecord->{id}, $dbrecord->{filename}, $version_digest, "$dbrecord->{filename}$suffix$baseExtension.html", "");
+        ", undef, $version_id, $record_unicode->{id}, $record_unicode->{filename}, $version_digest, "$record_unicode->{filename}$suffix$baseExtension.html", "");
         
         $sqlite->commit;
         
-        my $fileExt = $c->extractExtension($dbrecord->{mimetype});
+        if ($extension ~~ [".doc", ".odt", ".rtf"]) {
         
-        my $host = $c->config->get("openoffice.host");
-        my $port = $c->config->get("openoffice.port");
-        my $timeout = $c->config->get("openoffice.timeout");
-        
-        my $url = "http://$host:$port/api/converter/";
-        my $ua  = LWP::UserAgent->new();
-        
-        my $request = POST "$url", Content_Type => 'form-data',
-            Content => [
-                outputFormat => $fileExt,
-                inputDocument =>  [  "$storePath/.versions/$baseName$suffix$baseExtension.html" ]
-            ];
-        
-        my $response = $ua->request($request);
-        
-        if ($response->is_success()) {
-           
-            open FILE, "> $storePath/$baseName$baseExtension" or die "Can't open $storePath/$baseName$baseExtension : $!";
-            binmode FILE;
-                print FILE $response->content;
-            close FILE;
+            my $fileExt = $c->extractExtension($record_unicode->{mimetype});
             
-            my $file_digest = $c->getDigest("$storePath/$baseName$baseExtension");
+            my $host = $c->config->get("openoffice.host");
+            my $port = $c->config->get("openoffice.port");
+            my $timeout = $c->config->get("openoffice.timeout");
             
-            if ($file_digest ne $dbrecord->{digest}) {
-                unlink "$storePath/.thumbnails/$filerecord->{id}.png";
-                $sqlite->do("
-                    UPDATE files SET digest=? WHERE id=?
-                ", undef, $file_digest, $dbrecord->{id});
-                $sqlite->commit;
+            my $url = "http://$host:$port/api/converter/";
+            my $ua  = LWP::UserAgent->new();
+            
+            my $request = POST "$url", Content_Type => 'form-data',
+                Content => [
+                    outputFormat => $fileExt,
+                    inputDocument =>  [  "$storePath/.versions/$baseName$suffix$baseExtension.html" ]
+                ];
+            
+            my $response = $ua->request($request);
+            
+            if ($response->is_success()) {
+               
+                open FILE, "> $storePath/$baseName$baseExtension" or die "Can't open $storePath/$baseName$baseExtension : $!";
+                binmode FILE;
+                    print FILE $response->content;
+                close FILE;
+                
+            } else {
+                #print $response->as_string;
             }
             
-        } else {
-            #print $response->as_string;
         }
         
+        if ($extension ~~ [".txt"]) {
+            
+            my $converter = Text::Iconv->new("utf-8", "windows-1251");
+            my $text = $converter->convert($i_text);
+            
+            $text =~ s/<br>/\r\n/g;
+            
+            open FILE, "> $storePath/$baseName$baseExtension" or die "Can't open $storePath/$baseName$baseExtension : $!";
+                print FILE $text;
+            close FILE;
+            
+        }
+        
+        my $file_digest = $c->getDigest("$storePath/$baseName$baseExtension");
+                
+        if ($file_digest ne $record_unicode->{digest}) {
+            unlink "$storePath/.thumbnails/$record_ascii->{id}.png";
+            $sqlite->do("
+                UPDATE files SET digest=? WHERE id=?
+            ", undef, $file_digest, $record_unicode->{id});
+            $sqlite->commit;
+        }
     }
     
     $success = $c->json->true unless (@errors);
