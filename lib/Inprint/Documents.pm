@@ -588,7 +588,7 @@ sub create {
             push @data, $fascicle->{shortcut};
 
             if ($i_headline) {
-
+                
                 my $headline = $c->sql->Q("
                         SELECT DISTINCT t1.id, t1.shortcut
                         FROM index_fascicles t1 WHERE t1.id=? AND t1.fascicle=?
@@ -603,11 +603,14 @@ sub create {
                     push @data, $headline->{shortcut};
                     
                     if ($i_rubric) {
+
                         my $rubric = $c->sql->Q("
                             SELECT DISTINCT t1.id, t1.shortcut
-                            FROM index_fascicles t1 WHERE t1.id=? AND t1.fascicle=?
+                            FROM index_fascicles t1 WHERE t1.id=? AND t1.parent=?
                             ORDER BY t1.shortcut ASC
-                        ", [ $i_rubric, $fascicle->{id} ])->Hash;
+                        ", [ $i_rubric, $headline->{id} ])->Hash;
+
+                        
                         if ($rubric->{id} && $rubric->{shortcut}) {
                             push @fields, "rubric";
                             push @fields, "rubric_shortcut";
@@ -619,7 +622,7 @@ sub create {
             }
         }
     }
-    
+
     # Create document
     unless (@errors) {
         my @placeholders; foreach (@data) { push @placeholders, "?"; }
