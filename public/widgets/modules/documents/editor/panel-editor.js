@@ -71,8 +71,7 @@ Inprint.documents.Editor.FormPanel = Ext.extend( Ext.form.FormPanel,
                     var rspns = Ext.util.JSON.decode(response.responseText);
                     this.body.unmask();
                     
-                    this.editor.setValue(rspns.data).defer(1000);
-                    alert(2);
+                    this.editor.setValue(rspns.data);
                     this.parent.btnSave.enable();
                 },
                 failure : function(response, options) {
