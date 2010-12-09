@@ -591,9 +591,9 @@ sub create {
 
                 my $headline = $c->sql->Q("
                         SELECT DISTINCT t1.id, t1.shortcut
-                        FROM index t1, index_mapping t2 WHERE t1.id=t2.child AND t1.id=? AND t2.entity=?
+                        FROM index_fascicles t1 WHERE t1.id=? AND t1.fascicle=?
                         ORDER BY t1.shortcut ASC
-                ", [ $i_headline, $i_edition ])->Hash;
+                ", [ $i_headline, $fascicle->{id} ])->Hash;
 
                 if ($headline->{id} && $headline->{shortcut}) {
                     
@@ -605,9 +605,9 @@ sub create {
                     if ($i_rubric) {
                         my $rubric = $c->sql->Q("
                             SELECT DISTINCT t1.id, t1.shortcut
-                            FROM index t1, index_mapping t2 WHERE t1.id=t2.child AND t1.id=? AND t2.parent=?
+                            FROM index_fascicles t1 WHERE t1.id=? AND t1.fascicle=?
                             ORDER BY t1.shortcut ASC
-                        ", [ $i_rubric, $headline->{id} ])->Hash;
+                        ", [ $i_rubric, $fascicle->{id} ])->Hash;
                         if ($rubric->{id} && $rubric->{shortcut}) {
                             push @fields, "rubric";
                             push @fields, "rubric_shortcut";

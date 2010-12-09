@@ -34,13 +34,13 @@ sub list {
 
     my $c = shift;
 
-    my $i_id = $c->param("document");
+    my $i_document = $c->param("document");
     
     my @result;
     my @errors;
     my $success = $c->json->false;
     
-    my $document = Inprint::Utils::GetDocumentById($c, $i_id);
+    my $document = Inprint::Utils::GetDocumentById($c, $i_document);
     my $storePath = $c->getDocumentPath($document->{filepath}, \@errors);
     
     my @dir;

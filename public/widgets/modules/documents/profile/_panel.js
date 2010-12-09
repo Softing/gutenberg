@@ -69,10 +69,8 @@ Inprint.documents.Profile = Ext.extend(Ext.Panel, {
             params: { id: this.oid },
             success: function(result) {
                 var response = Ext.util.JSON.decode(result.responseText);
-                
                 if (response.data) {
                     this.document = response.data.id;
-                    
                     this.panels["profile"].cmpFill(response.data);
                     this.panels["files"].cmpFill(response.data);
                     this.panels["comments"].cmpFill(response.data);
