@@ -155,8 +155,6 @@ sub set {
         
         $sqlite->commit;
         
-        
-        
         my $fileExt = $c->extractExtension($dbrecord->{mimetype});
         
         my $host = $c->config->get("openoffice.host");
@@ -181,9 +179,18 @@ sub set {
                 print FILE $response->content;
             close FILE;
             
+            my $file_digest = $c->getDigest("$storePath/$baseName$baseExtension");
+            
+            if ($file_digest ne $dbrecord->{digest}) {
+                unlink "$storePath/.thumbnails/$filerecord->{id}.png";
+                $sqlite->do("
+                    UPDATE files SET digest=? WHERE id=?
+                ", undef, $file_digest, $dbrecord->{id});
+                $sqlite->commit;
+            }
+            
         } else {
-            die 1;
-        #    #print $response->as_string;
+            #print $response->as_string;
         }
         
     }
