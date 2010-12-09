@@ -2,7 +2,7 @@ Inprint.documents.Profile = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
         
-        this.document = null;
+        this.document = this.oid;
         
         this.panels = {};
         this.panels["profile"]  = new Inprint.documents.Profile.View({

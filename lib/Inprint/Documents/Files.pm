@@ -34,7 +34,7 @@ sub list {
 
     my $c = shift;
 
-    my $i_id = $c->param("id");
+    my $i_id = $c->param("document");
     
     my @result;
     my @errors;
@@ -139,58 +139,74 @@ sub create {
     my @errors;
     my $success = $c->json->false;
     
-    my $storePath    = $c->config->get("store.path");
-    my $templateFile = $c->processPath("$storePath/templates/template.rtf");
-    push @errors, { id => "filepath", msg => "Cant read template file from settings"}
-        unless -e -r $templateFile;
-        
-    my $document = Inprint::Utils::GetDocumentById($c, $i_document);
-    my $documentPath = $c->getDocumentPath($document->{filepath}, \@errors);
+    my $storePath;
+    my $documentStorePath;
+    my $templateFile;
     
-    my $fileId = $c->uuid;
+    my $document = Inprint::Utils::GetDocumentById($c, $i_document);
+    push @errors, { id => "id", msg => "Cant find object with this id"}
+        unless $document->{id};
+    
+    unless (@errors) {
+        $storePath    = $c->config->get("store.path");
+        push @errors, { id => "path", msg => "Cant find path"}
+            unless $storePath;
+    }
+    
+    unless (@errors) {
+        $documentStorePath = $c->getDocumentPath($document->{filepath}, \@errors);
+        push @errors, { id => "path", msg => "Cant find path"}
+            unless $documentStorePath;
+    }
+    
+    unless (@errors) {
+        $templateFile = $c->processPath("$storePath/templates/template.rtf");
+        push @errors, { id => "filepath", msg => "Cant read template file from settings"}
+            unless -e -r $templateFile;
+    }
     
     my $suffix;
     my $fileName = $i_title;
-    my $localFileName = $fileName;
-        
-    if ($^O eq "MSWin32") {
-        my $converter = Text::Iconv->new("utf-8", "windows-1251");
-        $localFileName = $converter->convert($localFileName);
-    }
-        
-    # Create file
+    my $localFileName  = $i_title;
+    
     unless (@errors) {
         
-        if (-e "$documentPath/$localFileName.rtf") {
+        if ($^O eq "MSWin32") {
+            my $converter = Text::Iconv->new("utf-8", "windows-1251");
+            $localFileName = $converter->convert($localFileName);
+        }
+        
+        if (-e "$documentStorePath/$localFileName.rtf") {
             for (1..100) {
-                unless (-e "$documentPath/$localFileName($_).rtf") {
+                unless (-e "$documentStorePath/$localFileName($_).rtf") {
                     $suffix = "($_)";
                     last;
                 }
             }
         }
         
-        copy $templateFile, "$documentPath/$localFileName$suffix.rtf";
+        copy $templateFile, "$documentStorePath/$localFileName$suffix.rtf";
         push @errors, { id => "filepath", msg => "Cant read new file"}
-            unless -e -r "$documentPath/$localFileName$suffix.rtf";
+            unless -e -r "$documentStorePath/$localFileName$suffix.rtf";
         
     }
     
     unless (@errors) {
         
         my $id = $c->uuid;
-        my $digest   = $c->getDigest("$documentPath/$localFileName$suffix.rtf");
-        my $mimetype = $c->getMimeType("$documentPath/$localFileName$suffix.rtf");
-        my $filesize = $c->getFileSize("$documentPath/$localFileName$suffix.rtf");
-        my $created  = $c->getFileChangedDate("$documentPath/$localFileName$suffix.rtf");
-        my $updated  = $c->getFileModifiedDate("$documentPath/$localFileName$suffix.rtf");
+        my $digest   = $c->getDigest("$documentStorePath/$localFileName$suffix.rtf");
+        my $mimetype = $c->getMimeType("$documentStorePath/$localFileName$suffix.rtf");
+        my $filesize = $c->getFileSize("$documentStorePath/$localFileName$suffix.rtf");
+        my $created  = $c->getFileChangedDate("$documentStorePath/$localFileName$suffix.rtf");
+        my $updated  = $c->getFileModifiedDate("$documentStorePath/$localFileName$suffix.rtf");
         
-        my $sqlite = $c->getSQLiteHandler($documentPath);
+        my $sqlite = $c->getSQLiteHandler($documentStorePath);
         $sqlite->do("INSERT INTO files (id, filename, description, digest, mimetype, draft, created, updated) VALUES (?,?,?,?,?,?,?,?)", undef, 
             $id, "$fileName$suffix.rtf", $i_description, $digest, $mimetype, 1, $created, $updated
         );
         $sqlite->commit;
         $sqlite->disconnect;
+        
     }
     
     $success = $c->json->true unless (@errors);

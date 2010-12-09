@@ -12,7 +12,10 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
         }
 
         this.store = Inprint.factory.Store.json(this.urls["list"], {
-            autoLoad:true
+            autoLoad:true,
+            baseParams: {
+                document: this.oid
+            }
         });
         
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();

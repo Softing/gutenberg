@@ -81,7 +81,9 @@ sub GetRubricById {
 
 sub GetDocumentById {
     my $c  = shift;
-    my %params = ( @_ );
+    my $id = shift;
+    
+    return undef unless $id;
     
     my @params = ();
     my $sql = "
@@ -94,10 +96,8 @@ sub GetDocumentById {
             t1.filepath
         FROM documents t1 WHERE 1=1 ";
     
-    if ($params{id}) {
-        $sql .= " AND t1.id=?  ";
-        push @params, $params{id};
-    }
+    $sql .= " AND t1.id=?  ";
+    push @params, $id;
     
     my $result = $c->sql->Q($sql, \@params)->Hash;
     
