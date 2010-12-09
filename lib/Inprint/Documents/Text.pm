@@ -17,6 +17,7 @@ use File::Temp qw/ tempfile tempdir /;
 use LWP::UserAgent;
 use HTTP::Request::Common;
 use Text::Iconv;
+use HTML::Scrubber;
 
 use Inprint::Utils;
 
@@ -76,8 +77,11 @@ sub get {
             
             $data = $response->content ;
             
-            #my $converter = Text::Iconv->new("windows-1251", "utf-8");
-            #$data = $converter->convert($data);
+            if ($^O eq "linux") {
+                $data = Encode::decode_utf8( $data );
+            }
+            
+            $data = $c->scrub($data);
             
         } else {
             print $response->as_string;
@@ -159,6 +163,89 @@ sub processPath {
     }
     
     return $filepath;
+}
+
+
+sub scrub {
+
+    my $c = shift;
+    my $data = shift;
+
+    # Обрабатываем текст
+
+    my $scrubber = HTML::Scrubber->new( allow => [ qw[ p b i u hr br ol ul li font table col tr td th tbody ] ]); #span
+    $scrubber->rules(
+
+      table =>
+      {
+        border => 1,
+        bordercolor => 1,
+        cellspacing => 1,
+        cellpadding => 1,
+        '*' 	=> 0
+      },
+
+      tr =>
+      {
+        valign 	=> 1,
+        '*' 	=> 0
+      },
+
+      col =>
+      {
+        width 	=> 1,
+        '*' 	=> 0
+      },
+
+      td =>
+      {
+        width 	=> 0,
+        colspan => 1,
+        rowspan => 1,
+        '*' 	=> 0
+      },
+
+      p =>
+      {
+        align 	=> 0,
+        '*' 	=> 0
+      },
+
+           font =>
+           {
+               size 	=> 0,
+               color 	=> 1,
+               style 	=> 0,
+               '*' 	=> 0,
+           }
+
+      );
+
+    $data =~ s/<title>(.*?)<\/title>//ig;
+
+    $data = $scrubber->scrub($data);
+
+    # постпроцессинг
+    $data =~ s/\n+/ /g;
+
+    $data =~ s/(<br>)+/<br>/ig;
+    $data =~ s/<p><br>\s+<\/p>/ /ig;
+
+    $data =~ s/<b>\s+<\/b>/ /ig;
+
+    $data =~ s/<font>\n+<\/font>/ /ig;
+    $data =~ s/<font>\s+<\/font>/ /ig;
+
+    $data =~ s/<td>\s+<\/td>/<td>&nbsp;<\/td>/ig;
+
+    $data =~ s/<font>(.*?)<\/font>/$1/ig;
+    $data =~ s/<font \w+="#\w+"> <\/font>/ /isg;
+
+    $data =~ s/\s+\./\./ig;
+    $data =~ s/\s+/ /ig;
+
+  return $data;
+
 }
 
 1;
