@@ -1,8 +1,10 @@
 Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
 
     initComponent: function() {
-
+        
+        this.access = {};
         this.record = {};
+        
         this.urls = {
             "list":        "/documents/files/list/",
             "create": _url("/documents/files/create/"),
@@ -20,45 +22,6 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
         
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
 
-        this.tbar = [
-            {
-                icon: _ico("document--plus"),
-                cls: "x-btn-text-icon",
-                text: _("Create"),
-                disabled:true,
-                ref: "../btnCreate",
-                scope:this,
-                handler: this.cmpCreate
-            },
-            {
-                icon: _ico("pencil"),
-                cls: "x-btn-text-icon",
-                text: _("Edit"),
-                disabled:true,
-                ref: "../btnUpdate",
-                scope:this,
-                handler: this.cmpUpdate
-            },
-            {
-                icon: _ico("document-globe"),
-                cls: "x-btn-text-icon",
-                text: _("Upload"),
-                disabled:true,
-                ref: "../btnUpload",
-                scope:this,
-                handler: this.cmpUpload
-            },
-            {
-                icon: _ico("document-shred"),
-                cls: "x-btn-text-icon",
-                text: _("Delete"),
-                disabled:true,
-                ref: "../btnDelete",
-                scope:this,
-                handler: this.cmpDelete
-            }
-            
-        ];
 
         // Column model
         this.columns = [
@@ -108,6 +71,39 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                 sortable: true,
                 dataIndex: "updated"
             }
+            
+        ];
+
+        this.tbar = [
+            {
+                icon: _ico("document--plus"),
+                cls: "x-btn-text-icon",
+                text: _("Create"),
+                disabled:true,
+                ref: "../btnCreate",
+                scope:this,
+                handler: this.cmpCreate
+            },
+            {
+                icon: _ico("document-globe"),
+                cls: "x-btn-text-icon",
+                text: _("Upload"),
+                disabled:true,
+                ref: "../btnUpload",
+                scope:this,
+                handler: this.cmpUpload
+            },
+            "-",
+            {
+                icon: _ico("document-shred"),
+                cls: "x-btn-text-icon",
+                text: _("Delete"),
+                disabled:true,
+                ref: "../btnDelete",
+                scope:this,
+                handler: this.cmpDelete
+            }
+            
         ];
 
         Ext.apply(this, {
@@ -121,11 +117,59 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
         // Call parent (required)
         Inprint.documents.Profile.Files.superclass.initComponent.apply(this, arguments);
     },
-
-    // Override other inherited methods
+    
     onRender: function() {
-        // Call parent (required)
+        
         Inprint.documents.Profile.Files.superclass.onRender.apply(this, arguments);
+        
+        this.on("rowdblclick", function(thisGrid, rowIndex, evtObj) {
+        
+            thisGrid.selModel.selectRow(rowIndex);
+            evtObj.stopEvent();
+            
+            var record = thisGrid.getStore().getAt(rowIndex);
+            
+            Inprint.ObjectResolver.resolve({
+                aid: "document-editor",
+                oid:  this.oid +"::"+ record.get("id"),
+                text: record.get("filename"),
+                description: _("Text editing")
+            });
+            
+        }, this);
+        
+        this.on("rowcontextmenu", function(thisGrid, rowIndex, evtObj) {
+            
+            thisGrid.selModel.selectRow(rowIndex);
+            evtObj.stopEvent();
+            
+            var rowCtxMenuItems = [];
+            
+            var record = thisGrid.getStore().getAt(rowIndex);
+            
+            rowCtxMenuItems.push({
+                icon: _ico("pencil"),
+                cls: "x-btn-text-icon",
+                text: _("Edit"),
+                scope:this,
+                handler : function() {
+                    Inprint.ObjectResolver.resolve({
+                        aid: "document-editor",
+                        oid:  this.oid +"::"+ record.get("id"),
+                        text: record.get("filename"),
+                        description: _("Text editing")
+                    });
+                }
+            });
+            
+            thisGrid.rowCtxMenu = new Ext.menu.Menu({
+                items : rowCtxMenuItems
+            });
+            
+            thisGrid.rowCtxMenu.showAt(evtObj.getXY());
+            
+        }, this);
+        
     },
     
     cmpFill: function(record) {
@@ -138,6 +182,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
     },
     
     cmpAccess: function(access) {
+        this.access = access;
         _disable(this.btnCreate, this.btnUpload, this.btnDelete);
         if (access["files.add"]     == true) this.btnCreate.enable();
         if (access["files.add"]     == true) this.btnUpload.enable();
