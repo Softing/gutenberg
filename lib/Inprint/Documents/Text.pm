@@ -75,8 +75,6 @@ sub get {
         if ($response->is_success()) {
             
             $data = $response->content ;
-            die $data;
-            
             
             #my $converter = Text::Iconv->new("windows-1251", "utf-8");
             #$data = $converter->convert($data);
