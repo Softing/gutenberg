@@ -13,7 +13,18 @@ Inprint.documents.Editor.FormPanel = Ext.extend( Ext.form.FormPanel,
         });
         
         Inprint.documents.Editor.FormPanel.superclass.initComponent.apply(this, arguments);
+        
+        this.on('beforeaction', function() {
+            this.body.mask('Идет сохранение текста...');
+            this.parent.btnSave.disable();
+        }, this);
       
+        this.on('actionfailed', function() {
+            this.body.unmask();
+            this.parent.btnSave.enable();
+            Ext.MessageBox.alert('Ошибка!', 'Не удалось сохранить текст!');
+        }, this);
+        
     },
     
     // Override other inherited methods
@@ -27,16 +38,7 @@ Inprint.documents.Editor.FormPanel = Ext.extend( Ext.form.FormPanel,
             oid: this.oid
         };
         
-        this.on('beforeaction', function() {
-            this.body.mask('Идет сохранение текста...');
-            this.parent.btnSave.disable();
-        }, this)
-      
-        this.on('actionfailed', function() {
-            this.body.unmask();
-            this.parent.btnSave.enable();
-            Ext.MessageBox.alert('Ошибка!', 'Не удалось сохранить текст!');
-        }, this)
+        
         
         this.on('actioncomplete', function() {
         
