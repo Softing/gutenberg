@@ -4,16 +4,29 @@ Inprint.documents.Editor.FormPanel = Ext.extend( Ext.form.FormPanel,
     initComponent: function()
     {
         
-        var cmp = new Inprint.documents.Editor.Form();
+        this.editor = new Inprint.documents.Editor.Form();
       
         Ext.apply(this,  {
             border:false,
             layout:'fit',
-            items: cmp
+            items: this.editor
         });
         
         Inprint.documents.Editor.FormPanel.superclass.initComponent.apply(this, arguments);
       
+    },
+    
+    // Override other inherited methods
+    onRender: function() {
+        
+        Inprint.documents.Editor.FormPanel.superclass.onRender.apply(this, arguments);
+        
+        this.getForm().timeout = 5;
+        this.getForm().url = '/documents/text/set/';
+        this.getForm().baseParams = {
+            oid: this.oid
+        };
+        
         this.on('beforeaction', function() {
             this.body.mask('Идет сохранение текста...');
             this.parent.btnSave.disable();
@@ -38,17 +51,16 @@ Inprint.documents.Editor.FormPanel = Ext.extend( Ext.form.FormPanel,
             
         }, this);
         
-        cmp.on('sync', function( editor, html ) {
+        this.editor.on('sync', function( editor, html ) {
             var count = this.cmpGetCharCount(html);
             Ext.fly( this.parent.charCounter.getEl()).update('Знаков: ' + count );
         }, this);
       
-        cmp.on('initialize', function(cmp) {
+        this.editor.on('initialize', function() {
             
             this.body.mask('Идет загрузка текста');
             
             Ext.Ajax.request({
-                async : false,
                 url : '/documents/text/get/',
                 scope : this,
                 params : {
@@ -59,34 +71,21 @@ Inprint.documents.Editor.FormPanel = Ext.extend( Ext.form.FormPanel,
                     var rspns = Ext.util.JSON.decode(response.responseText);
                     this.body.unmask();
                     
+                    this.editor.setValue(rspns.data).defer(1000);
+                    alert(2);
                     this.parent.btnSave.enable();
-                    
-                    cmp.setValue(rspns.data);
                 },
                 failure : function(response, options) {
                     this.body.unmask();
                     this.getBottomToolbar().items.get('save').enable();
                     Ext.MessageBox.alert('Ошибка!', 'Операция не удалась, текст не получен');
                 }
-            });
+            }, this);
             
-            var count = this.CmpGetCharCount( cmp.getValue() );
+            var count = this.CmpGetCharCount( this.editor.getValue() );
             
          }, this);
-      
-    },
-    
-    // Override other inherited methods
-    onRender: function() {
         
-        Inprint.documents.Editor.FormPanel.superclass.onRender.apply(this, arguments);
-        
-        this.getForm().timeout = 5;
-        this.getForm().url = '/documents/text/set/';
-        this.getForm().baseParams = {
-            oid: this.oid
-         };
-         
     },
     
     cmpGetCharCount: function(html) {
