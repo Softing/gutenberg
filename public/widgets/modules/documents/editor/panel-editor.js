@@ -3,6 +3,7 @@ Inprint.documents.Editor.FormPanel = Ext.extend( Ext.form.FormPanel,
    
     initComponent: function()
     {
+        
         var cmp = new Inprint.documents.Editor.Form();
       
         Ext.apply(this,  {
@@ -15,43 +16,34 @@ Inprint.documents.Editor.FormPanel = Ext.extend( Ext.form.FormPanel,
       
         this.on('beforeaction', function() {
             this.body.mask('Идет сохранение текста...');
-            this.getBottomToolbar().items.get('save').disable();
+            this.parent.btnSave.disable();
         }, this)
       
         this.on('actionfailed', function() {
             this.body.unmask();
-            this.getBottomToolbar().items.get('save').enable();
+            this.parent.btnSave.enable();
             Ext.MessageBox.alert('Ошибка!', 'Не удалось сохранить текст!');
         }, this)
         
-        this.on('actioncomplete', function() 
-        {
+        this.on('actioncomplete', function() {
         
             this.body.unmask();
-            this.getBottomToolbar().items.get('save').enable();
+            this.parent.btnSave.enable();
             
-            new Ext.ux.ToastWindow({
-                title: 'Все в порядке!',
-                html: 'Ваш текст успешно сохранен',
-                iconCls: 'toast-success'
-            }).show(document);
+            //new Ext.ux.ToastWindow({
+            //    title: 'Все в порядке!',
+            //    html: 'Ваш текст успешно сохранен',
+            //    iconCls: 'toast-success'
+            //}).show(document);
             
-        }, this)
-      
-        // Create sync events
+        }, this);
+        
         cmp.on('sync', function( editor, html ) {
-            //var count = this.CmpGetCharCount(html);
-            //Ext.fly( this.charCount.getEl()).update('Знаков: ' + count );
+            var count = this.cmpGetCharCount(html);
+            Ext.fly( this.parent.charCounter.getEl()).update('Знаков: ' + count );
         }, this);
       
-        // Create initialize event
-        this.initializeCount = 0;
         cmp.on('initialize', function(cmp) {
-            
-            this.initializeCount++;
-            
-            //if ( this.initializeCount == 1 )
-            //   return;
             
             this.body.mask('Идет загрузка текста');
             
@@ -67,16 +59,15 @@ Inprint.documents.Editor.FormPanel = Ext.extend( Ext.form.FormPanel,
                     var rspns = Ext.util.JSON.decode(response.responseText);
                     this.body.unmask();
                     
+                    this.parent.btnSave.enable();
+                    
                     cmp.setValue(rspns.data);
-                    
-                    //this.getBottomToolbar().items.get('save').enable();
-                    
-               },
-               failure : function(response, options) {
-                  this.body.unmask();
-                  this.getBottomToolbar().items.get('save').enable();
-                  Ext.MessageBox.alert('Ошибка!', 'Операция не удалась, текст не получен');
-               }
+                },
+                failure : function(response, options) {
+                    this.body.unmask();
+                    this.getBottomToolbar().items.get('save').enable();
+                    Ext.MessageBox.alert('Ошибка!', 'Операция не удалась, текст не получен');
+                }
             });
             
             var count = this.CmpGetCharCount( cmp.getValue() );
@@ -86,19 +77,19 @@ Inprint.documents.Editor.FormPanel = Ext.extend( Ext.form.FormPanel,
     },
     
     // Override other inherited methods
-    onRender: function()
-    {
+    onRender: function() {
+        
         Inprint.documents.Editor.FormPanel.superclass.onRender.apply(this, arguments);
         
         this.getForm().timeout = 5;
-        this.getForm().url = '/documents/text/get/';
+        this.getForm().url = '/documents/text/set/';
         this.getForm().baseParams = {
             oid: this.oid
          };
+         
     },
     
-    CmpGetCharCount: function(html)
-    {
+    cmpGetCharCount: function(html) {
         html = html.replace(/\s+$/, "");
         html = html.replace(/&nbsp;/g, "-");
         html = html.replace(/[\xD]?\xA/g, "");

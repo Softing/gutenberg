@@ -3,12 +3,39 @@ Inprint.documents.Editor = Ext.extend(Ext.Panel, {
     initComponent: function() {
         
         this.panels = {};
+        
         this.panels["form"]     = new Inprint.documents.Editor.FormPanel({
+            parent:this,
             oid: this.oid
         });
+        
         this.panels["versions"] = new Inprint.documents.Editor.Versions({
+            parent:this,
             oid: this.oid
         });
+
+        this.charCounter = new Ext.Toolbar.TextItem('Знаков: 0');
+
+        this.bbar = {
+            xtype: "statusbar",
+            statusAlign : 'right',
+            items : [
+                {
+                    ref: "../btnSave",
+                    disabled:true,
+                    scope : this,
+                    text : '<b>Сохранить текст</b>',
+                    cls : 'x-btn-text-icon',
+                    icon: _ico("disk-black"),
+                    scope:this,
+                    handler : function() {
+                        this.panels["form"].getForm().submit();
+                    }
+                },
+                '->',
+                this.charCounter
+            ]
+        };
 
         Ext.apply(this, {
             border:true,
@@ -29,28 +56,7 @@ Inprint.documents.Editor = Ext.extend(Ext.Panel, {
                     width:"50%",
                     items: this.panels["versions"]
                 }
-            ],
-            
-            bbar: {
-                xtype: "statusbar",
-                statusAlign : 'right',
-                items : [
-                    {
-                        id: 'save',
-                        disabled:true,
-                        scope : this,
-                        text : '<b>Сохранить текст</b>',
-                        cls : 'x-btn-text-icon',
-                        icon: _ico("disk-black"),
-                        handler : function() 
-                        {
-                           ///this.getForm().submit();
-                        }
-                    },
-                    '->',
-                    new Ext.Toolbar.TextItem('Знаков: 0')
-                ]
-            }
+            ]
         });
 
         Inprint.documents.Editor.superclass.initComponent.apply(this, arguments);

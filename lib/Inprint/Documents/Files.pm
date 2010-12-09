@@ -12,7 +12,6 @@ use DBI;
 
 use Digest::file qw(digest_file_hex);
 
-#use utf8;
 use Text::Iconv;
 use Image::Magick;
 
@@ -161,8 +160,6 @@ sub create {
         
     # Create file
     unless (@errors) {
-        
-        
         
         if (-e "$documentPath/$localFileName.rtf") {
             for (1..100) {
