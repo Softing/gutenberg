@@ -172,13 +172,20 @@ sub set {
         
         if ($extension ~~ [".doc", ".odt", ".rtf"]) {
             
-            #my $converter = Text::Iconv->new("utf-8", "windows-1251");
-            #my $text = $converter->convert($i_text);
-            
             my $text = $i_text;
             
             $text =~ s/charset=windows-1251/charset=utf8/;
             $text =~ s/charset=iso-8859-1/charset=utf8/;
+            
+            #TODO: add more meta tags
+            
+            unless ($text =~ m/<meta http-equiv="CONTENT-TYPE" content="text\/html; charset=.*?">/g) {
+                $text = '<meta http-equiv="CONTENT-TYPE" content="text/html; charset=utf8">' . $text;
+            }
+            
+            unless ($text =~ m/<meta name="GENERATOR" content=".*?">/g) {
+                $text = '<meta name="GENERATOR" content="OpenOffice.org 3.2 (Win32)">' . $text;
+            }
             
             open VERSION, ">:utf8", "$storePath/.versions/$baseName$suffix$baseExtension.html";
             print VERSION $text;
