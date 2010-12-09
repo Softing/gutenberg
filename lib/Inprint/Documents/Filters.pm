@@ -87,7 +87,7 @@ sub headlines {
 
     my $cgi_fascicle = $c->param("flt_fascicle") || undef;
 
-    my $sql = " SELECT DISTINCT headline as id, headline_shortcut as title FROM documents WHERE edition=ANY(?) ";
+    my $sql = " SELECT DISTINCT headline as id, headline_shortcut as title FROM documents WHERE edition=ANY(?) AND headline_shortcut is not null ";
 
     my $editions = $c->access->GetChildrens("editions.documents.work");
     push @data, $editions;
@@ -121,7 +121,7 @@ sub rubrics {
     my $cgi_fascicle = $c->param("flt_fascicle") || undef;
     my $cgi_headline = $c->param("flt_headline") || undef;
 
-    my $sql = " SELECT DISTINCT rubric as id, rubric_shortcut as title FROM documents WHERE edition=ANY(?) ";
+    my $sql = " SELECT DISTINCT rubric as id, rubric_shortcut as title FROM documents WHERE edition=ANY(?) AND rubric_shortcut is not null ";
 
     my $editions = $c->access->GetChildrens("editions.documents.work");
     push @data, $editions;

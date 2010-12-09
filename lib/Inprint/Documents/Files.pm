@@ -35,7 +35,7 @@ sub list {
     my $c = shift;
 
     my $i_document = $c->param("document");
-    
+
     my @result;
     my @errors;
     my $success = $c->json->false;

@@ -66,6 +66,8 @@ sub get {
             my $host = $c->config->get("openoffice.host");
             my $port = $c->config->get("openoffice.port");
             my $timeout = $c->config->get("openoffice.timeout");
+
+            $data = Encode::decode_utf8( $data );
             
             my $url = "http://$host:$port/api/converter/";
             
