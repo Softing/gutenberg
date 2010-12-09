@@ -166,9 +166,23 @@ sub set {
             }
         }
         
-        open VERSION, ">$storePath/.versions/$baseName$suffix$baseExtension.html";
-        print VERSION $i_text;
-        close VERSION;
+        if ($extension ~~ [".doc", ".odt", ".rtf"]) {
+            open VERSION, ">$storePath/.versions/$baseName$suffix$baseExtension.html";
+            print VERSION $i_text;
+            close VERSION;
+        }
+        if ($extension ~~ [".txt"]) {
+            
+            my $converter = Text::Iconv->new("utf-8", "windows-1251");
+            my $text = $converter->convert($i_text);
+            
+            $text =~ s/<br>/\r\n/g;
+            
+            open VERSION, ">$storePath/.versions/$baseName$suffix$baseExtension.txt";
+            print VERSION $text;
+            close VERSION;
+            
+        }
         
         my $version_digest = $c->getDigest("$storePath/$record_ascii->{filename}");
         
