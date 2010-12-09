@@ -17,11 +17,8 @@ use Text::Iconv;
 use Image::Magick;
 
 use File::Basename;
-#use File::Spec;
 use File::Copy qw(copy move);
 use File::Path qw(make_path remove_tree);
-
-#use File::Type;
 use File::Util;
 
 use POSIX qw(strftime);
@@ -329,6 +326,8 @@ sub preview {
     my $document = Inprint::Utils::GetDocumentById($c, $i_document);
     my $storePath = $c->getDocumentPath($document->{filepath}, \@errors);
     my $sqlite = $c->getSQLiteHandler($storePath);
+
+    $sqlite->{sqlite_unicode} = 0;
     
     my $sth  = $sqlite->prepare("SELECT * FROM files WHERE id = ?");
     $sth->execute( $i_file );
@@ -351,9 +350,12 @@ sub preview {
             my $url = "http://$host:$port/api/thumbnail/";
             
             my $ua  = LWP::UserAgent->new();
-                
+
+            my $filepath = "$storePath/$record->{filename}";
+
             my $request = POST "$url", Content_Type => 'form-data',
-                Content => [ inputDocument =>  [ "$storePath/$record->{filename}" ] ];
+                Content => [ inputDocument =>  [  "$storePath/$record->{filename}" ] ];
+
             
             $ua->timeout($timeout);
             my $response = $ua->request($request);
@@ -407,7 +409,7 @@ sub getSQLiteHandler {
     my $c = shift;
     my $filepath = shift;
     
-    my $dbargs = { AutoCommit => 0, RaiseError => 1, sqlite_unicode => 1};
+    my $dbargs = { AutoCommit => 0, RaiseError => 1, sqlite_unicode => 1 };
 
     my $dbh = DBI->connect("dbi:SQLite:dbname=$filepath/.database/store.db","","",$dbargs);
     
