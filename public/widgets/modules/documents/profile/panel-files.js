@@ -237,7 +237,8 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
         
         var AwesomeUploader = new Ext.Window({
             title:'Awesome Uploader in a Window!',
-            frame:true,
+            modal:true,
+            layout:"fit",
             width:500,
             height:200,
             items:{
