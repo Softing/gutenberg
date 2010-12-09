@@ -247,7 +247,7 @@ sub create {
                     $c->sql->Do("
                             INSERT INTO index_fascicles(id, edition, fascicle, entity, nature, parent, title, shortcut, description, created, updated)
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
-                        ", [ $rubric_id, $rubric->{edition}, $rubric->{fascicle}, $rubric->{entity}, $rubric->{nature}, $headline_id, $rubric->{title}, $rubric->{shortcut}, $rubric->{description} ]);
+                        ", [ $rubric_id, $rubric->{edition}, $id, $rubric->{entity}, $rubric->{nature}, $headline_id, $rubric->{title}, $rubric->{shortcut}, $rubric->{description} ]);
                 }
             }
             
