@@ -178,6 +178,7 @@ sub set {
             my $text = $i_text;
             
             $text =~ s/charset=windows-1251/charset=utf8/;
+            $text =~ s/charset=iso-8859-1/charset=utf8/;
             
             open VERSION, ">:utf8", "$storePath/.versions/$baseName$suffix$baseExtension.html";
             print VERSION $text;
