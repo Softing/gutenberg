@@ -76,8 +76,7 @@ sub list {
             my $updated  = $c->getFileModifiedDate($filepath);
             
             if ($^O eq "MSWin32") {
-                #my $converter = Text::Iconv->new("UTF-16LE", "utf-8");
-                #$file = $converter->convert($file);
+                $file = Encode::decode("cp1251", $file);
             }
 
             if ($^O eq "linux") {
@@ -143,7 +142,7 @@ sub create {
     
     my @errors;
     my $success = $c->json->false;
-
+    
     my $storePath    = $c->config->get("store.path");
     my $templateFile = $c->processPath("$storePath/templates/template.rtf");
     push @errors, { id => "filepath", msg => "Cant read template file from settings"}
@@ -153,37 +152,48 @@ sub create {
     my $documentPath = $c->getDocumentPath($document->{filepath}, \@errors);
     
     my $fileId = $c->uuid;
-    my $fileName = "$i_title.rtf";
     
+    my $suffix;
+    my $fileName = $i_title;
+    my $localFileName = $fileName;
+        
+    if ($^O eq "MSWin32") {
+        my $converter = Text::Iconv->new("utf-8", "windows-1251");
+        $localFileName = $converter->convert($localFileName);
+    }
+        
     # Create file
     unless (@errors) {
         
-        if (-e "$documentPath/$fileName") {
+        
+        
+        if (-e "$documentPath/$localFileName.rtf") {
             for (1..100) {
-                $fileName = "$i_title($_).rtf";
-                unless (-e "$documentPath/$fileName") {
+                unless (-e "$documentPath/$localFileName($_).rtf") {
+                    $suffix = "($_)";
                     last;
                 }
             }
         }
         
-        copy $templateFile, "$documentPath/$fileName";
+        copy $templateFile, "$documentPath/$localFileName$suffix.rtf";
         push @errors, { id => "filepath", msg => "Cant read new file"}
-            unless -e -r "$documentPath/$fileName";
+            unless -e -r "$documentPath/$localFileName$suffix.rtf";
+        
     }
     
     unless (@errors) {
         
         my $id = $c->uuid;
-        my $digest   = $c->getDigest("$documentPath/$fileName");
-        my $mimetype = $c->getMimeType("$documentPath/$fileName");
-        my $filesize = $c->getFileSize("$documentPath/$fileName");
-        my $created  = $c->getFileChangedDate("$documentPath/$fileName");
-        my $updated  = $c->getFileModifiedDate("$documentPath/$fileName");
+        my $digest   = $c->getDigest("$documentPath/$localFileName$suffix.rtf");
+        my $mimetype = $c->getMimeType("$documentPath/$localFileName$suffix.rtf");
+        my $filesize = $c->getFileSize("$documentPath/$localFileName$suffix.rtf");
+        my $created  = $c->getFileChangedDate("$documentPath/$localFileName$suffix.rtf");
+        my $updated  = $c->getFileModifiedDate("$documentPath/$localFileName$suffix.rtf");
         
         my $sqlite = $c->getSQLiteHandler($documentPath);
         $sqlite->do("INSERT INTO files (id, filename, description, digest, mimetype, draft, created, updated) VALUES (?,?,?,?,?,?,?,?)", undef, 
-            $id, $fileName, $i_description, $digest, $mimetype, 1, $created, $updated
+            $id, "$fileName$suffix.rtf", $i_description, $digest, $mimetype, 1, $created, $updated
         );
         $sqlite->commit;
         $sqlite->disconnect;
@@ -208,42 +218,44 @@ sub upload {
     my $storePath = $c->getDocumentPath($document->{filepath}, \@errors);
     
     
-    my ($name,$path,$suffix) = fileparse("$storePath/$i_filename", qr/(\.[^.]+){1}?/);
+    my ($name,$path,$extension) = fileparse("$storePath/$i_filename", qr/(\.[^.]+){1}?/);
+    
+    my $baseName = $name;
+    my $baseExtension = $extension;
     
     if ($^O eq "MSWin32") {
         my $converter = Text::Iconv->new("utf-8", "windows-1251");
-        $name = $converter->convert($name);
-        $suffix = $converter->convert($suffix);
+        $baseName = $converter->convert($baseName);
+        $baseExtension = $converter->convert($baseExtension);
     }
     
-    $i_filename = "$name$suffix";
-    
-    if (-e "$storePath/$i_filename") {
+    my $suffix;
+    if (-e "$storePath/$baseName$baseExtension") {
         for (1..100) {
-            $i_filename = "$name($_)$suffix";
-            unless (-e "$storePath/$i_filename") {
+            unless (-e "$storePath/$baseName($_)$baseExtension") {
+                $suffix = "($_)";
                 last;
             }
         }
     }
     
-    $upload->move_to("$storePath/$i_filename");
+    $upload->move_to("$storePath/$baseName$suffix$baseExtension");
     
         my $id = $c->uuid;
-        my $digest   = $c->getDigest("$storePath/$i_filename");
-        my $mimetype = $c->getMimeType("$storePath/$i_filename");
-        my $filesize = $c->getFileSize("$storePath/$i_filename");
-        my $created  = $c->getFileChangedDate("$storePath/$i_filename");
-        my $updated  = $c->getFileModifiedDate("$storePath/$i_filename");
+        my $digest   = $c->getDigest("$storePath/$baseName$suffix$baseExtension");
+        my $mimetype = $c->getMimeType("$storePath/$baseName$suffix$baseExtension");
+        my $filesize = $c->getFileSize("$storePath/$baseName$suffix$baseExtension");
+        my $created  = $c->getFileChangedDate("$storePath/$baseName$suffix$baseExtension");
+        my $updated  = $c->getFileModifiedDate("$storePath/$baseName$suffix$baseExtension");
         
         my $sqlite = $c->getSQLiteHandler($storePath);
         $sqlite->do("INSERT INTO files (id, filename, description, digest, mimetype, draft, created, updated) VALUES (?,?,?,?,?,?,?,?)", undef, 
-            $id, $i_filename, "", $digest, $mimetype, 1, $created, $updated
+            $id, "$name$suffix$extension", "", $digest, $mimetype, 1, $created, $updated
         );
         $sqlite->commit;
         $sqlite->disconnect;
     
-    $c->render_json( {"jsonrpc" => "2.0", "result" => 'null', success=> $c->json->true, "id" => "id"} );
+    $c->render_json( { success=> $c->json->true } );
 }
 
 sub update {
@@ -281,6 +293,11 @@ sub delete {
         my $record = $sth->fetchrow_hashref;
         $sth->finish();
         
+        if ($^O eq "MSWin32") {
+            my $converter = Text::Iconv->new("utf-8", "windows-1251");
+            $record->{filename} = $converter->convert($record->{filename});
+        }
+        
         if ($record->{id} && -w $storePath && -w "$storePath/$record->{filename}") {
             
             $sqlite->do("DELETE FROM files WHERE id = ?", undef, $record->{id});
@@ -317,6 +334,11 @@ sub preview {
     $sth->execute( $i_file );
     my $record = $sth->fetchrow_hashref;
     $sth->finish();
+
+    if ($^O eq "MSWin32") {
+        my $converter = Text::Iconv->new("utf-8", "windows-1251");
+        $record->{filename} = $converter->convert($record->{filename});
+    }
 
     if ($record->{id} && -r "$storePath/$record->{filename}") {
         

@@ -10,4 +10,13 @@ Inprint.documents.Profile.Interaction = function(parent, panels) {
         parent.cmpReload();
     });
     
+    
+    files.on("rowdblclick", function(grid, index, e) {
+        Inprint.ObjectResolver.resolve({
+            aid: "document-editor",
+            oid: this.oid,
+            text: this.record.title,
+            description: _("Text editing")
+        });
+    }, this);
 };

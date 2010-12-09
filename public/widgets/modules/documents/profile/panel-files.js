@@ -53,26 +53,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                 ref: "../btnDelete",
                 scope:this,
                 handler: this.cmpDelete
-            },
-            '->',
-            {
-                icon: _ico("pencil"),
-                cls: "x-btn-text-icon",
-                text: _("Editor"),
-                //disabled:true,
-                ref: "../btnEditor",
-                scope:this,
-                handler: function() {
-                    
-                    Inprint.ObjectResolver.resolve({
-                        aid: "document-editor",
-                        oid: this.oid,
-                        text: this.record.title,
-                        description: _("Text editing")
-                    });
-                    
-                }
-            },
+            }
             
         ];
 
@@ -272,55 +253,18 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                     xhrUploadUrl:_url("/documents/files/upload/"),
                     awesomeUploaderRoot: "/plugins/uploader/",
                     listeners:{
-                            scope:this,
-                            fileupload:function(uploader, success, result){
-                                    if(success){
-                                            Ext.Msg.alert('File Uploaded!','A file has been uploaded!');
-                                    }
+                        scope:this,
+                        fileupload:function(uploader, success, result){
+                            if(success){
+                                this.cmpReload();
                             }
+                        }
                     }
             }
         });
         
         AwesomeUploader.show();
-        
-        //var panel = new Ext.ux.PluploadPanel({
-        //    runtimes: 'flash,gears,silverlight,html5,browserplus,html4',
-        //    max_file_size: '20mb',
-        //    
-        //    //multipart: true,
-        //    //multipart_params: {
-        //    //    document: this.parent.document
-        //    //},
-        //    
-        //    url: _url("/documents/files/upload/"),
-        //    flash_swf_url : '/plupload/js/plupload.flash.swf',
-        //    silverlight_xap_url: '/plupload/js/plupload.silverlight.xap',
-        //    
-        //    addBtnIcn: _ico("plus-button"),
-        //    addBtnTxt: _("Add files"),
-        //    uploadBtnIcn: _ico("arrow-skip-270"),
-        //    uploadBtnTxt: _("Upload"),
-        //    cancelBtnIcn: _ico("cross-button"),
-        //    cancelBtnTxt: _("Cancel"),
-        //    deleteBtnIcn: _ico("minus-button"),
-        //    deleteBtnTxt: _("Delete")
-        //});
-        //
-        //win = new Ext.Window({
-        //    title: _("Upload"),
-        //    layout: "fit",
-        //    width:640, height:380,
-        //    items: panel
-        //});
-        //
-        //win.show();
-        //
-        //panel.on("uploadcomplete", function (panel, success, failures) {
-        //    if( success.length ) {
-        //        alert("uploadcomplete");
-        //    }
-        //}, this);
+  
         
     },
     
