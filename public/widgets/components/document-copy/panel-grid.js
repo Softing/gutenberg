@@ -43,14 +43,13 @@ Inprint.cmp.CopyDocument.Grid = Ext.extend(Ext.grid.EditorGridPanel, {
                     editor: xc.getConfig("/documents/combos/headlines/", {
                         listeners: {
                             scope: this,
-                            focus: function(combo) {
-                                combo.getStore().baseParams["flt_fascicle"] = this.currentRecord.get("id");
-                            },
                             select: function(combo, record) {
                                 this.currentRecord.set("headline", record.get("id"));
                             },
                             beforequery: function(qe) {
                                 delete qe.combo.lastQuery;
+                                qe.combo.getStore().baseParams["flt_edition"] = this.currentRecord.get("edition");
+                                qe.combo.getStore().baseParams["flt_fascicle"] = this.currentRecord.get("id");
                             }
                         }
                     })
@@ -71,14 +70,14 @@ Inprint.cmp.CopyDocument.Grid = Ext.extend(Ext.grid.EditorGridPanel, {
                                     combo.disable();
                                 }
                             },
-                            focus: function(combo) {
-                                combo.getStore().baseParams["flt_headline"] = this.currentRecord.get("headline");
-                            },
                             select: function(combo, record) {
                                 this.currentRecord.set("rubric", record.get("id"));
                             },
                             beforequery: function(qe) {
                                 delete qe.combo.lastQuery;
+                                qe.combo.getStore().baseParams["flt_edition"] =  this.currentRecord.get("edition");
+                                qe.combo.getStore().baseParams["flt_fascicle"] = this.currentRecord.get("id");
+                                qe.combo.getStore().baseParams["flt_headline"] = this.currentRecord.get("headline");
                             }
                         }
                     })

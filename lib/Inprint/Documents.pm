@@ -381,6 +381,12 @@ sub create {
     push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_fascicle));
     
+    if ($i_fascicle) {
+        $i_edition = $c->sql->Q(" SELECT edition FROM fascicles WHERE id = ?", [ $i_fascicle ])->Value;
+        push @errors, { id => "edition", msg => "Incorrectly filled field"}
+            unless ($c->is_uuid($i_edition));
+    }
+    
     # Check user access to this function
     unless ( @errors ) {
         
@@ -455,7 +461,9 @@ sub create {
     my $edition;
     unless ( @errors ) {
         # Set edition
+        
         $edition = $c->sql->Q(" SELECT id, path, shortcut FROM editions WHERE id = ?", [ $i_edition ])->Hash;
+        
         if ($edition->{id} && $edition->{shortcut}) {
             push @fields, "edition";
             push @data, $edition->{id};
@@ -797,6 +805,7 @@ sub update {
             } else {
                 $c->sql->Do(" UPDATE documents SET rubric=null, rubric_shortcut=null WHERE id=? ", [ $document->{id} ]);
             }
+            
         } else {
             $c->sql->Do(" UPDATE documents SET headline=null, headline_shortcut=null WHERE id=? ", [ $document->{id} ]);
             $c->sql->Do(" UPDATE documents SET rubric=null, rubric_shortcut=null WHERE id=? ; ", [ $document->{id} ]);
@@ -956,13 +965,13 @@ sub move {
     push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_fascicle));
     
-    my $edition  = Inprint::Utils::GetEditionById($c, id => $i_edition);
-    push @errors, { id => "edition", msg => "Can't find object"}
-        unless ( $edition->{id} || $edition->{shortcut} );
-    
     my $fascicle = Inprint::Utils::GetFascicleById($c, id => $i_fascicle);
     push @errors, { id => "fascicle", msg => "Can't find object"}
         unless ( $fascicle->{id} || $fascicle->{shortcut} );
+    
+    my $edition  = Inprint::Utils::GetEditionById($c, id => $fascicle->{edition} );
+    push @errors, { id => "edition", msg => "Can't find object"}
+        unless ( $edition->{id} || $edition->{shortcut} );
     
     my $headline = Inprint::Utils::GetHeadlineById($c, id => $i_headline, fascicle => $i_fascicle);
     my $rubric   = Inprint::Utils::GetRubricById($c,   id => $i_rubric,   headline=> $i_headline);
@@ -976,10 +985,10 @@ sub move {
             $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $id ]);
             
             # Change headline
-            if ($i_change) {
-                if ($headline) {
+            if ($i_change eq "yes") {
+                if ($headline->{id}) {
                     $c->sql->Do(" UPDATE documents SET headline=?, headline_shortcut=? WHERE id=? ", [ $headline->{id}, $headline->{shortcut}, $id ]);
-                    if ($rubric) {
+                    if ($rubric->{id}) {
                         $c->sql->Do(" UPDATE documents SET rubric=?, rubric_shortcut=? WHERE id=? ", [ $rubric->{id}, $rubric->{shortcut}, $id ]);
                     }
                 }
@@ -1089,6 +1098,14 @@ sub copy {
                     # Change Fascicle
                     $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $new_id ]);
                     
+                    if ($headline->{id}) {
+                        $c->sql->Do(" UPDATE documents SET headline=?, headline_shortcut=? WHERE id=? ", [ $headline->{id}, $headline->{shortcut}, $new_id ]);
+                    }
+                    
+                    if ($rubric->{id}) {
+                        $c->sql->Do(" UPDATE documents SET rubric=?, rubric_shortcut=? WHERE id=? ", [ $rubric->{id}, $rubric->{shortcut}, $new_id ]);
+                    }
+                    
                     # Change Index
                     Inprint::Utils::Documents::MoveDocumentIndexToFascicle($c, \@errors, $new_id);
                     
@@ -1196,6 +1213,14 @@ sub duplicate {
                     
                     # Change Fascicle
                     $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $new_id ]);
+                    
+                    if ($headline->{id}) {
+                        $c->sql->Do(" UPDATE documents SET headline=?, headline_shortcut=? WHERE id=? ", [ $headline->{id}, $headline->{shortcut}, $new_id ]);
+                    }
+                    
+                    if ($rubric->{id}) {
+                        $c->sql->Do(" UPDATE documents SET rubric=?, rubric_shortcut=? WHERE id=? ", [ $rubric->{id}, $rubric->{shortcut}, $new_id ]);
+                    }
                     
                     # Indexation
                     Inprint::Utils::Documents::MoveDocumentIndexToFascicle($c, \@errors, $new_id);
