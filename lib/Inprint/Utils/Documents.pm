@@ -42,13 +42,15 @@ sub MoveDocumentIndexToFascicle {
     
     my $editions = $c->sql->Q(" SELECT id FROM editions WHERE path @> ? order by path asc ", [ $edition->{path} ])->Values;
     
-    my $headline_exist = $c->sql->Q(" SELECT count(*) FROM index WHERE edition = ANY(?) AND nature='headline' AND lower(shortcut) = lower(?) ", [ $editions, $document->{headline_shortcut} ])->Value;
+    my $headline_exist = $c->sql->Q(" SELECT count(*) FROM index_fascicles WHERE edition = ANY(?) AND nature='headline' AND lower(shortcut) = lower(?) ", [ $editions, $document->{headline_shortcut} ])->Value;
     
     if ($headline_exist) {
+
         my $headline = Inprint::Utils::Headlines::Create($c, $edition->{id}, $fascicle->{id}, $document->{headline_shortcut}, $document->{headline_shortcut}, $document->{headline_shortcut});
         if ($headline->{id}) {
             my $rubric   = Inprint::Utils::Rubrics::Create($c, $edition->{id}, $fascicle->{id}, $headline->{id}, $document->{rubric_shortcut}, $document->{rubric_shortcut}, $document->{rubric_shortcut});
         }
+
     } else {
         
         my $headline = Inprint::Utils::Headlines::Create($c, $edition->{id}, $fascicle->{id}, "--", "--", "--" );

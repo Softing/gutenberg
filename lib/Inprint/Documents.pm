@@ -727,7 +727,7 @@ sub update {
             unless ($source_headline) {
                 $source_headline = $c->sql->Q(" SELECT * FROM index_fascicles WHERE id=? AND edition = ?", [ $i_headline, $document->{edition} ])->Hash;
             }
-            
+
             $headline = Inprint::Utils::Headlines::Create($c, $document->{edition}, $document->{fascicle}, $source_headline->{title}, $source_headline->{shortcut}, $source_headline->{description});
             
         }
@@ -762,14 +762,14 @@ sub update {
         $headline   = Inprint::Utils::Headlines::Create($c, $document->{edition}, $document->{fascicle}, "--", "--", "--");
     }
     
-    push @errors, { id => "headline", msg => "Can't find document object"}
+    push @errors, { id => "headline", msg => "Can't find headline object"}
         unless ($headline->{id});
     
     unless ($rubric->{id}) {
         $rubric   = Inprint::Utils::Rubrics::Create($c, $document->{edition}, $document->{fascicle}, $headline->{id}, "--", "--", "--");
     }
     
-    push @errors, { id => "rubric", msg => "Can't find document object"}
+    push @errors, { id => "rubric", msg => "Can't find rubric object"}
         unless ($rubric->{id});
     
     unless (@errors) {

@@ -227,7 +227,9 @@ sub rubrics {
             ", [ $i_headline ])->Hashes;
             
             unless (@$result) {
-            my $headline = $c->sql->Q(" SELECT * FROM index_fascicles WHERE id=? ", [ $i_headline ])->Hash;
+                
+                my $headline = $c->sql->Q(" SELECT * FROM index_fascicles WHERE id=? ", [ $i_headline ])->Hash;
+
                 $result = $c->sql->Q("
                     SELECT DISTINCT t1.id, t1.shortcut as title FROM index t1
                     WHERE t1.parent = ? AND t1.nature = 'rubric'

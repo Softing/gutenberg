@@ -8,6 +8,8 @@ package Inprint::Calendar;
 use strict;
 use warnings;
 
+use Inprint::Utils::Documents;
+
 use base 'Inprint::BaseController';
 
 sub tree {
