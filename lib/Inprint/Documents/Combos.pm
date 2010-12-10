@@ -147,18 +147,46 @@ sub headlines {
     my @errors;
     my $success = $c->json->false;
     
-    #push @errors, { id => "edition", msg => "Incorrectly filled field"}
-    #    unless ($c->is_uuid($i_edition));
+    push @errors, { id => "edition", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_edition));
+    
+    my $edition = $c->sql->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
+    
+    push @errors, { id => "edition", msg => "Incorrectly filled field"}
+        unless ($edition->{id});
     
     push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_fascicle));
     
+    my $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
+    
+    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
+        unless ($fascicle->{id});
+    
     unless (@errors) {
-        $result = $c->sql->Q("
-            SELECT DISTINCT t1.id, t1.shortcut as title FROM index_fascicles t1
-            WHERE t1.fascicle = ? AND t1.nature = 'headline'
-            ORDER BY t1.shortcut
-        ", [ $i_fascicle ])->Hashes;
+        
+        if ($i_fascicle eq "00000000-0000-0000-0000-000000000000") {
+            
+            my $editions = $c->sql->Q("
+                SELECT id FROM editions WHERE path @> ? order by path asc
+            ", [ $edition->{path} ])->Values;
+            
+            $result = $c->sql->Q("
+                SELECT DISTINCT t1.id, t1.shortcut as title FROM index t1
+                WHERE t1.edition = ANY(?) AND t1.nature = 'headline'
+                ORDER BY t1.shortcut
+            ", [ $editions ])->Hashes;
+            
+        }
+        else
+        {
+            $result = $c->sql->Q("
+                SELECT DISTINCT t1.id, t1.shortcut as title FROM index_fascicles t1
+                WHERE t1.fascicle = ? AND t1.nature = 'headline'
+                ORDER BY t1.shortcut
+            ", [ $i_fascicle ])->Hashes;
+        }
+        
     }
     
     $success = $c->json->true unless (@errors);
@@ -167,21 +195,43 @@ sub headlines {
 
 sub rubrics {
     my $c = shift;
+    
+    my $i_fascicle = $c->param("flt_fascicle") || undef;
     my $i_headline = $c->param("flt_headline") || undef;
     
     my $result;
     my @errors;
     my $success = $c->json->false;
     
+    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_fascicle));
+    
+    my $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
+    
+    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
+        unless ($fascicle->{id});
+        
     push @errors, { id => "headline", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_headline));
     
     unless (@errors) {
-        $result = $c->sql->Q("
-            SELECT DISTINCT t1.id, t1.shortcut as title FROM index_fascicles t1
-            WHERE t1.parent = ? AND t1.nature = 'rubric'
-            ORDER BY t1.shortcut
-        ", [ $i_headline ])->Hashes;
+        if ($i_fascicle eq "00000000-0000-0000-0000-000000000000") {
+            
+            $result = $c->sql->Q("
+                SELECT DISTINCT t1.id, t1.shortcut as title FROM index t1
+                WHERE t1.parent = ? AND t1.nature = 'rubric'
+                ORDER BY t1.shortcut
+            ", [ $i_headline ])->Hashes;
+            
+        }
+        else
+        {
+            $result = $c->sql->Q("
+                SELECT DISTINCT t1.id, t1.shortcut as title FROM index_fascicles t1
+                WHERE t1.fascicle = ? AND t1.parent = ? AND t1.nature = 'rubric'
+                ORDER BY t1.shortcut
+            ", [ $i_fascicle, $i_headline ])->Hashes;
+        }
     }
     
     $success = $c->json->true unless (@errors);

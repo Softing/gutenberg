@@ -100,10 +100,10 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                         },
                                         select: function(field) {
                                             this.getForm().findField("fascicle").reset();
-                                            this.getForm().findField("headline").reset();
-                                            this.getForm().findField("rubric").reset();
-                                            this.getForm().findField("headline").disable();
-                                            this.getForm().findField("rubric").disable();
+                                            //this.getForm().findField("headline").reset();
+                                            //this.getForm().findField("rubric").reset();
+                                            //this.getForm().findField("headline").disable();
+                                            //this.getForm().findField("rubric").disable();
                                         }
                                     }
                                 },
@@ -193,12 +193,12 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                 }, { baseParams: { term: 'editions.documents.assign' } }),
 
                                 xc.getConfig("/documents/combos/headlines/", {
-                                    disabled: true,
+                                    disabled: false,
                                     listeners: {
                                         scope: this,
                                         render: function(field) {
                                             this.getForm().findField("edition").on("select", function() {
-                                                field.disable();
+                                                this.getForm().findField("fascicle").setValue("00000000-0000-0000-0000-000000000000", _("Briefcase"));
                                                 field.reset();
                                             }, this);
                                             this.getForm().findField("fascicle").on("select", function() {
@@ -230,6 +230,7 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                             this.getForm().findField("headline").on("select", function() {
                                                 combo.enable();
                                                 combo.reset();
+                                                combo.getStore().baseParams["flt_fascicle"] = this.getForm().findField("fascicle").getValue();
                                                 combo.getStore().baseParams["flt_headline"] = this.getForm().findField("headline").getValue();
                                             }, this);
                                         },

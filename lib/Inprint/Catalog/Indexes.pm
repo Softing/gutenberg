@@ -42,15 +42,6 @@ sub editions {
         
         my $data = $c->sql->Q("$sql ORDER BY shortcut", \@data)->Hashes;
         
-        #if ($i_node eq '00000000-0000-0000-0000-000000000000') {
-        #    push @result, {
-        #        id   => '00000000-0000-0000-0000-000000000000',
-        #        icon => "briefcase",
-        #        text => $c->l("Briefcase"),
-        #        leaf => $c->json->true
-        #    };
-        #}
-        
         foreach my $item (@$data) {
             my $record = {
                 id   => $item->{id},
