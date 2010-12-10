@@ -451,9 +451,10 @@ sub create {
 
     }
 
+    my $edition;
     unless ( @errors ) {
         # Set edition
-        my $edition = $c->sql->Q(" SELECT id, shortcut FROM editions WHERE id = ?", [ $i_edition ])->Hash;
+        $edition = $c->sql->Q(" SELECT id, shortcut FROM editions WHERE id = ?", [ $i_edition ])->Hash;
         if ($edition->{id} && $edition->{shortcut}) {
             push @fields, "edition";
             push @data, $edition->{id};
@@ -591,12 +592,31 @@ sub create {
 
             if ($i_headline) {
                 
-                my $headline = $c->sql->Q("
-                        SELECT DISTINCT t1.id, t1.shortcut
-                        FROM index_fascicles t1 WHERE t1.id=? AND t1.fascicle=?
-                        ORDER BY t1.shortcut ASC
-                ", [ $i_headline, $fascicle->{id} ])->Hash;
-
+                #my $headline = $c->sql->Q("
+                #        SELECT DISTINCT t1.id, t1.shortcut
+                #        FROM index_fascicles t1 WHERE t1.id=? AND t1.fascicle=?
+                #        ORDER BY t1.shortcut ASC
+                #", [ $i_headline, $fascicle->{id} ])->Hash;
+                
+                undef my $headline;
+                if ($fascicle->{id} ne "00000000-0000-0000-0000-000000000000") {
+                    $headline = Inprint::Utils::GetHeadlineById($c, id => $i_headline, fascicle => $fascicle->{id} );
+                }
+                
+                if ($fascicle->{id} eq "00000000-0000-0000-0000-000000000000") {
+                    
+                    # find headline in index
+                    my $source_headline = $c->sql->Q(" SELECT * FROM index WHERE id=? AND edition  = ? ", [ $i_headline, $edition->{id} ])->Hash;
+                    
+                    # find headline in fascicle
+                    unless ($source_headline) {
+                        $source_headline = $c->sql->Q(" SELECT * FROM index_fascicles WHERE id=? AND edition = ?", [ $i_headline, $edition->{id} ])->Hash;
+                    }
+                    
+                    $headline = Inprint::Utils::Headlines::Create($c, $edition->{id}, $fascicle->{id}, $source_headline->{title}, $source_headline->{shortcut}, $source_headline->{description});
+                    
+                }
+                
                 if ($headline->{id} && $headline->{shortcut}) {
                     
                     push @fields, "headline";
@@ -605,13 +625,31 @@ sub create {
                     push @data, $headline->{shortcut};
                     
                     if ($i_rubric) {
-
-                        my $rubric = $c->sql->Q("
-                            SELECT DISTINCT t1.id, t1.shortcut
-                            FROM index_fascicles t1 WHERE t1.id=? AND t1.parent=?
-                            ORDER BY t1.shortcut ASC
-                        ", [ $i_rubric, $headline->{id} ])->Hash;
-
+                        
+                        #$rubric   = Inprint::Utils::Rubrics::Create($c, $document->{edition}, $document->{fascicle}, $headline->{id}, $source_rubric->{title}, $source_rubric->{shortcut}, $source_rubric->{description});
+                        #my $rubric = $c->sql->Q("
+                        #    SELECT DISTINCT t1.id, t1.shortcut
+                        #    FROM index_fascicles t1 WHERE t1.id=? AND t1.parent=?
+                        #    ORDER BY t1.shortcut ASC
+                        #", [ $i_rubric, $headline->{id} ])->Hash;
+                        
+                        undef my $rubric;
+                        if ($fascicle->{id} ne "00000000-0000-0000-0000-000000000000") {
+                            $rubric   = Inprint::Utils::GetRubricById($c, id => $i_rubric, fascicle => $fascicle->{id});
+                        }
+                        
+                        if ($fascicle->{id} eq "00000000-0000-0000-0000-000000000000") {
+                            
+                            # find headline in index
+                            my $source_rubric = $c->sql->Q(" SELECT * FROM index WHERE id=? AND edition  = ? ", [ $i_rubric, $edition->{id} ])->Hash;
+                            
+                            # find headline in fascicle
+                            unless ($source_rubric) {
+                                $source_rubric = $c->sql->Q(" SELECT * FROM index_fascicles WHERE id=? AND edition = ?", [ $i_rubric, $edition->{id} ])->Hash;
+                            }
+                            
+                            $rubric   = Inprint::Utils::Rubrics::Create($c, $edition->{id}, $fascicle->{id}, $headline->{id}, $source_rubric->{title}, $source_rubric->{shortcut}, $source_rubric->{description});
+                        }
                         
                         if ($rubric->{id} && $rubric->{shortcut}) {
                             push @fields, "rubric";
