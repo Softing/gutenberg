@@ -741,8 +741,10 @@ sub update {
             
             if ($document->{fascicle} eq "00000000-0000-0000-0000-000000000000") {
                 
+                my $editions = $c->sql->Q(" SELECT id FROM editions WHERE path @> (SELECT path FROM editions WHERE id=?) order by path asc ", [ $document->{edition} ])->Values;
+                
                 # find headline in index
-                my $source_rubric = $c->sql->Q(" SELECT * FROM index WHERE id=? AND edition  = ? ", [ $i_rubric, $document->{edition} ])->Hash;
+                my $source_rubric = $c->sql->Q(" SELECT * FROM index WHERE id=? AND edition  = ANY(?) ", [ $i_rubric, $editions ])->Hash;
                 
                 # find headline in fascicle
                 unless ($source_rubric) {
