@@ -71,7 +71,6 @@ Inprint.cmp.MoveDocument.Form = Ext.extend(Ext.FormPanel, {
                                 beforequery: function(qe) {
                                     delete qe.combo.lastQuery;
                                     qe.combo.getStore().baseParams["flt_edition"]  = this.getForm().findField("edition").getValue();
-                                    qe.combo.getStore().baseParams["flt_fascicle"] = this.getForm().findField("fascicle").getValue();
                                 }
                             }
                         })
@@ -137,6 +136,8 @@ Inprint.cmp.MoveDocument.Form = Ext.extend(Ext.FormPanel, {
                                 },
                                 beforequery: function(qe) {
                                     delete qe.combo.lastQuery;
+                                    qe.combo.getStore().baseParams["flt_edition"] = this.getForm().findField("edition").getValue();
+                                    qe.combo.getStore().baseParams["flt_fascicle"] = this.getForm().findField("fascicle").getValue();
                                 }
                             }
                         }),
@@ -149,11 +150,14 @@ Inprint.cmp.MoveDocument.Form = Ext.extend(Ext.FormPanel, {
                                     this.getForm().findField("headline").on("select", function() {
                                         combo.enable();
                                         combo.reset();
-                                        combo.getStore().baseParams["flt_headline"] = this.getForm().findField("headline").getValue();
                                     }, this);
                                 },
                                 beforequery: function(qe) {
                                     delete qe.combo.lastQuery;
+                                    qe.combo.getStore().baseParams["flt_edition"] = this.getForm().findField("edition").getValue();
+                                    qe.combo.getStore().baseParams["flt_fascicle"] = this.getForm().findField("fascicle").getValue();
+                                    qe.combo.getStore().baseParams["flt_headline"] = this.getForm().findField("headline").getValue();
+                                    
                                 }
                             }
                         })
