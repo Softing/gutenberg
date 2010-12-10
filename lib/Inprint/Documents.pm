@@ -589,7 +589,7 @@ sub create {
             push @fields, "fascicle_shortcut";
             push @data, $fascicle->{id};
             push @data, $fascicle->{shortcut};
-
+            
             if ($i_headline) {
                 
                 undef my $headline;
@@ -599,8 +599,10 @@ sub create {
                 
                 if ($fascicle->{id} eq "00000000-0000-0000-0000-000000000000") {
                     
+                    my $editions = $c->sql->Q(" SELECT id FROM editions WHERE path @> ? order by path asc ", [ $edition->{path} ])->Values;
+                    
                     # find headline in index
-                    my $source_headline = $c->sql->Q(" SELECT * FROM index WHERE id=? AND edition  = ? ", [ $i_headline, $edition->{id} ])->Hash;
+                    my $source_headline = $c->sql->Q(" SELECT * FROM index WHERE id=? AND edition  = ANY(?) ", [ $i_headline, $editions ])->Hash;
                     
                     # find headline in fascicle
                     unless ($source_headline) {
