@@ -114,7 +114,7 @@ sub create {
     
     unless (@errors) {
         $c->sql->Do("
-            INSERT INTO index_fascicles(id, edition, fascicle, entity, nature, parent, title, shortcut, description, created, updated)
+            INSERT INTO index_fascicles(id, edition, fascicle, origin, nature, parent, title, shortcut, description, created, updated)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
         ", [ $id, $fascicle->{edition}, $fascicle->{id}, $id, "rubric", $headline->{id}, $i_title, $i_shortcut, $i_description ]);
     }
@@ -197,7 +197,7 @@ sub delete {
     unless (@errors) {
         $c->sql->Do("
             DELETE FROM index_fascicles WHERE id =?
-            AND ( entity <> '00000000-0000-0000-0000-000000000000' )
+            AND ( origin <> '00000000-0000-0000-0000-000000000000' )
         ", [ $i_id ]);
     }
     

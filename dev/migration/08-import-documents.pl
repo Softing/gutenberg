@@ -224,25 +224,6 @@ foreach my $item( @{ $documents } ) {
     }
     die unless $RubricMapping;
 
-    #print "TAG2-1 - $item->{rubric_name}\n" ;
-    #my $Tag2 = $sql->Q(" SELECT * FROM index WHERE edition=? AND title=? AND variation='rubric' ", [ $Edition->{id}, $item->{rubric_name} || "--" ])->Hash;
-    #unless ($Tag2) {
-    #    $sql->Do("
-    #        INSERT INTO index(edition, variation, title, shortcut, description, created, updated)
-    #        VALUES (?, 'rubric', ?, ?, ?, now(), now());
-    #    ", [$EditionId, $item->{rubric_name}, $item->{rubric_name}, '' ]);
-    #    $Tag2 = $sql->Q(" SELECT * FROM index WHERE edition=? AND title=? AND variation='rubric' ", [ $Edition->{id}, $item->{rubric_name} || "--" ])->Hash;
-    #}
-    #die unless $Tag2;
-    #
-    #print "TAG2-2 = $Tag2->{title}, = $item->{fascicle} = $Headline->{id} = $Tag2->{id}\n";
-    #my $Rubric = $sql->Q(" SELECT * FROM index_mapping WHERE entity=? AND parent=? AND child=? ", [ $item->{fascicle}, $Tag1->{id}, $Tag2->{id} ])->Hash;
-    #unless ($Rubric) {
-    #    $sql->Do(" INSERT INTO index_mapping(entity,parent,child) VALUES (?,?,?); ", [ $item->{fascicle}, $Tag1->{id}, $Tag2->{id} ]);
-    #    $Rubric = $sql->Q(" SELECT * FROM index_mapping WHERE entity=? AND parent=? AND child=? ", [ $item->{fascicle}, $Tag1->{id}, $Tag2->{id} ])->Hash;
-    #}
-    #die unless $Rubric;
-
     # do insert
     $sql->Do("
         INSERT INTO documents(

@@ -4,6 +4,8 @@ sub GetEditionById {
     my $c  = shift;
     my %params = ( @_ );
     
+    return undef unless $params{id};
+    
     my @params = ($params{id});
     my $sql = " SELECT id, shortcut FROM editions WHERE id=? ";
     
@@ -15,6 +17,8 @@ sub GetEditionById {
 sub GetFascicleById {
     my $c  = shift;
     my %params = ( @_ );
+    
+    return undef unless $params{id};
     
     my @params = ($params{id});
     my $sql = " SELECT id, edition, shortcut FROM fascicles WHERE id=? ";
@@ -33,10 +37,12 @@ sub GetHeadlineById {
     my $c  = shift;
     my %params = ( @_ );
     
+    return undef unless $params{id};
+    
     my @params = ();
     my $sql = "
-        SELECT t1.id, t1.shortcut FROM index t1, index_mapping t2
-        WHERE t1.id = t2.child 
+        SELECT t1.id, t1.shortcut FROM index_fascicles t1
+        WHERE nature='headline'
     ";
     
     if ($params{id}) {
@@ -45,7 +51,7 @@ sub GetHeadlineById {
     }
     
     if ($params{fascicle}) {
-        $sql .= " AND t2.parent=?  ";
+        $sql .= " AND t2.fascicle=?  ";
         push @params, $params{fascicle};
     }
     
@@ -58,15 +64,22 @@ sub GetRubricById {
     my $c  = shift;
     my %params = ( @_ );
     
+    return undef unless $params{id};
+    
     my @params = ();
     my $sql = "
-        SELECT t1.id, t1.shortcut FROM index t1, index_mapping t2
-        WHERE t1.id = t2.child 
+        SELECT t1.id, t1.shortcut FROM index_fascicles t1
+        WHERE nature='rubric'
     ";
     
     if ($params{id}) {
         $sql .= " AND t1.id=?  ";
         push @params, $params{id};
+    }
+    
+    if ($params{fascicle}) {
+        $sql .= " AND t2.fascicle=?  ";
+        push @params, $params{fascicle};
     }
     
     if ($params{headline}) {
@@ -81,9 +94,9 @@ sub GetRubricById {
 
 sub GetDocumentById {
     my $c  = shift;
-    my $id = shift;
+    my %params = ( @_ );
     
-    return undef unless $id;
+    return undef unless $params{id};
     
     my @params = ();
     my $sql = "
@@ -97,7 +110,7 @@ sub GetDocumentById {
         FROM documents t1 WHERE 1=1 ";
     
     $sql .= " AND t1.id=?  ";
-    push @params, $id;
+    push @params, $params{id};
     
     my $result = $c->sql->Q($sql, \@params)->Hash;
     

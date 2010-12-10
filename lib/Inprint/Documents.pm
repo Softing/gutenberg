@@ -96,8 +96,8 @@ sub list {
     my @params;
 
     # Pagination
-    my $start    = $c->param("start")        || undef;
-    my $limit    = $c->param("limit")        || undef;
+    my $start    = $c->param("start")        || 0;
+    my $limit    = $c->param("limit")        || 60;
 
     # Grid mode
     my $mode     = $c->param("gridmode")     || "all";
@@ -284,7 +284,7 @@ sub list {
     }
 
     # Select rows with pagination
-    if ($limit && $start) {
+    if ($limit > 0 && $start >= 0) {
         $sql_query .= " LIMIT ? OFFSET ? ";
         push @params, $limit;
         push @params, $start;
@@ -641,6 +641,9 @@ sub update {
     my $i_author  = $c->param("author");
     my $i_size    = $c->param("size") || 0;
     my $i_enddate = $c->param("enddate");
+    
+    my $i_headline = $c->param("headline");
+    my $i_rubric   = $c->param("rubric");
 
     my @errors;
     my $success = $c->json->false;
@@ -666,16 +669,56 @@ sub update {
             unless ($c->is_date($i_enddate));
     }
     
-    unless (@errors) {
-        my $document = $c->sql->Q(" SELECT id, workgroup FROM documents WHERE id=? ", [ $i_id ])->Hash;
+    my $document = Inprint::Utils::GetDocumentById($c, id => $i_id);
+    push @errors, { id => "document", msg => "Can't find document object"}
+            unless ($document->{id});
     
+    undef my $headline;
+    if ($i_headline) {
+        $headline = Inprint::Utils::GetHeadlineById($c, id => $i_headline);
+        push @errors, { id => "headline", msg => "Incorrectly filled field"}
+            unless ($headline->{id});
+    }
+    
+    undef my $rubric;
+    if ($i_rubric) {
+        $rubric   = Inprint::Utils::GetHeadlineById($c, id => $i_rubric);
+        push @errors, { id => "rubric", msg => "Incorrectly filled field"}
+            unless ($rubric->{id});
+    }
+    
+    unless (@errors) {
         push @errors, { id => "access", msg => "Not enough permissions"}
             unless ($c->access->Check("catalog.documents.update:*", $document->{workgroup}));
     }
     
     unless (@errors) {
+        
+        # Update workgroup
+        
         $c->sql->Do(" UPDATE documents SET title=?, author=?, psize=?, pdate=? WHERE id=? OR copygroup=?; ",
-            [ $i_title, $i_author, $i_size, $i_enddate, $i_id, $i_id ]);
+            [ $i_title, $i_author, $i_size, $i_enddate, $document->{id}, $document->{id} ]);
+        
+        # Update document
+        
+        #$c->sql->Do(" UPDATE documents SET title=?, author=?, psize=?, pdate=? WHERE id=? OR copygroup=?; ",
+        #    [ $i_title, $i_author, $i_size, $i_enddate, $document->{id}, $document->{id} ]);
+        
+        # Update headline and rubric
+        if ($headline->{id}) {
+            $c->sql->Do(" UPDATE documents SET headlinee=?, headlinee_shortcut=? WHERE id=? ", [ $headline->{id}, $headline->{shortcut}, $document->{id} ]);
+            if ($rubric->{id}) {
+                $c->sql->Do(" UPDATE documents SET rubric=?, rubric_shortcut=? WHERE id=? ", [ $rubric->{id}, $rubric->{shortcut}, $document->{id} ]);
+            } else {
+                $c->sql->Do(" UPDATE documents SET rubric=null, rubric_shortcut=null WHERE id=? ", [ $document->{id} ]);
+            }
+        } else {
+            $c->sql->Do(" UPDATE documents SET headline=null, headline_shortcut=null WHERE id=? ", [ $document->{id} ]);
+            $c->sql->Do(" UPDATE documents SET rubric=null, rubric_shortcut=null WHERE id=? ; ", [ $document->{id} ]);
+        }
+        
+        # Update indexation
+        $c->MoveDocumentIndexToFascicle($document->{id}, $document->{fascicle});
     }
     
     $success = $c->json->true unless (@errors);
@@ -698,8 +741,8 @@ sub capture {
     my $edition   = $c->sql->Q(" SELECT id, shortcut FROM editions WHERE id=? ", [ $default_edition ])->Hash;
     my $workgroup = $c->sql->Q(" SELECT id, shortcut FROM catalog WHERE id=? ", [ $default_workgroup ])->Hash;
 
-    if ($member->{id}, $edition->{id}, $workgroup->{id} ) {
-        if ($member->{shortcut}, $edition->{shortcut}, $workgroup->{shortcut} ) {
+    if ( $member->{id} && $edition->{id} && $workgroup->{id} ) {
+        if ($member->{shortcut} && $edition->{shortcut} && $workgroup->{shortcut} ) {
             foreach my $id (@ids) {
                 
                 $success = $c->json->true;
@@ -786,6 +829,7 @@ sub briefcase {
     if ($fascicle) {
         foreach my $id (@ids) {
             $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $id ]);
+            $c->MoveDocumentIndexToFascicle($id, $fascicle->{id});
         }
     }
 
@@ -817,14 +861,18 @@ sub move {
             # Change fascicle
             $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $id ]);
             
-            # Change indexation
-            if ($i_change && $headline) {
-                $c->sql->Do(" UPDATE documents SET headline=?, headline_shortcut=? WHERE id=? ", [ $headline->{id}, $headline->{shortcut}, $id ]);
+            # Change headline
+            if ($i_change) {
+                if ($headline) {
+                    $c->sql->Do(" UPDATE documents SET headline=?, headline_shortcut=? WHERE id=? ", [ $headline->{id}, $headline->{shortcut}, $id ]);
+                    if ($rubric) {
+                        $c->sql->Do(" UPDATE documents SET rubric=?, rubric_shortcut=? WHERE id=? ", [ $rubric->{id}, $rubric->{shortcut}, $id ]);
+                    }
+                }
             }
             
-            if ($i_change && $headline && $rubric) {
-                $c->sql->Do(" UPDATE documents SET rubric=?, rubric_shortcut=? WHERE id=? ", [ $rubric->{id}, $rubric->{shortcut}, $id ]);
-            }
+            # Update indexation
+            $c->MoveDocumentIndexToFascicle($id, $fascicle->{id});
             
         }
     }
@@ -927,15 +975,8 @@ sub copy {
                     # Change Fascicle
                     $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $new_id ]);
                     
-                    # Change Headline
-                    if ( $headline->{id} ) {
-                        $c->sql->Do(" UPDATE documents SET headline=?, headline_shortcut=? WHERE id=? ", [ $headline->{id}, $headline->{shortcut}, $new_id ]);
-                    }
-                    
-                    # Change Rubric
-                    if ( $rubric->{id} ) {
-                        $c->sql->Do(" UPDATE documents SET rubric=?, rubric_shortcut=? WHERE id=? ", [ $rubric->{id}, $rubric->{shortcut}, $new_id ]);
-                    }
+                    # Change Index
+                    $c->MoveDocumentIndexToFascicle($new_id, $fascicle->{id});
                     
                     $c->sql->et();
                 }
@@ -1043,13 +1084,7 @@ sub duplicate {
                     $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $new_id ]);
                     
                     # Indexation
-                    if ( $headline->{id} ) {
-                        $c->sql->Do(" UPDATE documents SET headline=?, headline_shortcut=? WHERE id=? ", [ $headline->{id}, $headline->{shortcut}, $new_id ]);
-                    }
-                    
-                    if ( $rubric->{id} ) {
-                        $c->sql->Do(" UPDATE documents SET rubric=?, rubric_shortcut=? WHERE id=? ", [ $rubric->{id}, $rubric->{shortcut}, $new_id ]);
-                    }
+                    $c->MoveDocumentIndexToFascicle($new_id, $fascicle->{id});
                     
                     # Datastore
                     my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
@@ -1072,18 +1107,22 @@ sub duplicate {
 
 
 sub recycle {
+    
     my $c = shift;
+    
     my @ids = $c->param("id");
     
     my $fascicle = Inprint::Utils::GetFascicleById($c, id => '99999999-9999-9999-9999-999999999999');
     
     if ($fascicle) {
         foreach my $id (@ids) {
+            
             if ($c->is_uuid($id)) {
                 my $document = Inprint::Utils::GetDocumentById($c, id => $id);
-                if ($document->{workgroup}){
+                if ($document->{workgroup}) {
                     if ($c->access->Check("catalog.documents.delete:*", $document->{workgroup})) {
                         $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $document->{id} ]);
+                        $c->MoveDocumentIndexToFascicle($id, '99999999-9999-9999-9999-999999999999');
                     }
                 }
             }
@@ -1093,29 +1132,48 @@ sub recycle {
 }
 
 sub restore {
+    
     my $c = shift;
     
-    my @errors;
-    my $success = $c->json->false;
+    my @ids = $c->param("id");
     
-    my @ids = $c->param("id");
-    $c->render_json( { success => $success } );
-}
-
-
-sub delete {
-    my $c = shift;
-    my @ids = $c->param("id");
-    foreach my $id (@ids) {
-        if ($c->is_uuid($id)) {
-            my $document = $c->sql->Q(" SELECT id, workgroup FROM documents WHERE id=? ", [ $id ])->Hash;
-            if ($c->access->Check("catalog.documents.delete:*", $document->{workgroup})) {
-                $c->sql->Do(" UPDATE documents SET fascicle='99999999-9999-9999-9999-999999999999' WHERE id=? ", [ $document->{id} ]);
+    my $fascicle = Inprint::Utils::GetFascicleById($c, id => '00000000-0000-0000-0000-000000000000');
+    
+    if ($fascicle) {
+        foreach my $id (@ids) {
+            if ($c->is_uuid($id)) {
+                my $document = Inprint::Utils::GetDocumentById($c, id => $id);
+                if ($document->{workgroup}) {
+                    if ($c->access->Check("catalog.documents.delete:*", $document->{workgroup})) {
+                        $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $document->{id} ]);
+                        $c->MoveDocumentIndexToFascicle($id, '00000000-0000-0000-0000-000000000000');
+                    }
+                }
             }
         }
     }
     $c->render_json( { success => $c->json->true } );
 }
 
-1;
 
+sub delete {
+    my $c = shift;
+    my @ids = $c->param("id");
+    #foreach my $id (@ids) {
+    #    if ($c->is_uuid($id)) {
+    #        my $document = $c->sql->Q(" SELECT id, workgroup FROM documents WHERE id=? ", [ $id ])->Hash;
+    #        if ($c->access->Check("catalog.documents.delete:*", $document->{workgroup})) {
+    #            $c->sql->Do(" UPDATE documents SET fascicle='99999999-9999-9999-9999-999999999999' WHERE id=? ", [ $document->{id} ]);
+    #        }
+    #    }
+    #}
+    $c->render_json( { success => $c->json->true } );
+}
+
+sub MoveDocumentIndexToFascicle {
+    my $c = shift;
+    my $document = shift;
+    my $fascicle = shift;
+}
+
+1;

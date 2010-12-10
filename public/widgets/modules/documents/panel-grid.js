@@ -196,19 +196,21 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
             viewConfig: {
                 getRowClass: function(record, rowIndex, rp, ds) {
                     
+                    var css = '';
+                    
                     if (Inprint.session.member && Inprint.session.member.id == record.get("manager") ) {
-                        return 'inprint-document-grid-current-manager-bg';
+                        css = 'inprint-document-grid-current-manager-bg';
                     }
                     
                     if (record.get("workgroup") == record.get("holder")) {
-                        return 'inprint-document-grid-current-department-bg';
+                        css = 'inprint-document-grid-current-department-bg';
                     }
                     
                     if (Inprint.session.member && Inprint.session.member.id == record.get("holder") ) {
-                        return 'inprint-document-grid-current-user-bg';
+                        css = 'inprint-document-grid-current-user-bg';
                     }
                     
-                    return '';
+                    return css;
                 }
             }
         });

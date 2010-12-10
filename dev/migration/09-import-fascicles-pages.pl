@@ -74,12 +74,12 @@ foreach my $item ( @{ $pages } ) {
             my $headline = $sql_new->Q(" SELECT * FROM index WHERE edition=? AND title=? ", [ $fascicle->{edition}, $catchword->{title} ])->Hash;
             
             if ($headline) {
-                my $mapping  = $sql_new->Q(" SELECT * FROM index_mapping WHERE parent=? AND child=? ", [ $fascicle->{id}, $headline->{id} ])->Hash;
-                unless ($mapping) {
-                    $sql_new->Do(" DELETE FROM index_mapping WHERE parent=? AND child=? ", [ $fascicle->{id}, $headline->{id} ]);
-                    $sql_new->Do(" INSERT INTO index_mapping (entity, parent, child) VALUES (?,?,?) ", [ $edition->{id}, $fascicle->{id}, $headline->{id} ]);
-                }
-                $sql_new->Do(" UPDATE fascicles_pages SET headline=? WHERE id=? ", [ $headline->{id}, $item->{uuid} ]);
+                #my $mapping  = $sql_new->Q(" SELECT * FROM index_fascicles WHERE fascicle=? AND id=? ", [ $fascicle->{id}, $headline->{id} ])->Hash;
+                #unless ($mapping) {
+                #    $sql_new->Do(" DELETE FROM index_mapping WHERE parent=? AND child=? ", [ $fascicle->{id}, $headline->{id} ]);
+                #    $sql_new->Do(" INSERT INTO index_mapping (entity, parent, child) VALUES (?,?,?) ", [ $edition->{id}, $fascicle->{id}, $headline->{id} ]);
+                #}
+                #$sql_new->Do(" UPDATE fascicles_pages SET headline=? WHERE id=? ", [ $headline->{id}, $item->{uuid} ]);
             } else {
                 die 1;
             }

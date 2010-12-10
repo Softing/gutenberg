@@ -162,6 +162,24 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                 }
             });
             
+            rowCtxMenuItems.push("-");
+            
+            rowCtxMenuItems.push({
+                icon: _ico("edit-drop-cap"),
+                cls: "x-btn-text-icon",
+                text: _("Rename file"),
+                scope:this,
+                handler : this.cmpRenameFile
+            });
+            
+            rowCtxMenuItems.push({
+                icon: _ico("edit-column"),
+                cls: "x-btn-text-icon",
+                text: _("Change description"),
+                scope:this,
+                handler : this.cmpChangeDescription
+            });
+            
             thisGrid.rowCtxMenu = new Ext.menu.Menu({
                 items : rowCtxMenuItems
             });
@@ -315,6 +333,51 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
         AwesomeUploader.show();
   
         
+    },
+    
+    cmpRenameFile: function() {
+        Ext.MessageBox.prompt(
+            _("Warning"),
+            _("You really wish to do this?"),
+            function(btn, text) {
+                if (btn == "ok") {
+                    Ext.Ajax.request({
+                        url: _url("/documents/files/rename/"),
+                        scope:this,
+                        success: this.cmpReload,
+                        params: {
+                            document: this.parent.document,
+                            file: this.getValue("id"),
+                            text: text
+                        }
+                    });
+                }
+            }, this);
+    },
+    
+    cmpChangeDescription: function() {
+        Ext.MessageBox.show({
+            width:300,
+            scope:this,
+            multiline: true,
+            title: _("Warning"),
+            buttons: Ext.MessageBox.OKCANCEL,
+            msg: _("You really wish to do this?"),
+            fn: function(btn, text) {
+                if (btn == "ok") {
+                    Ext.Ajax.request({
+                        url: _url("/documents/files/description/"),
+                        scope:this,
+                        success: this.cmpReload,
+                        params: {
+                            document: this.parent.document,
+                            file: this.getValue("id"),
+                            text: text
+                        }
+                    });
+                }
+            }
+        });
     },
     
     cmpDelete: function() {

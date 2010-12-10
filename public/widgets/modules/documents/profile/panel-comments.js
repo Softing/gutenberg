@@ -41,6 +41,7 @@ Inprint.documents.Profile.Comments = Ext.extend(Ext.Panel, {
 
         var form = new Ext.FormPanel({
             border:false,
+            modal:true,
             url: _url("/documents/say/"),
             bodyStyle: "padding:5px 5px",
             defaults: {

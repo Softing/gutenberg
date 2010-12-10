@@ -36,7 +36,7 @@ sub get {
     my @errors;
     my $success = $c->json->false;
     
-    $document = Inprint::Utils::GetDocumentById($c, $document);
+    $document = Inprint::Utils::GetDocumentById($c, id => $document);
     my $storePath = $c->getDocumentPath($document->{filepath}, \@errors);
     my $sqlite = $c->getSQLiteHandler($storePath);
 
@@ -130,7 +130,7 @@ sub set {
     my @errors;
     my $success = $c->json->false;
     
-    $document = Inprint::Utils::GetDocumentById($c, $document);
+    $document = Inprint::Utils::GetDocumentById($c, id => $document);
     my $storePath = $c->getDocumentPath($document->{filepath}, \@errors);
     my $sqlite = $c->getSQLiteHandler($storePath);
 

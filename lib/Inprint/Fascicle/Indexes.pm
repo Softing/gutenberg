@@ -53,9 +53,9 @@ sub headlines {
         my @data;
         
         $sql = "
-            SELECT DISTINCT t1.id, t1.shortcut
-            FROM index t1, index_mapping t2 WHERE t1.id=t2.child AND t2.parent=?
-            ORDER BY t1.shortcut ASC
+            SELECT DISTINCT t1.id, t1.shortcut as title FROM index_fascicles
+            WHERE t1.fascicle=? AND t1.nature = 'headline'
+            ORDER BY t1.shortcut
         ";
         push @data, $i_node;
         
@@ -93,9 +93,9 @@ sub rubrics {
     my $result;
     unless (@errors) {
         $result = $c->sql->Q("
-            SELECT DISTINCT t1.id, t1.shortcut
-                FROM index t1, index_mapping t2 WHERE t1.id=t2.child AND t2.parent=?
-                ORDER BY t1.shortcut ASC
+            SELECT DISTINCT t1.id, t1.shortcut as title FROM index_fascicles
+            WHERE t1.fascicle=? AND t1.nature = 'rubric'
+            ORDER BY t1.shortcut
         ", [ $i_node ] )->Hashes;
     }
     

@@ -40,7 +40,7 @@ sub list {
     my @errors;
     my $success = $c->json->false;
     
-    my $document = Inprint::Utils::GetDocumentById($c, $i_document);
+    my $document = Inprint::Utils::GetDocumentById($c, id => $i_document);
     my $storePath = $c->getDocumentPath($document->{filepath}, \@errors);
     
     my @dir;
@@ -143,7 +143,7 @@ sub create {
     my $documentStorePath;
     my $templateFile;
     
-    my $document = Inprint::Utils::GetDocumentById($c, $i_document);
+    my $document = Inprint::Utils::GetDocumentById($c, id => $i_document);
     push @errors, { id => "id", msg => "Cant find object with this id"}
         unless $document->{id};
     
@@ -224,7 +224,7 @@ sub upload {
     my @errors;
     my $success = $c->json->false;
 
-    my $document = Inprint::Utils::GetDocumentById($c, $i_document);
+    my $document = Inprint::Utils::GetDocumentById($c, id => $i_document);
     my $storePath = $c->getDocumentPath($document->{filepath}, \@errors);
     
     
@@ -291,7 +291,7 @@ sub delete {
     my @errors;
     my $success = $c->json->false;
 
-    my $document = Inprint::Utils::GetDocumentById($c, $i_document);
+    my $document = Inprint::Utils::GetDocumentById($c, id => $i_document);
     my $storePath = $c->getDocumentPath($document->{filepath}, \@errors);
     
     my $sqlite = $c->getSQLiteHandler($storePath);
@@ -336,7 +336,7 @@ sub preview {
     my @errors;
     my $success = $c->json->false;
 
-    my $document = Inprint::Utils::GetDocumentById($c, $i_document);
+    my $document = Inprint::Utils::GetDocumentById($c, id => $i_document);
     my $storePath = $c->getDocumentPath($document->{filepath}, \@errors);
     my $sqlite = $c->getSQLiteHandler($storePath);
 

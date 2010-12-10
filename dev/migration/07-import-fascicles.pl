@@ -58,56 +58,74 @@ $sql_new->Do("
 # Import fascicles
 my $fascicles = $sql_old->Q(" SELECT id, edition, ownedby, title, dt_started, dt_closed, dt_closed > now() AS enabled FROM edition.calendar ")->Hashes;
 
-foreach my $item( @{ $fascicles } ) {
+foreach my $fascicle ( @{ $fascicles } ) {
 
-    my $edition_id = $sql_new->Q(" SELECT newid FROM migration WHERE oldid=? AND mtype = 'edition' ", [ $item->{edition} ])->Value;
+    my $edition_id = $sql_new->Q(" SELECT newid FROM migration WHERE oldid=? AND mtype = 'edition' ", [ $fascicle->{edition} ])->Value;
     
-    die "Can't find edition id $item->{edition}" unless $edition_id;
+    die "Can't find edition id $fascicle->{edition}" unless $edition_id;
     
     $sql_new->Do("
         INSERT INTO fascicles(id, base_edition, edition, variation, title, shortcut, description, begindate, enddate, is_system, is_enabled, is_blocked, created, updated)
         VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, false, ?, false, now(), now());
-    ", [ $item->{id}, $edition_id, $edition_id, $item->{id}, $item->{title}, $item->{title}, $item->{title}, $item->{dt_started}, $item->{dt_closed}, $item->{enabled} ]);
+    ", [ $fascicle->{id}, $edition_id, $edition_id, $fascicle->{id}, $fascicle->{title}, $fascicle->{title}, $fascicle->{title}, $fascicle->{dt_started}, $fascicle->{dt_closed}, $fascicle->{enabled} ]);
     
-    my $headlines = $sql_old->Q("
+    # Select headline from old db
+    
+    my $old_headlines = $sql_old->Q("
         SELECT uuid, base_uuid, fascicle, title, description FROM edition.catchword WHERE fascicle=?;
-    ", [ $item->{id} ])->Hashes;
+    ", [ $fascicle->{id} ])->Hashes;
     
-    foreach my $item2 ( @{ $headlines } ) {
+    foreach my $old_headline ( @{ $old_headlines } ) {
+        
+        # Select headline from new db
         
         my $headline = $sql_new->Q("
             SELECT * FROM index WHERE edition=? AND nature=? AND shortcut=?;
-        ", [ $edition_id, "headline", $item2->{title} ])->Hash;
+        ", [ $edition_id, "headline", $old_headline->{title} ])->Hash;
         
         if ($headline) {
             
             $sql_new->Do("
-                INSERT INTO index_fascicles( edition, fascicle, entity, nature, parent, title, shortcut, description, created, updated)
+                INSERT INTO index_fascicles(
+                    edition, fascicle, origin, parent,
+                    nature, title, shortcut, description, created, updated)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, now(), now());
-            ", [$edition_id, $item->{id}, $headline->{id}, 'headline', $item->{id}, $headline->{title}, $headline->{shortcut}, $headline->{description} || "" ]);
+            ", [
+                    $edition_id, $fascicle->{id}, $headline->{id}, $fascicle->{id},
+                    'headline', $headline->{title}, $headline->{shortcut}, $headline->{description} || "" ]);
             
-            my $rubrics = $sql_old->Q("
+            # Select rubrics from old db
+            
+            my $old_rubrics = $sql_old->Q("
                 SELECT uuid, base_uuid, catchword, title, description, fascicle FROM edition.rubric WHERE catchword=?;
             ", [ $headline->{uuid} ])->Hashes;
             
-            foreach my $item3 ( @{ $rubrics } ) {
+            foreach my $old_rubric ( @{ $old_rubrics } ) {
+                
+                # Select rubric from new db
                 
                 my $rubric = $sql_new->Q("
                     SELECT * FROM index WHERE edition=? AND nature=? AND shortcut=?;
-                ", [ $edition_id, "rubric", $item3->{title} ])->Hash;
+                ", [ $edition_id, "rubric", $old_rubric->{title} ])->Hash;
                 
                 if ($rubric) {
                     
                     $sql_new->Do("
-                        INSERT INTO index_fascicles( edition, fascicle, entity, nature, parent, title, shortcut, description, created, updated)
+                        INSERT INTO index_fascicles(
+                            edition, fascicle, origin, parent, nature,
+                            title, shortcut, description, created, updated)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, now(), now());
-                    ", [$edition_id, $item->{id}, $rubric->{id}, 'headline', $headline->{id}, $rubric->{title}, $rubric->{shortcut}, $rubric->{description} || "" ]);
+                    ", [
+                            $edition_id, $fascicle->{id}, $rubric->{id}, $headline->{id},
+                            'headline', $rubric->{title}, $rubric->{shortcut}, $rubric->{description} || "" ]);
+                    
                 } else {
-                    print "Can't find rubric $item3->{title}\n";
+                    print "Can't find rubric $old_rubric->{title}\n";
                 }
+                
             }
         } else {
-            print "Can't find headline $item2->{title}\n";
+            print "Can't find headline $old_headline->{title}\n";
         }
     }
     

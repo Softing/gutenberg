@@ -48,14 +48,6 @@ sub fascicles {
         $result = $c->sql->Q($sql, \@data)->Hashes;
     }
 
-    #unshift @$result, {
-    #    id => "99999999-9999-9999-9999-999999999999",
-    #    icon => "bin",
-    #    spacer => $c->json->true,
-    #    bold => $c->json->true,
-    #    title => $c->l("Recycle Bin")
-    #};
-
     if ( $i_gridmode ne "archive" ){
         unshift @$result, {
             id => "00000000-0000-0000-0000-000000000000",
