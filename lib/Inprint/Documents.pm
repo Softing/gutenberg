@@ -592,12 +592,6 @@ sub create {
 
             if ($i_headline) {
                 
-                #my $headline = $c->sql->Q("
-                #        SELECT DISTINCT t1.id, t1.shortcut
-                #        FROM index_fascicles t1 WHERE t1.id=? AND t1.fascicle=?
-                #        ORDER BY t1.shortcut ASC
-                #", [ $i_headline, $fascicle->{id} ])->Hash;
-                
                 undef my $headline;
                 if ($fascicle->{id} ne "00000000-0000-0000-0000-000000000000") {
                     $headline = Inprint::Utils::GetHeadlineById($c, id => $i_headline, fascicle => $fascicle->{id} );
@@ -625,13 +619,6 @@ sub create {
                     push @data, $headline->{shortcut};
                     
                     if ($i_rubric) {
-                        
-                        #$rubric   = Inprint::Utils::Rubrics::Create($c, $document->{edition}, $document->{fascicle}, $headline->{id}, $source_rubric->{title}, $source_rubric->{shortcut}, $source_rubric->{description});
-                        #my $rubric = $c->sql->Q("
-                        #    SELECT DISTINCT t1.id, t1.shortcut
-                        #    FROM index_fascicles t1 WHERE t1.id=? AND t1.parent=?
-                        #    ORDER BY t1.shortcut ASC
-                        #", [ $i_rubric, $headline->{id} ])->Hash;
                         
                         undef my $rubric;
                         if ($fascicle->{id} ne "00000000-0000-0000-0000-000000000000") {
