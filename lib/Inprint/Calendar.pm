@@ -301,13 +301,19 @@ sub update {
 sub delete {
     my $c = shift;
     my @ids = $c->param("ids");
+    
+    my @errors;
+    
+    my $fascicle = $c->sql->Q(" SELECT id, shortcut FROM fascicles WHERE id='00000000-0000-0000-0000-000000000000' ")->Hash;
+    
     foreach my $id (@ids) {
+        $c->sql->bt;
         $c->sql->Do(" DELETE FROM fascicles WHERE id=? ", [ $id ]);
         $c->sql->Do(" DELETE FROM index_fascicles WHERE fascicle=? ", [ $id ]);
-        $c->sql->Do("
-            UPDATE documents
-            SET fascicle = null, fascicle_shortcut = null, fascicle_blocked = false, pages = null, firstpage = null
-            WHERE fascicle=? ", [ $id ]);
+        $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $id ]);
+        Inprint::Utils::Documents::MoveDocumentIndexToFascicle($c, \@errors, $id);
+        $c->sql->et;
+        
     }
     $c->render_json( { success => $c->json->true } );
 }

@@ -41,11 +41,17 @@ sub Create {
     push @$errors, { id => "shortcut", msg => "Already exists"}
         if ($exists_shortcut);
     
+    my $rubric_origin = $c->sql->Q("
+            SELECT id FROM index WHERE nature = 'rubric' AND edition=ANY(
+                SELECT id FROM editions WHERE path @> (SELECT path FROM editions WHERE id=?)
+            ) AND lower(shortcut)=lower(?)
+        ", [ $edition, $shortcut ])->Value;
+    
     unless (@$errors) {
         $c->sql->Do("
             INSERT INTO index_fascicles(id, edition, fascicle, origin, nature, parent, title, shortcut, description, created, updated)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
-        ", [ $id, $edition, $fascicle, $id, "rubric", $headline, $title, $shortcut, $description ]);
+        ", [ $id, $edition, $fascicle, $rubric_origin || $id, "rubric", $headline, $title, $shortcut, $description ]);
     }
     
     my $rubric = $c->sql->Q("

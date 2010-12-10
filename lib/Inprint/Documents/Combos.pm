@@ -214,17 +214,26 @@ sub rubrics {
     push @errors, { id => "headline", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_headline));
     
-    my $headline = $c->sql->Q(" SELECT * FROM index_fascicles WHERE id=? ", [ $i_headline ])->Hash;
+    
     
     unless (@errors) {
+        
         if ($i_fascicle eq "00000000-0000-0000-0000-000000000000") {
             
             $result = $c->sql->Q("
                 SELECT DISTINCT t1.id, t1.shortcut as title FROM index t1
                 WHERE t1.parent = ? AND t1.nature = 'rubric'
                 ORDER BY t1.shortcut
-            ", [ $headline->{origin} ])->Hashes;
+            ", [ $i_headline ])->Hashes;
             
+            unless (@$result) {
+            my $headline = $c->sql->Q(" SELECT * FROM index_fascicles WHERE id=? ", [ $i_headline ])->Hash;
+                $result = $c->sql->Q("
+                    SELECT DISTINCT t1.id, t1.shortcut as title FROM index t1
+                    WHERE t1.parent = ? AND t1.nature = 'rubric'
+                    ORDER BY t1.shortcut
+                ", [ $headline->{origin} ])->Hashes;
+            }
         }
         else
         {
@@ -234,6 +243,7 @@ sub rubrics {
                 ORDER BY t1.shortcut
             ", [ $i_fascicle, $i_headline ])->Hashes;
         }
+        
     }
     
     $success = $c->json->true unless (@errors);
