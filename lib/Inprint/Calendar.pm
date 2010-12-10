@@ -187,15 +187,15 @@ sub create {
 
                 my $headline_id = $c->uuid();
                 
-                my $headline_entity = $headline->{id};
+                my $headline_origin = $headline->{id};
                 if ($headline->{parent} eq "00000000-0000-0000-0000-000000000000") {
-                    $headline_entity = "00000000-0000-0000-0000-000000000000";
+                    $headline_origin = "00000000-0000-0000-0000-000000000000";
                 }
                 
                 $c->sql->Do("
-                    INSERT INTO index_fascicles(id, edition, fascicle, entity, nature, parent, title, shortcut, description, created, updated)
+                    INSERT INTO index_fascicles(id, edition, fascicle, origin, nature, parent, title, shortcut, description, created, updated)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
-                ", [ $headline_id, $edition->{id}, $id, $headline_entity, 'headline', $headline_id, $headline->{title}, $headline->{shortcut}, $headline->{description} ]);
+                ", [ $headline_id, $edition->{id}, $id, $headline_origin, 'headline', $headline_id, $headline->{title}, $headline->{shortcut}, $headline->{description} ]);
                 
                 my $rubrics = $c->sql->Q("
                     SELECT id, edition, nature, parent, title, shortcut, description, created, updated
@@ -206,15 +206,15 @@ sub create {
                 foreach my $rubric (@$rubrics) {
                     my $rubric_id = $c->uuid();
 
-                    my $rubric_entity = $rubric->{id};
+                    my $rubric_origin = $rubric->{id};
                     if ($rubric->{parent} eq "00000000-0000-0000-0000-000000000000") {
-                        $rubric_entity = "00000000-0000-0000-0000-000000000000";
+                        $rubric_origin = "00000000-0000-0000-0000-000000000000";
                     }
                     
                     $c->sql->Do("
-                        INSERT INTO index_fascicles(id, edition, fascicle, entity, nature, parent, title, shortcut, description, created, updated)
+                        INSERT INTO index_fascicles(id, edition, fascicle, origin, nature, parent, title, shortcut, description, created, updated)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
-                    ", [ $rubric_id, $edition->{id}, $id, $rubric_entity, 'rubric', $headline_id, $rubric->{title}, $rubric->{shortcut}, $rubric->{description} ]);
+                    ", [ $rubric_id, $edition->{id}, $id, $rubric_origin, 'rubric', $headline_id, $rubric->{title}, $rubric->{shortcut}, $rubric->{description} ]);
                 }
 
             }
@@ -224,7 +224,7 @@ sub create {
         if ($i_copyindex && $i_copyindex ne "00000000-0000-0000-0000-000000000000") {
             
             my $headlines = $c->sql->Q("
-                SELECT id, edition, fascicle, entity, nature, parent, title, shortcut, description, created, updated
+                SELECT id, edition, fascicle, origin, nature, parent, title, shortcut, description, created, updated
                 FROM index_fascicles WHERE nature = 'headline' AND fascicle = ?;
             ", [ $i_copyindex ])->Hashes;
             
@@ -233,21 +233,21 @@ sub create {
                 my $headline_id = $c->uuid();
                 
                 $c->sql->Do("
-                    INSERT INTO index_fascicles(id, edition, fascicle, entity, nature, parent, title, shortcut, description, created, updated)
+                    INSERT INTO index_fascicles(id, edition, fascicle, origin, nature, parent, title, shortcut, description, created, updated)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
-                ", [ $headline_id, $headline->{edition}, $id, $headline->{entity}, $headline->{nature}, $headline_id, $headline->{title}, $headline->{shortcut}, $headline->{description} ]);
+                ", [ $headline_id, $headline->{edition}, $id, $headline->{origin}, $headline->{nature}, $headline_id, $headline->{title}, $headline->{shortcut}, $headline->{description} ]);
                 
                 my $rubrics = $c->sql->Q("
-                    SELECT id, edition, fascicle, entity, nature, parent, title, shortcut, description, created, updated
+                    SELECT id, edition, fascicle, origin, nature, parent, title, shortcut, description, created, updated
                     FROM index_fascicles WHERE nature = 'rubric' AND parent = ?
                 ", [ $headline->{id} ])->Hashes;
                 
                 foreach my $rubric (@$rubrics) {
                     my $rubric_id = $c->uuid();
                     $c->sql->Do("
-                            INSERT INTO index_fascicles(id, edition, fascicle, entity, nature, parent, title, shortcut, description, created, updated)
+                            INSERT INTO index_fascicles(id, edition, fascicle, origin, nature, parent, title, shortcut, description, created, updated)
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
-                        ", [ $rubric_id, $rubric->{edition}, $id, $rubric->{entity}, $rubric->{nature}, $headline_id, $rubric->{title}, $rubric->{shortcut}, $rubric->{description} ]);
+                        ", [ $rubric_id, $rubric->{edition}, $id, $rubric->{origin}, $rubric->{nature}, $headline_id, $rubric->{title}, $rubric->{shortcut}, $rubric->{description} ]);
                 }
             }
             

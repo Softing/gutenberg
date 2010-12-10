@@ -215,10 +215,8 @@ sub delete {
     #    unless ($c->access->Check("domain.editions.manage"));
     
     unless (@errors) {
-        $c->sql->Do("
-            DELETE FROM index_fascicles WHERE id =?
-            AND ( origin <> '00000000-0000-0000-0000-000000000000' )
-        ", [ $i_id ]);
+        $c->sql->Do(" DELETE FROM index_fascicles WHERE id =? AND ( origin <> '00000000-0000-0000-0000-000000000000' ) ", [ $i_id ]);
+        $c->sql->Do(" DELETE FROM index_fascicles WHERE parent=? ", [ $i_id ]);
     }
     
     $success = $c->json->true unless (@errors);

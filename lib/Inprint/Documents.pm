@@ -9,6 +9,8 @@ use strict;
 use warnings;
 
 use Inprint::Utils;
+use Inprint::Utils::Headlines;
+use Inprint::Utils::Rubrics;
 
 use base 'Inprint::BaseController';
 
@@ -634,6 +636,7 @@ sub create {
 }
 
 sub update {
+    
     my $c = shift;
 
     my $i_id      = $c->param("id");
@@ -644,10 +647,10 @@ sub update {
     
     my $i_headline = $c->param("headline");
     my $i_rubric   = $c->param("rubric");
-
+    
     my @errors;
     my $success = $c->json->false;
-
+    
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_id));
     
@@ -674,18 +677,65 @@ sub update {
             unless ($document->{id});
     
     undef my $headline;
+    undef my $rubric;
+    
     if ($i_headline) {
-        $headline = Inprint::Utils::GetHeadlineById($c, id => $i_headline);
-        push @errors, { id => "headline", msg => "Incorrectly filled field"}
-            unless ($headline->{id});
+        
+        if ($document->{fascicle} ne "00000000-0000-0000-0000-000000000000") {
+            $headline = Inprint::Utils::GetHeadlineById($c, id => $i_headline, fascicle => $document->{fascicle} );
+        }
+        
+        if ($document->{fascicle} eq "00000000-0000-0000-0000-000000000000") {
+            
+            # find headline in index
+            my $source_headline = $c->sql->Q(" SELECT * FROM index WHERE id=? AND edition  = ? ", [ $i_headline, $document->{edition} ])->Hash;
+            
+            # find headline in fascicle
+            unless ($source_headline) {
+                $source_headline = $c->sql->Q(" SELECT * FROM index_fascicles WHERE id=? AND edition = ?", [ $i_headline, $document->{edition} ])->Hash;
+            }
+            
+            $headline = Inprint::Utils::Headlines::Create($c, $document->{edition}, $document->{fascicle}, $source_headline->{title}, $source_headline->{shortcut}, $source_headline->{description});
+            
+        }
+        
+        # Process rubric
+        if ($i_rubric) {
+            
+            if ($document->{fascicle} ne "00000000-0000-0000-0000-000000000000") {
+                $rubric   = Inprint::Utils::GetRubricById($c, id => $i_rubric, fascicle => $document->{fascicle});
+            }
+            
+            if ($document->{fascicle} eq "00000000-0000-0000-0000-000000000000") {
+                
+                # find headline in index
+                my $source_rubric = $c->sql->Q(" SELECT * FROM index WHERE id=? AND edition  = ? ", [ $i_rubric, $document->{edition} ])->Hash;
+                
+                # find headline in fascicle
+                unless ($source_rubric) {
+                    $source_rubric = $c->sql->Q(" SELECT * FROM index_fascicles WHERE id=? AND edition = ?", [ $i_rubric, $document->{edition} ])->Hash;
+                }
+                
+                $rubric   = Inprint::Utils::Rubrics::Create($c, $document->{edition}, $document->{fascicle}, $headline->{id}, $source_rubric->{title}, $source_rubric->{shortcut}, $source_rubric->{description});
+            }
+            
+        }
+        
     }
     
-    undef my $rubric;
-    if ($i_rubric) {
-        $rubric   = Inprint::Utils::GetHeadlineById($c, id => $i_rubric);
-        push @errors, { id => "rubric", msg => "Incorrectly filled field"}
-            unless ($rubric->{id});
+    unless ($headline) {
+        $headline   = Inprint::Utils::Headlines::Create($c, $document->{edition}, $document->{fascicle}, "--", "--", "--");
     }
+    
+    push @errors, { id => "headline", msg => "Can't find document object"}
+        unless ($headline->{id});
+    
+    unless ($rubric) {
+        $rubric   = Inprint::Utils::Rubrics::Create($c, $document->{edition}, $document->{fascicle}, $headline->{id}, "--", "--", "--");
+    }
+    
+    push @errors, { id => "rubric", msg => "Can't find document object"}
+        unless ($rubric->{id});
     
     unless (@errors) {
         push @errors, { id => "access", msg => "Not enough permissions"}
@@ -706,7 +756,7 @@ sub update {
         
         # Update headline and rubric
         if ($headline->{id}) {
-            $c->sql->Do(" UPDATE documents SET headlinee=?, headlinee_shortcut=? WHERE id=? ", [ $headline->{id}, $headline->{shortcut}, $document->{id} ]);
+            $c->sql->Do(" UPDATE documents SET headline=?, headline_shortcut=? WHERE id=? ", [ $headline->{id}, $headline->{shortcut}, $document->{id} ]);
             if ($rubric->{id}) {
                 $c->sql->Do(" UPDATE documents SET rubric=?, rubric_shortcut=? WHERE id=? ", [ $rubric->{id}, $rubric->{shortcut}, $document->{id} ]);
             } else {
@@ -718,7 +768,7 @@ sub update {
         }
         
         # Update indexation
-        $c->MoveDocumentIndexToFascicle($document->{id}, $document->{fascicle});
+        $c->MoveDocumentIndexToFascicle(\@errors, $document->{id});
     }
     
     $success = $c->json->true unless (@errors);
@@ -731,6 +781,7 @@ sub capture {
     my $c = shift;
     my @ids = $c->param("id");
 
+    my @errors;
     my $success = $c->json->false;
 
     my $current_user      = $c->QuerySessionGet("member.id");
@@ -741,32 +792,40 @@ sub capture {
     my $edition   = $c->sql->Q(" SELECT id, shortcut FROM editions WHERE id=? ", [ $default_edition ])->Hash;
     my $workgroup = $c->sql->Q(" SELECT id, shortcut FROM catalog WHERE id=? ", [ $default_workgroup ])->Hash;
 
-    if ( $member->{id} && $edition->{id} && $workgroup->{id} ) {
-        if ($member->{shortcut} && $edition->{shortcut} && $workgroup->{shortcut} ) {
-            foreach my $id (@ids) {
-                
-                $success = $c->json->true;
-                
-                my $workgroups = $c->sql->Q("
-                    SELECT ARRAY( select id from catalog where path @> ( select path from catalog where id = ? ) )
-                ", [ $workgroup->{id} ])->Array;
-                
-                $c->sql->Do("
-                    UPDATE documents SET
-                        holder=?, holder_shortcut=?,
-                        workgroup=?, workgroup_shortcut=?, inworkgroups=?,
-                        fdate=now()
-                    WHERE id=?
-                ", [
-                    $member->{id}, $member->{shortcut},
-                    $workgroup->{id}, $workgroup->{shortcut}, $workgroups,
-                    $id
-                ]);
-            }
+    push @errors, { id => "member", msg => "Can't find object"}
+        unless ( $member->{id} || $member->{shortcut} );
+    
+    push @errors, { id => "edition", msg => "Can't find object"}
+        unless ( $edition->{id} || $edition->{shortcut} );
+    
+    push @errors, { id => "workgroup", msg => "Can't find object"}
+        unless ( $workgroup->{id} || $workgroup->{shortcut} );
+    
+    unless(@errors) {
+        foreach my $id (@ids) {
+            
+            $success = $c->json->true;
+            
+            my $workgroups = $c->sql->Q("
+                SELECT ARRAY( select id from catalog where path @> ( select path from catalog where id = ? ) )
+            ", [ $workgroup->{id} ])->Array;
+            
+            $c->sql->Do("
+                UPDATE documents SET
+                    holder=?, holder_shortcut=?,
+                    workgroup=?, workgroup_shortcut=?, inworkgroups=?,
+                    fdate=now()
+                WHERE id=?
+            ", [
+                $member->{id}, $member->{shortcut},
+                $workgroup->{id}, $workgroup->{shortcut}, $workgroups,
+                $id
+            ]);
         }
     }
 
-    $c->render_json( { success => $success } );
+    $success = $c->json->true unless (@errors);
+    $c->render_json( { success => $success, errors => \@errors } );
 }
 
 sub transfer {
@@ -775,6 +834,7 @@ sub transfer {
     my @ids = $c->param("id");
     my $tid = $c->param("transfer");
 
+    my @errors;
     my $success = $c->json->false;
 
     my $assignment = $c->sql->Q("
@@ -814,7 +874,8 @@ sub transfer {
         }
     }
 
-    $c->render_json( { success => $success } );
+    $success = $c->json->true unless (@errors);
+    $c->render_json( { success => $success, errors => \@errors } );
 }
 
 sub briefcase {
@@ -822,18 +883,22 @@ sub briefcase {
 
     my @ids = $c->param("id");
 
+    my @errors;
     my $success = $c->json->false;
 
     my $fascicle = $c->sql->Q(" SELECT id, shortcut FROM fascicles WHERE id='00000000-0000-0000-0000-000000000000' ")->Hash;
 
     if ($fascicle) {
         foreach my $id (@ids) {
+            $c->sql->bt;
             $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $id ]);
-            $c->MoveDocumentIndexToFascicle($id, $fascicle->{id});
+            $c->MoveDocumentIndexToFascicle(\@errors, $id);
+            $c->sql->et;
         }
     }
 
-    $c->render_json( { success => $success } );
+    $success = $c->json->true unless (@errors);
+    $c->render_json( { success => $success, errors => \@errors } );
 }
 
 sub move {
@@ -850,15 +915,29 @@ sub move {
     my @errors;
     my $success = $c->json->false;
     
+    push @errors, { id => "edition", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_edition));
+        
+    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_fascicle));
+    
+    my $edition  = Inprint::Utils::GetEditionById($c, id => $i_edition);
+    push @errors, { id => "edition", msg => "Can't find object"}
+        unless ( $edition->{id} || $edition->{shortcut} );
+    
     my $fascicle = Inprint::Utils::GetFascicleById($c, id => $i_fascicle);
+    push @errors, { id => "fascicle", msg => "Can't find object"}
+        unless ( $fascicle->{id} || $fascicle->{shortcut} );
+    
     my $headline = Inprint::Utils::GetHeadlineById($c, id => $i_headline, fascicle => $i_fascicle);
     my $rubric   = Inprint::Utils::GetRubricById($c,   id => $i_rubric,   headline=> $i_headline);
     
-    if ($fascicle) {
+    unless (@errors) {
         
         foreach my $id (@ids) {
             
             # Change fascicle
+            $c->sql->Do(" UPDATE documents SET edition=?,  edition_shortcut=?  WHERE id=? ", [ $edition->{id}, $edition->{shortcut}, $id ]);
             $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $id ]);
             
             # Change headline
@@ -872,13 +951,13 @@ sub move {
             }
             
             # Update indexation
-            $c->MoveDocumentIndexToFascicle($id, $fascicle->{id});
+            $c->MoveDocumentIndexToFascicle(\@errors, $id);
             
         }
     }
     
     $success = $c->json->true unless (@errors);
-    $c->render_json( { success => $success } );
+    $c->render_json( { success => $success, errors => \@errors } );
 }
 
 sub copy {
@@ -976,7 +1055,7 @@ sub copy {
                     $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $new_id ]);
                     
                     # Change Index
-                    $c->MoveDocumentIndexToFascicle($new_id, $fascicle->{id});
+                    $c->MoveDocumentIndexToFascicle(\@errors, $new_id);
                     
                     $c->sql->et();
                 }
@@ -985,7 +1064,7 @@ sub copy {
     }
     
     $success = $c->json->true unless (@errors);
-    $c->render_json( { success => $success } );
+    $c->render_json( { success => $success, errors => \@errors } );
 }
 
 sub duplicate {
@@ -1084,7 +1163,7 @@ sub duplicate {
                     $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $new_id ]);
                     
                     # Indexation
-                    $c->MoveDocumentIndexToFascicle($new_id, $fascicle->{id});
+                    $c->MoveDocumentIndexToFascicle(\@errors, $new_id);
                     
                     # Datastore
                     my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
@@ -1102,7 +1181,7 @@ sub duplicate {
     }
     
     $success = $c->json->true unless (@errors);
-    $c->render_json( { success => $success } );
+    $c->render_json( { success => $success, errors => \@errors } );
 }
 
 
@@ -1122,10 +1201,11 @@ sub recycle {
                 if ($document->{workgroup}) {
                     if ($c->access->Check("catalog.documents.delete:*", $document->{workgroup})) {
                         $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $document->{id} ]);
-                        $c->MoveDocumentIndexToFascicle($id, '99999999-9999-9999-9999-999999999999');
+                        $c->MoveDocumentIndexToFascicle([], $id);
                     }
                 }
             }
+            
         }
     }
     $c->render_json( { success => $c->json->true } );
@@ -1146,7 +1226,7 @@ sub restore {
                 if ($document->{workgroup}) {
                     if ($c->access->Check("catalog.documents.delete:*", $document->{workgroup})) {
                         $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $document->{id} ]);
-                        $c->MoveDocumentIndexToFascicle($id, '00000000-0000-0000-0000-000000000000');
+                        $c->MoveDocumentIndexToFascicle([], $id);
                     }
                 }
             }
@@ -1155,25 +1235,78 @@ sub restore {
     $c->render_json( { success => $c->json->true } );
 }
 
-
 sub delete {
     my $c = shift;
     my @ids = $c->param("id");
-    #foreach my $id (@ids) {
-    #    if ($c->is_uuid($id)) {
-    #        my $document = $c->sql->Q(" SELECT id, workgroup FROM documents WHERE id=? ", [ $id ])->Hash;
-    #        if ($c->access->Check("catalog.documents.delete:*", $document->{workgroup})) {
-    #            $c->sql->Do(" UPDATE documents SET fascicle='99999999-9999-9999-9999-999999999999' WHERE id=? ", [ $document->{id} ]);
-    #        }
-    #    }
-    #}
+    # TODO: this function
+    
     $c->render_json( { success => $c->json->true } );
 }
 
 sub MoveDocumentIndexToFascicle {
     my $c = shift;
-    my $document = shift;
-    my $fascicle = shift;
+    my $errors = shift;
+    my $i_document = shift;
+    
+    my $document = $c->sql->Q(" SELECT * FROM documents WHERE id=? ", [ $i_document ])->Hash;
+    unless ($document->{id}) {
+        push @$errors, { id => "document", msg => "Can't find object"};
+        return;
+    }
+    
+    my $edition = $c->sql->Q(" SELECT * FROM editions  WHERE id=? ", [ $document->{edition} ])->Hash;
+    unless ($edition->{id}) {
+        push @$errors, { id => "edition", msg => "Can't find object"};
+        return;
+    }
+    
+    my $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $document->{fascicle} ])->Hash;
+    unless ($fascicle->{id}) {
+        push @$errors, { id => "fascicle", msg => "Can't find object"};
+        return;
+    }
+    
+    # Briefcase
+    if ($fascicle->{id} eq '00000000-0000-0000-0000-000000000000') {
+        my $headline = Inprint::Utils::Headlines::Create($c, $edition->{id}, $fascicle->{id}, $document->{headline_shortcut}, $document->{headline_shortcut}, $document->{headline_shortcut});
+        my $rubric   = Inprint::Utils::Rubrics::Create($c, $edition->{id}, $fascicle->{id}, $headline->{id}, $document->{rubric_shortcut}, $document->{rubric_shortcut}, $document->{rubric_shortcut});
+        return;
+    }
+    
+    # TrashCan
+    if ($fascicle->{id} eq '99999999-9999-9999-9999-999999999999') {
+        my $headline = Inprint::Utils::Headlines::Create($c, $edition->{id}, $fascicle->{id}, $document->{headline_shortcut}, $document->{headline_shortcut}, $document->{headline_shortcut});
+        my $rubric   = Inprint::Utils::Rubrics::Create($c, $edition->{id}, $fascicle->{id}, $headline->{id}, $document->{rubric_shortcut}, $document->{rubric_shortcut}, $document->{rubric_shortcut});
+        return;
+    }
+    
+    my $editions = $c->sql->Q(" SELECT id FROM editions WHERE path @> ? order by path asc ", [ $edition->{path} ])->Values;
+    
+    my $headline_exist = $c->sql->Q(" SELECT count(*) FROM index WHERE edition = ANY(?) AND nature='headline' AND lower(shortcut) = lower(?) ", [ $editions, $document->{headline_shortcut} ])->Value;
+    
+    if ($headline_exist) {
+        my $headline = Inprint::Utils::Headlines::Create($c, $edition->{id}, $fascicle->{id}, $document->{headline_shortcut}, $document->{headline_shortcut}, $document->{headline_shortcut});
+        if ($headline->{id}) {
+            my $rubric   = Inprint::Utils::Rubrics::Create($c, $edition->{id}, $fascicle->{id}, $headline->{id}, $document->{rubric_shortcut}, $document->{rubric_shortcut}, $document->{rubric_shortcut});
+        }
+    } else {
+        
+        my $headline = Inprint::Utils::Headlines::Create($c, $edition->{id}, $fascicle->{id}, "--", "--", "--" );
+        
+        if ($headline->{id} || $headline->{shortcut}) {
+            
+            $c->sql->Do(" UPDATE documents SET headline=?, headline_shortcut=? WHERE id=? ", [ $headline->{id}, $headline->{shortcut}, $document->{id} ]);
+            
+            my $rubric = Inprint::Utils::Rubrics::Create($c, $edition->{id}, $fascicle->{id}, $headline->{id}, "--", "--", "--" );
+            
+            if ($rubric->{id} || $rubric->{shortcut}) {
+                $c->sql->Do(" UPDATE documents SET rubric=?, rubric_shortcut=? WHERE id=? ", [ $rubric->{id}, $rubric->{shortcut}, $document->{id} ]);
+            }
+        }
+        
+    }
+    
+    return;
 }
 
 1;

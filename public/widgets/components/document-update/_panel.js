@@ -81,11 +81,11 @@ Inprint.cmp.UpdateDocument = Ext.extend(Ext.Window, {
         
         if (json.data.headline && json.data.headline_shortcut) {
             form.findField("headline").setValue(json.data.headline, json.data.headline_shortcut);
-        }
-        
-        if (json.data.rubric && json.data.rubric_shortcut) {
-            form.findField("rubric").setValue(json.data.rubric, json.data.rubric_shortcut);
-            form.findField("rubric").enable();
+            if (json.data.rubric && json.data.rubric_shortcut) {
+                form.findField("rubric").setValue(json.data.rubric, json.data.rubric_shortcut);
+                form.findField("rubric").getStore().baseParams["flt_headline"] = json.data.headline;
+                form.findField("rubric").enable();
+            }
         }
 
     }

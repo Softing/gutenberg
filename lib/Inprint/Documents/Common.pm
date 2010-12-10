@@ -20,7 +20,7 @@ sub fascicles {
 
     my $sql = "
         SELECT
-            t1.id, t1.is_issystem, 
+            t1.id, t1.is_system, 
             t2.id as edition, t2.shortcut as edition_shortcut, 
             t1.title, t1.shortcut, t1.description,
             to_char(t1.begindate, 'YYYY-MM-DD HH24:MI:SS') as begindate,
@@ -30,7 +30,7 @@ sub fascicles {
             EXTRACT( DAY FROM now()-t1.begindate) as passeddays
         FROM fascicles t1, editions t2
         WHERE
-            t1.is_issystem = false AND t1.is_enabled = true AND t1.edition = t2.id 
+            t1.is_system = false AND t1.is_enabled = true AND t1.edition = t2.id 
     ";
 
     my $editions = $c->access->GetChildrens("editions.documents.work");

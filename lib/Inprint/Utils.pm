@@ -1,5 +1,7 @@
 package Inprint::Utils;
 
+use strict;
+
 sub GetEditionById {
     my $c  = shift;
     my %params = ( @_ );
@@ -45,13 +47,14 @@ sub GetHeadlineById {
         WHERE nature='headline'
     ";
     
+    
     if ($params{id}) {
         $sql .= " AND t1.id=?  ";
         push @params, $params{id};
     }
     
-    if ($params{fascicle}) {
-        $sql .= " AND t2.fascicle=?  ";
+    if ($params{fascicle} && $params{fascicle} ne '00000000-0000-0000-0000-000000000000') {
+        $sql .= " AND t1.fascicle=?  ";
         push @params, $params{fascicle};
     }
     
@@ -67,6 +70,7 @@ sub GetRubricById {
     return undef unless $params{id};
     
     my @params = ();
+    
     my $sql = "
         SELECT t1.id, t1.shortcut FROM index_fascicles t1
         WHERE nature='rubric'
@@ -77,13 +81,13 @@ sub GetRubricById {
         push @params, $params{id};
     }
     
-    if ($params{fascicle}) {
-        $sql .= " AND t2.fascicle=?  ";
+    if ($params{fascicle} && $params{fascicle} ne '00000000-0000-0000-0000-000000000000') {
+        $sql .= " AND t1.fascicle=?  ";
         push @params, $params{fascicle};
     }
     
     if ($params{headline}) {
-        $sql .= " AND t2.parent=?  ";
+        $sql .= " AND t1.parent=?  ";
         push @params, $params{headline};
     }
     
@@ -161,7 +165,7 @@ sub CollapsePagesToString {
         }
     };
     
-    $string = join (',',@string);
+    my $string = join (',',@string);
     $string =~ s/,-,/-/g;
     $string =~ s/-,/-/g;
     $string =~ s/-+/-/g;

@@ -1,7 +1,8 @@
 // Extend Comboboxes
 
 Ext.form.ComboBox.prototype.setValue = function(v, t){
-    if (t) {
+    
+    if (t || t === "") {
         this.displayText = t;
     }
     
@@ -45,6 +46,7 @@ Ext.form.ComboBox.prototype.resetValue = function(baseParams) {
     this.store.removeAll();
     this.lastQuery = null;
     this.store.baseParams = baseParams || {};
+    this.setValue("", "");
 };
 
 // Create XCombobox

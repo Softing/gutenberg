@@ -23,7 +23,7 @@ Inprint.cmp.UpdateDocument.Form = Ext.extend(Ext.FormPanel, {
                     value: _("Basic options")
                 },
                 {
-                    xtype: 'textfield',
+                    xtype: 'textarea',
                     fieldLabel: _("Title"),
                     name: 'title',
                     allowBlank:false
@@ -76,6 +76,8 @@ Inprint.cmp.UpdateDocument.Form = Ext.extend(Ext.FormPanel, {
                             this.getForm().findField("headline").on("select", function() {
                                 combo.enable();
                                 combo.reset();
+                                combo.resetValue();
+                                combo.getStore().baseParams["flt_headline"] = this.getForm().findField("headline").getValue();
                             }, this);
                         },
                         beforequery: function(qe) {
@@ -85,6 +87,7 @@ Inprint.cmp.UpdateDocument.Form = Ext.extend(Ext.FormPanel, {
                         }
                     }
                 })
+                
             ]
         });
 
