@@ -717,7 +717,7 @@ sub update {
             my $editions = $c->sql->Q(" SELECT id FROM editions WHERE path @> (SELECT path FROM editions WHERE id=?) order by path asc ", [ $document->{edition} ])->Values;
             
             # find headline in index
-            my $source_headline = $c->sql->Q(" SELECT * FROM index WHERE id=? AND edition  = ? ", [ $i_headline, $document->{edition} ])->Hash;
+            my $source_headline = $c->sql->Q(" SELECT * FROM index WHERE id=? AND edition  = ANY(?) ", [ $i_headline, $documents ])->Hash;
             
             # find headline in fascicle
             unless ($source_headline) {
