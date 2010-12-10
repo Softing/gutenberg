@@ -19,7 +19,7 @@ Inprint.cmp.MoveDocument.Form = Ext.extend(Ext.FormPanel, {
                         allowBlank:false
                     },
                     items: [
-
+                        
                         {
                             columnWidth:.125,
                             xtype: "treecombo",
@@ -39,27 +39,41 @@ Inprint.cmp.MoveDocument.Form = Ext.extend(Ext.FormPanel, {
                                 draggable: false,
                                 icon: _ico("book"),
                                 text: _("All editions")
+                            },
+                            listeners: {
+                                scope: this,
+                                render: function(field) {
+                                    var id = Inprint.session.options["default.edition"];
+                                    var title = Inprint.session.options["default.edition.name"] || _("Unknown edition");
+                                    if (id && title) field.setValue(id, title);
+                                    this.getForm().findField("fascicle").enable();
+                                },
+                                select: function(field) {
+                                    this.getForm().findField("fascicle").enable();
+                                    this.getForm().findField("fascicle").reset();
+                                }
                             }
                         },
-
+                        
                         xc.getConfig("/documents/combos/fascicles/", {
                             disabled: true,
+                            baseParams: { term: 'editions.documents.assign' },
                             listeners: {
                                 scope: this,
                                 render: function(combo) {
-
+                                    
                                     this.getForm().findField("edition").on("select", function() {
                                         combo.enable();
                                         combo.reset();
-                                        combo.getStore().baseParams["flt_edition"] = this.getForm().findField("edition").getValue();
                                     }, this);
-
+                                    
                                 },
                                 beforequery: function(qe) {
                                     delete qe.combo.lastQuery;
+                                    qe.combo.getStore().baseParams["flt_edition"] = this.getForm().findField("edition").getValue();
                                 }
                             }
-                        }),
+                        })
 
                     ]
                 },
@@ -85,16 +99,24 @@ Inprint.cmp.MoveDocument.Form = Ext.extend(Ext.FormPanel, {
                                 scope: this,
                                 change: function(group, radio) {
                                     var value = radio.getGroupValue();
+                                    
+                                    var edition  = this.getForm().findField("edition").getValue();
+                                    var fascicle = this.getForm().findField("fascicle").getValue();
+                                    
                                     if (value == "yes") {
-                                        this.getForm().findField("headline").enable();
+                                        
+                                        if (edition && fascicle) {
+                                            this.getForm().findField("headline").enable();
+                                        }
+                                        
                                         this.getForm().findField("headline").reset();
                                         this.getForm().findField("rubric").reset();
                                     }
+                                    
                                     if (value == "no") {
                                         this.getForm().findField("headline").reset();
-                                        this.getForm().findField("headline").disable();
-                                        
                                         this.getForm().findField("rubric").reset();
+                                        this.getForm().findField("headline").disable();
                                         this.getForm().findField("rubric").disable();
                                     }
                                 }

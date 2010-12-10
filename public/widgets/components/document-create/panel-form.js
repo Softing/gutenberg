@@ -100,10 +100,6 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                         },
                                         select: function(field) {
                                             this.getForm().findField("fascicle").reset();
-                                            //this.getForm().findField("headline").reset();
-                                            //this.getForm().findField("rubric").reset();
-                                            //this.getForm().findField("headline").disable();
-                                            //this.getForm().findField("rubric").disable();
                                         }
                                     }
                                 },
