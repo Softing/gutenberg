@@ -454,7 +454,7 @@ sub create {
     my $edition;
     unless ( @errors ) {
         # Set edition
-        $edition = $c->sql->Q(" SELECT id, shortcut FROM editions WHERE id = ?", [ $i_edition ])->Hash;
+        $edition = $c->sql->Q(" SELECT id, path, shortcut FROM editions WHERE id = ?", [ $i_edition ])->Hash;
         if ($edition->{id} && $edition->{shortcut}) {
             push @fields, "edition";
             push @data, $edition->{id};
@@ -713,6 +713,8 @@ sub update {
         }
         
         if ($document->{fascicle} eq "00000000-0000-0000-0000-000000000000") {
+            
+            my $editions = $c->sql->Q(" SELECT id FROM editions WHERE path @> (SELECT path FROM editions WHERE id=?) order by path asc ", [ $document->{edition} ])->Values;
             
             # find headline in index
             my $source_headline = $c->sql->Q(" SELECT * FROM index WHERE id=? AND edition  = ? ", [ $i_headline, $document->{edition} ])->Hash;
