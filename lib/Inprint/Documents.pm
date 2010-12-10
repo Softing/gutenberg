@@ -597,16 +597,19 @@ sub create {
                 if ($fascicle->{id} ne "00000000-0000-0000-0000-000000000000") {
                     $headline = Inprint::Utils::GetHeadlineById($c, id => $i_headline, fascicle => $fascicle->{id} );
                 }
-                
+
+                my $editions = $c->sql->Q(" SELECT id FROM editions WHERE path @> ? order by path asc ", [ $edition->{path} ])->Values;
+
                 if ($fascicle->{id} eq "00000000-0000-0000-0000-000000000000") {
                     
-                    my $editions = $c->sql->Q(" SELECT id FROM editions WHERE path @> ? order by path asc ", [ $edition->{path} ])->Values;
+
                     
                     # find headline in index
                     my $source_headline = $c->sql->Q(" SELECT * FROM index WHERE id=? AND edition  = ANY(?) ", [ $i_headline, $editions ])->Hash;
                     
+                    
                     # find headline in fascicle
-                    unless ($source_headline) {
+                    unless ($source_headline->{id}) {
                         $source_headline = $c->sql->Q(" SELECT * FROM index_fascicles WHERE id=? AND edition = ?", [ $i_headline, $edition->{id} ])->Hash;
                     }
                     
@@ -631,11 +634,11 @@ sub create {
                         if ($fascicle->{id} eq "00000000-0000-0000-0000-000000000000") {
                             
                             # find headline in index
-                            my $source_rubric = $c->sql->Q(" SELECT * FROM index WHERE id=? AND edition  = ? ", [ $i_rubric, $edition->{id} ])->Hash;
+                            my $source_rubric = $c->sql->Q(" SELECT * FROM index WHERE id=? AND edition = ANY(?) ", [ $i_rubric, $editions ])->Hash;
                             
                             # find headline in fascicle
-                            unless ($source_rubric) {
-                                $source_rubric = $c->sql->Q(" SELECT * FROM index_fascicles WHERE id=? AND edition = ?", [ $i_rubric, $edition->{id} ])->Hash;
+                            unless ($source_rubric->{id}) {
+                                $source_rubric = $c->sql->Q(" SELECT * FROM index_fascicles WHERE id=? AND edition = ANY(?)", [ $i_rubric, $editions ])->Hash;
                             }
                             
                             $rubric   = Inprint::Utils::Rubrics::Create($c, $edition->{id}, $fascicle->{id}, $headline->{id}, $source_rubric->{title}, $source_rubric->{shortcut}, $source_rubric->{description});
@@ -753,14 +756,14 @@ sub update {
         
     }
     
-    unless ($headline) {
+    unless ($headline->{id}) {
         $headline   = Inprint::Utils::Headlines::Create($c, $document->{edition}, $document->{fascicle}, "--", "--", "--");
     }
     
     push @errors, { id => "headline", msg => "Can't find document object"}
         unless ($headline->{id});
     
-    unless ($rubric) {
+    unless ($rubric->{id}) {
         $rubric   = Inprint::Utils::Rubrics::Create($c, $document->{edition}, $document->{fascicle}, $headline->{id}, "--", "--", "--");
     }
     
