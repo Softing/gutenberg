@@ -510,7 +510,7 @@ sub create {
         push @fields, "creator";
         push @fields, "creator_shortcut";
         push @data, $c->QuerySessionGet("member.id");
-        push @data, $c->QuerySessionGet("member.shortcut");
+        push @data, $c->QuerySessionGet("member.shortcut") || "<Unknown>";
     }
     
     my $manager_obj;
