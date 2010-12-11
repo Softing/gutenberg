@@ -380,7 +380,7 @@ sub create {
     push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_fascicle));
     
-    if ($i_fascicle) {
+    if ($i_fascicle && $i_fascicle ne  "00000000-0000-0000-0000-000000000000") {
         $i_edition = $c->sql->Q(" SELECT edition FROM fascicles WHERE id = ?", [ $i_fascicle ])->Value;
         push @errors, { id => "edition", msg => "Incorrectly filled field"}
             unless ($c->is_uuid($i_edition));
@@ -608,12 +608,9 @@ sub create {
                 my $editions = $c->sql->Q(" SELECT id FROM editions WHERE path @> ? order by path asc ", [ $edition->{path} ])->Values;
 
                 if ($fascicle->{id} eq "00000000-0000-0000-0000-000000000000") {
-                    
 
-                    
                     # find headline in index
                     my $source_headline = $c->sql->Q(" SELECT * FROM index WHERE id=? AND edition  = ANY(?) ", [ $i_headline, $editions ])->Hash;
-                    
                     
                     # find headline in fascicle
                     unless ($source_headline->{id}) {
@@ -621,7 +618,6 @@ sub create {
                     }
                     
                     $headline = Inprint::Utils::Headlines::Create($c, $edition->{id}, $fascicle->{id}, $source_headline->{title}, $source_headline->{shortcut}, $source_headline->{description});
-                    
                 }
                 
                 if ($headline->{id} && $headline->{shortcut}) {
