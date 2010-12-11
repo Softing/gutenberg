@@ -80,21 +80,22 @@ sub headlines {
 
     my @params;
     my $sql = "
-        SELECT DISTINCT dcm.headline_shortcut as id, dcm.headline_shortcut as title
-        FROM documents dcm
-        WHERE dcm.edition=ANY(?) AND dcm.headline_shortcut is not null
+        SELECT DISTINCT t1.headline_shortcut as id, t1.headline_shortcut as title
+        FROM documents t1
+        WHERE t1.edition=ANY(?) AND t1.headline_shortcut is not null
     ";
     
     my $editions = $c->access->GetChildrens("editions.documents.work");
     push @params, $editions;
 
     if ($cgi_edition &&  $cgi_edition ne "clear") {
-        $sql .= " AND dcm.edition = ? ";
-        push @params, $cgi_edition;
+        my $editions = $c->sql->Q(" SELECT id FROM editions WHERE path <@ ( SELECT path FROM editions WHERE id=?)", [ $cgi_edition ])->Values;
+        $sql .= " AND t1.edition = ANY(?) ";
+        push @params, $editions;
     }
 
     if ($cgi_fascicle &&  $cgi_fascicle ne "clear") {
-        $sql .= " AND dcm.fascicle = ? ";
+        $sql .= " AND t1.fascicle = ? ";
         push @params, $cgi_fascicle;
     }
     
@@ -102,8 +103,8 @@ sub headlines {
     $sql .= " $sql_filter->{sql} ";
     @params = (@params, @{ $sql_filter->{params} });
     
-    $sql .= " ORDER BY dcm.headline_shortcut ";
-
+    $sql .= " ORDER BY t1.headline_shortcut ";
+    
     my $result = $c->sql->Q($sql, \@params)->Hashes;
 
     unshift @$result, {
@@ -127,26 +128,26 @@ sub rubrics {
     
     my @params;
     my $sql = "
-        SELECT DISTINCT dcm.rubric_shortcut as id, dcm.rubric_shortcut as title
-        FROM documents dcm
-        WHERE dcm.edition=ANY(?) AND dcm.rubric_shortcut is not null
+        SELECT DISTINCT t1.rubric_shortcut as id, t1.rubric_shortcut as title
+        FROM document t1
+        WHERE t1.edition=ANY(?) AND t1.rubric_shortcut is not null
     ";
     
     my $editions = $c->access->GetChildrens("editions.documents.work");
     push @params, $editions;
     
     if ($cgi_edition &&  $cgi_edition ne "clear") {
-        $sql .= " AND dcm.edition = ? ";
+        $sql .= " AND t1.edition = ? ";
         push @params, $cgi_edition;
     }
     
     if ($cgi_fascicle &&  $cgi_fascicle ne "clear") {
-        $sql .= " AND dcm.fascicle = ? ";
+        $sql .= " AND t1.fascicle = ? ";
         push @params, $cgi_fascicle;
     }
     
     if ($cgi_headline &&  $cgi_headline ne "clear") {
-        $sql .= " AND dcm.headline_shortcut = ? ";
+        $sql .= " AND t1.headline_shortcut = ? ";
         push @params, $cgi_headline;
     }
     
@@ -154,7 +155,7 @@ sub rubrics {
     $sql .= " $sql_filter->{sql} ";
     @params = (@params, @{ $sql_filter->{params} });
     
-    $sql .= " ORDER BY dcm.rubric_shortcut ";
+    $sql .= " ORDER BY t1.rubric_shortcut ";
 
     my $result = $c->sql->Q($sql, \@params)->Hashes;
 
@@ -279,8 +280,8 @@ sub createSqlFilter {
     my $departments = $c->access->GetChildrens("catalog.documents.view:*");
 
     $sql .= " ( ";
-    $sql .= "    dcm.edition = ANY(?) ";
-    $sql .= "    AND dcm.workgroup = ANY(?) ";
+    $sql .= "    t1.edition = ANY(?) ";
+    $sql .= "    AND t1.workgroup = ANY(?) ";
     $sql .= " ) ";
     push @params, $editions;
     push @params, $departments;
@@ -290,7 +291,7 @@ sub createSqlFilter {
 
     if ($mode eq "todo") {
         my @holders;
-        $sql .= " AND holder = ANY(?) ";
+        $sql .= " AND t1.holder = ANY(?) ";
         
         my $departments = $c->sql->Q(" SELECT catalog FROM map_member_to_catalog WHERE member =? ", [ $current_member ])->Values;
         
@@ -301,13 +302,13 @@ sub createSqlFilter {
         push @holders, $current_member;
         push @params, \@holders;
         
-        $sql .= " AND isopen = true ";
-        $sql .= " AND fascicle <> '99999999-9999-9999-9999-999999999999' ";
+        $sql .= " AND t1.isopen = true ";
+        $sql .= " AND t1.fascicle <> '99999999-9999-9999-9999-999999999999' ";
     }
 
     if ($mode eq "all") {
-        $sql .= " AND isopen is true ";
-        $sql .= " AND fascicle <> '99999999-9999-9999-9999-999999999999' ";
+        $sql .= " AND t1.isopen is true ";
+        $sql .= " AND t1.fascicle <> '99999999-9999-9999-9999-999999999999' ";
         if ($fascicle && $fascicle ne 'clear' && $fascicle ne '00000000-0000-0000-0000-000000000000') {
             $sql .= " AND fascicle <> '00000000-0000-0000-0000-000000000000' ";
         }
