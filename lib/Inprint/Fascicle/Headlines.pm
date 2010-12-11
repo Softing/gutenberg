@@ -107,13 +107,14 @@ sub create {
     push @errors, { id => "description", msg => "Incorrectly filled field"}
         unless ($c->is_text($i_description));
         
-    push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.departments.manage"));
     
     my $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
     push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
         unless ($fascicle->{id});
     
+    push @errors, { id => "access", msg => "Not enough permissions [editions.layouts.manage]"}
+        unless ($c->access->Check("editions.layouts.manage", $fascicle->{edition}));
+
     unless (@errors) {
         my $exists_title = $c->sql->Q("
                 SELECT count(*)
@@ -166,13 +167,14 @@ sub update {
     push @errors, { id => "description", msg => "Incorrectly filled field"}
         unless ($c->is_text($i_description));
         
-    #push @errors, { id => "access", msg => "Not enough permissions"}
-    #    unless ($c->access->Check("domain.editions.manage"));
     
     my $headline = $c->sql->Q(" SELECT * FROM index_fascicles WHERE id=? ", [ $i_id ])->Hash;
     push @errors, { id => "headline", msg => "Incorrectly filled field"}
         unless ($headline->{id});
-    
+
+    push @errors, { id => "access", msg => "Not enough permissions [editions.layouts.manage]"}
+        unless ($c->access->Check("editions.layouts.manage", $headline->{edition}));
+
     unless (@errors) {
         
         my $exists_title = $c->sql->Q("
@@ -210,12 +212,16 @@ sub delete {
 
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_id));
-    
-    #push @errors, { id => "access", msg => "Not enough permissions"}
-    #    unless ($c->access->Check("domain.editions.manage"));
+
+    my $headline = $c->sql->Q(" SELECT * FROM index_fascicles WHERE id=? ", [ $i_id ])->Hash;
+    push @errors, { id => "headline", msg => "Incorrectly filled field"}
+        unless ($headline->{id});
+
+    push @errors, { id => "access", msg => "Not enough permissions [editions.layouts.manage]"}
+        unless ($c->access->Check("editions.layouts.manage", $headline->{edition}));
     
     unless (@errors) {
-        $c->sql->Do(" DELETE FROM index_fascicles WHERE id =? AND ( origin <> '00000000-0000-0000-0000-000000000000' ) ", [ $i_id ]);
+        $c->sql->Do(" DELETE FROM index_fascicles WHERE id =? AND ( origin <> '00000000-0000-0000-0000-000000000000' ) ", [ $headline->{id} ]);
         $c->sql->Do(" DELETE FROM index_fascicles WHERE parent=? ", [ $i_id ]);
     }
     

@@ -82,9 +82,6 @@ sub create {
         
     push @errors, { id => "description", msg => "Incorrectly filled field"}
         unless ($c->is_text($i_description));
-        
-    push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.departments.manage"));
     
     my $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
     push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
@@ -94,6 +91,9 @@ sub create {
     push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
         unless ($headline->{id});
     
+     push @errors, { id => "access", msg => "Not enough permissions [editions.layouts.manage]"}
+        unless ($c->access->Check("editions.layouts.manage", $headline->{edition}));
+
     unless (@errors) {
         my $exists_title = $c->sql->Q("
                 SELECT count(*)
@@ -146,13 +146,13 @@ sub update {
     push @errors, { id => "description", msg => "Incorrectly filled field"}
         unless ($c->is_text($i_description));
         
-    #push @errors, { id => "access", msg => "Not enough permissions"}
-    #    unless ($c->access->Check("domain.editions.manage"));
-    
     my $rubric = $c->sql->Q(" SELECT * FROM index_fascicles WHERE id=? ", [ $i_id ])->Hash;
     push @errors, { id => "rubric", msg => "Incorrectly filled field"}
         unless ($rubric->{id});
     
+    push @errors, { id => "access", msg => "Not enough permissions [editions.layouts.manage]"}
+        unless ($c->access->Check("editions.layouts.manage", $rubric->{edition}));
+
     unless (@errors) {
         
         my $exists_title = $c->sql->Q("
@@ -190,10 +190,14 @@ sub delete {
 
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_id));
-    
-    #push @errors, { id => "access", msg => "Not enough permissions"}
-    #    unless ($c->access->Check("domain.editions.manage"));
-    
+        
+    my $rubric = $c->sql->Q(" SELECT * FROM index_fascicles WHERE id=? ", [ $i_id ])->Hash;
+    push @errors, { id => "rubric", msg => "Incorrectly filled field"}
+        unless ($rubric->{id});
+
+    push @errors, { id => "access", msg => "Not enough permissions [editions.layouts.manage]"}
+        unless ($c->access->Check("editions.layouts.manage", $rubric->{edition}));
+
     unless (@errors) {
         $c->sql->Do("
             DELETE FROM index_fascicles WHERE id =?
