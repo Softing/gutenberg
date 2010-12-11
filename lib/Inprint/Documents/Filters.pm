@@ -254,7 +254,7 @@ sub progress {
     
     $sql .= " ORDER BY progress, title ";
 
-    my $result = $c->sql->Q($sql->{sql}, $sql->{params})->Hashes;
+    my $result = $c->sql->Q($sql, \@params)->Hashes;
 
     unshift @$result, {
         id => "clear",
