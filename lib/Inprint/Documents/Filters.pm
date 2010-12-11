@@ -176,18 +176,23 @@ sub managers {
 
     my $c = shift;
 
-    my $sql = $c->createSqlFilter([],
-        "
-            SELECT DISTINCT
-                t1.manager as id,
-                t2.shortcut as title,
-                t2.description as description,
-                CASE WHEN t2.type='group' THEN 'folders' ELSE 'user' END as icon
-            FROM documents t1, view_principals t2 WHERE t2.id = t1.manager
-        ",
-        " ORDER BY icon, t2.shortcut; ");
+    my @params;
+    my $sql = "
+        SELECT DISTINCT
+            t1.manager as id,
+            t2.shortcut as title,
+            t2.description as description,
+            CASE WHEN t2.type='group' THEN 'folders' ELSE 'user' END as icon
+        FROM documents t1, view_principals t2 WHERE t2.id = t1.manager
+    ";
     
-    my $result = $c->sql->Q($sql->{sql}, $sql->{params})->Hashes;
+    my $sql_filter = $c->createSqlFilter();
+    $sql .= " $sql_filter->{sql} ";
+    @params = (@params, @{ $sql_filter->{params} });
+    
+    $sql .= " ORDER BY icon, t2.shortcut; ";
+    
+    my $result = $c->sql->Q($sql, \@params)->Hashes;
 
     unshift @$result, {
         id => "clear",
@@ -205,17 +210,23 @@ sub holders {
 
     my $c = shift;
     
-    my $sql = $c->createSqlFilter([],
-        "   SELECT DISTINCT
-                t1.holder as id,
-                t2.shortcut as title,
-                t2.description as description,
-                CASE WHEN t2.type='group' THEN 'folders' ELSE 'user' END as icon
-            FROM documents t1, view_principals t2 WHERE t2.id = t1.holder
-        ",
-        " ORDER BY icon, t2.shortcut; ");
-
-    my $result = $c->sql->Q($sql->{sql}, $sql->{params})->Hashes;
+    my @params;
+    my $sql = "
+        SELECT DISTINCT
+            t1.holder as id,
+            t2.shortcut as title,
+            t2.description as description,
+            CASE WHEN t2.type='group' THEN 'folders' ELSE 'user' END as icon
+        FROM documents t1, view_principals t2 WHERE t2.id = t1.holder
+    ";
+    
+    my $sql_filter = $c->createSqlFilter();
+    $sql .= " $sql_filter->{sql} ";
+    @params = (@params, @{ $sql_filter->{params} });
+    
+    $sql .= " ORDER BY icon, t2.shortcut; ";
+    
+    my $result = $c->sql->Q($sql, \@params)->Hashes;
 
     unshift @$result, {
         id => "clear",
@@ -232,10 +243,16 @@ sub progress {
 
     my $c = shift;
 
-    my $sql = $c->createSqlFilter([],
-        "   SELECT DISTINCT t1.readiness as id, t1.progress || '% - ' || t1.readiness_shortcut as title, t1.color, t1.progress
-            FROM documents t1 WHERE 1=1 ",
-        " ORDER BY progress, title ");
+    my @params;
+    my $sql = "
+        SELECT DISTINCT t1.readiness as id, t1.progress || '% - ' || t1.readiness_shortcut as title, t1.color, t1.progress
+        FROM documents t1 WHERE 1=1 ";
+    
+    my $sql_filter = $c->createSqlFilter();
+    $sql .= " $sql_filter->{sql} ";
+    @params = (@params, @{ $sql_filter->{params} });
+    
+    $sql .= " ORDER BY progress, title ";
 
     my $result = $c->sql->Q($sql->{sql}, $sql->{params})->Hashes;
 
