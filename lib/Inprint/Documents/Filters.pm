@@ -75,23 +75,36 @@ sub headlines {
 
     my $c = shift;
 
-    my @data;
-
+    my $cgi_edition  = $c->param("flt_edition")  || undef;
     my $cgi_fascicle = $c->param("flt_fascicle") || undef;
 
-    my $sql = " SELECT DISTINCT headline as id, headline_shortcut as title FROM documents WHERE edition=ANY(?) AND headline_shortcut is not null ";
-
+    my @params;
+    my $sql = "
+        SELECT DISTINCT dcm.headline_shortcut as id, dcm.headline_shortcut as title
+        FROM documents dcm
+        WHERE dcm.edition=ANY(?) AND dcm.headline_shortcut is not null
+    ";
+    
     my $editions = $c->access->GetChildrens("editions.documents.work");
-    push @data, $editions;
+    push @params, $editions;
+
+    if ($cgi_edition &&  $cgi_edition ne "clear") {
+        $sql .= " AND dcm.edition = ? ";
+        push @params, $cgi_edition;
+    }
 
     if ($cgi_fascicle &&  $cgi_fascicle ne "clear") {
-        $sql .= " AND fascicle = ? ";
-        push @data, $cgi_fascicle;
+        $sql .= " AND dcm.fascicle = ? ";
+        push @params, $cgi_fascicle;
     }
     
-    $sql .= " ORDER BY headline_shortcut ";
+    my $sql_filter = $c->createSqlFilter();
+    $sql .= " $sql_filter->{sql} ";
+    @params = (@params, @{ $sql_filter->{params} });
+    
+    $sql .= " ORDER BY dcm.headline_shortcut ";
 
-    my $result = $c->sql->Q($sql, \@data)->Hashes;
+    my $result = $c->sql->Q($sql, \@params)->Hashes;
 
     unshift @$result, {
         id => "clear",
@@ -107,30 +120,43 @@ sub headlines {
 sub rubrics {
 
     my $c = shift;
-
-    my @data;
-
+    
+    my $cgi_edition  = $c->param("flt_edition")  || undef;
     my $cgi_fascicle = $c->param("flt_fascicle") || undef;
     my $cgi_headline = $c->param("flt_headline") || undef;
-
-    my $sql = " SELECT DISTINCT rubric as id, rubric_shortcut as title FROM documents WHERE edition=ANY(?) AND rubric_shortcut is not null ";
-
+    
+    my @params;
+    my $sql = "
+        SELECT DISTINCT dcm.rubric_shortcut as id, dcm.rubric_shortcut as title
+        FROM documents dcm
+        WHERE dcm.edition=ANY(?) AND dcm.rubric_shortcut is not null
+    ";
+    
     my $editions = $c->access->GetChildrens("editions.documents.work");
-    push @data, $editions;
-
+    push @params, $editions;
+    
+    if ($cgi_edition &&  $cgi_edition ne "clear") {
+        $sql .= " AND dcm.edition = ? ";
+        push @params, $cgi_edition;
+    }
+    
     if ($cgi_fascicle &&  $cgi_fascicle ne "clear") {
-        $sql .= " AND fascicle = ? ";
-        push @data, $cgi_fascicle;
+        $sql .= " AND dcm.fascicle = ? ";
+        push @params, $cgi_fascicle;
     }
-
+    
     if ($cgi_headline &&  $cgi_headline ne "clear") {
-        $sql .= " AND headline = ? ";
-        push @data, $cgi_headline;
+        $sql .= " AND dcm.headline_shortcut = ? ";
+        push @params, $cgi_headline;
     }
+    
+    my $sql_filter = $c->createSqlFilter();
+    $sql .= " $sql_filter->{sql} ";
+    @params = (@params, @{ $sql_filter->{params} });
+    
+    $sql .= " ORDER BY dcm.rubric_shortcut ";
 
-    $sql .= " ORDER BY rubric_shortcut ";
-
-    my $result = $c->sql->Q($sql, \@data)->Hashes;
+    my $result = $c->sql->Q($sql, \@params)->Hashes;
 
     unshift @$result, {
         id => "clear",
@@ -226,9 +252,10 @@ sub createSqlFilter {
 
     my $c       = shift;
     my $filters = shift;
-    my $sql     = shift;
-    my $order   = shift;
+    #my $sql     = shift;
+    #my $order   = shift;
 
+    my $sql;
     my @params;
 
     my $mode     = $c->param("gridmode")     || "all";
@@ -323,8 +350,8 @@ sub createSqlFilter {
         push @params, $fascicle;
     }
     
-    $sql .= $order;
-
+    #$sql .= $order;
+    
     return { sql => $sql, params => \@params };
 }
 

@@ -246,12 +246,12 @@ sub list {
     }
     
     if ($headline && $headline ne "clear") {
-        $sql_filters .= " AND headline = ? ";
+        $sql_filters .= " AND headline_shortcut = ? ";
         push @params, $headline;
     }
     
     if ($rubric && $rubric ne "clear") {
-        $sql_filters .= " AND rubric = ? ";
+        $sql_filters .= " AND rubric_shortcut = ? ";
         push @params, $rubric;
     }
     
