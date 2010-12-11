@@ -964,7 +964,13 @@ sub move {
     push @errors, { id => "fascicle", msg => "Can't find object"}
         unless ( $fascicle->{id} || $fascicle->{shortcut} );
     
-    my $edition  = Inprint::Utils::GetEditionById($c, id => $fascicle->{edition} );
+    if ($i_fascicle && $i_fascicle ne  "00000000-0000-0000-0000-000000000000") {
+        $i_edition = $c->sql->Q(" SELECT edition FROM fascicles WHERE id = ?", [ $i_fascicle ])->Value;
+        push @errors, { id => "edition", msg => "Incorrectly filled field"}
+            unless ($c->is_uuid($i_edition));
+    }
+    
+    my $edition  = Inprint::Utils::GetEditionById($c, id => $i_edition );
     push @errors, { id => "edition", msg => "Can't find object"}
         unless ( $edition->{id} || $edition->{shortcut} );
     
