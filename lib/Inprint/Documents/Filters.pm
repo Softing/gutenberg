@@ -129,7 +129,7 @@ sub rubrics {
     my @params;
     my $sql = "
         SELECT DISTINCT t1.rubric_shortcut as id, t1.rubric_shortcut as title
-        FROM document t1
+        FROM documents t1
         WHERE t1.edition=ANY(?) AND t1.rubric_shortcut is not null
     ";
     
@@ -137,8 +137,9 @@ sub rubrics {
     push @params, $editions;
     
     if ($cgi_edition &&  $cgi_edition ne "clear") {
-        $sql .= " AND t1.edition = ? ";
-        push @params, $cgi_edition;
+        my $editions = $c->sql->Q(" SELECT id FROM editions WHERE path <@ ( SELECT path FROM editions WHERE id=?)", [ $cgi_edition ])->Values;
+        $sql .= " AND t1.edition = ANY(?) ";
+        push @params, $editions;
     }
     
     if ($cgi_fascicle &&  $cgi_fascicle ne "clear") {
