@@ -43,7 +43,7 @@ Inprint.documents.GridColumns = function() {
             id:"edition",
             dataIndex: "edition_shortcut",
             header: _("Edition"),
-            width: 60,
+            width: 80,
             sortable: true
         },
         workgroup: {
