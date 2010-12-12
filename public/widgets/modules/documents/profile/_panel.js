@@ -29,7 +29,7 @@ Inprint.documents.Profile = Ext.extend(Ext.Panel, {
                 {   region: "north",
                     layout:"fit",
                     split:true,
-                    height:200,
+                    height:220,
                     items: this.panels["profile"]
                 },
                 {   region: "center",

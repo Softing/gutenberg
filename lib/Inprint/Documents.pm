@@ -1360,7 +1360,7 @@ sub duplicate {
                         $document->{title}, $document->{author},
                         $document->{pdate}, $document->{psize},
                         $document->{fdate}, $document->{rsize},
-                        $document->{filepath}, 
+                        $filepath, 
                         $document->{images}, $document->{files},
                         $document->{islooked}, $document->{isopen}
                 ]);
