@@ -8,10 +8,11 @@ package Inprint::Documents;
 use strict;
 use warnings;
 
-use File::Copy "cp";
+use File::Copy::Recursive qw(fcopy rcopy dircopy fmove rmove dirmove);
 
 use Inprint::Utils;
 use Inprint::Utils::Documents;
+use Inprint::Utils::Files;
 use Inprint::Utils::Headlines;
 use Inprint::Utils::Rubrics;
 
@@ -1388,10 +1389,12 @@ sub duplicate {
                 # Datastore
                 
                 my $storePath    = $c->config->get("store.path");
+                my $old_path = Inprint::Utils::Files::ProcessFilePath($c, "$storePath/documents/$document->{filepath}");
+                my $new_path = Inprint::Utils::Files::ProcessFilePath($c, "$storePath/documents/$filepath");
                 
                 if (-w $storePath) {
-                    if (-r "$storePath/$document->{filepath}") {
-                        cp("$storePath/$document->{filepath}", "$storePath/$filepath");
+                    if (-r $old_path) {
+                        rcopy($old_path, $new_path) || die "$!";
                     }
                 }
                 
@@ -1472,6 +1475,7 @@ sub recycle {
             
         }
     }
+    
     $c->render_json( { success => $c->json->true } );
 }
 
