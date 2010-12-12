@@ -18,7 +18,8 @@
             
             function pageInit() {
 				setTimeout("flash1Init()", 300);
-                setTimeout("flash2Init()", 300);
+                //setTimeout("flash2Init()", 300);
+				setTimeout("flash3Init()", 300);
             }
 		</script>
 		
@@ -38,6 +39,7 @@
         </script>
 		
 		<script>
+			
             function flash2Init() {
                 var flash = getFlashMovieObject("flashMovie2");
                 flash.init("flash1", "letter", 0, 0);
@@ -109,11 +111,90 @@
 			}
 			
         </script>
-	
+		
+		<script>
+            function flash3Init() {
+                var flash = getFlashMovieObject("flashMovie3");
+                flash.init("flash1", "letter", 0, 0);
+				flash.setGrid(  
+					["3/5", "1/5", "2/5", "9/10" ,"5/10" ], 
+					["4/6", "3/6", "2/6", "1/6", "5/6", "7/9", "1/9" ] 
+				); 
+				flash.setBlocks( [ 
+					{ id: "blck1", x: "0/5", y: "0/6", w: "1/1", h: "1/6" }, 
+					{ id: "blck2", x: "0/5", y: "2/6", w: "2/5", h: "2/6" }, 
+					{ id: "blck3", x: "1/1", y: "1/1", w: "1/5", h: "1/6" } 
+				] );
+            }
+            
+			function flash3Load() {
+                var flash = getFlashMovieObject("flashMovie3");
+                flash.setBlocks( [ 
+					{ id: "blck1", x: "0/5", y: "0/6", w: "1/1", h: "1/6" }, 
+					{ id: "blck2", x: "0/5", y: "2/6", w: "2/5", h: "2/6" }, 
+					{ id: "blck3", x: "1/1", y: "1/1", w: "1/5", h: "1/6" } 
+				] );
+            }
+			
+			function flash3ClearAll() {
+                var flash = getFlashMovieObject("flashMovie3");
+                flash.deleteAllBlocks();
+            }
+			
+			function flash3GetBlock(blk) {
+                var flash = getFlashMovieObject("flashMovie3");
+                flash.getBlock("flash3GetParams");
+            }
+			
+			function flash3GetBlocks() {
+                var flash = getFlashMovieObject("flashMovie3");
+                flash.getBlocks('flash3GetParams');
+            }
+			
+            function flash3GetParams (id, array) {
+                
+				var string = '';
+				
+				for (var c=0;c<array.length;c++) {
+					string += '[ ';
+						string += array[c].id + ', ';
+						string += array[c].x + ', ';
+						string += array[c].y + ', ';
+						string += array[c].w + ', ';
+						string += array[c].h;
+					string += ' ], ';
+				}
+				
+				alert(id +', '+ string);
+            }
+			
+			function flash3CreateBlock(blck) {
+				var flash = getFlashMovieObject("flashMovie3");
+				flash.setBlock( blck, "0/1", "0/1", "0/1", "0/1" );
+			}
+			function flash3EditBlock(blck) {
+				var flash = getFlashMovieObject("flashMovie3");
+				flash.editBlock( blck );
+			}
+			function flash3MoveBlock(blck) {
+				var flash = getFlashMovieObject("flashMovie3");
+				flash.moveBlock( blck );
+			}
+			function flash3DeleteBlock(blck) {
+				var flash = getFlashMovieObject("flashMovie3");
+				flash.deleteBlock(blck);
+			}
+			function flash3SelectBlock(blck) {
+				var flash = getFlashMovieObject("flashMovie3");
+				flash.selectBlock(blck);
+			}
+			
+        </script>
+		
 	</head>
      <body onload="pageInit();">
-		<table width="100%">
-		<td width="33%" valign="top">
+		<table>
+		<td width="400" valign="top">
 			<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
 					id="flashMovie1" width="380" height="360"
 					codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab">
@@ -131,7 +212,7 @@
 			<hr>
 			<button onClick="flash1Get();">Get Value</button>
 		</td>
-		<td width="33%" valign="top">
+		<!-- td width="33%" valign="top">
 		
 			<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
 					id="flashMovie2" width="380" height="360"
@@ -191,8 +272,75 @@
 			<button onClick="flash2Load();">Load</button>
 			<button onClick="flash2GetBlocks();">Get Values</button>
 			<button onClick="flash2ClearAll();">ClearAll</button>
+		</td-->
+		
+		
+		<td width="600" valign="top">
+		
+			<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+					id="flashMovie3" width="380" height="360"
+					codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab">
+				<param name="movie" value="Dispose.swf" />
+				<param name="quality" value="high" />
+				<param name="bgcolor" value="#f5f5f5" />
+				<param name="allowScriptAccess" value="sameDomain" />
+				<embed src="Dispose.swf" quality="high" bgcolor="#f5f5f5"
+					width="380" height="360" name="flashMovie3" align="middle"
+					play="true" loop="false" quality="high" allowScriptAccess="sameDomain"
+					type="application/x-shockwave-flash"
+					pluginspage="http://www.macromedia.com/go/getflashplayer">
+				</embed>
+			</object>
+			
+			<hr>
+			<table>
+			<tr>
+				<td onMouseOver="flash3SelectBlock('blck1')">blck1</td>
+				<td>
+					<button onClick="flash3GetBlock('blck1');">Get Value</button>
+					<button onClick="flash3CreateBlock('blck1');">CreateBlock</button>
+					<button onClick="flash3EditBlock('blck1');">EditBlock</button>
+					<button onClick="flash3MoveBlock('blck1');">MoveBlock</button>					
+					<button onClick="flash3DeleteBlock('blck1');">DeleteBlock</button>
+				</td>
+			</tr>
+			<tr>
+				<td onMouseOver="flash3SelectBlock('blck2')">blck2</td>
+				<td>
+					<button onClick="flash3GetBlock('blck2');">Get Value</button>
+					<button onClick="flash3CreateBlock('blck2');">CreateBlock</button>
+					<button onClick="flash3EditBlock('blck2');">EditBlock</button>
+					<button onClick="flash3MoveBlock('blck2');">MoveBlock</button>
+					<button onClick="flash3DeleteBlock('blck2');">DeleteBlock</button>
+				</td>
+			</tr>
+			<tr>
+				<td onMouseOver="flash3SelectBlock('blck3')">blck3</td>
+				<td>
+					<button onClick="flash3GetBlock('blck3');">Get Value</button>
+					<button onClick="flash3CreateBlock('blck3');">CreateBlock</button>
+					<button onClick="flash3EditBlock('blck3');">EditBlock</button>
+					<button onClick="flash3MoveBlock('blck3');">MoveBlock</button>
+					<button onClick="flash3DeleteBlock('blck3');">DeleteBlock</button>
+				</td>
+			</tr>
+			<tr>
+				<td onMouseOver="flash3SelectBlock('blck4')">blck4</td>
+				<td>
+					<button onClick="flash3GetBlock('blck4');">Get Value</button>
+					<button onClick="flash3CreateBlock('blck4');">CreateBlock</button>
+					<button onClick="flash3EditBlock('blck4');">EditBlock</button>
+					<button onClick="flash3MoveBlock('blck4');">MoveBlock</button>
+					<button onClick="flash3DeleteBlock('blck4');">DeleteBlock</button>
+				</td>
+			</tr>
+			</table>
+			<hr>
+			<button onClick="flash3Load();">Load</button>
+			<button onClick="flash3GetBlocks();">Get Values</button>
+			<button onClick="flash3ClearAll();">ClearAll</button>
 		</td>
-		<td width="33%" valign="top">&nbsp;</td>
 		</table>
+		
     </body>
 </html>
