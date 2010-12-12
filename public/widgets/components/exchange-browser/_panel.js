@@ -49,7 +49,7 @@ Inprint.cmp.ExcahngeBrowser = Ext.extend(Ext.Window, {
                     scope:this,
                     disabled:true,
                     handler: function() {
-                        this.fireEvent('complete', this.panels.principals.getValue("principal"));
+                        this.fireEvent('complete', this.panels.principals.getValue("id"));
                         this.hide();
                     }
                 },

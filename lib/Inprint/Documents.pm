@@ -872,9 +872,12 @@ sub transfer {
 
     my @ids = $c->param("id");
     my $tid = $c->param("transfer");
-
+    
     my @errors;
     my $success = $c->json->false;
+
+    push @errors, { id => "transfer", msg => "Can't find object"}
+        unless ($c->is_uuid($tid));
 
     my $assignment = $c->sql->Q("
         SELECT
@@ -889,8 +892,11 @@ sub transfer {
         WHERE id = ?
     ", [ $tid ])->Hash;
 
-    if ($assignment) {
-        $success = $c->json->true;
+    push @errors, { id => "assignment", msg => "Can't find object"}
+        unless ( $assignment->{id} );
+    
+    unless (@errors) {
+        
         foreach my $id (@ids) {
 
             my $workgroups = $c->sql->Q("
