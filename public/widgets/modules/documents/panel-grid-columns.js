@@ -50,14 +50,14 @@ Inprint.documents.GridColumns = function() {
             id:"workgroup",
             dataIndex: "workgroup_shortcut",
             header: _("Group"),
-            width: 55,
+            width: 80,
             sortable: true
         },
         fascicle: {
             id:"fascicle",
             dataIndex: "fascicle_shortcut",
             header: _("Fascicle"),
-            width: 65,
+            width: 70,
             sortable: true,
             renderer : function(value, p, record) {
                 return value;
