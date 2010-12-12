@@ -179,6 +179,8 @@ sub list {
     push @params, $departments;
     $sql_filters .= " OR manager=? ";
     push @params, $current_member;
+    $sql_filters .= " OR holder=? ";
+    push @params, $current_member;
     $sql_filters .= " ) ";
     
     # Set Filters
