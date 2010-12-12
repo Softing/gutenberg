@@ -8,6 +8,8 @@ package Inprint::Documents;
 use strict;
 use warnings;
 
+use File::Copy "cp";
+
 use Inprint::Utils;
 use Inprint::Utils::Documents;
 use Inprint::Utils::Headlines;
@@ -1303,93 +1305,98 @@ sub duplicate {
             
             if ( $document->{id} ) {
                 
-                #unless ($exist) {
-                    
-                    my $new_id = $c->uuid();
-                    
-                    $c->sql->bt;
-                    
-                    $c->sql->Do("
-                        INSERT INTO documents(
-                            id,
-                            creator, creator_shortcut,
-                            holder, holder_shortcut,
-                            manager, manager_shortcut,
-                            edition, edition_shortcut, ineditions,
-                            copygroup, movegroup,
-                            workgroup, workgroup_shortcut, inworkgroups,
-                            fascicle, fascicle_shortcut, 
-                            headline, headline_shortcut,
-                            rubric, rubric_shortcut,
-                            branch, branch_shortcut,
-                            stage, stage_shortcut,
-                            readiness, readiness_shortcut, 
-                            color, progress,
-                            title, author,
-                            pdate, psize,
-                            fdate, rsize,
-                            filepath, 
-                            images, files,
-                            islooked, isopen,
-                            created, updated
-                        )
-                        VALUES (
-                            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now()
-                        );
-                    ", [
-                        $new_id,
-                            $document->{creator}, $document->{creator_shortcut},
-                            $document->{holder},  $document->{holder_shortcut},
-                            $document->{manager}, $document->{manager_shortcut},
-                            $document->{edition}, $document->{edition_shortcut},  $document->{ineditions},
-                            $new_id, $document->{movegroup} || $new_id,
-                            $document->{workgroup}, $document->{workgroup_shortcut}, $document->{inworkgroups},
-                            $document->{fascicle}, $document->{fascicle_shortcut}, 
-                            $document->{headline}, $document->{headline_shortcut},
-                            $document->{rubric}, $document->{rubric_shortcut},
-                            $document->{branch}, $document->{branch_shortcut},
-                            $document->{stage}, $document->{stage_shortcut},
-                            $document->{readiness}, $document->{readiness_shortcut}, $document->{color}, $document->{progress},
-                            $document->{title}, $document->{author},
-                            $document->{pdate}, $document->{psize},
-                            $document->{fdate}, $document->{rsize},
-                            $document->{filepath}, 
-                            $document->{images}, $document->{files},
-                            $document->{islooked}, $document->{isopen}
-                    ]);
-                    
-                    # Change Edition
-                    my $editions = $c->sql->Q("
-                        SELECT ARRAY( select id from editions where path @> ( select path from editions where id = ? ) )
-                    ", [ $edition->{id} ])->Array;
-                    $c->sql->Do(" UPDATE documents SET edition=?, edition_shortcut=?, ineditions=? WHERE id=? ", [ $edition->{id}, $edition->{shortcut}, $editions, $new_id ]);
-                    
-                    # Change Fascicle
-                    $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $new_id ]);
-                    
-                    if ($headline->{id}) {
-                        $c->sql->Do(" UPDATE documents SET headline=?, headline_shortcut=? WHERE id=? ", [ $headline->{id}, $headline->{shortcut}, $new_id ]);
+                my $new_id = $c->uuid();
+                
+                #filepath
+                my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+                $year += 1900;
+                $mon += 1;
+                my $filepath = "/$year/$mon/$new_id";
+                
+                $c->sql->bt;
+                
+                $c->sql->Do("
+                    INSERT INTO documents(
+                        id,
+                        creator, creator_shortcut,
+                        holder, holder_shortcut,
+                        manager, manager_shortcut,
+                        edition, edition_shortcut, ineditions,
+                        copygroup, movegroup,
+                        workgroup, workgroup_shortcut, inworkgroups,
+                        fascicle, fascicle_shortcut, 
+                        headline, headline_shortcut,
+                        rubric, rubric_shortcut,
+                        branch, branch_shortcut,
+                        stage, stage_shortcut,
+                        readiness, readiness_shortcut, 
+                        color, progress,
+                        title, author,
+                        pdate, psize,
+                        fdate, rsize,
+                        filepath, 
+                        images, files,
+                        islooked, isopen,
+                        created, updated
+                    )
+                    VALUES (
+                        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now()
+                    );
+                ", [
+                    $new_id,
+                        $document->{creator}, $document->{creator_shortcut},
+                        $document->{holder},  $document->{holder_shortcut},
+                        $document->{manager}, $document->{manager_shortcut},
+                        $document->{edition}, $document->{edition_shortcut},  $document->{ineditions},
+                        $new_id, $document->{movegroup} || $new_id,
+                        $document->{workgroup}, $document->{workgroup_shortcut}, $document->{inworkgroups},
+                        $document->{fascicle}, $document->{fascicle_shortcut}, 
+                        $document->{headline}, $document->{headline_shortcut},
+                        $document->{rubric}, $document->{rubric_shortcut},
+                        $document->{branch}, $document->{branch_shortcut},
+                        $document->{stage}, $document->{stage_shortcut},
+                        $document->{readiness}, $document->{readiness_shortcut}, $document->{color}, $document->{progress},
+                        $document->{title}, $document->{author},
+                        $document->{pdate}, $document->{psize},
+                        $document->{fdate}, $document->{rsize},
+                        $document->{filepath}, 
+                        $document->{images}, $document->{files},
+                        $document->{islooked}, $document->{isopen}
+                ]);
+                
+                # Change Edition
+                my $editions = $c->sql->Q("
+                    SELECT ARRAY( select id from editions where path @> ( select path from editions where id = ? ) )
+                ", [ $edition->{id} ])->Array;
+                $c->sql->Do(" UPDATE documents SET edition=?, edition_shortcut=?, ineditions=? WHERE id=? ", [ $edition->{id}, $edition->{shortcut}, $editions, $new_id ]);
+                
+                # Change Fascicle
+                $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $new_id ]);
+                
+                if ($headline->{id}) {
+                    $c->sql->Do(" UPDATE documents SET headline=?, headline_shortcut=? WHERE id=? ", [ $headline->{id}, $headline->{shortcut}, $new_id ]);
+                }
+                
+                if ($rubric->{id}) {
+                    $c->sql->Do(" UPDATE documents SET rubric=?, rubric_shortcut=? WHERE id=? ", [ $rubric->{id}, $rubric->{shortcut}, $new_id ]);
+                }
+                
+                # Indexation
+                Inprint::Utils::Documents::MoveDocumentIndexToFascicle($c, \@errors, $new_id);
+                
+                # Datastore
+                
+                my $storePath    = $c->config->get("store.path");
+                
+                if (-w $storePath) {
+                    if (-r "$storePath/$document->{filepath}") {
+                        cp("$storePath/$document->{filepath}", "$storePath/$filepath");
                     }
-                    
-                    if ($rubric->{id}) {
-                        $c->sql->Do(" UPDATE documents SET rubric=?, rubric_shortcut=? WHERE id=? ", [ $rubric->{id}, $rubric->{shortcut}, $new_id ]);
-                    }
-                    
-                    # Indexation
-                    Inprint::Utils::Documents::MoveDocumentIndexToFascicle($c, \@errors, $new_id);
-                    
-                    # Datastore
-                    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
-                    
-                    $year += 1900;
-                    $mon += 1;
-                    
-                    $c->sql->Do(" UPDATE documents SET filepath=? WHERE id=? ", [ "/$year/$mon/$new_id", $new_id ]);
-                    
-                    $c->sql->et;
-                    
-                #}
+                }
+                
+                $c->sql->et;
+                
             }
         }
     }
