@@ -13,11 +13,8 @@ use DBI;
 use Text::Iconv;
 use Image::Magick;
 
-use File::Basename;
 use File::Copy qw(copy move);
 use File::Path qw(make_path remove_tree);
-
-use POSIX qw(strftime);
 
 use LWP::UserAgent;
 use HTTP::Request::Common;
@@ -38,7 +35,7 @@ sub list {
     my @errors;
     my $success = $c->json->false;
     
-    my $document = Inprint::Utils::Files::GetDocumentById($c, id => $i_document);
+    my $document = Inprint::Utils::GetDocumentById($c, id => $i_document);
     my $storePath = $c->getDocumentPath($document->{filepath}, \@errors);
     
     my @dir;
@@ -64,10 +61,10 @@ sub list {
             
             my $filepath = Inprint::Utils::Files::ProcessFilePath($c, "$storePath/$file");
             my $digest   = Inprint::Utils::Files::GetDigest($c, $filepath);
-            my $mimetype = Inprint::Utils::Files::GetMimeType($filepath);
-            my $filesize = Inprint::Utils::Files::GetFileSize($filepath);
-            my $created  = Inprint::Utils::Files::GetFileChangedDate($filepath);
-            my $updated  = Inprint::Utils::Files::GetFileModifiedDate($filepath);
+            my $mimetype = Inprint::Utils::Files::GetMimeType($c, $filepath);
+            my $filesize = Inprint::Utils::Files::GetFileSize($c, $filepath);
+            my $created  = Inprint::Utils::Files::GetFileChangedDate($c, $filepath);
+            my $updated  = Inprint::Utils::Files::GetFileModifiedDate($c, $filepath);
             
             if ($^O eq "MSWin32") {
                 $file = Encode::decode("cp1251", $file);
@@ -141,7 +138,7 @@ sub create {
     my $documentStorePath;
     my $templateFile;
     
-    my $document = Inprint::Utils::Files::GetDocumentById($c, id => $i_document);
+    my $document = Inprint::Utils::GetDocumentById($c, id => $i_document);
     push @errors, { id => "id", msg => "Cant find object with this id"}
         unless $document->{id};
     
@@ -193,10 +190,10 @@ sub create {
         
         my $id = $c->uuid;
         my $digest   = Inprint::Utils::Files::GetDigest($c, "$documentStorePath/$localFileName$suffix.rtf");
-        my $mimetype = Inprint::Utils::Files::GetMimeType("$documentStorePath/$localFileName$suffix.rtf");
-        my $filesize = Inprint::Utils::Files::GetFileSize("$documentStorePath/$localFileName$suffix.rtf");
-        my $created  = Inprint::Utils::Files::GetFileChangedDate("$documentStorePath/$localFileName$suffix.rtf");
-        my $updated  = Inprint::Utils::Files::GetFileModifiedDate("$documentStorePath/$localFileName$suffix.rtf");
+        my $mimetype = Inprint::Utils::Files::GetMimeType($c, "$documentStorePath/$localFileName$suffix.rtf");
+        my $filesize = Inprint::Utils::Files::GetFileSize($c, "$documentStorePath/$localFileName$suffix.rtf");
+        my $created  = Inprint::Utils::Files::GetFileChangedDate($c, "$documentStorePath/$localFileName$suffix.rtf");
+        my $updated  = Inprint::Utils::Files::GetFileModifiedDate($c, "$documentStorePath/$localFileName$suffix.rtf");
         
         my $sqlite = $c->getSQLiteHandler($documentStorePath);
         $sqlite->do("INSERT INTO files (id, filename, description, digest, mimetype, draft, created, updated) VALUES (?,?,?,?,?,?,?,?)", undef, 
@@ -222,7 +219,7 @@ sub upload {
     my @errors;
     my $success = $c->json->false;
 
-    my $document = Inprint::Utils::Files::GetDocumentById($c, id => $i_document);
+    my $document = Inprint::Utils::GetDocumentById($c, id => $i_document);
     my $storePath = $c->getDocumentPath($document->{filepath}, \@errors);
     
     
@@ -251,10 +248,10 @@ sub upload {
     
         my $id = $c->uuid;
         my $digest   = Inprint::Utils::Files::GetDigest($c, "$storePath/$baseName$suffix$baseExtension");
-        my $mimetype = Inprint::Utils::Files::GetMimeType("$storePath/$baseName$suffix$baseExtension");
-        my $filesize = Inprint::Utils::Files::GetFileSize("$storePath/$baseName$suffix$baseExtension");
-        my $created  = Inprint::Utils::Files::GetFileChangedDate("$storePath/$baseName$suffix$baseExtension");
-        my $updated  = Inprint::Utils::Files::GetFileModifiedDate("$storePath/$baseName$suffix$baseExtension");
+        my $mimetype = Inprint::Utils::Files::GetMimeType($c, "$storePath/$baseName$suffix$baseExtension");
+        my $filesize = Inprint::Utils::Files::GetFileSize($c, "$storePath/$baseName$suffix$baseExtension");
+        my $created  = Inprint::Utils::Files::GetFileChangedDate($c, "$storePath/$baseName$suffix$baseExtension");
+        my $updated  = Inprint::Utils::Files::GetFileModifiedDate($c, "$storePath/$baseName$suffix$baseExtension");
         
         my $sqlite = $c->getSQLiteHandler($storePath);
         $sqlite->do("INSERT INTO files (id, filename, description, digest, mimetype, draft, created, updated) VALUES (?,?,?,?,?,?,?,?)", undef, 
@@ -289,7 +286,7 @@ sub delete {
     my @errors;
     my $success = $c->json->false;
 
-    my $document = Inprint::Utils::Files::GetDocumentById($c, id => $i_document);
+    my $document = Inprint::Utils::GetDocumentById($c, id => $i_document);
     my $storePath = $c->getDocumentPath($document->{filepath}, \@errors);
     
     my $sqlite = $c->getSQLiteHandler($storePath);
@@ -334,7 +331,7 @@ sub preview {
     my @errors;
     my $success = $c->json->false;
 
-    my $document = Inprint::Utils::Files::GetDocumentById($c, id => $i_document);
+    my $document = Inprint::Utils::GetDocumentById($c, id => $i_document);
     my $storePath = $c->getDocumentPath($document->{filepath}, \@errors);
     my $sqlite = $c->getSQLiteHandler($storePath);
 
@@ -519,7 +516,7 @@ sub getDocumentPath {
     }
     
     unless (@$errors) {
-        $storePath = $c->processPath($storePath);
+        $storePath = Inprint::Utils::Files::ProcessFilePath($c, $storePath);
     }
     
     return $storePath;
