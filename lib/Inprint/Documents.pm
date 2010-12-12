@@ -413,7 +413,10 @@ sub create {
         push @data, $id;
 
         push @fields, "copygroup";
-        push @data, $copyid;
+        push @data, $id;
+        
+        push @fields, "movegroup";
+        push @data, $id;
 
         push @fields, "title";
         push @data, $i_title;
@@ -1296,12 +1299,12 @@ sub duplicate {
         foreach my $document_id (@ids) {
             
             my $document = $c->sql->Q("SELECT * FROM documents WHERE id=?", [ $document_id ])->Hash;
-            my $exist = $c->sql->Q("SELECT true FROM documents WHERE copygroup=? AND fascicle=?", [ $document->{id}, $fascicle->{id} ])->Value;
+            #my $exist = $c->sql->Q("SELECT true FROM documents WHERE copygroup=? AND fascicle=?", [ $document->{id}, $fascicle->{id} ])->Value;
             
             if ( $document->{id} ) {
                 
-                unless ($exist) {
-                
+                #unless ($exist) {
+                    
                     my $new_id = $c->uuid();
                     
                     $c->sql->bt;
@@ -1313,7 +1316,7 @@ sub duplicate {
                             holder, holder_shortcut,
                             manager, manager_shortcut,
                             edition, edition_shortcut, ineditions,
-                            copygroup, 
+                            copygroup, movegroup,
                             workgroup, workgroup_shortcut, inworkgroups,
                             fascicle, fascicle_shortcut, 
                             headline, headline_shortcut,
@@ -1331,7 +1334,7 @@ sub duplicate {
                             created, updated
                         )
                         VALUES (
-                            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                             ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now()
                         );
                     ", [
@@ -1340,7 +1343,7 @@ sub duplicate {
                             $document->{holder},  $document->{holder_shortcut},
                             $document->{manager}, $document->{manager_shortcut},
                             $document->{edition}, $document->{edition_shortcut},  $document->{ineditions},
-                            $new_id,
+                            $new_id, $document->{movegroup} || $new_id,
                             $document->{workgroup}, $document->{workgroup_shortcut}, $document->{inworkgroups},
                             $document->{fascicle}, $document->{fascicle_shortcut}, 
                             $document->{headline}, $document->{headline_shortcut},
@@ -1386,7 +1389,7 @@ sub duplicate {
                     
                     $c->sql->et;
                     
-                }
+                #}
             }
         }
     }
