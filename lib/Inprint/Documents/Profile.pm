@@ -55,15 +55,15 @@ sub read {
         
         $document->{access} = {};
         my $current_member = $c->QuerySessionGet("member.id");
-
+        
         my @rules = qw(
-            documents.update documents.capture documents.move documents.transfer
-            documents.briefcase documents.delete documents.recover documents.discuss
-            files.add files.delete files.work
+           documents.update documents.capture documents.move documents.transfer
+           documents.briefcase documents.delete documents.recover
+           documents.discuss files.add files.delete files.work
         );
         foreach (@rules) {
             if ($document->{holder} eq $current_member) {
-                if ($c->access->Check(["catalog.$_:member"], $document->{workgroup})) {
+                if ($c->access->Check(["catalog.$_:*"], $document->{workgroup})) {
                     $document->{access}->{$_} = $c->json->true;
                 }
             }
@@ -71,14 +71,6 @@ sub read {
                 if ($c->access->Check("catalog.$_:group", $document->{workgroup})) {
                     $document->{access}->{$_} = $c->json->true;
                 }
-            }
-            
-            if ($_ eq 'documents.capture' && $document->{holder} eq $current_member) {
-                $document->{access}->{$_} = $c->json->false;
-            }
-            
-            if ($_ eq 'documents.briefcase' && $document->{fascicle} eq '00000000-0000-0000-0000-000000000000') {
-                $document->{access}->{$_} = $c->json->false;
             }
         }
         

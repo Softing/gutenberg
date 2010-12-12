@@ -28,7 +28,7 @@ Inprint.documents.GridActions = function() {
                 function(btn) {
                     if (btn == "yes") {
                         Ext.Ajax.request({
-                            url: this.urls.capture,
+                            url: _url("/documents/capture/"),
                             scope:this,
                             success: this.cmpReload,
                             params: { id: this.getValues("id") }
@@ -42,7 +42,7 @@ Inprint.documents.GridActions = function() {
             var panel = new Inprint.cmp.ExcahngeBrowser().show();
             panel.on("complete", function(id){
                 Ext.Ajax.request({
-                    url: this.urls.transfer,
+                    url: _url("/documents/transfer/"),
                     scope:this,
                     success: this.cmpReload,
                     params: { id: this.getValues("id"), transfer: id }
@@ -58,7 +58,7 @@ Inprint.documents.GridActions = function() {
                 function(btn) {
                     if (btn == "yes") {
                         Ext.Ajax.request({
-                            url: this.urls.briefcase,
+                            url: _url("/documents/briefcase/"),
                             scope:this,
                             success: this.cmpReload,
                             params: {

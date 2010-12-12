@@ -46,7 +46,7 @@ Inprint.cmp.UpdateDocument.Form = Ext.extend(Ext.FormPanel, {
                     format:'F j, Y',
                     altFormats: 'c',
                     submitFormat:'Y-m-d',
-                    minValue: new Date(),
+                    //minValue: new Date(),
                     allowBlank:false,
                     fieldLabel: _("Delivery date")
                 },

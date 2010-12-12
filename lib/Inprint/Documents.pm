@@ -1224,7 +1224,7 @@ sub copy {
                             $document->{holder},  $document->{holder_shortcut},
                             $document->{manager}, $document->{manager_shortcut},
                             $document->{edition}, $document->{edition_shortcut},  $document->{ineditions},
-                        $new_id,
+                        $document->{copygroup},
                             $document->{workgroup}, $document->{workgroup_shortcut}, $document->{inworkgroups},
                             $document->{fascicle}, $document->{fascicle_shortcut}, 
                             $document->{headline}, $document->{headline_shortcut},
