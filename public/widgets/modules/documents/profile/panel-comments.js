@@ -14,8 +14,33 @@ Inprint.documents.Profile.Comments = Ext.extend(Ext.Panel, {
             }
         ];
 
+        this.tmpl = new Ext.XTemplate(
+            '<tpl if="history">',
+                '<table width="99%" align="center" style="border:0px;">',
+                '<td style="border:0px;">',
+                    '<tpl for="comments">', 
+                        '<div style="font-size:12px;padding-left:20px;margin-right:10px;margin-bottom:10px;background:url(/icons/balloon-left.png) 0px 4px  no-repeat;">',
+                            '<div style="padding:3px 0px;border-bottom:2px solid #{stage_color};"><span style="font-weight:bold;">{member_shortcut}</span> &mdash; {[ this.fmtDate( values.created ) ]}</div>',
+                            '<div style="font-size:90%;padding:5px 0px;">{fulltext}</div>',
+                        '</div>',
+                    '</tpl>',
+                    '<div style="clear:both;"></div>',
+                '</td>',
+                '</table>',
+            '</tpl>',
+            {
+                fmtDate : function(date) { return _fmtDate(date, 'M j, H:i'); }
+            }
+        );
+
         Ext.apply(this, {
-            border: false
+            border: false,
+            items: [
+                {
+                    border:false,
+                    tpl: this.tmpl
+                }
+            ]
         });
         // Call parent (required)
         Inprint.documents.Profile.Comments.superclass.initComponent.apply(this, arguments);
@@ -28,8 +53,13 @@ Inprint.documents.Profile.Comments = Ext.extend(Ext.Panel, {
     },
     
     cmpFill: function(record) {
-        if (record && record.access)
-            this.cmpAccess(record.access);
+        if (record) {
+            if (record && record.access) {
+                this.cmpAccess(record.access);
+            }
+            
+            this.items.get(0).update(record);
+        }
     },
     
     cmpAccess: function(access) {
@@ -37,43 +67,34 @@ Inprint.documents.Profile.Comments = Ext.extend(Ext.Panel, {
         if (access["documents.discuss"] == true) this.btnSay.enable();
     },
 
+    cmpReload: function() {
+        this.parent.cmpReload();
+    },
+
     cmpSay: function() {
-
-        var form = new Ext.FormPanel({
-            border:false,
-            modal:true,
-            url: _url("/documents/say/"),
-            bodyStyle: "padding:5px 5px",
-            defaults: {
-                anchor: "100%",
-                allowBlank:false
-            },
-            items: [
-                {
-                    xtype: "textarea",
-                    name: "text",
-                    height:160,
-                    hideLabel: true
+        
+        Ext.MessageBox.show({
+            title: _("Comments"),
+            msg: _("Please enter your text"),
+            width:300,
+            buttons: Ext.MessageBox.OKCANCEL,
+            multiline: true,
+            scope:this,
+            fn: function(btn, text) {
+                if (btn == "ok") {
+                    Ext.Ajax.request({
+                        url: _url("/documents/say/"),
+                        scope:this,
+                        success: this.cmpReload,
+                        params: {
+                            id: this.oid,
+                            text: text
+                        }
+                    });
                 }
-            ],
-            keys: [ _KEY_ENTER_SUBMIT ],
-            buttons: [ _BTN_ADD, _BTN_CANCEL ]
+            }
         });
-
-        var win = new Ext.Window({
-            title: _("Add a comment"),
-            layout: "fit",
-            width:400, height:260,
-            items: form
-        });
-
-        form.on("actioncomplete", function (form, action) {
-            if (action.type == "submit")
-                win.hide();
-            this.getStore().load();
-        }, this);
-
-        win.show();
+        
     }
 
 });

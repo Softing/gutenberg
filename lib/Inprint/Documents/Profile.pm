@@ -101,6 +101,18 @@ sub read {
         ", [ $document->{copygroup} ])->Hashes;
     }
     
+    # Get comments
+    unless (@errors) {
+        $document->{comments} = $c->sql->Q("
+            SELECT
+                id, entity, path,
+                member, member_shortcut,
+                stage, stage_shortcut, stage_color,
+                fulltext, to_char(created, 'YYYY-MM-DD HH24:MI:SS') as created
+            FROM comments WHERE entity = ? ORDER BY created DESC
+        ", [ $document->{id} ])->Hashes;
+    }
+    
     $success = $c->json->true unless (@errors);
     $c->render_json({ success => $success, errors => \@errors, data => $document || {} });
 }

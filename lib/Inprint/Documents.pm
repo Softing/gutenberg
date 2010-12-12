@@ -772,7 +772,7 @@ sub update {
     
     my $document = Inprint::Utils::GetDocumentById($c, id => $i_id);
     push @errors, { id => "document", msg => "Can't find document object"}
-            unless ($document->{id});
+        unless ($document->{id});
     
     undef my $headline;
     undef my $rubric;
@@ -1405,6 +1405,49 @@ sub duplicate {
     $c->render_json( { success => $success, errors => \@errors } );
 }
 
+sub say {
+    
+    my $c = shift;
+    my $i_id = $c->param("id");
+    my $i_text = $c->param("text");
+    
+    my @errors;
+    my $success = $c->json->false;
+    
+    push @errors, { id => "id", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_id));
+        
+    push @errors, { id => "text", msg => "Incorrectly filled field"}
+        unless ($i_text);
+    
+    my $document;
+    unless (@errors) {
+        $document = $c->sql->Q(" SELECT * FROM documents WHERE id=? ", [ $i_id ])->Hash;
+        push @errors, { id => "document", msg => "Can't find document object"}
+                unless ($document->{id});
+    }
+    
+    my $current_user = $c->QuerySessionGet("member.id");
+    my $member;
+    unless (@errors) {
+        $member    = $c->sql->Q(" SELECT id, shortcut FROM profiles WHERE id=? ", [ $current_user ])->Hash;
+        push @errors, { id => "document", msg => "Can't find document object"}
+            unless ($member->{id});
+    }
+    
+    unless (@errors) {
+        
+        $c->sql->Do("
+                INSERT INTO comments(
+                    path, entity, member, member_shortcut, stage, stage_shortcut, stage_color, fulltext, created, updated)
+                VALUES (null, ?, ?, ?, ?, ?, ?, ?, now(), now() ) ", [
+                $document->{id}, $member->{id}, $member->{shortcut}, $document->{stage}, $document->{stage_shortcut}, $document->{color}, $i_text
+            ]);
+    }
+    
+    $success = $c->json->true unless (@errors);
+    $c->render_json( { success => $success, errors => \@errors } );
+}
 
 sub recycle {
     

@@ -101,7 +101,7 @@ sub startup {
     $self->createRoutes($sessionBridge, "common/transfer",          [ "editions", "branches", "list" ]);
 
     # Documents routes
-    $self->createRoutes($sessionBridge, "documents",                [ "create", "read", "update", "delete", "list", "capture", "transfer", "briefcase", "move", "copy", "duplicate", "recycle", "restore" ]);
+    $self->createRoutes($sessionBridge, "documents",                [ "create", "read", "update", "delete", "list", "capture", "transfer", "briefcase", "move", "copy", "duplicate", "recycle", "restore", "say" ]);
     $self->createRoutes($sessionBridge, "documents/common",         [ "fascicles" ]);
     $self->createRoutes($sessionBridge, "documents/combos",         [ "stages", "assignments", "managers", "fascicles", "headlines", "rubrics" ]);
     $self->createRoutes($sessionBridge, "documents/trees",          [ "editions", "workgroups" ]);
