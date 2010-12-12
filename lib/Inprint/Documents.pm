@@ -940,15 +940,16 @@ sub capture {
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now());
             ", [
                 $document->{id}, "transfer",
-                $document->{id}, "transfer",
+                
                 $document->{color}, $document->{progress},
                 $document->{branch}, $document->{branch_shortcut},
                 $document->{stage}, $document->{stage_shortcut},
                 
                 $document->{creator}, $document->{creator_shortcut},
                 $document->{workgroup}, $document->{workgroup_shortcut},
+                
                 $member->{id}, $member->{shortcut},
-                $workgroup->{id}, $workgroup->{catalog_shortcut},
+                $workgroup->{id}, $workgroup->{shortcut},
             ]);
             
             $c->sql->et;
