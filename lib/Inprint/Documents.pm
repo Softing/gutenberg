@@ -977,6 +977,11 @@ sub transfer {
             
             $c->sql->bt;
             
+            if ($assignment->{principal_type} eq "group") {
+                $assignment->{catalog} = $assignment->{principal};
+                $assignment->{catalog_shortcut} = $assignment->{principal_shortcut};
+            }
+            
             $c->sql->Do("
                 UPDATE documents SET
                     holder=?, holder_shortcut=?,
