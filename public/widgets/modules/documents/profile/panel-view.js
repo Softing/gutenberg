@@ -168,7 +168,7 @@ Inprint.documents.Profile.View = Ext.extend(Ext.Panel, {
         }
     ),
     
-    tmpl2: [
+    tmpl2: new Ext.XTemplate(
         '<tpl if="fascicles">', 
             '<table width="99%" align="center">',
             '<tr style="background:#f5f5f5;">',
@@ -187,26 +187,30 @@ Inprint.documents.Profile.View = Ext.extend(Ext.Panel, {
             '</tpl>', 
             '</table>',
         '</tpl>',
-    ],
+        {
+            fmtDate : function(date) { return _fmtDate(date, 'M j, H:i'); }
+        }
+    ),
     
-    tmpl3: [
-        '<table width="99%" align="center">',
-        '<tr>',
-            '<td style="padding:4px;">',
-                '<tpl for="history">',
-                    '<table style="font-size:10px;margin-right:10px;float:left;" >',
-                    '<tr>',
-                        '<td style="font-size:12px;padding:4px;border-bottom:2px solid {color};">',
-                            '<div>{member_title}</div>',
-                            '<div style="font-size:10px;">{title}</div>',
-                        '</td>',
-                    '</tr>',
-                    '</table> ', 
+    tmpl3: new Ext.XTemplate(
+        '<tpl if="history">',
+            '<table width="99%" align="center" style="border:0px;">',
+            '<td style="border:0px;">',
+                '<tpl for="history">', 
+                    '<div style="width:100px;margin-right:10px;float:left;border-bottom:2px solid #{color};">',
+                        '<div style="font-weight:bold;">{destination_shortcut}</div>',
+                        '<div style="font-size:90%;">{stage_shortcut}</div>',
+                        '<div style="font-size:90%;">{[ this.fmtDate( values.created ) ]}</div>',
+                    '</div>',
                 '</tpl>',
-            '</td>', 
-        '</tr>',
-        '</table>'
-    ],
+                '<div style="clear:both;"></div>',
+            '</td>',
+            '</table>',
+        '</tpl>',
+        {
+            fmtDate : function(date) { return _fmtDate(date, 'M j, H:i'); }
+        }
+    ),
     
     cmpFill: function(record) {
         if (record) {

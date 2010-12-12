@@ -662,7 +662,64 @@ sub create {
     # Create document
     unless (@errors) {
         my @placeholders; foreach (@data) { push @placeholders, "?"; }
+        
+        $c->sql->bt;
+        
         $c->sql->Do(" INSERT INTO documents (" . ( join ",", @fields ) .") VALUES (". ( join ",", @placeholders ) .") ", \@data);
+        
+        my $document = $c->sql->Q(" SELECT * FROM documents WHERE id=? ", [ $id ])->Hash;
+        
+        $c->sql->Do("
+            INSERT INTO history(
+                entity, operation,
+                color, weight,
+                branch, branch_shortcut,
+                stage, stage_shortcut,
+                sender, sender_shortcut,
+                sender_catalog, sender_catalog_shortcut,
+                destination, destination_shortcut,
+                destination_catalog, destination_catalog_shortcut,
+                created)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now());
+        ", [
+            $document->{id}, "create",
+            $document->{color}, $document->{progress},
+            $document->{branch}, $document->{branch_shortcut},
+            $document->{stage}, $document->{stage_shortcut},
+            
+            $document->{creator}, $document->{creator_shortcut},
+            $document->{workgroup}, $document->{workgroup_shortcut},
+            
+            $document->{creator}, $document->{creator_shortcut},
+            $document->{workgroup}, $document->{workgroup_shortcut},
+        ]);
+        
+        $c->sql->Do("
+            INSERT INTO history(
+                entity, operation,
+                color, weight,
+                branch, branch_shortcut,
+                stage, stage_shortcut,
+                sender, sender_shortcut,
+                sender_catalog, sender_catalog_shortcut,
+                destination, destination_shortcut,
+                destination_catalog, destination_catalog_shortcut,
+                created)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now());
+        ", [
+            $document->{id}, "transfer",
+            $document->{color}, $document->{progress},
+            $document->{branch}, $document->{branch_shortcut},
+            $document->{stage}, $document->{stage_shortcut},
+            
+            $document->{creator}, $document->{creator_shortcut},
+            $document->{workgroup}, $document->{workgroup_shortcut},
+            
+            $document->{manager}, $document->{manager_shortcut},
+            $document->{workgroup}, $document->{workgroup_shortcut},
+        ]);
+        
+        $c->sql->et;
     }
 
     $success = $c->json->true unless (@errors);
@@ -871,14 +928,21 @@ sub transfer {
     my $c = shift;
 
     my @ids = $c->param("id");
-    my $tid = $c->param("transfer");
+    my $transfer = $c->param("transfer");
     
     my @errors;
     my $success = $c->json->false;
 
     push @errors, { id => "transfer", msg => "Can't find object"}
-        unless ($c->is_uuid($tid));
-
+        unless ($c->is_uuid($transfer));
+        
+    # Check sender
+    my $current_member = $c->QuerySessionGet("member.id");
+    my $sender = $c->sql->Q(" SELECT * FROM profiles WHERE id = ? ", [ $current_member ])->Hash;
+    push @errors, { id => "sender", msg => "Can't find object"}
+        unless ($c->is_uuid($sender->{id}));
+    
+    # Check assigment
     my $assignment = $c->sql->Q("
         SELECT
             id,
@@ -890,7 +954,7 @@ sub transfer {
             progress, color
         FROM view_assignments
         WHERE id = ?
-    ", [ $tid ])->Hash;
+    ", [ $transfer ])->Hash;
 
     push @errors, { id => "assignment", msg => "Can't find object"}
         unless ( $assignment->{id} );
@@ -899,10 +963,18 @@ sub transfer {
         
         foreach my $id (@ids) {
 
+            # TODO: Add access check
+            
+            my $document = $c->sql->Q(" SELECT * FROM documents WHERE id=? ", [ $id ])->Hash;
+            
+            next unless ($document->{id});
+            
             my $workgroups = $c->sql->Q("
                 SELECT ARRAY( select id from catalog where path @> ( select path from catalog where id = ? ) )
             ", [ $assignment->{catalog} ])->Array;
-
+            
+            $c->sql->bt;
+            
             $c->sql->Do("
                 UPDATE documents SET
                     holder=?, holder_shortcut=?,
@@ -916,6 +988,31 @@ sub transfer {
                 $assignment->{color}, $assignment->{progress},
                 $id
             ]);
+            
+            $c->sql->Do("
+                INSERT INTO history(
+                    entity, operation,
+                    color, weight,
+                    branch, branch_shortcut,
+                    stage, stage_shortcut,
+                    sender, sender_shortcut,
+                    sender_catalog, sender_catalog_shortcut,
+                    destination, destination_shortcut,
+                    destination_catalog, destination_catalog_shortcut,
+                    created)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now());
+            ", [
+                $document->{id}, "transfer",
+                $assignment->{color}, $assignment->{progress},
+                $assignment->{branch}, $assignment->{branch_shortcut},
+                $assignment->{stage}, $assignment->{stage_shortcut},
+                $sender->{id}, $sender->{shortcut},
+                $document->{workgroup}, $document->{workgroup_shortcut},
+                $assignment->{principal}, $assignment->{principal_shortcut},
+                $assignment->{catalog}, $assignment->{catalog_shortcut},
+            ]);
+            
+            $c->sql->et;
         }
     }
 

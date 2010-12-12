@@ -84,8 +84,20 @@ sub read {
         
     }
     
+    # Get history
     unless (@errors) {
-        # Get co-documents
+        $document->{history} = $c->sql->Q("
+            SELECT
+                id, entity, operation, color, weight,
+                branch, branch_shortcut, stage, stage_shortcut,
+                destination, destination_shortcut, destination_catalog, destination_catalog_shortcut,
+                to_char(created, 'YYYY-MM-DD HH24:MI:SS') as created
+            FROM history WHERE entity=? ORDER BY created
+        ", [ $document->{id} ])->Hashes;
+    }
+    
+    # Get co-documents
+    unless (@errors) {
         $document->{fascicles} = $c->sql->Q("
             SELECT
                 dcm.edition,  dcm.edition_shortcut,
@@ -95,7 +107,6 @@ sub read {
             FROM documents dcm WHERE dcm.copygroup=? 
             ORDER BY edition_shortcut, fascicle_shortcut
         ", [ $document->{copygroup} ])->Hashes;
-        
     }
     
     $success = $c->json->true unless (@errors);
