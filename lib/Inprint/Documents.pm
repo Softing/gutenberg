@@ -904,6 +904,12 @@ sub capture {
             
             $success = $c->json->true;
             
+            my $document = $c->sql->Q(" SELECT * FROM documents WHERE id=? ", [ $id ])->Hash;
+            
+            next unless ($document->{id});
+            
+            $c->sql->bt;
+            
             my $workgroups = $c->sql->Q("
                 SELECT ARRAY( select id from catalog where path @> ( select path from catalog where id = ? ) )
             ", [ $workgroup->{id} ])->Array;
@@ -917,8 +923,35 @@ sub capture {
             ", [
                 $member->{id}, $member->{shortcut},
                 $workgroup->{id}, $workgroup->{shortcut}, $workgroups,
-                $id
+                $document->{id}
             ]);
+            
+            $c->sql->Do("
+                INSERT INTO history(
+                    entity, operation,
+                    color, weight,
+                    branch, branch_shortcut,
+                    stage, stage_shortcut,
+                    sender, sender_shortcut,
+                    sender_catalog, sender_catalog_shortcut,
+                    destination, destination_shortcut,
+                    destination_catalog, destination_catalog_shortcut,
+                    created)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now());
+            ", [
+                $document->{id}, "transfer",
+                $document->{id}, "transfer",
+                $document->{color}, $document->{progress},
+                $document->{branch}, $document->{branch_shortcut},
+                $document->{stage}, $document->{stage_shortcut},
+                
+                $document->{creator}, $document->{creator_shortcut},
+                $document->{workgroup}, $document->{workgroup_shortcut},
+                $member->{id}, $member->{shortcut},
+                $workgroup->{id}, $workgroup->{catalog_shortcut},
+            ]);
+            
+            $c->sql->et;
         }
     }
 
@@ -1040,8 +1073,14 @@ sub briefcase {
     if ($fascicle) {
         foreach my $id (@ids) {
             $c->sql->bt;
+            
+            my $document = $c->sql->Q(" SELECT * FROM documents WHERE id=? ", [ $id ])->Hash;
+            
+            next unless ($document->{id});
+            
             $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $id ]);
-            Inprint::Utils::Documents::MoveDocumentIndexToFascicle($c, \@errors, $id);
+            Inprint::Utils::Documents::MoveDocumentIndexToFascicle($c, \@errors, $document->{id});
+            
             $c->sql->et;
         }
     }

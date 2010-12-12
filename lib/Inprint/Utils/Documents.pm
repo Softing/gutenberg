@@ -2,6 +2,14 @@ package Inprint::Utils::Documents;
 use strict;
 use warnings;
 
+sub TransferDocumentToPrincipal {
+    my $c = shift;
+    my $document = shift;
+    my $principal = shift;
+    
+    
+}
+
 sub MoveDocumentIndexToFascicle {
     
     my $c = shift;
