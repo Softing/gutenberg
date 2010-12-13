@@ -103,9 +103,33 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                 handler: this.cmpDelete
             },
             "->",
-            "<a href=\"/documents/"+ this.oid +"/zip/all/\">Download zip</a>",
-            "<a href=\"/documents/"+ this.oid +"/zip/txt/\">Download documents</a>",
-            "<a href=\"/documents/"+ this.oid +"/zip/img/\">Download images</a>"
+            {
+                icon: _ico("document-shred"),
+                cls: "x-btn-text-icon",
+                text: _("Download zip"),
+                scope:this,
+                handler: function() {
+                    window.location = "/documents/"+ this.oid +"/zip/all/?rnd="+ Math.random();
+                }
+            },
+            {
+                icon: _ico("document-shred"),
+                cls: "x-btn-text-icon",
+                text: _("Download documents"),
+                scope:this,
+                handler: function() {
+                    window.location = "/documents/"+ this.oid +"/zip/txt/?rnd="+ Math.random();
+                }
+            },
+            {
+                icon: _ico("document-shred"),
+                cls: "x-btn-text-icon",
+                text: _("Download images"),
+                scope:this,
+                handler: function() {
+                    window.location = "/documents/"+ this.oid +"/zip/img/?rnd="+ Math.random();
+                }
+            }
         ];
 
         Ext.apply(this, {

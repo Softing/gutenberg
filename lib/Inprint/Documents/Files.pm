@@ -15,13 +15,10 @@ use Image::Magick;
 
 use File::Copy qw(copy move);
 use File::Path qw(make_path remove_tree);
-use File::Temp qw/ tempfile tempdir /;
+use File::Basename;
 
 use LWP::UserAgent;
 use HTTP::Request::Common;
-
-use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
-use IO::Compress::Gzip qw(gzip $GzipError) ;
 
 use Inprint::Utils;
 use Inprint::Utils::Files;
@@ -431,16 +428,24 @@ sub createzip {
     
     if (-r $storePath) {
         opendir DIR, $storePath or die "read dir $storePath - $!";
-        @files = grep Inprint::Utils::Files::GetExtension($c, $_) ~~ ["doc", "odt", "rtf", "txt"], readdir DIR;
+        if ($i_type eq "txt") {
+            @files = grep Inprint::Utils::Files::GetExtension($c, $_) ~~ ["doc", "odt", "rtf", "txt"], readdir DIR;
+        }
+        if ($i_type eq "img") {
+            @files = grep Inprint::Utils::Files::GetExtension($c, $_) ~~ ["jpg", "gif", "png", "tiff", "bmp"], readdir DIR;
+        }
+        if ($i_type eq "all") {
+            @files = readdir DIR;
+        }
         closedir DIR;
     }
     
     unless (@errors) {
         
         my @archive;
+        
         foreach my $file (@files) {
             my $filepath =   Inprint::Utils::Files::ProcessFilePath($c, "$storePath\\$file");
-            #Encode::decode("utf8", $filepath);
             if (-r $filepath) {
                 push @archive, "\"$filepath\"";
             }
@@ -449,15 +454,19 @@ sub createzip {
         my $ArcilveFileName = Inprint::Utils::Files::ProcessFilePath($c, "$storePath\\.tmp\\" . $c->uuid . ".7z");
         
         my $bin7z = "7z";
-
         my $cmd;
-
+        my $modifer;
+        
+        unless (@archive) {
+            $modifer = " -x!* ";
+        }
+        
         if ($^O eq "MSWin32") {
-            $cmd = "$bin7z a $ArcilveFileName " . join " ", @archive;
+            $cmd = "$bin7z a $modifer $ArcilveFileName " . join " ", @archive;
         }
         
         if ($^O eq "linux") {
-            $cmd = "export LANG=en_US.UTF-8; $bin7z a $ArcilveFileName " . join " ", @archive;
+            $cmd = "export LANG=en_US.UTF-8; $bin7z a $modifer $ArcilveFileName " . join " ", @archive;
         }
         
         `$cmd`;
@@ -470,6 +479,7 @@ sub createzip {
             $c->res->content->headers($headers); 
             $c->res->content->asset(Mojo::Asset::File->new(path => $ArcilveFileName));
             $c->render_static();
+            
         } else {
             push @errors, { id => "file", msg => "Cant read file $ArcilveFileName"};
         }
