@@ -457,15 +457,13 @@ sub createzip {
         my $cmd;
         my $modifer;
         
-        unless (@archive) {
-            $modifer = " -x!* ";
-        }
-        
         if ($^O eq "MSWin32") {
+            my $modifer = " -x!* " unless @archive;
             $cmd = "$bin7z a $modifer $ArcilveFileName " . join " ", @archive;
         }
         
         if ($^O eq "linux") {
+            my $modifer = " -x\!\* " unless @archive;
             $cmd = "export LANG=en_US.UTF-8; $bin7z a $modifer $ArcilveFileName " . join " ", @archive;
         }
         
