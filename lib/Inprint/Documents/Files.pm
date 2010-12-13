@@ -431,8 +431,7 @@ sub createzip {
     
     if (-r $storePath) {
         opendir DIR, $storePath or die "read dir $storePath - $!";
-        @files = grep Inprint::Utils::Files::GetExtension($c, $_) ~~ ["doc"], readdir DIR;
-        
+        @files = grep Inprint::Utils::Files::GetExtension($c, $_) ~~ ["doc", "odt", "rtf", "txt"], readdir DIR;
         closedir DIR;
     }
     
@@ -440,10 +439,14 @@ sub createzip {
         
         my @archive;
         foreach my $file (@files) {
-            push @archive, "\"$storePath\\$file\"";
+            my $filepath =   Inprint::Utils::Files::ProcessFilePath($c, "$storePath\\$file");
+            #Encode::decode("utf8", $filepath);
+            if (-r $filepath) {
+                push @archive, "\"$filepath\"";
+            }
         }
         
-        my $ArcilveFileName = Inprint::Utils::Files::ProcessFilePath($c, "$storePath\\" . $c->uuid . ".7z");
+        my $ArcilveFileName = Inprint::Utils::Files::ProcessFilePath($c, "$storePath\\.tmp\\" . $c->uuid . ".7z");
         
         my $bin7z;
         if ($^O eq "MSWin32") {
@@ -451,13 +454,13 @@ sub createzip {
         }
         
         if ($^O eq "linux") {
-            $bin7z = "7zr";
+            $bin7z = "7z";
         }
         
-        my $cmd = "$bin7z a $ArcilveFileName " . join " ", @archive;
-        
-        system $cmd;
-        
+        my $cmd = "export LANG=en_US.UTF-8; $bin7z a $ArcilveFileName " . join " ", @archive;
+
+        `$cmd`;
+
         if (-r $ArcilveFileName) {
             my $headers = Mojo::Headers->new;
             $headers->add('Content-Type','application/x-7z-compressed;name=test.7z');
@@ -469,12 +472,15 @@ sub createzip {
         } else {
             push @errors, { id => "file", msg => "Cant read file $ArcilveFileName"};
         }
+
     }
     
     if (@errors) {
         $success = $c->json->true unless (@errors);
         $c->render_json( { success => $success, errors => \@errors, files => \@files } );
     }
+
+    return $c;
 }
 
 # Utils
@@ -574,12 +580,22 @@ sub getDocumentPath {
             unless -e -w "$storePath/.versions";
     }
     
-    # Thembnails folder
+    # Thumbnails folder
     unless (@$errors) {
         make_path("$storePath/.thumbnails") unless -e -w "$storePath/.thumbnails";
         push @$errors, { id => "filepath", msg => "Cant create document thumbnails folder"}
             unless -e -w "$storePath/.thumbnails";
     }
+
+    # Tmp folder
+    unless (@$errors) {
+        make_path("$storePath/.tmp") unless -e -w "$storePath/.tmp";
+        push @$errors, { id => "filepath", msg => "Cant create document tmp folder"}
+            unless -e -w "$storePath/.tmp";
+    }
+
+
+
     
     unless (@$errors) {
         $storePath = Inprint::Utils::Files::ProcessFilePath($c, $storePath);
