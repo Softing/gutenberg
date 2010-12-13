@@ -211,3 +211,15 @@ _KEY_ENTER_SUBMIT = {
         //this.findParentByType('form').getForm().submit();
     }
 };
+
+/* JS */
+
+Array.prototype.contains = function(obj) {
+  var i = this.length;
+  while (i--) {
+    if (this[i] == obj) {
+      return true;
+    }
+  }
+  return false;
+}

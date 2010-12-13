@@ -15,7 +15,7 @@ sub GetExtension {
     my ($name,$path,$suffix) = fileparse($filepath, qr/(\.[^.]+){1}?/);
     $suffix =~ s/^.//g;
     
-    return $suffix;
+    return lc($suffix);
 }
 
 sub GetDigest {

@@ -21,8 +21,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
         });
         
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
-
-
+        
         // Column model
         this.columns = [
             this.selectionModel,
@@ -102,8 +101,11 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                 ref: "../btnDelete",
                 scope:this,
                 handler: this.cmpDelete
-            }
-            
+            },
+            "->",
+            "<a href=\"/documents/"+ this.oid +"/zip/all/\">Download zip</a>",
+            "<a href=\"/documents/"+ this.oid +"/zip/txt/\">Download documents</a>",
+            "<a href=\"/documents/"+ this.oid +"/zip/img/\">Download images</a>"
         ];
 
         Ext.apply(this, {
@@ -128,13 +130,16 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
             evtObj.stopEvent();
             
             var record = thisGrid.getStore().getAt(rowIndex);
+            var extension = record.get("extension");
             
-            Inprint.ObjectResolver.resolve({
-                aid: "document-editor",
-                oid:  this.oid +"::"+ record.get("id"),
-                text: record.get("filename"),
-                description: _("Text editing")
-            });
+            if (["doc", "rtf", "odt", "txt"].contains(extension)) {
+                Inprint.ObjectResolver.resolve({
+                    aid: "document-editor",
+                    oid:  this.oid +"::"+ record.get("id"),
+                    text: record.get("filename"),
+                    description: _("Text editing")
+                });
+            }
             
         }, this);
         
@@ -147,23 +152,26 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
             
             var record = thisGrid.getStore().getAt(rowIndex);
             
-            rowCtxMenuItems.push({
-                icon: _ico("pencil"),
-                cls: "x-btn-text-icon",
-                text: _("Edit"),
-                scope:this,
-                handler : function() {
-                    Inprint.ObjectResolver.resolve({
-                        aid: "document-editor",
-                        oid:  this.oid +"::"+ record.get("id"),
-                        text: record.get("filename"),
-                        description: _("Text editing")
-                    });
-                }
-            });
+            var extension = record.get("extension");
             
-            rowCtxMenuItems.push("-");
-            
+            if (["doc", "rtf", "odt", "txt"].contains(extension)) {
+                rowCtxMenuItems.push({
+                    icon: _ico("pencil"),
+                    cls: "x-btn-text-icon",
+                    text: _("Edit"),
+                    scope:this,
+                    handler : function() {
+                        Inprint.ObjectResolver.resolve({
+                            aid: "document-editor",
+                            oid:  this.oid +"::"+ record.get("id"),
+                            text: record.get("filename"),
+                            description: _("Text editing")
+                        });
+                    }
+                });
+                
+                rowCtxMenuItems.push("-");
+            }
             rowCtxMenuItems.push({
                 icon: _ico("edit-drop-cap"),
                 cls: "x-btn-text-icon",

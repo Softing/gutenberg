@@ -111,6 +111,8 @@ sub startup {
     $self->createRoutes($sessionBridge, "documents/text",           [ "get", "set" ]);
     
     $sessionBridge->route('/documents/files/preview/:document/:file')->to('documents-files#preview', document => "", file => "");
+    $sessionBridge->route('/documents/:document/zip/:type')->to('documents-files#createzip', document => "", type => "");
+    
     #$sessionBridge->route('/documents/files/upload/:document')->to('documents-files#upload', document => "");
     
     # Catalog routes

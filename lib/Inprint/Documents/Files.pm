@@ -15,10 +15,13 @@ use Image::Magick;
 
 use File::Copy qw(copy move);
 use File::Path qw(make_path remove_tree);
+use File::Temp qw/ tempfile tempdir /;
 
 use LWP::UserAgent;
 use HTTP::Request::Common;
+
 use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
+use IO::Compress::Gzip qw(gzip $GzipError) ;
 
 use Inprint::Utils;
 use Inprint::Utils::Files;
@@ -39,8 +42,6 @@ sub list {
     my $storePath = $c->getDocumentPath($document->{filepath}, \@errors);
     
     my @dir;
-    
-    use Encode;
     
     if (-r $storePath) {
         opendir DIR, $storePath or die "read dir $storePath - $!";
@@ -99,10 +100,13 @@ sub list {
             
             my $preview  = "/documents/files/preview/$document->{id}/$record->{id}/?rnd=" . rand();
             
+            my $extension = Inprint::Utils::Files::GetExtension($c, $filepath);
+            
             push @result, {
                 id => $record->{id},
                 preview => $preview,
                 filename => $file,
+                extension => $extension,
                 description => $record->{description},
                 digest => $digest,
                 mimetype => $mimetype,
@@ -408,6 +412,58 @@ sub preview {
     if (@errors) {
         $success = $c->json->true unless (@errors);
         $c->render_json( { success => $success, errors => \@errors } );
+    }
+}
+
+sub createzip {
+    my $c = shift;
+
+    my $i_document = $c->param("document");
+    my $i_type = $c->param("type");
+    
+    my @errors;
+    my $success = $c->json->false;
+    
+    my $document = Inprint::Utils::GetDocumentById($c, id => $i_document);
+    my $storePath = $c->getDocumentPath($document->{filepath}, \@errors);
+    
+    my @files;
+    
+    if (-r $storePath) {
+        opendir DIR, $storePath or die "read dir $storePath - $!";
+        @files = grep Inprint::Utils::Files::GetExtension($c, $_) ~~ ["doc"], readdir DIR;
+        
+        closedir DIR;
+    }
+    
+    unless (@errors) {
+        
+        my @archive;
+        foreach my $file (@files) {
+            push @archive, "\"$storePath\\$file\"";
+        }
+        
+        my $ArcilveFileName = Inprint::Utils::Files::ProcessFilePath($c, "$storePath\\" . $c->uuid . ".7z");
+        
+        my $cmd = "7z a $ArcilveFileName " . join " ", @archive;
+        `$cmd`;
+        
+        if (-r $ArcilveFileName) {
+            my $headers = Mojo::Headers->new;
+            $headers->add('Content-Type','application/x-7z-compressed;name=test.7z');
+            $headers->add('Content-Disposition','attachment;filename=test.7z');
+            $headers->add('Content-Description','7z');
+            $c->res->content->headers($headers); 
+            $c->res->content->asset(Mojo::Asset::File->new(path => $ArcilveFileName));
+            $c->render_static();
+        } else {
+            push @errors, { id => "file", msg => "Cant read file $ArcilveFileName"};
+        }
+    }
+    
+    if (@errors) {
+        $success = $c->json->true unless (@errors);
+        $c->render_json( { success => $success, errors => \@errors, files => \@files } );
     }
 }
 
