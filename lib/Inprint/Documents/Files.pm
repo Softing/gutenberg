@@ -448,19 +448,20 @@ sub createzip {
         
         my $ArcilveFileName = Inprint::Utils::Files::ProcessFilePath($c, "$storePath\\.tmp\\" . $c->uuid . ".7z");
         
-        my $bin7z;
+        my $bin7z = "7z";
+
+        my $cmd;
+
         if ($^O eq "MSWin32") {
-            $bin7z = "7z";
+            $cmd = "$bin7z a $ArcilveFileName " . join " ", @archive;
         }
         
         if ($^O eq "linux") {
-            $bin7z = "7z";
+            $cmd = "export LANG=en_US.UTF-8; $bin7z a $ArcilveFileName " . join " ", @archive;
         }
         
-        my $cmd = "export LANG=en_US.UTF-8; $bin7z a $ArcilveFileName " . join " ", @archive;
-
         `$cmd`;
-
+        
         if (-r $ArcilveFileName) {
             my $headers = Mojo::Headers->new;
             $headers->add('Content-Type','application/x-7z-compressed;name=test.7z');
