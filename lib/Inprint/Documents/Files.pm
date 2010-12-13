@@ -453,7 +453,7 @@ sub createzip {
         
         foreach my $file (@files) {
             my $filepath =   Inprint::Utils::Files::ProcessFilePath($c, "$storePath\\$file");
-            if (-r $filepath) {
+            if (-r $filepath && -f $filepath) {
                 push @archive, "\"$filepath\"";
             }
         }
