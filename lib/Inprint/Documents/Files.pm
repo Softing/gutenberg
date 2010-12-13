@@ -247,20 +247,27 @@ sub upload {
     
     $upload->move_to("$storePath/$baseName$suffix$baseExtension");
     
-        my $id = $c->uuid;
-        my $digest   = Inprint::Utils::Files::GetDigest($c, "$storePath/$baseName$suffix$baseExtension");
-        my $mimetype = Inprint::Utils::Files::GetMimeType($c, "$storePath/$baseName$suffix$baseExtension");
-        my $filesize = Inprint::Utils::Files::GetFileSize($c, "$storePath/$baseName$suffix$baseExtension");
-        my $created  = Inprint::Utils::Files::GetFileChangedDate($c, "$storePath/$baseName$suffix$baseExtension");
-        my $updated  = Inprint::Utils::Files::GetFileModifiedDate($c, "$storePath/$baseName$suffix$baseExtension");
+    if (-r "$storePath/$baseName$suffix$baseExtension") {
         
-        my $sqlite = $c->getSQLiteHandler($storePath);
-        $sqlite->do("INSERT INTO files (id, filename, description, digest, mimetype, draft, created, updated) VALUES (?,?,?,?,?,?,?,?)", undef, 
-            $id, "$name$suffix$extension", "", $digest, $mimetype, 1, $created, $updated
-        );
-        $sqlite->commit;
-        $sqlite->disconnect;
-    
+        if ($baseExtension eq ".7z") {
+            `7z e -y -o$storePath $storePath/$baseName$suffix$baseExtension`;
+        } else {
+            
+            my $id = $c->uuid;
+            my $digest   = Inprint::Utils::Files::GetDigest($c, "$storePath/$baseName$suffix$baseExtension");
+            my $mimetype = Inprint::Utils::Files::GetMimeType($c, "$storePath/$baseName$suffix$baseExtension");
+            my $filesize = Inprint::Utils::Files::GetFileSize($c, "$storePath/$baseName$suffix$baseExtension");
+            my $created  = Inprint::Utils::Files::GetFileChangedDate($c, "$storePath/$baseName$suffix$baseExtension");
+            my $updated  = Inprint::Utils::Files::GetFileModifiedDate($c, "$storePath/$baseName$suffix$baseExtension");
+            
+            my $sqlite = $c->getSQLiteHandler($storePath);
+            $sqlite->do("INSERT INTO files (id, filename, description, digest, mimetype, draft, created, updated) VALUES (?,?,?,?,?,?,?,?)", undef, 
+                $id, "$name$suffix$extension", "", $digest, $mimetype, 1, $created, $updated
+            );
+            $sqlite->commit;
+            $sqlite->disconnect;
+        }
+    }
     $c->render_json( { success=> $c->json->true } );
 }
 
