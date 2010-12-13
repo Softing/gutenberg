@@ -104,7 +104,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
             },
             "->",
             {
-                icon: _ico("document-shred"),
+                icon: _ico("arrow-270-medium"),
                 cls: "x-btn-text-icon",
                 text: _("Download zip"),
                 scope:this,
@@ -113,7 +113,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                 }
             },
             {
-                icon: _ico("document-shred"),
+                icon: _ico("arrow-270-medium"),
                 cls: "x-btn-text-icon",
                 text: _("Download documents"),
                 scope:this,
@@ -122,7 +122,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                 }
             },
             {
-                icon: _ico("document-shred"),
+                icon: _ico("arrow-270-medium"),
                 cls: "x-btn-text-icon",
                 text: _("Download images"),
                 scope:this,
