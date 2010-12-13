@@ -445,8 +445,18 @@ sub createzip {
         
         my $ArcilveFileName = Inprint::Utils::Files::ProcessFilePath($c, "$storePath\\" . $c->uuid . ".7z");
         
-        my $cmd = "7z a $ArcilveFileName " . join " ", @archive;
-        `$cmd`;
+        my $bin7z;
+        if ($^O eq "MSWin32") {
+            $bin7z = "7z";
+        }
+        
+        if ($^O eq "linux") {
+            $bin7z = "7zr";
+        }
+        
+        my $cmd = "$bin7z a $ArcilveFileName " . join " ", @archive;
+        
+        system $cmd;
         
         if (-r $ArcilveFileName) {
             my $headers = Mojo::Headers->new;
