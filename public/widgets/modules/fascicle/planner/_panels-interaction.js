@@ -1,25 +1,24 @@
 Inprint.fascicle.planner.Interaction = function(parent, panels) {
 
-    //var editions  = panels.editions;
-    //var headlines = panels.headlines;
-    //var rubrics   = panels.rubrics;
-    //
-    //// Tree
-    //
-    //headlines.getSelectionModel().on("selectionchange", function(sm, node) {
-    //    rubrics.enable();
-    //    if (node) {
-    //        rubrics.cmpLoad({ node: node.id });
-    //    }
-    //});
-    //
-    ////Grids
-    //rubrics.getSelectionModel().on("selectionchange", function(sm) {
-    //    if (sm.getCount() > 0) {
-    //        this.buttons[0].enable();
-    //    } else {
-    //        this.buttons[0].disable();
-    //    }
-    //}, parent);
+    var pages = panels["pages"];
+    
+    // View 
+    pages.view.on("selectionchange", function(view, data) {
+        
+        _disable(parent.btnPageUpdate, parent.btnPageDelete, parent.btnPageMove, parent.btnPageMoveLeft, parent.btnPageMoveRight, parent.btnPageClean, parent.btnPageResize);
+        
+        if (parent.access.manage) {
+        
+            if (data.length == 1) {
+                _enable(parent.btnPageUpdate, parent.btnPageDelete, parent.btnPageMove, parent.btnPageMoveLeft, parent.btnPageMoveRight, parent.btnPageClean, parent.btnPageResize);
+            }
+            
+            if (data.length > 1) {
+                _enable(parent.btnPageUpdate, parent.btnPageDelete, parent.btnPageMove, parent.btnPageClean, parent.btnPageResize);
+            }
+            
+        }
+        
+    }, this);
 
 }

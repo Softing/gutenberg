@@ -43,6 +43,26 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
             },
             "-",
             {
+                ref: "../btnPageMoveLeft",
+                disabled:true,
+                text:'Сместить влево',
+                tooltip: 'Перенести отмеченные полосы',
+                icon: _ico("arrow-stop-180"),
+                cls: 'x-btn-text-icon',
+                scope:this.panels["pages"],
+                handler: this.panels["pages"].cmpPageMoveLeft
+            },
+            {
+                ref: "../btnPageMoveRight",
+                disabled:true,
+                text:'Сместить вправо',
+                tooltip: 'Перенести отмеченные полосы',
+                icon: _ico("arrow-stop"),
+                cls: 'x-btn-text-icon',
+                scope:this.panels["pages"],
+                handler: this.panels["pages"].cmpPageMoveRight
+            },
+            {
                 ref: "../btnPageMove",
                 disabled:true,
                 text:'Перенести',
@@ -52,6 +72,7 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                 scope:this.panels["pages"],
                 handler: this.panels["pages"].cmpPageMove
             },
+            "-",
             {
                 ref: "../btnPageClean",
                 disabled:true,
@@ -263,11 +284,13 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
             },
             success: function(response) {
                 var rsp = Ext.util.JSON.decode(response.responseText);
+                
                 Inprint.fascicle.planner.Access(this, this.panels, rsp.fascicle.access);
+                
                 if (this.manager && this.manager != rsp.fascicle.manager) {
                     Ext.MessageBox.alert(_("Error"), _("Another employee %1 captured this issue!", [1]));
                 } else {
-                    this.cmpCheckSession.defer( 10000, this);
+                    this.cmpCheckSession.defer( 50000, this);
                 }
             }
         });
@@ -336,64 +359,38 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
 
     cmpSave: function() {
         
-        //var panel1 = this.layout.east.panel; // advert
-        //var panel2 = this.layout.center.panel.layout.center.panel; // pages
-        //var panel3 = this.layout.center.panel.layout.south.panel; // documents
-        //
-        //var data1 = [];
-        //var data2 = [];
-        //
-        //// get documents changes
-        //
-        //var records1 = panel3.getStore().getModifiedRecords();
-        //if(records1.length) {
-        //    Ext.each(records1, function(r, i) {
-        //        var o = r.getChanges();
-        //        if(r.data.newRecord) {
-        //            o.newRecord = true;
-        //        }
-        //        o.uuid = r.get('uuid');
-        //        data1.push(o.uuid +'::'+ o.page_str);
-        //    }, this);
-        //}
-        //
-        //// get advert changes
-        //
-        //var records2 = panel1.getStore().getModifiedRecords();
-        //if(records2.length) { 
-        //    Ext.each(records2, function(r, i) {
-        //        var o = r.getChanges();
-        //        if(r.data.newRecord) {
-        //            o.newRecord = true;
-        //        }
-        //        o.uuid = r.get('uuid');
-        //        data2.push(o.page+'::'+o.uuid);
-        //    }, this);
-        //}
-        //
-        //// save state
-        //
-        //this.body.mask("Сохранение данных");
-        //
-        //var o = {
-        //    url:this.url.save,
-        //    params:{
-        //        fascicle: this.fascicle,
-        //        documents: data1,
-        //        advertising: data2
-        //    },
-        //    scope:this,
-        //    success: function () {
-        //        
-        //        panel1.getStore().rejectChanges();
-        //        panel3.getStore().rejectChanges();
-        //        
-        //        this.cmpReload();
-        //    },
-        //    failure: Inprint.ajax.failure
-        //};
-        //
-        //Ext.Ajax.request(o);
+        var pages = this.panels["pages"];
+        var documents = this.panels["documents"];
+        
+        var data = [];
+        
+        // get documents changes
+        
+        var records = documents.getStore().getModifiedRecords();
+        if(records.length) {
+            Ext.each(records, function(r, i) {
+                var document = r.get('id');
+                var pages = r.get('pages');
+                data.push(document +'::'+ pages);
+            }, this);
+        }
+        
+        this.body.mask("Сохранение данных");
+        
+        var o = {
+            url: _url("/fascicle/save/"),
+            params:{
+                fascicle: this.oid,
+                document: data
+            },
+            scope:this,
+            success: function () {
+                documents.getStore().commitChanges();
+                this.cmpReload();
+            }
+        };
+        
+        Ext.Ajax.request(o);
         
     },
 

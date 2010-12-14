@@ -28,7 +28,7 @@ sub headlines {
     
     unless (@errors) {
         $result = $c->sql->Q("
-            SELECT DISTINCT t1.id, t1.shortcut as title FROM index_fascicles
+            SELECT DISTINCT t1.id, t1.shortcut as title FROM index_fascicles t1
             WHERE t1.fascicle=? AND t1.nature = 'headline'
             ORDER BY t1.shortcut
         ", [ $i_fascicle ])->Hashes;

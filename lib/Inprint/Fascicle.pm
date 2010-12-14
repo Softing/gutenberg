@@ -74,7 +74,7 @@ sub seance {
             }
         }
         
-        $fascicle->{pc} = 0;
+        $fascicle->{pc} = $c->sql->Q(" SELECT max(seqnum) FROM fascicles_pages WHERE fascicle=? ", [ $fascicle->{id} ])->Value;
         $fascicle->{dc} = 0;
         $fascicle->{ac} = 0;
         $fascicle->{dav} = 0;
@@ -263,7 +263,8 @@ sub capture {
 sub save {
     
     my $c = shift;
-    my $i_fascicle = $c->param("fascicle");
+    my $i_fascicle  = $c->param("fascicle");
+    my @i_documents = $c->param("document");
     
     my @errors;
     my $success = $c->json->false;
@@ -282,6 +283,44 @@ sub save {
     
     unless (@errors) {
         
+        $c->sql->bt;
+        foreach my $node (@i_documents) {
+            
+            my ($id, $seqnum) = split '::', $node;
+            
+            next unless ($id);
+            
+            my $document = $c->sql->Q(" SELECT * FROM documents WHERE id=? AND fascicle=? ", [ $id, $fascicle->{id} ])->Hash;
+            
+            if ($document->{id}) {
+                
+                if ($seqnum > 0) {
+                    
+                    my $page = $c->sql->Q(" SELECT * FROM fascicles_pages WHERE fascicle=? AND seqnum=? ", [ $fascicle->{id}, $seqnum ])->Hash;
+                    
+                    if ($page->{id}) {
+                        
+                        $c->sql->Do("
+                            DELETE FROM fascicles_map_documents WHERE edition =? AND fascicle=? AND page=? AND entity=?
+                        ", [ $fascicle->{edition}, $fascicle->{id}, $page->{id}, $document->{id} ]);
+                        
+                        $c->sql->Do("
+                            INSERT INTO fascicles_map_documents(edition, fascicle, page, entity, created, updated)
+                            VALUES (?, ?, ?, ?, now(), now());
+                        ", [ $fascicle->{edition}, $fascicle->{id}, $page->{id}, $document->{id} ]);
+                    }
+                }
+                
+                if ($seqnum == 0) {
+                    $c->sql->Do("
+                            DELETE FROM fascicles_map_documents WHERE edition =? AND fascicle=? AND entity=?
+                        ", [ $fascicle->{edition}, $fascicle->{id}, $document->{id} ]);
+                }
+                
+            }
+            
+        }
+        $c->sql->et;
     }
     
     $success = $c->json->true unless (@errors);
@@ -311,9 +350,9 @@ sub getPages {
             t1.id, t1.place, t1.seqnum, t1.w, t1.h,
             t2.id as headline, t2.shortcut as headline_shortcut
         FROM fascicles_pages t1
-            LEFT JOIN index as t2 ON t2.id=t1.headline
-        WHERE fascicle = ?
-        ORDER BY seqnum
+            LEFT JOIN index_fascicles as t2 ON t2.id=t1.headline
+        WHERE t1.fascicle = ?
+        ORDER BY t1.seqnum
     ", [ $fascicle ])->Hashes;
     
     foreach my $item (@$dbpages) {
@@ -326,7 +365,7 @@ sub getPages {
             id => $item->{id},
             num => $item->{seqnum},
             dim   => "$item->{w}x$item->{h}",
-            headline => $headline
+            headline => $headline || $item->{headline_shortcut}
         };
         
         push @pageorder, $index->{$item->{id}};

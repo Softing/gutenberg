@@ -8,9 +8,145 @@ package Inprint::Fascicle::Pages;
 use strict;
 use warnings;
 
+use Inprint::Utils::Pages;
+
 use base 'Inprint::BaseController';
 
-sub view {
+sub create {
+    
+    my $c = shift;
+    
+    my $i_fascicle = $c->param("fascicle");
+    my $i_headline = $c->param("headline");
+    my $i_string   = $c->param("page");
+    
+    my @errors;
+    my $success = $c->json->false;
+    
+    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_fascicle));
+    
+    my $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id = ? ", [ $i_fascicle ])->Hash;
+    
+    push @errors, { id => "fascicle", msg => "Can't find object"}
+        unless ($fascicle->{id});
+    
+    my $headline = {};
+    if ($i_headline) {
+        $headline = $c->sql->Q(" SELECT * FROM index_fascicles WHERE nature = 'headline' AND id = ? ", [ $i_headline ])->Hash;
+        push @errors, { id => "headline", msg => "Can't find object"}
+            unless ($headline->{id});
+    }
+    
+    unless (@errors) {
+        
+        my $pages = Inprint::Utils::Pages::UncompressString($c, $i_string);
+        
+        my $chunks = Inprint::Utils::Pages::GetChunks($c, $pages);
+        
+        my $composition = $c->sql->Q("
+            SELECT id, edition, fascicle, headline, place, seqnum, w, h, created, updated
+            FROM fascicles_pages WHERE fascicle = ?; ",[
+                $i_fascicle
+            ])->Hashes;
+        
+        my @inserts;
+        
+        foreach my $newpage (@$pages) {
+            
+            push @inserts, {
+                edition  => $fascicle->{edition},
+                fascicle => $fascicle->{id},
+                headline => $headline->{id},
+                seqnum   => $newpage
+            };
+            
+            my $offset = 0;
+            
+            foreach my $oldpage (@$composition) {
+                if ($oldpage->{seqnum} == $newpage) {
+                    $offset = 1;
+                }
+            }
+            
+            foreach my $oldpage (@$composition) {
+                if ($oldpage->{seqnum} >= $newpage && $offset == 1) {
+                    $oldpage->{seqnum} ++;
+                    $oldpage->{is_updated} = 1;
+                }
+            }
+            
+        }
+        
+        $c->sql->bt;
+        
+        foreach my $page (@$composition) {
+            if ( $page->{id} && $page->{is_updated} == 1) {
+                $c->sql->Do("
+                    UPDATE fascicles_pages SET seqnum=? WHERE id=?
+                ", [$page->{seqnum}, $page->{id}]);
+            }
+        }
+        
+        foreach my $page (@inserts) {
+            my $id = $c->uuid;
+            
+            $c->sql->Do("
+                INSERT INTO fascicles_pages(id, edition, fascicle, headline, place, seqnum, w, h, created, updated)
+                VALUES (?, ?, ?, ?, null, ?, 0, 0, now(), now());
+            ", [$id, $page->{edition}, $page->{fascicle}, $page->{headline}, $page->{seqnum} ]);
+        }
+        
+        $c->sql->et;
+        
+    }
+    
+    
+    $success = $c->json->true unless (@errors);
+    $c->render_json({ success => $success, errors => \@errors });
+}
+
+sub update {
+    
+    my $c = shift;
+    
+    my $i_fascicle = $c->param("fascicle");
+    my $i_headline = $c->param("headline");
+    my @i_pages    = $c->param("page");
+    
+    my @errors;
+    my $success = $c->json->false;
+    
+    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
+    unless ($c->is_uuid($i_fascicle));
+    
+    my $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id = ? ", [ $i_fascicle ])->Hash;
+    
+    push @errors, { id => "fascicle", msg => "Can't find object"}
+        unless ($fascicle->{id});
+    
+    my $headline = {};
+    if ($i_headline) {
+        $headline = $c->sql->Q(" SELECT * FROM index_fascicles WHERE nature = 'headline' AND id = ? ", [ $i_headline ])->Hash;
+        push @errors, { id => "headline", msg => "Can't find object"}
+            unless ($headline->{id});
+    }
+    
+    $c->sql->bt;
+    unless (@errors) {
+        foreach my $item (@i_pages) {
+            my ($page, $seqnum) = split "::", $item;
+            $c->sql->Do(" UPDATE fascicles_pages SET headline=? WHERE id=? AND seqnum=? ", [ $headline->{id}, $page, $seqnum ]);
+        }
+    }
+    $c->sql->et;
+    
+    
+    $success = $c->json->true unless (@errors);
+    $c->render_json({ success => $success, errors => \@errors });
+}
+
+sub move {
     
     my $c = shift;
     
@@ -22,111 +158,160 @@ sub view {
     push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_fascicle));
     
-    my $data = {};
+    my $data;
     
     unless (@errors) {
-        
-        my $idcounter = 1;
-        my $index;
-        
-        my @pageorder;
-        
-        my $pages;
-        my $dbpages = $c->sql->Q("
-            SELECT 
-                t1.id, t1.place, t1.seqnum, t1.w, t1.h,
-                t2.id as headline, t2.shortcut as headline_shortcut
-            FROM fascicles_pages t1
-                LEFT JOIN index as t2 ON t2.id=t1.headline
-            WHERE fascicle = ?
-            ORDER BY seqnum
-        ", [ $i_fascicle ])->Hashes;
-        
-        foreach my $item (@$dbpages) {
-            
-            $index->{$item->{id}} = $idcounter++;
-            
-            my ($trash, $headline) = split /\//, $item->{headline_shortcut};
-            
-            $pages->{$index->{$item->{id}}} = {
-                id => $item->{id},
-                num => $item->{seqnum},
-                dim   => "$item->{w}x$item->{h}",
-                headline => $headline
-            };
-            
-            push @pageorder, $index->{$item->{id}};
-        }
-        
-        my $documents = {};
-        my $doccount = 0;
-        my $dbdocuments = $c->sql->Q("
-            SELECT DISTINCT t2.edition, t2.fascicle, t2.id, t2.title
-            FROM fascicles_map_documents t1, documents t2
-            WHERE t2.id = t1.entity AND t1.fascicle = ?
-        ", [ $i_fascicle ])->Hashes;
-        
-        foreach my $item (@$dbdocuments) {
-            
-            $index->{$item->{id}} = $idcounter++;
-            
-            $documents->{$index->{$item->{id}}} = {
-                id => $item->{id},
-                title => $item->{title}
-            };
-            
-            my $docpages = $c->sql->Q("
-                SELECT t2.id
-                FROM fascicles_map_documents t1, fascicles_pages t2
-                WHERE t2.id = t1.page AND t1.fascicle = ? AND entity = ?
-            ", [ $i_fascicle, $item->{id} ])->Values;
-            foreach my $pageid (@$docpages) {
-                my $pageindex = $index->{$pageid};
-                if ($pageindex) {
-                    push @{ $pages->{$pageindex}->{documents} }, $index->{$item->{id}};
-                }
-            }
-        }
-        
-        my $holes;
-        my $dbholes = $c->sql->Q("
-            SELECT
-                t1.id, t1.place, t1.page, t1.entity, t1.x, t1.y, t1.h, t1.w,
-                t2.id as module, t2.shortcut as module_shortcut
-            FROM fascicles_map_holes t1, ad_modules t2
-            WHERE t2.id = t1.module
-                AND t1.fascicle = ?
-        ", [ $i_fascicle ])->Hashes;
-        
-        foreach my $item (@$dbholes) {
-            $index->{$item->{id}} = $idcounter++;
-            
-            $holes->{$index->{$item->{id}}} = {
-                id => $item->{id},
-                title => $item->{module_shortcut},
-                entity => $item->{entity},
-                x => $item->{x},
-                y => $item->{y},
-                h => $item->{h},
-                w => $item->{w},
-            };
-            
-            my $pageindex = $index->{$item->{page}};
-            if ($pageindex) {
-                push @{ $pages->{$pageindex}->{holes} }, $index->{$item->{id}};
-            }
-        }
-        
-        $data->{pages}      = $pages;
-        $data->{documents}  = $documents;
-        $data->{holes}      = $holes;
-        $data->{pageorder}  = \@pageorder;
-        
     }
+    
     
     $success = $c->json->true unless (@errors);
     $c->render_json({ success => $success, errors => \@errors, data => [ $data ] });
 }
 
+sub right {
+    
+    my $c = shift;
+    
+    my $i_fascicle = $c->param("fascicle");
+    
+    my @errors;
+    my $success = $c->json->false;
+    
+    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_fascicle));
+    
+    my $data;
+    
+    unless (@errors) {
+    }
+    
+    
+    $success = $c->json->true unless (@errors);
+    $c->render_json({ success => $success, errors => \@errors, data => [ $data ] });
+}
+
+sub left {
+    
+    my $c = shift;
+    
+    my $i_fascicle = $c->param("fascicle");
+    
+    my @errors;
+    my $success = $c->json->false;
+    
+    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_fascicle));
+    
+    my $data;
+    
+    unless (@errors) {
+    }
+    
+    
+    $success = $c->json->true unless (@errors);
+    $c->render_json({ success => $success, errors => \@errors, data => [ $data ] });
+}
+
+sub resize {
+    
+    my $c = shift;
+    
+    my $i_fascicle = $c->param("fascicle");
+    
+    my @errors;
+    my $success = $c->json->false;
+    
+    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_fascicle));
+    
+    my $data;
+    
+    unless (@errors) {
+    }
+    
+    
+    $success = $c->json->true unless (@errors);
+    $c->render_json({ success => $success, errors => \@errors, data => [ $data ] });
+}
+
+sub clean {
+    
+    my $c = shift;
+    
+    my $i_fascicle  = $c->param("fascicle");
+    my $i_documents = $c->param("documents");
+    my $i_adverts   = $c->param("adverts");
+    my @i_pages    = $c->param("page");
+    
+    my @errors;
+    my $success = $c->json->false;
+    
+    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_fascicle));
+    
+    my $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id = ? ", [ $i_fascicle ])->Hash;
+    
+    push @errors, { id => "fascicle", msg => "Can't find object"}
+        unless ($fascicle->{id});
+    
+    unless (@errors) {
+        foreach my $item (@i_pages) {
+            my ($id, $seqnum) = split "::", $item;
+            my $page = $c->sql->Q(" SELECT * FROM fascicles_pages WHERE id=? AND seqnum=? ", [ $id, $seqnum ])->Hash;
+            if ($page->{id}) {
+                $c->sql->bt;
+                
+                if ($i_documents eq "true") {
+                    $c->sql->Do(" DELETE FROM fascicles_map_documents WHERE page=? ", [ $page->{id} ]);
+                }
+                
+                if ($i_adverts eq "true") {
+                    $c->sql->Do(" DELETE FROM fascicles_map_holes WHERE page=? ", [ $page->{id} ]);
+                }
+                
+                $c->sql->et;
+            }
+        }
+    }
+    
+    $success = $c->json->true unless (@errors);
+    $c->render_json({ success => $success, errors => \@errors });
+}
+
+sub delete {
+    
+    my $c = shift;
+    
+    my $i_fascicle = $c->param("fascicle");
+    my @i_pages    = $c->param("page");
+    
+    my @errors;
+    my $success = $c->json->false;
+    
+    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_fascicle));
+    
+    my $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id = ? ", [ $i_fascicle ])->Hash;
+    
+    push @errors, { id => "fascicle", msg => "Can't find object"}
+        unless ($fascicle->{id});
+    
+    unless (@errors) {
+        foreach my $item (@i_pages) {
+            my ($id, $seqnum) = split "::", $item;
+            my $page = $c->sql->Q(" SELECT * FROM fascicles_pages WHERE id=? AND seqnum=? ", [ $id, $seqnum ])->Hash;
+            if ($page->{id}) {
+                $c->sql->bt;
+                $c->sql->Do(" DELETE FROM fascicles_pages WHERE id=? ", [ $page->{id} ]);
+                $c->sql->Do(" DELETE FROM fascicles_map_documents WHERE page=? ", [ $page->{id} ]);
+                $c->sql->Do(" DELETE FROM fascicles_map_holes WHERE page=? ", [ $page->{id} ]);
+                $c->sql->et;
+            }
+        }
+    }
+    
+    $success = $c->json->true unless (@errors);
+    $c->render_json({ success => $success, errors => \@errors });
+}
 
 1;

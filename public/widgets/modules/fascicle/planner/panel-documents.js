@@ -51,7 +51,7 @@ Inprint.fascicle.planner.Documents = Ext.extend(Ext.grid.EditorGridPanel, {
         
         this.tbar = [
             {
-                ref: "../btnAdd",
+                ref: "../btnCreate",
                 text: _("Add"),
                 disabled:true,
                 icon: _ico("plus-button"),
@@ -60,7 +60,7 @@ Inprint.fascicle.planner.Documents = Ext.extend(Ext.grid.EditorGridPanel, {
                 handler : actions.Create
             },
             {
-                ref: "../btnEdit",
+                ref: "../btnUpdate",
                 text: _("Edit"),
                 disabled:true,
                 icon: _ico("pencil"),
@@ -70,7 +70,7 @@ Inprint.fascicle.planner.Documents = Ext.extend(Ext.grid.EditorGridPanel, {
             },
             "-",
             {
-                ref: "../btnToBriefcase",
+                ref: "../btnBriefcase",
                 text: 'В портфель',
                 disabled:true,
                 icon: _ico("briefcase--arrow"),
@@ -79,7 +79,7 @@ Inprint.fascicle.planner.Documents = Ext.extend(Ext.grid.EditorGridPanel, {
                 handler : actions.Briefcase
             },
             {
-                ref: "../btnToFascicle",
+                ref: "../btnMove",
                 text: 'В выпуск',
                 disabled:true,
                 icon: _ico("newspaper--arrow"),
@@ -88,7 +88,7 @@ Inprint.fascicle.planner.Documents = Ext.extend(Ext.grid.EditorGridPanel, {
                 handler : actions.Move
             },
             {
-                ref: "../btnToTrash",
+                ref: "../btnRecycle",
                 text: 'В корзину',
                 disabled:true,
                 icon: _ico("bin--arrow"),
@@ -98,7 +98,7 @@ Inprint.fascicle.planner.Documents = Ext.extend(Ext.grid.EditorGridPanel, {
             },
             "->",
             {
-                ref: "../btnBriefcase",
+                ref: "../btnFromBriefcase",
                 text: 'Портфель',
                 disabled:true,
                 icon: _ico("briefcase"),
@@ -130,8 +130,5 @@ Inprint.fascicle.planner.Documents = Ext.extend(Ext.grid.EditorGridPanel, {
 
     onRender: function() {
         Inprint.fascicle.planner.Documents.superclass.onRender.apply(this, arguments);
-        //this.on("dblclick", function(e){
-        //    Inprint.ObjectResolver.resolve({ aid:'document-profile', oid:this.getValue("id"), text:this.getValue("title") });
-        //}, this);
     }
 });

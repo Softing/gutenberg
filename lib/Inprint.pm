@@ -133,7 +133,7 @@ sub startup {
     $self->createRoutes($sessionBridge, "fascicle/combos",          [ "workgroups", "headlines", "rubrics" ]);
     $self->createRoutes($sessionBridge, "fascicle/indexes",         [ "editions", "headlines", "rubrics", "create", "update", "delete" ]);
     $self->createRoutes($sessionBridge, "fascicle/images",          [ "view" ]);
-    $self->createRoutes($sessionBridge, "fascicle/pages",           [ "view", "create", "update", "delete" ]);
+    $self->createRoutes($sessionBridge, "fascicle/pages",           [ "view", "create", "update", "delete", "move", "left", "right", "resize", "clean" ]);
     $self->createRoutes($sessionBridge, "fascicle/documents",       [ "list" ]);
     $self->createRoutes($sessionBridge, "fascicle/headlines",       [ "tree", "read", "create", "update", "delete" ]);
     $self->createRoutes($sessionBridge, "fascicle/rubrics",         [ "list", "read", "create", "update", "delete" ]);

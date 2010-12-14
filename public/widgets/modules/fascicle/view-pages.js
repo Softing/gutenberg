@@ -11,30 +11,41 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
                     var items = values[0];
                     
                     var string = '<div class="inprint-plan">';
-                    string += '<div class="inprint-plan-block">';
+                    string += '<div class="inprint-plan-block" style="border:1px dotted silver;">';
                     
                     for (var c=0; c<items.pageorder.length; c++) {
                         
-                        var pageorder = items.pageorder[c];
-                        var page = items.pages[pageorder];
+                        var page = items.pages[ items.pageorder[c] ];
                         
-                        var pageclass;
+                        var prevPage = items.pages[ items.pageorder[c-1] ];
+                        var nextPage = items.pages[ items.pageorder[c+1] ];
+                        
+                        var pageclass  = "";
+                        var alertclass = "";
                         
                         if(page.num && page.num % 2 == 0) {
-                            pageclass = "left";
+                            pageclass = "inprint-plan-page-left";
+                            if (prevPage && prevPage.num != page.num-1) {
+                                alertclass = "inprint-plan-page-alert-left";
+                            }
                         }
                         
                         if(page.num && page.num % 2 != 0) {
-                            pageclass = "right";
+                            pageclass = "inprint-plan-page-right";
+                            if (nextPage && nextPage.num != page.num+1) {
+                                alertclass = "inprint-plan-page-alert-right";
+                            }
                         }
                         
-                        if(page.num && page.num % 2 == 0) {
-                            string += '<div style="clear:both"></div>';
-                            string += '</div>';
-                            string += '<div class="inprint-plan-block">';
-                        }
-                        
-                        string += '<div id="'+ page.id +'" class="inprint-plan-page inprint-plan-page-'+ pageclass +'">';
+                        string += '<div id="'+ page.id +'" seqnum="'+ page.num +'" class="inprint-plan-page '+ pageclass +' '+ alertclass +'">';
+                            
+                            if (! page.num ) {
+                                page.num = "--";
+                            }
+                            
+                            if (! page.headline ) {
+                                page.headline = "";
+                            }
                             
                             string += '<div class="inprint-plan-page-title">';
                             string += '<div><nobr>'+ page.num +' - '+ page.headline +'</nobr></div>';
@@ -88,6 +99,19 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
                             string += '</div>';
                         
                         string += '</div>';
+                        
+                        var delimeter = '<div style="clear:both"></div>';
+                        delimeter += '</div>';
+                        delimeter += '<div class="inprint-plan-block" style="border:1px dotted silver;">';
+                            
+                        if(nextPage && page.num && page.num % 2 != 0) {
+                            string += delimeter;
+                        }
+                        
+                        else if(nextPage && nextPage.num % 2 == page.num % 2) {
+                            string += delimeter;
+                        }
+                        
                     }
                     
                     string += '<div style="clear:both"></div>';

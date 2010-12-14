@@ -8,8 +8,10 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
             "create": _url("/fascicle/pages/create/"),
             "update": _url("/fascicle/pages/update/"),
             "delete": _url("/fascicle/pages/delete/"),
-            "move": _url("/fascicle/pages/move/"),
-            "clean": _url("/fascicle/pages/clean/"),
+            "move":   _url("/fascicle/pages/move/"),
+            "left":   _url("/fascicle/pages/left/"),
+            "right":   _url("/fascicle/pages/right/"),
+            "clean":  _url("/fascicle/pages/clean/"),
             "resize": _url("/fascicle/pages/resize/")
         };
         
@@ -37,8 +39,28 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
         return this.view;
     },
     
+    getIdByNum: function(num) {
+        var id = null;
+        var nodes = this.view.getNodes();
+        Ext.each(nodes, function(c){
+            if (c.getAttribute("seqnum") == num) {
+                id = c.id;
+            }
+        });
+        return id;
+    },
+    
     getStore: function() {
         return this.view.getStore();
+    },
+    
+    cmpGetSelected: function () {
+        var result = [];
+        var records = this.view.getSelectedNodes();
+        Ext.each(records, function(c) {
+            result.push(c.id +"::"+ c.getAttribute("seqnum"));
+        }, this);
+        return result;
     },
 
     cmpPageCreate: function() {
@@ -48,9 +70,9 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
         if (!wndw) {
             
             wndw = new Ext.Window({
-                title: 'Укажите полосы для добавления',
+                title: 'Добавление полос',
                 width: 300,
-                height: 200,
+                height: 160,
                 modal:true,
                 draggable:true,
                 layout: "fit",
@@ -64,8 +86,8 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
                     },
                     labelWidth: 100,
                     defaultType: 'checkbox',
-                    defaults: { anchor: '100%' },
-                    bodyStyle: 'padding:5px 5px 0;',
+                    defaults: { anchor: '100%', hideLabel: true },
+                    bodyStyle: 'padding:10px;',
                     listeners: {
                         scope:this,
                         actioncomplete: function() {
@@ -75,16 +97,10 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
                     },
                     items: [
                         {
-                            xtype: 'box',
-                            autoEl: {tag:'div', html: 'Пример: 1, 2, 5-8, 9:10 (9:10 добавит 10 полос после полосы 9).' },
-                            cls: 'inprint-form-helpbox'
-                        },
-                        {
                             xtype: 'textfield',
                             name: 'page',
-                            fieldLabel: 'Полосы',
-                            allowBlank:false,
-                            itemCls: 'required'
+                            emptyText: 'Полосы',
+                            allowBlank:false
                         },
                         Inprint.factory.Combo.getConfig("/fascicle/combos/headlines/", {
                             baseParams:{
@@ -107,13 +123,10 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
             this.dialogs["create"] = wndw;
         }
         
-        //var form = wndw.items.first().getForm();
-        //
-        //var field = form.findField('page');
-        //field.setValue('');
-        //field.focus('', 10);
-        
+        var form = wndw.findByType("form")[0].getForm();
+        form.reset();
         wndw.show();
+        
     },
 
     // Редактировать
@@ -126,7 +139,7 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
             wndw = new Ext.Window({
                 title: 'Редактировать полосы',
                 width: 300,
-                height: 150,
+                height: 160,
                 modal:true,
                 draggable:true,
                 layout: "fit",
@@ -140,8 +153,8 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
                     },
                     labelWidth: 100,
                     defaultType: 'checkbox',
-                    defaults: { anchor: '100%' },
-                    bodyStyle: 'padding:5px 5px 0;',
+                    defaults: { anchor: '100%', hideLabel: true },
+                    bodyStyle: 'padding:10px;',
                     listeners: {
                         scope:this,
                         actioncomplete: function() {
@@ -173,97 +186,98 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
         
         wndw.show();
         
-        //this.dlgEdit.setTitle('Редактировать полосу <'+ this.selected_as_string +'>');
-        //this.dlgEdit.show();
-        //
-        //var form = this.dlgEdit.items.itemAt(0).getForm();
-        //form.reset();
-        //
-        //form.baseParams.selection = this.selection;
+        var form = wndw.findByType("form")[0].getForm();
+        form.reset();
+        form.baseParams.page = this.cmpGetSelected();
+        wndw.show();
     },
     
     //Переместить
-    cmpPageMove: function() {
+    cmpPageMove: function(inc) {
         
-        var wndw = this.dialogs["move"];
-        
-        if (!wndw) {
-            
-            wndw = new Ext.Window({
-                title: 'Перенос полос',
-                width: 400,
-                height: 300,
-                modal:true,
-                draggable:true,
-                layout: "fit",
-                closeAction: "hide",
-                items: {
-                    xtype: "form",
-                    border: false,
-                    url: this.urls["move"],
-                    baseParams: {
-                        fascicle: this.oid
-                    },
-                    labelWidth: 100,
-                    defaultType: 'checkbox',
-                    defaults: { anchor: '100%' },
-                    bodyStyle: 'padding:5px 5px 0;',
-                    listeners: {
-                        scope:this,
-                        actioncomplete: function() {
-                            wndw.hide();
-                            this.parent.cmpReload();
-                        }
-                    },
-                    items: [
-                        {
-                            xtype: 'box',
-                            autoEl: {tag:'div', html: 'Укажите после какой полосы нужно разместить выбранные полосы' },
-                            cls: 'inprint-form-helpbox'
-                        },
-                        {
-                            xtype: 'textfield',
-                            name: 'page',
-                            disabled:true,
-                            fieldLabel: 'Переместить',
-                            itemCls: 'required'
-                        },
-                        {
-                            xtype: 'textfield',
-                            fieldLabel: 'После полосы',
-                            itemCls: 'required',
-                            name: 'place'
-                        },
-                        {
-                            fieldLabel: '',
-                            labelSeparator: '',
-                            width: 'auto',
-                            checked:true,
-                            boxLabel: 'Удалить освободившиеся полосы',
-                            name: 'removeempty',
-                            inputValue: 'true'
-                        }
-                    ]
-                },
-                buttons: [
-                    _BTN_WNDW_OK, 
-                    _BTN_WNDW_CANCEL
-                ]
-            });
-            
-            this.dialogs["move"] = wndw;
+        if ( inc == 'cancel') {
+            return;
         }
         
-        wndw.show();
+        if ( inc == 'ok') {
+            Ext.Ajax.request({
+                url: this.urls["move"],
+                params: {
+                    fascicle: this.oid,
+                    page: this.cmpGetSelected()
+                },
+                scope: this,
+                success: function() {
+                    this.parent.cmpReload()
+                }
+            });
+            return;
+        }
         
-        //this.dlgMove.setTitle('Перенести полосу <'+ this.selected_as_string +'>');
-        //this.dlgMove.show();
-        //
-        //var form = this.dlgMove.items.itemAt(0).getForm();
-        //
-        //form.reset();
-        //form.findField('page').setValue( this.selected_as_string );
-        //form.baseParams.selection = this.selection;
+        Ext.MessageBox.prompt(
+            'Перемещение полос',
+            'Укажите номер полосы, после которой будут размещены выбранные полосы',
+            this.cmpPageMove, this
+        );
+        
+    },
+    
+    cmpPageMoveLeft: function(inc) {
+        
+        if ( inc == 'cancel') {
+            return;
+        }
+        
+        if ( inc == 'ok') {
+            Ext.Ajax.request({
+                url: this.urls["left"],
+                params: {
+                    fascicle: this.oid,
+                    page: this.cmpGetSelected()
+                },
+                scope: this,
+                success: function() {
+                    this.parent.cmpReload()
+                }
+            });
+            return;
+        }
+        
+        Ext.MessageBox.prompt(
+            'Cмещение влево',
+            'На сколько полос сместить?',
+            this.cmpPageMoveLeft, this
+        );
+        
+    },
+    
+    cmpPageMoveRight: function(inc) {
+        
+        if ( inc == 'cancel') {
+            return;
+        }
+        
+        if ( inc == 'ok') {
+            Ext.Ajax.request({
+                url: this.urls["right"],
+                params: {
+                    fascicle: this.oid,
+                    page: this.cmpGetSelected()
+                },
+                scope: this,
+                success: function() {
+                    this.parent.cmpReload()
+                }
+            });
+            return;
+        }
+        
+        Ext.MessageBox.prompt(
+            'Cмещение вправо',
+            'На сколько полос сместить?',
+            this.cmpPageMoveRight, this
+        );
+        
     },
     
     // Стереть
@@ -274,7 +288,7 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
         if (!wndw) {
             
             var wndw = new Ext.Window({
-                title: 'Очистка полос',
+                title: 'Удаление содержимого полосы',
                 width:250,
                 height:140,
                 modal:true,
@@ -290,8 +304,8 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
                     },
                     labelWidth: 60,
                     defaultType: 'checkbox',
-                    defaults: { anchor: '100%' },
-                    bodyStyle: 'padding:5px 5px 0;',
+                    defaults: { anchor: '100%', hideLabel:true },
+                    bodyStyle: 'padding:10px;',
                     listeners: {
                         scope:this,
                         actioncomplete: function() {
@@ -305,18 +319,18 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
                             name: 'documents',
                             checked:false,
                             inputValue: 'true',
-                            fieldLabel: 'Стереть',
+                            fieldLabel: '',
                             labelSeparator: ':',
-                            boxLabel: 'Материалы'
+                            boxLabel: 'Удалить материалы'
                         },
                         {
                             xtype: 'checkbox',
-                            name: 'advertisements',
+                            name: 'adverts',
                             checked:false,
                             inputValue: 'true',
                             fieldLabel: '',
                             labelSeparator: '',
-                            boxLabel: 'Рекламу'
+                            boxLabel: 'Удалить рекламу'
                         }
                     ]
                 },
@@ -329,14 +343,10 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
             this.dialogs["clean"] = wndw;
         }
         
+        var form = wndw.findByType("form")[0].getForm();
+        form.reset();
+        form.baseParams.page = this.cmpGetSelected();
         wndw.show();
-        
-        //this.dlgClean.setTitle('Очистить полосы <'+ this.selected_as_string +'>');
-        //this.dlgClean.show();
-        //
-        //var form = this.dlgClean.items.first().getForm();
-        //form.reset();
-        //form.baseParams.selection = this.selection;
     },
 
     // разверстать
@@ -413,15 +423,11 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
             this.dialogs["resize"] = wndw;
         }
         
+        var form = wndw.findByType("form")[0].getForm();
+        form.reset();
+        form.baseParams.page = this.cmpGetSelected();
         wndw.show();
         
-        //this.dlgResize.setTitle('Разверстать полосу <'+ this.selected_as_string +'>');
-        //this.dlgResize.show();
-        //
-        //var form = this.dlgResize.items.first().getForm();
-        //
-        //form.reset();
-        //form.baseParams.selection = this.selection;
     },
     
     //Удалить
@@ -432,7 +438,7 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
                 url: this.urls["delete"],
                 params: {
                     fascicle: this.oid,
-                    selection: this.selection
+                    page: this.cmpGetSelected()
                 },
                 scope: this,
                 success: function() {
@@ -442,8 +448,8 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
         } else {
             Ext.MessageBox.confirm(
                 'Подтверждение',
-                'Вы действительно хотите безвозвратно удалить полосы <'+ this.selected_as_string +'>?',
-                this.cmpDelete, this
+                'Вы действительно хотите безвозвратно удалить полосы?',
+                this.cmpPageDelete, this
             );
         }
     }

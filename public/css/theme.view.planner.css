@@ -24,11 +24,19 @@
     height:160px;
     padding:5px;
 }
+
 .inprint-plan-page-left {
     float:left;
 }
 .inprint-plan-page-right {
     float:right;
+}
+
+.inprint-plan-page-alert-left {
+    border-left:1px solid red;
+}
+.inprint-plan-page-alert-right {
+    border-right:1px solid red;
 }
 
 .inprint-plan-page-selected {

@@ -8,7 +8,7 @@ Inprint.cmp.UpdateDocument = Ext.extend(Ext.Window, {
             title: _("Edit Document Properties"),
             modal:true,
             layout: "fit",
-            width:400, height:350,
+            width:400, height:380,
             items: this.panel,
             buttons:[
                 {
