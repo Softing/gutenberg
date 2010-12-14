@@ -103,14 +103,16 @@ sub GetBindings {
     
     my %seen;
     @rules = grep { ! $seen{$_}++ } @rules;
-    
+
     if (@rules && $member) {
         $result = $c->{handler}->sql->Q("
-            SELECT parents || childrens FROM cache_visibility WHERE member=? AND term = ANY(?)
+            --SELECT parents || childrens FROM cache_visibility WHERE member=? AND term = ANY(?)
             --SELECT binding from cache_access where member = ? AND terms @> ?
-        ", [ $member, \@rules ])->Value();
+            SELECT t1.binding FROM cache_access t1
+            WHERE t1.member = ? AND ?::text[] && t1.terms;
+        ", [ $member, \@rules ])->Values();
     }
-    
+
     return $result || [];
 }
 

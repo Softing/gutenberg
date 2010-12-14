@@ -503,13 +503,13 @@ sub getDocumens {
 
     # Set Restrictions
 
-    my $editions = $c->access->GetChildrens("editions.documents.work");
-    $sql_filters .= " AND dcm.edition = ANY(?) ";
-    push @params, $editions;
+    #my $editions = $c->access->GetChildrens("editions.documents.work");
+    #$sql_filters .= " AND dcm.edition = ANY(?) ";
+    #push @params, $editions;
     
-    my $departments = $c->access->GetChildrens("catalog.documents.view:*");
-    $sql_filters .= " AND dcm.workgroup = ANY(?) ";
-    push @params, $departments;
+    #my $departments = $c->access->GetBindings("catalog.documents.view:*");
+    #$sql_filters .= " AND dcm.workgroup = ANY(?) ";
+    #push @params, $departments;
     
     # Set Filters
     
@@ -566,6 +566,7 @@ sub getDocumens {
 
     $sql_total .= $sql_filters;
     $sql_query .= $sql_filters;
+
 
     # Calculate total param
     my $total = $c->sql->Q($sql_total, \@params)->Value || 0;

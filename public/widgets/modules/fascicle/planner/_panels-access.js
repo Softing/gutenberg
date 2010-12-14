@@ -49,6 +49,7 @@ Inprint.fascicle.planner.Access = function(parent, panels, access) {
                     documents.btnDuplicate, documents.btnRecycle, documents.btnRestore, documents.btnDelete);
         
         if (access.manage) {
+
             if (sm.getCount() == 1) {
                 if (access["update"]    == 'enabled') documents.btnUpdate.enable();
                 //if (access["capture"]   == 'enabled') documents.btnCapture.enable();
