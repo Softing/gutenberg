@@ -250,7 +250,7 @@ Inprint.advert.modules.Grid = Ext.extend(Ext.grid.GridPanel, {
                             var swf = this.components["create-window"].findByType("flash")[0].swf;
                             (function () {
                                 swf.set(action.result.data.w, action.result.data.h);
-                            }).defer(10);
+                            }).defer(30);
                         }
                         if (action.type == "submit") {
                             this.components["create-window"].hide()
