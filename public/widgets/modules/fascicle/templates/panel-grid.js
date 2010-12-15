@@ -119,6 +119,12 @@ Inprint.fascicle.templates.Pages = Ext.extend(Ext.grid.GridPanel, {
                     scale :'exactfit',
                     autostart: 'yes',
                     loop: 'yes'
+                },
+                listeners: {
+                    scope:this,
+                    render: function(panel, flash) {
+                        alert( panel.getSwfId() );
+                    }
                 }
             });
             

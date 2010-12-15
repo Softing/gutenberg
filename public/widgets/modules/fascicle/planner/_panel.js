@@ -174,7 +174,6 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                 collapsible: false,
                 split: true
             },
-            
             items: [
                 {
                     border:false,
@@ -198,7 +197,8 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                             maxSize: 800,
                             layout:"fit",
                             collapseMode: 'mini',
-                            items: this.panels["documents"]
+                            items: this.panels["documents"],
+                            stateId: 'fasicles.planner.documents'
                         }
                     ]
                 },
@@ -210,7 +210,8 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                     maxSize: 800,
                     layout:"fit",
                     collapseMode: 'mini',
-                    items: this.panels["summary"]
+                    items: this.panels["summary"],
+                    stateId: 'fasicles.planner.summary'
                 }
             ]
         });
