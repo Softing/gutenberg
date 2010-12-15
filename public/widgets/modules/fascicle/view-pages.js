@@ -113,7 +113,9 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
                         delimeter += '<div class="inprint-plan-block">';
                         
                         if(nextPage && page.num && nextPage.num != page.num + 1) {
-                            string += delimeter;
+                            if (  nextPage.num < page.num + 1  ) {
+                                string += delimeter;
+                            }
                         }
                         
                         if(nextPage && page.num && page.num % 2 != 0) {
