@@ -70,6 +70,7 @@ Inprint.advert.modules.Grid = Ext.extend(Ext.grid.GridPanel, {
         ];
 
         Ext.apply(this, {
+            border:false,
             stripeRows: true,
             columnLines: true,
             sm: this.selectionModel,
@@ -98,9 +99,6 @@ Inprint.advert.modules.Grid = Ext.extend(Ext.grid.GridPanel, {
                 labelWidth: 75,
                 url: this.urls["create"],
                 bodyStyle: "padding:5px 5px",
-                baseParams: {
-                    edition: this.parent.edition
-                },
                 defaults: {
                     anchor: "100%",
                     allowBlank:false
@@ -154,7 +152,7 @@ Inprint.advert.modules.Grid = Ext.extend(Ext.grid.GridPanel, {
                         var init = function () {
                             panel.swf.init(panel.getSwfId(), "letter", 0, 0);
                         };
-                        init.defer(300);
+                        init.defer(1000);
                     }
                 }
             };
@@ -196,16 +194,16 @@ Inprint.advert.modules.Grid = Ext.extend(Ext.grid.GridPanel, {
             });
             
         }
-
-        //var form = win.items.first().getForm();
-        //form.reset();
-        //
-        //form.findField("fascicle").setValue(this.parent.fascicle);
-        //form.findField("headline").setValue(this.parent.headline);
-
+        
         win.show(this);
         this.components["create-window"] = win;
         
+        var form = win.form.getForm();
+        form.reset();
+        
+        form.baseParams = {
+            edition: this.parent.edition
+        };
     },
 
     cmpUpdate: function() {
@@ -229,6 +227,7 @@ Inprint.advert.modules.Grid = Ext.extend(Ext.grid.GridPanel, {
                     allowBlank:false
                 },
                 items: [
+                    _FLD_HDN_ID,
                     _FLD_HDN_FASCICLE,
                     _FLD_HDN_HEADLINE,
                     _FLD_TITLE,
@@ -243,7 +242,7 @@ Inprint.advert.modules.Grid = Ext.extend(Ext.grid.GridPanel, {
                             var id = Ext.getCmp(this.components["create-window"].getId()).form.getId();
                             (function () {
                                 swf.get("Inprint.flash.Proxy.setGrid", id);
-                            }).defer(10);
+                            }).defer(100);
                         }
                     },
                     actioncomplete: function (form, action) {
@@ -251,7 +250,7 @@ Inprint.advert.modules.Grid = Ext.extend(Ext.grid.GridPanel, {
                             var swf = this.components["create-window"].findByType("flash")[0].swf;
                             (function () {
                                 swf.set(action.result.data.w, action.result.data.h);
-                            }).defer(10);
+                            }).defer(100);
                         }
                         if (action.type == "submit") {
                             this.components["create-window"].hide()
@@ -284,7 +283,7 @@ Inprint.advert.modules.Grid = Ext.extend(Ext.grid.GridPanel, {
                         var init = function () {
                             panel.swf.init(panel.getSwfId(), "letter", 0, 0);
                         };
-                        init.defer(300);
+                        init.defer(1000);
                     }
                 }
             };
@@ -322,7 +321,7 @@ Inprint.advert.modules.Grid = Ext.extend(Ext.grid.GridPanel, {
                         panel.form  = panel.findByType("form")[0];
                     }
                 },
-                buttons: [ _BTN_WNDW_ADD, _BTN_WNDW_CLOSE ]
+                buttons: [ _BTN_WNDW_SAVE, _BTN_WNDW_CLOSE ]
             });
             
         }

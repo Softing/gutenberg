@@ -8,7 +8,12 @@ Inprint.advert.modules.Main = Ext.extend(Ext.Panel, {
         this.panels["editions"]  = new Inprint.advert.modules.Editions({
             parent: this
         });
+        
         this.panels["pages"]     = new Inprint.advert.modules.Grid({
+            parent: this
+        });
+        
+        this.panels["modules"]   = new Inprint.advert.modules.Grid({
             parent: this
         });
 
@@ -27,11 +32,20 @@ Inprint.advert.modules.Main = Ext.extend(Ext.Panel, {
                 },
                 {
                     region: "center",
-                    border:false,
                     margins: "3 3 3 0",
                     layout:"fit",
                     items: this.panels["pages"]
-                }
+                },
+                {
+                    region:"south",
+                    height: 300,
+                    minSize: 100,
+                    maxSize: 600,
+                    split: true,
+                    layout:"fit",
+                    margins: "3 0 3 3",
+                    items: this.panels["modules"]
+                },
             ]
         });
         Inprint.advert.modules.Main.superclass.initComponent.apply(this, arguments);
