@@ -7,9 +7,11 @@ Inprint.advert.modules.Interaction = function(parent, panels) {
     tree.getSelectionModel().on("selectionchange", function(sm, node) {
         grid.disable();
         if (node) {
+            
+            parent.edition = node.attributes.id;
+            
             grid.enable();
-            grid.cmpLoad({ id: node.attributes.id, type: node.attributes.type });
-            grid.params["place"] = node.attributes.id;
+            grid.cmpLoad({ edition: node.attributes.id });
         }
     });
 

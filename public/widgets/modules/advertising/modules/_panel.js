@@ -2,9 +2,15 @@ Inprint.advert.modules.Main = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
 
+        this.edition = null;
         this.panels = {};
-        this.panels["editions"]  = new Inprint.advert.modules.Editions();
-        this.panels["pages"] = new Inprint.advert.modules.Grid();
+        
+        this.panels["editions"]  = new Inprint.advert.modules.Editions({
+            parent: this
+        });
+        this.panels["pages"]     = new Inprint.advert.modules.Grid({
+            parent: this
+        });
 
         Ext.apply(this, {
             layout: "border",

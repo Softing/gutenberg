@@ -12,9 +12,7 @@ Inprint.flash.Proxy = {
     setGrid : function(panel, id, w, h) {
         var form = Ext.getCmp(panel).getForm();
         
-        form.baseParams = {
-            "w": w, "h": h
-        };
-        
+        form.baseParams["w"] = w;
+        form.baseParams["h"] = h;
     }
 };
