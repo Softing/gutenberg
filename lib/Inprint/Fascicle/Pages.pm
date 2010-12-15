@@ -20,6 +20,8 @@ sub create {
     my $i_headline = $c->param("headline");
     my $i_string   = $c->param("page");
     
+    my $i_copyfrom   = $c->param("copyfrom");
+    
     my @errors;
     my $success = $c->json->false;
     

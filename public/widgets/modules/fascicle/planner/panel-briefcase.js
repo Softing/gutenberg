@@ -5,7 +5,7 @@ Inprint.fascicle.planner.Briefcase = Ext.extend(Ext.grid.GridPanel, {
         var columns = new Inprint.documents.GridColumns();
         
         this.urls = {
-            "list":       "/fascicle/documents/list/"
+            "list":       "/documents/list/"
         }
 
         this.store = Inprint.factory.Store.group(this.urls.list, {
