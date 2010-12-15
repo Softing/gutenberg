@@ -193,7 +193,7 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
     },
     
     //Переместить
-    cmpPageMove: function(inc) {
+    cmpPageMove: function(inc, text) {
         
         if ( inc == 'cancel') {
             return;
@@ -204,6 +204,7 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
                 url: this.urls["move"],
                 params: {
                     fascicle: this.oid,
+                    after: text,
                     page: this.cmpGetSelected()
                 },
                 scope: this,
@@ -222,7 +223,7 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
         
     },
     
-    cmpPageMoveLeft: function(inc) {
+    cmpPageMoveLeft: function(inc, text) {
         
         if ( inc == 'cancel') {
             return;
@@ -233,6 +234,7 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
                 url: this.urls["left"],
                 params: {
                     fascicle: this.oid,
+                    amount: text,
                     page: this.cmpGetSelected()
                 },
                 scope: this,
@@ -251,7 +253,7 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
         
     },
     
-    cmpPageMoveRight: function(inc) {
+    cmpPageMoveRight: function(inc, text) {
         
         if ( inc == 'cancel') {
             return;
@@ -262,6 +264,7 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
                 url: this.urls["right"],
                 params: {
                     fascicle: this.oid,
+                    amount: text,
                     page: this.cmpGetSelected()
                 },
                 scope: this,

@@ -1085,7 +1085,8 @@ sub briefcase {
             
             next unless ($document->{id});
             
-            $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $id ]);
+            $c->sql->Do(" DELETE FROM fascicles_map_documents WHERE fascicle=? AND entity=? ", [ $document->{fascicle}, $document->{id} ]);
+            $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $document->{id} ]);
             Inprint::Utils::Documents::MoveDocumentIndexToFascicle($c, \@errors, $document->{id});
             
             $c->sql->et;
@@ -1101,7 +1102,7 @@ sub move {
     
     my @ids = $c->param("id");
     
-    my $i_edition  = $c->param("edition");
+    #my $i_edition  = $c->param("edition");
     my $i_fascicle = $c->param("fascicle");
     my $i_headline = $c->param("headline");
     my $i_rubric   = $c->param("rubric");
@@ -1110,8 +1111,8 @@ sub move {
     my @errors;
     my $success = $c->json->false;
     
-    push @errors, { id => "edition", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_edition));
+    #push @errors, { id => "edition", msg => "Incorrectly filled field"}
+    #    unless ($c->is_uuid($i_edition));
         
     push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_fascicle));
@@ -1120,8 +1121,10 @@ sub move {
     push @errors, { id => "fascicle", msg => "Can't find object"}
         unless ( $fascicle->{id} || $fascicle->{shortcut} );
     
+    my $i_edition = $fascicle->{edition};
+    
     if ($i_fascicle && $i_fascicle ne  "00000000-0000-0000-0000-000000000000") {
-        $i_edition = $c->sql->Q(" SELECT edition FROM fascicles WHERE id = ?", [ $i_fascicle ])->Value;
+        $i_edition = $c->sql->Q(" SELECT edition FROM fascicles WHERE id = ?", [ $fascicle->{id} ])->Value;
         push @errors, { id => "edition", msg => "Incorrectly filled field"}
             unless ($c->is_uuid($i_edition));
     }
@@ -1137,16 +1140,25 @@ sub move {
         
         foreach my $id (@ids) {
             
-            # Change fascicle
-            $c->sql->Do(" UPDATE documents SET edition=?,  edition_shortcut=?  WHERE id=? ", [ $edition->{id}, $edition->{shortcut}, $id ]);
-            $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $id ]);
+            my $document = $c->sql->Q(" SELECT * FROM documents WHERE id=? ", [ $id ])->Hash;
             
-            # Change headline
+            next unless ($document->{id});
+            
+            # Remove document from old fascicle composition
+            if ($document->{fascicle} ne $fascicle->{id}) {
+                $c->sql->Do(" DELETE FROM fascicles_map_documents WHERE fascicle=? AND entity=? ", [ $document->{fascicle}, $document->{id} ]);
+            }
+            
+            # Change fascicle to new
+            $c->sql->Do(" UPDATE documents SET edition=?,  edition_shortcut=?  WHERE id=? ", [ $edition->{id}, $edition->{shortcut}, $document->{id} ]);
+            $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $document->{id} ]);
+            
+            # Change headline to new
             if ($i_change eq "yes") {
                 if ($headline->{id}) {
-                    $c->sql->Do(" UPDATE documents SET headline=?, headline_shortcut=? WHERE id=? ", [ $headline->{id}, $headline->{shortcut}, $id ]);
+                    $c->sql->Do(" UPDATE documents SET headline=?, headline_shortcut=? WHERE id=? ", [ $headline->{id}, $headline->{shortcut}, $document->{id} ]);
                     if ($rubric->{id}) {
-                        $c->sql->Do(" UPDATE documents SET rubric=?, rubric_shortcut=? WHERE id=? ", [ $rubric->{id}, $rubric->{shortcut}, $id ]);
+                        $c->sql->Do(" UPDATE documents SET rubric=?, rubric_shortcut=? WHERE id=? ", [ $rubric->{id}, $rubric->{shortcut}, $document->{id} ]);
                     }
                 }
             }
@@ -1465,10 +1477,21 @@ sub recycle {
             
             if ($c->is_uuid($id)) {
                 my $document = Inprint::Utils::GetDocumentById($c, id => $id);
+                
+                next unless ($document->{id});
+                
                 if ($document->{workgroup}) {
                     if ($c->access->Check("catalog.documents.delete:*", $document->{workgroup})) {
+                        
+                        # Remove document from old fascicle composition
+                        $c->sql->Do(" DELETE FROM fascicles_map_documents WHERE fascicle=? AND entity=? ", [ $document->{fascicle}, $document->{id} ]);
+                        
+                        # Change document fascicle to sytem's Recycle fascicle
                         $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $document->{id} ]);
+                        
+                        # Update fascicle indexation
                         Inprint::Utils::Documents::MoveDocumentIndexToFascicle($c, [], $id);
+                        
                     }
                 }
             }

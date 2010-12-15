@@ -286,19 +286,31 @@ sub save {
         $c->sql->bt;
         foreach my $node (@i_documents) {
             
-            my ($id, $seqnum) = split '::', $node;
+            my ($id, $seqnumstr) = split '::', $node;
             
             next unless ($id);
             
             my $document = $c->sql->Q(" SELECT * FROM documents WHERE id=? AND fascicle=? ", [ $id, $fascicle->{id} ])->Hash;
             
-            if ($document->{id}) {
+            next unless ($document->{id});
+            
+            my @seqnums = split /[^\d]/, $seqnumstr;
+            
+            next unless (@seqnums);
+            
+            foreach my $seqnum (@seqnums) {
                 
                 if ($seqnum > 0) {
                     
                     my $page = $c->sql->Q(" SELECT * FROM fascicles_pages WHERE fascicle=? AND seqnum=? ", [ $fascicle->{id}, $seqnum ])->Hash;
                     
                     if ($page->{id}) {
+                        
+                        unless ($page->{headline}) {
+                            $c->sql->Do("
+                                UPDATE fascicles_pages SET headline = ? WHERE id=?
+                            ", [ $document->{headline}, $page->{id}  ]);
+                        }
                         
                         $c->sql->Do("
                             DELETE FROM fascicles_map_documents WHERE edition =? AND fascicle=? AND page=? AND entity=?

@@ -43,37 +43,37 @@ Inprint.fascicle.planner.Access = function(parent, panels, access) {
     documents.getSelectionModel().on("selectionchange", function(sm) {
 
         var records = documents.getSelectionModel().getSelections();
-        var access = _arrayAccessCheck(records, ['delete', 'recover', 'update', 'capture', 'move', 'transfer', 'briefcase']);
+        var doc_access = _arrayAccessCheck(records, ['delete', 'recover', 'update', 'capture', 'move', 'transfer', 'briefcase']);
         
         _disable(documents.btnUpdate, documents.btnCapture, documents.btnTransfer, documents.btnMove, documents.btnBriefcase, documents.btnCopy,
                     documents.btnDuplicate, documents.btnRecycle, documents.btnRestore, documents.btnDelete);
         
         if (access.manage) {
-
+            
             if (sm.getCount() == 1) {
-                if (access["update"]    == 'enabled') documents.btnUpdate.enable();
-                //if (access["capture"]   == 'enabled') documents.btnCapture.enable();
-                //if (access["transfer"]  == 'enabled') documents.btnTransfer.enable();
-                if (access["briefcase"] == 'enabled') documents.btnBriefcase.enable();
-                if (access["move"]      == 'enabled') documents.btnMove.enable();
+                if (doc_access["update"]    == 'enabled') documents.btnUpdate.enable();
+                if (doc_access["capture"]   == 'enabled') documents.btnCapture.enable();
+                if (doc_access["transfer"]  == 'enabled') documents.btnTransfer.enable();
+                if (doc_access["briefcase"] == 'enabled') documents.btnBriefcase.enable();
+                if (doc_access["move"]      == 'enabled') documents.btnMove.enable();
                 //if (access["move"]      == 'enabled') documents.btnCopy.enable();
                 //if (access["move"]      == 'enabled') documents.btnDuplicate.enable();
                 //if (access["recover"]   == 'enabled') documents.btnRestore.enable();
-                if (access["delete"]    == 'enabled') documents.btnRecycle.enable();
+                if (doc_access["delete"]    == 'enabled') documents.btnRecycle.enable();
                 //if (access["delete"]    == 'enabled') documents.btnDelete.enable();
             }
             
             if (sm.getCount() > 0 ) {
                 //if (access["update"]    == 'enabled') documents.btnCapture.enable();
                 //if (access["transfer"]  == 'enabled') documents.btnTransfer.enable();
-                //if (access["capture"]   == 'enabled') documents.btnCapture.enable();
-                //if (access["transfer"]  == 'enabled') documents.btnTransfer.enable();
-                if (access["briefcase"] == 'enabled') documents.btnBriefcase.enable();
-                if (access["move"]      == 'enabled') documents.btnMove.enable();
+                if (doc_access["capture"]   == 'enabled') documents.btnCapture.enable();
+                if (doc_access["transfer"]  == 'enabled') documents.btnTransfer.enable();
+                if (doc_access["briefcase"] == 'enabled') documents.btnBriefcase.enable();
+                if (doc_access["move"]      == 'enabled') documents.btnMove.enable();
                 //if (access["move"]      == 'enabled') documents.btnCopy.enable();
                 //if (access["move"]      == 'enabled') documents.btnDuplicate.enable();
                 //if (access["recover"]   == 'enabled') documents.btnRestore.enable();
-                if (access["delete"]    == 'enabled') documents.btnRecycle.enable();
+                if (doc_access["delete"]    == 'enabled') documents.btnRecycle.enable();
                 //if (access["delete"]    == 'enabled') documents.btnDelete.enable();
             }
         }

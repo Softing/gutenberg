@@ -68,6 +68,25 @@ Inprint.fascicle.planner.Documents = Ext.extend(Ext.grid.EditorGridPanel, {
                 scope:this,
                 handler : actions.Update
             },
+            '-',
+            {
+                icon: _ico("hand"),
+                cls: "x-btn-text-icon",
+                text: _("Capture"),
+                disabled:true,
+                ref: "../btnCapture",
+                scope:this,
+                handler: actions.Capture
+            },
+            {
+                icon: _ico("arrow"),
+                cls: "x-btn-text-icon",
+                text: _("Transfer"),
+                disabled:true,
+                ref: "../btnTransfer",
+                scope:this,
+                handler: actions.Transfer
+            },
             "-",
             {
                 ref: "../btnBriefcase",
@@ -111,7 +130,6 @@ Inprint.fascicle.planner.Documents = Ext.extend(Ext.grid.EditorGridPanel, {
         this.view = new Ext.grid.GroupingView({
             forceFit:true,
             groupTextTpl: '{text} ({[values.rs.length]} {[values.rs.length > 1 ? "Items" : "Item"]})'
-
         });
         
         Ext.apply(this, {
@@ -130,5 +148,44 @@ Inprint.fascicle.planner.Documents = Ext.extend(Ext.grid.EditorGridPanel, {
 
     onRender: function() {
         Inprint.fascicle.planner.Documents.superclass.onRender.apply(this, arguments);
+    },
+    
+    cmpShowBriefcase: function() {
+        
+        //if (!this.dlgShowBriefcase) {
+            
+            this.dlgShowBriefcase = new Ext.Window({
+                title: 'Просмотр портфеля материалов',
+                width: 900, height: 600,
+                draggable:true,
+                layout: "fit",
+                items: new Inprint.fascicle.planner.Briefcase(),
+                buttons:[
+                {
+                    text: _("Add"),
+                    scope:this,
+                    handler: function() {
+                        var grid = this.dlgShowBriefcase.items.first();
+                        Ext.Ajax.request({
+                            url: _url("/documents/move/"),
+                            scope: this,
+                            params: {
+                                fascicle: this.oid,
+                                id: grid.getValues("id")
+                            },
+                            success: function(response, options) {
+                                this.parent.cmpReload();
+                                this.dlgShowBriefcase.hide();
+                            }
+                        });
+                    }
+                },
+                _BTN_WNDW_CANCEL
+            ]
+            });
+        //}
+        
+        this.dlgShowBriefcase.show();
+        
     }
 });

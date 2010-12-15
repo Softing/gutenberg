@@ -266,7 +266,7 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                 
                 Inprint.fascicle.planner.Access(this, this.panels, rsp.fascicle.access);
                 
-                this.cmpCheckSession.defer( 10000, this);
+                this.cmpCheckSession.defer( 50000, this);
             }
         });
     },

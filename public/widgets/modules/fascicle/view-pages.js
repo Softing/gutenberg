@@ -11,7 +11,7 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
                     var items = values[0];
                     
                     var string = '<div class="inprint-plan">';
-                    string += '<div class="inprint-plan-block" style="border:1px dotted silver;">';
+                    string += '<div class="inprint-plan-block">';
                     
                     for (var c=0; c<items.pageorder.length; c++) {
                         
@@ -28,10 +28,18 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
                             if (prevPage && prevPage.num != page.num-1) {
                                 alertclass = "inprint-plan-page-alert-left";
                             }
+                            if (nextPage && nextPage.num != page.num+1) {
+                                alertclass = "inprint-plan-page-alert-right";
+                            }
                         }
+                        
+                        
                         
                         if(page.num && page.num % 2 != 0) {
                             pageclass = "inprint-plan-page-right";
+                            if (prevPage && prevPage.num != page.num-1) {
+                                alertclass = "inprint-plan-page-alert-left";
+                            }
                             if (nextPage && nextPage.num != page.num+1) {
                                 alertclass = "inprint-plan-page-alert-right";
                             }
@@ -102,8 +110,12 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
                         
                         var delimeter = '<div style="clear:both"></div>';
                         delimeter += '</div>';
-                        delimeter += '<div class="inprint-plan-block" style="border:1px dotted silver;">';
-                            
+                        delimeter += '<div class="inprint-plan-block">';
+                        
+                        if(nextPage && page.num && nextPage.num != page.num + 1) {
+                            string += delimeter;
+                        }
+                        
                         if(nextPage && page.num && page.num % 2 != 0) {
                             string += delimeter;
                         }
