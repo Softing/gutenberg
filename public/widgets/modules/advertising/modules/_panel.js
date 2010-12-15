@@ -3,8 +3,8 @@ Inprint.advert.modules.Main = Ext.extend(Ext.Panel, {
     initComponent: function() {
 
         this.panels = {};
-        this.panels["places"]  = new Inprint.advert.modules.Places();
-        this.panels["modules"] = new Inprint.advert.modules.Grid();
+        this.panels["editions"]  = new Inprint.advert.modules.Editions();
+        this.panels["pages"] = new Inprint.advert.modules.Grid();
 
         Ext.apply(this, {
             layout: "border",
@@ -17,14 +17,14 @@ Inprint.advert.modules.Main = Ext.extend(Ext.Panel, {
                     split: true,
                     layout:"fit",
                     margins: "3 0 3 3",
-                    items: this.panels["places"]
+                    items: this.panels["editions"]
                 },
                 {
                     region: "center",
                     border:false,
                     margins: "3 3 3 0",
                     layout:"fit",
-                    items: this.panels["modules"]
+                    items: this.panels["pages"]
                 }
             ]
         });

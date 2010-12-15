@@ -1,4 +1,4 @@
-Inprint.advert.modules.Grid = Ext.extend(Ext.grid.GridPanel, {
+Inprint.advert.index.Grid = Ext.extend(Ext.grid.GridPanel, {
 
     initComponent: function() {
 
@@ -101,28 +101,24 @@ Inprint.advert.modules.Grid = Ext.extend(Ext.grid.GridPanel, {
             autoExpandColumn: "description"
         });
 
-        Inprint.advert.modules.Grid.superclass.initComponent.apply(this, arguments);
+        Inprint.advert.index.Grid.superclass.initComponent.apply(this, arguments);
 
     },
 
     onRender: function() {
-        Inprint.advert.modules.Grid.superclass.onRender.apply(this, arguments);
+        Inprint.advert.index.Grid.superclass.onRender.apply(this, arguments);
     },
     
     
     cmpCreate: function() {
-        var win = this.components["create-window"];
 
+        var win = this.components["create-window"];
         if (!win) {
 
-            var form = {
-                
-                xtype: "form",
-                
-                url: this.urls.create,
+            var form = new Ext.FormPanel({
+                url: this.urls["create"],
                 frame:false,
                 border:false,
-                
                 labelWidth: 75,
                 defaults: {
                     anchor: "100%",
@@ -130,173 +126,63 @@ Inprint.advert.modules.Grid = Ext.extend(Ext.grid.GridPanel, {
                 },
                 bodyStyle: "padding:5px 5px",
                 items: [
-                    _FLD_HDN_FASCICLE,
-                    _FLD_HDN_HEADLINE,
+                    _FLD_HDN_PLACE,
                     _FLD_TITLE,
                     _FLD_SHORTCUT,
-                    _FLD_DESCRIPTION
-                ],
-                listeners: {
-                    scope:this,
-                    beforeaction: function(form, action) {
-                        var swf = this.components["add-window"].findByType("flash")[0].swf;
-                        
-                        var id = Ext.getCmp(this.components["add-window"].getId()).form.getId();
-                        
-                        var get = function () {
-                            swf.get("Inprint.flash.Proxy.setGrid", id);
-                        }
-                        get.defer(100);
-                        //alert(2);
-                    }
-                },
-                keys: [ _KEY_ENTER_SUBMIT ]
-            };
-
-            var flash =  {
-                xtype: "flash",
-                swfWidth:380,
-                swfHeight:360,
-                hideMode : 'offsets',
-                url      : '/flash/Grid.swf',
-                expressInstall: true,
-                flashVars: {
-                    src: '/flash/Grid.swf',
-                    scale :'noscale',
-                    autostart: 'yes',
-                    loop: 'yes'
-                },
-                listeners: {
-                    scope:this,
-                    initialize: function(panel, flash) {
-                        alert(2);
+                    _FLD_DESCRIPTION,
+                    {
+                        xtype: "textfield",
+                        allowBlank:false,
+                        name: "amount",
+                        fieldLabel: _("Amount")
                     },
-                    afterrender: function(panel) {
-                        var init = function () {
-                            panel.swf.init(panel.getSwfId(), "letter", 0, 0);
-                        };
-                        init.defer(300);
-                    }
-                }
-            };
-            
-            win = new Ext.Window({
-                title: _("Adding a new category"),
-                closeAction: "hide",
-                width:700,
-                height:500,
-                layout: "border",
-                defaults: {
-                    collapsible: false,
-                    split: true
-                },
-                items: [
-                    {   region: "center",
-                        margins: "3 0 3 3",
-                        layout:"fit",
-                        items: form
+                    {
+                        xtype: "textfield",
+                        allowBlank:false,
+                        name: "volume",
+                        fieldLabel: _("Volume")
                     },
-                    {   region:"east",
-                        margins: "3 3 3 0",
-                        width: 380,
-                        minSize: 200,
-                        maxSize: 600,
-                        layout:"fit",
-                        collapseMode: 'mini',
-                        items: flash
+                    {
+                        xtype: "textfield",
+                        allowBlank:false,
+                        name: "w",
+                        fieldLabel: _("Width")
+                    },
+                    {
+                        xtype: "textfield",
+                        allowBlank:false,
+                        name: "h",
+                        fieldLabel: _("Height")
                     }
                 ],
-                listeners: {
-                    scope:this,
-                    afterrender: function(panel) {
-                        panel.flash = panel.findByType("flash")[0].swf;
-                        panel.form  = panel.findByType("form")[0];
-                    }
-                },
-                buttons: [ _BTN_WNDW_ADD, _BTN_WNDW_CLOSE ]
+                keys: [ _KEY_ENTER_SUBMIT ],
+                buttons: [ _BTN_SAVE,_BTN_CLOSE ]
             });
+
+            win = new Ext.Window({
+                title: _("Create role"),
+                layout: "fit",
+                closeAction: "hide",
+                width:400, height:320,
+                items: form
+            });
+
+            form.on("actioncomplete", function (form, action) {
+                if (action.type == "submit") {
+                    win.hide();
+                    this.cmpReload();
+                }
+            }, this);
+
+            this.components["create-window"] = win;
         }
 
-        //var form = win.items.first().getForm();
-        //form.reset();
-        //
-        //form.findField("fascicle").setValue(this.parent.fascicle);
-        //form.findField("headline").setValue(this.parent.headline);
-
-        win.show(this);
-        this.components["create-window"] = win;
+        var form = win.items.first().getForm();
+        form.reset();
         
-        //var win = this.components["create-window"];
-        //if (!win) {
-        //
-        //    var form = new Ext.FormPanel({
-        //        url: this.urls["create"],
-        //        frame:false,
-        //        border:false,
-        //        labelWidth: 75,
-        //        defaults: {
-        //            anchor: "100%",
-        //            allowBlank:false
-        //        },
-        //        bodyStyle: "padding:5px 5px",
-        //        items: [
-        //            _FLD_HDN_PLACE,
-        //            _FLD_TITLE,
-        //            _FLD_SHORTCUT,
-        //            _FLD_DESCRIPTION,
-        //            {
-        //                xtype: "textfield",
-        //                allowBlank:false,
-        //                name: "amount",
-        //                fieldLabel: _("Amount")
-        //            },
-        //            {
-        //                xtype: "textfield",
-        //                allowBlank:false,
-        //                name: "volume",
-        //                fieldLabel: _("Volume")
-        //            },
-        //            {
-        //                xtype: "textfield",
-        //                allowBlank:false,
-        //                name: "w",
-        //                fieldLabel: _("Width")
-        //            },
-        //            {
-        //                xtype: "textfield",
-        //                allowBlank:false,
-        //                name: "h",
-        //                fieldLabel: _("Height")
-        //            }
-        //        ],
-        //        keys: [ _KEY_ENTER_SUBMIT ],
-        //        buttons: [ _BTN_SAVE,_BTN_CLOSE ]
-        //    });
-        //
-        //    win = new Ext.Window({
-        //        title: _("Create role"),
-        //        layout: "fit",
-        //        closeAction: "hide",
-        //        width:400, height:320,
-        //        items: form
-        //    });
-        //
-        //    form.on("actioncomplete", function (form, action) {
-        //        if (action.type == "submit") {
-        //            win.hide();
-        //            this.cmpReload();
-        //        }
-        //    }, this);
-        //
-        //    this.components["create-window"] = win;
-        //}
-        //
-        //var form = win.items.first().getForm();
-        //form.reset();
-        //
-        //form.findField("place").setValue(this.params["place"]);
-        //
-        //win.show();
+        form.findField("place").setValue(this.params["place"]);
+
+        win.show();
 
     },
 

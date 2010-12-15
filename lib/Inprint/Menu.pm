@@ -78,6 +78,7 @@ sub index
     push @{ $advertising->{menu} }, { id => "advert-requests" };
     push @{ $advertising->{menu} }, { id => "advert-advertisers" };
     push @{ $advertising->{menu} }, { id => "advert-modules" };
+    push @{ $advertising->{menu} }, { id => "advert-index" };
     push @{ $advertising->{menu} }, { id => "advert-archive" };
     
     push @result, $advertising;
@@ -161,17 +162,17 @@ sub index
             description => $fascicle->{shortcut}
         } if $accessLayoutManage;
         
-        push @{ $fascicle_menu->{menu} }, {
-            id  => "fascicle-templates",
-            oid => $fascicle->{id},
-            description => $fascicle->{shortcut}
-        } if $accessLayoutManage;
-        
-        push @{ $fascicle_menu->{menu} }, {
-            id  => "fascicle-modules",
-            oid => $fascicle->{id},
-            description => $fascicle->{shortcut}
-        } if $accessLayoutManage;
+        #push @{ $fascicle_menu->{menu} }, {
+        #    id  => "fascicle-templates",
+        #    oid => $fascicle->{id},
+        #    description => $fascicle->{shortcut}
+        #} if $accessLayoutManage;
+        #
+        #push @{ $fascicle_menu->{menu} }, {
+        #    id  => "fascicle-modules",
+        #    oid => $fascicle->{id},
+        #    description => $fascicle->{shortcut}
+        #} if $accessLayoutManage;
         
         push @result, $fascicle_menu;
         

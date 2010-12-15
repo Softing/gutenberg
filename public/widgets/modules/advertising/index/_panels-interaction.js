@@ -1,12 +1,13 @@
-Inprint.advert.modules.Interaction = function(parent, panels) {
+Inprint.advert.index.Interaction = function(parent, panels) {
 
-    var tree = panels["editions"];
-    var grid = panels["pages"];
+    var tree = panels["places"];
+    var grid = panels["modules"];
 
     // Tree
     tree.getSelectionModel().on("selectionchange", function(sm, node) {
         grid.disable();
-        if (node) {
+        if (node && node.attributes.type == "module") {
+            
             grid.enable();
             grid.cmpLoad({ id: node.attributes.id, type: node.attributes.type });
             grid.params["place"] = node.attributes.id;

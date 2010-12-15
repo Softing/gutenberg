@@ -84,9 +84,9 @@ Inprint.fascicle.templates.Pages = Ext.extend(Ext.grid.GridPanel, {
 
         if (!win) {
 
-            var form = new Ext.FormPanel({
+            var form = {
                 
-                flex: 1,
+                xtype: "form",
                 
                 url: this.urls.create,
                 frame:false,
@@ -105,69 +105,84 @@ Inprint.fascicle.templates.Pages = Ext.extend(Ext.grid.GridPanel, {
                     _FLD_SHORTCUT,
                     _FLD_DESCRIPTION
                 ],
-                keys: [ _KEY_ENTER_SUBMIT ],
-                buttons: [ _BTN_ADD,_BTN_CLOSE ]
-            });
+                listeners: {
+                    scope:this,
+                    beforeaction: function(form, action) {
+                        var swf = this.components["add-window"].findByType("flash")[0].swf;
+                        
+                        var id = Ext.getCmp(this.components["add-window"].getId()).form.getId();
+                        
+                        var get = function () {
+                            swf.get("Inprint.flash.Proxy.setGrid", id);
+                        }
+                        get.defer(100);
+                        //alert(2);
+                    }
+                },
+                keys: [ _KEY_ENTER_SUBMIT ]
+            };
 
-            var flash =  new Ext.FlashComponent({
-                flex:2,
+            var flash =  {
+                xtype: "flash",
+                swfWidth:380,
+                swfHeight:360,
                 hideMode : 'offsets',
                 url      : '/flash/Grid.swf',
                 expressInstall: true,
                 flashVars: {
                     src: '/flash/Grid.swf',
-                    scale :'exactfit',
+                    scale :'noscale',
                     autostart: 'yes',
                     loop: 'yes'
                 },
                 listeners: {
                     scope:this,
-                    render: function(panel, flash) {
-                        alert( panel.getSwfId() );
+                    initialize: function(panel, flash) {
+                        alert(2);
+                    },
+                    afterrender: function(panel) {
+                        var init = function () {
+                            panel.swf.init(panel.getSwfId(), "letter", 0, 0);
+                        };
+                        init.defer(300);
                     }
                 }
-            });
+            };
             
-            //{
-            //    flex:2,
-            //    xtype:"flashpanel",
-            //    mediaCfg: {
-            //        url    : '/flash/Grid.swf',
-            //        style  : { width:'380px', height:'360px' },
-            //        start  : true,
-            //        loop   : true,
-            //        controls :true,
-            //        params: {
-            //            wmode :'opaque',
-            //            scale :'exactfit',
-            //            //salign :'t',
-            //            allowScriptAccess: "sameDomain"
-            //        }
-            //    },
-            //    onFlashInit: function() {
-            //        alert(1);
-            //    },
-            //    listeners: {
-            //        scope:this,
-            //        flashinit: function(panel, flash) {
-            //            alert(2);
-            //        }
-            //    }
-            //};
-
             win = new Ext.Window({
                 title: _("Adding a new category"),
                 closeAction: "hide",
-                width:600, height:400,
-                layout: "hbox",
-                layoutConfig: {
-                    align : 'stretch',
-                    pack  : 'start'
+                width:700,
+                height:500,
+                layout: "border",
+                defaults: {
+                    collapsible: false,
+                    split: true
                 },
                 items: [
-                    form,
-                    flash
-                ]
+                    {   region: "center",
+                        margins: "3 0 3 3",
+                        layout:"fit",
+                        items: form
+                    },
+                    {   region:"east",
+                        margins: "3 3 3 0",
+                        width: 380,
+                        minSize: 200,
+                        maxSize: 600,
+                        layout:"fit",
+                        collapseMode: 'mini',
+                        items: flash
+                    }
+                ],
+                listeners: {
+                    scope:this,
+                    afterrender: function(panel) {
+                        panel.flash = panel.findByType("flash")[0].swf;
+                        panel.form  = panel.findByType("form")[0];
+                    }
+                },
+                buttons: [ _BTN_WNDW_ADD, _BTN_WNDW_CLOSE ]
             });
             
         }
