@@ -335,8 +335,8 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
                     scope:this,
                     beforeaction: function(form, action) {
                         if (action.type == "submit") {
-                            var swf = this.components["create-window"].findByType("flash")[0].swf;
-                            var id = Ext.getCmp(this.components["create-window"].getId()).form.getId();
+                            var swf = this.components["update-window"].findByType("flash")[0].swf;
+                            var id = Ext.getCmp(this.components["update-window"].getId()).form.getId();
                             (function () {
                                 swf.getBlock("Inprint.flash.Proxy.setModule", id, "update_block");
                             }).defer(10);
@@ -345,11 +345,12 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
                     actioncomplete: function (form, action) {
                         if (action.type == "load") {
                             
-                            var swf = this.components["create-window"].findByType("flash")[0].swf;
+                            var swf = this.components["update-window"].findByType("flash")[0].swf;
                             
                             var load = function () {
                                 if (swf.setBlocks) {
                                     var record = action.result.data;
+                                    swf.deleteAllBlocks();
                                     swf.setBlocks( [ { id: "update_block", n:record.shortcut, x: record.x, y: record.y, w: record.w, h: record.h } ] );
                                     swf.editBlock( "update_block", true );
                                 } else {
@@ -361,7 +362,7 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
                             
                         }
                         if (action.type == "submit") {
-                            this.components["create-window"].hide()
+                            this.components["update-window"].hide()
                             this.cmpReload();
                         }
                     }
@@ -446,7 +447,7 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
         }
 
         win.show(this);
-        this.components["create-window"] = win;
+        this.components["update-window"] = win;
 
         var form = win.form.getForm();
         form.reset();
