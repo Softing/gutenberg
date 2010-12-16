@@ -374,12 +374,28 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
                         alert(2);
                     },
                     afterrender: function(panel) {
-                        (function () {
-                            panel.swf.init(panel.getSwfId(), "letter", 0, 0);
-                            if (this.pageW && this.pageH) {
-                                panel.swf.setGrid( this.pageW, this.pageH );
+                        
+                        var init = function () {
+                            alert(1);
+                            if (panel.swf.init) {
+                                panel.swf.init(panel.getSwfId(), "letter", 0, 0);
+                                if (this.pageW && this.pageH) {
+                                    panel.swf.setGrid( this.pageW, this.pageH );
+                                }
+                            } else {
+                                init.defer(100);
                             }
-                        }).defer(600, this);
+                        };
+                        
+                        init.defer(100);
+                        
+                        //(function () {
+                        //    alert(panel.swf.init);
+                        //    panel.swf.init(panel.getSwfId(), "letter", 0, 0);
+                        //    if (this.pageW && this.pageH) {
+                        //        panel.swf.setGrid( this.pageW, this.pageH );
+                        //    }
+                        //}).defer(600, this);
                     }
                 }
             };
