@@ -215,14 +215,22 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
                         alert(2);
                     },
                     afterrender: function(panel) {
-                        (function () {
-                            panel.swf.init(panel.getSwfId(), "letter", 0, 0);
-                            if (this.pageW && this.pageH) {
-                                panel.swf.setGrid( this.pageW, this.pageH );
-                                panel.swf.setBlocks( [ { id: "new_block", n:"New modules", x: "0/1", y: "0/1", w: "0/1", h: "0/1" } ] );
-                                panel.swf.editBlock( "new_block", true );
+                        
+                        var init = function () {
+                            if (panel.swf.init) {
+                                panel.swf.init(panel.getSwfId(), "letter", 0, 0);
+                                if (this.pageW && this.pageH) {
+                                    panel.swf.setGrid( this.pageW, this.pageH );
+                                    panel.swf.setBlocks( [ { id: "new_block", n:"New modules", x: "0/1", y: "0/1", w: "0/1", h: "0/1" } ] );
+                                    panel.swf.editBlock( "new_block", true );
+                                }
+                            } else {
+                                init.defer(100, this);
                             }
-                        }).defer(600, this);
+                        };
+                        
+                        init.defer(100, this);
+                        
                     }
                 }
             };
@@ -339,11 +347,17 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
                             
                             var swf = this.components["create-window"].findByType("flash")[0].swf;
                             
-                            (function () {
-                                var record = action.result.data;
-                                swf.setBlocks( [ { id: "update_block", n:record.shortcut, x: record.x, y: record.y, w: record.w, h: record.h } ] );
-                                swf.editBlock( "update_block", true );
-                            }).defer(600);
+                            var load = function () {
+                                if (swf.setBlocks) {
+                                    var record = action.result.data;
+                                    swf.setBlocks( [ { id: "update_block", n:record.shortcut, x: record.x, y: record.y, w: record.w, h: record.h } ] );
+                                    swf.editBlock( "update_block", true );
+                                } else {
+                                    load.defer(100, this);
+                                }
+                            };
+                            
+                            load.defer(100, this);
                             
                         }
                         if (action.type == "submit") {
@@ -376,26 +390,18 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
                     afterrender: function(panel) {
                         
                         var init = function () {
-                            alert(1);
                             if (panel.swf.init) {
                                 panel.swf.init(panel.getSwfId(), "letter", 0, 0);
                                 if (this.pageW && this.pageH) {
                                     panel.swf.setGrid( this.pageW, this.pageH );
                                 }
                             } else {
-                                init.defer(100);
+                                init.defer(100, this);
                             }
                         };
                         
-                        init.defer(100);
+                        init.defer(100, this);
                         
-                        //(function () {
-                        //    alert(panel.swf.init);
-                        //    panel.swf.init(panel.getSwfId(), "letter", 0, 0);
-                        //    if (this.pageW && this.pageH) {
-                        //        panel.swf.setGrid( this.pageW, this.pageH );
-                        //    }
-                        //}).defer(600, this);
                     }
                 }
             };

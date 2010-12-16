@@ -164,9 +164,17 @@ Inprint.advert.modules.Pages = Ext.extend(Ext.grid.GridPanel, {
                         alert(2);
                     },
                     afterrender: function(panel) {
-                        (function () {
-                            panel.swf.init(panel.getSwfId(), "letter", 0, 0);
-                        }).defer(300);
+                        
+                        var init = function () {
+                            if (panel.swf.init) {
+                                panel.swf.init(panel.getSwfId(), "letter", 0, 0);
+                            } else {
+                                init.defer(100, this);
+                            }
+                        };
+                        
+                        init.defer(100, this);
+                        
                     }
                 }
             };
@@ -261,10 +269,19 @@ Inprint.advert.modules.Pages = Ext.extend(Ext.grid.GridPanel, {
                     },
                     actioncomplete: function (form, action) {
                         if (action.type == "load") {
+                            
                             var swf = this.components["create-window"].findByType("flash")[0].swf;
-                            (function () {
-                                swf.set(action.result.data.w, action.result.data.h);
-                            }).defer(30);
+                            
+                            var load = function () {
+                                if (swf.init) {
+                                    swf.set(action.result.data.w, action.result.data.h);
+                                } else {
+                                    load.defer(100, this);
+                                }
+                            };
+                            
+                            load.defer(100, this);
+                            
                         }
                         if (action.type == "submit") {
                             this.components["create-window"].hide()
@@ -294,10 +311,17 @@ Inprint.advert.modules.Pages = Ext.extend(Ext.grid.GridPanel, {
                         alert(2);
                     },
                     afterrender: function(panel) {
+                        
                         var init = function () {
-                            panel.swf.init(panel.getSwfId(), "letter", 0, 0);
+                            if (panel.swf.init) {
+                                panel.swf.init(panel.getSwfId(), "letter", 0, 0);
+                            } else {
+                                init.defer(100, this);
+                            }
                         };
-                        init.defer(300);
+                        
+                        init.defer(100, this);
+                        
                     }
                 }
             };
