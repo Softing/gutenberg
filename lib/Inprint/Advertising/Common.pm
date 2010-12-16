@@ -90,13 +90,18 @@ sub fascicles {
         
         $sql = "
             (
-                SELECT id, 'edition' as type, id as edition, null as fascicle, shortcut as text, 'blue-folders-stack' as icon,
-                    EXISTS(
-                        SELECT true FROM fascicles WHERE fascicles.edition = editions.id AND is_system = false AND is_enabled = true 
-                    ) as have_childs
-                FROM editions
-                WHERE id <> '00000000-0000-0000-0000-000000000000' AND subpath(path, nlevel(path) - 2, 1)::text = replace(?, '-', '')::text
-                ORDER BY shortcut
+                SELECT edition1.id, 'edition' as type, edition1.id as edition, null as fascicle, edition1.shortcut as text, 'blue-folders-stack' as icon,
+                    (
+                        EXISTS( SELECT * FROM editions WHERE path <@ edition1.path AND id <> edition1.id )
+                        OR
+                        EXISTS( SELECT true FROM fascicles WHERE fascicles.edition = edition1.id AND fascicles.is_system = false AND fascicles.is_enabled = true  )
+                    )
+                    as have_childs
+                FROM editions as edition1
+                WHERE
+                    edition1.id <> '00000000-0000-0000-0000-000000000000'
+                    AND subpath(edition1.path, nlevel(edition1.path) - 2, 1)::text = replace(?, '-', '')::text
+                ORDER BY edition1.shortcut
             ) UNION ALL (
                 SELECT id, 'fascicle' as type, edition, id as fascicle, shortcut as text, 'blue-folder' as icon,
                     false as have_childs
