@@ -64,6 +64,8 @@ sub headlines {
     
     my $result = [];
     
+    my $sql;
+    my @params;
     my @errors;
     my $success = $c->json->false;
     
@@ -76,8 +78,11 @@ sub headlines {
             unless ($edition);
     }
     
-    my $sql;
-    my @params;
+    my $editions = []; unless (@errors) {
+        $editions = $c->sql->Q("
+            SELECT id FROM editions WHERE path @> ? order by path asc; 
+        ", [ $edition->{path} ])->Values;
+    }
     
     unless (@errors) {
         $sql = "
@@ -85,10 +90,10 @@ sub headlines {
                 t1.id, t1.edition, t1.nature, t1.parent, t1.title, t1.shortcut, t1.description, t1.created, t1.updated,
                 EXISTS(SELECT true FROM ad_index WHERE edition=t1.edition AND entity=t1.id) as selected
             FROM index t1
-            WHERE edition=? AND nature='headline'
+            WHERE t1.edition = ANY(?) AND t1.nature='headline'
             ORDER BY shortcut
         ";
-        push @params, $edition->{id};
+        push @params, $editions;
     }
     
     unless (@errors) {
