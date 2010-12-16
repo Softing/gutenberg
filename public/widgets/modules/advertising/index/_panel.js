@@ -63,6 +63,11 @@ Inprint.advert.index.Main = Ext.extend(Ext.Panel, {
         Inprint.advert.index.Access(this, this.panels);
         Inprint.advert.index.Context(this, this.panels);
         Inprint.advert.index.Interaction(this, this.panels);
+    },
+    
+    cmpReload: function() {
+        this.panels["modules"].cmpReload();
+        this.panels["headlines"].cmpReload();
     }
 
 });

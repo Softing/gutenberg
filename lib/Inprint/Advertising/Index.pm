@@ -131,7 +131,7 @@ sub modules {
     unless (@errors) {
         $sql = "
             SELECT
-                t1.id, t1.edition, t1.page, t1.title, t1.shortcut, t1.description, t1.amount, t1.area, t1.x, t1.y, t1.w, t1.h, t1.created, t1.updated,
+                t1.id, t1.edition, t1.page, t1.title, t1.shortcut, t1.description, t1.amount, round(t1.area::numeric, 2) as area, t1.x, t1.y, t1.w, t1.h, t1.created, t1.updated,
                 t2.id as page, t2.shortcut as page_shortcut,
                 EXISTS(SELECT true FROM ad_index WHERE edition=t1.edition AND entity=t1.id) as selected
             FROM ad_modules t1, ad_pages t2
