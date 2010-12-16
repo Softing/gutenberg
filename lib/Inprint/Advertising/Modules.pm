@@ -230,13 +230,25 @@ sub update {
         push @errors, { id => "h", msg => "Incorrectly filled field"}
             unless ($c->is_text($i_h));
     }
-        
+    
+    my $area = 0;
+    my $size_w = 0;
+    my $size_h = 0;
+    
+    my ($w1, $w2) = split '/', $i_w;
+    my ($h1, $h2) = split '/', $i_h;
+    
+    $size_w = $w1/$w2;
+    $size_h = $h1/$h2;
+    
+    $area = $size_w * $size_h;
+    
     unless (@errors) {
         $c->sql->Do("
             UPDATE ad_modules
-                SET title=?, shortcut=?, description=?, amount=?, x=?, y=?, w=?, h=?, updated=now()
+                SET title=?, shortcut=?, description=?, amount=?, area=?, x=?, y=?, w=?, h=?, updated=now()
             WHERE id =?;
-        ", [ $i_title, $i_shortcut, $i_description, $i_amount, $i_x, $i_y, $i_w, $i_h, $i_id ]);
+        ", [ $i_title, $i_shortcut, $i_description, $i_amount, $area, $i_x, $i_y, $i_w, $i_h, $i_id ]);
     }
     
     $success = $c->json->true unless (@errors);
