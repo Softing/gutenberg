@@ -69,7 +69,7 @@ sub list {
     
     unless (@errors) {
         $sql = "
-            SELECT id, edition, page, title, shortcut, description, amount, round(area, 2) as area, x, y, w, h, created, updated
+            SELECT id, edition, page, title, shortcut, description, amount, round(area::numeric, 2) as area, x, y, w, h, created, updated
             FROM ad_modules
             WHERE page=?
             ORDER BY shortcut
