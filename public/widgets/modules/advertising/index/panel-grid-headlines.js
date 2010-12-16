@@ -1,11 +1,11 @@
-Inprint.advert.index.Modules = Ext.extend(Ext.grid.GridPanel, {
+Inprint.advert.index.Headlines = Ext.extend(Ext.grid.GridPanel, {
 
     initComponent: function() {
 
         this.params = {};
         this.components = {};
         this.urls = {
-            "list":      "/advertising/index/modules/",
+            "list":      "/advertising/index/headlines/",
             "save": _url("/advertising/index/save/")
         }
 
@@ -15,13 +15,6 @@ Inprint.advert.index.Modules = Ext.extend(Ext.grid.GridPanel, {
 
         this.columns = [
             this.selectionModel,
-            {
-                id:"page_shortcut",
-                header: _("Page"),
-                width: 150,
-                sortable: true,
-                dataIndex: "page_shortcut"
-            },
             {
                 id:"title",
                 header: _("Title"),
@@ -41,42 +34,6 @@ Inprint.advert.index.Modules = Ext.extend(Ext.grid.GridPanel, {
                 header: _("Description"),
                 sortable: true,
                 dataIndex: "description"
-            },
-            {
-                id:"amount",
-                header: _("Amount"),
-                sortable: true,
-                dataIndex: "amount"
-            },
-            {
-                id:"area",
-                header: _("Area"),
-                sortable: true,
-                dataIndex: "area"
-            },
-            {
-                id:"x",
-                header: _("X"),
-                sortable: true,
-                dataIndex: "x"
-            },
-            {
-                id:"y",
-                header: _("Y"),
-                sortable: true,
-                dataIndex: "y"
-            },
-            {
-                id:"w",
-                header: _("W"),
-                sortable: true,
-                dataIndex: "w"
-            },
-            {
-                id:"h",
-                header: _("H"),
-                sortable: true,
-                dataIndex: "h"
             }
         ];
         
@@ -94,19 +51,18 @@ Inprint.advert.index.Modules = Ext.extend(Ext.grid.GridPanel, {
 
         Ext.apply(this, {
             border: false,
-            disabled:true,
             stripeRows: true,
             columnLines: true,
             sm: this.selectionModel,
             autoExpandColumn: "description"
         });
 
-        Inprint.advert.index.Modules.superclass.initComponent.apply(this, arguments);
+        Inprint.advert.index.Headlines.superclass.initComponent.apply(this, arguments);
 
     },
 
     onRender: function() {
-        Inprint.advert.index.Modules.superclass.onRender.apply(this, arguments);
+        Inprint.advert.index.Headlines.superclass.onRender.apply(this, arguments);
         
         this.getStore().on("load", function() {
             var sm = this.getSelectionModel();
@@ -135,7 +91,7 @@ Inprint.advert.index.Modules = Ext.extend(Ext.grid.GridPanel, {
                         params: {
                             edition: this.parent.edition,
                             entity: this.getValues("id"),
-                            type: "module"
+                            type: "headline"
                         }
                     });
                 }

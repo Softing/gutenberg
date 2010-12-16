@@ -28,10 +28,9 @@ sub read {
             SELECT
                 t1.id,
                 t2.id as edition, t2.shortcut as edition_shortcut,
-                t3.id as fascicle, t3.shortcut as fascicle_shortcut,
                 t1.title, t1.shortcut, t1.description, t1.created, t1.updated
-            FROM ad_places t1, editions t2, fascicles t3
-            WHERE t2.id = t1.edition AND t3.id = t1.fascicle AND t1.id=?
+            FROM ad_places t1, editions t2
+            WHERE t2.id = t1.edition AND t1.id=?
         ", [ $i_id ])->Hash;
     }
     
@@ -44,7 +43,7 @@ sub create {
     
     my $id = $c->uuid();
     
-    my $i_fascicle    = $c->param("fascicle");
+    my $i_edition     = $c->param("edition");
     my $i_title       = $c->param("title");
     my $i_shortcut    = $c->param("shortcut");
     my $i_description = $c->param("description");
@@ -64,25 +63,19 @@ sub create {
     #push @errors, { id => "access", msg => "Not enough permissions"}
     #    unless ($c->access->Check("domain.roles.manage"));
     
-    my $fascicle;
     my $edition;
     
     unless (@errors) {
-        $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
-        push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
-            unless ($fascicle);
-    }
-    unless (@errors) {
-        $edition  = $c->sql->Q(" SELECT * FROM editions WHERE id=? ", [ $fascicle->{edition} ])->Hash;
+        $edition  = $c->sql->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
         push @errors, { id => "edition", msg => "Incorrectly filled field"}
             unless ($edition);
     }
     
     unless (@errors) {
         $c->sql->Do("
-            INSERT INTO ad_places(edition, fascicle, title, shortcut, description, created, updated)
-            VALUES (?, ?, ?, ?, ?, now(), now());
-        ", [ $edition->{id}, $fascicle->{id}, $i_title, $i_shortcut, $i_description ]);
+            INSERT INTO ad_places(edition, title, shortcut, description, created, updated)
+            VALUES (?, ?, ?, ?, now(), now());
+        ", [ $edition->{id}, $i_title, $i_shortcut, $i_description ]);
     }
     
     $success = $c->json->true unless (@errors);

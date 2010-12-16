@@ -1,30 +1,57 @@
 Inprint.advert.index.Main = Ext.extend(Ext.Panel, {
-
+    
     initComponent: function() {
-
+        
+        this.edition = null;
         this.panels = {};
-        this.panels["places"]  = new Inprint.advert.index.Places();
-        this.panels["modules"] = new Inprint.advert.index.Grid();
-
+        
+        this.panels["editions"]  = new Inprint.advert.index.Editions({
+            parent: this
+        });
+        this.panels["modules"]   = new Inprint.advert.index.Modules({
+            parent: this
+        });
+        this.panels["headlines"] = new Inprint.advert.index.Headlines({
+            parent: this
+        });
+        
         Ext.apply(this, {
             layout: "border",
             items: [
                 {
                     region:"west",
-                    width: 300,
+                    width: 200,
                     minSize: 100,
                     maxSize: 600,
                     split: true,
                     layout:"fit",
                     margins: "3 0 3 3",
-                    items: this.panels["places"]
+                    items: this.panels["editions"]
                 },
                 {
-                    region: "center",
                     border:false,
-                    margins: "3 3 3 0",
-                    layout:"fit",
-                    items: this.panels["modules"]
+                    region: "center",
+                    layout: "border",
+                    items: [
+                        {
+                            title: _("Modules"),
+                            region: "center",
+                            margins: "3 3 0 0",
+                            layout:"fit",
+                            items: this.panels["modules"]
+                        },
+                        {
+                            title: _("Headlines"),
+                            region:"south",
+                            height: 300,
+                            minSize: 100,
+                            maxSize: 600,
+                            split: true,
+                            layout:"fit",
+                            margins: "0 3 3 0",
+                            items: this.panels["headlines"]
+                        },
+                    ]
                 }
             ]
         });

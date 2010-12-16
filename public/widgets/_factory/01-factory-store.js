@@ -19,6 +19,8 @@ Inprint.factory.Store = new function() {
 
     var source = {
 
+        "/advertising/index/headlines/":        [ "id", "selected", "title", "shortcut", "description", createDateField("created"), createDateField("updated") ],
+        "/advertising/index/modules/":          [ "id", "selected", "title", "shortcut", "description", "page", "page_shortcut", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
         "/advertising/requests/list/":          [ "id", "serialnum", "title", "shortcut", "status", "payment", "readiness", "edition", "edition_shortcut",  "fascicle", "fascicle_shortcut", "advertiser", "advertiser_shortcut", "place", "place_shortcut", "manager", "manager_shortcut", "x", "y", "h", "w", "seqnum", createDateField("created"), createDateField("updated") ],
         "/advertising/advertisers/list/":       [ "id", "serialnum", "edition", "edition_shortcut", "title", "shortcut", "description", "address", "contact", "phones", "inn", "kpp", "bank", "rs", "ks", "bik", createDateField("created"), createDateField("updated") ],
         "/advertising/pages/list/":             [ "id", "edition", "title", "shortcut", "description", "w", "h", createDateField("created"), createDateField("updated") ],

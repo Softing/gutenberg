@@ -1,27 +1,30 @@
 Inprint.advert.index.Interaction = function(parent, panels) {
 
-    var tree = panels["places"];
-    var grid = panels["modules"];
+    var editions  = panels["editions"];
+    var modules   = panels["modules"];
+    var headlines = panels["headlines"];
 
     // Tree
-    tree.getSelectionModel().on("selectionchange", function(sm, node) {
-        grid.disable();
-        if (node && node.attributes.type == "module") {
-            
-            grid.enable();
-            grid.cmpLoad({ id: node.attributes.id, type: node.attributes.type });
-            grid.params["place"] = node.attributes.id;
+    editions.getSelectionModel().on("selectionchange", function(sm, node) {
+        modules.disable();
+        headlines.disable();
+        
+        if (node && node.attributes.type == "place") {
+            parent.edition = node.attributes.edition;
+            modules.enable();
+            modules.cmpLoad({ edition: node.attributes.edition });
+            headlines.enable();
+            headlines.cmpLoad({ edition: node.attributes.edition });
         }
     });
 
     //Grids
-    grid.getSelectionModel().on("selectionchange", function(sm) {
-        _disable(grid.btnUpdate, grid.btnDelete);
-        if (sm.getCount() == 1) {
-            _enable(grid.btnUpdate, grid.btnDelete);
-        } else if (sm.getCount() > 1) {
-            _enable(grid.btnDelete);
-        }
+    modules.getSelectionModel().on("selectionchange", function(sm) {
+        _enable(modules.btnSave);
+    }, parent);
+    
+    headlines.getSelectionModel().on("selectionchange", function(sm) {
+        _enable(headlines.btnSave);
     }, parent);
 
 }

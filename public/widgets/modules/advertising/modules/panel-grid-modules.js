@@ -181,9 +181,9 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
                     beforeaction: function(form, action) {
                         var swf = this.components["create-window"].findByType("flash")[0].swf;
                         var id = Ext.getCmp(this.components["create-window"].getId()).form.getId();
-                        //(function () {
+                        (function () {
                         //    swf.get("Inprint.flash.Proxy.setGrid", id);
-                        //}).defer(10);
+                        }).defer(10);
                     },
                     actioncomplete: function (form, action) {
                         if (action.type == "submit") {
@@ -215,11 +215,14 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
                     },
                     afterrender: function(panel) {
                         (function () {
+                            //alert(this.pageW +'-'+ this.pageH);
                             panel.swf.init(panel.getSwfId(), "letter", 0, 0);
                             if (this.pageW && this.pageH) {
-                                panel.swf.setGrid( this.pageW, this.pageH ); 
+                                panel.swf.setGrid( this.pageW, this.pageH );
+                            //    panel.swf.setBlocks( [ { id: "new", n:"New modules", x: "1/1", y: "1/1", w: "1/1", h: "1/1" } ] );
+                            //    panel.swf.editBlock( "new", true );
                             }
-                        }).defer(300, this);
+                        }).defer(600, this);
                     }
                 }
             };

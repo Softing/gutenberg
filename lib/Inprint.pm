@@ -85,14 +85,19 @@ sub startup {
 
     # Advertising
     
-    $self->createRoutes($sessionBridge, "advertising/common",       [ "editions", "fascicles", "places" ]);
-    $self->createRoutes($sessionBridge, "advertising/combo",        [ "advertisers", "managers", "fascicles", "places", "modules" ]);
-    $self->createRoutes($sessionBridge, "advertising/requests",     [ "list", "create", "read", "update", "delete" ]);
-    $self->createRoutes($sessionBridge, "advertising/advertisers",  [ "list", "create", "read", "update", "delete" ]);
-    $self->createRoutes($sessionBridge, "advertising/places",       [ "list", "create", "read", "update", "delete" ]);
-    $self->createRoutes($sessionBridge, "advertising/pages",        [ "list", "create", "read", "update", "delete" ]);
-    $self->createRoutes($sessionBridge, "advertising/modules",      [ "list", "create", "read", "update", "delete" ]);
     $self->createRoutes($sessionBridge, "advertising/archive",      [ "list" ]);
+    $self->createRoutes($sessionBridge, "advertising/advertisers",  [ "list", "create", "read", "update", "delete" ]);
+    $self->createRoutes($sessionBridge, "advertising/common",       [ "editions", "fascicles", "places" ]);
+    #$self->createRoutes($sessionBridge, "advertising/common/tree",  [ "editions", "fascicles", "places" ]);
+    #$self->createRoutes($sessionBridge, "advertising/common/grid",  [ "headlines", "modules" ]);
+    $self->createRoutes($sessionBridge, "advertising/combo",        [ "advertisers", "managers", "fascicles", "places", "modules" ]);
+    $self->createRoutes($sessionBridge, "advertising/index",        [ "headlines", "modules", "save" ]);
+    $self->createRoutes($sessionBridge, "advertising/modules",      [ "list", "create", "read", "update", "delete" ]);
+    $self->createRoutes($sessionBridge, "advertising/pages",        [ "list", "create", "read", "update", "delete" ]);
+    $self->createRoutes($sessionBridge, "advertising/places",       [ "list", "create", "read", "update", "delete" ]);
+    $self->createRoutes($sessionBridge, "advertising/requests",     [ "list", "create", "read", "update", "delete" ]);
+    
+    
 
     # Calendar routes
     $self->createRoutes($sessionBridge, "calendar",                 [ "create", "read", "update", "delete", "list", "tree", "enable", "disable" ]);

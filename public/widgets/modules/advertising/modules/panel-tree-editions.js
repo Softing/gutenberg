@@ -1,13 +1,13 @@
 Inprint.advert.modules.Editions = Ext.extend(Ext.tree.TreePanel, {
-
+    
     initComponent: function() {
-
+        
         this.components = {};
-
+        
         this.urls = {
             "tree":    _url("/advertising/common/editions/")
         };
-
+        
         Ext.apply(this, {
             title:_("Editions"),
             autoScroll:true,
@@ -23,29 +23,28 @@ Inprint.advert.modules.Editions = Ext.extend(Ext.tree.TreePanel, {
                 text: _("Editions")
             }
         });
-
+        
         Inprint.advert.modules.Editions.superclass.initComponent.apply(this, arguments);
-
+        
         this.on("beforeappend", function(tree, parent, node) {
             node.attributes.icon = _ico(node.attributes.icon);
         });
-
+        
     },
-
+    
     onRender: function() {
-
+        
         Inprint.advert.modules.Editions.superclass.onRender.apply(this, arguments);
-
-        //this.getRootNode().expand();
-        //
+        
         this.getRootNode().on("expand", function(node) {
-            node.firstChild.expand();
-            node.firstChild.select();
+            if (node.firstChild) {
+                node.firstChild.select();
+            }
         });
         
         this.getLoader().on("beforeload", function() { this.body.mask(_("Loading")); }, this);
         this.getLoader().on("load", function() { this.body.unmask(); }, this);
-
+        
     }
-
+    
 });

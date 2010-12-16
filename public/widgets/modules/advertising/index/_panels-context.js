@@ -1,6 +1,6 @@
 Inprint.advert.index.Context = function(parent, panels) {
 
-    var tree = panels["places"];
+    var tree = panels["editions"];
 
     tree.on("contextmenu", function(node) {
         
@@ -12,7 +12,7 @@ Inprint.advert.index.Context = function(parent, panels) {
         var disabled = false;
         var items = [];
         
-        if (nodetype == 'fascicle') {
+        if (nodetype == 'edition') {
             items.push({
                 icon: _ico("zone--plus"),
                 cls: "x-btn-text-icon",
