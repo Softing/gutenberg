@@ -29,15 +29,23 @@ Inprint.flash.Proxy = {
             if (form.baseParams) {
                 if(hash.x) {
                     form.baseParams["x"] = hash.x;
+                } else {
+                    alert ("Can't find x!");
                 }
                 if(hash.y) {
                     form.baseParams["y"] = hash.y;
+                } else {
+                    alert ("Can't find y!");
                 }
                 if(hash.w) {
                     form.baseParams["w"] = hash.w;
+                } else {
+                    alert ("Can't find w!");
                 }
                 if(hash.h) {
                     form.baseParams["h"] = hash.h;
+                } else {
+                    alert ("Can't find h!");
                 }
             } else {
                 alert("Can't find form baseParams!");
