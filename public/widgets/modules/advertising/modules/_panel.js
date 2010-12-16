@@ -65,6 +65,11 @@ Inprint.advert.modules.Main = Ext.extend(Ext.Panel, {
         Inprint.advert.modules.Access(this, this.panels);
         Inprint.advert.modules.Context(this, this.panels);
         Inprint.advert.modules.Interaction(this, this.panels);
+    },
+    
+    cmpReload: function() {
+        this.panels["pages"].cmpReload();
+        this.panels["modules"].cmpReload();
     }
 
 });
