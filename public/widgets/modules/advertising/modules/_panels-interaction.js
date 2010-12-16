@@ -32,7 +32,9 @@ Inprint.advert.modules.Interaction = function(parent, panels) {
             modules.pageW  = pages.getValue("w");
             modules.pageH  = pages.getValue("h");
             
-            if (modules.pageId && modules.pageW.length > 1 && modules.pageH.length > 1) {
+            
+            
+            if (modules.pageId && modules.pageW.length > 0 && modules.pageH.length > 0) {
                 modules.btnCreate.enable();
             }
             

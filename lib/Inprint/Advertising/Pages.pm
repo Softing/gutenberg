@@ -77,8 +77,8 @@ sub create {
     my $i_shortcut    = $c->param("shortcut");
     my $i_description = $c->param("description");
     
-    my @i_w      = $c->param("w");
-    my @i_h      = $c->param("h");
+    my @i_w      = $c->param("w") || [ "1/1" ];
+    my @i_h      = $c->param("h") || [ "1/1" ];
     
     my @errors;
     my $success = $c->json->false;
@@ -179,6 +179,7 @@ sub delete {
         foreach my $id (@ids) {
             if ($c->is_uuid($id)) {
                 $c->sql->Do(" DELETE FROM ad_pages WHERE id=? ", [ $id ]);
+                $c->sql->Do(" DELETE FROM ad_modules WHERE page=? ", [ $id ]);
             }
         }
     }
