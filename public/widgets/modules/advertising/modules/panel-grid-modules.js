@@ -298,8 +298,7 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
                 labelWidth: 75,
                 url: this.urls["update"],
                 bodyStyle: "padding:5px 5px",
-                baseParams: {
-                },
+                baseParams: {},
                 defaults: {
                     anchor: "100%",
                     allowBlank:false
@@ -337,9 +336,9 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
                         if (action.type == "submit") {
                             var swf = this.components["update-window"].findByType("flash")[0].swf;
                             var id = Ext.getCmp(this.components["update-window"].getId()).form.getId();
-                            (function () {
+                            //(function () {
                                 swf.getBlock("Inprint.flash.Proxy.setModule", id, "update_block");
-                            }).defer(10);
+                            //}).defer(10);
                         }
                     },
                     actioncomplete: function (form, action) {

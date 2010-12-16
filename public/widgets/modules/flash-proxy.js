@@ -13,8 +13,8 @@ Inprint.flash.Proxy = {
         var form = Ext.getCmp(panel).getForm();
         if (form) {
             if (form.baseParams) {
-                form.baseParams["w"] = hash.w;
-                form.baseParams["h"] = hash.h;
+                form.baseParams["w"] = w;
+                form.baseParams["h"] = h;
             } else {
                 alert("Can't find form baseParams!");
             }
@@ -27,10 +27,18 @@ Inprint.flash.Proxy = {
         var form = Ext.getCmp(panel).getForm();
         if (form) {
             if (form.baseParams) {
-                form.baseParams["x"] = hash.x;
-                form.baseParams["y"] = hash.y;
-                form.baseParams["w"] = hash.w;
-                form.baseParams["h"] = hash.h;
+                if(hash.x) {
+                    form.baseParams["x"] = hash.x;
+                }
+                if(hash.y) {
+                    form.baseParams["y"] = hash.y;
+                }
+                if(hash.w) {
+                    form.baseParams["w"] = hash.w;
+                }
+                if(hash.h) {
+                    form.baseParams["h"] = hash.h;
+                }
             } else {
                 alert("Can't find form baseParams!");
             }

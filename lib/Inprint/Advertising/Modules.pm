@@ -59,7 +59,7 @@ sub list {
     }
     
     my $page; unless (@errors) {
-        $page  = $c->sql->Q(" SELECT * FROM ad_pages WHERE id=? ", [ $i_page ])->Hash;
+        $page  = $c->sql->Q(" SELECT * FROM ad_pages WHERE id=?", [ $i_page ])->Hash;
         push @errors, { id => "page", msg => "Incorrectly filled field"}
             unless ($page);
     }
@@ -71,7 +71,8 @@ sub list {
         $sql = "
             SELECT id, edition, page, title, shortcut, description, amount, area, x, y, w, h, created, updated
             FROM ad_modules
-            WHERE page=?;
+            WHERE page=?
+            ORDER BY shortcut
         ";
         push @params, $page->{id};
     }
