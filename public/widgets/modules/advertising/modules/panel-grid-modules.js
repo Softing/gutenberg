@@ -147,6 +147,7 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
                     anchor: "100%",
                     allowBlank:false
                 },
+                baseParams: {},
                 items: [
                     
                     _FLD_HDN_EDITION,
@@ -182,7 +183,7 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
                         var swf = this.components["create-window"].findByType("flash")[0].swf;
                         var id = Ext.getCmp(this.components["create-window"].getId()).form.getId();
                         (function () {
-                        //    swf.get("Inprint.flash.Proxy.setGrid", id);
+                            swf.getBlock("Inprint.flash.Proxy.setModule", id, "new_block");
                         }).defer(10);
                     },
                     actioncomplete: function (form, action) {
@@ -215,12 +216,11 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
                     },
                     afterrender: function(panel) {
                         (function () {
-                            //alert(this.pageW +'-'+ this.pageH);
                             panel.swf.init(panel.getSwfId(), "letter", 0, 0);
                             if (this.pageW && this.pageH) {
                                 panel.swf.setGrid( this.pageW, this.pageH );
-                            //    panel.swf.setBlocks( [ { id: "new", n:"New modules", x: "1/1", y: "1/1", w: "1/1", h: "1/1" } ] );
-                            //    panel.swf.editBlock( "new", true );
+                                panel.swf.setBlocks( [ { id: "new_block", n:"New modules", x: "0/1", y: "0/1", w: "0/1", h: "0/1" } ] );
+                                panel.swf.editBlock( "new_block", true );
                             }
                         }).defer(600, this);
                     }
@@ -291,7 +291,6 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
                 url: this.urls["update"],
                 bodyStyle: "padding:5px 5px",
                 baseParams: {
-                    edition: this.parent.edition
                 },
                 defaults: {
                     anchor: "100%",
@@ -299,9 +298,30 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
                 },
                 items: [
                     _FLD_HDN_ID,
+                    
+                    {
+                        xtype: "titlefield",
+                        value: _("Basic options")
+                    },
+                    
                     _FLD_SHORTCUT,
                     _FLD_TITLE,
-                    _FLD_DESCRIPTION
+                    _FLD_DESCRIPTION,
+                    
+                    {
+                        xtype: "titlefield",
+                        value: _("More options")
+                    },
+                    
+                    {
+                        xtype: "numberfield",
+                        allowBlank:false,
+                        allowDecimals:false,
+                        minValue: 1,
+                        name: "amount",
+                        value: 1,
+                        fieldLabel: _("Amount")
+                    }
                 ],
                 listeners: {
                     scope:this,
@@ -309,17 +329,22 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
                         if (action.type == "submit") {
                             var swf = this.components["create-window"].findByType("flash")[0].swf;
                             var id = Ext.getCmp(this.components["create-window"].getId()).form.getId();
-                            //(function () {
-                            //    swf.get("Inprint.flash.Proxy.setGrid", id);
-                            //}).defer(10);
+                            (function () {
+                                swf.getBlock("Inprint.flash.Proxy.setModule", id, "update_block");
+                            }).defer(10);
                         }
                     },
                     actioncomplete: function (form, action) {
                         if (action.type == "load") {
+                            
                             var swf = this.components["create-window"].findByType("flash")[0].swf;
+                            
                             (function () {
-                                swf.set(action.result.data.w, action.result.data.h);
-                            }).defer(30);
+                                var record = action.result.data;
+                                swf.setBlocks( [ { id: "update_block", n:record.shortcut, x: record.x, y: record.y, w: record.w, h: record.h } ] );
+                                swf.editBlock( "update_block", true );
+                            }).defer(600);
+                            
                         }
                         if (action.type == "submit") {
                             this.components["create-window"].hide()
@@ -352,9 +377,9 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
                         (function () {
                             panel.swf.init(panel.getSwfId(), "letter", 0, 0);
                             if (this.pageW && this.pageH) {
-                                panel.swf.setGrid( this.pageW, this.pageH ); 
+                                panel.swf.setGrid( this.pageW, this.pageH );
                             }
-                        }).defer(300, this);
+                        }).defer(600, this);
                     }
                 }
             };
@@ -409,9 +434,6 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
             scope:this,
             params: {
                 id: this.getValue("id")
-            },
-            failure: function(form, action) {
-                Ext.Msg.alert("Load failed", action.result.errorMessage);
             }
         });
         

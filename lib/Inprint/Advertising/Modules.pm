@@ -181,10 +181,13 @@ sub update {
     my $i_shortcut    = $c->param("shortcut");
     my $i_description = $c->param("description");
     
-    my $i_amount = $c->param("amount");
-    my $i_volume = $c->param("volume");
-    my $i_w      = $c->param("w");
-    my $i_h      = $c->param("h");
+    my $i_amount      = $c->param("amount") // 1;
+    
+    my $i_x           = $c->param("x") // "1/1";
+    my $i_y           = $c->param("y") // "1/1";
+    
+    my $i_w           = $c->param("w") // "1/1";
+    my $i_h           = $c->param("h") // "1/1";
 
     my @errors;
     my $success = $c->json->false;
@@ -207,21 +210,32 @@ sub update {
     push @errors, { id => "amount", msg => "Incorrectly filled field"}
         unless ($c->is_int($i_amount));
     
-    push @errors, { id => "amount", msg => "Incorrectly filled field"}
-        unless ($c->is_float($i_volume));
-        
-    push @errors, { id => "width", msg => "Incorrectly filled field"}
-        unless ($c->is_int($i_w));
-        
-    push @errors, { id => "height", msg => "Incorrectly filled field"}
-        unless ($c->is_int($i_h));
+    if ($i_x) {
+        push @errors, { id => "x", msg => "Incorrectly filled field"}
+            unless ($c->is_text($i_x));
+    }
+    
+    if ($i_y) {
+        push @errors, { id => "y", msg => "Incorrectly filled field"}
+            unless ($c->is_text($i_y));
+    }
+    
+    if ($i_w) {
+        push @errors, { id => "w", msg => "Incorrectly filled field"}
+            unless ($c->is_text($i_w));
+    }
+    
+    if ($i_h) {
+        push @errors, { id => "h", msg => "Incorrectly filled field"}
+            unless ($c->is_text($i_h));
+    }
         
     unless (@errors) {
         $c->sql->Do("
             UPDATE ad_modules
-                SET title=?, shortcut=?, description=?, amount=?, volume=?, w=?, h=?, updated=now()
+                SET title=?, shortcut=?, description=?, amount=?, x=?, y=?, w=?, h=?, updated=now()
             WHERE id =?;
-        ", [ $i_title, $i_shortcut, $i_description, $i_amount, $i_volume, $i_w, $i_h, $i_id ]);
+        ", [ $i_title, $i_shortcut, $i_description, $i_amount, $i_x, $i_y, $i_w, $i_h, $i_id ]);
     }
     
     $success = $c->json->true unless (@errors);
