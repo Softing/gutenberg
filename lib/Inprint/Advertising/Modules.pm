@@ -158,6 +158,16 @@ sub create {
     }
     
     my $area = 0;
+    my $size_w = 0;
+    my $size_h = 0;
+    
+    my ($w1, $w2) = split '/', $i_w;
+    my ($h1, $h2) = split '/', $i_h;
+    
+    $size_w = $w1/$w2;
+    $size_h = $h1/$h2;
+    
+    $area = $size_w * $size_h * $i_amount;
     
     unless (@errors) {
         $c->sql->Do("
@@ -241,7 +251,7 @@ sub update {
     $size_w = $w1/$w2;
     $size_h = $h1/$h2;
     
-    $area = $size_w * $size_h;
+    $area = $size_w * $size_h * $i_amount;
     
     unless (@errors) {
         $c->sql->Do("
