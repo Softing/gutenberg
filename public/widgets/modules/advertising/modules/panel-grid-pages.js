@@ -1,22 +1,18 @@
-Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
+Inprint.advert.modules.Pages = Ext.extend(Ext.grid.GridPanel, {
 
     initComponent: function() {
-        
-        this.pageId = null;
-        this.pageW  = null;
-        this.pageH  = null;
-        
+
         this.params = {};
         this.components = {};
         
         this.urls = {
-            "list":        "/advertising/modules/list/",
-            "create": _url("/advertising/modules/create/"),
-            "read":   _url("/advertising/modules/read/"),
-            "update": _url("/advertising/modules/update/"),
-            "delete": _url("/advertising/modules/delete/")
+            "list":        "/advertising/pages/list/",
+            "create": _url("/advertising/pages/create/"),
+            "read":   _url("/advertising/pages/read/"),
+            "update": _url("/advertising/pages/update/"),
+            "delete": _url("/advertising/pages/delete/")
         }
-
+        
         this.store = Inprint.factory.Store.json(this.urls["list"]);
         
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
@@ -42,30 +38,6 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
                 header: _("Description"),
                 sortable: true,
                 dataIndex: "description"
-            },
-            {
-                id:"amount",
-                header: _("Amount"),
-                sortable: true,
-                dataIndex: "amount"
-            },
-            {
-                id:"area",
-                header: _("Area"),
-                sortable: true,
-                dataIndex: "area"
-            },
-            {
-                id:"x",
-                header: _("X"),
-                sortable: true,
-                dataIndex: "x"
-            },
-            {
-                id:"y",
-                header: _("Y"),
-                sortable: true,
-                dataIndex: "y"
             },
             {
                 id:"w",
@@ -121,12 +93,12 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
             autoExpandColumn: "description"
         });
 
-        Inprint.advert.modules.Modules.superclass.initComponent.apply(this, arguments);
+        Inprint.advert.modules.Pages.superclass.initComponent.apply(this, arguments);
 
     },
 
     onRender: function() {
-        Inprint.advert.modules.Modules.superclass.onRender.apply(this, arguments);
+        Inprint.advert.modules.Pages.superclass.onRender.apply(this, arguments);
     },
     
     
@@ -137,7 +109,7 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
 
             var form = {
                 xtype: "form",
-                modal:true,
+                
                 frame:false,
                 border:false,
                 labelWidth: 75,
@@ -148,42 +120,20 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
                     allowBlank:false
                 },
                 items: [
-                    
-                    _FLD_HDN_EDITION,
-                    _FLD_HDN_PAGE,
-                    
-                    {
-                        xtype: "titlefield",
-                        value: _("Basic options")
-                    },
-                    
+                    _FLD_HDN_FASCICLE,
+                    _FLD_HDN_HEADLINE,
                     _FLD_SHORTCUT,
                     _FLD_TITLE,
-                    _FLD_DESCRIPTION,
-                    
-                    {
-                        xtype: "titlefield",
-                        value: _("More options")
-                    },
-                    
-                    {
-                        xtype: "numberfield",
-                        allowBlank:false,
-                        allowDecimals:false,
-                        minValue: 1,
-                        name: "amount",
-                        value: 1,
-                        fieldLabel: _("Amount")
-                    }
+                    _FLD_DESCRIPTION
                 ],
                 listeners: {
                     scope:this,
                     beforeaction: function(form, action) {
                         var swf = this.components["create-window"].findByType("flash")[0].swf;
                         var id = Ext.getCmp(this.components["create-window"].getId()).form.getId();
-                        //(function () {
-                        //    swf.get("Inprint.flash.Proxy.setGrid", id);
-                        //}).defer(10);
+                        (function () {
+                            swf.get("Inprint.flash.Proxy.setGrid", id);
+                        }).defer(10);
                     },
                     actioncomplete: function (form, action) {
                         if (action.type == "submit") {
@@ -194,16 +144,16 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
                 },
                 keys: [ _KEY_ENTER_SUBMIT ]
             };
-            
+
             var flash =  {
                 xtype: "flash",
                 swfWidth:380,
                 swfHeight:360,
                 hideMode : 'offsets',
-                url      : '/flash/Dispose.swf',
+                url      : '/flash/Grid.swf',
                 expressInstall: true,
                 flashVars: {
-                    src: '/flash/Dispose.swf',
+                    src: '/flash/Grid.swf',
                     scale :'noscale',
                     autostart: 'yes',
                     loop: 'yes'
@@ -216,10 +166,7 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
                     afterrender: function(panel) {
                         (function () {
                             panel.swf.init(panel.getSwfId(), "letter", 0, 0);
-                            if (this.pageW && this.pageH) {
-                                panel.swf.setGrid( this.pageW, this.pageH ); 
-                            }
-                        }).defer(300, this);
+                        }).defer(300);
                     }
                 }
             };
@@ -267,12 +214,11 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
         this.components["create-window"] = win;
         
         var form = win.form.getForm();
-        
         form.reset();
         
-        form.findField("edition").setValue(this.parent.edition);
-        form.findField("page").setValue(this.pageId);
-        
+        form.baseParams = {
+            edition: this.parent.edition
+        };
     },
 
     cmpUpdate: function() {
@@ -296,6 +242,8 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
                 },
                 items: [
                     _FLD_HDN_ID,
+                    _FLD_HDN_FASCICLE,
+                    _FLD_HDN_HEADLINE,
                     _FLD_SHORTCUT,
                     _FLD_TITLE,
                     _FLD_DESCRIPTION
@@ -306,9 +254,9 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
                         if (action.type == "submit") {
                             var swf = this.components["create-window"].findByType("flash")[0].swf;
                             var id = Ext.getCmp(this.components["create-window"].getId()).form.getId();
-                            //(function () {
-                            //    swf.get("Inprint.flash.Proxy.setGrid", id);
-                            //}).defer(10);
+                            (function () {
+                                swf.get("Inprint.flash.Proxy.setGrid", id);
+                            }).defer(10);
                         }
                     },
                     actioncomplete: function (form, action) {
@@ -332,10 +280,10 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
                 swfWidth:380,
                 swfHeight:360,
                 hideMode : 'offsets',
-                url      : '/flash/Dispose.swf',
+                url      : '/flash/Grid.swf',
                 expressInstall: true,
                 flashVars: {
-                    src: '/flash/Dispose.swf',
+                    src: '/flash/Grid.swf',
                     scale :'noscale',
                     autostart: 'yes',
                     loop: 'yes'
@@ -346,12 +294,10 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
                         alert(2);
                     },
                     afterrender: function(panel) {
-                        (function () {
+                        var init = function () {
                             panel.swf.init(panel.getSwfId(), "letter", 0, 0);
-                            if (this.pageW && this.pageH) {
-                                panel.swf.setGrid( this.pageW, this.pageH ); 
-                            }
-                        }).defer(300, this);
+                        };
+                        init.defer(300);
                     }
                 }
             };

@@ -61,6 +61,12 @@ _FLD_HDN_PLACE = {
     allowBlank:false
 };
 
+_FLD_HDN_PAGE = {
+    xtype: "hidden",
+    name: "page",
+    allowBlank:false
+};
+
 _FLD_HDN_HEADLINE = {
     xtype: "hidden",
     name: "headline",

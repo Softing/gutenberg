@@ -25,15 +25,9 @@ sub read {
     
     unless (@errors) {
         $result = $c->sql->Q("
-            SELECT
-                t1.id,
-                t2.id as edition, t2.shortcut as edition_shortcut,
-                t3.id as fascicle, t3.shortcut as fascicle_shortcut,
-                t4.id as place, t4.shortcut as place_shortcut,
-                t1.place, t1.amount, t1.volume, t1.w, t1.h, 
-                t1.title, t1.shortcut, t1.description, t1.created, t1.updated
-            FROM ad_modules t1, editions t2, fascicles t3, ad_places t4
-            WHERE t2.id = t1.edition AND t3.id = t1.fascicle AND t4.id = t1.place AND t1.id=?
+            SELECT id, edition, page, title, shortcut, description, amount, area, x, y, w, h, created, updated
+            FROM ad_modules
+            WHERE id=?;
         ", [ $i_id ])->Hash;
     }
     
@@ -44,33 +38,47 @@ sub read {
 sub list {
     my $c = shift;
     
-    my $i_id    = $c->param("id");
-    my $i_type  = $c->param("type");
+    my $i_edition = $c->param("edition");
+    my $i_page    = $c->param("page");
     
     my $result = [];
     
     my @errors;
     my $success = $c->json->false;
 
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_id));
+    push @errors, { id => "edition", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_edition));
+        
+    push @errors, { id => "page", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_page));
     
-    my @data;
-    my $sql = "
-        SELECT id, edition, fascicle, place, title, shortcut, description, amount, volume, w, h, created, updated
-        FROM ad_modules WHERE 1=1
-    ";
-    
-    if ($i_type eq "module") {
-        $sql .= " AND place=? ";
+    my $edition; unless (@errors) {
+        $edition  = $c->sql->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
+        push @errors, { id => "edition", msg => "Incorrectly filled field"}
+            unless ($edition);
     }
-    push @data, $i_id;
-
-    if ($i_type eq "module") {
-        unless (@errors) {
-            $result = $c->sql->Q(" $sql ", \@data)->Hashes;
-            $c->render_json( { data => $result } );
-        }
+    
+    my $page; unless (@errors) {
+        $page  = $c->sql->Q(" SELECT * FROM ad_pages WHERE id=? ", [ $i_page ])->Hash;
+        push @errors, { id => "page", msg => "Incorrectly filled field"}
+            unless ($page);
+    }
+    
+    my $sql;
+    my @params;
+    
+    unless (@errors) {
+        $sql = "
+            SELECT id, edition, page, title, shortcut, description, amount, area, x, y, w, h, created, updated
+            FROM ad_modules
+            WHERE page=?;
+        ";
+        push @params, $page->{id};
+    }
+    
+    unless (@errors) {
+        $result = $c->sql->Q(" $sql ", \@params)->Hashes;
+        $c->render_json( { data => $result } );
     }
     
     $success = $c->json->true unless (@errors);
@@ -78,19 +86,25 @@ sub list {
 }
 
 sub create {
+    
     my $c = shift;
     
     my $id = $c->uuid();
+    
+    my $i_edition     = $c->param("edition");
+    my $i_page        = $c->param("page");
     
     my $i_title       = $c->param("title");
     my $i_shortcut    = $c->param("shortcut");
     my $i_description = $c->param("description");
     
-    my $i_place  = $c->param("place");
-    my $i_amount = $c->param("amount");
-    my $i_volume = $c->param("volume");
-    my $i_w      = $c->param("w");
-    my $i_h      = $c->param("h");
+    my $i_amount      = $c->param("amount") // 1;
+    
+    my $i_x           = $c->param("x") // "1/1";
+    my $i_y           = $c->param("y") // "1/1";
+    
+    my $i_w           = $c->param("w") // "1/1";
+    my $i_h           = $c->param("h") // "1/1";
     
     my @errors;
     my $success = $c->json->false;
@@ -104,54 +118,54 @@ sub create {
     push @errors, { id => "description", msg => "Incorrectly filled field"}
         unless ($c->is_text($i_description));
     
-    #push @errors, { id => "access", msg => "Not enough permissions"}
-    #    unless ($c->access->Check("domain.roles.manage"));
-    
     push @errors, { id => "amount", msg => "Incorrectly filled field"}
         unless ($c->is_int($i_amount));
     
-    push @errors, { id => "amount", msg => "Incorrectly filled field"}
-        unless ($c->is_float($i_volume));
-        
-    push @errors, { id => "width", msg => "Incorrectly filled field"}
-        unless ($c->is_int($i_w));
-        
-    push @errors, { id => "height", msg => "Incorrectly filled field"}
-        unless ($c->is_int($i_h));
-    
-    push @errors, { id => "place", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_place));
-        
-    my $place;
-    my $fascicle;
-    my $edition;
-    
-    unless (@errors) {
-        $place = $c->sql->Q(" SELECT * FROM ad_places WHERE id=? ", [ $i_place ])->Hash;
-        push @errors, { id => "place", msg => "Incorrectly filled field"}
-            unless ($place);
+    if ($i_x) {
+        push @errors, { id => "x", msg => "Incorrectly filled field"}
+            unless ($c->is_text($i_x));
     }
     
-    unless (@errors) {
-        $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $place->{fascicle} ])->Hash;
-        push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
-            unless ($fascicle);
+    if ($i_y) {
+        push @errors, { id => "y", msg => "Incorrectly filled field"}
+            unless ($c->is_text($i_y));
     }
     
-    unless (@errors) {
-        $edition  = $c->sql->Q(" SELECT * FROM editions WHERE id=? ", [ $place->{edition} ])->Hash;
+    if ($i_w) {
+        push @errors, { id => "w", msg => "Incorrectly filled field"}
+            unless ($c->is_text($i_w));
+    }
+    
+    if ($i_h) {
+        push @errors, { id => "h", msg => "Incorrectly filled field"}
+            unless ($c->is_text($i_h));
+    }
+    
+    #push @errors, { id => "access", msg => "Not enough permissions"}
+    #    unless ($c->access->Check("domain.roles.manage"));
+    
+    my $edition; unless (@errors) {
+        $edition  = $c->sql->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
         push @errors, { id => "edition", msg => "Incorrectly filled field"}
             unless ($edition);
     }
     
+    my $page; unless (@errors) {
+        $page  = $c->sql->Q(" SELECT * FROM ad_pages WHERE id=? ", [ $i_page ])->Hash;
+        push @errors, { id => "page", msg => "Incorrectly filled field"}
+            unless ($page);
+    }
+    
+    my $area = 0;
+    
     unless (@errors) {
         $c->sql->Do("
-            INSERT INTO ad_modules(id, edition, fascicle, place, title, shortcut, description, amount, volume, w, h, created, updated)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
+            INSERT INTO ad_modules(id, edition, page, title, shortcut, description, amount, area, x, y, w, h, created, updated)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
         ", [
-            $id, $edition->{id}, $fascicle->{id}, $place->{id},
+            $id, $edition->{id}, $page->{id},
             $i_title, $i_shortcut, $i_description,
-            $i_amount, $i_volume, $i_w, $i_h
+            $i_amount, $area, $i_x, $i_y, $i_w, $i_h
         ]);
     }
     
