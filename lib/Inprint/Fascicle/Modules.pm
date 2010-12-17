@@ -24,11 +24,28 @@ sub read {
     my $result = [];
     
     unless (@errors) {
+        
         $result = $c->sql->Q("
-            SELECT id, fascicle, page, title, shortcut, description, amount, area, x, y, w, h, created, updated
-            FROM fascicles_tmpl_modules
+            SELECT id, edition, fascicle, origin, title, shortcut, description, amount, area, w, h, created, updated
+            FROM fascicles_modules
             WHERE id=?;
         ", [ $i_id ])->Hash;
+        
+        $result->{pages} = $c->sql->Q("
+            SELECT page, module
+            FROM fascicles_map_modules WHERE module=?
+        ", [ $result->{id} ])->Hashes;
+        
+        my $pages = $c->sql->Q("
+            SELECT DISTINCT page FROM fascicles_map_modules WHERE module=?
+        ", [ $result->{id} ])->Values;
+        
+        $result->{composition} = $c->sql->Q("
+            SELECT t1.id, t1.shortcut, t1.w, t1.h, t2.page, t2.x, t2.y
+            FROM fascicles_modules t1, fascicles_map_modules t2
+            WHERE page=ANY(?) AND t2.module=t1.id
+        ", [ $pages ])->Hashes;
+        
     }
     
     $success = $c->json->true unless (@errors);
@@ -155,18 +172,20 @@ sub create {
                 my $module_id = $c->uuid;
                 
                 $c->sql->Do("
-                    INSERT INTO fascicles_modules(id, edition, fascicle, origin, title, shortcut, description, amount, area, created, updated)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
+                    INSERT INTO fascicles_modules(id, edition, fascicle, origin, title, shortcut, description, amount, area, w, h,  created, updated)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
                 ", [
-                    $module_id, $fascicle->{edition}, $fascicle->{id}, $module->{id}, $module->{title}, $module->{shortcut}, $module->{description}, $module->{amount}, $module->{area}
+                    $module_id, $fascicle->{edition}, $fascicle->{id}, $module->{id}, $module->{title}, $module->{shortcut}, $module->{description},
+                    $module->{amount}, $module->{area},
+                    $module->{w}, $module->{h}
                 ]);
                 
                 foreach my $page (@pages) {
                     $c->sql->Do("
-                        INSERT INTO fascicles_map_modules(edition, fascicle, module, page, x, y, h, w, created, updated)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, now(), now());
+                        INSERT INTO fascicles_map_modules(edition, fascicle, module, page, x, y, created, updated)
+                        VALUES (?, ?, ?, ?, ?, ?, now(), now());
                     ", [
-                        $fascicle->{edition}, $fascicle->{id}, $module_id, $page->{id}, "0/1", "0/1", "0/1", "0/1"
+                        $fascicle->{edition}, $fascicle->{id}, $module_id, $page->{id}, "0/1", "0/1"
                     ]);
                 }
             }
@@ -272,7 +291,8 @@ sub delete {
     unless (@errors) {
         foreach my $id (@ids) {
             if ($c->is_uuid($id)) {
-                $c->sql->Do(" DELETE FROM fascicles_tmpl_modules WHERE id=? ", [ $id ]);
+                $c->sql->Do(" DELETE FROM fascicles_modules WHERE id=? ", [ $id ]);
+                $c->sql->Do(" DELETE FROM fascicles_map_modules WHERE module=? ", [ $id ]);
             }
         }
     }

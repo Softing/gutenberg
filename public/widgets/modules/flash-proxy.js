@@ -57,6 +57,10 @@ Inprint.flash.Proxy = {
         } else {
             alert("Can't find form object!");
         }
+    },
+    
+    savePage: function(panel, page, array) {
+        Ext.getCmp(panel).cmpSaveProxy(page, array);
     }
     
 };

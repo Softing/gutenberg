@@ -5,7 +5,6 @@ Inprint.cmp.Composer = Ext.extend(Ext.Window, {
         this.panels = {};
         
         
-        
         this.selLength = this.selection.length;
         
         this.panels["modules"] = new Inprint.cmp.composer.Modules({
@@ -37,21 +36,21 @@ Inprint.cmp.Composer = Ext.extend(Ext.Window, {
                     //panel.flashRight = panel.findByType("flash")[0].swf;
                     //panel.grid  = panel.findByType("grid")[0];
                 }
-            },
-            buttons:[
-                {
-                    text: _("Save"),
-                    scope:this,
-                    disabled:true
-                },
-                {
-                    text: _("Close"),
-                    scope:this,
-                    handler: function() {
-                        this.hide();
-                    }
-                }
-            ]
+            }
+            //buttons:[
+            //    {
+            //        text: _("Save"),
+            //        scope:this,
+            //        disabled:true
+            //    },
+            //    {
+            //        text: _("Close"),
+            //        scope:this,
+            //        handler: function() {
+            //            this.hide();
+            //        }
+            //    }
+            //]
         });
 
         Inprint.cmp.Composer.superclass.initComponent.apply(this, arguments);
@@ -60,7 +59,7 @@ Inprint.cmp.Composer = Ext.extend(Ext.Window, {
 
     onRender: function() {
         Inprint.cmp.Composer.superclass.onRender.apply(this, arguments);
-        //Inprint.cmp.Composer.Interaction(this, this.panels);
+        Inprint.cmp.composer.Interaction(this, this.panels);
     }
 
 });

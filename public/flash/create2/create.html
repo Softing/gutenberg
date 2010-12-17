@@ -51,16 +51,17 @@
 					{ id: "blck2", n:"1/2 гор", x: "0/5", y: "2/6", w: "2/5", h: "2/6" }, 
 					{ id: "blck3", n:"Вствка", x: "1/1", y: "1/1", w: "1/5", h: "1/6" } 
 				] );
-				flash.editBlock("blck1", true);
+				//flash.editBlock("blck1", true);
             }
             
 			function flash3Load() {
                 var flash = getFlashMovieObject("flashMovie3");
                 flash.setBlocks( [ 
 					{ id: "blck1", n:"1/3 вер", x: "0/5", y: "0/6", w: "1/1", h: "1/6" }, 
-					{ id: "blck2", n:"1/2 гор", x: "0/5", y: "2/6", w: "2/5", h: "2/6" }, 
-					{ id: "blck3", n:"Вствка", x: "1/1", y: "1/1", w: "1/5", h: "1/6" } 
+					{ id: "blck2", n:"1/2 гор", x: "0/5", y: "2/6", w: "2/5", h: "2/6" }
 				] );
+				
+				flash.setBlock( "blck3", "Вствка", "0/1", "0/1", "1/5", "1/6" );
             }
 			
 			function flash3ClearAll() {
