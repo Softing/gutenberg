@@ -11,7 +11,7 @@ use warnings;
 
 use POSIX qw/ceil floor/;
 use GD;
-use GD::Text::Align;
+use GD::Text::Wrap;
 
 use base 'Inprint::BaseController';
 
