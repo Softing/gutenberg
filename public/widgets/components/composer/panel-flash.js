@@ -170,8 +170,15 @@ Inprint.cmp.composer.Flash = Ext.extend(Ext.Panel, {
                 Ext.each(responce.data.pages, function(c) {
                     var flash = this.cmpGetFlashById(c.id);
                     if (flash) {
-                        flash.init(c.id, "letter", 0, 0);
-                        flash.setGrid( c.w, c.h );
+                        var init = function() {
+                            if (flash.init) {
+                                flash.init(c.id, "letter", 0, 0);
+                                flash.setGrid( c.w, c.h );
+                            } else {
+                                init.defer(10, this);
+                            }
+                        }
+                        init.defer(10, this);
                     }
                 }, this);
                 
