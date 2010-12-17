@@ -197,7 +197,10 @@ Inprint.cmp.composer.Modules = Ext.extend(Ext.grid.GridPanel, {
                     Ext.Ajax.request({
                         url: this.urls["delete"],
                         scope:this,
-                        success: this.cmpReload,
+                        success: function() {
+                            this.panels["flash"].cmpInit();
+                            this.cmpReload();
+                        },
                         params: { id: this.getValues("id") }
                     });
                 }
