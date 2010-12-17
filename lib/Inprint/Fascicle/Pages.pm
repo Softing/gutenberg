@@ -12,11 +12,37 @@ use Inprint::Utils::Pages;
 
 use base 'Inprint::BaseController';
 
+sub read {
+    
+    my $c = shift;
+    
+    my @i_pages    = $c->param("page");
+    
+    my @data;
+    my @errors;
+    my $success = $c->json->false;
+    
+    unless (@errors) {
+        
+        foreach my $item (@i_pages) {
+            my ($pageid, $seqnum) = split "::", $item;
+            my $page = $c->sql->Q(" SELECT * FROM fascicles_pages WHERE id=? AND seqnum=? ", [ $pageid, $seqnum ])->Hash();
+            push @data, $page;
+        }
+        
+    }
+    
+    
+    $success = $c->json->true unless (@errors);
+    $c->render_json({ success => $success, errors => \@errors, data => \@data });
+}
+
 sub create {
     
     my $c = shift;
     
     my $i_fascicle = $c->param("fascicle");
+    my $i_template = $c->param("template");
     my $i_headline = $c->param("headline");
     my $i_string   = $c->param("page");
     
@@ -33,6 +59,14 @@ sub create {
     push @errors, { id => "fascicle", msg => "Can't find object"}
         unless ($fascicle->{id});
     
+    push @errors, { id => "template", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_template));
+    
+    my $template = $c->sql->Q(" SELECT * FROM fascicles_tmpl_pages WHERE id = ? ", [ $i_template ])->Hash;
+    
+    push @errors, { id => "fascicle", msg => "Can't find object"}
+        unless ($template->{id});
+    
     my $headline = {};
     if ($i_headline) {
         $headline = $c->sql->Q(" SELECT * FROM index_fascicles WHERE nature = 'headline' AND id = ? ", [ $i_headline ])->Hash;
@@ -47,7 +81,7 @@ sub create {
         my $chunks = Inprint::Utils::Pages::GetChunks($c, $pages);
         
         my $composition = $c->sql->Q("
-            SELECT id, edition, fascicle, headline, place, seqnum, w, h, created, updated
+            SELECT id, edition, fascicle, headline, seqnum, w, h, created, updated
             FROM fascicles_pages WHERE fascicle = ?; ",[
                 $i_fascicle
             ])->Hashes;
@@ -94,9 +128,9 @@ sub create {
             my $id = $c->uuid;
             
             $c->sql->Do("
-                INSERT INTO fascicles_pages(id, edition, fascicle, headline, place, seqnum, w, h, created, updated)
-                VALUES (?, ?, ?, ?, null, ?, 0, 0, now(), now());
-            ", [$id, $page->{edition}, $page->{fascicle}, $page->{headline}, $page->{seqnum} ]);
+                INSERT INTO fascicles_pages(id, edition, fascicle, origin, headline, seqnum, w, h, created, updated)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, now(), now());
+            ", [$id, $page->{edition}, $page->{fascicle}, $template->{id}, $page->{headline}, $page->{seqnum}, $template->{w}, $template->{h} ]);
         }
         
         $c->sql->et;

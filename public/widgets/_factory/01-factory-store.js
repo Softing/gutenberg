@@ -52,32 +52,34 @@ Inprint.factory.Store = new function() {
             'created','updated'
         ],
         
-        '/documents/common/fascicles/':         [ "id", "edition", "edition_shortcut", "title", "shortcut", 'description', "headline", "headline_shortcut", "rubric", "rubric_shortcut" ],
-        '/documents/files/list/':               [ "id", "preview", "filename", "extension", "description", "mimetype", "digest", "draft", "size", "created", "updated" ],
+        '/documents/common/fascicles/':                 [ "id", "edition", "edition_shortcut", "title", "shortcut", 'description', "headline", "headline_shortcut", "rubric", "rubric_shortcut" ],
+        '/documents/files/list/':                       [ "id", "preview", "filename", "extension", "description", "mimetype", "digest", "draft", "size", "created", "updated" ],
 
         // Catalog
-        "/catalog/readiness/list/":             [ "id", "color", "percent", "title", "shortcut", "description" ],
-        "/catalog/roles/list/":                 [ "id", "title", "shortcut", "description", "rules" ],
-        "/catalog/rules/list/":                 [ "id", "rule",  "icon", "title", "groupby", "limit", "selection" ],
-        "/catalog/members/list/":               [ "id", "login", "password", "position", "email", "title", "shortcut", createDateField("created"), createDateField("updated") ],
-        "/catalog/members/rules/":              [ "id", "binding", "binding_shortcut", "area", "area_shortcut", "rules" ],
-        "/catalog/stages/list/":                [ "id", "chain", "readiness_shortcut", "readiness_color", "weight", "title", "shortcut", "description", "members" ],
-        "/catalog/stages/principals-mapping/":  [ "id", "type", "catalog", "stage", "principal", "title", "description", "catalog_shortcut", "stage_shortcut" ],
-        "/catalog/principals/list/":            [ "id", "type", "title", "description" ],
-        "/catalog/rubrics/list/":               [ "id", "title", "shortcut", "description" ],
+        "/catalog/readiness/list/":                     [ "id", "color", "percent", "title", "shortcut", "description" ],
+        "/catalog/roles/list/":                         [ "id", "title", "shortcut", "description", "rules" ],
+        "/catalog/rules/list/":                         [ "id", "rule",  "icon", "title", "groupby", "limit", "selection" ],
+        "/catalog/members/list/":                       [ "id", "login", "password", "position", "email", "title", "shortcut", createDateField("created"), createDateField("updated") ],
+        "/catalog/members/rules/":                      [ "id", "binding", "binding_shortcut", "area", "area_shortcut", "rules" ],
+        "/catalog/stages/list/":                        [ "id", "chain", "readiness_shortcut", "readiness_color", "weight", "title", "shortcut", "description", "members" ],
+        "/catalog/stages/principals-mapping/":          [ "id", "type", "catalog", "stage", "principal", "title", "description", "catalog_shortcut", "stage_shortcut" ],
+        "/catalog/principals/list/":                    [ "id", "type", "title", "description" ],
+        "/catalog/rubrics/list/":                       [ "id", "title", "shortcut", "description" ],
         
         // Fascicles
-        "/fascicle/rubrics/list/":              [ "id", "title", "shortcut", "description" ],
-        "/fascicle/summary/":                   [ "place", "place_shortcut", "module", "module_shortcut", "holes", "requests", "free" ],
-        "/fascicle/documents/list/":            [
+        "/fascicle/rubrics/list/":                      [ "id", "title", "shortcut", "description" ],
+        "/fascicle/summary/":                           [ "place", "place_shortcut", "module", "module_shortcut", "holes", "requests", "free" ],
+        "/fascicle/documents/list/":                    [
             'id', 'access',    'edition',  'edition_shortcut',    'fascicle',    'fascicle_shortcut',    'headline', 'headline_shortcut',
             'rubric', 'rubric_shortcut',    'copygroup',    'holder','creator','manager','holder_shortcut','creator_shortcut','manager_shortcut',
             'workgroup','workgroup_shortcut','ingroups',    'islooked','isopen',    'branch','branch_shortcut','stage','stage_shortcut','color','progress',
             'title','author','pages',    'pdate','psize','rdate','rsize',    'images','files',    'created','updated'
         ],
+        "/fascicle/templates/pages/list/":              [ "id", "edition", "title", "shortcut", "description", "w", "h", createDateField("created"), createDateField("updated") ],
+        "/fascicle/templates/modules/list/":            [ "id", "edition", "page", "title", "shortcut", "description", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
         
         // System
-        "/system/events/list/":                 [ "id", "initiator", "initiator_login", "initiator_shortcut", "initiator_position", "entity", "entity_type", "message", "message_type", "message_variables", createDateField("created") ],
+        "/system/events/list/":                         [ "id", "initiator", "initiator_login", "initiator_shortcut", "initiator_position", "entity", "entity_type", "message", "message_type", "message_variables", createDateField("created") ],
 
 
         "" : []
@@ -92,6 +94,7 @@ Inprint.factory.Store = new function() {
         "/advertising/combo/places/",
         "/advertising/combo/modules/",
 
+        "/calendar/combos/fascicles/",
         "/calendar/combos/copypages/",
         "/calendar/combos/copyindex/",
 
@@ -101,6 +104,7 @@ Inprint.factory.Store = new function() {
         "/catalog/combos/readiness/",
         "/catalog/combos/roles/",
         
+        "/fascicle/combos/templates/",
         "/fascicle/combos/workgroups/",
         "/fascicle/combos/headlines/",
         "/fascicle/combos/rubrics/",

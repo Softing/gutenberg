@@ -359,7 +359,7 @@ sub getPages {
     my $pages;
     my $dbpages = $c->sql->Q("
         SELECT 
-            t1.id, t1.place, t1.seqnum, t1.w, t1.h,
+            t1.id, t1.seqnum, t1.w, t1.h,
             t2.id as headline, t2.shortcut as headline_shortcut
         FROM fascicles_pages t1
             LEFT JOIN index_fascicles as t2 ON t2.id=t1.headline
@@ -628,41 +628,41 @@ sub getSummary {
     
     my $data;
     
-    my $places = $c->sql->Q("
-        SELECT id, edition, fascicle, title, shortcut, description, created, updated
-        FROM ad_places WHERE fascicle = ? ORDER BY shortcut
-    ", [ $fascicle ])->Hashes;
-    
-    foreach my $place (@$places) {
-        
-        my $modules = $c->sql->Q("
-            SELECT id, edition, fascicle, place, title, shortcut, description, amount, volume, w, h, created, updated
-            FROM ad_modules WHERE fascicle = ? AND place = ?
-        ", [ $fascicle, $place->{id} ])->Hashes;
-        
-        foreach my $module (@$modules) {
-            
-            my $hl = $c->sql->Q("
-                SELECT count(*) FROM fascicles_map_holes WHERE fascicle=? AND place=? AND module=?
-            ", [ $fascicle, $place->{id}, $module->{id} ])->Value;
-            
-            my $rq = $c->sql->Q("
-                SELECT count(*) FROM fascicles_map_holes WHERE fascicle=? AND place=? AND module=? -- AND entity is not null
-            ", [ $fascicle, $place->{id}, $module->{id} ])->Value;
-            
-            my $fr = $hl - $rq;
-            
-            push @$data, {
-                place => $place->{id},
-                place_shortcut => $place->{shortcut},
-                module => $module->{id},
-                module_shortcut => $module->{shortcut},
-                holes => $hl,
-                requests => $rq,
-                free => $fr
-            }
-        }
-    }
+    #my $places = $c->sql->Q("
+    #    SELECT id, edition, title, shortcut, description, created, updated
+    #    FROM ad_places WHERE fascicle = ? ORDER BY shortcut
+    #", [ $fascicle ])->Hashes;
+    #
+    #foreach my $place (@$places) {
+    #    
+    #    my $modules = $c->sql->Q("
+    #        SELECT id, edition, fascicle, place, title, shortcut, description, amount, volume, w, h, created, updated
+    #        FROM ad_modules WHERE fascicle = ? AND place = ?
+    #    ", [ $fascicle, $place->{id} ])->Hashes;
+    #    
+    #    foreach my $module (@$modules) {
+    #        
+    #        my $hl = $c->sql->Q("
+    #            SELECT count(*) FROM fascicles_map_holes WHERE fascicle=? AND place=? AND module=?
+    #        ", [ $fascicle, $place->{id}, $module->{id} ])->Value;
+    #        
+    #        my $rq = $c->sql->Q("
+    #            SELECT count(*) FROM fascicles_map_holes WHERE fascicle=? AND place=? AND module=? -- AND entity is not null
+    #        ", [ $fascicle, $place->{id}, $module->{id} ])->Value;
+    #        
+    #        my $fr = $hl - $rq;
+    #        
+    #        push @$data, {
+    #            place => $place->{id},
+    #            place_shortcut => $place->{shortcut},
+    #            module => $module->{id},
+    #            module_shortcut => $module->{shortcut},
+    #            holes => $hl,
+    #            requests => $rq,
+    #            free => $fr
+    #        }
+    #    }
+    #}
     
     return $data;
 }

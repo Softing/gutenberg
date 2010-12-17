@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 use POSIX qw/ceil floor/;
-use GD::Simple;
+use GD;
 
 use base 'Inprint::BaseController';
 
@@ -27,30 +27,49 @@ sub view {
     my $grid_h = $i_h || 140;
     
     my $page = $c->sql->Q("
-        SELECT t1.id, t1.place, t1.seqnum, t1.w, t1.h
-        FROM fascicles_pages t1
-        WHERE t1.id=?
+        SELECT id, edition, fascicle, origin, headline, seqnum, w, h, created, updated
+        FROM fascicles_pages WHERE id=?
     ", [ $i_page ])->Hash;
     
-    my $modules = $c->sql->Q("
-        SELECT
-            t1.id, t1.place, t1.page, t1.entity, t1.x, t1.y, t1.h, t1.w
-        FROM fascicles_map_holes t1
-        WHERE 
-            t1.page = ?
-    ", [ $i_page ])->Hashes;
+    #my $modules = $c->sql->Q("
+    #    SELECT
+    #        t1.id, t1.place, t1.page, t1.entity, t1.x, t1.y, t1.h, t1.w
+    #    FROM fascicles_map_holes t1
+    #    WHERE 
+    #        t1.page = ?
+    #", [ $i_page ])->Hashes;
     
-    my @modules;
-    foreach my $item (@$modules) {
-        if ($item->{x} && $item->{y}) {
-            push @modules, [ $item->{x}, $item->{y}, $item->{w}, $item->{h}, "orange", "black" ];
-        }
-    }
+    #my @modules;
+    #foreach my $item (@$modules) {
+    #    if ($item->{x} && $item->{y}) {
+    #        push @modules, [ $item->{x}, $item->{y}, $item->{w}, $item->{h}, "orange", "black" ];
+    #    }
+    #}
     
     # create a new image
-    my $img = GD::Simple->new($grid_w*2+(10*2), $grid_h+10);
+    my $img = new GD::Image($grid_w, $grid_h);
     
-    $img = $c->draw_page($img, $grid_w ."x". $grid_h, $page->{w} ."x". $page->{h}, 0, \@modules);
+    my $white = $img->colorAllocate(255,255,255);
+    my $black = $img->colorAllocate(0,0,0);
+    my $red   = $img->colorAllocate(255,0,0);
+    my $blue  = $img->colorAllocate(0,0,255);
+    my $gray  = $img->colorAllocate(214,214,214);
+    
+    $img->rectangle(0,0, $grid_w-1, $grid_h-1, $gray);
+    
+    foreach my $cord ( @{ $page->{w} } ) {
+        my ($a,$b) = split '/', $cord;
+        my $xcord = $grid_w * ($a/$b);
+        $img->line( $xcord, 0, $xcord, $grid_h, $gray);
+    }
+    
+    foreach my $cord ( @{ $page->{h} } ) {
+        my ($a,$b) = split '/', $cord;
+        my $ycord = $grid_h * ($a/$b);
+        $img->line( 0, $ycord, $grid_w, $ycord, $gray);
+    }
+    
+    #$img = $c->draw_page($img, $grid_w ."x". $grid_h, $page->{w} ."x". $page->{h}, 0, \@modules);
     
     $c->tx->res->headers->content_type('image/png');
     $c->render_data($img->png);

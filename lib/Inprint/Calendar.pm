@@ -123,8 +123,7 @@ sub create {
     my $i_begindate   = $c->param("begindate");
     my $i_enddate     = $c->param("enddate");
     
-    my $i_copypages     = $c->param("copypages");
-    my $i_copyindex     = $c->param("copyindex");
+    my $i_copyfrom     = $c->param("copyfrom");
     
     my @errors;
     my $success = $c->json->false;
@@ -145,14 +144,9 @@ sub create {
             unless ($c->is_text($i_description));
     }
     
-    if ($i_copypages) {
+    if ($i_copyfrom) {
         push @errors, { id => "copypages", msg => "Incorrectly filled field"}
-            unless ($c->is_uuid($i_copypages));
-    }
-    
-    if ($i_copyindex) {
-        push @errors, { id => "copyindex", msg => "Incorrectly filled field"}
-            unless ($c->is_uuid($i_copyindex));
+            unless ($c->is_uuid($i_copyfrom));
     }
     
     #TODO: add date checks
@@ -167,17 +161,21 @@ sub create {
     unless (@errors) {
         $c->sql->bt;
     
+        # Create new fascicle
         $c->sql->Do("
             INSERT INTO fascicles (
                 id, edition, base_edition, variation, is_system, is_enabled, is_blocked, title, shortcut, description, begindate, enddate, created, updated)
                 VALUES (?, ?, ?, ?, false, true, false, ?, ?, ?, ?, ?, now(), now());
         ", [ $id, $i_edition, $i_edition, $version, $i_title, $i_title, $i_title, $i_begindate, $i_enddate ]);
         
-        if ($i_copyindex && $i_copyindex eq "00000000-0000-0000-0000-000000000000") {
+        # Import defaults
+        if ($i_copyfrom && $i_copyfrom eq "00000000-0000-0000-0000-000000000000") {
             
             my $editions = $c->sql->Q("
                 SELECT id FROM editions WHERE path @> ? order by path asc; 
             ", [ $edition->{path} ])->Values;
+            
+            # import index
             
             my $headlines = $c->sql->Q("
                 SELECT id, edition, nature, parent, title, shortcut, description, created, updated
@@ -220,15 +218,55 @@ sub create {
                 }
 
             }
+            
+            # import page and modules templates
+            
+            my $tmpl_pages   = $c->sql->Q(" SELECT id, edition, title, shortcut, description, w, h, created, updated FROM ad_pages WHERE edition = ANY(?) ", [ $editions ])->Hashes;
+            
+            foreach my $page (@$tmpl_pages) {
+                
+                my $page_id = $c->uuid;
+                
+                $c->sql->Do("
+                    INSERT INTO fascicles_tmpl_pages(id, origin, fascicle, title, shortcut, description, w, h, created, updated)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, now(), now());
+                ", [ $page_id, $page->{id}, $id, $page->{title}, $page->{shortcut}, $page->{description}, $page->{w}, $page->{h} ]);
+                
+                my $tmpl_modules = $c->sql->Q("
+                    SELECT id, edition, page, title, shortcut, description, amount, area, x, y, w, h, created, updated
+                    FROM ad_modules WHERE page=? ", [ $page->{id} ])->Hashes;
+                
+                foreach my $module (@$tmpl_modules) {
+                    
+                    $c->sql->Do("
+                        INSERT INTO fascicles_tmpl_modules(origin, fascicle, page, title, shortcut, description, amount, area, x, y, w, h, created, updated)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
+                    ", [ $module->{id},  $id, $page_id, $module->{title}, $module->{shortcut}, $module->{description}, $module->{amount}, $module->{area}, $module->{x}, $module->{y}, $module->{w}, $module->{h} ]);
+                }
+            
+            }
+            
+            # import places
+            
+            my $tmpl_places  = $c->sql->Q(" SELECT id, edition, title, shortcut, description, created, updated FROM ad_places WHERE edition = ANY(?) ", [ $editions ])->Hashes;
+            
+            foreach my $place (@$tmpl_places) {
+                $c->sql->Do("
+                    INSERT INTO fascicles_tmpl_places(origin, fascicle, title, shortcut, description, created, updated)
+                        VALUES (?, ?, ?, ?, ?, now(), now());
+                ", [ $place->{id}, $id, $place->{title}, $place->{shortcut}, $place->{description} ]);
+            }
+            
+            my $tmpl_index   = $c->sql->Q(" SELECT id, edition, nature, entity, created, updated FROM ad_index WHERE edition = ANY(?) ", [ $editions ])->Hashes;
 
         }
         
-        if ($i_copyindex && $i_copyindex ne "00000000-0000-0000-0000-000000000000") {
+        if ($i_copyfrom && $i_copyfrom ne "00000000-0000-0000-0000-000000000000") {
             
             my $headlines = $c->sql->Q("
                 SELECT id, edition, fascicle, origin, nature, parent, title, shortcut, description, created, updated
                 FROM index_fascicles WHERE nature = 'headline' AND fascicle = ?;
-            ", [ $i_copyindex ])->Hashes;
+            ", [ $i_copyfrom ])->Hashes;
             
             foreach my $headline (@$headlines) {
                 
@@ -311,7 +349,14 @@ sub delete {
     foreach my $id (@ids) {
         $c->sql->bt;
         $c->sql->Do(" DELETE FROM fascicles WHERE id=? ", [ $id ]);
+        
+        $c->sql->Do(" DELETE FROM fascicles_tmpl_index WHERE fascicle=? ", [ $id ]);
+        $c->sql->Do(" DELETE FROM fascicles_tmpl_modules WHERE fascicle=? ", [ $id ]);
+        $c->sql->Do(" DELETE FROM fascicles_tmpl_pages WHERE fascicle=? ", [ $id ]);
+        $c->sql->Do(" DELETE FROM fascicles_tmpl_places WHERE fascicle=? ", [ $id ]);
+        
         $c->sql->Do(" DELETE FROM index_fascicles WHERE fascicle=? ", [ $id ]);
+        
         $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $id ]);
         Inprint::Utils::Documents::MoveDocumentIndexToFascicle($c, \@errors, $id);
         $c->sql->et;

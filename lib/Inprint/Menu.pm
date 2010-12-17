@@ -162,17 +162,17 @@ sub index
             description => $fascicle->{shortcut}
         } if $accessLayoutManage;
         
-        #push @{ $fascicle_menu->{menu} }, {
-        #    id  => "fascicle-templates",
-        #    oid => $fascicle->{id},
-        #    description => $fascicle->{shortcut}
-        #} if $accessLayoutManage;
-        #
-        #push @{ $fascicle_menu->{menu} }, {
-        #    id  => "fascicle-modules",
-        #    oid => $fascicle->{id},
-        #    description => $fascicle->{shortcut}
-        #} if $accessLayoutManage;
+        push @{ $fascicle_menu->{menu} }, {
+            id  => "fascicle-templates",
+            oid => $fascicle->{id},
+            description => $fascicle->{shortcut}
+        } if $accessLayoutManage;
+        
+        push @{ $fascicle_menu->{menu} }, {
+            id  => "fascicle-places",
+            oid => $fascicle->{id},
+            description => $fascicle->{shortcut}
+        } if $accessLayoutManage;
         
         push @result, $fascicle_menu;
         

@@ -10,6 +10,31 @@ use warnings;
 
 use base 'Inprint::BaseController';
 
+sub templates {
+    my $c = shift;
+    
+    my $i_edition  = $c->param("edition") || undef;
+    my $i_fascicle = $c->param("fascicle") || undef;
+    
+    my $result;
+    my @errors;
+    my $success = $c->json->false;
+    
+    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_fascicle));
+    
+    unless (@errors) {
+        $result = $c->sql->Q("
+            SELECT DISTINCT t1.id, t1.shortcut as title FROM fascicles_tmpl_pages t1
+            WHERE t1.fascicle=?
+            ORDER BY t1.shortcut
+        ", [ $i_fascicle ])->Hashes;
+    }
+    
+    $success = $c->json->true unless (@errors);
+    $c->render_json({ success => $success, errors => \@errors, data => $result || [] });
+}
+
 sub headlines {
     my $c = shift;
     

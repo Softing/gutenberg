@@ -10,6 +10,42 @@ use warnings;
 
 use base 'Inprint::BaseController';
 
+sub fascicles {
+    my $c = shift;
+    
+    my @errors;
+    my $success = $c->json->false;
+    
+    my @data;
+    my $sql = "
+        SELECT t1.id, t2.shortcut || '/' || t1.shortcut as title, t1.shortcut, t1.description,
+            CASE WHEN is_enabled is true THEN  'rocket-fly' ELSE 'book' END as icon
+        FROM fascicles t1, editions t2
+        WHERE t2.id = t1.edition AND is_enabled = true AND is_system = false
+    ";
+    
+    my $access = $c->access->GetBindings("editions.calendar.manage");
+    $sql .= " AND edition = ANY(?) ";
+    push @data, $access;
+    
+    my $result = $c->sql->Q("
+        $sql
+        ORDER BY is_enabled DESC, t2.shortcut, t1.shortcut
+    ", \@data)->Hashes;
+    
+    unshift @$result, {
+        id=> "00000000-0000-0000-0000-000000000000",
+        icon => "marker",
+        title=> $c->l("Defaults"),
+        shortcut=> $c->l("Get defaults"),
+        description=> $c->l("Copy from defaults"),
+    };
+    
+    $success = $c->json->true unless (@errors);
+    $c->render_json( { data => $result } );
+}
+
+
 sub copypages {
     my $c = shift;
     

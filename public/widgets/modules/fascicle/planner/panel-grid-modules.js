@@ -1,4 +1,4 @@
-Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
+Inprint.fascicle.planner.Modules = Ext.extend(Ext.grid.GridPanel, {
 
     initComponent: function() {
         
@@ -23,13 +23,13 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
         
         this.columns = [
             this.selectionModel,
-            {
-                id:"title",
-                header: _("Title"),
-                width: 150,
-                sortable: true,
-                dataIndex: "title"
-            },
+            //{
+            //    id:"title",
+            //    header: _("Title"),
+            //    width: 150,
+            //    sortable: true,
+            //    dataIndex: "title"
+            //},
             {
                 id:"shortcut",
                 header: _("Shortcut"),
@@ -42,48 +42,48 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
                 header: _("Description"),
                 sortable: true,
                 dataIndex: "description"
-            },
-            {
-                id:"amount",
-                header: _("Amount"),
-                sortable: true,
-                dataIndex: "amount"
-            },
-            {
-                id:"area",
-                header: _("Area"),
-                sortable: true,
-                dataIndex: "area"
-            },
-            {
-                id:"x",
-                header: _("X"),
-                sortable: true,
-                dataIndex: "x"
-            },
-            {
-                id:"y",
-                header: _("Y"),
-                sortable: true,
-                dataIndex: "y"
-            },
-            {
-                id:"w",
-                header: _("W"),
-                sortable: true,
-                dataIndex: "w"
-            },
-            {
-                id:"h",
-                header: _("H"),
-                sortable: true,
-                dataIndex: "h"
             }
+            //{
+            //    id:"amount",
+            //    header: _("Amount"),
+            //    sortable: true,
+            //    dataIndex: "amount"
+            //},
+            //{
+            //    id:"area",
+            //    header: _("Area"),
+            //    sortable: true,
+            //    dataIndex: "area"
+            //},
+            //{
+            //    id:"x",
+            //    header: _("X"),
+            //    sortable: true,
+            //    dataIndex: "x"
+            //},
+            //{
+            //    id:"y",
+            //    header: _("Y"),
+            //    sortable: true,
+            //    dataIndex: "y"
+            //},
+            //{
+            //    id:"w",
+            //    header: _("W"),
+            //    sortable: true,
+            //    dataIndex: "w"
+            //},
+            //{
+            //    id:"h",
+            //    header: _("H"),
+            //    sortable: true,
+            //    dataIndex: "h"
+            //}
         ];
         
         this.tbar = [
             {
-                disabled:true,
+                disabled:false,
                 icon: _ico("plus-button"),
                 cls: "x-btn-text-icon",
                 text: _("Add"),
@@ -111,22 +111,21 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
                 handler: this.cmpDelete
             }
         ];
-
+        
         Ext.apply(this, {
-            disabled:true,
             border:false,
             stripeRows: true,
             columnLines: true,
-            sm: this.selectionModel,
-            autoExpandColumn: "description"
+            sm: this.selectionModel
+            //autoExpandColumn: "description"
         });
 
-        Inprint.advert.modules.Modules.superclass.initComponent.apply(this, arguments);
+        Inprint.fascicle.planner.Modules.superclass.initComponent.apply(this, arguments);
 
     },
 
     onRender: function() {
-        Inprint.advert.modules.Modules.superclass.onRender.apply(this, arguments);
+        Inprint.fascicle.planner.Modules.superclass.onRender.apply(this, arguments);
     },
     
     

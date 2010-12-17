@@ -216,10 +216,11 @@ Inprint.edition.calendar.Grid = Ext.extend(Ext.grid.GridPanel, {
         if (!win) {
 
             win = new Ext.Window({
-                title: _("Release addition"),
+                modal:true,
                 layout: "fit",
                 closeAction: "hide",
                 width:400, height:250,
+                title: _("Release addition"),
                 items: new Ext.FormPanel({
                     
                     url: this.url["create"],
@@ -266,16 +267,7 @@ Inprint.edition.calendar.Grid = Ext.extend(Ext.grid.GridPanel, {
                             }
                         },
                         Inprint.factory.Combo.create(
-                            "/calendar/combos/copypages/",
-                            {
-                                listeners: {
-                                    beforequery: function(qe) {
-                                        delete qe.combo.lastQuery;
-                                    }
-                                }
-                            }),
-                        Inprint.factory.Combo.create(
-                            "/calendar/combos/copyindex/",
+                            "/calendar/combos/fascicles/",
                             {
                                 listeners: {
                                     beforequery: function(qe) {

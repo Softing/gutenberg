@@ -24,7 +24,12 @@ Inprint.factory.Combo = new function() {
     var combos = {
 
         //Calendar
-        
+        "/calendar/combos/fascicles/": {
+            hiddenName: "copyfrom",
+            icon: "building",
+            fieldLabel: _("Copy from"),
+            emptyText: _("Select") + "..."
+        },
         "/calendar/combos/copypages/": {
             hiddenName: "copypages",
             icon: "building",
@@ -103,6 +108,11 @@ Inprint.factory.Combo = new function() {
         //},
         
         // Fascicles
+        "/fascicle/combos/templates/": {
+            hiddenName: "template",
+            fieldLabel: _("Template"),
+            emptyText: _("Template") + "..."
+        },
         "/fascicle/combos/workgroups/": {
             hiddenName: "workgroup",
             fieldLabel: _("Workgroup"),
