@@ -5,11 +5,13 @@ package Inprint::Fascicle::Images;
 # licensing@softing.ru
 # http://softing.ru/license
 
+use utf8;
 use strict;
 use warnings;
 
 use POSIX qw/ceil floor/;
 use GD;
+use GD::Text::Align;
 
 use base 'Inprint::BaseController';
 
@@ -60,7 +62,7 @@ sub view {
     
     my $modules = $c->sql->Q("
         SELECT
-            t1.id, t1.w, t1.h, t2.x, t2.y
+            t1.id, t1.shortcut, t1.w, t1.h, t2.x, t2.y
         FROM fascicles_modules t1, fascicles_map_modules t2
         WHERE 
             t2.page = ? AND t2.module = t1.id
@@ -92,10 +94,20 @@ sub view {
             $y2--;
         }
         
-        $img->filledRectangle($x1, $y1, $x2, $y2,$darkgray);
-        $img->rectangle($x1, $y1, $x2, $y2,$black);
+        #$img->filledRectangle($x1, $y1, $x2, $y2,$darkgray);
+        #$img->rectangle($x1, $y1, $x2, $y2,$black);
         
-        #$img->fill(50,50,$red);
+        
+        my $wrapbox = GD::Text::Wrap->new( $img,
+            line_space  => 0,
+            color       => $black,
+            text        => $module->{shortcut},
+        );
+        $wrapbox->set_font(gdMediumBoldFont);
+        $wrapbox->set_font('arial', 10);
+        $wrapbox->set(align => 'center', width => 100);
+        $wrapbox->draw(10,40);
+        
     }
     
     $c->tx->res->headers->content_type('image/png');
