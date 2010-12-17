@@ -106,19 +106,19 @@ sub view {
         
         if ($^O eq "linux") {
             $font = '/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf';
-            $fontsize = 10;
+            $fontsize = 8;
         }
         
         my $wrapbox = GD::Text::Wrap->new( $img,
             line_space  => 0,
             color       => $black,
-            text        => $module->{shortcut},
+            text        => $module->{shortcut}
         );
         
         $wrapbox->set_font(gdMediumBoldFont);
         $wrapbox->set_font($font, $fontsize);
         $wrapbox->set(align => 'center', width => $x2-$x1);
-        $wrapbox->draw( $x1, $y1);
+        $wrapbox->draw( $x1, (($y2-$y1)/2)+$y1-10);
         
     }
     
