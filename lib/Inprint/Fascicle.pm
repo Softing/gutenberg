@@ -414,13 +414,19 @@ sub getPages {
     }
     
     my $holes;
+    #my $dbholes = $c->sql->Q("
+    #    SELECT
+    #        t1.id, t1.place, t1.page, t1.entity, t1.x, t1.y, t1.h, t1.w,
+    #        t2.id as module, t2.shortcut as module_shortcut
+    #    FROM fascicles_map_holes t1, ad_modules t2
+    #    WHERE t2.id = t1.module
+    #        AND t1.fascicle = ?
+    #", [ $fascicle ])->Hashes;
+    
     my $dbholes = $c->sql->Q("
-        SELECT
-            t1.id, t1.place, t1.page, t1.entity, t1.x, t1.y, t1.h, t1.w,
-            t2.id as module, t2.shortcut as module_shortcut
-        FROM fascicles_map_holes t1, ad_modules t2
-        WHERE t2.id = t1.module
-            AND t1.fascicle = ?
+        SELECT t1.id, t1.shortcut, t1.w, t1.h, t2.page, t2.x, t2.y
+        FROM fascicles_modules t1, fascicles_map_modules t2
+        WHERE t1.fascicle = ? AND t2.module=t1.id
     ", [ $fascicle ])->Hashes;
     
     foreach my $item (@$dbholes) {
@@ -428,12 +434,11 @@ sub getPages {
         
         $holes->{$index->{$item->{id}}} = {
             id => $item->{id},
-            title => $item->{module_shortcut},
-            entity => $item->{entity},
-            x => $item->{x},
-            y => $item->{y},
-            h => $item->{h},
-            w => $item->{w},
+            title => $item->{shortcut},
+            #x => $item->{x},
+            #y => $item->{y},
+            #h => $item->{h},
+            #w => $item->{w},
         };
         
         my $pageindex = $index->{$item->{page}};
