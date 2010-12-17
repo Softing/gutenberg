@@ -151,7 +151,7 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
         Ext.apply(this, {
             autoWidth:true,
             autoHeight:true,
-            simpleSelect: true,
+            simpleSelect: false,
             multiSelect: true,
             loadingText:'Загрузка',
             emptyText: 'Полосы не найдены',

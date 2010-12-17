@@ -4,8 +4,10 @@ Inprint.fascicle.planner.Context = function(parent, panels) {
 
     view.on("contextmenu", function( view, index, node, e) {
         
-         e.stopEvent();
-
+        e.stopEvent();
+        
+        view.select(node);
+        
         var selection = panels["pages"].cmpGetSelected();
         var selLength = selection.length;
         
