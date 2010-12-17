@@ -6,7 +6,7 @@ Inprint.fascicle.planner.Context = function(parent, panels) {
         
         e.stopEvent();
         
-        view.select(node);
+        view.select(node, true);
         
         var selection = panels["pages"].cmpGetSelected();
         var selLength = selection.length;
