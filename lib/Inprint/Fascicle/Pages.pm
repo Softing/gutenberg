@@ -42,6 +42,8 @@ sub templates {
     
     my @i_pages    = $c->param("page");
     
+    my $amount = $#i_pages+1;
+    
     my $result = [];
     
     my @errors;
@@ -63,10 +65,11 @@ sub templates {
         $sql = "
             SELECT id, fascicle, page, title, shortcut, description, amount, round(area::numeric, 2) as area, x, y, w, h, created, updated
             FROM fascicles_tmpl_modules
-            WHERE page = ANY(?)
+            WHERE page = ANY(?) AND amount=?
             ORDER BY shortcut
         ";
         push @params, \@$origins;
+        push @params, $amount;
     }
     
     unless (@errors) {

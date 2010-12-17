@@ -38,19 +38,15 @@ sub read {
 sub list {
     my $c = shift;
     
-    #my $i_fascicle = $c->param("fascicle");
-    my $i_page    = $c->param("page");
+    my @i_pages    = $c->param("page");
     
     my $result = [];
     
     my @errors;
     my $success = $c->json->false;
-
-    #push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
-    #    unless ($c->is_uuid($i_fascicle));
-        
-    push @errors, { id => "page", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_page));
+    
+    #push @errors, { id => "page", msg => "Incorrectly filled field"}
+    #    unless ($c->is_uuid($i_page));
     
     #my $fascicle; unless (@errors) {
     #    $fascicle  = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
@@ -58,23 +54,42 @@ sub list {
     #        unless ($fascicle);
     #}
     
-    my $page; unless (@errors) {
-        $page  = $c->sql->Q(" SELECT * FROM fascicles_tmpl_pages WHERE id=?", [ $i_page ])->Hash;
-        push @errors, { id => "page", msg => "Incorrectly filled field"}
-            unless ($page);
-    }
+    #my $page; unless (@errors) {
+    #    $page  = $c->sql->Q(" SELECT * FROM fascicles_tmpl_pages WHERE id=?", [ $i_page ])->Hash;
+    #    push @errors, { id => "page", msg => "Incorrectly filled field"}
+    #        unless ($page);
+    #}
     
     my $sql;
     my @params;
     
+    my @pages;
+    
     unless (@errors) {
+        
+        foreach my $code (@i_pages) {
+            my ($page_id, $seqnum) = split '::', $code;
+            
+            my $page = $c->sql->Q("
+                SELECT id, edition, fascicle, origin, headline, seqnum, w, h, created, updated
+                FROM fascicles_pages WHERE id=? AND seqnum=?
+            ", [ $page_id, $seqnum ])->Hash;
+            
+            next unless $page->{id};
+            
+            push @pages, $page->{id};
+        }
+        
         $sql = "
-            SELECT id, fascicle, page, title, shortcut, description, amount, round(area::numeric, 2) as area, x, y, w, h, created, updated
-            FROM fascicles_tmpl_modules
-            WHERE page=?
-            ORDER BY shortcut
+            SELECT
+                DISTINCT t1.id, t1.edition, t1.fascicle, t1.origin, t1.title, t1.shortcut, t1.description, t1.amount, t1.area, t1.created, t1.updated,
+                ( SELECT count(*) FROM fascicles_map_modules WHERE module=t1.id ) as count
+            FROM fascicles_modules t1, fascicles_map_modules t2
+            WHERE t2.module=t1.id AND t2.page = ANY(?) 
         ";
-        push @params, $page->{id};
+        
+        push @params, \@pages;
+        
     }
     
     unless (@errors) {
@@ -94,6 +109,7 @@ sub create {
     
     my $i_fascicle    = $c->param("fascicle");
     my @i_modules     = $c->param("module");
+    my @i_pages       = $c->param("page");
     
     my @errors;
     my $success = $c->json->false;
@@ -109,21 +125,51 @@ sub create {
     
     unless (@errors) {
         
-        foreach my $id (@{ @i_modules }) {
+        foreach my $id (@i_modules) {
             
-            #my $module = $c->sql->Q("
-            #        SELECT id, origin, fascicle, page, title, shortcut, description, amount, area, x, y, w, h, created, updated
-            #        FROM fascicles_tmpl_modules WHERE id=?
-            #    ", [ $id ])->Hash;
-            #
-            #$c->sql->Do("
-            #    INSERT INTO fascicles_page_modules(fascicle, origin, page, title, shortcut, description, amount, area, x, y, w, h, created, updated)
-            #    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
-            #", [
-            #    $module->{fascicle}, $module->{id}, $page->{id},
-            #    $i_title, $i_shortcut, $i_description,
-            #    $i_amount, $area, $i_x, $i_y, $i_w, $i_h
-            #]);
+            my $module = $c->sql->Q("
+                    SELECT id, origin, fascicle, page, title, shortcut, description, amount, area, x, y, w, h, created, updated
+                    FROM fascicles_tmpl_modules WHERE id=?
+                ", [ $id ])->Hash;
+            
+            next unless $module->{id};
+            
+            my @pages;
+            
+            foreach my $code (@i_pages) {
+                my ($page_id, $seqnum) = split '::', $code;
+                
+                my $page = $c->sql->Q("
+                    SELECT id, edition, fascicle, origin, headline, seqnum, w, h, created, updated
+                    FROM fascicles_pages WHERE id=? AND seqnum=?
+                ", [ $page_id, $seqnum ])->Hash;
+                
+                next unless $page->{id};
+                
+                push @pages, $page;
+                
+            }
+            
+            if ($#pages == $#i_pages) {
+                
+                my $module_id = $c->uuid;
+                
+                $c->sql->Do("
+                    INSERT INTO fascicles_modules(id, edition, fascicle, origin, title, shortcut, description, amount, area, created, updated)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
+                ", [
+                    $module_id, $fascicle->{edition}, $fascicle->{id}, $module->{id}, $module->{title}, $module->{shortcut}, $module->{description}, $module->{amount}, $module->{area}
+                ]);
+                
+                foreach my $page (@pages) {
+                    $c->sql->Do("
+                        INSERT INTO fascicles_map_modules(edition, fascicle, module, page, x, y, h, w, created, updated)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, now(), now());
+                    ", [
+                        $fascicle->{edition}, $fascicle->{id}, $module_id, $page->{id}, "0/1", "0/1", "0/1", "0/1"
+                    ]);
+                }
+            }
             
         }
     }

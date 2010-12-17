@@ -17,7 +17,12 @@ Inprint.cmp.composer.Modules = Ext.extend(Ext.grid.GridPanel, {
             "delete": _url("/fascicle/modules/delete/")
         }
 
-        this.store = Inprint.factory.Store.json(this.urls["list"]);
+        this.store = Inprint.factory.Store.json(this.urls["list"], {
+            autoLoad:true,
+            baseParams: {
+                page: this.parent.selection
+            }
+        });
         
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
         
@@ -166,6 +171,7 @@ Inprint.cmp.composer.Modules = Ext.extend(Ext.grid.GridPanel, {
                                 },
                                 params: {
                                     fascicle: this.parent.fascicle,
+                                    page: this.parent.selection,
                                     module: grid.getValues("id")
                                 }
                             });

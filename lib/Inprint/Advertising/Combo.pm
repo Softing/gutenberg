@@ -53,15 +53,18 @@ sub advertisers {
     my @errors;
     my $success = $c->json->false;
     
-    push @errors, { id => "query", msg => "Incorrectly filled field"}
-        if (length $i_query < 2);
+    if ($i_query) {
+        push @errors, { id => "query", msg => "Incorrectly filled field"}
+            if (length $i_query < 2);
+    }
     
     my @data;
     my $sql = " SELECT id, title FROM ad_advertisers  WHERE 1=1 ";
     
     if ($i_edition) {
-        $sql .= " AND edition = ? ";
-        push @data, $i_edition;
+        my $editions = $c->sql->Q(" SELECT id FROM editions WHERE path ~ ('*.' || replace(?, '-', '')::text || '.*')::lquery ", [$i_edition])->Values;
+        $sql .= " AND edition = ANY(?)";
+        push @data, $editions;
     }
     
     if ($i_query) {
@@ -73,7 +76,7 @@ sub advertisers {
     unless(@errors){
         $result = $c->sql->Q(" $sql ORDER BY title", \@data)->Hashes;
     }
-    $c->render_json( { data => $result || [] } );
+    $c->render_json( { errors => \@errors, data => $result || [] } );
 }
 
 sub fascicles {
@@ -100,8 +103,9 @@ sub fascicles {
     }
     
     if ($i_edition) {
-        $sql .= " AND edition = ? ";
-        push @data, $i_edition;
+        my $editions = $c->sql->Q(" SELECT id FROM editions WHERE path ~ ('*.' || replace(?, '-', '')::text || '.*')::lquery ", [$i_edition])->Values;
+        $sql .= " AND edition = ANY(?)";
+        push @data, $editions;
     }
     
     my $result = $c->sql->Q("
@@ -118,13 +122,11 @@ sub places {
     
     my $result = $c->sql->Q("
         SELECT id, title
-        FROM ad_places WHERE fascicle=?
+        FROM fascicles_tmpl_places WHERE fascicle=?
         ORDER BY title
     ", [ $i_fascicle ])->Hashes;
     $c->render_json( { data => $result } );
 }
-
-
 
 sub modules {
     my $c = shift;
