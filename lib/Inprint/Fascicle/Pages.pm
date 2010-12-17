@@ -37,6 +37,47 @@ sub read {
     $c->render_json({ success => $success, errors => \@errors, data => \@data });
 }
 
+sub templates {
+    my $c = shift;
+    
+    my @i_pages    = $c->param("page");
+    
+    my $result = [];
+    
+    my @errors;
+    my $success = $c->json->false;
+    
+    #push @errors, { id => "page", msg => "Incorrectly filled field"}
+    #    unless ($c->is_uuid($i_page));
+    
+    my $origins; unless (@errors) {
+        $origins  = $c->sql->Q(" SELECT origin FROM fascicles_pages WHERE id= ANY(?) ", [ \@i_pages ])->Values;
+        push @errors, { id => "page", msg => "Incorrectly filled field"}
+            unless (@$origins);
+    }
+    
+    my $sql;
+    my @params;
+    
+    unless (@errors) {
+        $sql = "
+            SELECT id, fascicle, page, title, shortcut, description, amount, round(area::numeric, 2) as area, x, y, w, h, created, updated
+            FROM fascicles_tmpl_modules
+            WHERE page = ANY(?)
+            ORDER BY shortcut
+        ";
+        push @params, \@$origins;
+    }
+    
+    unless (@errors) {
+        $result = $c->sql->Q(" $sql ", \@params)->Hashes;
+        $c->render_json( { data => $result } );
+    }
+    
+    $success = $c->json->true unless (@errors);
+    $c->render_json( { success => $success, errors => \@errors, data => $result } );
+}
+
 sub create {
     
     my $c = shift;

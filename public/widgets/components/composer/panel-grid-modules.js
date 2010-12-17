@@ -10,11 +10,11 @@ Inprint.cmp.composer.Modules = Ext.extend(Ext.grid.GridPanel, {
         this.components = {};
         
         this.urls = {
-            "list":        "/advertising/modules/list/",
-            "create": _url("/advertising/modules/create/"),
-            "read":   _url("/advertising/modules/read/"),
-            "update": _url("/advertising/modules/update/"),
-            "delete": _url("/advertising/modules/delete/")
+            "list":        "/fascicle/modules/list/",
+            "create": _url("/fascicle/modules/create/"),
+            "read":   _url("/fascicle/modules/read/"),
+            "update": _url("/fascicle/modules/update/"),
+            "delete": _url("/fascicle/modules/delete/")
         }
 
         this.store = Inprint.factory.Store.json(this.urls["list"]);
@@ -135,167 +135,51 @@ Inprint.cmp.composer.Modules = Ext.extend(Ext.grid.GridPanel, {
     
     
     cmpCreate: function() {
+        
         var win = this.components["create-window"];
-
+        
         if (!win) {
-
-            var form = {
-                xtype: "form",
-                modal:true,
-                frame:false,
-                border:false,
-                labelWidth: 75,
-                url: this.urls["create"],
-                bodyStyle: "padding:5px 5px",
-                defaults: {
-                    anchor: "100%",
-                    allowBlank:false
-                },
-                baseParams: {},
-                items: [
-                    
-                    _FLD_HDN_EDITION,
-                    _FLD_HDN_PAGE,
-                    
-                    {
-                        xtype: "titlefield",
-                        value: _("Basic options")
-                    },
-                    
-                    _FLD_SHORTCUT,
-                    _FLD_TITLE,
-                    _FLD_DESCRIPTION,
-                    
-                    {
-                        xtype: "titlefield",
-                        value: _("More options")
-                    },
-                    
-                    {
-                        xtype: "numberfield",
-                        allowBlank:false,
-                        allowDecimals:false,
-                        minValue: 1,
-                        name: "amount",
-                        value: 1,
-                        fieldLabel: _("Amount")
-                    }
-                ],
-                listeners: {
-                    scope:this,
-                    beforeaction: function(form, action) {
-                        var swf = this.components["create-window"].findByType("flash")[0].swf;
-                        var id = Ext.getCmp(this.components["create-window"].getId()).form.getId();
-                        //(function () {
-                            swf.getBlock("Inprint.flash.Proxy.setModule", id, "new_block");
-                        //}).defer(10);
-                    },
-                    actioncomplete: function (form, action) {
-                        if (action.type == "submit") {
-                            this.components["create-window"].hide()
-                            this.cmpReload();
-                        }
-                    }
-                },
-                keys: [ _KEY_ENTER_SUBMIT ]
-            };
             
-            var flash =  {
-                xtype: "flash",
-                swfWidth:380,
-                swfHeight:360,
-                hideMode : 'offsets',
-                url      : '/flash/Dispose.swf',
-                expressInstall: true,
-                flashVars: {
-                    src: '/flash/Dispose.swf',
-                    scale :'noscale',
-                    autostart: 'yes',
-                    loop: 'yes'
-                },
-                listeners: {
-                    scope:this,
-                    initialize: function(panel, flash) {
-                        alert(2);
-                    },
-                    afterrender: function(panel) {
-                        
-                        var init = function () {
-                            if (panel.swf.init) {
-                                panel.swf.init(panel.getSwfId(), "letter", 0, 0);
-                            } else {
-                                init.defer(10, this);
-                            }
-                        };
-                        
-                        init.defer(10, this);
-                        
-                    }
-                }
-            };
+            var grid = new Inprint.cmp.composer.GridTemplates({
+                parent: this.parent
+            });
             
             win = new Ext.Window({
                 width:700,
                 height:500,
                 modal:true,
-                layout: "border",
+                layout: "fit",
                 closeAction: "hide",
                 title: _("Adding a new category"),
-                defaults: {
-                    collapsible: false,
-                    split: true
-                },
-                items: [
-                    {   region: "center",
-                        margins: "3 0 3 3",
-                        layout:"fit",
-                        items: form
+                items: grid,
+                buttons: [
+                    {
+                        text: _("Add"),
+                        scope:this,
+                        handler: function() {
+                            Ext.Ajax.request({
+                                url: this.urls["create"],
+                                scope:this,
+                                success: function() {
+                                    this.components["create-window"].hide();
+                                    this.cmpReload();
+                                },
+                                params: {
+                                    fascicle: this.parent.fascicle,
+                                    module: grid.getValues("id")
+                                }
+                            });
+                        }
                     },
-                    {   region:"east",
-                        margins: "3 3 3 0",
-                        width: 380,
-                        minSize: 200,
-                        maxSize: 600,
-                        layout:"fit",
-                        collapseMode: 'mini',
-                        items: flash
-                    }
-                ],
-                listeners: {
-                    scope:this,
-                    afterrender: function(panel) {
-                        panel.flash = panel.findByType("flash")[0].swf;
-                        panel.form  = panel.findByType("form")[0];
-                    }
-                },
-                buttons: [ _BTN_WNDW_ADD, _BTN_WNDW_CLOSE ]
+                    _BTN_WNDW_CLOSE
+                ]
+                
             });
             
         }
         
         win.show(this);
         this.components["create-window"] = win;
-        
-        if (this.pageW && this.pageH) {
-            var configure = function () {
-                if (win.flash.setGrid) {
-                    win.flash.setGrid( this.pageW, this.pageH );
-                    win.flash.setBlocks( [ { id: "new_block", n:"New modules", x: "0/1", y: "0/1", w: "0/1", h: "0/1" } ] );
-                    win.flash.editBlock( "new_block", true );
-                } else {
-                    configure.defer(10, this);
-                }
-            }
-            configure.defer(10, this);
-        }
-        
-        var form = win.form.getForm();
-        
-        form.reset();
-        
-        form.findField("edition").setValue(this.parent.edition);
-        form.findField("page").setValue(this.pageId);
-        
     },
 
     cmpUpdate: function() {

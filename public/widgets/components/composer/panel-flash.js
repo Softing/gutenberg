@@ -81,8 +81,8 @@ Inprint.cmp.composer.Flash = Ext.extend(Ext.Panel, {
                     afterrender: function(panel) {
                          
                         var init = function () {
-                            if (panel.swf.init) {
-                                var record = this.params[panel.id];
+                            var record = this.params[panel.id];
+                            if (panel.swf.init && record) {
                                 panel.swf.init(panel.getSwfId(), "letter", 0, 0);
                                 panel.swf.setGrid( record.w, record.h );
                             } else {

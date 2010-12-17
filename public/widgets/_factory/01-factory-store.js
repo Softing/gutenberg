@@ -75,8 +75,10 @@ Inprint.factory.Store = new function() {
             'workgroup','workgroup_shortcut','ingroups',    'islooked','isopen',    'branch','branch_shortcut','stage','stage_shortcut','color','progress',
             'title','author','pages',    'pdate','psize','rdate','rsize',    'images','files',    'created','updated'
         ],
-        "/fascicle/templates/pages/list/":              [ "id", "edition", "title", "shortcut", "description", "w", "h", createDateField("created"), createDateField("updated") ],
-        "/fascicle/templates/modules/list/":            [ "id", "edition", "page", "title", "shortcut", "description", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
+        "/fascicle/templates/pages/list/":              [ "id", "fascicle", "title", "shortcut", "description", "w", "h", createDateField("created"), createDateField("updated") ],
+        "/fascicle/templates/modules/list/":            [ "id", "fascicle", "page", "title", "shortcut", "description", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
+        "/fascicle/pages/templates/":                   [ "id", "fascicle", "page", "title", "shortcut", "description", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
+        "/fascicle/modules/list/":                      [ "id", "fascicle", "page", "title", "shortcut", "description", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
         
         // System
         "/system/events/list/":                         [ "id", "initiator", "initiator_login", "initiator_shortcut", "initiator_position", "entity", "entity_type", "message", "message_type", "message_variables", createDateField("created") ],

@@ -4,6 +4,8 @@ Inprint.cmp.Composer = Ext.extend(Ext.Window, {
 
         this.panels = {};
         
+        
+        
         this.selLength = this.selection.length;
         
         this.panels["modules"] = new Inprint.cmp.composer.Modules({

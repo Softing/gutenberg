@@ -6,6 +6,8 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
         this.version;
         this.access = {};
         
+        this.fascicle = this.oid;
+        
         this.panels = {
             pages: new Inprint.fascicle.planner.Pages({
                 parent: this,

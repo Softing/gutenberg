@@ -135,14 +135,15 @@ sub startup {
     $self->createRoutes($sessionBridge, "fascicle/combos",                  [ "templates", "workgroups", "headlines", "rubrics" ]);
     $self->createRoutes($sessionBridge, "fascicle/indexes",                 [ "editions", "headlines", "rubrics", "create", "update", "delete" ]);
     $self->createRoutes($sessionBridge, "fascicle/images",                  [ "view" ]);
-    $self->createRoutes($sessionBridge, "fascicle/pages",                   [ "view", "create", "read", "update", "delete", "move", "left", "right", "resize", "clean" ]);
+    $self->createRoutes($sessionBridge, "fascicle/pages",                   [ "view", "templates", "modules", "create", "read", "update", "delete", "move", "left", "right", "resize", "clean" ]);
     $self->createRoutes($sessionBridge, "fascicle/documents",               [ "list" ]);
     $self->createRoutes($sessionBridge, "fascicle/headlines",               [ "tree", "read", "create", "update", "delete" ]);
     $self->createRoutes($sessionBridge, "fascicle/rubrics",                 [ "list", "read", "create", "update", "delete" ]);
+    $self->createRoutes($sessionBridge, "fascicle/modules",                 [ "list", "create", "read", "update", "delete" ]);
     
-    $self->createRoutes($sessionBridge, "fascicle/templates/modules",      [ "list", "create", "read", "update", "delete" ]);
-    $self->createRoutes($sessionBridge, "fascicle/templates/pages",        [ "list", "create", "read", "update", "delete" ]);
-    $self->createRoutes($sessionBridge, "fascicle/templates/places",       [ "tree", "create", "read", "update", "delete" ]);
+    $self->createRoutes($sessionBridge, "fascicle/templates/modules",       [ "list", "create", "read", "update", "delete" ]);
+    $self->createRoutes($sessionBridge, "fascicle/templates/pages",         [ "list", "create", "read", "update", "delete" ]);
+    $self->createRoutes($sessionBridge, "fascicle/templates/places",        [ "tree", "create", "read", "update", "delete" ]);
     
     # Profile routes
     $self->createRoutes($sessionBridge, "profile",                          [ "read", "update" ]);
