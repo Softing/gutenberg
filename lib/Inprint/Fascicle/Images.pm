@@ -94,19 +94,31 @@ sub view {
             $y2--;
         }
         
-        #$img->filledRectangle($x1, $y1, $x2, $y2,$darkgray);
-        #$img->rectangle($x1, $y1, $x2, $y2,$black);
+        $img->filledRectangle($x1, $y1, $x2, $y2,$darkgray);
+        $img->rectangle($x1, $y1, $x2, $y2,$black);
         
+        my $font;
+        my $fontsize;
+        if ($^O eq "MSWin32") {
+            $font = 'C:\Windows\Fonts\ARIALUNI.TTF';
+            $fontsize = 10;
+        }
+        
+        if ($^O eq "linux") {
+            $font = '/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf';
+            $fontsize = 10;
+        }
         
         my $wrapbox = GD::Text::Wrap->new( $img,
             line_space  => 0,
             color       => $black,
             text        => $module->{shortcut},
         );
+        
         $wrapbox->set_font(gdMediumBoldFont);
-        $wrapbox->set_font('arial', 10);
-        $wrapbox->set(align => 'center', width => 100);
-        $wrapbox->draw(10,40);
+        $wrapbox->set_font($font, $fontsize);
+        $wrapbox->set(align => 'center', width => $x2-$x1);
+        $wrapbox->draw( $x1, $y1);
         
     }
     
