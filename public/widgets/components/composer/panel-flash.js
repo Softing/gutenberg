@@ -174,6 +174,7 @@ Inprint.cmp.composer.Flash = Ext.extend(Ext.Panel, {
                             if (flash.init) {
                                 flash.init(c.id, "letter", 0, 0);
                                 flash.setGrid( c.w, c.h );
+                                flash.deleteAllBlocks();
                             } else {
                                 init.defer(10, this);
                             }

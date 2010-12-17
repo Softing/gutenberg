@@ -167,6 +167,7 @@ Inprint.cmp.composer.Modules = Ext.extend(Ext.grid.GridPanel, {
                                 scope:this,
                                 success: function() {
                                     this.components["create-window"].hide();
+                                    this.parent.panels["flash"].cmpInit();
                                     this.cmpReload();
                                 },
                                 params: {
@@ -198,7 +199,7 @@ Inprint.cmp.composer.Modules = Ext.extend(Ext.grid.GridPanel, {
                         url: this.urls["delete"],
                         scope:this,
                         success: function() {
-                            this.panels["flash"].cmpInit();
+                            this.parent.panels["flash"].cmpInit();
                             this.cmpReload();
                         },
                         params: { id: this.getValues("id") }
