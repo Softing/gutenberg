@@ -185,7 +185,14 @@ Inprint.cmp.composer.Flash = Ext.extend(Ext.Panel, {
                 Ext.each(responce.data.modules, function(c) {
                     var flash = this.cmpGetFlashById(c.page);
                     if (flash){
-                        flash.setBlock(c.id, c.shortcut, c.x, c.y, c.w, c.h );
+                        var set = function() {
+                            if (flash.setBlock) {
+                                flash.setBlock(c.id, c.shortcut, c.x, c.y, c.w, c.h );
+                            } else {
+                                set.defer(10, this);
+                            }
+                        }
+                        set.defer(10, this);
                     }
                 }, this);
                 
