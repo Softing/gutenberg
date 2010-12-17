@@ -31,21 +31,6 @@ sub view {
         FROM fascicles_pages WHERE id=?
     ", [ $i_page ])->Hash;
     
-    #my $modules = $c->sql->Q("
-    #    SELECT
-    #        t1.id, t1.place, t1.page, t1.entity, t1.x, t1.y, t1.h, t1.w
-    #    FROM fascicles_map_holes t1
-    #    WHERE 
-    #        t1.page = ?
-    #", [ $i_page ])->Hashes;
-    
-    #my @modules;
-    #foreach my $item (@$modules) {
-    #    if ($item->{x} && $item->{y}) {
-    #        push @modules, [ $item->{x}, $item->{y}, $item->{w}, $item->{h}, "orange", "black" ];
-    #    }
-    #}
-    
     # create a new image
     my $img = new GD::Image($grid_w, $grid_h);
     
@@ -70,6 +55,46 @@ sub view {
     }
     
     #$img = $c->draw_page($img, $grid_w ."x". $grid_h, $page->{w} ."x". $page->{h}, 0, \@modules);
+    
+    my $modules = $c->sql->Q("
+        SELECT
+            t1.id, t1.w, t1.h, t2.x, t2.y
+        FROM fascicles_modules t1, fascicles_map_modules t2
+        WHERE 
+            t2.page = ? AND t2.module = t1.id
+    ", [ $i_page ])->Hashes;
+    
+    
+    foreach my $module (@$modules) {
+        
+        my ($xl1,$xl2) = split '/', $module->{x};
+        my ($yl1,$yl2) = split '/', $module->{y};
+        
+        my ($wl1,$wl2) = split '/', $module->{w};
+        my ($hl1,$hl2) = split '/', $module->{h};
+        
+        my $x1 = ($xl1/$xl2) * $grid_w;
+        my $y1 = ($yl1/$yl2) * $grid_h;
+        
+        my $w1 = ($wl1/$wl2) * $grid_w;
+        my $h1 = ($hl1/$hl2) * $grid_h;
+        
+        my $x2 = $x1+$w1;
+        my $y2 = $y1+$h1;
+        
+        if ($x2 == $grid_w) {
+            $x2--;
+        }
+        
+        if ($y2 == $grid_h) {
+            $y2--;
+        }
+        
+        $img->filledRectangle($x1, $y1, $x2, $y2,$red);
+        $img->rectangle($x1, $y1, $x2, $y2,$black);
+        
+        #$img->fill(50,50,$red);
+    }
     
     $c->tx->res->headers->content_type('image/png');
     $c->render_data($img->png);
