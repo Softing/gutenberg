@@ -222,6 +222,10 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
             selection: selection
         });
         
+        wndw.on("actioncomplete", function() {
+            this.parent.cmpReload();
+        }, this);
+        
         wndw.show();
     },
     

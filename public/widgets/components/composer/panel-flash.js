@@ -5,6 +5,8 @@ Inprint.cmp.composer.Flash = Ext.extend(Ext.Panel, {
         this.params = {};
         this.components = {};
         
+        this.saveCounter = 0;
+        
         this.urls = {
             "init":   _url("/fascicle/composer/initialize/"),
             "save":   _url("/fascicle/composer/save/")
@@ -228,7 +230,13 @@ Inprint.cmp.composer.Flash = Ext.extend(Ext.Panel, {
             scope:this,
             success: function ( result, request ) {
                 var responce = Ext.util.JSON.decode(result.responseText);
-                alert(1);
+                this.saveCounter++;
+                
+                if (this.saveCounter >= this.pages.length) {
+                    this.saveCounter = 0;
+                    this.parent.fireEvent("actioncomplete", this);
+                }
+                
             },
             params: {
                 page: page,
