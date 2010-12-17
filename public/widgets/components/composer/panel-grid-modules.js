@@ -28,13 +28,13 @@ Inprint.cmp.composer.Modules = Ext.extend(Ext.grid.GridPanel, {
         
         this.columns = [
             this.selectionModel,
-            //{
-            //    id:"title",
-            //    header: _("Title"),
-            //    width: 150,
-            //    sortable: true,
-            //    dataIndex: "title"
-            //},
+            {
+                id:"title",
+                header: _("Title"),
+                width: 150,
+                sortable: true,
+                dataIndex: "title"
+            },
             {
                 id:"shortcut",
                 header: _("Shortcut"),
@@ -47,43 +47,43 @@ Inprint.cmp.composer.Modules = Ext.extend(Ext.grid.GridPanel, {
                 header: _("Description"),
                 sortable: true,
                 dataIndex: "description"
+            },
+            {
+                id:"amount",
+                header: _("Amount"),
+                sortable: true,
+                dataIndex: "amount"
+            },
+            {
+                id:"area",
+                header: _("Area"),
+                sortable: true,
+                dataIndex: "area"
+            },
+            {
+                id:"x",
+                header: _("X"),
+                sortable: true,
+                dataIndex: "x"
+            },
+            {
+                id:"y",
+                header: _("Y"),
+                sortable: true,
+                dataIndex: "y"
+            },
+            {
+                id:"w",
+                header: _("W"),
+                sortable: true,
+                dataIndex: "w"
+            },
+            {
+                id:"h",
+                header: _("H"),
+                sortable: true,
+                dataIndex: "h"
             }
-            //{
-            //    id:"amount",
-            //    header: _("Amount"),
-            //    sortable: true,
-            //    dataIndex: "amount"
-            //},
-            //{
-            //    id:"area",
-            //    header: _("Area"),
-            //    sortable: true,
-            //    dataIndex: "area"
-            //},
-            //{
-            //    id:"x",
-            //    header: _("X"),
-            //    sortable: true,
-            //    dataIndex: "x"
-            //},
-            //{
-            //    id:"y",
-            //    header: _("Y"),
-            //    sortable: true,
-            //    dataIndex: "y"
-            //},
-            //{
-            //    id:"w",
-            //    header: _("W"),
-            //    sortable: true,
-            //    dataIndex: "w"
-            //},
-            //{
-            //    id:"h",
-            //    header: _("H"),
-            //    sortable: true,
-            //    dataIndex: "h"
-            //}
         ];
         
         this.tbar = [
