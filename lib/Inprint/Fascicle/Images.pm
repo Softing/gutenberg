@@ -38,7 +38,9 @@ sub view {
     my $black = $img->colorAllocate(0,0,0);
     my $red   = $img->colorAllocate(255,0,0);
     my $blue  = $img->colorAllocate(0,0,255);
+    
     my $gray  = $img->colorAllocate(214,214,214);
+    my $darkgray  = $img->colorAllocate(227,227,227);
     
     $img->rectangle(0,0, $grid_w-1, $grid_h-1, $gray);
     
@@ -90,7 +92,7 @@ sub view {
             $y2--;
         }
         
-        $img->filledRectangle($x1, $y1, $x2, $y2,$red);
+        $img->filledRectangle($x1, $y1, $x2, $y2,$darkgray);
         $img->rectangle($x1, $y1, $x2, $y2,$black);
         
         #$img->fill(50,50,$red);
