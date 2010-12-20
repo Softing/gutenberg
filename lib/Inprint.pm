@@ -135,7 +135,6 @@ sub startup {
     $self->createRoutes($sessionBridge, "fascicle/combos",                  [ "templates", "workgroups", "headlines", "rubrics" ]);
     $self->createRoutes($sessionBridge, "fascicle/composer",                [ "initialize", "save" ]);
     $self->createRoutes($sessionBridge, "fascicle/indexes",                 [ "editions", "headlines", "rubrics", "create", "update", "delete" ]);
-    $self->createRoutes($sessionBridge, "fascicle/images",                  [ "view" ]);
     $self->createRoutes($sessionBridge, "fascicle/pages",                   [ "view", "templates", "modules", "create", "read", "update", "delete", "move", "left", "right", "resize", "clean" ]);
     $self->createRoutes($sessionBridge, "fascicle/documents",               [ "list" ]);
     $self->createRoutes($sessionBridge, "fascicle/headlines",               [ "tree", "read", "create", "update", "delete" ]);
@@ -146,6 +145,14 @@ sub startup {
     $self->createRoutes($sessionBridge, "fascicle/templates/pages",         [ "list", "create", "read", "update", "delete" ]);
     $self->createRoutes($sessionBridge, "fascicle/templates/places",        [ "tree", "create", "read", "update", "delete" ]);
     $self->createRoutes($sessionBridge, "fascicle/templates/index",         [ "headlines", "modules", "save" ]);
+    
+    # Images
+    $sessionBridge->route('/aimgs/fascicle/page/:id/:w/:h')->to('images#fascicle_page');
+    $sessionBridge->route('/aimgs/fascicle/template/:id/:w/:h')->to('images#fascicle_page');
+    $sessionBridge->route('/aimgs/fascicle/module/:id/:w/:h')->to('images#fascicle_page');
+    $sessionBridge->route('/aimgs/advert/page/:id/:w/:h')->to('images#fascicle_page');
+    $sessionBridge->route('/aimgs/advert/template/:id/:w/:h')->to('images#fascicle_page');
+    $sessionBridge->route('/aimgs/advert/module/:id/:w/:h')->to('images#fascicle_page');
     
     # Profile routes
     $self->createRoutes($sessionBridge, "profile",                          [ "read", "update" ]);

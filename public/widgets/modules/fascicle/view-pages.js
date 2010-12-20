@@ -60,7 +60,7 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
                             string += '</div>';
                             
                             string += '<div class="inprint-plan-page-body"'+
-                                ' style="background:url(/fascicle/images/view/?page='+ page.id +'&w=105&h=129&rnd='+ Math.random() +') no-repeat;">';
+                                ' style="background:url(/aimgs/fascicle/page/'+ page.id +'/105/129/?rnd='+ Math.random() +') no-repeat;">';
                             
                             if (page.documents) {
                                 string += '<div  class="inprint-plan-page-documents">';

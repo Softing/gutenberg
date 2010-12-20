@@ -171,6 +171,8 @@ sub create {
         # Import defaults
         if ($i_copyfrom && $i_copyfrom eq "00000000-0000-0000-0000-000000000000") {
             
+            my %cache;
+            
             my $editions = $c->sql->Q("
                 SELECT id FROM editions WHERE path @> ? order by path asc; 
             ", [ $edition->{path} ])->Values;
@@ -197,13 +199,15 @@ sub create {
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
                 ", [ $headline_id, $edition->{id}, $id, $headline_origin, 'headline', $headline_id, $headline->{title}, $headline->{shortcut}, $headline->{description} ]);
                 
+                $cache{ $headline->{id} } = $headline_id;
+                
                 my $rubrics = $c->sql->Q("
                     SELECT id, edition, nature, parent, title, shortcut, description, created, updated
-                    FROM index
-                    WHERE nature = 'rubric' AND parent = ?
+                    FROM index WHERE nature = 'rubric' AND parent = ?
                 ", [ $headline->{id} ])->Hashes;
 
                 foreach my $rubric (@$rubrics) {
+                    
                     my $rubric_id = $c->uuid();
 
                     my $rubric_origin = $rubric->{id};
@@ -238,27 +242,60 @@ sub create {
                 
                 foreach my $module (@$tmpl_modules) {
                     
+                    my $module_id = $c->uuid();
+                    
                     $c->sql->Do("
-                        INSERT INTO fascicles_tmpl_modules(origin, fascicle, page, title, shortcut, description, amount, area, x, y, w, h, created, updated)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
-                    ", [ $module->{id},  $id, $page_id, $module->{title}, $module->{shortcut}, $module->{description}, $module->{amount}, $module->{area}, $module->{x}, $module->{y}, $module->{w}, $module->{h} ]);
+                        INSERT INTO fascicles_tmpl_modules(id, origin, fascicle, page, title, shortcut, description, amount, area, x, y, w, h, created, updated)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
+                    ", [ $module_id, $module->{id},  $id, $page_id, $module->{title}, $module->{shortcut}, $module->{description}, $module->{amount}, $module->{area}, $module->{x}, $module->{y}, $module->{w}, $module->{h} ]);
+                    
+                    $cache{ $module->{id} } = $module_id;
+                    
                 }
             
             }
             
-            # import places
+            # Import places
             
             my $tmpl_places  = $c->sql->Q(" SELECT id, edition, title, shortcut, description, created, updated FROM ad_places WHERE edition = ANY(?) ", [ $editions ])->Hashes;
             
             foreach my $place (@$tmpl_places) {
+                
+                my $place_id = $c->uuid();
+                
                 $c->sql->Do("
-                    INSERT INTO fascicles_tmpl_places(origin, fascicle, title, shortcut, description, created, updated)
-                        VALUES (?, ?, ?, ?, ?, now(), now());
-                ", [ $place->{id}, $id, $place->{title}, $place->{shortcut}, $place->{description} ]);
+                    INSERT INTO fascicles_tmpl_places(id, origin, fascicle, title, shortcut, description, created, updated)
+                        VALUES (?, ?, ?, ?, ?, ?, now(), now());
+                ", [ $place_id, $place->{id}, $id, $place->{title}, $place->{shortcut}, $place->{description} ]);
+                
+                $cache{ $place->{id} } = $place_id;
             }
             
-            my $tmpl_index   = $c->sql->Q(" SELECT id, edition, nature, entity, created, updated FROM ad_index WHERE edition = ANY(?) ", [ $editions ])->Hashes;
-
+            # Import places index
+            
+            my $tmpl_places_index = $c->sql->Q("
+                    SELECT id, edition, place, nature, entity, created, updated
+                    FROM ad_index WHERE edition = ?
+                ", [ $edition->{id} ])->Hashes;
+            
+            foreach my $indx (@$tmpl_places_index) {
+                
+                my $indx_id = $c->uuid();
+                die $indx->{entity} unless $cache{ $indx->{entity} };
+                
+                my $place_id = $cache{ $indx->{place} };
+                my $entity_id = $cache{ $indx->{entity} };
+                
+                next unless $place_id;
+                next unless $entity_id;
+                
+                $c->sql->Do("
+                    INSERT INTO fascicles_tmpl_index(id, edition, fascicle, place, nature, entity, created, updated)
+                        VALUES (?, ?, ?, ?, ?, ?, now(), now());
+                ", [ $indx_id, $edition->{id}, $id, $place_id, $indx->{nature}, $entity_id ]);
+                
+            }
+            
         }
         
         if ($i_copyfrom && $i_copyfrom ne "00000000-0000-0000-0000-000000000000") {
