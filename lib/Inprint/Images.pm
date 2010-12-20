@@ -55,7 +55,7 @@ sub fascicle_page {
     
     my $modules = $c->sql->Q("
         SELECT
-            t1.id, t1.shortcut, t1.w, t1.h, t2.x, t2.y
+            t1.id, t1.shortcut, t1.w, t1.h, t2.placed, t2.x, t2.y
         FROM fascicles_modules t1, fascicles_map_modules t2
         WHERE 
             t2.page = ? AND t2.module = t1.id
@@ -107,6 +107,10 @@ sub draw_module {
     my $img = shift;
     my $grid = shift;
     my $module = shift;
+    
+    return unless $module->{x};
+    return unless $module->{y};
+    return unless $module->{placed};
     
     my ($xl1,$xl2) = split '/', $module->{x};
     my ($yl1,$yl2) = split '/', $module->{y};

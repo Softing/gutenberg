@@ -59,8 +59,7 @@ sub save {
             my ($id, $x, $y, $w, $h) = split "::", $string;
             
             $c->sql->Do("
-                    UPDATE fascicles_map_modules SET x=?, y=?
-                    WHERE page=? AND module=?
+                    UPDATE fascicles_map_modules SET placed=true, x=?, y=? WHERE page=? AND module=?
                 ", [ $x, $y, $i_page, $id ]);
             
         }

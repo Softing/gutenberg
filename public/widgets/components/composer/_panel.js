@@ -50,17 +50,33 @@ Inprint.cmp.Composer = Ext.extend(Ext.Window, {
                     ]
                 },
                 this.panels["flash"]
+            ],
+            buttons: [
+                {
+                    text: _("Save"),
+                    scope:this,
+                    handler: this.cmpSave
+                },
+                {
+                    text: _("Close"),
+                    scope:this,
+                    handler: this.hide
+                }
             ]
             
         });
-
+        
         Inprint.cmp.Composer.superclass.initComponent.apply(this, arguments);
         
     },
-
+    
     onRender: function() {
         Inprint.cmp.Composer.superclass.onRender.apply(this, arguments);
         Inprint.cmp.composer.Interaction(this, this.panels);
+    },
+    
+    cmpSave: function() {
+        this.panels["flash"].cmpSave();
     }
 
 });
