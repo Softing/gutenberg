@@ -85,7 +85,16 @@ Inprint.cmp.composer.GridTemplates = Ext.extend(Ext.grid.GridPanel, {
         ];
         
         Ext.apply(this, {
-            border:false,
+            
+            title: _("Templates"),
+            
+            enableDragDrop: true,
+            ddGroup: 'principals-selector',
+            
+            height:200,
+            layout:"fit",
+            region: "south",
+            
             stripeRows: true,
             columnLines: true,
             sm: this.selectionModel

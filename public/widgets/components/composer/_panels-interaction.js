@@ -1,17 +1,10 @@
 Inprint.cmp.composer.Interaction = function(parent, panels) {
 
     var modules = panels["modules"];
+    var templates = panels["templates"];
     var flash   = panels["flash"];
 
     modules.getSelectionModel().on("selectionchange", function(sm) {
-
-        if (sm.getCount() > 0) {
-            modules.btnDelete.enable();
-        }
-        if (sm.getCount() == 0) {
-            modules.btnDelete.disable();
-        }
-        
         if (sm.getCount() == 1) {
             Ext.Ajax.request({
                 url: _url("/fascicle/modules/read/"),
@@ -23,28 +16,55 @@ Inprint.cmp.composer.Interaction = function(parent, panels) {
                 params: { id: modules.getValue("id") }
             });
         }
-        
     }, parent);
     
-    //parent.buttons[0].on("click", function(){
-    //    
-    //    var data = [];
-    //    Ext.each(grid.getSelectionModel().getSelections(), function(record) {
-    //        data.push(record.get("id") +'::'+ record.get("headline") +'::'+ record.get("rubric"));
-    //    });
-    //    
-    //    Ext.Ajax.request({
-    //        scope:this,
-    //        url: _url("/documents/copy/"),
-    //        params: {
-    //            id: this.oid,
-    //            copyto: data
-    //        },
-    //        success: function(form, action) {
-    //            this.hide();
-    //            this.fireEvent("actioncomplete", this);
-    //        }
-    //    });
-    //}, parent)
-
+    modules.on("rowcontextmenu", function(grid, rindex, e) {
+        e.stopEvent();
+        var items = [];
+        items.push({
+            icon: _ico("minus-button"),
+            cls: "x-btn-text-icon",
+            text: _("Remove"),
+            ref: "../btnRemove",
+            scope:this,
+            handler: this.cmpDelete
+        });
+        var coords = e.getXY();
+        new Ext.menu.Menu({ items : items }).showAt([coords[0], coords[1]]);
+    }, modules);
+    
+    modules.on("afterrender", function() {
+        
+        new Ext.dd.DropTarget(modules.getView().scroller.dom, {
+            
+            ddGroup    : 'principals-selector',
+            notifyDrop : function(ddSource, e, data){
+                
+                var ids = [];
+                
+                Ext.each(ddSource.dragData.selections, function(r) {
+                    ids.push(r.data.id);
+                });
+                
+                Ext.Ajax.request({
+                    url: _url("/fascicle/modules/create/"),
+                    scope:this,
+                    success: function() {
+                        flash.cmpInit();
+                        modules.cmpReload();
+                    },
+                    params: {
+                        fascicle: parent.fascicle,
+                        page: parent.selection,
+                        module: ids
+                    }
+                });
+                
+                return true;
+            }
+            
+        });
+        
+    }, this);
+    
 }

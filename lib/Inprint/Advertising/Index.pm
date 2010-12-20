@@ -147,7 +147,13 @@ sub modules {
             unless ($edition);
     }
     
-        push @errors, { id => "place", msg => "Incorrectly filled field"}
+    my $editions = []; unless (@errors) {
+        $editions = $c->sql->Q("
+            SELECT id FROM editions WHERE path @> ? order by path asc; 
+        ", [ $edition->{path} ])->Values;
+    }
+    
+    push @errors, { id => "place", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_place));
     
     my $place; unless (@errors) {
@@ -163,11 +169,11 @@ sub modules {
                 t2.id as page, t2.shortcut as page_shortcut,
                 EXISTS(SELECT true FROM ad_index WHERE place=? AND entity=t1.id) as selected
             FROM ad_modules t1, ad_pages t2
-            WHERE t2.id = t1.page AND t1.edition=?
+            WHERE t1.edition= ANY(?) AND t2.id = t1.page
             ORDER BY t2.shortcut, t1.shortcut
         ";
         push @params, $place->{id};
-        push @params, $edition->{id};
+        push @params, $editions;
     }
     
     unless (@errors) {

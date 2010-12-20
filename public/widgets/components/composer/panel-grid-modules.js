@@ -84,50 +84,53 @@ Inprint.cmp.composer.Modules = Ext.extend(Ext.grid.GridPanel, {
             }
         ];
         
-        this.tbar = [
-            {
-                disabled:false,
-                icon: _ico("plus-button"),
-                cls: "x-btn-text-icon",
-                text: _("Add"),
-                ref: "../btnCreate",
-                scope:this,
-                handler: this.cmpCreate
-            },
-            {
-                disabled:false,
-                icon: _ico("disk-black"),
-                cls: "x-btn-text-icon",
-                text: _("Save"),
-                ref: "../btnSave",
-                scope:this,
-                handler: function() {
-                    this.parent.panels["flash"].cmpSave();
-                }
-            },
-            '-',
-            {
-                disabled:true,
-                icon: _ico("minus-button"),
-                cls: "x-btn-text-icon",
-                text: _("Remove"),
-                ref: "../btnDelete",
-                scope:this,
-                handler: this.cmpDelete
-            }
-        ];
+        //this.tbar = [
+        //    //{
+        //    //    disabled:false,
+        //    //    icon: _ico("plus-button"),
+        //    //    cls: "x-btn-text-icon",
+        //    //    text: _("Add"),
+        //    //    ref: "../btnCreate",
+        //    //    scope:this,
+        //    //    handler: this.cmpCreate
+        //    //},
+        //    {
+        //        disabled:false,
+        //        icon: _ico("disk-black"),
+        //        cls: "x-btn-text-icon",
+        //        text: _("Save"),
+        //        ref: "../btnSave",
+        //        scope:this,
+        //        handler: function() {
+        //            this.parent.panels["flash"].cmpSave();
+        //        }
+        //    },
+        //    '-',
+        //    {
+        //        disabled:true,
+        //        icon: _ico("minus-button"),
+        //        cls: "x-btn-text-icon",
+        //        text: _("Remove"),
+        //        ref: "../btnDelete",
+        //        scope:this,
+        //        handler: this.cmpDelete
+        //    }
+        //];
         
         Ext.apply(this, {
             
-            region: "center",
-            margins: "3 0 3 3",
-            layout:"fit",
+            title: _("Modules"),
             
-            //border:false,
+            enableDragDrop: true,
+            ddGroup: 'principals-selector',
+            
+            layout:"fit",
+            region: "center",
+            
             stripeRows: true,
             columnLines: true,
             sm: this.selectionModel
-            //autoExpandColumn: "description"
+
         });
 
         Inprint.cmp.composer.Modules.superclass.initComponent.apply(this, arguments);
@@ -139,55 +142,55 @@ Inprint.cmp.composer.Modules = Ext.extend(Ext.grid.GridPanel, {
     },
     
     
-    cmpCreate: function() {
-        
-        var win = this.components["create-window"];
-        
-        if (!win) {
-            
-            var grid = new Inprint.cmp.composer.GridTemplates({
-                parent: this.parent
-            });
-            
-            win = new Ext.Window({
-                width:700,
-                height:500,
-                modal:true,
-                layout: "fit",
-                closeAction: "hide",
-                title: _("Adding a new category"),
-                items: grid,
-                buttons: [
-                    {
-                        text: _("Add"),
-                        scope:this,
-                        handler: function() {
-                            Ext.Ajax.request({
-                                url: this.urls["create"],
-                                scope:this,
-                                success: function() {
-                                    this.components["create-window"].hide();
-                                    this.parent.panels["flash"].cmpInit();
-                                    this.cmpReload();
-                                },
-                                params: {
-                                    fascicle: this.parent.fascicle,
-                                    page: this.parent.selection,
-                                    module: grid.getValues("id")
-                                }
-                            });
-                        }
-                    },
-                    _BTN_WNDW_CLOSE
-                ]
-                
-            });
-            
-        }
-        
-        win.show(this);
-        this.components["create-window"] = win;
-    },
+    //cmpCreate: function() {
+    //    
+    //    var win = this.components["create-window"];
+    //    
+    //    if (!win) {
+    //        
+    //        var grid = new Inprint.cmp.composer.GridTemplates({
+    //            parent: this.parent
+    //        });
+    //        
+    //        win = new Ext.Window({
+    //            width:700,
+    //            height:500,
+    //            modal:true,
+    //            layout: "fit",
+    //            closeAction: "hide",
+    //            title: _("Adding a new category"),
+    //            items: grid,
+    //            buttons: [
+    //                {
+    //                    text: _("Add"),
+    //                    scope:this,
+    //                    handler: function() {
+    //                        Ext.Ajax.request({
+    //                            url: this.urls["create"],
+    //                            scope:this,
+    //                            success: function() {
+    //                                this.components["create-window"].hide();
+    //                                this.parent.panels["flash"].cmpInit();
+    //                                this.cmpReload();
+    //                            },
+    //                            params: {
+    //                                fascicle: this.parent.fascicle,
+    //                                page: this.parent.selection,
+    //                                module: grid.getValues("id")
+    //                            }
+    //                        });
+    //                    }
+    //                },
+    //                _BTN_WNDW_CLOSE
+    //            ]
+    //            
+    //        });
+    //        
+    //    }
+    //    
+    //    win.show(this);
+    //    this.components["create-window"] = win;
+    //},
     
     cmpDelete: function() {
         Ext.MessageBox.confirm(
