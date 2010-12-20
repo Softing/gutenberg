@@ -225,16 +225,16 @@ sub create {
             
             # import page and modules templates
             
-            my $tmpl_pages   = $c->sql->Q(" SELECT id, edition, title, shortcut, description, w, h, created, updated FROM ad_pages WHERE edition = ANY(?) ", [ $editions ])->Hashes;
+            my $tmpl_pages   = $c->sql->Q(" SELECT id, edition, title, shortcut, description, bydefault, w, h, created, updated FROM ad_pages WHERE edition = ANY(?) ", [ $editions ])->Hashes;
             
             foreach my $page (@$tmpl_pages) {
                 
                 my $page_id = $c->uuid;
                 
                 $c->sql->Do("
-                    INSERT INTO fascicles_tmpl_pages(id, origin, fascicle, title, shortcut, description, w, h, created, updated)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, now(), now());
-                ", [ $page_id, $page->{id}, $id, $page->{title}, $page->{shortcut}, $page->{description}, $page->{w}, $page->{h} ]);
+                    INSERT INTO fascicles_tmpl_pages(id, origin, fascicle, title, shortcut, description, bydefault, w, h, created, updated)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
+                ", [ $page_id, $page->{id}, $id, $page->{title}, $page->{shortcut}, $page->{description}, $page->{bydefault}, $page->{w}, $page->{h} ]);
                 
                 my $tmpl_modules = $c->sql->Q("
                     SELECT id, edition, page, title, shortcut, description, amount, area, x, y, w, h, created, updated

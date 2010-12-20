@@ -120,8 +120,7 @@ Inprint.advert.modules.Pages = Ext.extend(Ext.grid.GridPanel, {
                     allowBlank:false
                 },
                 items: [
-                    _FLD_HDN_FASCICLE,
-                    _FLD_HDN_HEADLINE,
+                    _FLD_HDN_EDITION,
                     {
                         xtype: "titlefield",
                         value: _("Basic options")
@@ -240,9 +239,7 @@ Inprint.advert.modules.Pages = Ext.extend(Ext.grid.GridPanel, {
         var form = win.form.getForm();
         form.reset();
         
-        form.baseParams = {
-            edition: this.parent.edition
-        };
+        form.findField("edition").setValue(this.parent.edition);
     },
 
     cmpUpdate: function() {
@@ -266,8 +263,6 @@ Inprint.advert.modules.Pages = Ext.extend(Ext.grid.GridPanel, {
                 },
                 items: [
                     _FLD_HDN_ID,
-                    _FLD_HDN_FASCICLE,
-                    _FLD_HDN_HEADLINE,
                     {
                         xtype: "titlefield",
                         value: _("Basic options")
