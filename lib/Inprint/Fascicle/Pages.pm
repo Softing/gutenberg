@@ -39,7 +39,7 @@ sub read {
 sub templates {
     my $c = shift;
     
-    my @i_pages    = $c->param("page");
+    my @i_pages = $c->param("page");
     
     my $amount = $#i_pages+1;
     
@@ -48,8 +48,10 @@ sub templates {
     my @errors;
     my $success = $c->json->false;
     
-    #push @errors, { id => "page", msg => "Incorrectly filled field"}
-    #    unless ($c->is_uuid($i_page));
+    foreach (@i_pages) {
+        push @errors, { id => "page", msg => "Incorrectly filled field"}
+            unless ($c->is_uuid($_));
+    }
     
     my $origins; unless (@errors) {
         $origins  = $c->sql->Q(" SELECT origin FROM fascicles_pages WHERE id= ANY(?) ", [ \@i_pages ])->Values;
