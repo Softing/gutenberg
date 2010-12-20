@@ -76,6 +76,6 @@ Inprint.fascicle.places.Main = Ext.extend(Ext.Panel, {
 
 Inprint.registry.register("fascicle-places", {
     icon: "table-select-cells",
-    text: _("Places"),
+    text: _("Advertizing positions"),
     xobject: Inprint.fascicle.places.Main
 });

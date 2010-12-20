@@ -74,11 +74,40 @@ sub seance {
             }
         }
         
-        $fascicle->{pc} = $c->sql->Q(" SELECT max(seqnum) FROM fascicles_pages WHERE fascicle=? ", [ $fascicle->{id} ])->Value;
-        $fascicle->{dc} = 0;
-        $fascicle->{ac} = 0;
-        $fascicle->{dav} = 0;
-        $fascicle->{aav} = 0;
+        my $statusbar_all = $c->sql->Q(" SELECT count(*) FROM fascicles_pages WHERE fascicle=? AND seqnum is not null ", [ $fascicle->{id} ])->Value;
+
+        my $statusbar_adv = $c->sql->Q(" 
+                SELECT sum(t1.area)
+                FROM fascicles_modules t1, fascicles_map_modules t2, fascicles_pages t3
+                WHERE 
+                    t2.module = t1.id AND t2.page = t3.id AND t3.fascicle=?
+            ", [ $fascicle->{id} ]
+        )->Value;
+        
+        my $statusbar_doc = $statusbar_all - $statusbar_adv;
+
+        my $statusbar_doc_average = 0;
+        
+        if ($statusbar_all > 0) {
+            $statusbar_doc_average = sprintf "%.2f", $statusbar_doc/ $statusbar_all * 100 ;
+        }
+        
+        my $statusbar_adv_average = 0;
+        if ($statusbar_all > 0) {
+            $statusbar_adv_average = sprintf "%.2f", $statusbar_adv/ $statusbar_all * 100 ;
+        }
+        
+        $fascicle->{pc}  = $statusbar_all || 0;
+        $fascicle->{dc}  = $statusbar_doc || 0;
+        $fascicle->{ac}  = $statusbar_adv || 0;
+        $fascicle->{dav} = $statusbar_doc_average || 0;
+        $fascicle->{aav} = $statusbar_adv_average || 0;
+        
+        #$fascicle->{pc} = $c->sql->Q(" SELECT count(*) FROM fascicles_pages WHERE fascicle=? AND seqnum is not null ", [ $fascicle->{id} ])->Value;
+        #$fascicle->{dc} = 1;
+        #$fascicle->{ac} = 2;
+        #$fascicle->{dav} = 0;
+        #$fascicle->{aav} = 0;
         
     }
     
@@ -146,11 +175,6 @@ sub check {
             }
         }
         
-        $fascicle->{pc} = 0;
-        $fascicle->{dc} = 0;
-        $fascicle->{ac} = 0;
-        $fascicle->{dav} = 0;
-        $fascicle->{aav} = 0;
     }
     
     $success = $c->json->true unless (@errors);

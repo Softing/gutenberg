@@ -74,6 +74,6 @@ Inprint.advert.index.Main = Ext.extend(Ext.Panel, {
 
 Inprint.registry.register("advert-index", {
     icon: "table-select-cells",
-    text: _("Advertizing index"),
+    text: _("Advertizing positions"),
     xobject: Inprint.advert.index.Main
 });

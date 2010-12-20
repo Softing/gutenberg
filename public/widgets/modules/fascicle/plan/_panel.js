@@ -52,6 +52,6 @@ Inprint.fascicle.plan.Panel = Ext.extend(Ext.Panel, {
 
 Inprint.registry.register("fascicle-plan", {
     icon: "table",
-    text: _("Plan"),
+    text: _("Fascicle plan"),
     xobject: Inprint.fascicle.plan.Panel
 });

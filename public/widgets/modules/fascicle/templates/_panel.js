@@ -55,6 +55,6 @@ Inprint.fascicle.templates.Main = Ext.extend(Ext.Panel, {
 
 Inprint.registry.register("fascicle-templates", {
     icon: "table-select-cells",
-    text: _("Templates"),
+    text: _("Templates of pages"),
     xobject: Inprint.fascicle.templates.Main
 });
