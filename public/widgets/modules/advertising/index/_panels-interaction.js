@@ -10,11 +10,17 @@ Inprint.advert.index.Interaction = function(parent, panels) {
         headlines.disable();
         
         if (node && node.attributes.type == "place") {
+            
             parent.edition = node.attributes.edition;
+            
             modules.enable();
-            modules.cmpLoad({ edition: node.attributes.edition });
+            modules.place = node.id;
+            modules.cmpLoad({ edition: parent.edition, place: modules.place });
+            
             headlines.enable();
-            headlines.cmpLoad({ edition: node.attributes.edition });
+            headlines.place = node.id;
+            headlines.cmpLoad({ edition: parent.edition, place: headlines.place });
+            
         }
     });
 

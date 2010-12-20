@@ -15,6 +15,7 @@ sub save {
     my $c = shift;
 
     my $i_edition   = $c->param("edition");
+    my $i_place    = $c->param("place");
     my $i_type = $c->param("type");
     my @i_ids  = $c->param("entity");
     
@@ -33,22 +34,29 @@ sub save {
             unless ($edition);
     }
     
+    push @errors, { id => "place", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_place));
+    
+    my $place; unless (@errors) {
+        $place = $c->sql->Q(" SELECT * FROM ad_places WHERE id=? ", [ $i_place ])->Hash;
+        push @errors, { id => "place", msg => "Can't find object"}
+            unless ($place);
+    }
+    
     unless (@errors) {
         
         $c->sql->Do("
-                DELETE FROM ad_index WHERE edition=? AND nature=?
-            ", [ $edition->{id}, $i_type ]);
-        
-        #die "$edition->{id}, $i_type";
+                DELETE FROM ad_index WHERE edition=? AND place=? AND nature=?
+            ", [ $edition->{id}, $place->{id}, $i_type ]);
         
         foreach my $item (@i_ids) {
             
             next unless ($c->is_uuid($item));
             
             $c->sql->Do("
-                INSERT INTO ad_index(edition, nature, entity, created, updated)
-                    VALUES (?, ?, ?, now(), now());
-            ", [ $edition->{id}, $i_type, $item ]);
+                INSERT INTO ad_index(edition, place, nature, entity, created, updated)
+                    VALUES (?, ?, ?, ?, now(), now());
+            ", [ $edition->{id}, $place->{id}, $i_type, $item ]);
         }
     }
     
@@ -61,6 +69,7 @@ sub headlines {
     my $c = shift;
     
     my $i_edition = $c->param("edition");
+    my $i_place   = $c->param("place");
     
     my $result = [];
     
@@ -84,15 +93,25 @@ sub headlines {
         ", [ $edition->{path} ])->Values;
     }
     
+    push @errors, { id => "place", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_place));
+    
+    my $place; unless (@errors) {
+        $place = $c->sql->Q(" SELECT * FROM ad_places WHERE id=? ", [ $i_place ])->Hash;
+        push @errors, { id => "place", msg => "Can't find object"}
+            unless ($place);
+    }
+    
     unless (@errors) {
         $sql = "
             SELECT
                 t1.id, t1.edition, t1.nature, t1.parent, t1.title, t1.shortcut, t1.description, t1.created, t1.updated,
-                EXISTS(SELECT true FROM ad_index WHERE edition=t1.edition AND entity=t1.id) as selected
+                EXISTS(SELECT true FROM ad_index WHERE place=? AND entity=t1.id) as selected
             FROM index t1
             WHERE t1.edition = ANY(?) AND t1.nature='headline'
             ORDER BY shortcut
         ";
+        push @params, $place->{id};
         push @params, $editions;
     }
     
@@ -110,9 +129,12 @@ sub modules {
     my $c = shift;
     
     my $i_edition = $c->param("edition");
+    my $i_place   = $c->param("place");
     
     my $result = [];
     
+    my $sql;
+    my @params;
     my @errors;
     my $success = $c->json->false;
     
@@ -125,19 +147,26 @@ sub modules {
             unless ($edition);
     }
     
-    my $sql;
-    my @params;
+        push @errors, { id => "place", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_place));
+    
+    my $place; unless (@errors) {
+        $place = $c->sql->Q(" SELECT * FROM ad_places WHERE id=? ", [ $i_place ])->Hash;
+        push @errors, { id => "place", msg => "Can't find object"}
+            unless ($place);
+    }
     
     unless (@errors) {
         $sql = "
             SELECT
                 t1.id, t1.edition, t1.page, t1.title, t1.shortcut, t1.description, t1.amount, round(t1.area::numeric, 2) as area, t1.x, t1.y, t1.w, t1.h, t1.created, t1.updated,
                 t2.id as page, t2.shortcut as page_shortcut,
-                EXISTS(SELECT true FROM ad_index WHERE edition=t1.edition AND entity=t1.id) as selected
+                EXISTS(SELECT true FROM ad_index WHERE place=? AND entity=t1.id) as selected
             FROM ad_modules t1, ad_pages t2
             WHERE t2.id = t1.page AND t1.edition=?
             ORDER BY t2.shortcut, t1.shortcut
         ";
+        push @params, $place->{id};
         push @params, $edition->{id};
     }
     

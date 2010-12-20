@@ -134,6 +134,7 @@ Inprint.advert.index.Modules = Ext.extend(Ext.grid.GridPanel, {
                         success: this.cmpReload,
                         params: {
                             edition: this.parent.edition,
+                            place: this.place,
                             entity: this.getValues("id"),
                             type: "module"
                         }

@@ -12,8 +12,6 @@ Inprint.fascicle.places.Places = Ext.extend(Ext.tree.TreePanel, {
             "delete":  _url("/fascicle/templates/places/delete/")
         };
         
-        alert(this.fascicle);
-        
         Ext.apply(this, {
             title:_("Editions"),
             autoScroll:true,
