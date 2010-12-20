@@ -1,5 +1,6 @@
 Inprint.fascicle.planner.Context = function(parent, panels) {
 
+    var access = parent.access;
     var view  = panels["pages"].getView();
 
     view.on("contextmenu", function( view, index, node, e) {
@@ -11,14 +12,12 @@ Inprint.fascicle.planner.Context = function(parent, panels) {
         var selection = panels["pages"].cmpGetSelected();
         var selLength = selection.length;
         
-        //this.selection = node;
-        
         var disabled = true;
         var disabled1 = true;
         var disabled2 = true;
         var items = [];
         
-        //if (parent.access["editions"]) {
+        if (access["manage"]) {
             
             if (selLength == 1) {
                 disabled1 = false;
@@ -29,7 +28,7 @@ Inprint.fascicle.planner.Context = function(parent, panels) {
             }
             
             disabled = false;
-        //}
+        }
         
         items.push(
             {
