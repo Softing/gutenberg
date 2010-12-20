@@ -16,8 +16,6 @@ sub tree {
     my $c = shift;
 
     my $i_node = $c->param("node");
-    $i_node = '00000000-0000-0000-0000-000000000000' unless ($i_node);
-    $i_node = '00000000-0000-0000-0000-000000000000' if ($i_node eq "root-node");
     
     my @errors;
     my $success = $c->json->false;
@@ -32,28 +30,12 @@ sub tree {
         my @data;
         
         $sql = "
-            (
-                SELECT edition1.id, 'edition' as type, edition1.id as edition, edition1.shortcut as text, 'blue-folders-stack' as icon,
-                    (
-                        EXISTS( SELECT * FROM editions WHERE path <@ edition1.path AND id <> edition1.id )
-                        OR
-                        EXISTS( SELECT true FROM ad_places WHERE ad_places.edition = edition1.id  )
-                    )
-                    as have_childs
-                FROM editions as edition1
-                WHERE
-                    edition1.id <> '00000000-0000-0000-0000-000000000000'
-                    AND subpath(edition1.path, nlevel(edition1.path) - 2, 1)::text = replace(?, '-', '')::text
-                ORDER BY edition1.shortcut
-            ) UNION ALL (
-                SELECT id, 'place' as type, edition, title as text, 'zone' as icon, false as have_childs
-                FROM ad_places
-                WHERE edition=?
-                ORDER BY shortcut
-            )
+            SELECT id, 'place' as type, fascicle, title as text, 'zone' as icon, false as have_childs
+            FROM fascicles_tmpl_places
+            WHERE fascicle=?
+            ORDER BY shortcut
         ";
         
-        push @data, $i_node;
         push @data, $i_node;
         
         my $data = $c->sql->Q("$sql", \@data)->Hashes;
@@ -61,7 +43,7 @@ sub tree {
         foreach my $item (@$data) {
             my $record = {
                 id      => $item->{id},
-                edition => $item->{edition},
+                fascicle => $item->{fascicle},
                 text    => $item->{text},
                 leaf    => $item->{have_childs},
                 icon    => $item->{icon},
@@ -96,11 +78,9 @@ sub read {
     unless (@errors) {
         $result = $c->sql->Q("
             SELECT
-                t1.id,
-                t2.id as edition, t2.shortcut as edition_shortcut,
-                t1.title, t1.shortcut, t1.description, t1.created, t1.updated
-            FROM ad_places t1, editions t2
-            WHERE t2.id = t1.edition AND t1.id=?
+                t1.id, t1.title, t1.shortcut, t1.description, t1.created, t1.updated
+            FROM fascicles_tmpl_places t1
+            WHERE t1.id=?
         ", [ $i_id ])->Hash;
     }
     
@@ -113,13 +93,16 @@ sub create {
     
     my $id = $c->uuid();
     
-    my $i_edition     = $c->param("edition");
+    my $i_fascicle    = $c->param("fascicle");
     my $i_title       = $c->param("title");
     my $i_shortcut    = $c->param("shortcut");
     my $i_description = $c->param("description");
     
     my @errors;
     my $success = $c->json->false;
+    
+    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_fascicle));
     
     push @errors, { id => "title", msg => "Incorrectly filled field"}
         unless ($c->is_text($i_title));
@@ -133,19 +116,17 @@ sub create {
     #push @errors, { id => "access", msg => "Not enough permissions"}
     #    unless ($c->access->Check("domain.roles.manage"));
     
-    my $edition;
-    
-    unless (@errors) {
-        $edition  = $c->sql->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
-        push @errors, { id => "edition", msg => "Incorrectly filled field"}
-            unless ($edition);
+    my $fascicle; unless (@errors) {
+        $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
+        push @errors, { id => "fascicle", msg => "Can't find object"}
+            unless ($fascicle);
     }
     
     unless (@errors) {
         $c->sql->Do("
-            INSERT INTO ad_places(edition, title, shortcut, description, created, updated)
-            VALUES (?, ?, ?, ?, now(), now());
-        ", [ $edition->{id}, $i_title, $i_shortcut, $i_description ]);
+            INSERT INTO fascicles_tmpl_places(id, origin, fascicle, title, shortcut, description, created, updated)
+            VALUES (?, ?, ?, ?, ?, ?, now(), now());
+        ", [ $id, $fascicle->{id}, $fascicle->{id}, $i_title, $i_shortcut, $i_description ]);
     }
     
     $success = $c->json->true unless (@errors);
@@ -179,7 +160,7 @@ sub update {
     #    unless ($c->access->Check("domain.roles.manage"));
     
     unless (@errors) {
-        $c->sql->Do(" UPDATE ad_places SET title=?, shortcut=?, description=?, updated=now() WHERE id=?;",
+        $c->sql->Do(" UPDATE fascicles_tmpl_places SET title=?, shortcut=?, description=?, updated=now() WHERE id=?;",
             [ $i_title, $i_shortcut, $i_description, $i_id ]);
     }
     
@@ -200,7 +181,7 @@ sub delete {
     unless (@errors) {
         foreach my $id (@ids) {
             if ($c->is_uuid($id)) {
-                $c->sql->Do(" DELETE FROM ad_places WHERE id=? ", [ $id ]);
+                $c->sql->Do(" DELETE FROM fascicles_tmpl_places WHERE id=? ", [ $id ]);
             }
         }
     }

@@ -17,14 +17,15 @@ Inprint.fascicle.places.Places = Ext.extend(Ext.tree.TreePanel, {
             autoScroll:true,
             dataUrl: this.urls.tree,
             border:false,
-            rootVisible: false,
+            rootVisible: true,
             root: {
-                id:'00000000-0000-0000-0000-000000000000',
+                id: this.fascicle,
                 nodeType: 'async',
                 expanded: true,
                 draggable: false,
-                icon: _ico("book"),
-                text: _("Editions")
+                icon: _ico("blue-folder"),
+                text: _("Fascicle"),
+                type: "fascicle"
             }
         });
         
@@ -80,7 +81,7 @@ Inprint.fascicle.places.Places = Ext.extend(Ext.tree.TreePanel, {
                         }
                     },
                     items: [
-                        _FLD_HDN_EDITION,
+                        _FLD_HDN_FASCICLE,
                         _FLD_SHORTCUT,
                         _FLD_TITLE,
                         _FLD_DESCRIPTION
@@ -100,7 +101,7 @@ Inprint.fascicle.places.Places = Ext.extend(Ext.tree.TreePanel, {
         form.reset();
         wndw.show();
         
-        form.findField("edition").setValue(node.id);
+        form.findField("fascicle").setValue(this.fascicle);
         
     },
     
@@ -122,8 +123,8 @@ Inprint.fascicle.places.Places = Ext.extend(Ext.tree.TreePanel, {
                 bodyStyle: "padding:5px 5px",
                 items: [
                     _FLD_HDN_ID,
-                    _FLD_TITLE,
                     _FLD_SHORTCUT,
+                    _FLD_TITLE,
                     _FLD_DESCRIPTION
                 ],
                 keys: [ _KEY_ENTER_SUBMIT ],

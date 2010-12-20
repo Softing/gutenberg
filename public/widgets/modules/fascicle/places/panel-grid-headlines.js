@@ -5,8 +5,8 @@ Inprint.fascicle.places.Headlines = Ext.extend(Ext.grid.GridPanel, {
         this.params = {};
         this.components = {};
         this.urls = {
-            "list":      "/advertising/index/headlines/",
-            "save": _url("/advertising/index/save/")
+            "list":      "/fascicle/templates/index/headlines/",
+            "save": _url("/fascicle/templates/index/save/")
         }
 
         this.store = Inprint.factory.Store.json(this.urls["list"]);
@@ -89,7 +89,7 @@ Inprint.fascicle.places.Headlines = Ext.extend(Ext.grid.GridPanel, {
                         scope:this,
                         success: this.cmpReload,
                         params: {
-                            edition: this.parent.edition,
+                            fascicle: this.fascicle,
                             entity: this.getValues("id"),
                             type: "headline"
                         }

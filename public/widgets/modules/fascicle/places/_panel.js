@@ -6,15 +6,15 @@ Inprint.fascicle.places.Main = Ext.extend(Ext.Panel, {
         this.panels = {};
         
         this.panels["places"]   = new Inprint.fascicle.places.Places({
-            parent: this
+            parent: this, fascicle: this.oid
         });
         
         this.panels["modules"]   = new Inprint.fascicle.places.Modules({
-            parent: this
+            parent: this, fascicle: this.oid
         });
         
         this.panels["headlines"] = new Inprint.fascicle.places.Headlines({
-            parent: this
+            parent: this, fascicle: this.oid
         });
         
         Ext.apply(this, {

@@ -13,9 +13,9 @@ Inprint.fascicle.places.Interaction = function(parent, panels) {
         if (node && node.attributes.type == "place") {
             parent.edition = node.attributes.edition;
             modules.enable();
-            modules.cmpLoad({ edition: node.attributes.edition });
+            modules.cmpLoad({ fascicle: parent.fascicle });
             headlines.enable();
-            headlines.cmpLoad({ edition: node.attributes.edition });
+            headlines.cmpLoad({ fascicle: parent.fascicle });
         }
     });
 

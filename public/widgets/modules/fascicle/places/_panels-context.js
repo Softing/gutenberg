@@ -12,7 +12,7 @@ Inprint.fascicle.places.Context = function(parent, panels) {
         var disabled = false;
         var items = [];
         
-        if (nodetype == 'edition') {
+        if (nodetype == 'fascicle') {
             items.push({
                 icon: _ico("zone--plus"),
                 cls: "x-btn-text-icon",
@@ -23,7 +23,7 @@ Inprint.fascicle.places.Context = function(parent, panels) {
                 handler: function() { this.cmpCreate(node); }
             });
         }
-        if (nodetype == 'module') {
+        if (nodetype == 'place') {
             items.push({
                 icon: _ico("zone--pencil"),
                 cls: "x-btn-text-icon",

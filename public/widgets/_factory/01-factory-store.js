@@ -67,21 +67,40 @@ Inprint.factory.Store = new function() {
         "/catalog/rubrics/list/":                       [ "id", "title", "shortcut", "description" ],
         
         // Fascicles
-        "/fascicle/rubrics/list/":                      [ "id", "title", "shortcut", "description" ],
-        "/fascicle/summary/":                           [ "place", "place_shortcut", "module", "module_shortcut", "holes", "requests", "free" ],
-        "/fascicle/documents/list/":                    [
-            'id', 'access',    'edition',  'edition_shortcut',    'fascicle',    'fascicle_shortcut',    'headline', 'headline_shortcut',
-            'rubric', 'rubric_shortcut',    'copygroup',    'holder','creator','manager','holder_shortcut','creator_shortcut','manager_shortcut',
-            'workgroup','workgroup_shortcut','ingroups',    'islooked','isopen',    'branch','branch_shortcut','stage','stage_shortcut','color','progress',
-            'title','author','pages',    'pdate','psize','rdate','rsize',    'images','files',    'created','updated'
-        ],
-        "/fascicle/templates/pages/list/":              [ "id", "fascicle", "title", "shortcut", "description", "w", "h", createDateField("created"), createDateField("updated") ],
-        "/fascicle/templates/modules/list/":            [ "id", "fascicle", "page", "title", "shortcut", "description", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
-        "/fascicle/pages/templates/":                   [ "id", "fascicle", "page", "title", "shortcut", "description", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
-        "/fascicle/modules/list/":                      [ "id", "fascicle", "page", "title", "shortcut", "description", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
+        "/fascicle/rubrics/list/":
+            [ "id", "title", "shortcut", "description" ],
+        
+        "/fascicle/summary/":
+            [ "place", "place_shortcut", "module", "module_shortcut", "holes", "requests", "free" ],
+        
+        "/fascicle/documents/list/":
+            [   'id', 'access',    'edition',  'edition_shortcut',    'fascicle',    'fascicle_shortcut',    'headline', 'headline_shortcut',
+                'rubric', 'rubric_shortcut',    'copygroup',    'holder','creator','manager','holder_shortcut','creator_shortcut','manager_shortcut',
+                'workgroup','workgroup_shortcut','ingroups',    'islooked','isopen',    'branch','branch_shortcut','stage','stage_shortcut','color','progress',
+                'title','author','pages',    'pdate','psize','rdate','rsize',    'images','files',    'created','updated'
+            ],
+        
+        "/fascicle/templates/pages/list/":
+            [ "id", "fascicle", "title", "shortcut", "description", "w", "h", createDateField("created"), createDateField("updated") ],
+
+        "/fascicle/templates/modules/list/":
+            [ "id", "fascicle", "page", "title", "shortcut", "description", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
+        
+        "/fascicle/templates/index/headlines/":
+            [ "id", "selected", "title", "shortcut", "description", createDateField("created"), createDateField("updated") ],
+        
+        "/fascicle/templates/index/modules/":
+            [ "id", "selected", "title", "shortcut", "description", "page", "page_shortcut", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
+        
+        "/fascicle/pages/templates/":
+            [ "id", "fascicle", "page", "title", "shortcut", "description", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
+        
+        "/fascicle/modules/list/":
+            [ "id", "fascicle", "page", "title", "shortcut", "description", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
         
         // System
-        "/system/events/list/":                         [ "id", "initiator", "initiator_login", "initiator_shortcut", "initiator_position", "entity", "entity_type", "message", "message_type", "message_variables", createDateField("created") ],
+        "/system/events/list/":
+            [ "id", "initiator", "initiator_login", "initiator_shortcut", "initiator_position", "entity", "entity_type", "message", "message_type", "message_variables", createDateField("created") ],
 
 
         "" : []
