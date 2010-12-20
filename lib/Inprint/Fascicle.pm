@@ -89,25 +89,20 @@ sub seance {
         my $statusbar_doc_average = 0;
         
         if ($statusbar_all > 0) {
-            $statusbar_doc_average = sprintf "%.2f", $statusbar_doc/ $statusbar_all * 100 ;
+            $statusbar_doc_average = $statusbar_doc/ $statusbar_all * 100 ;
         }
         
         my $statusbar_adv_average = 0;
         if ($statusbar_all > 0) {
-            $statusbar_adv_average = sprintf "%.2f", $statusbar_adv/ $statusbar_all * 100 ;
+            $statusbar_adv_average = $statusbar_adv/ $statusbar_all * 100 ;
         }
         
         $fascicle->{pc}  = $statusbar_all || 0;
-        $fascicle->{dc}  = $statusbar_doc || 0;
-        $fascicle->{ac}  = $statusbar_adv || 0;
-        $fascicle->{dav} = $statusbar_doc_average || 0;
-        $fascicle->{aav} = $statusbar_adv_average || 0;
+        $fascicle->{dc}  = sprintf "%.2f", $statusbar_doc || 0;
+        $fascicle->{ac}  = sprintf "%.2f", $statusbar_adv || 0;
+        $fascicle->{dav} = sprintf "%.2f", $statusbar_doc_average || 0;
+        $fascicle->{aav} = sprintf "%.2f", $statusbar_adv_average || 0;
         
-        #$fascicle->{pc} = $c->sql->Q(" SELECT count(*) FROM fascicles_pages WHERE fascicle=? AND seqnum is not null ", [ $fascicle->{id} ])->Value;
-        #$fascicle->{dc} = 1;
-        #$fascicle->{ac} = 2;
-        #$fascicle->{dav} = 0;
-        #$fascicle->{aav} = 0;
         
     }
     
