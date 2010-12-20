@@ -281,7 +281,7 @@ sub create {
             foreach my $indx (@$tmpl_places_index) {
                 
                 my $indx_id = $c->uuid();
-                die $indx->{entity} unless $cache{ $indx->{entity} };
+                #die $indx->{entity} .'-'. $indx->{nature} unless $cache{ $indx->{entity} };
                 
                 my $place_id = $cache{ $indx->{place} };
                 my $entity_id = $cache{ $indx->{entity} };
