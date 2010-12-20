@@ -120,6 +120,9 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
                                 fascicle: this.oid
                             },
                             listeners: {
+                                render: function(combo) {
+                                    combo.setValue("00000000-0000-0000-0000-000000000000", _("Defaults"));
+                                },
                                 beforequery: function(qe) {
                                     delete qe.combo.lastQuery;
                                 }

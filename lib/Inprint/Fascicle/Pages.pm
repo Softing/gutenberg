@@ -32,7 +32,6 @@ sub read {
         
     }
     
-    
     $success = $c->json->true unless (@errors);
     $c->render_json({ success => $success, errors => \@errors, data => \@data });
 }
@@ -106,9 +105,17 @@ sub create {
     push @errors, { id => "template", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_template));
     
-    my $template = $c->sql->Q(" SELECT * FROM fascicles_tmpl_pages WHERE id = ? ", [ $i_template ])->Hash;
+    my $template;
     
-    push @errors, { id => "fascicle", msg => "Can't find object"}
+    unless (@errors) {
+        if ($i_template eq "00000000-0000-0000-0000-000000000000") {
+            $template = $c->sql->Q(" SELECT * FROM fascicles_tmpl_pages WHERE bydefault=true AND fascicle = ? ", [ $fascicle->{id} ])->Hash;
+        } else {
+            $template = $c->sql->Q(" SELECT * FROM fascicles_tmpl_pages WHERE id = ? ", [ $i_template ])->Hash;
+        }
+    }
+
+    push @errors, { id => "template", msg => "Can't find object"}
         unless ($template->{id});
     
     my $headline = {};

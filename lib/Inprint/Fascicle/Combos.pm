@@ -31,6 +31,13 @@ sub templates {
         ", [ $i_fascicle ])->Hashes;
     }
     
+    unshift @$result, {
+        id=> "00000000-0000-0000-0000-000000000000",
+        title=> $c->l("Defaults"),
+        shortcut=> $c->l("Get defaults"),
+        description=> $c->l("Copy from defaults"),
+    };
+    
     $success = $c->json->true unless (@errors);
     $c->render_json({ success => $success, errors => \@errors, data => $result || [] });
 }

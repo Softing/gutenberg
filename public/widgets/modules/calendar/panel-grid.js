@@ -270,6 +270,9 @@ Inprint.edition.calendar.Grid = Ext.extend(Ext.grid.GridPanel, {
                             "/calendar/combos/fascicles/",
                             {
                                 listeners: {
+                                    render: function(combo) {
+                                        combo.setValue("00000000-0000-0000-0000-000000000000", _("Defaults"));
+                                    },
                                     beforequery: function(qe) {
                                         delete qe.combo.lastQuery;
                                     }
