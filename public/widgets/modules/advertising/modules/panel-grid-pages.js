@@ -122,9 +122,25 @@ Inprint.advert.modules.Pages = Ext.extend(Ext.grid.GridPanel, {
                 items: [
                     _FLD_HDN_FASCICLE,
                     _FLD_HDN_HEADLINE,
+                    {
+                        xtype: "titlefield",
+                        value: _("Basic options")
+                    },
                     _FLD_SHORTCUT,
                     _FLD_TITLE,
-                    _FLD_DESCRIPTION
+                    _FLD_DESCRIPTION,
+                    {
+                        xtype: "titlefield",
+                        value: _("More options")
+                    },
+                    {
+                        xtype: 'checkbox',
+                        labelSeparator: '',
+                        boxLabel: _("Yes"),
+                        fieldLabel: _("By default"),
+                        name: 'bydefault',
+                        checked: false
+                    }
                 ],
                 listeners: {
                     scope:this,
@@ -252,9 +268,25 @@ Inprint.advert.modules.Pages = Ext.extend(Ext.grid.GridPanel, {
                     _FLD_HDN_ID,
                     _FLD_HDN_FASCICLE,
                     _FLD_HDN_HEADLINE,
+                    {
+                        xtype: "titlefield",
+                        value: _("Basic options")
+                    },
                     _FLD_SHORTCUT,
                     _FLD_TITLE,
-                    _FLD_DESCRIPTION
+                    _FLD_DESCRIPTION,
+                    {
+                        xtype: "titlefield",
+                        value: _("More options")
+                    },
+                    {
+                        xtype: 'checkbox',
+                        labelSeparator: '',
+                        boxLabel: _("Yes"),
+                        fieldLabel: _("By default"),
+                        name: 'bydefault',
+                        checked: false
+                    }
                 ],
                 listeners: {
                     scope:this,
