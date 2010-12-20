@@ -434,30 +434,6 @@ sub getPages {
     
     my $holes;
     
-    #my $dbholes = $c->sql->Q("
-    #    SELECT t1.id, t1.shortcut, t1.w, t1.h, t2.page, t2.x, t2.y
-    #    FROM fascicles_modules t1, fascicles_map_modules t2
-    #    WHERE t1.fascicle = ? AND t2.module=t1.id
-    #", [ $fascicle ])->Hashes;
-    #
-    #foreach my $item (@$dbholes) {
-    #    $index->{$item->{id}} = $idcounter++;
-    #    
-    #    $holes->{$index->{$item->{id}}} = {
-    #        id => $item->{id},
-    #        title => $item->{shortcut},
-    #        #x => $item->{x},
-    #        #y => $item->{y},
-    #        #h => $item->{h},
-    #        #w => $item->{w},
-    #    };
-    #    
-    #    my $pageindex = $index->{$item->{page}};
-    #    if ($pageindex) {
-    #        push @{ $pages->{$pageindex}->{holes} }, $index->{$item->{id}};
-    #    }
-    #}
-    
     $data->{pages}      = $pages;
     $data->{documents}  = $documents;
     $data->{holes}      = $holes;
@@ -644,41 +620,47 @@ sub getSummary {
     
     my $data;
     
-    #my $places = $c->sql->Q("
-    #    SELECT id, edition, title, shortcut, description, created, updated
-    #    FROM ad_places WHERE fascicle = ? ORDER BY shortcut
-    #", [ $fascicle ])->Hashes;
-    #
-    #foreach my $place (@$places) {
-    #    
-    #    my $modules = $c->sql->Q("
-    #        SELECT id, edition, fascicle, place, title, shortcut, description, amount, volume, w, h, created, updated
-    #        FROM ad_modules WHERE fascicle = ? AND place = ?
-    #    ", [ $fascicle, $place->{id} ])->Hashes;
-    #    
-    #    foreach my $module (@$modules) {
-    #        
-    #        my $hl = $c->sql->Q("
-    #            SELECT count(*) FROM fascicles_map_holes WHERE fascicle=? AND place=? AND module=?
-    #        ", [ $fascicle, $place->{id}, $module->{id} ])->Value;
-    #        
-    #        my $rq = $c->sql->Q("
-    #            SELECT count(*) FROM fascicles_map_holes WHERE fascicle=? AND place=? AND module=? -- AND entity is not null
-    #        ", [ $fascicle, $place->{id}, $module->{id} ])->Value;
-    #        
-    #        my $fr = $hl - $rq;
-    #        
-    #        push @$data, {
-    #            place => $place->{id},
-    #            place_shortcut => $place->{shortcut},
-    #            module => $module->{id},
-    #            module_shortcut => $module->{shortcut},
-    #            holes => $hl,
-    #            requests => $rq,
-    #            free => $fr
-    #        }
-    #    }
-    #}
+    my $places = $c->sql->Q("
+        SELECT id, fascicle, title, shortcut, description, created, updated
+        FROM fascicles_tmpl_places WHERE fascicle = ? ORDER BY shortcut
+    ", [ $fascicle ])->Hashes;
+    
+    foreach my $place (@$places) {
+        
+        my $modules = $c->sql->Q("
+            SELECT
+                t1.id, t1.origin, t1.fascicle, t1.page, t1.title, t1.shortcut,
+                t1.description, t1.amount, t1.area, t1.x, t1.y, t1.w, t1.h,
+                t1.created, t1.updated
+            FROM fascicles_tmpl_modules t1, fascicles_tmpl_index t2
+            WHERE t1.fascicle=? AND t2.entity=t1.id AND t2.place=?
+        ", [ $fascicle, $place->{id} ])->Hashes;
+        
+        foreach my $module (@$modules) {
+            
+            my $hl = 0;
+                #$c->sql->Q("
+                #    SELECT count(*) FROM fascicles_map_modules WHERE fascicle=? AND place=? AND module=?
+                #", [ $fascicle, $place->{id}, $module->{id} ])->Value;
+            
+            my $rq = 0;
+            #$c->sql->Q("
+            #    SELECT count(*) FROM fascicles_map_holes WHERE fascicle=? AND place=? AND module=? -- AND entity is not null
+            #", [ $fascicle, $place->{id}, $module->{id} ])->Value;
+            
+            my $fr = $hl - $rq;
+            
+            push @$data, {
+                place => $place->{id},
+                place_shortcut => $place->{shortcut},
+                module => $module->{id},
+                module_shortcut => $module->{shortcut},
+                holes => $hl,
+                requests => $rq,
+                free => $fr
+            }
+        }
+    }
     
     return $data;
 }

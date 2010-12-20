@@ -11,11 +11,17 @@ Inprint.fascicle.places.Interaction = function(parent, panels) {
         headlines.disable();
         
         if (node && node.attributes.type == "place") {
-            parent.edition = node.attributes.edition;
+            
+            //parent.edition = node.attributes.edition;
+            
             modules.enable();
-            modules.cmpLoad({ fascicle: parent.fascicle });
+            modules.place = node.id;
+            modules.cmpLoad({ fascicle: parent.fascicle, place: node.id });
+            
             headlines.enable();
-            headlines.cmpLoad({ fascicle: parent.fascicle });
+            headlines.place = node.id;
+            headlines.cmpLoad({ fascicle: parent.fascicle, place: node.id });
+            
         }
     });
 

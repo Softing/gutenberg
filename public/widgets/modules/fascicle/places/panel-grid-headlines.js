@@ -90,6 +90,7 @@ Inprint.fascicle.places.Headlines = Ext.extend(Ext.grid.GridPanel, {
                         success: this.cmpReload,
                         params: {
                             fascicle: this.fascicle,
+                            place: this.place,
                             entity: this.getValues("id"),
                             type: "headline"
                         }
