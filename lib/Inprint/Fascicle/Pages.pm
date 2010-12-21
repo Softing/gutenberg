@@ -23,13 +23,11 @@ sub read {
     my $success = $c->json->false;
     
     unless (@errors) {
-        
         foreach my $item (@i_pages) {
             my ($pageid, $seqnum) = split "::", $item;
             my $page = $c->sql->Q(" SELECT * FROM fascicles_pages WHERE id=? AND seqnum=? ", [ $pageid, $seqnum ])->Hash();
             push @data, $page;
         }
-        
     }
     
     $success = $c->json->true unless (@errors);
