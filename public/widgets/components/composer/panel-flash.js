@@ -39,24 +39,6 @@ Inprint.cmp.composer.Flash = Ext.extend(Ext.Panel, {
                 scale :'noscale',
                 autostart: 'yes',
                 loop: 'yes'
-            },
-            listeners: {
-                scope:this,
-                afterrender: function(panel) {
-                     
-                    //var init = function () {
-                    //    if (panel.swf.init) {
-                    //        var record = this.params[panel.id];
-                    //        panel.swf.init(panel.getSwfId(), "letter", 0, 0);
-                    //        //panel.swf.setGrid( record.w, record.h );
-                    //    } else {
-                    //        init.defer(10, this);
-                    //    }
-                    //};
-                    // 
-                    //init.defer(10, this);
-                    
-                }
             }
         };
         
@@ -78,24 +60,6 @@ Inprint.cmp.composer.Flash = Ext.extend(Ext.Panel, {
                     scale :'noscale',
                     autostart: 'yes',
                     loop: 'yes'
-                },
-                listeners: {
-                    scope:this,
-                    afterrender: function(panel) {
-                         
-                        //var init = function () {
-                        //    var record = this.params[panel.id];
-                        //    if (panel.swf.init && record) {
-                        //        panel.swf.init(panel.getSwfId(), "letter", 0, 0);
-                        //        //panel.swf.setGrid( record.w, record.h );
-                        //    } else {
-                        //        init.defer(10, this);
-                        //    }
-                        //};
-                        // 
-                        //init.defer(10, this);
-                        
-                    }
                 }
             };
             
@@ -121,33 +85,8 @@ Inprint.cmp.composer.Flash = Ext.extend(Ext.Panel, {
     },
 
     onRender: function() {
-        
         Inprint.cmp.composer.Flash.superclass.onRender.apply(this, arguments);
-        
         this.cmpInit();
-        
-        //Ext.Ajax.request({
-        //    url: this.urls["init"],
-        //    params: {
-        //        page: this.parent.selection
-        //    },
-        //    scope: this,
-        //    success: function(result, request) {
-        //        
-        //        var responce = Ext.util.JSON.decode(result.responseText);
-        //        
-        //        for (var c = 0; c < responce.data.length; c++) {
-        //            
-        //            var id = responce.data[c].id;
-        //            var swf = this.findById('flash-'+ id).swf;
-        //            var record = responce.data[c];
-        //            
-        //            this.params['flash-'+id] = record;
-        //            
-        //        }
-        //    }
-        //});
-        
     },
     
     cmpGetFlashById: function(id) {
@@ -160,9 +99,14 @@ Inprint.cmp.composer.Flash = Ext.extend(Ext.Panel, {
     
     cmpInit: function() {
         
+        this.body.mask(_("Loading..."));
+        
         Ext.Ajax.request({
             url: this.urls["init"],
             scope:this,
+            callback : function() {
+                this.body.unmask();
+            },
             success: function ( result, request ) {
                 
                 var responce = Ext.util.JSON.decode(result.responseText);
@@ -179,7 +123,7 @@ Inprint.cmp.composer.Flash = Ext.extend(Ext.Panel, {
                                 init.defer(10, this);
                             }
                         }
-                        init.defer(10, this);
+                        init.defer(100, this);
                     }
                 }, this);
                 
@@ -193,7 +137,7 @@ Inprint.cmp.composer.Flash = Ext.extend(Ext.Panel, {
                                 set.defer(10, this);
                             }
                         }
-                        set.defer(10, this);
+                        set.defer(100, this);
                     }
                 }, this);
                 

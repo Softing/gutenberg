@@ -1,8 +1,7 @@
 Inprint.fascicle.planner.Context = function(parent, panels) {
 
-    var access = parent.access;
     var view  = panels["pages"].getView();
-
+    
     view.on("contextmenu", function( view, index, node, e) {
         
         e.stopEvent();
@@ -17,7 +16,7 @@ Inprint.fascicle.planner.Context = function(parent, panels) {
         var disabled2 = true;
         var items = [];
         
-        if (access["manage"]) {
+        if (parent.access["manage"]) {
             
             if (selLength == 1) {
                 disabled1 = false;

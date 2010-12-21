@@ -436,25 +436,25 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
                             name: 'page',
                             itemCls: 'required',
                             fieldLabel: 'На полосы'
-                        },
-                        {
-                            xtype: 'checkbox',
-                            name: 'documents',
-                            checked:true,
-                            inputValue: 'true',
-                            fieldLabel: 'Скопировать',
-                            labelSeparator: ':',
-                            boxLabel: 'Материалы'
-                        },
-                        {
-                            xtype: 'checkbox',
-                            name: 'advertisements',
-                            checked:false,
-                            inputValue: 'true',
-                            fieldLabel: '',
-                            labelSeparator: '',
-                            boxLabel: 'Рекламу'
                         }
+                        //{
+                        //    xtype: 'checkbox',
+                        //    name: 'documents',
+                        //    checked:true,
+                        //    inputValue: 'true',
+                        //    fieldLabel: 'Скопировать',
+                        //    labelSeparator: ':',
+                        //    boxLabel: 'Материалы'
+                        //},
+                        //{
+                        //    xtype: 'checkbox',
+                        //    name: 'advertisements',
+                        //    checked:false,
+                        //    inputValue: 'true',
+                        //    fieldLabel: '',
+                        //    labelSeparator: '',
+                        //    boxLabel: 'Рекламу'
+                        //}
                     ]
                 },
                 buttons: [

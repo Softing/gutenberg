@@ -4,6 +4,7 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
         
         this.manager;
         this.version;
+        
         this.access = {};
         
         this.fascicle = this.oid;

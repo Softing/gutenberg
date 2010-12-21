@@ -23,7 +23,7 @@ Inprint.advert.index.Context = function(parent, panels) {
                 handler: function() { this.cmpCreate(node); }
             });
         }
-        if (nodetype == 'module') {
+        if (nodetype == 'place') {
             items.push({
                 icon: _ico("zone--pencil"),
                 cls: "x-btn-text-icon",

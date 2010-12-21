@@ -484,6 +484,7 @@ sub resize {
     my $data;
     
     unless (@errors) {
+        
     }
     
     
@@ -523,7 +524,7 @@ sub clean {
                 }
                 
                 if ($i_adverts eq "true") {
-                    $c->sql->Do(" DELETE FROM fascicles_map_holes WHERE page=? ", [ $page->{id} ]);
+                    $c->sql->Do(" UPDATE fascicles_map_modules SET placed=false WHERE page=? ", [ $page->{id} ]);
                 }
                 
                 $c->sql->et;

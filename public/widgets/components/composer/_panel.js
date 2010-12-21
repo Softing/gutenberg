@@ -60,7 +60,9 @@ Inprint.cmp.Composer = Ext.extend(Ext.Window, {
                 {
                     text: _("Close"),
                     scope:this,
-                    handler: this.hide
+                    handler: function() {
+                        this.hide();
+                    }
                 }
             ]
             

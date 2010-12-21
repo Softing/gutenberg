@@ -2,10 +2,14 @@ Inprint.fascicle.plan.Panel = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
         
-        this.view = new Inprint.fascicle.plan.View({
-            parent: this,
-            fascicle: this.oid
-        });
+        this.fascicle = this.oid;
+        
+        this.panels = {
+            pages: new Inprint.fascicle.planner.Pages({
+                parent: this,
+                oid: this.oid
+            })
+        };
         
         this.tbar = [
             "->",
@@ -32,7 +36,7 @@ Inprint.fascicle.plan.Panel = Ext.extend(Ext.Panel, {
         Ext.apply(this, {
             layout: 'fit',
             autoScroll:true,
-            items: this.view
+            items: this.panels["pages"]
         });
         
         Inprint.fascicle.plan.Panel.superclass.initComponent.apply(this, arguments);
@@ -41,12 +45,55 @@ Inprint.fascicle.plan.Panel = Ext.extend(Ext.Panel, {
 
     onRender: function() {
         Inprint.fascicle.plan.Panel.superclass.onRender.apply(this, arguments);
+        
+        this.cmpInitSession();
+        
     },
     
-    cmpReload:  function() {
-        this.view.cmpReload();
-    }
+    cmpInitSession: function () {
+        this.body.mask("Обновление данных...");
+        Ext.Ajax.request({
+            url: _url("/fascicle/seance/"),
+            scope: this,
+            params: {
+                fascicle: this.oid
+            },
+            callback: function() {
+                this.body.unmask();
+            },
+            success: function(response) {
+                
+                var rsp = Ext.util.JSON.decode(response.responseText)
+                
+                this.version = rsp.fascicle.version;
+                this.manager = rsp.fascicle.manager;
+                
+                var shortcut = rsp.fascicle.shortcut;
+                var description = "";
+                
+                if (rsp.fascicle.manager) {
+                    description += '&nbsp;[<b>Работает '+ rsp.fascicle.manager_shortcut +'</b>]';
+                }
+                
+                description += '&nbsp;[Полос&nbsp;'+ rsp.fascicle.pc +'='+ rsp.fascicle.dc +'+'+ rsp.fascicle.ac;
+                description += '&nbsp;|&nbsp;'+ rsp.fascicle.dav +'%/'+ rsp.fascicle.aav +'%]';
+                
+                var title = Inprint.ObjectResolver.makeTitle(this.parent.oid, this.parent.aid, this.parent.icon, shortcut, description);
+                this.parent.setTitle(title)
+                
+                this.panels["pages"].getStore().loadData({ data: rsp.pages });
+                
+                //this.panels["documents"].getStore().loadData({ data: rsp.documents });
+                //this.panels["summary"].getStore().loadData({ data: rsp.summary });
+                //Inprint.fascicle.planner.Access(this, this.panels, rsp.fascicle.access);
+                //this.cmpCheckSession.defer( 50000, this);
+            }
+        });
+    },
     
+    cmpReload: function() {
+        this.cmpInitSession();
+    }
     
 });
 

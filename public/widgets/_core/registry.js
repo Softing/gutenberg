@@ -40,7 +40,7 @@ Inprint.registry = function() {
         
         "fascicle": {
             text: _("Unknown fascicle"),
-            icon: "blue-folder"
+            icon: "blue-folder-open-document-text"
         },
         "fascicles": {
             text: _("Fascicles"),
