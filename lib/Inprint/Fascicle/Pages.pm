@@ -272,7 +272,7 @@ sub move {
     unless (@errors) {
         
         my $composition = $c->sql->Q("
-            SELECT id, edition, fascicle, headline, place, seqnum, w, h, created, updated
+            SELECT id, edition, fascicle, headline, seqnum, w, h, created, updated
             FROM fascicles_pages WHERE fascicle = ?; ",[
                 $i_fascicle
             ])->Hashes;
