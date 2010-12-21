@@ -75,11 +75,11 @@ sub index
     my $advertising = {
         id => "advertising"
     };
-    push @{ $advertising->{menu} }, { id => "advert-requests" };
+    #push @{ $advertising->{menu} }, { id => "advert-requests" };
     push @{ $advertising->{menu} }, { id => "advert-advertisers" };
     push @{ $advertising->{menu} }, { id => "advert-modules" };
     push @{ $advertising->{menu} }, { id => "advert-index" };
-    push @{ $advertising->{menu} }, { id => "advert-archive" };
+    $push @{ $advertising->{menu} }, { id => "advert-archive" };
     
     push @result, $advertising;
     push @result, "-";

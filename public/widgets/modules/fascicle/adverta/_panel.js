@@ -28,8 +28,8 @@ Inprint.fascicle.adverta.Panel = Ext.extend(Ext.Panel, {
             {
                 ref: "../btnPageCreate",
                 disabled:true,
-                text: "Добавить полосу",
-                tooltip: 'Добавить новые полосы в этот выпуск',
+                text: "Добавить заявку",
+                tooltip: 'Добавить рекламную заявку в выпуск',
                 icon: _ico("plus-button"),
                 cls: 'x-btn-text-icon',
                 scope: this.panels["pages"],
@@ -43,58 +43,6 @@ Inprint.fascicle.adverta.Panel = Ext.extend(Ext.Panel, {
                 cls: 'x-btn-text-icon',
                 scope: this.panels["pages"],
                 handler: this.panels["pages"].cmpPageUpdate
-            },
-            "-",
-            {
-                ref: "../btnPageMoveLeft",
-                disabled:true,
-                text:'Сместить влево',
-                tooltip: 'Перенести отмеченные полосы',
-                icon: _ico("arrow-stop-180"),
-                cls: 'x-btn-text-icon',
-                scope:this.panels["pages"],
-                handler: this.panels["pages"].cmpPageMoveLeft
-            },
-            {
-                ref: "../btnPageMoveRight",
-                disabled:true,
-                text:'Сместить вправо',
-                tooltip: 'Перенести отмеченные полосы',
-                icon: _ico("arrow-stop"),
-                cls: 'x-btn-text-icon',
-                scope:this.panels["pages"],
-                handler: this.panels["pages"].cmpPageMoveRight
-            },
-            {
-                ref: "../btnPageMove",
-                disabled:true,
-                text:'Перенести',
-                tooltip: 'Перенести отмеченные полосы',
-                icon: _ico("navigation-000-button"),
-                cls: 'x-btn-text-icon',
-                scope:this.panels["pages"],
-                handler: this.panels["pages"].cmpPageMove
-            },
-            "-",
-            {
-                ref: "../btnPageClean",
-                disabled:true,
-                text: 'Очистить',
-                tooltip: 'Очистить содержимое полос',
-                icon: _ico("eraser"),
-                cls: 'x-btn-text-icon',
-                scope:this.panels["pages"],
-                handler: this.panels["pages"].cmpPageClean
-            },
-            {
-                ref: "../btnPageResize",
-                disabled:true,
-                text: 'Разверстать',
-                tooltip: 'Добавить новые полосы скопировав содержимое',
-                icon: _ico("arrow-resize-045"),
-                cls: 'x-btn-text-icon',
-                scope:this.panels["pages"],
-                handler: this.panels["pages"].cmpPageResize
             },
             "-",
             {
@@ -201,7 +149,7 @@ Inprint.fascicle.adverta.Panel = Ext.extend(Ext.Panel, {
                             layout:"fit",
                             collapseMode: 'mini',
                             items: this.panels["documents"],
-                            stateId: 'fasicles.planner.documents'
+                            stateId: 'fasicles.planner.adverta'
                         }
                     ]
                 },

@@ -48,85 +48,85 @@ Inprint.fascicle.adverta.Documents = Ext.extend(Ext.grid.EditorGridPanel, {
             columns.images,
             columns.size
         ];
-        
-        this.tbar = [
-            {
-                ref: "../btnCreate",
-                text: _("Add"),
-                disabled:true,
-                icon: _ico("plus-button"),
-                cls: 'x-btn-text-icon',
-                scope:this,
-                handler : actions.Create
-            },
-            {
-                ref: "../btnUpdate",
-                text: _("Edit"),
-                disabled:true,
-                icon: _ico("pencil"),
-                cls: 'x-btn-text-icon',
-                scope:this,
-                handler : actions.Update
-            },
-            '-',
-            {
-                icon: _ico("hand"),
-                cls: "x-btn-text-icon",
-                text: _("Capture"),
-                disabled:true,
-                ref: "../btnCapture",
-                scope:this,
-                handler: actions.Capture
-            },
-            {
-                icon: _ico("arrow"),
-                cls: "x-btn-text-icon",
-                text: _("Transfer"),
-                disabled:true,
-                ref: "../btnTransfer",
-                scope:this,
-                handler: actions.Transfer
-            },
-            "-",
-            {
-                ref: "../btnBriefcase",
-                text: 'В портфель',
-                disabled:true,
-                icon: _ico("briefcase--arrow"),
-                cls: 'x-btn-text-icon',
-                scope:this,
-                handler : actions.Briefcase
-            },
-            {
-                ref: "../btnMove",
-                text: 'В выпуск',
-                disabled:true,
-                icon: _ico("newspaper--arrow"),
-                cls: 'x-btn-text-icon',
-                scope:this,
-                handler : actions.Move
-            },
-            {
-                ref: "../btnRecycle",
-                text: 'В корзину',
-                disabled:true,
-                icon: _ico("bin--arrow"),
-                cls: 'x-btn-text-icon',
-                scope:this,
-                handler : actions.Recycle
-            },
-            "->",
-            {
-                ref: "../btnFromBriefcase",
-                text: 'Портфель',
-                disabled:true,
-                icon: _ico("briefcase"),
-                cls: 'x-btn-text-icon',
-                scope:this,
-                handler : this.cmpShowBriefcase
-            }
-        ]
-        
+        //
+        //this.tbar = [
+        //    {
+        //        ref: "../btnCreate",
+        //        text: _("Add"),
+        //        disabled:true,
+        //        icon: _ico("plus-button"),
+        //        cls: 'x-btn-text-icon',
+        //        scope:this,
+        //        handler : actions.Create
+        //    },
+        //    {
+        //        ref: "../btnUpdate",
+        //        text: _("Edit"),
+        //        disabled:true,
+        //        icon: _ico("pencil"),
+        //        cls: 'x-btn-text-icon',
+        //        scope:this,
+        //        handler : actions.Update
+        //    },
+        //    '-',
+        //    {
+        //        icon: _ico("hand"),
+        //        cls: "x-btn-text-icon",
+        //        text: _("Capture"),
+        //        disabled:true,
+        //        ref: "../btnCapture",
+        //        scope:this,
+        //        handler: actions.Capture
+        //    },
+        //    {
+        //        icon: _ico("arrow"),
+        //        cls: "x-btn-text-icon",
+        //        text: _("Transfer"),
+        //        disabled:true,
+        //        ref: "../btnTransfer",
+        //        scope:this,
+        //        handler: actions.Transfer
+        //    },
+        //    "-",
+        //    {
+        //        ref: "../btnBriefcase",
+        //        text: 'В портфель',
+        //        disabled:true,
+        //        icon: _ico("briefcase--arrow"),
+        //        cls: 'x-btn-text-icon',
+        //        scope:this,
+        //        handler : actions.Briefcase
+        //    },
+        //    {
+        //        ref: "../btnMove",
+        //        text: 'В выпуск',
+        //        disabled:true,
+        //        icon: _ico("newspaper--arrow"),
+        //        cls: 'x-btn-text-icon',
+        //        scope:this,
+        //        handler : actions.Move
+        //    },
+        //    {
+        //        ref: "../btnRecycle",
+        //        text: 'В корзину',
+        //        disabled:true,
+        //        icon: _ico("bin--arrow"),
+        //        cls: 'x-btn-text-icon',
+        //        scope:this,
+        //        handler : actions.Recycle
+        //    },
+        //    "->",
+        //    {
+        //        ref: "../btnFromBriefcase",
+        //        text: 'Портфель',
+        //        disabled:true,
+        //        icon: _ico("briefcase"),
+        //        cls: 'x-btn-text-icon',
+        //        scope:this,
+        //        handler : this.cmpShowBriefcase
+        //    }
+        //]
+        //
         this.view = new Ext.grid.GroupingView({
             forceFit:true,
             groupTextTpl: '{text} ({[values.rs.length]} {[values.rs.length > 1 ? "Items" : "Item"]})'
