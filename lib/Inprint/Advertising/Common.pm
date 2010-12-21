@@ -103,7 +103,7 @@ sub fascicles {
                     AND subpath(edition1.path, nlevel(edition1.path) - 2, 1)::text = replace(?, '-', '')::text
                 ORDER BY edition1.shortcut
             ) UNION ALL (
-                SELECT id, 'fascicle' as type, edition, id as fascicle, shortcut as text, 'blue-folder' as icon,
+                SELECT id, 'fascicle' as type, edition, id as fascicle, shortcut as text, 'blue-folder-open-document-text' as icon,
                     false as have_childs
                 FROM fascicles
                 WHERE is_system = false AND is_enabled = true AND edition = ?

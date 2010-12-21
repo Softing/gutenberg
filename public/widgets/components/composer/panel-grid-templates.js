@@ -27,60 +27,24 @@ Inprint.cmp.composer.GridTemplates = Ext.extend(Ext.grid.GridPanel, {
         this.columns = [
             this.selectionModel,
             {
-                id:"title",
-                header: _("Title"),
-                width: 150,
+                id:"place_shortcut",
+                header: _("Place"),
+                width: 100,
                 sortable: true,
-                dataIndex: "title"
+                dataIndex: "place_shortcut"
             },
             {
                 id:"shortcut",
                 header: _("Shortcut"),
-                width: 150,
+                width: 100,
                 sortable: true,
                 dataIndex: "shortcut"
-            },
-            {
-                id:"description",
-                header: _("Description"),
-                sortable: true,
-                dataIndex: "description"
             },
             {
                 id:"amount",
                 header: _("Amount"),
                 sortable: true,
                 dataIndex: "amount"
-            },
-            {
-                id:"area",
-                header: _("Area"),
-                sortable: true,
-                dataIndex: "area"
-            },
-            {
-                id:"x",
-                header: _("X"),
-                sortable: true,
-                dataIndex: "x"
-            },
-            {
-                id:"y",
-                header: _("Y"),
-                sortable: true,
-                dataIndex: "y"
-            },
-            {
-                id:"w",
-                header: _("W"),
-                sortable: true,
-                dataIndex: "w"
-            },
-            {
-                id:"h",
-                header: _("H"),
-                sortable: true,
-                dataIndex: "h"
             }
         ];
         

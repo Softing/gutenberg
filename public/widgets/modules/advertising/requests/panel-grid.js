@@ -157,14 +157,14 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
 
             var form = new Ext.FormPanel({
                 border:false,
-                url: this.urls["create"],
-                frame:false,
                 labelWidth: 75,
+                url: this.urls["create"],
+                bodyStyle: "padding:5px 5px",
+                plugins: new Ext.ux.DataTip(),
                 defaults: {
                     anchor: "100%",
                     allowBlank:false
                 },
-                bodyStyle: "padding:5px 5px",
                 items: [
                     _FLD_HDN_EDITION,
                     {
@@ -173,15 +173,8 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
                         hideLabel:true,
                         name: "title",
                         fieldLabel: _("Title"),
-                        emptyText: _("Title")
-                    },
-                    {
-                        xtype: "textfield",
-                        allowBlank:false,
-                        hideLabel:true,
-                        name: "shortcut",
-                        fieldLabel: _("Shortcut"),
-                        emptyText: _("Shortcut")
+                        emptyText: _("Title"),
+                        tooltip: 'Название заявки'
                     },
                     {
                         xtype: "textarea",
@@ -189,7 +182,8 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
                         name: "description",
                         hideLabel:true,
                         fieldLabel: _("Description"),
-                        emptyText: _("Description")
+                        emptyText: _("Description"),
+                        tooltip: 'Описание заявки'
                     },
                     
                     {
@@ -197,19 +191,19 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
                         value: "Заявка"
                     },
                     
-                    xc.getConfig("/advertising/combo/managers/", {
-                        hideLabel:true,
-                        editable:true,
-                        typeAhead: true,
-                        minChars: 2,
-                        allowBlank:true,
-                        listeners: {
-                            scope: this,
-                            beforequery: function(qe) {
-                                delete qe.combo.lastQuery;
-                            }
-                        }
-                    }),
+                    //xc.getConfig("/advertising/combo/managers/", {
+                    //    hideLabel:true,
+                    //    editable:true,
+                    //    typeAhead: true,
+                    //    minChars: 2,
+                    //    allowBlank:true,
+                    //    listeners: {
+                    //        scope: this,
+                    //        beforequery: function(qe) {
+                    //            delete qe.combo.lastQuery;
+                    //        }
+                    //    }
+                    //}),
                     
                     xc.getConfig("/advertising/combo/advertisers/", {
                         hideLabel:true,
@@ -217,6 +211,7 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
                         typeAhead: true,
                         minChars: 2,
                         allowBlank:false,
+                        //tooltip: 'Рекламодатель',
                         listeners: {
                             scope: this,
                             beforequery: function(qe) {
@@ -233,6 +228,7 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
                     xc.getConfig("/advertising/combo/fascicles/", {
                         hideLabel:true,
                         allowBlank:true,
+                        tooltip: 'Выпуск',
                         listeners: {
                             scope: this,
                             select: function(combo) {
@@ -357,9 +353,7 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
                 ]
             });
 
-            var view = new Ext.Panel({
-                border:false
-            });
+            var view = new Inprint.advert.requests.View({ parent:this.parent });
 
             win = new Ext.Window({
                 border:false,
@@ -373,7 +367,7 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
                         title: "Формуляр заявки",
                         region:"west",
                         margins: "0 3 0 0",
-                        width: 400,
+                        width: 200,
                         layout:"fit",
                         items: form
                     },
@@ -414,9 +408,9 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
         
         form.findField("edition").setValue( this.parent.currentEdition );
         
-        form.findField("manager").getStore().baseParams["edition"] = this.parent.currentEdition;
-        form.findField("manager").getStore().baseParams["fascicle"] = this.parent.currentFascicle;
-        form.findField("manager").setValue(Inprint.session.member.id, Inprint.session.member.shortcut);
+        //form.findField("manager").getStore().baseParams["edition"] = this.parent.currentEdition;
+        //form.findField("manager").getStore().baseParams["fascicle"] = this.parent.currentFascicle;
+        //form.findField("manager").setValue(Inprint.session.member.id, Inprint.session.member.shortcut);
         
         form.findField("advertiser").getStore().baseParams["edition"] = this.parent.currentEdition;
         form.findField("advertiser").getStore().baseParams["fascicle"] = this.parent.currentFascicle;
@@ -589,6 +583,7 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
                         triggerAction: 'all',
                         selectOnFocus:true
                     },
+                    
                     {
                         xtype: "combo",
                         hiddenName: "payment",
@@ -654,7 +649,7 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
                         title: "Формуляр заявки",
                         region:"west",
                         margins: "0 3 0 0",
-                        width: 400,
+                        width: 200,
                         layout:"fit",
                         items: form
                     },

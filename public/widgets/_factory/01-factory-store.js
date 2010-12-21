@@ -93,10 +93,10 @@ Inprint.factory.Store = new function() {
             [ "id", "selected", "title", "shortcut", "description", "page", "page_shortcut", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
         
         "/fascicle/pages/templates/":
-            [ "id", "fascicle", "page", "title", "shortcut", "description", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
+            [ "id", "fascicle", "page", "place", "place_shortcut", "title", "shortcut", "description", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
         
         "/fascicle/modules/list/":
-            [ "id", "fascicle", "page", "title", "shortcut", "description", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
+            [ "id", "fascicle", "page", , "place", "place_shortcut", "title", "shortcut", "description", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
         
         // System
         "/system/events/list/":

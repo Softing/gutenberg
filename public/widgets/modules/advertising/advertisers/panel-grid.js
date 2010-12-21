@@ -21,7 +21,7 @@ Inprint.advert.advertisers.Grid = Ext.extend(Ext.grid.GridPanel, {
             this.selectionModel,
             {
                 id:"searial",
-                header: _("Serial"),
+                header: _("#"),
                 width: 40,
                 sortable: true,
                 dataIndex: "serialnum"
@@ -182,13 +182,13 @@ Inprint.advert.advertisers.Grid = Ext.extend(Ext.grid.GridPanel, {
                                 items: [
                                     {
                                         xtype:'fieldset',
-                                        title: 'User Information',
+                                        title: _("General information"),
                                         defaults: {
                                             anchor: "100%"
                                         },
                                         items :[
-                                            _FLD_TITLE,
                                             _FLD_SHORTCUT,
+                                            _FLD_TITLE,
                                             _FLD_DESCRIPTION,
                                             {
                                                 xtype: "textarea",
@@ -216,7 +216,7 @@ Inprint.advert.advertisers.Grid = Ext.extend(Ext.grid.GridPanel, {
                                 items: [
                                     {
                                         xtype:'fieldset',
-                                        title: 'User Information',
+                                        title: _("Banking details"),
                                         defaults: {
                                             anchor: "100%"
                                         },
@@ -263,7 +263,7 @@ Inprint.advert.advertisers.Grid = Ext.extend(Ext.grid.GridPanel, {
             });
 
             win = new Ext.Window({
-                title: _("Create role"),
+                title: _("Adding an advertiser"),
                 layout: "fit",
                 closeAction: "hide",
                 width:800, height:500,
@@ -320,8 +320,8 @@ Inprint.advert.advertisers.Grid = Ext.extend(Ext.grid.GridPanel, {
                                             anchor: "100%"
                                         },
                                         items :[
-                                            _FLD_TITLE,
                                             _FLD_SHORTCUT,
+                                            _FLD_TITLE,
                                             _FLD_DESCRIPTION,
                                             {
                                                 xtype: "textarea",

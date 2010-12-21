@@ -25,32 +25,34 @@ sub read {
     
     unless (@errors) {
         $result = $c->sql->Q("
-        SELECT
-            t1.id, t1.serialnum, t1.title, t1.shortcut, t1.status, t1.payment, t1.readiness, t1.created, t1.updated, 
-            edition.id as edition, edition.shortcut as edition_shortcut, 
-            fascicle.id as fascicle, fascicle.shortcut as fascicle_shortcut,
-            advertiser.id as advertiser, advertiser.shortcut as advertiser_shortcut,
-            place.id as place, place.shortcut as place_shortcut,
-            module.id as module, module.shortcut as module_shortcut,
-            manager.id as manager, manager.shortcut as manager_shortcut,
+            SELECT
             
-            hole.x, hole.y, hole.h, hole.w,
-            page.seqnum
-        
-        
-        FROM ad_requests AS t1
-        
-            LEFT JOIN ad_places             AS place        ON place.id = t1.place
-            LEFT JOIN ad_modules            AS module       ON module.id = t1.module
-            LEFT JOIN profiles              AS manager      ON manager.id = t1.manager
-            LEFT JOIN fascicles_map_holes   AS hole         ON hole.entity = t1.id
-            LEFT JOIN ad_modules            AS linking      ON linking.id = hole.module
-            LEFT JOIN fascicles_pages       AS page         ON page.id = hole.page
-        
-        , editions AS edition, fascicles AS fascicle, ad_advertisers AS advertiser
-        
-        WHERE edition.id = t1.edition AND fascicle.id = t1.fascicle AND fascicle.is_enabled=true AND advertiser.id = t1.advertiser
-            AND t1.id = ?
+                t1.id, t1.serialnum, t1.title, t1.shortcut, t1.status, t1.payment, t1.readiness, t1.created, t1.updated, 
+                edition.id as edition, edition.shortcut as edition_shortcut, 
+                fascicle.id as fascicle, fascicle.shortcut as fascicle_shortcut,
+                advertiser.id as advertiser, advertiser.shortcut as advertiser_shortcut,
+                place.id as place, place.shortcut as place_shortcut,
+                module.id as module, module.shortcut as module_shortcut,
+                manager.id as manager, manager.shortcut as manager_shortcut,
+                
+                hole.x, hole.y, hole.h, hole.w,
+                page.seqnum
+            
+            FROM ad_requests AS t1
+            
+                LEFT JOIN fascicles_tmpl_places     AS place            ON place.id = t1.place
+                LEFT JOIN fascicles_tmpl_modules    AS module           ON module.id = t1.module
+                LEFT JOIN profiles                  AS manager          ON manager.id = t1.manager
+                
+                LEFT JOIN fascicles_modules         AS rl_module        ON hole.entity = t1.id
+                LEFT JOIN fascicles_map_modules     AS rl_module_map    ON hole.entity = t1.id
+                
+                LEFT JOIN fascicles_pages           AS page             ON page.id = hole.page
+            
+            , editions AS edition, fascicles AS fascicle, ad_advertisers AS advertiser
+            
+            WHERE edition.id = t1.edition AND fascicle.id = t1.fascicle AND fascicle.is_enabled=true AND advertiser.id = t1.advertiser
+                AND t1.id = ?
         ", [ $i_id ])->Hash;
     }
     

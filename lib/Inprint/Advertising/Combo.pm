@@ -59,7 +59,7 @@ sub advertisers {
     }
     
     my @data;
-    my $sql = " SELECT id, title FROM ad_advertisers  WHERE 1=1 ";
+    my $sql = " SELECT id, shortcut as title FROM ad_advertisers  WHERE 1=1 ";
     
     if ($i_edition) {
         my $editions = $c->sql->Q(" SELECT id FROM editions WHERE path ~ ('*.' || replace(?, '-', '')::text || '.*')::lquery ", [$i_edition])->Values;
@@ -134,8 +134,9 @@ sub modules {
     my $i_place = $c->param("place") || undef;
     
     my $result = $c->sql->Q("
-        SELECT id, title
-        FROM ad_modules WHERE place=?
+        SELECT t1.id, t1.shortcut as title
+        FROM fascicles_tmpl_modules t1, fascicles_tmpl_index t2
+        WHERE t2.entity=t1.id AND t2.nature='module' AND t2.place=?
         ORDER BY title
     ", [ $i_place ])->Hashes;
     

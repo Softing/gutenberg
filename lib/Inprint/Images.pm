@@ -34,6 +34,16 @@ sub fascicle_page {
         FROM fascicles_pages WHERE id=?
     ", [ $i_page ])->Hash;
     
+    $page->{allowed_places} = $c->sql->Q("
+        SELECT place
+        FROM fascicles_tmpl_index WHERE nature='headline' AND fascicle=? AND entity=?
+    ", [ $page->{fascicle}, $page->{headline} ])->Values;
+    
+    $page->{allowed_modules} = $c->sql->Q("
+        SELECT place
+        FROM fascicles_tmpl_index WHERE nature='module' AND fascicle=? AND place=ANY(?)
+    ", [ $page->{fascicle}, $page->{allowed_places} ])->Values;
+    
     # create a new image
     my $img = new GD::Image($grid_w, $grid_h);
     
@@ -55,16 +65,21 @@ sub fascicle_page {
     
     my $modules = $c->sql->Q("
         SELECT
-            t1.id, t1.shortcut, t1.w, t1.h, t2.placed, t2.x, t2.y
+            t1.id, t1.shortcut, t1.place, t1.w, t1.h, t2.placed, t2.x, t2.y
         FROM fascicles_modules t1, fascicles_map_modules t2
         WHERE 
             t2.page = ? AND t2.module = t1.id
     ", [ $i_page ])->Hashes;
     
     foreach my $module (@$modules) {
+        
         $module->{bg_color} = $gray;
         $module->{brd_color} = $black;
         $module->{txt_color} = $black;
+        
+        unless ($module->{place} ~~ $page->{allowed_places}) {
+            $module->{brd_color} = $red;
+        }
         
         $c->draw_module($img, $grid, $module);
     }

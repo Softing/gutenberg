@@ -55,8 +55,20 @@ sub templates {
     
     my $origins; unless (@errors) {
         $origins  = $c->sql->Q(" SELECT origin FROM fascicles_pages WHERE id= ANY(?) ", [ \@i_pages ])->Values;
-        push @errors, { id => "page", msg => "Incorrectly filled field"}
+        push @errors, { id => "page", msg => "Can't find object!"}
             unless (@$origins);
+    }
+    
+    my $headlines; unless (@errors) {
+        $headlines  = $c->sql->Q(" SELECT headline FROM fascicles_pages WHERE id= ANY(?) ", [ \@i_pages ])->Values;
+        push @errors, { id => "healine", msg => "Can't find object!"}
+            unless (@$headlines);
+    }
+    
+    my $places; unless (@errors) {
+        $places = $c->sql->Q(" SELECT place FROM fascicles_tmpl_index WHERE nature='headline' AND entity = ANY(?) ", [ $headlines ])->Values;
+        push @errors, { id => "place", msg => "Can't find object!"}
+            unless (@$places);
     }
     
     my $sql;
@@ -64,12 +76,17 @@ sub templates {
     
     unless (@errors) {
         $sql = "
-            SELECT id, fascicle, page, title, shortcut, description, amount, round(area::numeric, 2) as area, x, y, w, h, created, updated
-            FROM fascicles_tmpl_modules
-            WHERE page = ANY(?) AND amount=?
+            SELECT
+                t1.id, t1.fascicle, t1.page, t1.title, t1.shortcut,
+                t1.description, t1.amount, round(t1.area::numeric, 2) as area,
+                t1.x, t1.y, t1.w, t1.h, t1.created, t1.updated,
+                t3.id as place, t3.shortcut as place_shortcut
+            FROM fascicles_tmpl_modules t1, fascicles_tmpl_index t2, fascicles_tmpl_places t3
+            WHERE
+                t2.place = t3.id AND t2.nature='module' AND t2.entity = t1.id AND t2.place = ANY(?) AND t1.amount=?
             ORDER BY shortcut
         ";
-        push @params, \@$origins;
+        push @params, \@$places;
         push @params, $amount;
     }
     

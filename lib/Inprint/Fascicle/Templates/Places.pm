@@ -181,7 +181,10 @@ sub delete {
     unless (@errors) {
         foreach my $id (@ids) {
             if ($c->is_uuid($id)) {
-                $c->sql->Do(" DELETE FROM fascicles_tmpl_places WHERE id=? ", [ $id ]);
+                my $exists = $c->sql->Q(" SELECT EXISTS( SELECT id FROM fascicles_modules WHERE place=? ) ", [ $id ])->Value;
+                unless ($exists) {
+                    $c->sql->Do(" DELETE FROM fascicles_tmpl_places WHERE id=? ", [ $id ]);
+                }
             }
         }
     }

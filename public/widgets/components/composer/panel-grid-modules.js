@@ -27,95 +27,26 @@ Inprint.cmp.composer.Modules = Ext.extend(Ext.grid.GridPanel, {
         this.columns = [
             this.selectionModel,
             {
-                id:"title",
-                header: _("Title"),
-                width: 150,
+                id:"place_shortcut",
+                header: _("Place"),
+                width: 100,
                 sortable: true,
-                dataIndex: "title"
+                dataIndex: "place_shortcut"
             },
             {
                 id:"shortcut",
                 header: _("Shortcut"),
-                width: 150,
+                width: 100,
                 sortable: true,
                 dataIndex: "shortcut"
-            },
-            {
-                id:"description",
-                header: _("Description"),
-                sortable: true,
-                dataIndex: "description"
             },
             {
                 id:"amount",
                 header: _("Amount"),
                 sortable: true,
                 dataIndex: "amount"
-            },
-            {
-                id:"area",
-                header: _("Area"),
-                sortable: true,
-                dataIndex: "area"
-            },
-            {
-                id:"x",
-                header: _("X"),
-                sortable: true,
-                dataIndex: "x"
-            },
-            {
-                id:"y",
-                header: _("Y"),
-                sortable: true,
-                dataIndex: "y"
-            },
-            {
-                id:"w",
-                header: _("W"),
-                sortable: true,
-                dataIndex: "w"
-            },
-            {
-                id:"h",
-                header: _("H"),
-                sortable: true,
-                dataIndex: "h"
             }
         ];
-        
-        //this.tbar = [
-        //    //{
-        //    //    disabled:false,
-        //    //    icon: _ico("plus-button"),
-        //    //    cls: "x-btn-text-icon",
-        //    //    text: _("Add"),
-        //    //    ref: "../btnCreate",
-        //    //    scope:this,
-        //    //    handler: this.cmpCreate
-        //    //},
-        //    {
-        //        disabled:false,
-        //        icon: _ico("disk-black"),
-        //        cls: "x-btn-text-icon",
-        //        text: _("Save"),
-        //        ref: "../btnSave",
-        //        scope:this,
-        //        handler: function() {
-        //            this.parent.panels["flash"].cmpSave();
-        //        }
-        //    },
-        //    '-',
-        //    {
-        //        disabled:true,
-        //        icon: _ico("minus-button"),
-        //        cls: "x-btn-text-icon",
-        //        text: _("Remove"),
-        //        ref: "../btnDelete",
-        //        scope:this,
-        //        handler: this.cmpDelete
-        //    }
-        //];
         
         Ext.apply(this, {
             

@@ -3,8 +3,8 @@ Inprint.advert.requests.Main = Ext.extend(Ext.Panel, {
     initComponent: function() {
 
         this.panels = {};
-        this.panels["tree"]  = new Inprint.advert.requests.Tree({ parent:this });
-        this.panels["grid"]  = new Inprint.advert.requests.Grid({ parent:this });
+        this.panels["tree"] = new Inprint.advert.requests.Tree({ parent:this });
+        this.panels["grid"] = new Inprint.advert.requests.Grid({ parent:this });
         
         this.currentEdition  = null;
         this.currentFascicle = null;

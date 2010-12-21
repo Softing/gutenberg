@@ -99,10 +99,13 @@ sub list {
         
         $sql = "
             SELECT
-                DISTINCT t1.id, t1.edition, t1.fascicle, t1.origin, t1.title, t1.shortcut, t1.description, t1.amount, t1.area, t1.created, t1.updated,
+                DISTINCT t1.id, t1.edition, t1.fascicle,t1.origin, t1.title,
+                t1.shortcut, t1.description, t1.amount, t1.area, t1.created,
+                t1.updated, t3.id as place, t3.shortcut as place_shortcut,
                 ( SELECT count(*) FROM fascicles_map_modules WHERE module=t1.id ) as count
-            FROM fascicles_modules t1, fascicles_map_modules t2
-            WHERE t2.module=t1.id AND t2.page = ANY(?) 
+                
+            FROM fascicles_modules t1, fascicles_map_modules t2, fascicles_tmpl_places t3
+            WHERE t1.place = t3.id AND t2.module=t1.id AND t2.page = ANY(?) 
         ";
         
         push @params, \@pages;
@@ -142,18 +145,31 @@ sub create {
     
     unless (@errors) {
         
-        foreach my $id (@i_modules) {
+        foreach my $string (@i_modules) {
+            
+            my ($module_id, $place_id) = split "::", $string;
+            
+            next unless $c->is_uuid($module_id);
+            next unless $c->is_uuid($place_id);
             
             my $module = $c->sql->Q("
                     SELECT id, origin, fascicle, page, title, shortcut, description, amount, area, x, y, w, h, created, updated
                     FROM fascicles_tmpl_modules WHERE id=?
-                ", [ $id ])->Hash;
+                ", [ $module_id ])->Hash;
             
             next unless $module->{id};
+            
+            my $place = $c->sql->Q("
+                    SELECT id, origin, fascicle, title, shortcut, description, created, updated
+                    FROM fascicles_tmpl_places  WHERE id=?
+                ", [ $place_id ])->Hash;
+            
+            next unless $place->{id};
             
             my @pages;
             
             foreach my $code (@i_pages) {
+                
                 my ($page_id, $seqnum) = split '::', $code;
                 
                 my $page = $c->sql->Q("
@@ -172,10 +188,10 @@ sub create {
                 my $module_id = $c->uuid;
                 
                 $c->sql->Do("
-                    INSERT INTO fascicles_modules(id, edition, fascicle, origin, title, shortcut, description, amount, area, w, h,  created, updated)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
+                    INSERT INTO fascicles_modules(id, edition, fascicle, place, origin, title, shortcut, description, amount, area, w, h,  created, updated)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
                 ", [
-                    $module_id, $fascicle->{edition}, $fascicle->{id}, $module->{id}, $module->{title}, $module->{shortcut}, $module->{description},
+                    $module_id, $fascicle->{edition}, $fascicle->{id}, $place->{id}, $module->{id}, $module->{title}, $module->{shortcut}, $module->{description},
                     $module->{amount}, $module->{area},
                     $module->{w}, $module->{h}
                 ]);
