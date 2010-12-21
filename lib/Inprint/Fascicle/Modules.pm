@@ -101,11 +101,15 @@ sub list {
             SELECT
                 DISTINCT t1.id, t1.edition, t1.fascicle,t1.origin, t1.title,
                 t1.shortcut, t1.description, t1.amount, t1.area, t1.created,
-                t1.updated, t3.id as place, t3.shortcut as place_shortcut,
+                t1.updated, t3.id as place,
+                t3.shortcut as place_shortcut,
                 ( SELECT count(*) FROM fascicles_map_modules WHERE module=t1.id ) as count
                 
-            FROM fascicles_modules t1, fascicles_map_modules t2, fascicles_tmpl_places t3
-            WHERE t1.place = t3.id AND t2.module=t1.id AND t2.page = ANY(?) 
+            FROM
+                fascicles_modules t1
+                    LEFT JOIN fascicles_tmpl_places t3 ON ( t1.place = t3.id ),
+                fascicles_map_modules t2
+            WHERE t2.module=t1.id AND t2.page = ANY(?) 
         ";
         
         push @params, \@pages;
