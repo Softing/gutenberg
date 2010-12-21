@@ -64,11 +64,14 @@ sub fascicle_page {
     $c->draw_page($img, $grid, $page->{w}, $page->{h});
     
     my $modules = $c->sql->Q("
-        SELECT
-            t1.id, t1.shortcut, t1.place, t1.w, t1.h, t2.placed, t2.x, t2.y
-        FROM fascicles_modules t1, fascicles_map_modules t2
-        WHERE 
-            t2.page = ? AND t2.module = t1.id
+        SELECT DISTINCT
+                t1.id, t1.shortcut, t1.place, t1.w, t1.h, t2.placed, t2.x, t2.y,
+                t3.id as place, t3.shortcut as place_shortcut
+            FROM
+                fascicles_modules t1
+                    LEFT JOIN fascicles_tmpl_places t3 ON ( t1.place = t3.id ),
+                fascicles_map_modules t2
+            WHERE t2.module=t1.id AND t2.page = ?
     ", [ $i_page ])->Hashes;
     
     foreach my $module (@$modules) {
@@ -76,6 +79,10 @@ sub fascicle_page {
         $module->{bg_color} = $gray;
         $module->{brd_color} = $black;
         $module->{txt_color} = $black;
+        
+        unless ($module->{place}) {
+            $module->{brd_color} = $red;
+        }
         
         unless ($module->{place} ~~ $page->{allowed_places}) {
             $module->{brd_color} = $red;

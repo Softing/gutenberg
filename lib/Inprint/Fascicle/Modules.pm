@@ -98,11 +98,10 @@ sub list {
         }
         
         $sql = "
-            SELECT
-                DISTINCT t1.id, t1.edition, t1.fascicle,t1.origin, t1.title,
-                t1.shortcut, t1.description, t1.amount, t1.area, t1.created,
-                t1.updated, t3.id as place,
-                t3.shortcut as place_shortcut,
+            SELECT DISTINCT
+                t1.id, t1.edition, t1.fascicle,t1.origin, t1.title, t1.shortcut,
+                t1.description, t1.amount, t1.area, t1.created, t1.updated,
+                t3.id as place, t3.shortcut as place_shortcut,
                 ( SELECT count(*) FROM fascicles_map_modules WHERE module=t1.id ) as count
                 
             FROM
