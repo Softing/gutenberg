@@ -59,13 +59,13 @@ sub save {
             
             my ($id, $x, $y, $w, $h) = split "::", $string;
             
-            my $placed = 0;
+            my $placed = 1;
             
-            unless ($x eq "0/1") {
-                unless ($y eq "0/1") {
-                    $placed = 1;
-                }
-            }
+            #unless ($x eq "0/1") {
+            #    unless ($y eq "0/1") {
+            #        $placed = 1;
+            #    }
+            #}
             
             $c->sql->Do("
                     UPDATE fascicles_map_modules SET placed=?, x=?, y=? WHERE page=? AND module=?

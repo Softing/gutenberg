@@ -662,14 +662,13 @@ sub getSummary {
         
         foreach my $tmpl_module (@$tmpl_modules) {
             
-            my $hl = 
-                $c->sql->Q("
+            my $hl = $c->sql->Q("
                         SELECT count(*)
                         FROM fascicles_modules t1, fascicles_map_modules t2
                         WHERE t2.module=t1.id AND t1.fascicle=? AND t1.place=? AND t1.origin=?
-                ", [ $fascicle, $place->{id}, $tmpl_module->{id} ])->Value;
+                ", [ $fascicle, $place->{id}, $tmpl_module->{id} ])->Value || 0;
             
-            #die " $fascicle, $place->{id}, $tmpl_module->{id} ";
+            say STDERR " $fascicle, $place->{id}, $tmpl_module->{id} ";
             
             my $rq = 0;
             #$c->sql->Q("
