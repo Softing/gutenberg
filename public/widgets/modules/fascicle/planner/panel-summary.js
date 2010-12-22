@@ -20,7 +20,8 @@ Inprint.fascicle.planner.Summary = Ext.extend(Ext.grid.EditorGridPanel, {
         
         this.colModel = new Ext.grid.ColumnModel({
             defaults: {
-                sortable: false
+                sortable: false,
+                menuDisabled: true
             },
             columns: [
                 {
@@ -30,25 +31,29 @@ Inprint.fascicle.planner.Summary = Ext.extend(Ext.grid.EditorGridPanel, {
                     dataIndex: 'place_shortcut'
                 },
                 {
+                    id: 'pages',
+                    header: _('Pages')
+                },
+                {
                     id: 'module',
                     header: _('Module'),
                     dataIndex: 'module_shortcut'
                 },
                 {
                     id: 'holes',
-                    width: 20,
+                    width: 10,
                     header: _('HL'),
                     dataIndex: 'holes'
                 },
                 {
                     id: 'requests',
-                    width: 20,
+                    width: 10,
                     header: _('RQ'),
                     dataIndex: 'requests'
                 },
                 {
                     id: 'free',
-                    width: 20,
+                    width: 10,
                     header: _('FR'),
                     dataIndex: 'free'
                 }  

@@ -219,7 +219,7 @@ sub create {
                         INSERT INTO fascicles_map_modules(edition, fascicle, module, page, placed, x, y, created, updated)
                         VALUES (?, ?, ?, ?, ?, ?, ?, now(), now());
                     ", [
-                        $fascicle->{edition}, $fascicle->{id}, $module_id, $page->{id}, 0, "0/1", "0/1"
+                        $fascicle->{edition}, $fascicle->{id}, $module_id, $page->{id}, 0, "1/1", "1/1"
                     ]);
                 }
             }
