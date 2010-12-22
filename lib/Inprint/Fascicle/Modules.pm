@@ -309,10 +309,18 @@ sub delete {
     
     unless (@errors) {
         foreach my $id (@ids) {
+            
+            my $module;
+            
             if ($c->is_uuid($id)) {
-                $c->sql->Do(" DELETE FROM fascicles_modules WHERE id=? ", [ $id ]);
-                $c->sql->Do(" DELETE FROM fascicles_map_modules WHERE module=? ", [ $id ]);
+                $module = $c->sql->Q(" SELECT * FROM fascicles_modules WHERE id=? ", [ $id ])->Value;
             }
+            
+            if ($module->{id}) {
+                $c->sql->Do(" DELETE FROM fascicles_modules WHERE id=? ", [ $module->{id} ]);
+                $c->sql->Do(" DELETE FROM fascicles_map_modules WHERE module=? ", [ $module->{id} ]);
+            }
+            
         }
     }
     

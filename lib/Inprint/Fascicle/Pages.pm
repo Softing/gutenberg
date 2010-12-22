@@ -51,41 +51,32 @@ sub templates {
             unless ($c->is_uuid($_));
     }
     
-    my $origins; unless (@errors) {
-        $origins  = $c->sql->Q(" SELECT origin FROM fascicles_pages WHERE id= ANY(?) ", [ \@i_pages ])->Values;
+    my $templates; unless (@errors) {
+        $templates = $c->sql->Q(" SELECT origin FROM fascicles_pages WHERE id= ANY(?) ", [ \@i_pages ])->Values;
         push @errors, { id => "page", msg => "Can't find object!"}
-            unless (@$origins);
-    }
-    
-    my $headlines; unless (@errors) {
-        $headlines  = $c->sql->Q(" SELECT headline FROM fascicles_pages WHERE id= ANY(?) ", [ \@i_pages ])->Values;
-        push @errors, { id => "healine", msg => "Can't find object!"}
-            unless (@$headlines);
-    }
-    
-    my $places; unless (@errors) {
-        $places = $c->sql->Q(" SELECT place FROM fascicles_tmpl_index WHERE nature='headline' AND entity = ANY(?) ", [ $headlines ])->Values;
-        push @errors, { id => "place", msg => "Can't find object!"}
-            unless (@$places);
+            unless (@$templates);
     }
     
     my $sql;
+    my @queries;
     my @params;
     
     unless (@errors) {
-        $sql = "
-            SELECT
-                t1.id, t1.fascicle, t1.page, t1.title, t1.shortcut,
-                t1.description, t1.amount, round(t1.area::numeric, 2) as area,
-                t1.x, t1.y, t1.w, t1.h, t1.created, t1.updated,
-                t3.id as place, t3.shortcut as place_shortcut
-            FROM fascicles_tmpl_modules t1, fascicles_tmpl_index t2, fascicles_tmpl_places t3
-            WHERE
-                t2.place = t3.id AND t2.nature='module' AND t2.entity = t1.id AND t2.place = ANY(?) AND t1.amount=?
-            ORDER BY shortcut
-        ";
-        push @params, \@$places;
-        push @params, $amount;
+        
+        foreach my $tmpl_id (@$templates) {
+            
+            push @queries, "
+                SELECT
+                    id, origin, fascicle, page, title, shortcut, description,
+                    amount, round(area::numeric, 2) as area, x, y, w, h,
+                    created, updated
+                FROM fascicles_tmpl_modules WHERE page=? ";
+            push @params, $tmpl_id;
+            
+        }
+        
+        $sql = join "\n INTERSECT \n", @queries;
+        
     }
     
     unless (@errors) {
@@ -577,7 +568,7 @@ sub delete {
                 $c->sql->bt;
                 $c->sql->Do(" DELETE FROM fascicles_pages WHERE id=? ", [ $page->{id} ]);
                 $c->sql->Do(" DELETE FROM fascicles_map_documents WHERE page=? ", [ $page->{id} ]);
-                $c->sql->Do(" DELETE FROM fascicles_map_holes WHERE page=? ", [ $page->{id} ]);
+                $c->sql->Do(" DELETE FROM fascicles_map_modules WHERE page=? ", [ $page->{id} ]);
                 $c->sql->et;
             }
         }
