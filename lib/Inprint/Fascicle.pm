@@ -434,6 +434,30 @@ sub getPages {
     
     my $holes;
     
+    my $dbholes = $c->sql->Q("
+        SELECT t1.id, t1.shortcut, t1.w, t1.h, t2.page, t2.x, t2.y
+        FROM fascicles_modules t1, fascicles_map_modules t2
+        WHERE t1.fascicle = ? AND t2.module=t1.id AND t2.placed=false
+    ", [ $fascicle ])->Hashes;
+    
+    foreach my $item (@$dbholes) {
+        $index->{$item->{id}} = $idcounter++;
+        
+        $holes->{$index->{$item->{id}}} = {
+            id => $item->{id},
+            title => $item->{shortcut},
+            #x => $item->{x},
+            #y => $item->{y},
+            #h => $item->{h},
+            #w => $item->{w},
+        };
+        
+        my $pageindex = $index->{$item->{page}};
+        if ($pageindex) {
+            push @{ $pages->{$pageindex}->{holes} }, $index->{$item->{id}};
+        }
+    }
+    
     $data->{pages}      = $pages;
     $data->{documents}  = $documents;
     $data->{holes}      = $holes;
