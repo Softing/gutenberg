@@ -662,13 +662,21 @@ sub getSummary {
         
         foreach my $tmpl_module (@$tmpl_modules) {
             
-            my $hl = $c->sql->Q("
-                        SELECT count(*)
-                        FROM fascicles_modules t1, fascicles_map_modules t2
-                        WHERE t2.module=t1.id AND t1.fascicle=? AND t1.place=? AND t1.origin=?
-                ", [ $fascicle, $place->{id}, $tmpl_module->{id} ])->Value || 0;
+            my $pages = $c->sql->Q("
+                    SELECT t3.seqnum
+                    FROM fascicles_modules t1, fascicles_map_modules t2, fascicles_pages t3
+                    WHERE t2.module=t1.id AND t2.page=t3.id
+                        AND t1.fascicle=? AND t1.place=? AND t1.origin=?
+                    ORDER BY t3.seqnum
+                ", [ $fascicle, $place->{id}, $tmpl_module->{id} ])->Values;
             
-            say STDERR " $fascicle, $place->{id}, $tmpl_module->{id} ";
+            $pages = join ", ", @$pages;
+            
+            my $hl = $c->sql->Q("
+                    SELECT count(*)
+                    FROM fascicles_modules t1, fascicles_map_modules t2
+                    WHERE t2.module=t1.id AND t1.fascicle=? AND t1.place=? AND t1.origin=?
+                ", [ $fascicle, $place->{id}, $tmpl_module->{id} ])->Value || 0;
             
             my $rq = 0;
             #$c->sql->Q("
@@ -683,6 +691,7 @@ sub getSummary {
                 module          => $tmpl_module->{id},
                 place           => $place->{id},
                 place_shortcut  => $place->{shortcut},
+                pages           => $pages,
                 holes           => $hl,
                 requests        => $rq,
                 free            => $fr
