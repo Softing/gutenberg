@@ -328,7 +328,7 @@ sub delete {
             my $module;
             
             if ($c->is_uuid($id)) {
-                $module = $c->sql->Q(" SELECT * FROM fascicles_modules WHERE id=? ", [ $id ])->Value;
+                $module = $c->sql->Q(" SELECT * FROM fascicles_modules WHERE id=? ", [ $id ])->Hash;
             }
             
             if ($module->{id}) {
