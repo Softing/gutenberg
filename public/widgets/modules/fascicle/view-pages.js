@@ -33,8 +33,6 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
                             }
                         }
                         
-                        
-                        
                         if(page.num && page.num % 2 != 0) {
                             pageclass = "inprint-plan-page-right";
                             if (prevPage && prevPage.num != page.num-1) {
@@ -61,6 +59,15 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
                             
                             string += '<div class="inprint-plan-page-body"'+
                                 ' style="background:url(/aimgs/fascicle/page/'+ page.id +'/105/129/?rnd='+ Math.random() +') no-repeat;">';
+                            
+                            if (page.holes) {
+                                string += '<div class="inprint-plan-page-holes">';
+                                for (var d=0; d<page.holes.length; d++) {
+                                    var hole = items.holes[ page.holes[d] ];
+                                    string += '<div class="inprint-plan-page-hole">'+ hole.title +'</div>';
+                                }
+                                string += '</div>';
+                            }
                             
                             if (page.documents) {
                                 string += '<div  class="inprint-plan-page-documents">';
@@ -92,15 +99,6 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
                                     '</div>';
                                 }
                                 string += '<div style="clear:both"></div>';
-                                string += '</div>';
-                            }
-                            
-                            if (page.holes) {
-                                string += '<div class="inprint-plan-page-holes">';
-                                for (var d=0; d<page.holes.length; d++) {
-                                    var hole = items.holes[ page.holes[d] ];
-                                    string += '<div class="inprint-plan-page-hole">'+ hole.title +'</div>';
-                                }
                                 string += '</div>';
                             }
                             
