@@ -14,7 +14,13 @@ Inprint.cmp.composer.Flash = Ext.extend(Ext.Panel, {
 
         var selection = this.parent.selection;
         var selLength = this.parent.selLength;
-
+        
+        selection.sort(function(a, b){
+            var array1 = a.split("::");
+            var array2 = b.split("::");
+            return array1[1] - array2[1];
+        });
+        
         this.pages = [];
         for (var c = 1; c < selection.length+1; c++) {
             var array = selection[c-1].split("::");
