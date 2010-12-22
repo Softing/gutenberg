@@ -530,7 +530,9 @@ sub clean {
                 }
                 
                 if ($i_adverts eq "true") {
-                    $c->sql->Do(" UPDATE fascicles_map_modules SET placed=false WHERE page=? ", [ $page->{id} ]);
+                    my $modules = $c->sql->Q(" SELECT DISTINCT module FROM fascicles_map_modules WHERE page=? ", [ $page->{id} ])->Values;
+                    $c->sql->Do(" DELETE FROM fascicles_modules WHERE id=ANY(?) ", [ $modules ]);
+                    #$c->sql->Do(" UPDATE fascicles_map_modules SET placed=false WHERE page=? ", [ $page->{id} ]);
                 }
                 
                 $c->sql->et;
