@@ -662,10 +662,12 @@ sub getSummary {
         
         foreach my $module (@$modules) {
             
-            my $hl = 0;
-                #$c->sql->Q("
-                #    SELECT count(*) FROM fascicles_map_modules WHERE fascicle=? AND place=? AND module=?
-                #", [ $fascicle, $place->{id}, $module->{id} ])->Value;
+            my $hl = 
+                $c->sql->Q("
+                    SELECT count(*)
+                    FROM fascicles_modules t1, fascicles_map_modules t2
+                    WHERE t2.module=t1.id AND t1.fascicle=? AND t1.place=? AND t1.origin=?
+                ", [ $fascicle, $place->{id}, $module->{id} ])->Value;
             
             my $rq = 0;
             #$c->sql->Q("
@@ -675,13 +677,13 @@ sub getSummary {
             my $fr = $hl - $rq;
             
             push @$data, {
-                place => $place->{id},
-                place_shortcut => $place->{shortcut},
-                module => $module->{id},
-                module_shortcut => $module->{shortcut},
-                holes => $hl,
-                requests => $rq,
-                free => $fr
+                id              => $module->{id},
+                shortcut        => $module->{shortcut},
+                place           => $place->{id},
+                place_shortcut  => $place->{shortcut},
+                holes           => $hl,
+                requests        => $rq,
+                free            => $fr
             }
         }
     }

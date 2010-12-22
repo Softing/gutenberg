@@ -26,34 +26,38 @@ Inprint.fascicle.planner.Summary = Ext.extend(Ext.grid.EditorGridPanel, {
             columns: [
                 {
                     id: 'place',
-                    hidden:true,
                     header: _('Place'),
                     dataIndex: 'place_shortcut'
                 },
                 {
-                    id: 'pages',
-                    header: _('Pages')
+                    id: 'module',
+                    width:80,
+                    header: _('Module'),
+                    dataIndex: 'shortcut'
                 },
                 {
-                    id: 'module',
-                    header: _('Module'),
-                    dataIndex: 'module_shortcut'
+                    id: 'pages',
+                    header: _('Pages'),
+                    dataIndex: 'pages',
+                    editor: new Ext.form.TextField({
+                        allowBlank: true
+                    })
                 },
                 {
                     id: 'holes',
-                    width: 10,
+                    width: 20,
                     header: _('HL'),
                     dataIndex: 'holes'
                 },
                 {
                     id: 'requests',
-                    width: 10,
+                    width: 20,
                     header: _('RQ'),
                     dataIndex: 'requests'
                 },
                 {
                     id: 'free',
-                    width: 10,
+                    width: 20,
                     header: _('FR'),
                     dataIndex: 'free'
                 }  
@@ -61,7 +65,6 @@ Inprint.fascicle.planner.Summary = Ext.extend(Ext.grid.EditorGridPanel, {
         });
         
         this.view = new Ext.grid.GroupingView({
-            forceFit:true,
             hideGroupedColumn: true,
             groupTextTpl: '{text}'
         });
@@ -70,7 +73,7 @@ Inprint.fascicle.planner.Summary = Ext.extend(Ext.grid.EditorGridPanel, {
             border:false,
             stripeRows: true,
             columnLines: true,
-            autoExpandColumn: "title",
+            autoExpandColumn: "pages",
             sm: this.sm,
             tbar: this.tbar,
             columns: this.columns

@@ -363,19 +363,29 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
 
     cmpSave: function() {
         
-        var pages = this.panels["pages"];
+        var pages     = this.panels["pages"];
         var documents = this.panels["documents"];
-        
-        var data = [];
+        var modules   = this.panels["summary"];
         
         // get documents changes
-        
-        var records = documents.getStore().getModifiedRecords();
-        if(records.length) {
-            Ext.each(records, function(r, i) {
+        var data1 = [];
+        var records1 = documents.getStore().getModifiedRecords();
+        if(records1.length) {
+            Ext.each(records1, function(r, i) {
                 var document = r.get('id');
                 var pages = r.get('pages');
-                data.push(document +'::'+ pages);
+                data1.push(document +'::'+ pages);
+            }, this);
+        }
+        
+        // get modules changes
+        var data2 = [];
+        var records2 = modules.getStore().getModifiedRecords();
+        if(records2.length) {
+            Ext.each(records2, function(r, i) {
+                var place = r.get('id');
+                var pages = r.get('pages');
+                data2.push(place +'::'+ pages);
             }, this);
         }
         
@@ -385,7 +395,8 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
             url: _url("/fascicle/save/"),
             params:{
                 fascicle: this.oid,
-                document: data
+                document: data1,
+                module: data2
             },
             scope:this,
             success: function () {
