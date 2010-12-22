@@ -678,8 +678,9 @@ sub getSummary {
             my $fr = $hl - $rq;
             
             push @$data, {
-                id              => $tmpl_module->{id},
+                id              => $place->{id} ."::". $tmpl_module->{id},
                 shortcut        => $tmpl_module->{shortcut},
+                module          => $tmpl_module->{id},
                 place           => $place->{id},
                 place_shortcut  => $place->{shortcut},
                 holes           => $hl,

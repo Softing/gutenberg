@@ -71,7 +71,7 @@ Inprint.factory.Store = new function() {
             [ "id", "title", "shortcut", "description" ],
         
         "/fascicle/summary/":
-            [ "id", "shortcut", "pages", "place", "place_shortcut", "holes", "requests", "free" ],
+            [ "id", "shortcut", "pages", "place", "module", "place_shortcut", "holes", "requests", "free" ],
         
         "/fascicle/documents/list/":
             [   'id', 'access',    'edition',  'edition_shortcut',    'fascicle',    'fascicle_shortcut',    'headline', 'headline_shortcut',

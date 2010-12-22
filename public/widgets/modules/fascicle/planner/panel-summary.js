@@ -7,7 +7,6 @@ Inprint.fascicle.planner.Summary = Ext.extend(Ext.grid.EditorGridPanel, {
         }
 
         this.store = Inprint.factory.Store.group(this.urls.list, {
-            remoteSort: true,
             groupField:'place_shortcut',
             remoteGroup:false,
             remoteSort:false,
@@ -25,7 +24,7 @@ Inprint.fascicle.planner.Summary = Ext.extend(Ext.grid.EditorGridPanel, {
             },
             columns: [
                 {
-                    id: 'place',
+                    id: 'place_shortcut',
                     header: _('Place'),
                     dataIndex: 'place_shortcut'
                 },
