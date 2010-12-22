@@ -113,8 +113,6 @@ Inprint.cmp.composer.Flash = Ext.extend(Ext.Panel, {
                 
                 Ext.each(responce.data.pages, function(c) {
                     
-                    alert(c.seqnum);
-                    
                     var flash = this.cmpGetFlashById(c.id);
                     if (flash) {
                         var init = function() {
