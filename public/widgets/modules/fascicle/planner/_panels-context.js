@@ -101,16 +101,16 @@ Inprint.fascicle.planner.Context = function(parent, panels) {
                 scope:panels["pages"],
                 handler: panels["pages"].cmpPageClean
             },
-            {
-                ref: "../btnPageResize",
-                disabled:disabled,
-                text: 'Разверстать',
-                tooltip: 'Добавить новые полосы скопировав содержимое',
-                icon: _ico("arrow-resize-045"),
-                cls: 'x-btn-text-icon',
-                scope:panels["pages"],
-                handler: panels["pages"].cmpPageResize
-            },
+            //{
+            //    ref: "../btnPageResize",
+            //    disabled:disabled,
+            //    text: 'Разверстать',
+            //    tooltip: 'Добавить новые полосы скопировав содержимое',
+            //    icon: _ico("arrow-resize-045"),
+            //    cls: 'x-btn-text-icon',
+            //    scope:panels["pages"],
+            //    handler: panels["pages"].cmpPageResize
+            //},
             "-",
             {
                 ref: "../btnPageDelete",
