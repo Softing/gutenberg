@@ -4,7 +4,7 @@
 
 -- Dumped from database version 8.4.5
 -- Dumped by pg_dump version 9.0.1
--- Started on 2010-12-06 10:14:13
+-- Started on 2010-12-23 01:24:18
 
 SET statement_timeout = 0;
 SET client_encoding = 'UTF8';
@@ -14,7 +14,7 @@ SET client_min_messages = warning;
 SET escape_string_warning = off;
 
 --
--- TOC entry 507 (class 2612 OID 16386)
+-- TOC entry 535 (class 2612 OID 16386)
 -- Name: plpgsql; Type: PROCEDURAL LANGUAGE; Schema: -; Owner: -
 --
 
@@ -24,7 +24,7 @@ CREATE OR REPLACE PROCEDURAL LANGUAGE plpgsql;
 SET search_path = public, pg_catalog;
 
 --
--- TOC entry 384 (class 0 OID 0)
+-- TOC entry 385 (class 0 OID 0)
 -- Name: lquery; Type: SHELL TYPE; Schema: public; Owner: -
 --
 
@@ -33,7 +33,7 @@ CREATE TYPE lquery;
 
 --
 -- TOC entry 8 (class 1255 OID 78145)
--- Dependencies: 3 384
+-- Dependencies: 3 385
 -- Name: lquery_in(cstring); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -44,7 +44,7 @@ CREATE FUNCTION lquery_in(cstring) RETURNS lquery
 
 --
 -- TOC entry 20 (class 1255 OID 78146)
--- Dependencies: 3 384
+-- Dependencies: 3 385
 -- Name: lquery_out(lquery); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -54,8 +54,8 @@ CREATE FUNCTION lquery_out(lquery) RETURNS cstring
 
 
 --
--- TOC entry 383 (class 1247 OID 78144)
--- Dependencies: 3 8 20
+-- TOC entry 384 (class 1247 OID 78144)
+-- Dependencies: 8 3 20
 -- Name: lquery; Type: TYPE; Schema: public; Owner: -
 --
 
@@ -69,7 +69,7 @@ CREATE TYPE lquery (
 
 
 --
--- TOC entry 387 (class 0 OID 0)
+-- TOC entry 388 (class 0 OID 0)
 -- Name: ltree; Type: SHELL TYPE; Schema: public; Owner: -
 --
 
@@ -78,7 +78,7 @@ CREATE TYPE ltree;
 
 --
 -- TOC entry 21 (class 1255 OID 78149)
--- Dependencies: 3 387
+-- Dependencies: 3 388
 -- Name: ltree_in(cstring); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -89,7 +89,7 @@ CREATE FUNCTION ltree_in(cstring) RETURNS ltree
 
 --
 -- TOC entry 22 (class 1255 OID 78150)
--- Dependencies: 3 387
+-- Dependencies: 3 388
 -- Name: ltree_out(ltree); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -99,8 +99,8 @@ CREATE FUNCTION ltree_out(ltree) RETURNS cstring
 
 
 --
--- TOC entry 386 (class 1247 OID 78148)
--- Dependencies: 3 22 21
+-- TOC entry 387 (class 1247 OID 78148)
+-- Dependencies: 21 22 3
 -- Name: ltree; Type: TYPE; Schema: public; Owner: -
 --
 
@@ -114,7 +114,7 @@ CREATE TYPE ltree (
 
 
 --
--- TOC entry 390 (class 0 OID 0)
+-- TOC entry 391 (class 0 OID 0)
 -- Name: ltree_gist; Type: SHELL TYPE; Schema: public; Owner: -
 --
 
@@ -123,7 +123,7 @@ CREATE TYPE ltree_gist;
 
 --
 -- TOC entry 23 (class 1255 OID 78153)
--- Dependencies: 3 390
+-- Dependencies: 3 391
 -- Name: ltree_gist_in(cstring); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -134,7 +134,7 @@ CREATE FUNCTION ltree_gist_in(cstring) RETURNS ltree_gist
 
 --
 -- TOC entry 24 (class 1255 OID 78154)
--- Dependencies: 3 390
+-- Dependencies: 3 391
 -- Name: ltree_gist_out(ltree_gist); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -144,8 +144,8 @@ CREATE FUNCTION ltree_gist_out(ltree_gist) RETURNS cstring
 
 
 --
--- TOC entry 389 (class 1247 OID 78152)
--- Dependencies: 23 3 24
+-- TOC entry 390 (class 1247 OID 78152)
+-- Dependencies: 3 24 23
 -- Name: ltree_gist; Type: TYPE; Schema: public; Owner: -
 --
 
@@ -159,7 +159,7 @@ CREATE TYPE ltree_gist (
 
 
 --
--- TOC entry 393 (class 0 OID 0)
+-- TOC entry 394 (class 0 OID 0)
 -- Name: ltxtquery; Type: SHELL TYPE; Schema: public; Owner: -
 --
 
@@ -168,7 +168,7 @@ CREATE TYPE ltxtquery;
 
 --
 -- TOC entry 25 (class 1255 OID 78157)
--- Dependencies: 3 393
+-- Dependencies: 3 394
 -- Name: ltxtq_in(cstring); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -179,7 +179,7 @@ CREATE FUNCTION ltxtq_in(cstring) RETURNS ltxtquery
 
 --
 -- TOC entry 26 (class 1255 OID 78158)
--- Dependencies: 3 393
+-- Dependencies: 3 394
 -- Name: ltxtq_out(ltxtquery); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -189,8 +189,8 @@ CREATE FUNCTION ltxtq_out(ltxtquery) RETURNS cstring
 
 
 --
--- TOC entry 392 (class 1247 OID 78156)
--- Dependencies: 26 3 25
+-- TOC entry 393 (class 1247 OID 78156)
+-- Dependencies: 3 25 26
 -- Name: ltxtquery; Type: TYPE; Schema: public; Owner: -
 --
 
@@ -205,7 +205,7 @@ CREATE TYPE ltxtquery (
 
 --
 -- TOC entry 27 (class 1255 OID 78160)
--- Dependencies: 385 3 388
+-- Dependencies: 386 389 3
 -- Name: _lt_q_regex(ltree[], lquery[]); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -216,7 +216,7 @@ CREATE FUNCTION _lt_q_regex(ltree[], lquery[]) RETURNS boolean
 
 --
 -- TOC entry 28 (class 1255 OID 78161)
--- Dependencies: 388 3 385
+-- Dependencies: 386 389 3
 -- Name: _lt_q_rregex(lquery[], ltree[]); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -227,7 +227,7 @@ CREATE FUNCTION _lt_q_rregex(lquery[], ltree[]) RETURNS boolean
 
 --
 -- TOC entry 29 (class 1255 OID 78162)
--- Dependencies: 383 3 386 388
+-- Dependencies: 387 384 389 3
 -- Name: _ltq_extract_regex(ltree[], lquery); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -238,7 +238,7 @@ CREATE FUNCTION _ltq_extract_regex(ltree[], lquery) RETURNS ltree
 
 --
 -- TOC entry 30 (class 1255 OID 78163)
--- Dependencies: 388 3 383
+-- Dependencies: 3 389 384
 -- Name: _ltq_regex(ltree[], lquery); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -249,7 +249,7 @@ CREATE FUNCTION _ltq_regex(ltree[], lquery) RETURNS boolean
 
 --
 -- TOC entry 31 (class 1255 OID 78164)
--- Dependencies: 383 3 388
+-- Dependencies: 384 3 389
 -- Name: _ltq_rregex(lquery, ltree[]); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -282,7 +282,7 @@ CREATE FUNCTION _ltree_consistent(internal, internal, smallint, oid, internal) R
 
 --
 -- TOC entry 34 (class 1255 OID 78167)
--- Dependencies: 388 3 386 386
+-- Dependencies: 387 389 387 3
 -- Name: _ltree_extract_isparent(ltree[], ltree); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -293,7 +293,7 @@ CREATE FUNCTION _ltree_extract_isparent(ltree[], ltree) RETURNS ltree
 
 --
 -- TOC entry 35 (class 1255 OID 78168)
--- Dependencies: 388 3 386 386
+-- Dependencies: 3 387 389 387
 -- Name: _ltree_extract_risparent(ltree[], ltree); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -304,7 +304,7 @@ CREATE FUNCTION _ltree_extract_risparent(ltree[], ltree) RETURNS ltree
 
 --
 -- TOC entry 36 (class 1255 OID 78169)
--- Dependencies: 388 3 386
+-- Dependencies: 389 387 3
 -- Name: _ltree_isparent(ltree[], ltree); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -337,7 +337,7 @@ CREATE FUNCTION _ltree_picksplit(internal, internal) RETURNS internal
 
 --
 -- TOC entry 39 (class 1255 OID 78172)
--- Dependencies: 386 3 388
+-- Dependencies: 387 389 3
 -- Name: _ltree_r_isparent(ltree, ltree[]); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -348,7 +348,7 @@ CREATE FUNCTION _ltree_r_isparent(ltree, ltree[]) RETURNS boolean
 
 --
 -- TOC entry 40 (class 1255 OID 78173)
--- Dependencies: 386 3 388
+-- Dependencies: 389 387 3
 -- Name: _ltree_r_risparent(ltree, ltree[]); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -359,7 +359,7 @@ CREATE FUNCTION _ltree_r_risparent(ltree, ltree[]) RETURNS boolean
 
 --
 -- TOC entry 41 (class 1255 OID 78174)
--- Dependencies: 388 3 386
+-- Dependencies: 387 389 3
 -- Name: _ltree_risparent(ltree[], ltree); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -392,7 +392,7 @@ CREATE FUNCTION _ltree_union(internal, internal) RETURNS integer
 
 --
 -- TOC entry 44 (class 1255 OID 78177)
--- Dependencies: 388 392 3
+-- Dependencies: 3 393 389
 -- Name: _ltxtq_exec(ltree[], ltxtquery); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -403,7 +403,7 @@ CREATE FUNCTION _ltxtq_exec(ltree[], ltxtquery) RETURNS boolean
 
 --
 -- TOC entry 45 (class 1255 OID 78178)
--- Dependencies: 3 392 388 386
+-- Dependencies: 393 389 387 3
 -- Name: _ltxtq_extract_exec(ltree[], ltxtquery); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -414,7 +414,7 @@ CREATE FUNCTION _ltxtq_extract_exec(ltree[], ltxtquery) RETURNS ltree
 
 --
 -- TOC entry 46 (class 1255 OID 78179)
--- Dependencies: 3 388 392
+-- Dependencies: 389 3 393
 -- Name: _ltxtq_rexec(ltxtquery, ltree[]); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -425,7 +425,7 @@ CREATE FUNCTION _ltxtq_rexec(ltxtquery, ltree[]) RETURNS boolean
 
 --
 -- TOC entry 94 (class 1255 OID 78746)
--- Dependencies: 507 3
+-- Dependencies: 535 3
 -- Name: access_delete_after_trigger(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -448,7 +448,7 @@ $$;
 
 --
 -- TOC entry 95 (class 1255 OID 78745)
--- Dependencies: 3 507
+-- Dependencies: 535 3
 -- Name: access_insert_after_trigger(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -498,7 +498,7 @@ $$;
 
 --
 -- TOC entry 99 (class 1255 OID 78744)
--- Dependencies: 507 3
+-- Dependencies: 3 535
 -- Name: access_update_after_trigger(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -573,8 +573,42 @@ CREATE FUNCTION digest(text, text) RETURNS bytea
 
 
 --
+-- TOC entry 100 (class 1255 OID 211311)
+-- Dependencies: 535 3
+-- Name: fascicles_map_documents_delete_after_trigger(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION fascicles_map_documents_delete_after_trigger() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $_$
+DECLARE
+    arg_seqnums integer[]; 
+BEGIN
+
+    EXECUTE 'SELECT ARRAY(
+                SELECT t2.seqnum
+                FROM fascicles_map_documents t1, fascicles_pages t2 
+                WHERE t2.id = t1.page AND t1.fascicle = $1 AND t1.entity = $2
+                ORDER BY t2.seqnum
+            );'
+        INTO arg_seqnums USING OLD.fascicle, OLD.entity;
+
+    --RAISE EXCEPTION '%', arg_seqnums;
+
+    EXECUTE 'UPDATE documents SET pages=array_to_string($1, '','') WHERE id=$2'
+        USING arg_seqnums, OLD.entity;
+
+    EXECUTE 'UPDATE documents SET firstpage=$1 WHERE id=$2'
+        USING arg_seqnums[1], OLD.entity;
+    
+    return OLD;
+END;
+$_$;
+
+
+--
 -- TOC entry 98 (class 1255 OID 144838)
--- Dependencies: 507 3
+-- Dependencies: 3 535
 -- Name: fascicles_map_documents_update_after_trigger(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -608,7 +642,7 @@ $_$;
 
 --
 -- TOC entry 48 (class 1255 OID 78184)
--- Dependencies: 386 3 386
+-- Dependencies: 387 387 3
 -- Name: index(ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -619,7 +653,7 @@ CREATE FUNCTION index(ltree, ltree) RETURNS integer
 
 --
 -- TOC entry 49 (class 1255 OID 78185)
--- Dependencies: 386 3 386
+-- Dependencies: 3 387 387
 -- Name: index(ltree, ltree, integer); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -630,7 +664,7 @@ CREATE FUNCTION index(ltree, ltree, integer) RETURNS integer
 
 --
 -- TOC entry 50 (class 1255 OID 78186)
--- Dependencies: 386 3 388
+-- Dependencies: 389 387 3
 -- Name: lca(ltree[]); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -641,7 +675,7 @@ CREATE FUNCTION lca(ltree[]) RETURNS ltree
 
 --
 -- TOC entry 51 (class 1255 OID 78187)
--- Dependencies: 386 3 386 386
+-- Dependencies: 387 387 3 387
 -- Name: lca(ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -652,7 +686,7 @@ CREATE FUNCTION lca(ltree, ltree) RETURNS ltree
 
 --
 -- TOC entry 52 (class 1255 OID 78188)
--- Dependencies: 386 3 386 386 386
+-- Dependencies: 3 387 387 387 387
 -- Name: lca(ltree, ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -663,7 +697,7 @@ CREATE FUNCTION lca(ltree, ltree, ltree) RETURNS ltree
 
 --
 -- TOC entry 53 (class 1255 OID 78189)
--- Dependencies: 386 3 386 386 386 386
+-- Dependencies: 3 387 387 387 387 387
 -- Name: lca(ltree, ltree, ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -674,7 +708,7 @@ CREATE FUNCTION lca(ltree, ltree, ltree, ltree) RETURNS ltree
 
 --
 -- TOC entry 54 (class 1255 OID 78190)
--- Dependencies: 386 3 386 386 386 386 386
+-- Dependencies: 387 387 387 387 387 3 387
 -- Name: lca(ltree, ltree, ltree, ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -685,7 +719,7 @@ CREATE FUNCTION lca(ltree, ltree, ltree, ltree, ltree) RETURNS ltree
 
 --
 -- TOC entry 55 (class 1255 OID 78191)
--- Dependencies: 3 386 386 386 386 386 386 386
+-- Dependencies: 387 387 3 387 387 387 387 387
 -- Name: lca(ltree, ltree, ltree, ltree, ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -696,7 +730,7 @@ CREATE FUNCTION lca(ltree, ltree, ltree, ltree, ltree, ltree) RETURNS ltree
 
 --
 -- TOC entry 56 (class 1255 OID 78192)
--- Dependencies: 386 386 3 386 386 386 386 386 386
+-- Dependencies: 387 3 387 387 387 387 387 387 387
 -- Name: lca(ltree, ltree, ltree, ltree, ltree, ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -707,7 +741,7 @@ CREATE FUNCTION lca(ltree, ltree, ltree, ltree, ltree, ltree, ltree) RETURNS ltr
 
 --
 -- TOC entry 57 (class 1255 OID 78193)
--- Dependencies: 386 3 386 386 386 386 386 386 386 386
+-- Dependencies: 387 3 387 387 387 387 387 387 387 387
 -- Name: lca(ltree, ltree, ltree, ltree, ltree, ltree, ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -718,7 +752,7 @@ CREATE FUNCTION lca(ltree, ltree, ltree, ltree, ltree, ltree, ltree, ltree) RETU
 
 --
 -- TOC entry 58 (class 1255 OID 78194)
--- Dependencies: 386 3 385
+-- Dependencies: 3 387 386
 -- Name: lt_q_regex(ltree, lquery[]); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -729,7 +763,7 @@ CREATE FUNCTION lt_q_regex(ltree, lquery[]) RETURNS boolean
 
 --
 -- TOC entry 59 (class 1255 OID 78195)
--- Dependencies: 385 3 386
+-- Dependencies: 386 3 387
 -- Name: lt_q_rregex(lquery[], ltree); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -740,7 +774,7 @@ CREATE FUNCTION lt_q_rregex(lquery[], ltree) RETURNS boolean
 
 --
 -- TOC entry 60 (class 1255 OID 78196)
--- Dependencies: 3 383 386
+-- Dependencies: 384 387 3
 -- Name: ltq_regex(ltree, lquery); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -751,7 +785,7 @@ CREATE FUNCTION ltq_regex(ltree, lquery) RETURNS boolean
 
 --
 -- TOC entry 61 (class 1255 OID 78197)
--- Dependencies: 383 3 386
+-- Dependencies: 387 3 384
 -- Name: ltq_rregex(lquery, ltree); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -762,7 +796,7 @@ CREATE FUNCTION ltq_rregex(lquery, ltree) RETURNS boolean
 
 --
 -- TOC entry 62 (class 1255 OID 78198)
--- Dependencies: 3 386
+-- Dependencies: 3 387
 -- Name: ltree2text(ltree); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -773,7 +807,7 @@ CREATE FUNCTION ltree2text(ltree) RETURNS text
 
 --
 -- TOC entry 63 (class 1255 OID 78199)
--- Dependencies: 386 3 386 386
+-- Dependencies: 387 3 387 387
 -- Name: ltree_addltree(ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -784,7 +818,7 @@ CREATE FUNCTION ltree_addltree(ltree, ltree) RETURNS ltree
 
 --
 -- TOC entry 64 (class 1255 OID 78200)
--- Dependencies: 386 3 386
+-- Dependencies: 387 387 3
 -- Name: ltree_addtext(ltree, text); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -795,7 +829,7 @@ CREATE FUNCTION ltree_addtext(ltree, text) RETURNS ltree
 
 --
 -- TOC entry 65 (class 1255 OID 78201)
--- Dependencies: 386 3 386
+-- Dependencies: 3 387 387
 -- Name: ltree_cmp(ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -839,7 +873,7 @@ CREATE FUNCTION ltree_decompress(internal) RETURNS internal
 
 --
 -- TOC entry 69 (class 1255 OID 78205)
--- Dependencies: 386 3 386
+-- Dependencies: 387 387 3
 -- Name: ltree_eq(ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -850,7 +884,7 @@ CREATE FUNCTION ltree_eq(ltree, ltree) RETURNS boolean
 
 --
 -- TOC entry 70 (class 1255 OID 78206)
--- Dependencies: 386 3 386
+-- Dependencies: 387 3 387
 -- Name: ltree_ge(ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -861,7 +895,7 @@ CREATE FUNCTION ltree_ge(ltree, ltree) RETURNS boolean
 
 --
 -- TOC entry 71 (class 1255 OID 78207)
--- Dependencies: 386 3 386
+-- Dependencies: 387 3 387
 -- Name: ltree_gt(ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -872,7 +906,7 @@ CREATE FUNCTION ltree_gt(ltree, ltree) RETURNS boolean
 
 --
 -- TOC entry 72 (class 1255 OID 78208)
--- Dependencies: 386 3 386
+-- Dependencies: 3 387 387
 -- Name: ltree_isparent(ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -883,7 +917,7 @@ CREATE FUNCTION ltree_isparent(ltree, ltree) RETURNS boolean
 
 --
 -- TOC entry 73 (class 1255 OID 78209)
--- Dependencies: 386 3 386
+-- Dependencies: 387 3 387
 -- Name: ltree_le(ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -894,7 +928,7 @@ CREATE FUNCTION ltree_le(ltree, ltree) RETURNS boolean
 
 --
 -- TOC entry 74 (class 1255 OID 78210)
--- Dependencies: 386 3 386
+-- Dependencies: 387 3 387
 -- Name: ltree_lt(ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -905,7 +939,7 @@ CREATE FUNCTION ltree_lt(ltree, ltree) RETURNS boolean
 
 --
 -- TOC entry 75 (class 1255 OID 78211)
--- Dependencies: 386 3 386
+-- Dependencies: 387 3 387
 -- Name: ltree_ne(ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -938,7 +972,7 @@ CREATE FUNCTION ltree_picksplit(internal, internal) RETURNS internal
 
 --
 -- TOC entry 78 (class 1255 OID 78214)
--- Dependencies: 386 386 3
+-- Dependencies: 387 3 387
 -- Name: ltree_risparent(ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -960,7 +994,7 @@ CREATE FUNCTION ltree_same(internal, internal, internal) RETURNS internal
 
 --
 -- TOC entry 80 (class 1255 OID 78216)
--- Dependencies: 386 3 386
+-- Dependencies: 3 387 387
 -- Name: ltree_textadd(text, ltree); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -993,7 +1027,7 @@ CREATE FUNCTION ltreeparentsel(internal, oid, internal, integer) RETURNS double 
 
 --
 -- TOC entry 83 (class 1255 OID 78219)
--- Dependencies: 386 3 392
+-- Dependencies: 393 387 3
 -- Name: ltxtq_exec(ltree, ltxtquery); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -1004,7 +1038,7 @@ CREATE FUNCTION ltxtq_exec(ltree, ltxtquery) RETURNS boolean
 
 --
 -- TOC entry 84 (class 1255 OID 78220)
--- Dependencies: 392 386 3
+-- Dependencies: 3 387 393
 -- Name: ltxtq_rexec(ltxtquery, ltree); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -1015,7 +1049,7 @@ CREATE FUNCTION ltxtq_rexec(ltxtquery, ltree) RETURNS boolean
 
 --
 -- TOC entry 85 (class 1255 OID 78221)
--- Dependencies: 3 386
+-- Dependencies: 3 387
 -- Name: nlevel(ltree); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -1026,7 +1060,7 @@ CREATE FUNCTION nlevel(ltree) RETURNS integer
 
 --
 -- TOC entry 97 (class 1255 OID 78769)
--- Dependencies: 3 507
+-- Dependencies: 535 3
 -- Name: rules_delete_after_trigger(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -1045,8 +1079,10 @@ BEGIN
             INTO arg_term_name USING OLD.term;
     END IF;
 
-    IF OLD.section = 'editions' THEN
-        /*
+    
+
+    IF OLD.section = 'editions' THEN    
+    
         EXECUTE 'DELETE FROM cache_access WHERE type=''' ||OLD.section|| ''' AND member=''' ||OLD.member|| ''' AND path ~ (''' || arg_path::text || '.*'')::lquery ';
         EXECUTE 'DELETE FROM cache_visibility WHERE type=''' ||OLD.section|| ''' AND member=''' ||OLD.member|| ''' AND term LIKE ''' ||arg_term_name|| ''' ';
         
@@ -1073,7 +1109,7 @@ BEGIN
                         path <@ ARRAY( SELECT path from map_member_to_rule t1, ' ||OLD.section|| ' t2 WHERE t2.id = t1.binding AND t1.member=''' ||OLD.member|| ''' AND t1.term = ''' ||OLD.term|| ''')
                 ) as childrens
         ';
-        */
+        
     END IF;
 
     IF OLD.section = 'catalog' THEN
@@ -1120,7 +1156,7 @@ $_$;
 
 --
 -- TOC entry 96 (class 1255 OID 78762)
--- Dependencies: 3 507
+-- Dependencies: 535 3
 -- Name: rules_insert_after_trigger(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -1234,7 +1270,7 @@ $_$;
 
 --
 -- TOC entry 86 (class 1255 OID 78222)
--- Dependencies: 386 386 3
+-- Dependencies: 387 3 387
 -- Name: subltree(ltree, integer, integer); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -1245,7 +1281,7 @@ CREATE FUNCTION subltree(ltree, integer, integer) RETURNS ltree
 
 --
 -- TOC entry 88 (class 1255 OID 78224)
--- Dependencies: 386 386 3
+-- Dependencies: 3 387 387
 -- Name: subpath(ltree, integer); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -1256,7 +1292,7 @@ CREATE FUNCTION subpath(ltree, integer) RETURNS ltree
 
 --
 -- TOC entry 87 (class 1255 OID 78223)
--- Dependencies: 386 386 3
+-- Dependencies: 3 387 387
 -- Name: subpath(ltree, integer, integer); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -1267,7 +1303,7 @@ CREATE FUNCTION subpath(ltree, integer, integer) RETURNS ltree
 
 --
 -- TOC entry 89 (class 1255 OID 78225)
--- Dependencies: 386 3
+-- Dependencies: 3 387
 -- Name: text2ltree(text); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -1278,7 +1314,7 @@ CREATE FUNCTION text2ltree(text) RETURNS ltree
 
 --
 -- TOC entry 90 (class 1255 OID 78226)
--- Dependencies: 3 507
+-- Dependencies: 535 3
 -- Name: tree_delete_after_trigger(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -1294,7 +1330,7 @@ $$;
 
 --
 -- TOC entry 91 (class 1255 OID 78227)
--- Dependencies: 3 507
+-- Dependencies: 3 535
 -- Name: tree_insert_before_trigger(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -1338,7 +1374,7 @@ $_$;
 
 --
 -- TOC entry 92 (class 1255 OID 78228)
--- Dependencies: 507 3
+-- Dependencies: 535 3
 -- Name: tree_update_after_trigger(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -1403,8 +1439,8 @@ CREATE FUNCTION uuid_generate_v4() RETURNS uuid
 
 
 --
--- TOC entry 1212 (class 2617 OID 78232)
--- Dependencies: 386 74 3 386
+-- TOC entry 1240 (class 2617 OID 78232)
+-- Dependencies: 387 3 74 387
 -- Name: <; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1420,8 +1456,8 @@ CREATE OPERATOR < (
 
 
 --
--- TOC entry 1215 (class 2617 OID 78233)
--- Dependencies: 386 386 73 3
+-- TOC entry 1243 (class 2617 OID 78233)
+-- Dependencies: 387 387 3 73
 -- Name: <=; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1437,8 +1473,8 @@ CREATE OPERATOR <= (
 
 
 --
--- TOC entry 1213 (class 2617 OID 78235)
--- Dependencies: 386 3 75 386
+-- TOC entry 1241 (class 2617 OID 78235)
+-- Dependencies: 75 387 3 387
 -- Name: <>; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1454,8 +1490,8 @@ CREATE OPERATOR <> (
 
 
 --
--- TOC entry 1218 (class 2617 OID 78237)
--- Dependencies: 3 386 386 78 82
+-- TOC entry 1246 (class 2617 OID 78237)
+-- Dependencies: 387 3 387 78 82
 -- Name: <@; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1470,8 +1506,8 @@ CREATE OPERATOR <@ (
 
 
 --
--- TOC entry 1220 (class 2617 OID 78239)
--- Dependencies: 39 386 3 388
+-- TOC entry 1248 (class 2617 OID 78239)
+-- Dependencies: 39 3 387 389
 -- Name: <@; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1486,8 +1522,8 @@ CREATE OPERATOR <@ (
 
 
 --
--- TOC entry 1222 (class 2617 OID 78241)
--- Dependencies: 41 3 388 386
+-- TOC entry 1250 (class 2617 OID 78241)
+-- Dependencies: 387 3 389 41
 -- Name: <@; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1502,8 +1538,8 @@ CREATE OPERATOR <@ (
 
 
 --
--- TOC entry 1221 (class 2617 OID 78234)
--- Dependencies: 386 3 69 386
+-- TOC entry 1249 (class 2617 OID 78234)
+-- Dependencies: 69 387 3 387
 -- Name: =; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1520,8 +1556,8 @@ CREATE OPERATOR = (
 
 
 --
--- TOC entry 1214 (class 2617 OID 78230)
--- Dependencies: 386 3 71 386
+-- TOC entry 1242 (class 2617 OID 78230)
+-- Dependencies: 387 387 3 71
 -- Name: >; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1537,8 +1573,8 @@ CREATE OPERATOR > (
 
 
 --
--- TOC entry 1217 (class 2617 OID 78231)
--- Dependencies: 70 3 386 386
+-- TOC entry 1245 (class 2617 OID 78231)
+-- Dependencies: 70 387 3 387
 -- Name: >=; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1554,8 +1590,8 @@ CREATE OPERATOR >= (
 
 
 --
--- TOC entry 1226 (class 2617 OID 78242)
--- Dependencies: 58 385 3 386
+-- TOC entry 1254 (class 2617 OID 78242)
+-- Dependencies: 386 58 3 387
 -- Name: ?; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1570,8 +1606,8 @@ CREATE OPERATOR ? (
 
 
 --
--- TOC entry 1224 (class 2617 OID 78243)
--- Dependencies: 386 3 385 59
+-- TOC entry 1252 (class 2617 OID 78243)
+-- Dependencies: 3 59 387 386
 -- Name: ?; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1586,8 +1622,8 @@ CREATE OPERATOR ? (
 
 
 --
--- TOC entry 1228 (class 2617 OID 78244)
--- Dependencies: 27 385 388 3
+-- TOC entry 1256 (class 2617 OID 78244)
+-- Dependencies: 27 3 389 386
 -- Name: ?; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1602,8 +1638,8 @@ CREATE OPERATOR ? (
 
 
 --
--- TOC entry 1227 (class 2617 OID 78245)
--- Dependencies: 388 28 3 385
+-- TOC entry 1255 (class 2617 OID 78245)
+-- Dependencies: 389 28 3 386
 -- Name: ?; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1618,8 +1654,8 @@ CREATE OPERATOR ? (
 
 
 --
--- TOC entry 1229 (class 2617 OID 78246)
--- Dependencies: 388 3 386 35 386
+-- TOC entry 1257 (class 2617 OID 78246)
+-- Dependencies: 387 35 3 389 387
 -- Name: ?<@; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1631,8 +1667,8 @@ CREATE OPERATOR ?<@ (
 
 
 --
--- TOC entry 1230 (class 2617 OID 78247)
--- Dependencies: 392 3 386 45 388
+-- TOC entry 1258 (class 2617 OID 78247)
+-- Dependencies: 389 393 387 45 3
 -- Name: ?@; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1644,8 +1680,8 @@ CREATE OPERATOR ?@ (
 
 
 --
--- TOC entry 1231 (class 2617 OID 78248)
--- Dependencies: 386 388 3 34 386
+-- TOC entry 1259 (class 2617 OID 78248)
+-- Dependencies: 389 387 34 3 387
 -- Name: ?@>; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1657,8 +1693,8 @@ CREATE OPERATOR ?@> (
 
 
 --
--- TOC entry 1232 (class 2617 OID 78249)
--- Dependencies: 383 388 3 386 29
+-- TOC entry 1260 (class 2617 OID 78249)
+-- Dependencies: 384 389 3 29 387
 -- Name: ?~; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1670,8 +1706,8 @@ CREATE OPERATOR ?~ (
 
 
 --
--- TOC entry 1235 (class 2617 OID 78250)
--- Dependencies: 83 3 386 392
+-- TOC entry 1263 (class 2617 OID 78250)
+-- Dependencies: 83 3 387 393
 -- Name: @; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1686,8 +1722,8 @@ CREATE OPERATOR @ (
 
 
 --
--- TOC entry 1233 (class 2617 OID 78251)
--- Dependencies: 392 3 84 386
+-- TOC entry 1261 (class 2617 OID 78251)
+-- Dependencies: 84 3 393 387
 -- Name: @; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1702,8 +1738,8 @@ CREATE OPERATOR @ (
 
 
 --
--- TOC entry 1237 (class 2617 OID 78252)
--- Dependencies: 388 392 3 44
+-- TOC entry 1265 (class 2617 OID 78252)
+-- Dependencies: 393 44 389 3
 -- Name: @; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1718,8 +1754,8 @@ CREATE OPERATOR @ (
 
 
 --
--- TOC entry 1236 (class 2617 OID 78253)
--- Dependencies: 388 392 3 46
+-- TOC entry 1264 (class 2617 OID 78253)
+-- Dependencies: 46 389 393 3
 -- Name: @; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1734,8 +1770,8 @@ CREATE OPERATOR @ (
 
 
 --
--- TOC entry 1216 (class 2617 OID 78236)
--- Dependencies: 82 3 386 72 386
+-- TOC entry 1244 (class 2617 OID 78236)
+-- Dependencies: 387 3 82 72 387
 -- Name: @>; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1750,8 +1786,8 @@ CREATE OPERATOR @> (
 
 
 --
--- TOC entry 1219 (class 2617 OID 78238)
--- Dependencies: 3 388 36 386
+-- TOC entry 1247 (class 2617 OID 78238)
+-- Dependencies: 3 387 389 36
 -- Name: @>; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1766,8 +1802,8 @@ CREATE OPERATOR @> (
 
 
 --
--- TOC entry 1238 (class 2617 OID 78240)
--- Dependencies: 386 388 40 3
+-- TOC entry 1266 (class 2617 OID 78240)
+-- Dependencies: 389 3 387 40
 -- Name: @>; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1782,8 +1818,8 @@ CREATE OPERATOR @> (
 
 
 --
--- TOC entry 1239 (class 2617 OID 78255)
--- Dependencies: 78 386 3 386
+-- TOC entry 1267 (class 2617 OID 78255)
+-- Dependencies: 78 3 387 387
 -- Name: ^<@; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1798,8 +1834,8 @@ CREATE OPERATOR ^<@ (
 
 
 --
--- TOC entry 1241 (class 2617 OID 78257)
--- Dependencies: 388 3 386 39
+-- TOC entry 1269 (class 2617 OID 78257)
+-- Dependencies: 39 3 387 389
 -- Name: ^<@; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1814,8 +1850,8 @@ CREATE OPERATOR ^<@ (
 
 
 --
--- TOC entry 1242 (class 2617 OID 78259)
--- Dependencies: 386 41 3 388
+-- TOC entry 1270 (class 2617 OID 78259)
+-- Dependencies: 41 3 389 387
 -- Name: ^<@; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1830,8 +1866,8 @@ CREATE OPERATOR ^<@ (
 
 
 --
--- TOC entry 1244 (class 2617 OID 78260)
--- Dependencies: 385 386 58 3
+-- TOC entry 1272 (class 2617 OID 78260)
+-- Dependencies: 58 3 387 386
 -- Name: ^?; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1846,8 +1882,8 @@ CREATE OPERATOR ^? (
 
 
 --
--- TOC entry 1243 (class 2617 OID 78261)
--- Dependencies: 386 385 3 59
+-- TOC entry 1271 (class 2617 OID 78261)
+-- Dependencies: 3 386 387 59
 -- Name: ^?; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1862,8 +1898,8 @@ CREATE OPERATOR ^? (
 
 
 --
--- TOC entry 1247 (class 2617 OID 78262)
--- Dependencies: 27 385 388 3
+-- TOC entry 1275 (class 2617 OID 78262)
+-- Dependencies: 27 3 389 386
 -- Name: ^?; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1878,8 +1914,8 @@ CREATE OPERATOR ^? (
 
 
 --
--- TOC entry 1245 (class 2617 OID 78263)
--- Dependencies: 385 388 28 3
+-- TOC entry 1273 (class 2617 OID 78263)
+-- Dependencies: 3 28 389 386
 -- Name: ^?; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1894,8 +1930,8 @@ CREATE OPERATOR ^? (
 
 
 --
--- TOC entry 1249 (class 2617 OID 78264)
--- Dependencies: 3 392 386 83
+-- TOC entry 1277 (class 2617 OID 78264)
+-- Dependencies: 83 3 387 393
 -- Name: ^@; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1910,8 +1946,8 @@ CREATE OPERATOR ^@ (
 
 
 --
--- TOC entry 1248 (class 2617 OID 78265)
--- Dependencies: 392 84 386 3
+-- TOC entry 1276 (class 2617 OID 78265)
+-- Dependencies: 3 84 387 393
 -- Name: ^@; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1926,8 +1962,8 @@ CREATE OPERATOR ^@ (
 
 
 --
--- TOC entry 1252 (class 2617 OID 78266)
--- Dependencies: 3 388 392 44
+-- TOC entry 1280 (class 2617 OID 78266)
+-- Dependencies: 393 44 3 389
 -- Name: ^@; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1942,8 +1978,8 @@ CREATE OPERATOR ^@ (
 
 
 --
--- TOC entry 1250 (class 2617 OID 78267)
--- Dependencies: 3 392 388 46
+-- TOC entry 1278 (class 2617 OID 78267)
+-- Dependencies: 389 3 393 46
 -- Name: ^@; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1958,8 +1994,8 @@ CREATE OPERATOR ^@ (
 
 
 --
--- TOC entry 1253 (class 2617 OID 78254)
--- Dependencies: 72 386 386 3
+-- TOC entry 1281 (class 2617 OID 78254)
+-- Dependencies: 387 72 387 3
 -- Name: ^@>; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1974,8 +2010,8 @@ CREATE OPERATOR ^@> (
 
 
 --
--- TOC entry 1223 (class 2617 OID 78256)
--- Dependencies: 388 36 386 3
+-- TOC entry 1251 (class 2617 OID 78256)
+-- Dependencies: 3 36 387 389
 -- Name: ^@>; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -1990,8 +2026,8 @@ CREATE OPERATOR ^@> (
 
 
 --
--- TOC entry 1225 (class 2617 OID 78258)
--- Dependencies: 386 388 40 3
+-- TOC entry 1253 (class 2617 OID 78258)
+-- Dependencies: 387 3 389 40
 -- Name: ^@>; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -2006,8 +2042,8 @@ CREATE OPERATOR ^@> (
 
 
 --
--- TOC entry 1240 (class 2617 OID 78268)
--- Dependencies: 3 386 60 383
+-- TOC entry 1268 (class 2617 OID 78268)
+-- Dependencies: 3 60 384 387
 -- Name: ^~; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -2022,8 +2058,8 @@ CREATE OPERATOR ^~ (
 
 
 --
--- TOC entry 1234 (class 2617 OID 78269)
--- Dependencies: 386 3 383 61
+-- TOC entry 1262 (class 2617 OID 78269)
+-- Dependencies: 387 384 3 61
 -- Name: ^~; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -2038,8 +2074,8 @@ CREATE OPERATOR ^~ (
 
 
 --
--- TOC entry 1251 (class 2617 OID 78270)
--- Dependencies: 30 3 388 383
+-- TOC entry 1279 (class 2617 OID 78270)
+-- Dependencies: 384 3 389 30
 -- Name: ^~; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -2054,8 +2090,8 @@ CREATE OPERATOR ^~ (
 
 
 --
--- TOC entry 1246 (class 2617 OID 78271)
--- Dependencies: 31 388 383 3
+-- TOC entry 1274 (class 2617 OID 78271)
+-- Dependencies: 389 31 3 384
 -- Name: ^~; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -2070,8 +2106,8 @@ CREATE OPERATOR ^~ (
 
 
 --
--- TOC entry 1254 (class 2617 OID 78272)
--- Dependencies: 386 3 386 386 63
+-- TOC entry 1282 (class 2617 OID 78272)
+-- Dependencies: 63 387 387 387 3
 -- Name: ||; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -2083,8 +2119,8 @@ CREATE OPERATOR || (
 
 
 --
--- TOC entry 1255 (class 2617 OID 78273)
--- Dependencies: 386 3 386 64
+-- TOC entry 1283 (class 2617 OID 78273)
+-- Dependencies: 387 64 387 3
 -- Name: ||; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -2096,8 +2132,8 @@ CREATE OPERATOR || (
 
 
 --
--- TOC entry 1256 (class 2617 OID 78274)
--- Dependencies: 3 386 386 80
+-- TOC entry 1284 (class 2617 OID 78274)
+-- Dependencies: 387 80 3 387
 -- Name: ||; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -2109,8 +2145,8 @@ CREATE OPERATOR || (
 
 
 --
--- TOC entry 1258 (class 2617 OID 78275)
--- Dependencies: 386 60 383 3
+-- TOC entry 1286 (class 2617 OID 78275)
+-- Dependencies: 387 60 384 3
 -- Name: ~; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -2125,8 +2161,8 @@ CREATE OPERATOR ~ (
 
 
 --
--- TOC entry 1257 (class 2617 OID 78276)
--- Dependencies: 61 3 383 386
+-- TOC entry 1285 (class 2617 OID 78276)
+-- Dependencies: 61 384 3 387
 -- Name: ~; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -2141,8 +2177,8 @@ CREATE OPERATOR ~ (
 
 
 --
--- TOC entry 1260 (class 2617 OID 78277)
--- Dependencies: 383 3 388 30
+-- TOC entry 1288 (class 2617 OID 78277)
+-- Dependencies: 3 389 30 384
 -- Name: ~; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -2157,8 +2193,8 @@ CREATE OPERATOR ~ (
 
 
 --
--- TOC entry 1259 (class 2617 OID 78278)
--- Dependencies: 31 388 383 3
+-- TOC entry 1287 (class 2617 OID 78278)
+-- Dependencies: 384 3 389 31
 -- Name: ~; Type: OPERATOR; Schema: public; Owner: -
 --
 
@@ -2173,8 +2209,8 @@ CREATE OPERATOR ~ (
 
 
 --
--- TOC entry 1372 (class 2616 OID 78280)
--- Dependencies: 389 388 1481 3
+-- TOC entry 1400 (class 2616 OID 78280)
+-- Dependencies: 3 1509 389 390
 -- Name: gist__ltree_ops; Type: OPERATOR CLASS; Schema: public; Owner: -
 --
 
@@ -2199,8 +2235,8 @@ CREATE OPERATOR CLASS gist__ltree_ops
 
 
 --
--- TOC entry 1373 (class 2616 OID 78297)
--- Dependencies: 389 386 1482 3
+-- TOC entry 1401 (class 2616 OID 78297)
+-- Dependencies: 1510 390 387 3
 -- Name: gist_ltree_ops; Type: OPERATOR CLASS; Schema: public; Owner: -
 --
 
@@ -2230,8 +2266,8 @@ CREATE OPERATOR CLASS gist_ltree_ops
 
 
 --
--- TOC entry 1374 (class 2616 OID 78319)
--- Dependencies: 1483 386 3
+-- TOC entry 1402 (class 2616 OID 78319)
+-- Dependencies: 1511 387 3
 -- Name: ltree_ops; Type: OPERATOR CLASS; Schema: public; Owner: -
 --
 
@@ -2248,8 +2284,8 @@ CREATE OPERATOR CLASS ltree_ops
 SET default_with_oids = false;
 
 --
--- TOC entry 1781 (class 1259 OID 144768)
--- Dependencies: 2141 2143 2144 3
+-- TOC entry 1802 (class 1259 OID 144768)
+-- Dependencies: 2153 2155 2156 3
 -- Name: ad_advertisers; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2275,8 +2311,8 @@ CREATE TABLE ad_advertisers (
 
 
 --
--- TOC entry 1780 (class 1259 OID 144766)
--- Dependencies: 3 1781
+-- TOC entry 1801 (class 1259 OID 144766)
+-- Dependencies: 1802 3
 -- Name: ad_advertisers_serialnum_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -2289,8 +2325,8 @@ CREATE SEQUENCE ad_advertisers_serialnum_seq
 
 
 --
--- TOC entry 2268 (class 0 OID 0)
--- Dependencies: 1780
+-- TOC entry 2365 (class 0 OID 0)
+-- Dependencies: 1801
 -- Name: ad_advertisers_serialnum_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
@@ -2298,38 +2334,75 @@ ALTER SEQUENCE ad_advertisers_serialnum_seq OWNED BY ad_advertisers.serialnum;
 
 
 --
--- TOC entry 1779 (class 1259 OID 144749)
--- Dependencies: 2134 2135 2136 2137 2138 2139 2140 3
+-- TOC entry 1822 (class 1259 OID 211738)
+-- Dependencies: 2224 2225 2226 3
+-- Name: ad_index; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE ad_index (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    edition uuid NOT NULL,
+    place uuid NOT NULL,
+    nature character varying NOT NULL,
+    entity uuid NOT NULL,
+    created timestamp(0) with time zone DEFAULT now(),
+    updated timestamp(0) with time zone DEFAULT now()
+);
+
+
+--
+-- TOC entry 1817 (class 1259 OID 211411)
+-- Dependencies: 2197 2198 2199 2200 2201 2202 2203 2204 2205 3
 -- Name: ad_modules; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE ad_modules (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
     edition uuid NOT NULL,
-    fascicle uuid NOT NULL,
-    place uuid NOT NULL,
+    page uuid NOT NULL,
     title character varying NOT NULL,
     shortcut character varying NOT NULL,
     description character varying,
     amount integer DEFAULT 1 NOT NULL,
-    volume double precision DEFAULT 0 NOT NULL,
-    w integer DEFAULT 0 NOT NULL,
-    h integer DEFAULT 0 NOT NULL,
+    area double precision DEFAULT 0 NOT NULL,
+    x character varying DEFAULT '1/1'::character varying NOT NULL,
+    y character varying DEFAULT '1/1'::character varying NOT NULL,
+    w character varying DEFAULT '1/1'::character varying NOT NULL,
+    h character varying DEFAULT '1/1'::character varying NOT NULL,
     created timestamp(0) with time zone DEFAULT now(),
     updated timestamp(0) with time zone DEFAULT now()
 );
 
 
 --
--- TOC entry 1778 (class 1259 OID 144738)
--- Dependencies: 2131 2132 2133 3
+-- TOC entry 1825 (class 1259 OID 211772)
+-- Dependencies: 2234 2235 2236 2237 3
+-- Name: ad_pages; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE ad_pages (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    edition uuid NOT NULL,
+    title character varying NOT NULL,
+    shortcut character varying NOT NULL,
+    description character varying,
+    bydefault boolean DEFAULT false NOT NULL,
+    w character varying[],
+    h character varying[],
+    created timestamp(0) with time zone DEFAULT now(),
+    updated timestamp(0) with time zone DEFAULT now()
+);
+
+
+--
+-- TOC entry 1818 (class 1259 OID 211428)
+-- Dependencies: 2206 2207 2208 3
 -- Name: ad_places; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE ad_places (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
     edition uuid NOT NULL,
-    fascicle uuid NOT NULL,
     title character varying NOT NULL,
     shortcut character varying NOT NULL,
     description character varying,
@@ -2339,8 +2412,8 @@ CREATE TABLE ad_places (
 
 
 --
--- TOC entry 1783 (class 1259 OID 144796)
--- Dependencies: 2145 2147 2148 3
+-- TOC entry 1804 (class 1259 OID 144796)
+-- Dependencies: 2157 2159 2160 3
 -- Name: ad_requests; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2365,8 +2438,8 @@ CREATE TABLE ad_requests (
 
 
 --
--- TOC entry 1782 (class 1259 OID 144794)
--- Dependencies: 3 1783
+-- TOC entry 1803 (class 1259 OID 144794)
+-- Dependencies: 1804 3
 -- Name: ad_requests_serialnum_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -2379,8 +2452,8 @@ CREATE SEQUENCE ad_requests_serialnum_seq
 
 
 --
--- TOC entry 2269 (class 0 OID 0)
--- Dependencies: 1782
+-- TOC entry 2366 (class 0 OID 0)
+-- Dependencies: 1803
 -- Name: ad_requests_serialnum_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
@@ -2388,8 +2461,8 @@ ALTER SEQUENCE ad_requests_serialnum_seq OWNED BY ad_requests.serialnum;
 
 
 --
--- TOC entry 1749 (class 1259 OID 78326)
--- Dependencies: 2075 2076 2077 3
+-- TOC entry 1777 (class 1259 OID 78326)
+-- Dependencies: 2111 2112 2113 3
 -- Name: branches; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2406,8 +2479,8 @@ CREATE TABLE branches (
 
 
 --
--- TOC entry 1768 (class 1259 OID 78891)
--- Dependencies: 3 386
+-- TOC entry 1795 (class 1259 OID 78891)
+-- Dependencies: 3 387
 -- Name: cache_access; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2421,8 +2494,8 @@ CREATE TABLE cache_access (
 
 
 --
--- TOC entry 1750 (class 1259 OID 78335)
--- Dependencies: 2078 2079 2080 386 3
+-- TOC entry 1778 (class 1259 OID 78335)
+-- Dependencies: 2114 2115 2116 387 3
 -- Name: catalog; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2440,8 +2513,8 @@ CREATE TABLE catalog (
 
 
 --
--- TOC entry 1751 (class 1259 OID 78360)
--- Dependencies: 2081 2082 2083 386 3
+-- TOC entry 1779 (class 1259 OID 78360)
+-- Dependencies: 2117 2118 2119 387 3
 -- Name: editions; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2457,8 +2530,8 @@ CREATE TABLE editions (
 
 
 --
--- TOC entry 1765 (class 1259 OID 78657)
--- Dependencies: 2110 3
+-- TOC entry 1792 (class 1259 OID 78657)
+-- Dependencies: 2144 3
 -- Name: map_member_to_rule; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2473,8 +2546,8 @@ CREATE TABLE map_member_to_rule (
 
 
 --
--- TOC entry 1757 (class 1259 OID 78439)
--- Dependencies: 2090 2091 2092 3
+-- TOC entry 1784 (class 1259 OID 78439)
+-- Dependencies: 2124 2125 2126 3
 -- Name: members; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2488,8 +2561,8 @@ CREATE TABLE members (
 
 
 --
--- TOC entry 1766 (class 1259 OID 78701)
--- Dependencies: 2111 2112 3
+-- TOC entry 1793 (class 1259 OID 78701)
+-- Dependencies: 2145 2146 3
 -- Name: rules; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2506,8 +2579,8 @@ CREATE TABLE rules (
 
 
 --
--- TOC entry 1767 (class 1259 OID 78720)
--- Dependencies: 1878 386 3
+-- TOC entry 1794 (class 1259 OID 78720)
+-- Dependencies: 1914 3 387
 -- Name: cache_rules; Type: VIEW; Schema: public; Owner: -
 --
 
@@ -2516,7 +2589,7 @@ CREATE VIEW cache_rules AS
 
 
 --
--- TOC entry 1769 (class 1259 OID 78920)
+-- TOC entry 1796 (class 1259 OID 78920)
 -- Dependencies: 3
 -- Name: cache_visibility; Type: TABLE; Schema: public; Owner: -
 --
@@ -2532,8 +2605,29 @@ CREATE TABLE cache_visibility (
 
 
 --
--- TOC entry 1784 (class 1259 OID 210063)
--- Dependencies: 2149 2150 2151 2152 2153 2154 2155 2156 2157 2158 2159 3
+-- TOC entry 1816 (class 1259 OID 211300)
+-- Dependencies: 2194 2195 2196 387 3
+-- Name: comments; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE comments (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    entity uuid NOT NULL,
+    path ltree,
+    member uuid NOT NULL,
+    member_shortcut character varying NOT NULL,
+    stage uuid NOT NULL,
+    stage_shortcut character varying NOT NULL,
+    stage_color character varying NOT NULL,
+    fulltext character varying NOT NULL,
+    created timestamp(6) with time zone DEFAULT now() NOT NULL,
+    updated timestamp(6) with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- TOC entry 1805 (class 1259 OID 210063)
+-- Dependencies: 2161 2162 2163 2164 2165 2166 2167 2168 2169 2170 2171 3
 -- Name: documents; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2588,8 +2682,8 @@ CREATE TABLE documents (
 
 
 --
--- TOC entry 1785 (class 1259 OID 210088)
--- Dependencies: 2160 2161 2162 3
+-- TOC entry 1806 (class 1259 OID 210088)
+-- Dependencies: 2172 2173 2174 3
 -- Name: editions_options; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2604,8 +2698,8 @@ CREATE TABLE editions_options (
 
 
 --
--- TOC entry 1791 (class 1259 OID 210181)
--- Dependencies: 2168 2169 2170 2171 2172 2173 3
+-- TOC entry 1812 (class 1259 OID 210181)
+-- Dependencies: 2180 2181 2182 2183 2184 2185 3
 -- Name: fascicles; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2629,8 +2723,8 @@ CREATE TABLE fascicles (
 
 
 --
--- TOC entry 1774 (class 1259 OID 144476)
--- Dependencies: 2117 2118 2119 3
+-- TOC entry 1799 (class 1259 OID 144476)
+-- Dependencies: 2147 2148 2149 3
 -- Name: fascicles_index; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2647,8 +2741,8 @@ CREATE TABLE fascicles_index (
 
 
 --
--- TOC entry 1776 (class 1259 OID 144494)
--- Dependencies: 2125 2126 2127 3
+-- TOC entry 1800 (class 1259 OID 144494)
+-- Dependencies: 2150 2151 2152 3
 -- Name: fascicles_map_documents; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2664,31 +2758,52 @@ CREATE TABLE fascicles_map_documents (
 
 
 --
--- TOC entry 1777 (class 1259 OID 144540)
--- Dependencies: 2128 2129 2130 3
--- Name: fascicles_map_holes; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 1826 (class 1259 OID 211784)
+-- Dependencies: 2238 2239 2240 2241 3
+-- Name: fascicles_map_modules; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE fascicles_map_holes (
+CREATE TABLE fascicles_map_modules (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
     edition uuid NOT NULL,
     fascicle uuid NOT NULL,
-    place uuid NOT NULL,
     module uuid NOT NULL,
     page uuid,
-    entity uuid,
-    x integer,
-    y integer,
-    h integer,
-    w integer,
+    placed boolean DEFAULT false NOT NULL,
+    x character varying,
+    y character varying,
     created timestamp(0) with time zone DEFAULT now(),
     updated timestamp(0) with time zone DEFAULT now()
 );
 
 
 --
--- TOC entry 1786 (class 1259 OID 210108)
--- Dependencies: 2163 2164 2165 3
+-- TOC entry 1827 (class 1259 OID 211796)
+-- Dependencies: 2242 2243 2244 2245 2246 3
+-- Name: fascicles_modules; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE fascicles_modules (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    edition uuid NOT NULL,
+    fascicle uuid NOT NULL,
+    place uuid NOT NULL,
+    origin uuid NOT NULL,
+    title character varying NOT NULL,
+    shortcut character varying NOT NULL,
+    description character varying,
+    amount integer DEFAULT 1 NOT NULL,
+    w character varying,
+    h character varying,
+    area double precision DEFAULT 0 NOT NULL,
+    created timestamp(0) with time zone DEFAULT now(),
+    updated timestamp(0) with time zone DEFAULT now()
+);
+
+
+--
+-- TOC entry 1807 (class 1259 OID 210108)
+-- Dependencies: 2175 2176 2177 3
 -- Name: fascicles_options; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2704,8 +2819,8 @@ CREATE TABLE fascicles_options (
 
 
 --
--- TOC entry 1775 (class 1259 OID 144484)
--- Dependencies: 2120 2121 2122 2123 2124 3
+-- TOC entry 1821 (class 1259 OID 211631)
+-- Dependencies: 2221 2222 2223 3
 -- Name: fascicles_pages; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2713,57 +2828,137 @@ CREATE TABLE fascicles_pages (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
     edition uuid NOT NULL,
     fascicle uuid NOT NULL,
+    origin uuid NOT NULL,
     headline uuid,
-    place uuid,
     seqnum integer,
-    w integer DEFAULT 0 NOT NULL,
-    h integer DEFAULT 0 NOT NULL,
+    w character varying[],
+    h character varying[],
     created timestamp(0) with time zone DEFAULT now(),
     updated timestamp(0) with time zone DEFAULT now()
 );
 
 
 --
--- TOC entry 1752 (class 1259 OID 78386)
--- Dependencies: 2084 2085 3
+-- TOC entry 1823 (class 1259 OID 211749)
+-- Dependencies: 2227 2228 2229 3
+-- Name: fascicles_tmpl_index; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE fascicles_tmpl_index (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    edition uuid NOT NULL,
+    fascicle uuid NOT NULL,
+    place uuid NOT NULL,
+    nature character varying NOT NULL,
+    entity uuid NOT NULL,
+    created timestamp(0) with time zone DEFAULT now(),
+    updated timestamp(0) with time zone DEFAULT now()
+);
+
+
+--
+-- TOC entry 1820 (class 1259 OID 211611)
+-- Dependencies: 2212 2213 2214 2215 2216 2217 2218 2219 2220 3
+-- Name: fascicles_tmpl_modules; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE fascicles_tmpl_modules (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    origin uuid NOT NULL,
+    fascicle uuid NOT NULL,
+    page uuid NOT NULL,
+    title character varying NOT NULL,
+    shortcut character varying NOT NULL,
+    description character varying,
+    amount integer DEFAULT 1 NOT NULL,
+    area double precision DEFAULT 0 NOT NULL,
+    x character varying DEFAULT '1/1'::character varying NOT NULL,
+    y character varying DEFAULT '1/1'::character varying NOT NULL,
+    w character varying DEFAULT '1/1'::character varying NOT NULL,
+    h character varying DEFAULT '1/1'::character varying NOT NULL,
+    created timestamp(0) with time zone DEFAULT now(),
+    updated timestamp(0) with time zone DEFAULT now()
+);
+
+
+--
+-- TOC entry 1824 (class 1259 OID 211760)
+-- Dependencies: 2230 2231 2232 2233 3
+-- Name: fascicles_tmpl_pages; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE fascicles_tmpl_pages (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    origin uuid NOT NULL,
+    fascicle uuid NOT NULL,
+    title character varying NOT NULL,
+    shortcut character varying NOT NULL,
+    description character varying,
+    bydefault boolean DEFAULT false NOT NULL,
+    w character varying[],
+    h character varying[],
+    created timestamp(0) with time zone DEFAULT now(),
+    updated timestamp(0) with time zone DEFAULT now()
+);
+
+
+--
+-- TOC entry 1819 (class 1259 OID 211589)
+-- Dependencies: 2209 2210 2211 3
+-- Name: fascicles_tmpl_places; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE fascicles_tmpl_places (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    origin uuid NOT NULL,
+    fascicle uuid NOT NULL,
+    title character varying NOT NULL,
+    shortcut character varying NOT NULL,
+    description character varying,
+    created timestamp(0) with time zone DEFAULT now(),
+    updated timestamp(0) with time zone DEFAULT now()
+);
+
+
+--
+-- TOC entry 1815 (class 1259 OID 211290)
+-- Dependencies: 2192 2193 3
 -- Name: history; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE history (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    item uuid NOT NULL,
-    color character varying,
-    weight character varying,
+    entity uuid NOT NULL,
+    operation character varying NOT NULL,
+    color character varying NOT NULL,
+    weight character varying NOT NULL,
     branch uuid NOT NULL,
-    branch_shortcut character varying,
+    branch_shortcut character varying NOT NULL,
     stage uuid NOT NULL,
-    stage_shortcut character varying,
+    stage_shortcut character varying NOT NULL,
     sender uuid NOT NULL,
-    sender_shortcut character varying,
-    sender_edition uuid NOT NULL,
-    sender_edition_shortcut character varying,
+    sender_shortcut character varying NOT NULL,
     sender_catalog uuid NOT NULL,
-    sender_catalog_shortcut character varying,
-    receiver uuid NOT NULL,
-    receiver_shortcut character varying,
-    receiver_edition uuid NOT NULL,
-    receiver_edition_shortcut character varying,
-    receiver_catalog uuid NOT NULL,
-    receiver_catalog_shortcut character varying,
+    sender_catalog_shortcut character varying NOT NULL,
+    destination uuid NOT NULL,
+    destination_shortcut character varying NOT NULL,
+    destination_catalog uuid NOT NULL,
+    destination_catalog_shortcut character varying NOT NULL,
     created timestamp(6) with time zone DEFAULT now() NOT NULL
 );
 
 
 --
--- TOC entry 1772 (class 1259 OID 78994)
--- Dependencies: 2113 2114 2115 3
+-- TOC entry 1813 (class 1259 OID 210251)
+-- Dependencies: 2186 2187 2188 3
 -- Name: index; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE index (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
     edition uuid NOT NULL,
-    variation character varying NOT NULL,
+    nature character varying NOT NULL,
+    parent uuid NOT NULL,
     title character varying NOT NULL,
     shortcut character varying NOT NULL,
     description character varying NOT NULL,
@@ -2773,22 +2968,29 @@ CREATE TABLE index (
 
 
 --
--- TOC entry 1773 (class 1259 OID 79015)
--- Dependencies: 2116 3
--- Name: index_mapping; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 1814 (class 1259 OID 210262)
+-- Dependencies: 2189 2190 2191 3
+-- Name: index_fascicles; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE index_mapping (
+CREATE TABLE index_fascicles (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    entity uuid NOT NULL,
+    edition uuid NOT NULL,
+    fascicle uuid NOT NULL,
+    origin uuid NOT NULL,
+    nature character varying NOT NULL,
     parent uuid NOT NULL,
-    child uuid NOT NULL
+    title character varying NOT NULL,
+    shortcut character varying NOT NULL,
+    description character varying NOT NULL,
+    created timestamp(6) with time zone DEFAULT now() NOT NULL,
+    updated timestamp(6) with time zone DEFAULT now() NOT NULL
 );
 
 
 --
--- TOC entry 1753 (class 1259 OID 78394)
--- Dependencies: 2086 2087 3
+-- TOC entry 1780 (class 1259 OID 78394)
+-- Dependencies: 2120 2121 3
 -- Name: logs; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2808,8 +3010,8 @@ CREATE TABLE logs (
 
 
 --
--- TOC entry 1754 (class 1259 OID 78418)
--- Dependencies: 2088 3
+-- TOC entry 1781 (class 1259 OID 78418)
+-- Dependencies: 2122 3
 -- Name: map_member_to_catalog; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2821,8 +3023,8 @@ CREATE TABLE map_member_to_catalog (
 
 
 --
--- TOC entry 1755 (class 1259 OID 78429)
--- Dependencies: 2089 3
+-- TOC entry 1782 (class 1259 OID 78429)
+-- Dependencies: 2123 3
 -- Name: map_principals_to_stages; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2835,7 +3037,7 @@ CREATE TABLE map_principals_to_stages (
 
 
 --
--- TOC entry 1756 (class 1259 OID 78433)
+-- TOC entry 1783 (class 1259 OID 78433)
 -- Dependencies: 3
 -- Name: map_role_to_rule; Type: TABLE; Schema: public; Owner: -
 --
@@ -2848,8 +3050,8 @@ CREATE TABLE map_role_to_rule (
 
 
 --
--- TOC entry 1758 (class 1259 OID 78448)
--- Dependencies: 2093 3
+-- TOC entry 1785 (class 1259 OID 78448)
+-- Dependencies: 2127 3
 -- Name: migration; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2862,8 +3064,8 @@ CREATE TABLE migration (
 
 
 --
--- TOC entry 1759 (class 1259 OID 78455)
--- Dependencies: 2094 3
+-- TOC entry 1786 (class 1259 OID 78455)
+-- Dependencies: 2128 3
 -- Name: options; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2876,8 +3078,8 @@ CREATE TABLE options (
 
 
 --
--- TOC entry 1787 (class 1259 OID 210157)
--- Dependencies: 2166 2167 3
+-- TOC entry 1808 (class 1259 OID 210157)
+-- Dependencies: 2178 2179 3
 -- Name: profiles; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2901,8 +3103,8 @@ CREATE TABLE profiles (
 
 
 --
--- TOC entry 1760 (class 1259 OID 78470)
--- Dependencies: 2095 2096 2097 3
+-- TOC entry 1787 (class 1259 OID 78470)
+-- Dependencies: 2129 2130 2131 3
 -- Name: readiness; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2919,8 +3121,8 @@ CREATE TABLE readiness (
 
 
 --
--- TOC entry 1761 (class 1259 OID 78479)
--- Dependencies: 2098 2099 2100 3
+-- TOC entry 1788 (class 1259 OID 78479)
+-- Dependencies: 2132 2133 2134 3
 -- Name: roles; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2935,8 +3137,8 @@ CREATE TABLE roles (
 
 
 --
--- TOC entry 1762 (class 1259 OID 78502)
--- Dependencies: 2101 2102 2103 3
+-- TOC entry 1789 (class 1259 OID 78502)
+-- Dependencies: 2135 2136 2137 3
 -- Name: sessions; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2950,8 +3152,8 @@ CREATE TABLE sessions (
 
 
 --
--- TOC entry 1763 (class 1259 OID 78511)
--- Dependencies: 2104 2105 2106 3
+-- TOC entry 1790 (class 1259 OID 78511)
+-- Dependencies: 2138 2139 2140 3
 -- Name: stages; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2969,8 +3171,8 @@ CREATE TABLE stages (
 
 
 --
--- TOC entry 1764 (class 1259 OID 78520)
--- Dependencies: 2107 2108 2109 3
+-- TOC entry 1791 (class 1259 OID 78520)
+-- Dependencies: 2141 2142 2143 3
 -- Name: state; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2985,8 +3187,8 @@ CREATE TABLE state (
 
 
 --
--- TOC entry 1788 (class 1259 OID 210167)
--- Dependencies: 1881 3
+-- TOC entry 1809 (class 1259 OID 210167)
+-- Dependencies: 1917 3
 -- Name: view_principals; Type: VIEW; Schema: public; Owner: -
 --
 
@@ -2995,8 +3197,8 @@ CREATE VIEW view_principals AS
 
 
 --
--- TOC entry 1789 (class 1259 OID 210171)
--- Dependencies: 1882 3
+-- TOC entry 1810 (class 1259 OID 210171)
+-- Dependencies: 1918 3
 -- Name: view_assignments; Type: VIEW; Schema: public; Owner: -
 --
 
@@ -3005,8 +3207,8 @@ CREATE VIEW view_assignments AS
 
 
 --
--- TOC entry 1790 (class 1259 OID 210175)
--- Dependencies: 1883 3
+-- TOC entry 1811 (class 1259 OID 210175)
+-- Dependencies: 1919 3
 -- Name: view_members; Type: VIEW; Schema: public; Owner: -
 --
 
@@ -3015,8 +3217,8 @@ CREATE VIEW view_members AS
 
 
 --
--- TOC entry 1771 (class 1259 OID 78933)
--- Dependencies: 1880 3
+-- TOC entry 1798 (class 1259 OID 78933)
+-- Dependencies: 1916 3
 -- Name: view_rules; Type: VIEW; Schema: public; Owner: -
 --
 
@@ -3025,8 +3227,8 @@ CREATE VIEW view_rules AS
 
 
 --
--- TOC entry 1770 (class 1259 OID 78928)
--- Dependencies: 1879 386 3
+-- TOC entry 1797 (class 1259 OID 78928)
+-- Dependencies: 1915 387 3
 -- Name: view_rules_old; Type: VIEW; Schema: public; Owner: -
 --
 
@@ -3035,8 +3237,8 @@ CREATE VIEW view_rules_old AS
 
 
 --
--- TOC entry 2142 (class 2604 OID 144772)
--- Dependencies: 1780 1781 1781
+-- TOC entry 2154 (class 2604 OID 144772)
+-- Dependencies: 1801 1802 1802
 -- Name: serialnum; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3044,8 +3246,8 @@ ALTER TABLE ad_advertisers ALTER COLUMN serialnum SET DEFAULT nextval('ad_advert
 
 
 --
--- TOC entry 2146 (class 2604 OID 144800)
--- Dependencies: 1783 1782 1783
+-- TOC entry 2158 (class 2604 OID 144800)
+-- Dependencies: 1803 1804 1804
 -- Name: serialnum; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3053,8 +3255,8 @@ ALTER TABLE ad_requests ALTER COLUMN serialnum SET DEFAULT nextval('ad_requests_
 
 
 --
--- TOC entry 2233 (class 2606 OID 144779)
--- Dependencies: 1781 1781
+-- TOC entry 2290 (class 2606 OID 144779)
+-- Dependencies: 1802 1802
 -- Name: ad_advertisers_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3063,8 +3265,18 @@ ALTER TABLE ONLY ad_advertisers
 
 
 --
--- TOC entry 2231 (class 2606 OID 144763)
--- Dependencies: 1779 1779
+-- TOC entry 2323 (class 2606 OID 211748)
+-- Dependencies: 1822 1822
+-- Name: ad_index_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY ad_index
+    ADD CONSTRAINT ad_index_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 2312 (class 2606 OID 211427)
+-- Dependencies: 1817 1817
 -- Name: ad_modules_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3073,8 +3285,18 @@ ALTER TABLE ONLY ad_modules
 
 
 --
--- TOC entry 2229 (class 2606 OID 144748)
--- Dependencies: 1778 1778
+-- TOC entry 2329 (class 2606 OID 211783)
+-- Dependencies: 1825 1825
+-- Name: ad_pages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY ad_pages
+    ADD CONSTRAINT ad_pages_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 2314 (class 2606 OID 211438)
+-- Dependencies: 1818 1818
 -- Name: ad_places_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3083,8 +3305,8 @@ ALTER TABLE ONLY ad_places
 
 
 --
--- TOC entry 2235 (class 2606 OID 144807)
--- Dependencies: 1783 1783
+-- TOC entry 2292 (class 2606 OID 144807)
+-- Dependencies: 1804 1804
 -- Name: ad_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3093,8 +3315,8 @@ ALTER TABLE ONLY ad_requests
 
 
 --
--- TOC entry 2211 (class 2606 OID 78898)
--- Dependencies: 1768 1768 1768 1768
+-- TOC entry 2282 (class 2606 OID 78898)
+-- Dependencies: 1795 1795 1795 1795
 -- Name: cache_access_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3103,8 +3325,8 @@ ALTER TABLE ONLY cache_access
 
 
 --
--- TOC entry 2213 (class 2606 OID 78927)
--- Dependencies: 1769 1769 1769 1769
+-- TOC entry 2284 (class 2606 OID 78927)
+-- Dependencies: 1796 1796 1796 1796
 -- Name: cache_visibility_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3113,8 +3335,8 @@ ALTER TABLE ONLY cache_visibility
 
 
 --
--- TOC entry 2177 (class 2606 OID 78551)
--- Dependencies: 1750 1750
+-- TOC entry 2250 (class 2606 OID 78551)
+-- Dependencies: 1778 1778
 -- Name: catalog_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3123,8 +3345,8 @@ ALTER TABLE ONLY catalog
 
 
 --
--- TOC entry 2175 (class 2606 OID 78553)
--- Dependencies: 1749 1749
+-- TOC entry 2248 (class 2606 OID 78553)
+-- Dependencies: 1777 1777
 -- Name: chains_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3133,8 +3355,18 @@ ALTER TABLE ONLY branches
 
 
 --
--- TOC entry 2237 (class 2606 OID 210081)
--- Dependencies: 1784 1784
+-- TOC entry 2310 (class 2606 OID 211310)
+-- Dependencies: 1816 1816
+-- Name: comments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY comments
+    ADD CONSTRAINT comments_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 2294 (class 2606 OID 210081)
+-- Dependencies: 1805 1805
 -- Name: documents_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3143,8 +3375,8 @@ ALTER TABLE ONLY documents
 
 
 --
--- TOC entry 2239 (class 2606 OID 210098)
--- Dependencies: 1785 1785
+-- TOC entry 2296 (class 2606 OID 210098)
+-- Dependencies: 1806 1806
 -- Name: editions_options_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3153,8 +3385,8 @@ ALTER TABLE ONLY editions_options
 
 
 --
--- TOC entry 2179 (class 2606 OID 78557)
--- Dependencies: 1751 1751
+-- TOC entry 2252 (class 2606 OID 78557)
+-- Dependencies: 1779 1779
 -- Name: editions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3163,8 +3395,8 @@ ALTER TABLE ONLY editions
 
 
 --
--- TOC entry 2221 (class 2606 OID 144483)
--- Dependencies: 1774 1774
+-- TOC entry 2286 (class 2606 OID 144483)
+-- Dependencies: 1799 1799
 -- Name: fascicles_index_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3173,8 +3405,8 @@ ALTER TABLE ONLY fascicles_index
 
 
 --
--- TOC entry 2225 (class 2606 OID 144501)
--- Dependencies: 1776 1776
+-- TOC entry 2288 (class 2606 OID 144501)
+-- Dependencies: 1800 1800
 -- Name: fascicles_map_documents_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3183,18 +3415,28 @@ ALTER TABLE ONLY fascicles_map_documents
 
 
 --
--- TOC entry 2227 (class 2606 OID 144547)
--- Dependencies: 1777 1777
--- Name: fascicles_map_holes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 2331 (class 2606 OID 211795)
+-- Dependencies: 1826 1826
+-- Name: fascicles_map_modules_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY fascicles_map_holes
-    ADD CONSTRAINT fascicles_map_holes_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY fascicles_map_modules
+    ADD CONSTRAINT fascicles_map_modules_pkey PRIMARY KEY (id);
 
 
 --
--- TOC entry 2241 (class 2606 OID 210118)
--- Dependencies: 1786 1786
+-- TOC entry 2333 (class 2606 OID 211808)
+-- Dependencies: 1827 1827
+-- Name: fascicles_modules_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY fascicles_modules
+    ADD CONSTRAINT fascicles_modules_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 2298 (class 2606 OID 210118)
+-- Dependencies: 1807 1807
 -- Name: fascicles_options_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3203,8 +3445,8 @@ ALTER TABLE ONLY fascicles_options
 
 
 --
--- TOC entry 2223 (class 2606 OID 144493)
--- Dependencies: 1775 1775
+-- TOC entry 2320 (class 2606 OID 211641)
+-- Dependencies: 1821 1821
 -- Name: fascicles_pages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3213,8 +3455,8 @@ ALTER TABLE ONLY fascicles_pages
 
 
 --
--- TOC entry 2245 (class 2606 OID 210194)
--- Dependencies: 1791 1791
+-- TOC entry 2302 (class 2606 OID 210194)
+-- Dependencies: 1812 1812
 -- Name: fascicles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3223,8 +3465,48 @@ ALTER TABLE ONLY fascicles
 
 
 --
--- TOC entry 2181 (class 2606 OID 78563)
--- Dependencies: 1752 1752
+-- TOC entry 2325 (class 2606 OID 211759)
+-- Dependencies: 1823 1823
+-- Name: fascicles_tmpl_index_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY fascicles_tmpl_index
+    ADD CONSTRAINT fascicles_tmpl_index_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 2318 (class 2606 OID 211627)
+-- Dependencies: 1820 1820
+-- Name: fascicles_tmpl_modules_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY fascicles_tmpl_modules
+    ADD CONSTRAINT fascicles_tmpl_modules_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 2327 (class 2606 OID 211771)
+-- Dependencies: 1824 1824
+-- Name: fascicles_tmpl_pages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY fascicles_tmpl_pages
+    ADD CONSTRAINT fascicles_tmpl_pages_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 2316 (class 2606 OID 211599)
+-- Dependencies: 1819 1819
+-- Name: fascicles_tmpl_places_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY fascicles_tmpl_places
+    ADD CONSTRAINT fascicles_tmpl_places_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 2308 (class 2606 OID 211299)
+-- Dependencies: 1815 1815
 -- Name: history_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3233,38 +3515,28 @@ ALTER TABLE ONLY history
 
 
 --
--- TOC entry 2217 (class 2606 OID 79026)
--- Dependencies: 1773 1773 1773 1773
--- Name: index_mapping_entity_key; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 2306 (class 2606 OID 210272)
+-- Dependencies: 1814 1814 1814 1814 1814
+-- Name: index_fascicles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY index_mapping
-    ADD CONSTRAINT index_mapping_entity_key UNIQUE (entity, parent, child);
-
-
---
--- TOC entry 2219 (class 2606 OID 79024)
--- Dependencies: 1773 1773
--- Name: index_mapping_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY index_mapping
-    ADD CONSTRAINT index_mapping_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY index_fascicles
+    ADD CONSTRAINT index_fascicles_pkey PRIMARY KEY (id, edition, fascicle, origin);
 
 
 --
--- TOC entry 2215 (class 2606 OID 79006)
--- Dependencies: 1772 1772 1772 1772
+-- TOC entry 2304 (class 2606 OID 210261)
+-- Dependencies: 1813 1813
 -- Name: index_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY index
-    ADD CONSTRAINT index_pkey PRIMARY KEY (id, edition, variation);
+    ADD CONSTRAINT index_pkey PRIMARY KEY (id);
 
 
 --
--- TOC entry 2183 (class 2606 OID 78565)
--- Dependencies: 1753 1753
+-- TOC entry 2254 (class 2606 OID 78565)
+-- Dependencies: 1780 1780
 -- Name: logs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3273,8 +3545,8 @@ ALTER TABLE ONLY logs
 
 
 --
--- TOC entry 2185 (class 2606 OID 78573)
--- Dependencies: 1754 1754 1754
+-- TOC entry 2256 (class 2606 OID 78573)
+-- Dependencies: 1781 1781 1781
 -- Name: map_member_to_catalog_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3283,8 +3555,8 @@ ALTER TABLE ONLY map_member_to_catalog
 
 
 --
--- TOC entry 2207 (class 2606 OID 78665)
--- Dependencies: 1765 1765
+-- TOC entry 2278 (class 2606 OID 78665)
+-- Dependencies: 1792 1792
 -- Name: map_member_to_rule_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3293,8 +3565,8 @@ ALTER TABLE ONLY map_member_to_rule
 
 
 --
--- TOC entry 2187 (class 2606 OID 78577)
--- Dependencies: 1755 1755 1755 1755
+-- TOC entry 2258 (class 2606 OID 78577)
+-- Dependencies: 1782 1782 1782 1782
 -- Name: map_principals_to_stages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3303,8 +3575,8 @@ ALTER TABLE ONLY map_principals_to_stages
 
 
 --
--- TOC entry 2189 (class 2606 OID 78579)
--- Dependencies: 1756 1756 1756 1756
+-- TOC entry 2260 (class 2606 OID 78579)
+-- Dependencies: 1783 1783 1783 1783
 -- Name: map_role_to_rule_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3313,8 +3585,8 @@ ALTER TABLE ONLY map_role_to_rule
 
 
 --
--- TOC entry 2191 (class 2606 OID 78583)
--- Dependencies: 1757 1757
+-- TOC entry 2262 (class 2606 OID 78583)
+-- Dependencies: 1784 1784
 -- Name: member_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3323,8 +3595,8 @@ ALTER TABLE ONLY members
 
 
 --
--- TOC entry 2243 (class 2606 OID 210166)
--- Dependencies: 1787 1787
+-- TOC entry 2300 (class 2606 OID 210166)
+-- Dependencies: 1808 1808
 -- Name: member_profiles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3333,8 +3605,8 @@ ALTER TABLE ONLY profiles
 
 
 --
--- TOC entry 2201 (class 2606 OID 78585)
--- Dependencies: 1762 1762
+-- TOC entry 2272 (class 2606 OID 78585)
+-- Dependencies: 1789 1789
 -- Name: member_session_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3343,8 +3615,8 @@ ALTER TABLE ONLY sessions
 
 
 --
--- TOC entry 2193 (class 2606 OID 78587)
--- Dependencies: 1758 1758
+-- TOC entry 2264 (class 2606 OID 78587)
+-- Dependencies: 1785 1785
 -- Name: migration_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3353,8 +3625,8 @@ ALTER TABLE ONLY migration
 
 
 --
--- TOC entry 2195 (class 2606 OID 78589)
--- Dependencies: 1759 1759
+-- TOC entry 2266 (class 2606 OID 78589)
+-- Dependencies: 1786 1786
 -- Name: options_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3363,8 +3635,8 @@ ALTER TABLE ONLY options
 
 
 --
--- TOC entry 2199 (class 2606 OID 78591)
--- Dependencies: 1761 1761
+-- TOC entry 2270 (class 2606 OID 78591)
+-- Dependencies: 1788 1788
 -- Name: roles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3373,8 +3645,8 @@ ALTER TABLE ONLY roles
 
 
 --
--- TOC entry 2209 (class 2606 OID 78710)
--- Dependencies: 1766 1766
+-- TOC entry 2280 (class 2606 OID 78710)
+-- Dependencies: 1793 1793
 -- Name: rules_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3383,8 +3655,8 @@ ALTER TABLE ONLY rules
 
 
 --
--- TOC entry 2203 (class 2606 OID 78597)
--- Dependencies: 1763 1763
+-- TOC entry 2274 (class 2606 OID 78597)
+-- Dependencies: 1790 1790
 -- Name: stages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3393,8 +3665,8 @@ ALTER TABLE ONLY stages
 
 
 --
--- TOC entry 2205 (class 2606 OID 78599)
--- Dependencies: 1764 1764
+-- TOC entry 2276 (class 2606 OID 78599)
+-- Dependencies: 1791 1791
 -- Name: state_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3403,8 +3675,8 @@ ALTER TABLE ONLY state
 
 
 --
--- TOC entry 2197 (class 2606 OID 78601)
--- Dependencies: 1760 1760
+-- TOC entry 2268 (class 2606 OID 78601)
+-- Dependencies: 1787 1787
 -- Name: statuses_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3413,8 +3685,17 @@ ALTER TABLE ONLY readiness
 
 
 --
--- TOC entry 2252 (class 2620 OID 78759)
--- Dependencies: 1750 94
+-- TOC entry 2321 (class 1259 OID 211821)
+-- Dependencies: 1821
+-- Name: fki_; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX fki_ ON fascicles_pages USING btree (origin);
+
+
+--
+-- TOC entry 2348 (class 2620 OID 78759)
+-- Dependencies: 94 1778
 -- Name: catalog_access_delete_after; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -3425,8 +3706,8 @@ CREATE TRIGGER catalog_access_delete_after
 
 
 --
--- TOC entry 2253 (class 2620 OID 78760)
--- Dependencies: 1750 95
+-- TOC entry 2349 (class 2620 OID 78760)
+-- Dependencies: 95 1778
 -- Name: catalog_access_insert_after; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -3437,8 +3718,8 @@ CREATE TRIGGER catalog_access_insert_after
 
 
 --
--- TOC entry 2254 (class 2620 OID 78761)
--- Dependencies: 1750 99
+-- TOC entry 2350 (class 2620 OID 78761)
+-- Dependencies: 99 1778
 -- Name: catalog_access_update_after; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -3449,8 +3730,8 @@ CREATE TRIGGER catalog_access_update_after
 
 
 --
--- TOC entry 2249 (class 2620 OID 78604)
--- Dependencies: 90 1750
+-- TOC entry 2345 (class 2620 OID 78604)
+-- Dependencies: 1778 90
 -- Name: catalog_delete_after; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -3461,8 +3742,8 @@ CREATE TRIGGER catalog_delete_after
 
 
 --
--- TOC entry 2250 (class 2620 OID 78605)
--- Dependencies: 1750 91
+-- TOC entry 2346 (class 2620 OID 78605)
+-- Dependencies: 1778 91
 -- Name: catalog_insert_before; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -3473,8 +3754,8 @@ CREATE TRIGGER catalog_insert_before
 
 
 --
--- TOC entry 2251 (class 2620 OID 78606)
--- Dependencies: 92 1750
+-- TOC entry 2347 (class 2620 OID 78606)
+-- Dependencies: 1778 92
 -- Name: catalog_update_after; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -3485,8 +3766,8 @@ CREATE TRIGGER catalog_update_after
 
 
 --
--- TOC entry 2260 (class 2620 OID 78768)
--- Dependencies: 1751 94
+-- TOC entry 2356 (class 2620 OID 78768)
+-- Dependencies: 1779 94
 -- Name: editions_access_delete_after; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -3497,8 +3778,8 @@ CREATE TRIGGER editions_access_delete_after
 
 
 --
--- TOC entry 2259 (class 2620 OID 78766)
--- Dependencies: 95 1751
+-- TOC entry 2355 (class 2620 OID 78766)
+-- Dependencies: 1779 95
 -- Name: editions_access_insert_after; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -3509,8 +3790,8 @@ CREATE TRIGGER editions_access_insert_after
 
 
 --
--- TOC entry 2258 (class 2620 OID 78765)
--- Dependencies: 99 1751
+-- TOC entry 2354 (class 2620 OID 78765)
+-- Dependencies: 1779 99
 -- Name: editions_access_update_after; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -3521,8 +3802,8 @@ CREATE TRIGGER editions_access_update_after
 
 
 --
--- TOC entry 2255 (class 2620 OID 78607)
--- Dependencies: 90 1751
+-- TOC entry 2351 (class 2620 OID 78607)
+-- Dependencies: 90 1779
 -- Name: editions_delete_after; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -3533,8 +3814,8 @@ CREATE TRIGGER editions_delete_after
 
 
 --
--- TOC entry 2256 (class 2620 OID 78608)
--- Dependencies: 1751 91
+-- TOC entry 2352 (class 2620 OID 78608)
+-- Dependencies: 91 1779
 -- Name: editions_insert_before; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -3545,8 +3826,8 @@ CREATE TRIGGER editions_insert_before
 
 
 --
--- TOC entry 2257 (class 2620 OID 78609)
--- Dependencies: 92 1751
+-- TOC entry 2353 (class 2620 OID 78609)
+-- Dependencies: 92 1779
 -- Name: editions_update_after; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -3557,8 +3838,20 @@ CREATE TRIGGER editions_update_after
 
 
 --
--- TOC entry 2263 (class 2620 OID 144843)
--- Dependencies: 98 1776
+-- TOC entry 2360 (class 2620 OID 211314)
+-- Dependencies: 1800 100
+-- Name: fascicles_map_documents_delete_after; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER fascicles_map_documents_delete_after
+    AFTER DELETE ON fascicles_map_documents
+    FOR EACH ROW
+    EXECUTE PROCEDURE fascicles_map_documents_delete_after_trigger();
+
+
+--
+-- TOC entry 2359 (class 2620 OID 144843)
+-- Dependencies: 1800 98
 -- Name: fascicles_map_documents_update_after; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -3569,8 +3862,8 @@ CREATE TRIGGER fascicles_map_documents_update_after
 
 
 --
--- TOC entry 2262 (class 2620 OID 78771)
--- Dependencies: 1765 97
+-- TOC entry 2358 (class 2620 OID 78771)
+-- Dependencies: 1792 97
 -- Name: rules_mapping_delete_after; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -3581,8 +3874,8 @@ CREATE TRIGGER rules_mapping_delete_after
 
 
 --
--- TOC entry 2261 (class 2620 OID 78764)
--- Dependencies: 96 1765
+-- TOC entry 2357 (class 2620 OID 78764)
+-- Dependencies: 96 1792
 -- Name: rules_mapping_insert_after; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -3593,8 +3886,8 @@ CREATE TRIGGER rules_mapping_insert_after
 
 
 --
--- TOC entry 2248 (class 2606 OID 78899)
--- Dependencies: 1768 2190 1757
+-- TOC entry 2336 (class 2606 OID 78899)
+-- Dependencies: 1795 1784 2261
 -- Name: cache_access_member_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3603,8 +3896,88 @@ ALTER TABLE ONLY cache_access
 
 
 --
--- TOC entry 2246 (class 2606 OID 78610)
--- Dependencies: 2190 1754 1757
+-- TOC entry 2337 (class 2606 OID 211832)
+-- Dependencies: 1805 2293 1800
+-- Name: fascicles_map_documents_entity_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY fascicles_map_documents
+    ADD CONSTRAINT fascicles_map_documents_entity_fkey FOREIGN KEY (entity) REFERENCES documents(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- TOC entry 2338 (class 2606 OID 211867)
+-- Dependencies: 1800 2319 1821
+-- Name: fascicles_map_documents_page_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY fascicles_map_documents
+    ADD CONSTRAINT fascicles_map_documents_page_fkey FOREIGN KEY (page) REFERENCES fascicles_pages(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- TOC entry 2342 (class 2606 OID 211862)
+-- Dependencies: 1826 2332 1827
+-- Name: fascicles_map_modules_module_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY fascicles_map_modules
+    ADD CONSTRAINT fascicles_map_modules_module_fkey FOREIGN KEY (module) REFERENCES fascicles_modules(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- TOC entry 2341 (class 2606 OID 211857)
+-- Dependencies: 1821 2319 1826
+-- Name: fascicles_map_modules_page_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY fascicles_map_modules
+    ADD CONSTRAINT fascicles_map_modules_page_fkey FOREIGN KEY (page) REFERENCES fascicles_pages(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- TOC entry 2343 (class 2606 OID 211847)
+-- Dependencies: 1820 2317 1827
+-- Name: fascicles_modules_origin_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY fascicles_modules
+    ADD CONSTRAINT fascicles_modules_origin_fkey FOREIGN KEY (origin) REFERENCES fascicles_tmpl_modules(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- TOC entry 2344 (class 2606 OID 211852)
+-- Dependencies: 1827 2315 1819
+-- Name: fascicles_modules_place_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY fascicles_modules
+    ADD CONSTRAINT fascicles_modules_place_fkey FOREIGN KEY (place) REFERENCES fascicles_tmpl_places(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- TOC entry 2340 (class 2606 OID 211816)
+-- Dependencies: 1821 1824 2326
+-- Name: fascicles_pages_origin_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY fascicles_pages
+    ADD CONSTRAINT fascicles_pages_origin_fkey FOREIGN KEY (origin) REFERENCES fascicles_tmpl_pages(id) ON DELETE RESTRICT;
+
+
+--
+-- TOC entry 2339 (class 2606 OID 211827)
+-- Dependencies: 1820 2326 1824
+-- Name: fascicles_tmpl_modules_page_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY fascicles_tmpl_modules
+    ADD CONSTRAINT fascicles_tmpl_modules_page_fkey FOREIGN KEY (page) REFERENCES fascicles_tmpl_pages(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- TOC entry 2334 (class 2606 OID 78610)
+-- Dependencies: 1781 2261 1784
 -- Name: map_member_to_catalog_member_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3613,8 +3986,8 @@ ALTER TABLE ONLY map_member_to_catalog
 
 
 --
--- TOC entry 2247 (class 2606 OID 78615)
--- Dependencies: 1761 2198 1756
+-- TOC entry 2335 (class 2606 OID 78615)
+-- Dependencies: 1788 2269 1783
 -- Name: map_role_to_rule_role_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3622,7 +3995,7 @@ ALTER TABLE ONLY map_role_to_rule
     ADD CONSTRAINT map_role_to_rule_role_fkey FOREIGN KEY (role) REFERENCES roles(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
--- Completed on 2010-12-06 10:14:14
+-- Completed on 2010-12-23 01:24:19
 
 --
 -- PostgreSQL database dump complete
