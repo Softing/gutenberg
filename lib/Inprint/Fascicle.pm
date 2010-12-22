@@ -651,7 +651,7 @@ sub getSummary {
     
     foreach my $place (@$places) {
         
-        my $modules = $c->sql->Q("
+        my $tmpl_modules = $c->sql->Q("
             SELECT
                 t1.id, t1.origin, t1.fascicle, t1.page, t1.title, t1.shortcut,
                 t1.description, t1.amount, t1.area, t1.x, t1.y, t1.w, t1.h,
@@ -660,14 +660,16 @@ sub getSummary {
             WHERE t1.fascicle=? AND t2.entity=t1.id AND t2.place=?
         ", [ $fascicle, $place->{id} ])->Hashes;
         
-        foreach my $module (@$modules) {
+        foreach my $tmpl_module (@$tmpl_modules) {
             
             my $hl = 
                 $c->sql->Q("
-                    SELECT count(*)
-                    FROM fascicles_modules t1, fascicles_map_modules t2
-                    WHERE t2.module=t1.id AND t1.fascicle=? AND t1.place=? AND t1.origin=?
-                ", [ $fascicle, $place->{id}, $module->{id} ])->Value;
+                        SELECT count(*)
+                        FROM fascicles_modules t1, fascicles_map_modules t2
+                        WHERE t2.module=t1.id AND t1.fascicle=? AND t1.place=? AND t1.origin=?
+                ", [ $fascicle, $place->{id}, $tmpl_module->{id} ])->Value;
+            
+            #die " $fascicle, $place->{id}, $tmpl_module->{id} ";
             
             my $rq = 0;
             #$c->sql->Q("
@@ -677,8 +679,8 @@ sub getSummary {
             my $fr = $hl - $rq;
             
             push @$data, {
-                id              => $module->{id},
-                shortcut        => $module->{shortcut},
+                id              => $tmpl_module->{id},
+                shortcut        => $tmpl_module->{shortcut},
                 place           => $place->{id},
                 place_shortcut  => $place->{shortcut},
                 holes           => $hl,
