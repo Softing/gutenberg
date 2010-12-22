@@ -28,7 +28,7 @@ sub initialize {
         
         $data->{pages} = $c->sql->Q("
             SELECT id, w, h 
-            FROM fascicles_pages WHERE id = ANY(?)
+            FROM fascicles_pages WHERE id = ANY(?) ORDER BY seqnum 
         ", [ \@i_pages ])->Hashes;
         
         $data->{modules} = $c->sql->Q("
