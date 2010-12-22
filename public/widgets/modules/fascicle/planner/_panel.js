@@ -86,16 +86,16 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                 scope:this.panels["pages"],
                 handler: this.panels["pages"].cmpPageClean
             },
-            {
-                ref: "../btnPageResize",
-                disabled:true,
-                text: 'Разверстать',
-                tooltip: 'Добавить новые полосы скопировав содержимое',
-                icon: _ico("arrow-resize-045"),
-                cls: 'x-btn-text-icon',
-                scope:this.panels["pages"],
-                handler: this.panels["pages"].cmpPageResize
-            },
+            //{
+            //    ref: "../btnPageResize",
+            //    disabled:true,
+            //    text: 'Разверстать',
+            //    tooltip: 'Добавить новые полосы скопировав содержимое',
+            //    icon: _ico("arrow-resize-045"),
+            //    cls: 'x-btn-text-icon',
+            //    scope:this.panels["pages"],
+            //    handler: this.panels["pages"].cmpPageResize
+            //},
             "-",
             {
                 ref: "../btnPageDelete",
