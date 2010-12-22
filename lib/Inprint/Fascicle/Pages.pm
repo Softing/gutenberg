@@ -70,9 +70,9 @@ sub templates {
                     id, origin, fascicle, page, title, shortcut, description,
                     amount, round(area::numeric, 2) as area, x, y, w, h,
                     created, updated
-                FROM fascicles_tmpl_modules WHERE page=? ";
+                FROM fascicles_tmpl_modules WHERE page=? AND amount=? ";
             push @params, $tmpl_id;
-            
+            push @params, $amount;
         }
         
         $sql = join "\n INTERSECT \n", @queries;

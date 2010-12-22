@@ -43,7 +43,7 @@ Inprint.cmp.composer.Interaction = function(parent, panels) {
                 var ids = [];
                 
                 Ext.each(ddSource.dragData.selections, function(r) {
-                    ids.push(r.data.id +'::'+ r.data.place);
+                    ids.push(r.data.id);
                 });
                 
                 Ext.Ajax.request({

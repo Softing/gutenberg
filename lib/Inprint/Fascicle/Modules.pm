@@ -148,12 +148,9 @@ sub create {
     
     unless (@errors) {
         
-        foreach my $string (@i_modules) {
-            
-            my ($module_id, $place_id) = split "::", $string;
+        foreach my $module_id (@i_modules) {
             
             next unless $c->is_uuid($module_id);
-            next unless $c->is_uuid($place_id);
             
             my $module = $c->sql->Q("
                     SELECT id, origin, fascicle, page, title, shortcut, description, amount, area, x, y, w, h, created, updated
@@ -162,14 +159,9 @@ sub create {
             
             next unless $module->{id};
             
-            my $place = $c->sql->Q("
-                    SELECT id, origin, fascicle, title, shortcut, description, created, updated
-                    FROM fascicles_tmpl_places  WHERE id=?
-                ", [ $place_id ])->Hash;
-            
-            next unless $place->{id};
-            
             my @pages;
+            
+            my $place;
             
             foreach my $code (@i_pages) {
                 
@@ -182,11 +174,32 @@ sub create {
                 
                 next unless $page->{id};
                 
+                my $page_place = $c->sql->Q("
+                    SELECT
+                        t1.id, t1.origin, t1.fascicle, t1.title, t1.shortcut,
+                        t1.description, t1.created, t1.updated
+                    FROM fascicles_tmpl_places t1, fascicles_tmpl_index t2
+                    WHERE t1.fascicle=? AND t2.place=t1.id AND t2.entity=?
+
+                ", [ $page->{fascicle}, $page->{headline} ])->Hash;
+                
+                next unless $page_place->{id};
+                
+                unless ( $place->{id} ) {
+                    $place = $page_place;
+                }
+                
+                push @errors, { id => "page", msg => "Pages not equal 1"}
+                    unless ( $place->{id} eq $page_place->{id} );
+                
                 push @pages, $page;
                 
             }
             
-            if ($#pages == $#i_pages) {
+            push @errors, { id => "page", msg => "Pages not equal 2"}
+                unless ($#pages == $#i_pages);
+            
+            unless (@errors) {
                 
                 my $module_id = $c->uuid;
                 
@@ -194,7 +207,9 @@ sub create {
                     INSERT INTO fascicles_modules(id, edition, fascicle, place, origin, title, shortcut, description, amount, area, w, h,  created, updated)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
                 ", [
-                    $module_id, $fascicle->{edition}, $fascicle->{id}, $place->{id}, $module->{id}, $module->{title}, $module->{shortcut}, $module->{description},
+                    $module_id, $fascicle->{edition}, $fascicle->{id},
+                    $place->{id},
+                    $module->{id}, $module->{title}, $module->{shortcut}, $module->{description},
                     $module->{amount}, $module->{area},
                     $module->{w}, $module->{h}
                 ]);
