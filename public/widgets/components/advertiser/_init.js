@@ -1,0 +1,1 @@
+Ext.namespace("Inprint.cmp.adverta");

@@ -3,45 +3,41 @@ Inprint.fascicle.adverta.Access = function(parent, panels, access) {
     parent.access = access;
     
     var pages = panels["pages"];
-    var documents = panels["documents"];
+    var requests = panels["requests"];
     
-    ////Seance
-    //_hide(parent.btnCaptureSession, parent.btnBeginSession, parent.btnEndSession);
-    //_disable(parent.btnCaptureSession, parent.btnBeginSession, parent.btnEndSession, parent.btnSave);
-    //
-    //if (access.open) {
-    //    parent.btnBeginSession.show();
-    //    parent.btnBeginSession.enable();
-    //}
-    //
-    //if (access.capture) {
-    //    parent.btnCaptureSession.show();
-    //    parent.btnCaptureSession.enable();
-    //}
-    //
-    //if (access.close) {
-    //    parent.btnEndSession.show();
-    //    parent.btnEndSession.enable();
-    //}
-    //
-    //if (access.save) {
-    //    parent.btnSave.show();
-    //    parent.btnSave.enable();
-    //}
-    //
-    ////Pages
-    //if (access.manage) {
-    //    parent.btnPageCreate.enable();
-    //    documents.btnCreate.enable();
-    //    documents.btnFromBriefcase.enable();
-    //} else {
-    //    parent.btnPageCreate.disable();
-    //    documents.btnCreate.disable();
-    //    documents.btnFromBriefcase.disable();
-    //}
-    //
-    //documents.getSelectionModel().on("selectionchange", function(sm) {
-    //
+    //Seance
+    _hide(parent.btnCaptureSession, parent.btnBeginSession, parent.btnEndSession);
+    _disable(parent.btnCaptureSession, parent.btnBeginSession, parent.btnEndSession, parent.btnSave);
+    
+    if (access.open) {
+        parent.btnBeginSession.show();
+        parent.btnBeginSession.enable();
+    }
+    
+    if (access.capture) {
+        parent.btnCaptureSession.show();
+        parent.btnCaptureSession.enable();
+    }
+    
+    if (access.close) {
+        parent.btnEndSession.show();
+        parent.btnEndSession.enable();
+    }
+    
+    if (access.save) {
+        parent.btnSave.show();
+        parent.btnSave.enable();
+    }
+    
+    //Pages
+    if (access.manage) {
+        //parent.btnPageCreate.enable();
+    } else {
+        //parent.btnPageCreate.disable();
+    }
+    
+    requests.getSelectionModel().on("selectionchange", function(sm) {
+    
     //    var records = documents.getSelectionModel().getSelections();
     //    var doc_access = _arrayAccessCheck(records, ['delete', 'recover', 'update', 'capture', 'move', 'transfer', 'briefcase']);
     //    
@@ -77,7 +73,7 @@ Inprint.fascicle.adverta.Access = function(parent, panels, access) {
     //            //if (access["delete"]    == 'enabled') documents.btnDelete.enable();
     //        }
     //    }
-    //    
-    //});
+    
+    });
     
 }

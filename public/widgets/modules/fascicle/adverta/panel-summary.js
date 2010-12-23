@@ -7,7 +7,6 @@ Inprint.fascicle.adverta.Summary = Ext.extend(Ext.grid.EditorGridPanel, {
         }
 
         this.store = Inprint.factory.Store.group(this.urls.list, {
-            remoteSort: true,
             groupField:'place_shortcut',
             remoteGroup:false,
             remoteSort:false,
@@ -20,19 +19,28 @@ Inprint.fascicle.adverta.Summary = Ext.extend(Ext.grid.EditorGridPanel, {
         
         this.colModel = new Ext.grid.ColumnModel({
             defaults: {
-                sortable: false
+                sortable: false,
+                menuDisabled: true
             },
             columns: [
                 {
-                    id: 'place',
-                    hidden:true,
+                    id: 'place_shortcut',
                     header: _('Place'),
                     dataIndex: 'place_shortcut'
                 },
                 {
                     id: 'module',
+                    width:80,
                     header: _('Module'),
-                    dataIndex: 'module_shortcut'
+                    dataIndex: 'shortcut'
+                },
+                {
+                    id: 'pages',
+                    header: _('Pages'),
+                    dataIndex: 'pages',
+                    editor: new Ext.form.TextField({
+                        allowBlank: true
+                    })
                 },
                 {
                     id: 'holes',
@@ -56,7 +64,6 @@ Inprint.fascicle.adverta.Summary = Ext.extend(Ext.grid.EditorGridPanel, {
         });
         
         this.view = new Ext.grid.GroupingView({
-            forceFit:true,
             hideGroupedColumn: true,
             groupTextTpl: '{text}'
         });
@@ -65,17 +72,17 @@ Inprint.fascicle.adverta.Summary = Ext.extend(Ext.grid.EditorGridPanel, {
             border:false,
             stripeRows: true,
             columnLines: true,
-            autoExpandColumn: "title",
+            autoExpandColumn: "pages",
             sm: this.sm,
             tbar: this.tbar,
             columns: this.columns
         });
         
-        Inprint.fascicle.adverta.Summary.superclass.initComponent.apply(this, arguments);
+        Inprint.fascicle.planner.Summary.superclass.initComponent.apply(this, arguments);
 
     },
 
     onRender: function() {
-        Inprint.fascicle.adverta.Summary.superclass.onRender.apply(this, arguments);
+        Inprint.fascicle.planner.Summary.superclass.onRender.apply(this, arguments);
     }
 });

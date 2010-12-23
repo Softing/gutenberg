@@ -14,7 +14,7 @@ Inprint.fascicle.adverta.Panel = Ext.extend(Ext.Panel, {
                 parent: this,
                 oid: this.oid
             }),
-            documents: new Inprint.fascicle.adverta.Documents({
+            requests: new Inprint.fascicle.adverta.Requests({
                 parent: this,
                 oid: this.oid
             }),
@@ -25,36 +25,6 @@ Inprint.fascicle.adverta.Panel = Ext.extend(Ext.Panel, {
         }
         
         this.tbar = [
-            {
-                ref: "../btnPageCreate",
-                disabled:true,
-                text: "Добавить заявку",
-                tooltip: 'Добавить рекламную заявку в выпуск',
-                icon: _ico("plus-button"),
-                cls: 'x-btn-text-icon',
-                scope: this.panels["pages"],
-                handler: this.panels["pages"].cmpPageCreate
-            },
-            {
-                ref: "../btnPageUpdate",
-                disabled:true,
-                text:'Редактировать',
-                icon: _ico("pencil"),
-                cls: 'x-btn-text-icon',
-                scope: this.panels["pages"],
-                handler: this.panels["pages"].cmpPageUpdate
-            },
-            "-",
-            {
-                ref: "../btnPageDelete",
-                disabled:true,
-                text: 'Удалить',
-                tooltip: 'Удалить полосы',
-                icon: _ico("minus-button"),
-                cls: 'x-btn-text-icon',
-                scope:this.panels["pages"],
-                handler: this.panels["pages"].cmpPageDelete
-            },
             '->',
             {
                 ref: "../btnSave",
@@ -148,7 +118,7 @@ Inprint.fascicle.adverta.Panel = Ext.extend(Ext.Panel, {
                             maxSize: 800,
                             layout:"fit",
                             collapseMode: 'mini',
-                            items: this.panels["documents"],
+                            items: this.panels["requests"],
                             stateId: 'fasicles.planner.adverta'
                         }
                     ]
@@ -213,7 +183,7 @@ Inprint.fascicle.adverta.Panel = Ext.extend(Ext.Panel, {
                 this.parent.setTitle(title)
                 
                 this.panels["pages"].getStore().loadData({ data: rsp.pages });
-                this.panels["documents"].getStore().loadData({ data: rsp.documents });
+                this.panels["requests"].getStore().loadData({ data: rsp.requests });
                 this.panels["summary"].getStore().loadData({ data: rsp.summary });
                 
                 Inprint.fascicle.adverta.Access(this, this.panels, rsp.fascicle.access);
@@ -312,13 +282,13 @@ Inprint.fascicle.adverta.Panel = Ext.extend(Ext.Panel, {
     cmpSave: function() {
         
         var pages = this.panels["pages"];
-        var documents = this.panels["documents"];
+        var requests = this.panels["requests"];
         
         var data = [];
         
-        // get documents changes
+        // get requests changes
         
-        var records = documents.getStore().getModifiedRecords();
+        var records = requests.getStore().getModifiedRecords();
         if(records.length) {
             Ext.each(records, function(r, i) {
                 var document = r.get('id');
@@ -337,7 +307,7 @@ Inprint.fascicle.adverta.Panel = Ext.extend(Ext.Panel, {
             },
             scope:this,
             success: function () {
-                documents.getStore().commitChanges();
+                requests.getStore().commitChanges();
                 this.cmpReload();
             }
         };

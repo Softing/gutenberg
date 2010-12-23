@@ -29,6 +29,7 @@ sub seance {
     my $fascicle;
     my $pages;
     my $documents;
+    my $requests;
     my $summary;
     
     unless (@errors) {
@@ -39,9 +40,10 @@ sub seance {
     
     unless (@errors) {
         
-        $pages = $c->getPages($fascicle->{id});
+        $pages     = $c->getPages($fascicle->{id});
         $documents = $c->getDocumens($fascicle->{id});
-        $summary = $c->getSummary($fascicle->{id});
+        $requests  = $c->getRequests($fascicle->{id});
+        $summary   = $c->getSummary($fascicle->{id});
         
         if ($fascicle->{manager}) {
             $fascicle->{manager_shortcut} = $c->sql->Q(" SELECT shortcut FROM profiles WHERE id=?", [$fascicle->{manager}])->Value;
@@ -108,12 +110,13 @@ sub seance {
     
     $success = $c->json->true unless (@errors);
     $c->render_json({
-        success => $success,
-        errors => \@errors,
-        fascicle => $fascicle || {},
-        pages => [ $pages ],
-        documents => $documents || [],
-        summary => $summary || []
+        success     => $success,
+        errors      => \@errors,
+        fascicle    => $fascicle || {},
+        pages       => [ $pages ],
+        documents   => $documents || [],
+        requests    => $requests || [],
+        summary     => $summary || []
     });
 }
 
@@ -630,6 +633,32 @@ sub getDocumens {
         }
     }
     
+    
+    return $result;
+}
+
+sub getRequests {
+
+    my $c = shift;
+    my $fascicle = shift;
+    
+    return unless $fascicle;
+    
+    my @params;
+    
+    # Query headers
+    my $sql_query = "
+        SELECT
+            id, serialnum, edition, advertiser, manager, fascicle, place,
+            module, title, shortcut, description, status, payment, readiness,
+            created, updated
+        FROM fascicles_requests
+        WHERE fascicle=?
+    ";
+    
+    push @params, $fascicle;
+    
+    my $result = $c->sql->Q($sql_query, \@params)->Hashes;
     
     return $result;
 }

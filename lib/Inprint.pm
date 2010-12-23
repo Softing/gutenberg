@@ -131,15 +131,17 @@ sub startup {
     $self->createRoutes($sessionBridge, "catalog/headlines",                [ "tree", "read", "create", "update", "delete" ]);
     $self->createRoutes($sessionBridge, "catalog/rubrics",                  [ "list", "read", "create", "update", "delete" ]);
     
+    # Fascicles routes
     $self->createRoutes($sessionBridge, "fascicle",                         [ "seance", "check", "open", "close", "save", "capture" ]);
     $self->createRoutes($sessionBridge, "fascicle/combos",                  [ "templates", "workgroups", "headlines", "rubrics" ]);
     $self->createRoutes($sessionBridge, "fascicle/composer",                [ "initialize", "save" ]);
-    $self->createRoutes($sessionBridge, "fascicle/indexes",                 [ "editions", "headlines", "rubrics", "create", "update", "delete" ]);
-    $self->createRoutes($sessionBridge, "fascicle/pages",                   [ "view", "templates", "modules", "create", "read", "update", "delete", "move", "left", "right", "resize", "clean" ]);
     $self->createRoutes($sessionBridge, "fascicle/documents",               [ "list" ]);
+    $self->createRoutes($sessionBridge, "fascicle/indexes",                 [ "editions", "headlines", "rubrics", "create", "update", "delete" ]);
     $self->createRoutes($sessionBridge, "fascicle/headlines",               [ "tree", "read", "create", "update", "delete" ]);
-    $self->createRoutes($sessionBridge, "fascicle/rubrics",                 [ "list", "read", "create", "update", "delete" ]);
     $self->createRoutes($sessionBridge, "fascicle/modules",                 [ "list", "create", "read", "update", "delete" ]);
+    $self->createRoutes($sessionBridge, "fascicle/pages",                   [ "view", "templates", "modules", "create", "read", "update", "delete", "move", "left", "right", "resize", "clean" ]);
+    $self->createRoutes($sessionBridge, "fascicle/requests",                [ "process", "list", "create", "read", "update", "delete" ]);
+    $self->createRoutes($sessionBridge, "fascicle/rubrics",                 [ "list", "read", "create", "update", "delete" ]);
     
     $self->createRoutes($sessionBridge, "fascicle/templates/modules",       [ "list", "create", "read", "update", "delete" ]);
     $self->createRoutes($sessionBridge, "fascicle/templates/pages",         [ "list", "create", "read", "update", "delete" ]);

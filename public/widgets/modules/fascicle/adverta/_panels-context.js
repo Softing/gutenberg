@@ -1,6 +1,7 @@
 Inprint.fascicle.adverta.Context = function(parent, panels) {
 
-    var view  = panels["pages"].getView();
+    var view     = panels["pages"].getView();
+    var requests = panels["requests"];
     
     view.on("contextmenu", function( view, index, node, e) {
         
@@ -12,7 +13,11 @@ Inprint.fascicle.adverta.Context = function(parent, panels) {
         var selLength = selection.length;
         
         var items = [];
-        var disabled = false;
+        var disabled = true;
+        
+        if (parent.access["manage"]) {
+            disabled = false;
+        }
         
         items.push(
             {
@@ -23,7 +28,7 @@ Inprint.fascicle.adverta.Context = function(parent, panels) {
                 icon: _ico("plus-button"),
                 cls: 'x-btn-text-icon',
                 scope: panels["pages"],
-                handler: panels["pages"].cmpPageCreate
+                handler: panels["requests"].cmpCreate
             },
             "-",
             {

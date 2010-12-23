@@ -1,20 +1,22 @@
-Inprint.cmp.Composer = Ext.extend(Ext.Window, {
+Inprint.cmp.Adverta = Ext.extend(Ext.Window, {
 
     initComponent: function() {
         
         this.panels = {};
         
-        this.selLength = this.selection.length;
-        
-        this.panels["modules"] = new Inprint.cmp.composer.Modules({
+        this.panels["modules"] = new Inprint.cmp.adverta.Modules({
             parent: this
         });
         
-        this.panels["templates"] = new Inprint.cmp.composer.Templates({
+        this.panels["templates"] = new Inprint.cmp.adverta.Templates({
             parent: this
         });
         
-        this.panels["flash"]   = new Inprint.cmp.composer.Flash({
+        this.panels["flash"]   = new Inprint.cmp.adverta.Flash({
+            parent: this
+        });
+        
+        this.panels["request"]   = new Inprint.cmp.adverta.Request({
             parent: this
         });
         
@@ -25,9 +27,9 @@ Inprint.cmp.Composer = Ext.extend(Ext.Window, {
             modal:true,
             layout: "border",
             closeAction: "hide",
-            title: _("Разметка полос"),
+            title: _("Добавление рекламной заявки"),
             
-            width: (this.selLength*300) + 400,
+            width: (this.selection.length*300) + 600,
             height:450,
             
             defaults: {
@@ -49,11 +51,12 @@ Inprint.cmp.Composer = Ext.extend(Ext.Window, {
                         this.panels["templates"]
                     ]
                 },
+                this.panels["request"],
                 this.panels["flash"]
             ],
             buttons: [
                 {
-                    text: _("Save"),
+                    text: _("Add"),
                     scope:this,
                     handler: this.cmpSave
                 },
@@ -68,17 +71,22 @@ Inprint.cmp.Composer = Ext.extend(Ext.Window, {
             
         });
         
-        Inprint.cmp.Composer.superclass.initComponent.apply(this, arguments);
+        Inprint.cmp.Adverta.superclass.initComponent.apply(this, arguments);
         
     },
     
     onRender: function() {
-        Inprint.cmp.Composer.superclass.onRender.apply(this, arguments);
-        Inprint.cmp.composer.Interaction(this, this.panels);
+        
+        Inprint.cmp.Adverta.superclass.onRender.apply(this, arguments);
+        Inprint.cmp.adverta.Interaction(this, this.panels);
+        
+        this.panels["request"].getForm().findField("id").setValue( this.request );
+        this.panels["request"].getForm().findField("fascicle").setValue( this.fascicle );
+        
     },
     
     cmpSave: function() {
-        this.panels["flash"].cmpSave();
+        this.panels["request"].getForm().submit();
     }
 
 });

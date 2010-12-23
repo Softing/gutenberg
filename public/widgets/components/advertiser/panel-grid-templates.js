@@ -1,4 +1,4 @@
-Inprint.cmp.composer.Templates = Ext.extend(Ext.grid.GridPanel, {
+Inprint.cmp.adverta.Templates = Ext.extend(Ext.grid.GridPanel, {
 
     initComponent: function() {
         
@@ -62,14 +62,13 @@ Inprint.cmp.composer.Templates = Ext.extend(Ext.grid.GridPanel, {
             stripeRows: true,
             columnLines: true,
             sm: this.selectionModel
-            //autoExpandColumn: "description"
         });
 
-        Inprint.cmp.composer.Templates.superclass.initComponent.apply(this, arguments);
+        Inprint.cmp.adverta.Templates.superclass.initComponent.apply(this, arguments);
 
     },
 
     onRender: function() {
-        Inprint.cmp.composer.Templates.superclass.onRender.apply(this, arguments);
+        Inprint.cmp.adverta.Templates.superclass.onRender.apply(this, arguments);
     }
 });
