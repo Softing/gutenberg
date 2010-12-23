@@ -162,6 +162,22 @@ sub create {
     push @errors, { id => "description", msg => "Incorrectly filled field"}
         unless ($c->is_text($i_description));
     
+    unless ($i_module) {
+        unless ($i_template) {
+            push @errors, { id => "module-or-template", msg => "Incorrectly filled field"}
+        }
+    }
+    
+    if (length $i_module > 0) {
+        push @errors, { id => "module", msg => "Incorrectly filled field"}
+            unless ($c->is_uuid($i_module));
+    }
+    
+    if (length $i_template > 0) {
+        push @errors, { id => "template", msg => "Incorrectly filled field"}
+            unless ($c->is_uuid($i_template));
+    }
+    
     my $fascicle; unless(@errors) {
         $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
         push @errors, { id => "fascicle", msg => "Can't find object"}
@@ -181,9 +197,79 @@ sub create {
         
         my $module; 
         unless(@errors) {
-            $module = $c->sql->Q(" SELECT * FROM ad_advertisers WHERE id=? ", [ $i_module ])->Hash;
+            $module = $c->sql->Q(" SELECT * FROM fascicles_modules WHERE id=? ", [ $i_module ])->Hash;
             push @errors, { id => "module", msg => "Can't find object"}
                 unless ($module->{id});
+        }
+        
+        my $place;
+        unless(@errors) {
+            $place = $c->sql->Q("
+                    SELECT t1.* FROM fascicles_tmpl_places t1
+                    WHERE t1.id=?
+                ", [ $module->{place} ])->Hash;
+            push @errors, { id => "place", msg => "Can't find object"}
+                unless ($place->{id});
+        }
+        
+        my $template;
+        unless(@errors) {
+            $template = $c->sql->Q("
+                    SELECT t1.* FROM fascicles_tmpl_modules t1
+                    WHERE t1.id=?
+                ", [ $module->{origin} ])->Hash;
+            push @errors, { id => "template", msg => "Can't find object"}
+                unless ($template->{id});
+        }
+        
+        my $pages;
+        unless(@errors) {
+            $pages = $c->sql->Q("
+                    SELECT t2.seqnum
+                    FROM fascicles_map_modules t1, fascicles_pages t2 
+                    WHERE t2.id = t1.page AND t1.fascicle=? AND t1.module=?
+                    ORDER BY t2.seqnum
+                ", [ $module->{fascicle}, $module->{id} ])->Values;
+        }
+        
+        unless (@errors) {
+            $c->sql->Do("
+                INSERT INTO fascicles_requests(
+                    id,
+                    edition, fascicle,
+                    advertiser, advertiser_shortcut, 
+                    place, place_shortcut,
+                    manager, manager_shortcut,
+                    origin, origin_shortcut, origin_area, origin_x, origin_y, origin_w, origin_h, 
+                    module, amount,
+                    pages, firstpage,
+                    shortcut, description,
+                    status, payment, readiness,
+                    created, updated)
+                VALUES (
+                    ?,
+                    ?, ?,
+                    ?, ?,
+                    ?, ?,
+                    ?, ?,
+                    ?, ?, ?, ?, ?, ?, ?,
+                    ?, ?,
+                    ?, ?,
+                    ?, ?,
+                    ?, ?, ?,
+                    now(), now());
+            ", [
+                $id,
+                $fascicle->{edition}, $fascicle->{id},
+                $advertiser->{id}, $advertiser->{shortcut},
+                $place->{id}, $place->{shortcut},
+                $c->QuerySessionGet("member.id"), $c->QuerySessionGet("member.shortcut"),
+                $template->{id}, $template->{shortcut}, $template->{area},  $template->{x},  $template->{y},  $template->{w},  $template->{h},
+                $module->{id}, $module->{amount},
+                join (', ', @$pages), @$pages[0],
+                $i_shortcut, $i_description,
+                $i_status, $i_payment, $i_readiness
+            ]);
         }
         
     }

@@ -64,5 +64,8 @@ Inprint.cmp.adverta.GridTemplates = Ext.extend(Ext.grid.GridPanel, {
 
     onRender: function() {
         Inprint.cmp.adverta.GridTemplates.superclass.onRender.apply(this, arguments);
+        
+        this.getStore().load();
+        
     }
 });

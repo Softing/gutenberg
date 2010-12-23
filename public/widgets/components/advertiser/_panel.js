@@ -81,12 +81,6 @@ Inprint.cmp.Adverta = Ext.extend(Ext.Window, {
         this.panels["request"].getForm().findField("id").setValue( this.request );
         this.panels["request"].getForm().findField("fascicle").setValue( this.fascicle );
         
-        this.panels["request"].getForm().on("actioncomplete", function(form, action){
-            if (action.type == "submit") {
-                this.hide();
-                this.fireEvent("actioncomplete");
-            }
-        }, this);
     },
     
     cmpSave: function() {
@@ -94,6 +88,20 @@ Inprint.cmp.Adverta = Ext.extend(Ext.Window, {
         if ( this.selection.length == 0 ) {
             this.panels["request"].getForm().baseParams = {
                 template: this.panels["templates"].getValue("id")
+            }
+        }
+        
+        if ( this.selection.length > 0 ) {
+            
+            Ext.each(this.panels["flash"].pages, function(c) {
+                var flash = this.cmpGetFlashById(c);
+                if (flash) {
+                    flash.getBlocks("Inprint.flash.Proxy.savePage", this.id );
+                }
+            }, this.panels["flash"]);
+            
+            this.panels["request"].getForm().baseParams = {
+                module: this.panels["modules"].panels["modules"].getValue("id")
             }
         }
         

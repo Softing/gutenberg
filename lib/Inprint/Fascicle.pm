@@ -649,14 +649,16 @@ sub getRequests {
     # Query headers
     my $sql_query = "
         SELECT
-            id, serialnum, edition, fascicle, advertiser, advertiser_shortcut, 
-            place, place_shortcut, manager, manager_shortcut, 
-            origin, origin_shortcut, origin_area,
-            origin_x, origin_y, origin_w, origin_h, 
-            module, amount, shortcut, description, status, payment, readiness,
-            created, updated
-        FROM fascicles_requests
-        WHERE fascicle=?
+            t1.id, t1.serialnum, t1.edition, t1.fascicle, t1.advertiser, t1.advertiser_shortcut, 
+            t1.place, t1.place_shortcut, t1.manager, t1.manager_shortcut, 
+            t1.origin, t1.origin_shortcut, t1.origin_area,
+            t1.origin_x, t1.origin_y, t1.origin_w, t1.origin_h, 
+            t2.id as module, t2.shortcut as module_shortcut, pages, firstpage, 
+            t1.amount, t1.shortcut, t1.description, t1.status, t1.payment, t1.readiness,
+            to_char(t1.created, 'YYYY-MM-DD HH24:MI:SS') as created,
+            to_char(t1.updated, 'YYYY-MM-DD HH24:MI:SS') as updated
+        FROM fascicles_requests t1 LEFT JOIN fascicles_modules t2 ON t1.module = t2.id
+        WHERE t1.fascicle=?
     ";
     
     push @params, $fascicle;
@@ -710,10 +712,9 @@ sub getSummary {
                     WHERE t2.module=t1.id AND t1.fascicle=? AND t1.place=? AND t1.origin=?
                 ", [ $fascicle, $place->{id}, $tmpl_module->{id} ])->Value || 0;
             
-            my $rq = 0;
-            #$c->sql->Q("
-            #    SELECT count(*) FROM fascicles_map_holes WHERE fascicle=? AND place=? AND module=? -- AND entity is not null
-            #", [ $fascicle, $place->{id}, $module->{id} ])->Value;
+            my $rq = $c->sql->Q("
+                SELECT count(*) FROM fascicles_requests WHERE fascicle=? AND place=? AND origin=?
+            ", [ $fascicle, $place->{id}, $tmpl_module->{id} ])->Value;
             
             my $fr = $hl - $rq;
             

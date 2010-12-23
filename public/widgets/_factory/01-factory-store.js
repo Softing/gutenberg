@@ -73,11 +73,20 @@ Inprint.factory.Store = new function() {
         "/fascicle/summary/":
             [ "id", "shortcut", "pages", "place", "module", "place_shortcut", "holes", "requests", "free" ],
         
-        "/fascicle/documents/list/":
-            [   'id', 'access',    'edition',  'edition_shortcut',    'fascicle',    'fascicle_shortcut',    'headline', 'headline_shortcut',
+        "/fascicle/documents/list/": [
+                'id', 'access',    'edition',  'edition_shortcut',    'fascicle',    'fascicle_shortcut',    'headline', 'headline_shortcut',
                 'rubric', 'rubric_shortcut',    'copygroup',    'holder','creator','manager','holder_shortcut','creator_shortcut','manager_shortcut',
                 'workgroup','workgroup_shortcut','ingroups',    'islooked','isopen',    'branch','branch_shortcut','stage','stage_shortcut','color','progress',
                 'title','author','pages',    'pdate','psize','rdate','rsize',    'images','files',    'created','updated'
+            ],
+        
+        "/fascicle/requests/list/": [
+                "id", "serialnum", "edition", "fascicle", "advertiser", "advertiser_shortcut", 
+                "place", "place_shortcut", "manager", "manager_shortcut", 
+                "origin", "origin_shortcut", "origin_area",
+                "origin_x", "origin_y", "origin_w", "origin_h", 
+                "module", "module_shortcut", "pages", "firstpage", "amount", "shortcut", "description", "status", "payment", "readiness",
+                createDateField("created"), createDateField("updated")
             ],
         
         "/fascicle/templates/pages/list/":

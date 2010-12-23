@@ -76,6 +76,11 @@ sub fascicle_page {
     
     foreach my $module (@$modules) {
         
+        $module->{requets} = $c->sql->Q("
+            SELECT id, shortcut
+            FROM fascicles_requests WHERE module=?
+        ", [ $module->{id} ])->Hashes;
+        
         $module->{bg_color} = $gray;
         $module->{brd_color} = $black;
         $module->{txt_color} = $black;
@@ -174,10 +179,17 @@ sub draw_module {
         $fontsize = 8;
     }
     
+    my $text = $module->{shortcut};
+    
+    if ($module->{requets}) {
+        my $request = ${ $module->{requets} }[0];
+        $text .= "\n" . $request->{shortcut};
+    }
+    
     my $wrapbox = GD::Text::Wrap->new( $img,
         line_space  => 0,
         color       => $module->{txt_color},
-        text        => $module->{shortcut}
+        text        => $text
     );
     
     $wrapbox->set_font(gdMediumBoldFont);
