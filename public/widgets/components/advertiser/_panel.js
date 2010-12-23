@@ -5,15 +5,15 @@ Inprint.cmp.Adverta = Ext.extend(Ext.Window, {
         this.panels = {};
         
         this.panels["request"]   = new Inprint.cmp.adverta.Request({
-            parent: this
+            parent: this, fascicle: this.fascicle
         });
         
         this.panels["modules"] = new Inprint.cmp.adverta.Modules({
-            parent: this
+            parent: this, fascicle: this.fascicle
         });
         
         this.panels["templates"] = new Inprint.cmp.adverta.Templates({
-            parent: this
+            parent: this, fascicle: this.fascicle
         });
         
         this.panels["flash"]   = new Inprint.cmp.adverta.Flash({
@@ -81,9 +81,22 @@ Inprint.cmp.Adverta = Ext.extend(Ext.Window, {
         this.panels["request"].getForm().findField("id").setValue( this.request );
         this.panels["request"].getForm().findField("fascicle").setValue( this.fascicle );
         
+        this.panels["request"].getForm().on("actioncomplete", function(form, action){
+            if (action.type == "submit") {
+                this.hide();
+                this.fireEvent("actioncomplete");
+            }
+        }, this);
     },
     
     cmpSave: function() {
+        
+        if ( this.selection.length == 0 ) {
+            this.panels["request"].getForm().baseParams = {
+                template: this.panels["templates"].getValue("id")
+            }
+        }
+        
         this.panels["request"].getForm().submit();
     }
 

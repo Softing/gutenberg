@@ -649,8 +649,11 @@ sub getRequests {
     # Query headers
     my $sql_query = "
         SELECT
-            id, serialnum, edition, advertiser, manager, fascicle, place,
-            module, title, shortcut, description, status, payment, readiness,
+            id, serialnum, edition, fascicle, advertiser, advertiser_shortcut, 
+            place, place_shortcut, manager, manager_shortcut, 
+            origin, origin_shortcut, origin_area,
+            origin_x, origin_y, origin_w, origin_h, 
+            module, amount, shortcut, description, status, payment, readiness,
             created, updated
         FROM fascicles_requests
         WHERE fascicle=?

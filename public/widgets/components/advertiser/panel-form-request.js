@@ -20,7 +20,6 @@ Inprint.cmp.adverta.Request = Ext.extend(Ext.FormPanel, {
                 typeAhead: true,
                 minChars: 2,
                 allowBlank:false,
-                //tooltip: 'Рекламодатель',
                 listeners: {
                     scope: this,
                     beforequery: function(qe) {
@@ -33,10 +32,9 @@ Inprint.cmp.adverta.Request = Ext.extend(Ext.FormPanel, {
                 xtype: "textfield",
                 allowBlank:false,
                 hideLabel:true,
-                name: "title",
-                fieldLabel: _("Title"),
-                emptyText: _("Title"),
-                tooltip: 'Название заявки'
+                name: "shortcut",
+                fieldLabel: _("Shortcut"),
+                emptyText: _("Shortcut")
             },
             {
                 xtype: "textarea",
@@ -44,11 +42,8 @@ Inprint.cmp.adverta.Request = Ext.extend(Ext.FormPanel, {
                 name: "description",
                 hideLabel:true,
                 fieldLabel: _("Description"),
-                emptyText: _("Description"),
-                tooltip: 'Описание заявки'
+                emptyText: _("Description")
             },
-            
-
             
             {
                 xtype: "titlefield",
@@ -61,9 +56,9 @@ Inprint.cmp.adverta.Request = Ext.extend(Ext.FormPanel, {
                 style: "margin-bottom:10px",
                 columns: 1,
                 items: [
-                    { name: 'request', inputValue: 1, boxLabel: _("Possible") },
-                    { name: 'request', inputValue: 2, boxLabel: _("Active") },
-                    { name: 'request', inputValue: 3, boxLabel: _("Reservation"), checked: true }
+                    { name: "status", inputValue: "possible",    boxLabel: _("Possible") },
+                    { name: "status", inputValue: "active",      boxLabel: _("Active") },
+                    { name: "status", inputValue: "reservation", boxLabel: _("Reservation"), checked: true }
                 ]
             },
             
@@ -73,8 +68,8 @@ Inprint.cmp.adverta.Request = Ext.extend(Ext.FormPanel, {
                 style: "margin-bottom:10px",
                 columns: 1,
                 items: [
-                    { name: 'payment', inputValue: 1, boxLabel: _("Yes") },
-                    { name: 'payment', inputValue: 2, boxLabel: _("No"), checked: true }
+                    { name: "payment", inputValue: "yes", boxLabel: _("Yes") },
+                    { name: "payment", inputValue: "no",  boxLabel: _("No"), checked: true }
                 ]
             },
             
@@ -83,8 +78,8 @@ Inprint.cmp.adverta.Request = Ext.extend(Ext.FormPanel, {
                 fieldLabel: _("Approved"),
                 columns: 1,
                 items: [
-                    { name: 'readiness', inputValue: 1, boxLabel: _("Yes") },
-                    { name: 'readiness', inputValue: 2, boxLabel: _("No"), checked: true }
+                    { name: "readiness", inputValue: "yes", boxLabel: _("Yes") },
+                    { name: "readiness", inputValue: "no",  boxLabel: _("No"), checked: true }
                 ]
             }
             

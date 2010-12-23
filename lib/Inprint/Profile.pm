@@ -54,8 +54,6 @@ sub read {
             WHERE t1.id = ?
         ", [ $i_id ])->Hash || {};
 
-        print STDERR $i_id;
-
         $success = $c->json->true;
     }
 

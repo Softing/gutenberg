@@ -16,8 +16,8 @@ Inprint.cmp.adverta.GridModules = Ext.extend(Ext.grid.GridPanel, {
         }
 
         this.store = Inprint.factory.Store.json(this.urls["list"], {
-            autoLoad:true,
             baseParams: {
+                fascicle: this.fascicle,
                 page: this.parent.selection
             }
         });

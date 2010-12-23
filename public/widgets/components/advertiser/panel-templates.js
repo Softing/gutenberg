@@ -3,7 +3,7 @@ Inprint.cmp.adverta.Templates = Ext.extend(Ext.grid.GridPanel, {
     initComponent: function() {
         
         this.urls = {
-            "list": "/fascicle/pages/templates/"
+            "list": "/fascicle/templates/modules/"
         }
         
         var selection = this.parent.selection;
@@ -15,9 +15,15 @@ Inprint.cmp.adverta.Templates = Ext.extend(Ext.grid.GridPanel, {
             pages.push(array[0]);
         }
         
-        this.store = Inprint.factory.Store.json(this.urls["list"]);
+        this.store = Inprint.factory.Store.json(this.urls["list"], {
+            baseParams: {
+                fascicle: this.fascicle
+            }
+        });
         
-        this.selectionModel = new Ext.grid.CheckboxSelectionModel();
+        this.selectionModel = new Ext.grid.CheckboxSelectionModel({
+            singleSelect:true
+        });
         
         this.columns = [
             this.selectionModel,
@@ -55,6 +61,11 @@ Inprint.cmp.adverta.Templates = Ext.extend(Ext.grid.GridPanel, {
     },
 
     onRender: function() {
+        
         Inprint.cmp.adverta.Templates.superclass.onRender.apply(this, arguments);
+        
+        this.getStore().load();
+        
+        
     }
 });
