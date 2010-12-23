@@ -109,6 +109,7 @@ sub seance {
     }
     
     $success = $c->json->true unless (@errors);
+    
     $c->render_json({
         success     => $success,
         errors      => \@errors,
@@ -118,6 +119,7 @@ sub seance {
         requests    => $requests || [],
         summary     => $summary || []
     });
+    
 }
 
 sub check {
@@ -398,7 +400,6 @@ sub getPages {
         $pages->{$index->{$item->{id}}} = {
             id => $item->{id},
             num => $item->{seqnum},
-            dim   => "$item->{w}x$item->{h}",
             headline => $headline || $item->{headline_shortcut}
         };
         
@@ -427,6 +428,7 @@ sub getPages {
             FROM fascicles_map_documents t1, fascicles_pages t2
             WHERE t2.id = t1.page AND t1.fascicle = ? AND entity = ?
         ", [ $fascicle, $item->{id} ])->Values;
+        
         foreach my $pageid (@$docpages) {
             my $pageindex = $index->{$pageid};
             if ($pageindex) {
@@ -448,11 +450,7 @@ sub getPages {
         
         $holes->{$index->{$item->{id}}} = {
             id => $item->{id},
-            title => $item->{shortcut},
-            #x => $item->{x},
-            #y => $item->{y},
-            #h => $item->{h},
-            #w => $item->{w},
+            title => $item->{shortcut}
         };
         
         my $pageindex = $index->{$item->{page}};
@@ -461,9 +459,35 @@ sub getPages {
         }
     }
     
+    my $requests;
+    
+    my $dbrequests = $c->sql->Q("
+        SELECT t1.id, t1.shortcut, t2.page
+        FROM fascicles_requests t1, fascicles_map_modules t2
+        WHERE t1.fascicle = ? AND t1.module=t2.module AND t2.placed=false
+    ", [ $fascicle ])->Hashes;
+    
+    foreach my $item (@$dbrequests) {
+        
+        $index->{$item->{id}} = $idcounter++;
+        
+        $requests->{$index->{$item->{id}}} = {
+            id => $item->{id},
+            title => $item->{shortcut}
+        };
+        
+        my $pageindex = $index->{$item->{page}};
+        
+        if ($pageindex) {
+            push @{ $pages->{$pageindex}->{requests} }, $index->{$item->{id}};
+        }
+        
+    }
+    
     $data->{pages}      = $pages;
     $data->{documents}  = $documents;
     $data->{holes}      = $holes;
+    $data->{requests}   = $requests;
     $data->{pageorder}  = \@pageorder;
     
     return $data ;

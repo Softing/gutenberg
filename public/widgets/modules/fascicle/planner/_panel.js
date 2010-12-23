@@ -18,6 +18,10 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                 parent: this,
                 oid: this.oid
             }),
+            requests: new Inprint.fascicle.planner.Requests({
+                parent: this,
+                oid: this.oid
+            }),
             summary: new Inprint.fascicle.planner.Summary({
                 parent: this,
                 oid: this.oid
@@ -86,16 +90,6 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                 scope:this.panels["pages"],
                 handler: this.panels["pages"].cmpPageClean
             },
-            //{
-            //    ref: "../btnPageResize",
-            //    disabled:true,
-            //    text: 'Разверстать',
-            //    tooltip: 'Добавить новые полосы скопировав содержимое',
-            //    icon: _ico("arrow-resize-045"),
-            //    cls: 'x-btn-text-icon',
-            //    scope:this.panels["pages"],
-            //    handler: this.panels["pages"].cmpPageResize
-            //},
             "-",
             {
                 ref: "../btnPageDelete",
@@ -198,9 +192,13 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                             height: 200,
                             minSize: 100,
                             maxSize: 800,
-                            layout:"fit",
+                            layout:"card",
+                            activeItem: 0,
                             collapseMode: 'mini',
-                            items: this.panels["documents"],
+                            items: [
+                                this.panels["documents"],
+                                this.panels["requests"]
+                            ],
                             stateId: 'fasicles.planner.documents'
                         }
                     ]
@@ -234,7 +232,9 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
     },
     
     cmpInitSession: function () {
+        
         this.body.mask("Обновление данных...");
+        
         Ext.Ajax.request({
             url: _url("/fascicle/seance/"),
             scope: this,
@@ -266,6 +266,7 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                 
                 this.panels["pages"].getStore().loadData({ data: rsp.pages });
                 this.panels["documents"].getStore().loadData({ data: rsp.documents });
+                this.panels["requests"].getStore().loadData({ data: rsp.requests });
                 this.panels["summary"].getStore().loadData({ data: rsp.summary });
                 
                 Inprint.fascicle.planner.Access(this, this.panels, rsp.fascicle.access);

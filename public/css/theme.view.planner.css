@@ -76,20 +76,41 @@
     text-decoration:none;
 }
 .inprint-plan-page-document {
-    padding:2px;
-    background:white;
-    opacity: 0.8;
+    margin:2px;
+    float:left;
+    padding:3px;
+    opacity: 0.7;
+    background:#1B9BE0;
+    border-radius: 2px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
     line-height:9px;
 }
 
 .inprint-plan-page-holes {
-    --margin-bottom:10px;
+    
 }
 .inprint-plan-page-hole {
-    background:orange;
-    padding:3px;
     margin:2px;
-    -moz-border-radius: 2px;
+    float:left;
+    padding:3px;
+    opacity: 0.7;
+    background:orange;
     border-radius: 2px;
-    display:inline;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+}
+
+.inprint-plan-page-requests {
+    
+}
+.inprint-plan-page-request {
+    margin:2px;
+    float:left;
+    padding:3px;
+    opacity: 0.7;
+    background:#E0D01B;
+    border-radius: 2px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
 }

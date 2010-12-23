@@ -124,6 +124,22 @@ Inprint.fascicle.planner.Documents = Ext.extend(Ext.grid.EditorGridPanel, {
                 cls: 'x-btn-text-icon',
                 scope:this,
                 handler : this.cmpShowBriefcase
+            },
+            "-",
+            {
+                ref: "../btnSwitchToDocuments",
+                text: 'Документы',
+                icon: _ico("document-word"),
+                cls: 'x-btn-text-icon',
+                pressed: true,
+                scope:this
+            },
+            {
+                ref: "../btnSwitchToRequests",
+                text: 'Заявки',
+                icon: _ico("document-excel"),
+                cls: 'x-btn-text-icon',
+                scope:this
             }
         ]
         

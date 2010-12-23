@@ -148,17 +148,17 @@ sub index
             description => $fascicle->{shortcut}
         } if $accessLayoutManage;
         
-        push @{ $fascicle_menu->{menu} }, {
-            id   => "fascicle-adverta",
-            oid  => $fascicle->{id},
-            description => $fascicle->{shortcut}
-        } if $accessLayoutManage;
+        #push @{ $fascicle_menu->{menu} }, {
+        #    id   => "fascicle-adverta",
+        #    oid  => $fascicle->{id},
+        #    description => $fascicle->{shortcut}
+        #} if $accessLayoutManage;
         
-        push @{ $fascicle_menu->{menu} }, {
-            id  => "fascicle-advert",
-            oid => $fascicle->{id},
-            description => $fascicle->{shortcut}
-        } if $accessAdvertManage;
+        #push @{ $fascicle_menu->{menu} }, {
+        #    id  => "fascicle-advert",
+        #    oid => $fascicle->{id},
+        #    description => $fascicle->{shortcut}
+        #} if $accessAdvertManage;
         
         push @{ $fascicle_menu->{menu} }, "-";
         

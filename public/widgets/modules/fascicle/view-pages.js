@@ -8,7 +8,10 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
             '{[ this.renderPages(values) ]}',
             {
                 renderPages: function(values){
+                    
                     var items = values[0];
+                    
+                    
                     
                     var string = '<div class="inprint-plan">';
                     string += '<div class="inprint-plan-block">';
@@ -61,11 +64,23 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
                                 ' style="background:url(/aimgs/fascicle/page/'+ page.id +'/105/129/?rnd='+ Math.random() +') no-repeat;">';
                             
                             if (page.holes) {
+                                string += '<div style="clear:both"></div>';
                                 string += '<div class="inprint-plan-page-holes">';
                                 for (var d=0; d<page.holes.length; d++) {
                                     var hole = items.holes[ page.holes[d] ];
                                     string += '<div class="inprint-plan-page-hole">'+ hole.title +'</div>';
                                 }
+                                string += '</div>';
+                            }
+                            
+                            if (page.requests) {
+                                string += '<div style="clear:both"></div>';
+                                string += '<div class="inprint-plan-page-requests">';
+                                for (var r=0; r<page.requests.length; r++) {
+                                    var request = items.requests[ page.requests[r] ];
+                                    string += '<div class="inprint-plan-page-request">'+ request.title +'</div>';
+                                }
+                                
                                 string += '</div>';
                             }
                             
@@ -142,7 +157,7 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
                 fascicle: this.fascicle
             },
             fields: [
-                "index", "pageorder", "pages", "documents", "holes"
+                "index", "pageorder", "pages", "documents", "requests", "holes"
             ]
         });
         
