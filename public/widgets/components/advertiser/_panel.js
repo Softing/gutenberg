@@ -4,6 +4,10 @@ Inprint.cmp.Adverta = Ext.extend(Ext.Window, {
         
         this.panels = {};
         
+        this.panels["request"]   = new Inprint.cmp.adverta.Request({
+            parent: this
+        });
+        
         this.panels["modules"] = new Inprint.cmp.adverta.Modules({
             parent: this
         });
@@ -16,44 +20,38 @@ Inprint.cmp.Adverta = Ext.extend(Ext.Window, {
             parent: this
         });
         
-        this.panels["request"]   = new Inprint.cmp.adverta.Request({
-            parent: this
-        });
+        this.items = [];
+        
+        this.items.push(this.panels["request"]);
+        
+        if ( this.selection.length == 0 ) {
+            this.items.push(this.panels["templates"]);
+        }
+        
+        if ( this.selection.length > 0 ) {
+            this.items.push(this.panels["modules"]);
+            this.items.push(this.panels["flash"]);
+        }
+        
+        var winWidth = (this.selection.length*300) + 500;
         
         Ext.apply(this, {
             
             border:false,
             
             modal:true,
-            layout: "border",
             closeAction: "hide",
             title: _("Добавление рекламной заявки"),
             
-            width: (this.selection.length*300) + 600,
+            width: winWidth,
             height:450,
             
-            defaults: {
-                collapsible: false,
-                split: true
+            layout:'hbox',
+            layoutConfig: {
+                align : 'stretch',
+                pack  : 'start'
             },
             
-            items: [
-                {
-                    border:false,
-                    region: "center",
-                    layout: "border",
-                    defaults: {
-                        collapsible: false,
-                        split: true
-                    },
-                    items: [
-                        this.panels["modules"],
-                        this.panels["templates"]
-                    ]
-                },
-                this.panels["request"],
-                this.panels["flash"]
-            ],
             buttons: [
                 {
                     text: _("Add"),

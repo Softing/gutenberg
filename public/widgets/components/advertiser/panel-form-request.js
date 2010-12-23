@@ -91,25 +91,15 @@ Inprint.cmp.adverta.Request = Ext.extend(Ext.FormPanel, {
         ];
         
         Ext.apply(this, {
-            
-            region:"west",
-            margins: "3 3 3 0",
-            width: 200,
-            
-            minSize: 100,
-            maxSize: 200,
-            
-            labelWidth: 100,
-            
+            flex:1,
+            width: 180, 
+            labelWidth: 90,
             defaults: {
                 anchor: "100%",
                 allowBlank:false
             },
-            
             bodyStyle: "padding:5px 5px",
-            
             url: _url("/fascicle/requests/process/")
-            
         });
         
         Inprint.cmp.adverta.Request.superclass.initComponent.apply(this, arguments);

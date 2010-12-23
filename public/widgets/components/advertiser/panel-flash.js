@@ -13,7 +13,6 @@ Inprint.cmp.adverta.Flash = Ext.extend(Ext.Panel, {
         }
 
         var selection = this.parent.selection;
-        var selLength = this.parent.selLength;
         
         selection.sort(function(a, b){
             var array1 = a.split("::");
@@ -72,12 +71,11 @@ Inprint.cmp.adverta.Flash = Ext.extend(Ext.Panel, {
             flashItems.push( flashRight );
         }
         
+        
+        
         Ext.apply(this, {
-            region:"east",
-            margins: "3 3 3 0",
-            width: this.parent.selLength*300,
-            minSize: 200,
-            maxSize: 600,
+            width: selLength*300,
+            flex:3,
             layout:"hbox",
             layoutConfig: {
                 align : 'stretch',

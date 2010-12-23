@@ -1,4 +1,4 @@
-Inprint.cmp.adverta.Modules = Ext.extend(Ext.grid.GridPanel, {
+Inprint.cmp.adverta.GridModules = Ext.extend(Ext.grid.GridPanel, {
 
     initComponent: function() {
         
@@ -22,29 +22,25 @@ Inprint.cmp.adverta.Modules = Ext.extend(Ext.grid.GridPanel, {
             }
         });
         
-        this.selectionModel = new Ext.grid.CheckboxSelectionModel();
+        this.selectionModel = new Ext.grid.CheckboxSelectionModel({
+            singleSelect: true
+        });
         
         this.columns = [
             this.selectionModel,
             {
                 id:"place_shortcut",
                 header: _("Place"),
-                width: 100,
+                width: 80,
                 sortable: true,
                 dataIndex: "place_shortcut"
             },
             {
                 id:"shortcut",
                 header: _("Shortcut"),
-                width: 100,
+                width: 120,
                 sortable: true,
                 dataIndex: "shortcut"
-            },
-            {
-                id:"amount",
-                header: _("Amount"),
-                sortable: true,
-                dataIndex: "amount"
             }
         ];
         
@@ -58,18 +54,22 @@ Inprint.cmp.adverta.Modules = Ext.extend(Ext.grid.GridPanel, {
             layout:"fit",
             region: "center",
             
+            viewConfig: {
+                forceFit: true
+            },
+            
             stripeRows: true,
             columnLines: true,
             sm: this.selectionModel
 
         });
 
-        Inprint.cmp.adverta.Modules.superclass.initComponent.apply(this, arguments);
+        Inprint.cmp.adverta.GridModules.superclass.initComponent.apply(this, arguments);
 
     },
 
     onRender: function() {
-        Inprint.cmp.adverta.Modules.superclass.onRender.apply(this, arguments);
+        Inprint.cmp.adverta.GridModules.superclass.onRender.apply(this, arguments);
     },
     
     

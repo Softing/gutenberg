@@ -1,4 +1,4 @@
-Inprint.cmp.adverta.Templates = Ext.extend(Ext.grid.GridPanel, {
+Inprint.cmp.adverta.GridTemplates = Ext.extend(Ext.grid.GridPanel, {
 
     initComponent: function() {
         
@@ -39,12 +39,6 @@ Inprint.cmp.adverta.Templates = Ext.extend(Ext.grid.GridPanel, {
                 width: 100,
                 sortable: true,
                 dataIndex: "shortcut"
-            },
-            {
-                id:"amount",
-                header: _("Amount"),
-                sortable: true,
-                dataIndex: "amount"
             }
         ];
         
@@ -64,11 +58,11 @@ Inprint.cmp.adverta.Templates = Ext.extend(Ext.grid.GridPanel, {
             sm: this.selectionModel
         });
 
-        Inprint.cmp.adverta.Templates.superclass.initComponent.apply(this, arguments);
+        Inprint.cmp.adverta.GridTemplates.superclass.initComponent.apply(this, arguments);
 
     },
 
     onRender: function() {
-        Inprint.cmp.adverta.Templates.superclass.onRender.apply(this, arguments);
+        Inprint.cmp.adverta.GridTemplates.superclass.onRender.apply(this, arguments);
     }
 });
