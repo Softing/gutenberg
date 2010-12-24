@@ -28,47 +28,36 @@ sub process {
 
 sub read {
     my $c = shift;
-    my $i_id = $c->param("id");
+    my $i_request = $c->param("request");
     
     my @errors;
     my $success = $c->json->false;
 
     push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_id));
+        unless ($c->is_uuid($i_request));
     
     my $result = [];
     
     unless (@errors) {
+        
         $result = $c->sql->Q("
             SELECT
-            
-                t1.id, t1.serialnum, t1.title, t1.shortcut, t1.status, t1.payment, t1.readiness, t1.created, t1.updated, 
-                edition.id as edition, edition.shortcut as edition_shortcut, 
-                fascicle.id as fascicle, fascicle.shortcut as fascicle_shortcut,
-                advertiser.id as advertiser, advertiser.shortcut as advertiser_shortcut,
-                place.id as place, place.shortcut as place_shortcut,
-                module.id as module, module.shortcut as module_shortcut,
-                manager.id as manager, manager.shortcut as manager_shortcut,
-                
-                hole.x, hole.y, hole.h, hole.w,
-                page.seqnum
-            
-            FROM ad_requests AS t1
-            
-                LEFT JOIN fascicles_tmpl_places     AS place            ON place.id = t1.place
-                LEFT JOIN fascicles_tmpl_modules    AS module           ON module.id = t1.module
-                LEFT JOIN profiles                  AS manager          ON manager.id = t1.manager
-                
-                LEFT JOIN fascicles_modules         AS rl_module        ON hole.entity = t1.id
-                LEFT JOIN fascicles_map_modules     AS rl_module_map    ON hole.entity = t1.id
-                
-                LEFT JOIN fascicles_pages           AS page             ON page.id = hole.page
-            
-            , editions AS edition, fascicles AS fascicle, ad_advertisers AS advertiser
-            
-            WHERE edition.id = t1.edition AND fascicle.id = t1.fascicle AND fascicle.is_enabled=true AND advertiser.id = t1.advertiser
-                AND t1.id = ?
-        ", [ $i_id ])->Hash;
+                id, serialnum, edition, fascicle, advertiser, advertiser_shortcut, 
+                place, place_shortcut, manager, manager_shortcut, amount, origin, 
+                origin_shortcut, origin_area, origin_x, origin_y, origin_w, origin_h, 
+                module, pages, firstpage, shortcut, description, status, payment, 
+                readiness, created, updated
+            FROM fascicles_requests
+            WHERE id=?
+        ", [ $i_request ])->Hash;
+        
+        $result->{pages} = $c->sql->Q("
+            SELECT
+                t1.id ||'::'|| t1.seqnum
+            FROM fascicles_pages t1, fascicles_map_modules t2
+            WHERE t2.page=t1.id AND t2.module=?
+        ", [ $result->{module} ])->Values;
+        
     }
     
     $success = $c->json->true unless (@errors);
@@ -408,8 +397,8 @@ sub move {
     my @errors;
     my $success = $c->json->false;
     
-    push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.roles.manage"));
+    #push @errors, { id => "access", msg => "Not enough permissions"}
+    #    unless ($c->access->Check("domain.roles.manage"));
     
     my @pages;
     
@@ -482,8 +471,8 @@ sub delete {
     my @errors;
     my $success = $c->json->false;
     
-    push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.roles.manage"));
+    #push @errors, { id => "access", msg => "Not enough permissions"}
+    #    unless ($c->access->Check("domain.roles.manage"));
     
     unless (@errors) {
         
