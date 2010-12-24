@@ -51,7 +51,10 @@ Inprint.cmp.adverta.Modules = Ext.extend(Ext.Panel, {
             new Ext.menu.Menu({ items : items }).showAt([coords[0], coords[1]]);
         }, modules);
         
-        modules.on("afterrender", function() {
+        modules.on("afterrender", function(panel) {
+            
+            var selection = panel.parent.selection;
+            var fascicle  = panel.parent.fascicle;
             
             new Ext.dd.DropTarget(modules.getView().scroller.dom, {
                 
@@ -66,14 +69,14 @@ Inprint.cmp.adverta.Modules = Ext.extend(Ext.Panel, {
                     
                     Ext.Ajax.request({
                         url: _url("/fascicle/modules/create/"),
-                        scope:this,
+                        scope: panel.parent,
                         success: function() {
-                            flash.cmpInit();
-                            modules.cmpReload();
+                            this.panels["flash"].cmpInit();
+                            this.panels["modules"].panels["modules"].cmpReload();
                         },
                         params: {
-                            fascicle: parent.fascicle,
-                            page: parent.selection,
+                            fascicle: fascicle,
+                            page: selection,
                             module: ids
                         }
                     });

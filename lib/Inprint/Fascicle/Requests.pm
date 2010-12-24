@@ -400,7 +400,13 @@ sub update {
 
 sub delete {
     my $c = shift;
-    my @ids = $c->param("id");
+    
+    my $i_fascicle  = $c->param("fascicle");
+    
+    my $d_request = $c->param("delete-request");
+    my $d_module  = $c->param("delete-module");
+    
+    my @requests  = $c->param("request");
     
     my @errors;
     my $success = $c->json->false;
@@ -409,9 +415,34 @@ sub delete {
         unless ($c->access->Check("domain.roles.manage"));
     
     unless (@errors) {
-        foreach my $id (@ids) {
+        
+        foreach my $id (@requests ) {
+            
+            my $request;
+            
             if ($c->is_uuid($id)) {
-                $c->sql->Do(" DELETE FROM ad_requests WHERE id=? ", [ $id ]);
+                $request = $c->sql->Q(" SELECT * FROM fascicles_requests WHERE id=? ", [ $id ])->Hash;
+            }
+            
+            if ($request->{id}) {
+                
+                $c->sql->bt;
+                
+                if ($d_request eq "true") {
+                    
+                    $c->sql->Do(" DELETE FROM fascicles_requests WHERE id=? ", [ $request->{id} ]);
+                    
+                    my $exist = $c->sql->Q(" SELECT EXISTS ( SELECT id FROM fascicles_requests WHERE module=? ) ", [ $request->{module} ])->Value;
+                    
+                    if ($d_module eq "true") {
+                        unless ($exist) {
+                            $c->sql->Do(" DELETE FROM fascicles_modules WHERE id=? ", [ $request->{module} ]);
+                        }
+                    }
+                    
+                }
+                
+                $c->sql->et;
             }
         }
     }
