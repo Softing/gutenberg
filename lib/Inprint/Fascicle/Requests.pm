@@ -398,6 +398,77 @@ sub update {
     $c->render_json({ success => $success, errors => \@errors });
 }
 
+sub move {
+    my $c = shift;
+    
+    my $i_fascicle  = $c->param("fascicle");
+    my @i_requests    = $c->param("request");
+    my @i_pages       = $c->param("page");
+    
+    my @errors;
+    my $success = $c->json->false;
+    
+    push @errors, { id => "access", msg => "Not enough permissions"}
+        unless ($c->access->Check("domain.roles.manage"));
+    
+    my @pages;
+    
+    foreach my $string (@i_pages) {
+        
+        my ($page_id, $seqnum) = split "::", $string;
+        my $page = $c->sql->Q(" SELECT * FROM fascicles_pages WHERE id=? AND seqnum=? ", [ $page_id, $seqnum ])->Hash;
+        
+        if ($page->{id}) {
+            push @pages, $page;
+        }
+        
+        push @errors, { id => "page", msg => "Can't find object"}
+            unless ($page->{id});
+    }
+    
+    unless (@errors) {
+        
+        foreach my $id (@i_requests) {
+            
+            my $request;
+            
+            if ($c->is_uuid($id)) {
+                $request = $c->sql->Q(" SELECT * FROM fascicles_requests WHERE id=? ", [ $id ])->Hash;
+            }
+            
+            my $module;
+            
+            if ($request->{id}) {
+                $module = $c->sql->Q(" SELECT * FROM fascicles_modules WHERE id=? ", [ $request->{module} ])->Hash;
+            }
+            
+            if ($module->{id}) {
+                
+                $c->sql->bt;
+                
+                $c->sql->Do(" DELETE FROM fascicles_map_modules WHERE module=? ", [ $request->{module} ]);
+                
+                foreach my $page ( @pages ) {
+                    
+                    $c->sql->Do("
+                        INSERT INTO fascicles_map_modules(
+                            edition, fascicle, module, page, placed, x, y, created, updated)
+                        VALUES (?, ?, ?, ?, false, ?, ?, now(), now());
+                        ", [
+                        $request->{edition}, $request->{fascicle}, $module->{id}, $page->{id}, "1/1", "1/1"
+                    ]);
+                    
+                }
+                
+                $c->sql->et;
+            }
+        }
+    }
+    
+    $success = $c->json->true unless (@errors);
+    $c->render_json({ success => $success, errors => \@errors });
+}
+
 sub delete {
     my $c = shift;
     

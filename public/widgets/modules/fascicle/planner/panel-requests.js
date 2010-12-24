@@ -271,7 +271,7 @@ Inprint.fascicle.planner.Requests = Ext.extend(Ext.grid.GridPanel, {
                     items: [
                         {
                             xtype: 'checkbox',
-                            name: 'request',
+                            name: 'move-request',
                             checked:false,
                             inputValue: 'true',
                             fieldLabel: '',
@@ -280,7 +280,7 @@ Inprint.fascicle.planner.Requests = Ext.extend(Ext.grid.GridPanel, {
                         },
                         {
                             xtype: 'checkbox',
-                            name: 'module',
+                            name: 'move-module',
                             checked:false,
                             inputValue: 'true',
                             fieldLabel: '',

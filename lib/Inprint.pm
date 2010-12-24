@@ -140,7 +140,7 @@ sub startup {
     $self->createRoutes($sessionBridge, "fascicle/headlines",               [ "tree", "read", "create", "update", "delete" ]);
     $self->createRoutes($sessionBridge, "fascicle/modules",                 [ "list", "create", "read", "update", "delete" ]);
     $self->createRoutes($sessionBridge, "fascicle/pages",                   [ "view", "templates", "modules", "create", "read", "update", "delete", "move", "left", "right", "resize", "clean" ]);
-    $self->createRoutes($sessionBridge, "fascicle/requests",                [ "process", "list", "create", "read", "update", "delete" ]);
+    $self->createRoutes($sessionBridge, "fascicle/requests",                [ "process", "list", "create", "read", "update", "move", "delete" ]);
     $self->createRoutes($sessionBridge, "fascicle/rubrics",                 [ "list", "read", "create", "update", "delete" ]);
     
     $self->createRoutes($sessionBridge, "fascicle/templates",               [ "modules" ]);
