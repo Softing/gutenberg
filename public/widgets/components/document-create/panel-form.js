@@ -177,7 +177,8 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                 {
                                     columnWidth:.125,
                                     xtype: "treecombo",
-                                    name: "fascicle",
+                                    name: "fascicle-shortcut",
+                                    hiddenName: "fascicle",
                                     fieldLabel: _("Fascicle"),
                                     emptyText: _("Fascicle") + "...",
                                     minListWidth: 250,
