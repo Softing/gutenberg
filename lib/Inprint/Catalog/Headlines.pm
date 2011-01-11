@@ -118,7 +118,7 @@ sub create {
         unless ($c->is_text($i_description));
 
     push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.departments.manage"));
+        unless ($c->access->Check("domain.editions.manage"));
 
     my $edition = $c->sql->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
     push @errors, { id => "edition", msg => "Incorrectly filled field"}

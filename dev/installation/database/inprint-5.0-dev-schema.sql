@@ -2706,7 +2706,6 @@ CREATE TABLE fascicles_tmpl_places (
     origin uuid NOT NULL,
     fascicle uuid NOT NULL,
     title character varying NOT NULL,
-    shortcut character varying NOT NULL,
     description character varying,
     created timestamp(0) with time zone DEFAULT now(),
     updated timestamp(0) with time zone DEFAULT now()
