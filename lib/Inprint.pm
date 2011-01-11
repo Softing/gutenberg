@@ -28,8 +28,8 @@ sub startup {
     $self->log->level('debug');
     $self->secret('passw0rd');
 
-    $self->session->cookie_name("inprint");
-    $self->session->default_expiration(864000);
+    $self->sessions->cookie_name("inprint");
+    $self->sessions->default_expiration(864000);
 
     $self->types->type(json => 'application/json; charset=utf-8;');
 
@@ -57,8 +57,8 @@ sub startup {
 
     # Load Plugins
     $self->plugin('i18n');
-    
-    $self->plugins->namespaces([qw(Mojo::Plugins)]); 
+
+    $self->plugins->namespaces([qw(Mojo::Plugins)]);
     $self->plugin("inprint-access");
 
 
@@ -84,7 +84,7 @@ sub startup {
     $sessionBridge->route('/logout/')->to('session#logout');
 
     # Advertising
-    
+
     $self->createRoutes($sessionBridge, "advertising/archive",      [ "list" ]);
     $self->createRoutes($sessionBridge, "advertising/advertisers",  [ "list", "create", "read", "update", "delete" ]);
     $self->createRoutes($sessionBridge, "advertising/common",       [ "editions", "fascicles", "places" ]);
@@ -94,10 +94,10 @@ sub startup {
     $self->createRoutes($sessionBridge, "advertising/pages",        [ "list", "create", "read", "update", "delete" ]);
     $self->createRoutes($sessionBridge, "advertising/places",       [ "list", "create", "read", "update", "delete" ]);
     $self->createRoutes($sessionBridge, "advertising/requests",     [ "list", "create", "read", "update", "delete" ]);
-    
+
     # Calendar routes
     $self->createRoutes($sessionBridge, "calendar",                 [ "create", "read", "update", "delete", "list", "tree", "enable", "disable" ]);
-    $self->createRoutes($sessionBridge, "calendar/combos",          [ "fascicles", "copypages", "copyindex" ]);
+    $self->createRoutes($sessionBridge, "calendar/combos",          [ "editions", "parents", "sources" ]);
 
     # Common routes
     $self->createRoutes($sessionBridge, "common/transfer",          [ "editions", "branches", "list" ]);
@@ -106,17 +106,17 @@ sub startup {
     $self->createRoutes($sessionBridge, "documents",                [ "create", "read", "update", "delete", "list", "capture", "transfer", "briefcase", "move", "copy", "duplicate", "recycle", "restore", "say" ]);
     $self->createRoutes($sessionBridge, "documents/common",         [ "fascicles" ]);
     $self->createRoutes($sessionBridge, "documents/combos",         [ "stages", "assignments", "managers", "fascicles", "headlines", "rubrics" ]);
-    $self->createRoutes($sessionBridge, "documents/trees",          [ "editions", "workgroups" ]);
+    $self->createRoutes($sessionBridge, "documents/trees",          [ "editions", "workgroups", "fascicles" ]);
     $self->createRoutes($sessionBridge, "documents/filters",        [ "editions", "groups", "fascicles", "headlines", "rubrics", "holders", "managers", "progress" ]);
     $self->createRoutes($sessionBridge, "documents/profile",        [ "read" ]);
     $self->createRoutes($sessionBridge, "documents/files",          [ "list", "create", "read", "update", "delete", "upload" ]);
     $self->createRoutes($sessionBridge, "documents/text",           [ "get", "set" ]);
-    
+
     $sessionBridge->route('/documents/files/preview/:document/:file')->to('documents-files#preview', document => "", file => "");
     $sessionBridge->route('/documents/:document/zip/:type')->to('documents-files#createzip', document => "", type => "");
-    
+
     #$sessionBridge->route('/documents/files/upload/:document')->to('documents-files#upload', document => "");
-    
+
     # Catalog routes
     $self->createRoutes($sessionBridge, "catalog/combos",                   [ "editions", "groups", "fascicles", "roles", "readiness" ]);
     $self->createRoutes($sessionBridge, "catalog/editions",                 [ "create", "read", "update", "delete", "tree" ]);
@@ -130,7 +130,7 @@ sub startup {
     $self->createRoutes($sessionBridge, "catalog/indexes",                  [ "editions" ]);
     $self->createRoutes($sessionBridge, "catalog/headlines",                [ "tree", "read", "create", "update", "delete" ]);
     $self->createRoutes($sessionBridge, "catalog/rubrics",                  [ "list", "read", "create", "update", "delete" ]);
-    
+
     # Fascicles routes
     $self->createRoutes($sessionBridge, "fascicle",                         [ "seance", "check", "open", "close", "save", "capture" ]);
     $self->createRoutes($sessionBridge, "fascicle/combos",                  [ "templates", "workgroups", "headlines", "rubrics" ]);
@@ -142,13 +142,13 @@ sub startup {
     $self->createRoutes($sessionBridge, "fascicle/pages",                   [ "view", "templates", "modules", "create", "read", "update", "delete", "move", "left", "right", "resize", "clean" ]);
     $self->createRoutes($sessionBridge, "fascicle/requests",                [ "process", "list", "create", "read", "update", "move", "delete" ]);
     $self->createRoutes($sessionBridge, "fascicle/rubrics",                 [ "list", "read", "create", "update", "delete" ]);
-    
+
     $self->createRoutes($sessionBridge, "fascicle/templates",               [ "modules" ]);
     $self->createRoutes($sessionBridge, "fascicle/templates/modules",       [ "list", "create", "read", "update", "delete" ]);
     $self->createRoutes($sessionBridge, "fascicle/templates/pages",         [ "list", "create", "read", "update", "delete" ]);
     $self->createRoutes($sessionBridge, "fascicle/templates/places",        [ "tree", "create", "read", "update", "delete" ]);
     $self->createRoutes($sessionBridge, "fascicle/templates/index",         [ "headlines", "modules", "save" ]);
-    
+
     # Images
     $sessionBridge->route('/aimgs/fascicle/page/:id/:w/:h')->to('images#fascicle_page');
     $sessionBridge->route('/aimgs/fascicle/template/:id/:w/:h')->to('images#fascicle_page');
@@ -156,7 +156,7 @@ sub startup {
     $sessionBridge->route('/aimgs/advert/page/:id/:w/:h')->to('images#fascicle_page');
     $sessionBridge->route('/aimgs/advert/template/:id/:w/:h')->to('images#fascicle_page');
     $sessionBridge->route('/aimgs/advert/module/:id/:w/:h')->to('images#fascicle_page');
-    
+
     # Profile routes
     $self->createRoutes($sessionBridge, "profile",                          [ "read", "update" ]);
     $sessionBridge->route('/profile/image/:id')->to('profile#image', id => "00000000-0000-0000-0000-000000000000");
@@ -189,9 +189,9 @@ sub createRoutes {
     my $routes = shift;
 
     foreach my $route (@$routes) {
-        
+
         my $cprefix = "/$prefix/$route/";
-        
+
         if ($route eq "index") {
             $cprefix = "/$prefix/";
         }

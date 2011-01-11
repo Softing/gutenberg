@@ -3,7 +3,9 @@ Inprint.fascicle.indexes.Context = function(parent, panels) {
     var headlines = panels["headlines"];
 
     headlines.on("contextmenu", function(node) {
-        
+
+        node.select();
+
         this.selection = node;
 
         var disabled = true;
@@ -45,7 +47,7 @@ Inprint.fascicle.indexes.Context = function(parent, panels) {
                 handler: function() { this.cmpDelete(node); }
             });
         }
-        
+
         items.push('-', {
             icon: _ico("arrow-circle-double"),
             cls: "x-btn-text-icon",

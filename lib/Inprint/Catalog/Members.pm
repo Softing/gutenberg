@@ -31,24 +31,26 @@ sub list {
         FROM members t1
         LEFT JOIN profiles t2 ON t1.id = t2.id
         LEFT JOIN map_member_to_catalog m1 ON m1.member = t1.id
-        WHERE 1=1
+        WHERE 1=1 ";
 
-    ";
+    #if ($i_node eq '00000000-0000-0000-0000-000000000000') {
+    #    $sql .= " AND (
+    #            m1.catalog in (
+    #                 SELECT id FROM catalog WHERE path ~ ('*.' || replace(?, '-', '')::text || '.*')::lquery
+    #            ) OR m1.catalog is null
+    #        )
+    #    ";
+    #} else {
+    #    $sql .= " AND
+    #        m1.catalog in (
+    #             SELECT id FROM catalog WHERE path ~ ('*.' || replace(?, '-', '')::text || '.*')::lquery
+    #        ) ";
+    #}
+
+    $sql .= " AND m1.catalog=? ";
     push @params, $i_node;
 
-    if ($i_node eq '00000000-0000-0000-0000-000000000000') {
-        $sql .= " AND (
-                m1.catalog in (
-                     SELECT id FROM catalog WHERE path ~ ('*.' || replace(?, '-', '')::text || '.*')::lquery
-                ) OR m1.catalog is null
-            )
-        ";
-    } else {
-        $sql .= " AND
-            m1.catalog in (
-                 SELECT id FROM catalog WHERE path ~ ('*.' || replace(?, '-', '')::text || '.*')::lquery
-            ) ";
-    }
+
 
     if ( $i_filter ) {
         $sql .= " AND (login LIKE ? OR title LIKE ? OR shortcut LIKE ?) ";
@@ -173,7 +175,7 @@ sub rules {
             WHERE t1.member=? AND t1.area = 'member' AND t2.id = t1.binding
             GROUP BY area, binding, shortcut)
     ", [ $i_member, $i_member, $i_member, $i_member ])->Hashes;
-    
+
     foreach my $item (@$result) {
         $item->{rules} = $c->sql->Q("
             SELECT t2.title
@@ -197,7 +199,7 @@ sub setup {
 
     my $i_edition            = $c->param("edition");
     my $i_edition_shortcut   = $c->param("edition-shortcut");
-    
+
     my $i_workgroup          = $c->param("workgroup");
     my $i_workgroup_shortcut = $c->param("workgroup-shortcut");
 
@@ -228,37 +230,37 @@ sub setup {
 
     push @errors, { id => "title", msg => "Incorrectly filled field"}
         unless ($c->is_text($i_title));
-        
+
     push @errors, { id => "shortcut", msg => "Incorrectly filled field"}
         unless ($c->is_text($i_shortcut));
-        
+
     push @errors, { id => "position", msg => "Incorrectly filled field"}
         unless ($c->is_text($i_position));
-        
+
     push @errors, { id => "edition", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_edition));
-        
+
     push @errors, { id => "edition", msg => "Incorrectly filled field"}
         unless ($c->is_text($i_edition_shortcut));
-        
+
     push @errors, { id => "workgroup", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_workgroup));
-        
+
     push @errors, { id => "workgroup", msg => "Incorrectly filled field"}
         unless ($c->is_text($i_workgroup_shortcut));
-    
+
     unless (@errors) {
 
         $c->sql->Do("DELETE FROM profiles WHERE id=?", [ $member_id ]);
         $c->sql->Do("INSERT INTO profiles (id, title, shortcut, job_position) VALUES (?, ?, ?, ?)",[
             $member_id, $i_title, $i_shortcut, $i_position
         ]);
-        
+
         $c->sql->Do("DELETE FROM options WHERE option_name=? AND member=?", ["default.edition", $member_id]);
         $c->sql->Do("INSERT INTO options (member, option_name, option_value) VALUES (?, ?, ?)", [$member_id, "default.edition", $i_edition]);
         $c->sql->Do("DELETE FROM options WHERE option_name=? AND member=?", ["default.edition.name", $member_id]);
         $c->sql->Do("INSERT INTO options (member, option_name, option_value) VALUES (?, ?, ?)", [$member_id, "default.edition.name", $i_edition_shortcut]);
-        
+
         $c->sql->Do("DELETE FROM options WHERE option_name=? AND member=?", ["default.workgroup", $member_id]);
         $c->sql->Do("INSERT INTO options (member, option_name, option_value) VALUES (?, ?, ?)", [$member_id, "default.workgroup", $i_workgroup]);
         $c->sql->Do("DELETE FROM options WHERE option_name=? AND member=?", ["default.workgroup.name", $member_id]);

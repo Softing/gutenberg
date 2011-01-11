@@ -1,9 +1,9 @@
 Inprint.fascicle.places.Places = Ext.extend(Ext.tree.TreePanel, {
-    
+
     initComponent: function() {
-        
+
         this.components = {};
-        
+
         this.urls = {
             "tree":    _url("/fascicle/templates/places/tree/"),
             "create":  _url("/fascicle/templates/places/create/"),
@@ -11,7 +11,7 @@ Inprint.fascicle.places.Places = Ext.extend(Ext.tree.TreePanel, {
             "update":  _url("/fascicle/templates/places/update/"),
             "delete":  _url("/fascicle/templates/places/delete/")
         };
-        
+
         Ext.apply(this, {
             title:_("Editions"),
             autoScroll:true,
@@ -28,36 +28,36 @@ Inprint.fascicle.places.Places = Ext.extend(Ext.tree.TreePanel, {
                 type: "fascicle"
             }
         });
-        
+
         Inprint.fascicle.places.Places.superclass.initComponent.apply(this, arguments);
-        
+
         this.on("beforeappend", function(tree, parent, node) {
             node.attributes.icon = _ico(node.attributes.icon);
         });
-        
+
     },
-    
+
     onRender: function() {
-        
+
         Inprint.fascicle.places.Places.superclass.onRender.apply(this, arguments);
-        
+
         this.getRootNode().on("expand", function(node) {
             if (node.firstChild) {
                 node.firstChild.select();
             }
         });
-        
+
         this.getLoader().on("beforeload", function() { this.body.mask(_("Loading")); }, this);
         this.getLoader().on("load", function() { this.body.unmask(); }, this);
-        
+
     },
-    
+
     cmpCreate: function(node) {
-        
+
         var wndw = this.components["create-window"];
-        
+
         if (!wndw) {
-            
+
             wndw = new Ext.Window({
                 layout: "fit",
                 closeAction: "hide",
@@ -82,35 +82,34 @@ Inprint.fascicle.places.Places = Ext.extend(Ext.tree.TreePanel, {
                     },
                     items: [
                         _FLD_HDN_FASCICLE,
-                        _FLD_SHORTCUT,
                         _FLD_TITLE,
                         _FLD_DESCRIPTION
                     ],
                     keys: [ _KEY_ENTER_SUBMIT ]
                 },
                 buttons: [
-                    _BTN_WNDW_ADD, 
+                    _BTN_WNDW_ADD,
                     _BTN_WNDW_CANCEL
                 ]
             });
-            
+
             this.components["create-window"] = wndw;
         }
-        
+
         var form = wndw.findByType("form")[0].getForm();
         form.reset();
         wndw.show();
-        
+
         form.findField("fascicle").setValue(this.fascicle);
-        
+
     },
-    
+
     cmpUpdate: function(node) {
-        
+
         var win = this.components["edit-window"];
-        
+
         if (!win) {
-            
+
             var form = new Ext.FormPanel({
                 url: this.urls.update,
                 frame:false,
@@ -123,14 +122,13 @@ Inprint.fascicle.places.Places = Ext.extend(Ext.tree.TreePanel, {
                 bodyStyle: "padding:5px 5px",
                 items: [
                     _FLD_HDN_ID,
-                    _FLD_SHORTCUT,
                     _FLD_TITLE,
                     _FLD_DESCRIPTION
                 ],
                 keys: [ _KEY_ENTER_SUBMIT ],
                 buttons: [ _BTN_SAVE,_BTN_CLOSE ]
             });
-            
+
             win = new Ext.Window({
                 title: _("Creating a new module"),
                 layout: "fit",
@@ -138,7 +136,7 @@ Inprint.fascicle.places.Places = Ext.extend(Ext.tree.TreePanel, {
                 width:400, height:300,
                 items: form
             });
-            
+
             form.on("actioncomplete", function (form, action) {
                 if (action.type == "submit") {
                     win.hide();
@@ -150,14 +148,14 @@ Inprint.fascicle.places.Places = Ext.extend(Ext.tree.TreePanel, {
                 }
             }, this);
         }
-        
+
         win.show(this);
         win.body.mask(_("Loading..."));
         this.components["edit-window"] = win;
-        
+
         var form = win.items.first().getForm();
         form.reset();
-        
+
         form.load({
             url: this.urls.read,
             scope:this,
@@ -173,11 +171,11 @@ Inprint.fascicle.places.Places = Ext.extend(Ext.tree.TreePanel, {
             }
         });
     },
-    
+
     cmpDelete: function(node) {
-        
-        var title = _("Group removal") +" <"+ node.attributes.shortcut +">";
-        
+
+        var title = _("Group removal") +" <"+ node.attributes.title +">";
+
         Ext.MessageBox.confirm(
             title,
             _("You really wish to do this?"),
@@ -194,5 +192,5 @@ Inprint.fascicle.places.Places = Ext.extend(Ext.tree.TreePanel, {
                 }
             }, this).setIcon(Ext.MessageBox.WARNING);
     }
-    
+
 });

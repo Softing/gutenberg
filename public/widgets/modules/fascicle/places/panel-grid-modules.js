@@ -10,7 +10,7 @@ Inprint.fascicle.places.Modules = Ext.extend(Ext.grid.GridPanel, {
         }
 
         this.store = Inprint.factory.Store.json(this.urls["list"]);
-        
+
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
 
         this.columns = [
@@ -28,13 +28,6 @@ Inprint.fascicle.places.Modules = Ext.extend(Ext.grid.GridPanel, {
                 width: 150,
                 sortable: true,
                 dataIndex: "title"
-            },
-            {
-                id:"shortcut",
-                header: _("Shortcut"),
-                width: 150,
-                sortable: true,
-                dataIndex: "shortcut"
             },
             {
                 id:"description",
@@ -79,7 +72,7 @@ Inprint.fascicle.places.Modules = Ext.extend(Ext.grid.GridPanel, {
                 dataIndex: "h"
             }
         ];
-        
+
         this.tbar = [
             {
                 scope:this,
@@ -107,7 +100,7 @@ Inprint.fascicle.places.Modules = Ext.extend(Ext.grid.GridPanel, {
 
     onRender: function() {
         Inprint.fascicle.places.Modules.superclass.onRender.apply(this, arguments);
-        
+
         this.getStore().on("load", function() {
             var sm = this.getSelectionModel();
             var ds = this.store;
@@ -119,9 +112,9 @@ Inprint.fascicle.places.Modules = Ext.extend(Ext.grid.GridPanel, {
                 }
             }
         }, this);
-        
+
     },
-    
+
     cmpSave: function() {
         Ext.MessageBox.confirm(
             _("Warning"),
@@ -142,5 +135,5 @@ Inprint.fascicle.places.Modules = Ext.extend(Ext.grid.GridPanel, {
                 }
             }, this).setIcon(Ext.MessageBox.WARNING);
     }
-    
+
 });

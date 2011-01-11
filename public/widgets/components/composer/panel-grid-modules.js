@@ -1,14 +1,14 @@
 Inprint.cmp.composer.Modules = Ext.extend(Ext.grid.GridPanel, {
 
     initComponent: function() {
-        
+
         this.pageId = null;
         this.pageW  = null;
         this.pageH  = null;
-        
+
         this.params = {};
         this.components = {};
-        
+
         this.urls = {
             "list":        "/fascicle/modules/list/",
             "create": _url("/fascicle/modules/create/"),
@@ -21,9 +21,9 @@ Inprint.cmp.composer.Modules = Ext.extend(Ext.grid.GridPanel, {
                 page: this.parent.selection
             }
         });
-        
+
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
-        
+
         this.columns = [
             this.selectionModel,
             {
@@ -34,11 +34,11 @@ Inprint.cmp.composer.Modules = Ext.extend(Ext.grid.GridPanel, {
                 dataIndex: "place_shortcut"
             },
             {
-                id:"shortcut",
-                header: _("Shortcut"),
+                id:"title",
+                header: _("Title"),
                 width: 100,
                 sortable: true,
-                dataIndex: "shortcut"
+                dataIndex: "title"
             },
             {
                 id:"amount",
@@ -47,17 +47,17 @@ Inprint.cmp.composer.Modules = Ext.extend(Ext.grid.GridPanel, {
                 dataIndex: "amount"
             }
         ];
-        
+
         Ext.apply(this, {
-            
+
             title: _("Modules"),
-            
+
             enableDragDrop: true,
             ddGroup: 'principals-selector',
-            
+
             layout:"fit",
             region: "center",
-            
+
             stripeRows: true,
             columnLines: true,
             sm: this.selectionModel
@@ -71,18 +71,18 @@ Inprint.cmp.composer.Modules = Ext.extend(Ext.grid.GridPanel, {
     onRender: function() {
         Inprint.cmp.composer.Modules.superclass.onRender.apply(this, arguments);
     },
-    
-    
+
+
     //cmpCreate: function() {
-    //    
+    //
     //    var win = this.components["create-window"];
-    //    
+    //
     //    if (!win) {
-    //        
+    //
     //        var grid = new Inprint.cmp.composer.GridTemplates({
     //            parent: this.parent
     //        });
-    //        
+    //
     //        win = new Ext.Window({
     //            width:700,
     //            height:500,
@@ -114,15 +114,15 @@ Inprint.cmp.composer.Modules = Ext.extend(Ext.grid.GridPanel, {
     //                },
     //                _BTN_WNDW_CLOSE
     //            ]
-    //            
+    //
     //        });
-    //        
+    //
     //    }
-    //    
+    //
     //    win.show(this);
     //    this.components["create-window"] = win;
     //},
-    
+
     cmpDelete: function() {
         Ext.MessageBox.confirm(
             _("Warning"),

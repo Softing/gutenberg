@@ -2,7 +2,7 @@ Inprint.edition.calendar.Panel = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
 
-        
+
         this.panels = {};
 
         this.panels.tree = new Inprint.edition.calendar.Tree();
@@ -50,11 +50,14 @@ Inprint.edition.calendar.Panel = Ext.extend(Ext.Panel, {
         });
 
         Inprint.edition.calendar.Panel.superclass.initComponent.apply(this, arguments);
-        Inprint.edition.calendar.Interaction(this.panels);
+
     },
 
     onRender: function() {
         Inprint.edition.calendar.Panel.superclass.onRender.apply(this, arguments);
+
+        Inprint.edition.calendar.Interaction(this, this.panels);
+
     },
 
     getRow: function() {
@@ -62,7 +65,7 @@ Inprint.edition.calendar.Panel = Ext.extend(Ext.Panel, {
     },
 
     cmpReload:function() {
-        this.panels.grid.cmpReload();
+        this.panels.tree.cmpReload();
     }
 
 });

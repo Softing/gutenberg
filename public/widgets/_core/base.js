@@ -214,7 +214,7 @@ Ext.onReady(function() {
             !Inprint.session.options["default.edition"] ||
             !Inprint.session.options["default.edition.name"] ||
             !Inprint.session.options["default.workgroup"] ||
-            !Inprint.session.options["default.workgroup.name"] 
+            !Inprint.session.options["default.workgroup.name"]
         ) {
             if (Inprint.session.member.login != "root") {
                 Inprint.checkInProgress = true;

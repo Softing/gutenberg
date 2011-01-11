@@ -48,7 +48,7 @@ Inprint.catalog.editions.Panel = Ext.extend(Ext.Panel, {
         });
 
         Inprint.catalog.editions.Panel.superclass.initComponent.apply(this, arguments);
-        
+
     },
 
     onRender: function() {
@@ -70,7 +70,7 @@ Inprint.catalog.editions.Panel = Ext.extend(Ext.Panel, {
 });
 
 Inprint.registry.register("settings-editions", {
-    icon: "books",
+    icon: "blue-folders",
     text: _("Editions"),
     xobject: Inprint.catalog.editions.Panel
 });

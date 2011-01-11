@@ -1,9 +1,9 @@
-Inprint.edition.calendar.Grid = Ext.extend(Ext.grid.GridPanel, {
+Inprint.edition.calendar.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
 
     initComponent: function() {
 
         this.components = {};
-        
+
         this.url = {
             'load':    _url('/calendar/list/'),
             'create':  _url('/calendar/create/'),
@@ -15,83 +15,31 @@ Inprint.edition.calendar.Grid = Ext.extend(Ext.grid.GridPanel, {
         };
 
         this.sm = new Ext.grid.CheckboxSelectionModel();
-        
-        this.store = Inprint.factory.Store.json("/calendar/list/");
 
-        this.cm = new Ext.grid.ColumnModel([
-            this.sm,
-            {
-                dataIndex: 'is_enabled',
-                width: 24,
-                renderer: function(v,p,r) {
-                    if (v == 1) {
-                        return '<img src="'+ _ico("rocket-fly") +'"/>';
-                    }
-                    return '<img src="'+ _ico("book") +'"/>';
+        Ext.apply(this, {
+
+            columns: [
+                {
+                    header: _("Shortcut"),
+                    dataIndex: 'shortcut',
+                    width: 240
+                },
+                {
+                    header: _("Title"),
+                    dataIndex: 'title',
+                    width: 240
+                },
+                {
+                    header: _("Description"),
+                    dataIndex: 'description',
+                    width: 240
                 }
-            },
-            {
-                header: _("Edition"),
-                dataIndex: 'edition_shortcut',
-                width: 60
-            },
-            {
-                header: _("Title"),
-                dataIndex: 'title',
-                width: 240,
-                renderer: function(v,p,r) {
-                    var id    = r.data.id;
-                    var title = r.data.title;
-                    var url = "/?aid=fascicle-plan&oid="+id+"&text="+title;
-                    var jscript = "Inprint.ObjectResolver.resolve({aid:'fascicle-plan', oid: '"+id+"', text: '"+title+"' });";
-                    return '<a href="'+ url +'" onclick="'+jscript+';return false;">' + v + '</a>';
-                }
-            },
-            {
-                header: _("Opening date"),
-                dataIndex: 'begindate',
-                width: 140
-            },
-            {
-                header: _("Closing date"),
-                dataIndex: 'enddate',
-                width: 140
-            },
 
-            {
-                header: _("Readiness"),
-                dataIndex: 'progress',
-                width: 200,
-                renderer: function(v, p, record){
+            ],
 
-                    var totaldays  = record.data.totaldays;
-                    var passeddays = record.data.passeddays;
+            dataUrl: _url('/calendar/list/')
 
-                    var progress = Math.round((totaldays/100)*passeddays);
-
-                    if (progress > 100) progress = 100;
-
-                    p.css += ' x-grid3-progresscol';
-
-                    var bg1 = 'red';
-                    var bg2 = 'green';
-
-                    if (record.data.enabled === 0){
-                        bg2 = 'silver';
-                    }
-
-                    return String.format(
-                        '<div class="x-progress-wrap">'+
-                            '<div class="x-progress-inner">'+
-                                '<div style="width:{0}%;height:9px;background:{2} !important;"></div>'+
-                                '<div style="width:{1}%;height:9px;background:{3} !important;"></div>'+
-                            '</div>'+
-                        '</div>',
-                        0, progress, bg1, bg2);
-                }
-            }
-
-        ]);
+        });
 
         this.tbar = [
             {
@@ -138,265 +86,173 @@ Inprint.edition.calendar.Grid = Ext.extend(Ext.grid.GridPanel, {
                         showArchive:pressed
                     });
                 }
-            },
-            {
-                id: 'enable',
-                text: _("Enable"),
-                disabled: true,
-                icon: _ico("switch--plus"),
-                cls: 'x-btn-text-icon',
-                ref: "../btnEnable",
-                scope: this,
-                handler: this.cmpEnable
-            },
-            {
-                id: 'disable',
-                text: _("Disable"),
-                disabled: true,
-                icon: _ico("switch--minus"),
-                cls: 'x-btn-text-icon',
-                ref: "../btnDisable",
-                scope: this,
-                handler: this.cmpDisable
             }
         ];
-
-        Ext.apply(this, {
-            border: false,
-            loadMask: true,
-            stripeRows: true,
-            stateful: false
-        });
 
         Inprint.edition.calendar.Grid.superclass.initComponent.apply(this, arguments);
     },
 
     onRender: function() {
         Inprint.edition.calendar.Grid.superclass.onRender.apply(this, arguments);
-        
-        this.on("rowcontextmenu", function(thisGrid, rowIndex, evtObj) {
-            
-            thisGrid.selModel.selectRow(rowIndex);
-            evtObj.stopEvent();
-            
-            var rowCtxMenuItems = [];
-            
-            var record = thisGrid.getStore().getAt(rowIndex);
-            
-            rowCtxMenuItems.push({
+
+        this.on("contextmenu", function(node) {
+
+            var items = [];
+
+            node.select();
+
+            var edition = node.attributes.edition;
+            var parent  = node.attributes.parent;
+
+            if (edition == parent) {
+                items.push({
+                    icon: _ico("blueprint--plus"),
+                    cls: 'x-btn-text-icon',
+                    text    : _('Create attachment'),
+                    scope:this,
+                    handler : function() {
+                        this.cmpCreateAttachment(node);
+                    }
+                });
+            }
+
+            if (edition != parent) {
+                items.push({
+                    icon: _ico("blueprint--pencil"),
+                    cls: 'x-btn-text-icon',
+                    text    : _('Edit attachment'),
+                    scope:this,
+                    handler : this.cmpUpdate
+                });
+                items.push({
+                    icon: _ico("blueprint--minus"),
+                    cls: 'x-btn-text-icon',
+                    text    : _('Delete attachment'),
+                    scope:this,
+                    handler: this.cmpDelete
+                });
+            }
+
+            items.push("-");
+
+            items.push({
                 icon: _ico("table"),
                 cls: 'x-btn-text-icon',
                 text    : _('View plan'),
                 handler : function() {
-                    Inprint.ObjectResolver.resolve({ aid:'fascicle-plan', oid: record.get("id"), text: record.get("shortcut") });
+                    Inprint.ObjectResolver.resolve({ aid:'fascicle-plan', oid: node.id, text: node.text });
                 }
             });
-            
-            rowCtxMenuItems.push({
+
+            items.push({
                 icon: _ico("clock"),
                 cls: 'x-btn-text-icon',
                 text    : _('View composer'),
                 handler : function() {
-                    Inprint.ObjectResolver.resolve({ aid:'fascicle-planner', oid: record.get("id"), text: record.get("shortcut") });
+                    Inprint.ObjectResolver.resolve({ aid:'fascicle-planner', oid: node.id, text: node.text });
                 }
             });
-            
-            thisGrid.rowCtxMenu = new Ext.menu.Menu({
-                items : rowCtxMenuItems
+
+            items.push('-', {
+                icon: _ico("arrow-circle-double"),
+                cls: "x-btn-text-icon",
+                text: _("Reload"),
+                scope: this,
+                handler: this.cmpReload
             });
-            
-            thisGrid.rowCtxMenu.showAt(evtObj.getXY());
-        });
-        
+
+            new Ext.menu.Menu({ items : items }).show(node.ui.getAnchor());
+        }, this);
+
+    },
+
+    cmpGetSelectedNode: function() {
+        return this.getSelectionModel().getSelectedNode();
+    },
+
+    cmpLoad: function(params) {
+        Ext.apply(this.getLoader().baseParams, params);
+        this.getRootNode().reload();
+    },
+
+    cmpReload: function() {
+        this.getRootNode().reload();
     },
 
     cmpCreate: function() {
 
-        var win = this.components["create-window"];
-        if (!win) {
+        var wndw = this.components["create-window"];
 
-            win = new Ext.Window({
-                modal:true,
-                layout: "fit",
-                closeAction: "hide",
-                width:400, height:250,
-                title: _("Release addition"),
-                items: new Ext.FormPanel({
-                    
-                    url: this.url["create"],
-
-                    border:false,
-
-                    labelWidth: 120,
-                    defaults: {
-                        anchor: "100%"
-                    },
-                    bodyStyle: "padding:10px",
-
-                    items: [
-                        _FLD_HDN_EDITION,
-                        _FLD_TITLE,
-                        {
-                            xtype: 'xdatefield',
-                            name: 'begindate',
-                            format:'F j, Y',
-                            submitFormat:'Y-m-d',
-                            allowBlank:false,
-                            fieldLabel: _("Opening date"),
-                            listeners: {
-                                scope:this
-                            }
-                        },
-                        {
-                            xtype: 'xdatefield',
-                            name: 'enddate',
-                            format:'F j, Y',
-                            submitFormat:'Y-m-d',
-                            allowBlank:false,
-                            fieldLabel: _("Closing date"),
-                            listeners: {
-                                scope:this,
-                                change: function(field, value, old)
-                                {
-                                    var v = field.getValue();
-                                    var f = field.ownerCt.getForm().findField('title');
-                                    if (f.getValue().length === 0) {
-                                        f.setValue(v.dateFormat('F j, Y'));
-                                    }
-                                }
-                            }
-                        },
-                        Inprint.factory.Combo.create(
-                            "/calendar/combos/fascicles/",
-                            {
-                                listeners: {
-                                    render: function(combo) {
-                                        combo.setValue("00000000-0000-0000-0000-000000000000", _("Defaults"));
-                                    },
-                                    beforequery: function(qe) {
-                                        delete qe.combo.lastQuery;
-                                    }
-                                }
-                            })
-                    ],
-
-                    buttons: [ _BTN_ADD, _BTN_CANCEL ],
-
-                    listeners: {
-                        scope:this,
-                        "actioncomplete": function() {
-                            win.hide();
-                            this.cmpReload();
-                        }
-                    }
-                })
-            });
+        if (!wndw) {
+            var form = this.cmpCreateForm("create", "fascicle", this.url["create"]);
+            wndw = this.cmpCreateWindow(_("Release addition"), [ _BTN_WNDW_ADD, _BTN_WNDW_CLOSE ], form);
+            this.components["create-window"] = wndw;
         }
 
-        var form = win.items.first().getForm();
+        var form = wndw.findByType("form")[0].getForm();
         form.reset();
         form.findField("edition").setValue(this.currentEdition);
 
-        win.show(this);
-        this.components["create-window"] = win;
+        wndw.show(this);
     },
 
     cmpUpdate: function() {
-        var win = this.components["update-window"];
-        if (!win) {
 
-            win = new Ext.Window({
-                title: _("Release change"),
-                layout: "fit",
-                closeAction: "hide",
-                width:400, height:200,
-                items: new Ext.FormPanel({
-                    
-                    url: this.url["update"],
+        var wndw = this.components["update-window"];
 
-                    frame:false,
-                    border:false,
-
-                    labelWidth: 120,
-                    defaults: {
-                        anchor: "100%"
-                    },
-                    bodyStyle: "padding:10px",
-
-                    items: [
-                        _FLD_HDN_ID,
-                        _FLD_NAME,
-                        {
-                            xtype: 'xdatefield',
-                            name: 'begindate',
-                            format:'F j, Y',
-                            submitFormat:'Y-m-d',
-                            allowBlank:false,
-                            fieldLabel: _("Opening date"),
-                            listeners: {
-                                scope:this
-                            }
-                        },
-                        {
-                            xtype: 'xdatefield',
-                            name: 'enddate',
-                            format:'F j, Y',
-                            submitFormat:'Y-m-d',
-                            allowBlank:false,
-                            fieldLabel: _("Closing date")
-                        }
-                    ],
-
-                    buttons: [ _BTN_SAVE, _BTN_CANCEL ],
-
-                    listeners: {
-                        scope:this,
-                        "actioncomplete": function() {
-                            win.hide();
-                            this.cmpReload();
-                        }
-                    }
-                })
-            });
+        if (!wndw) {
+            var form = this.cmpCreateForm("update", "fascicle", this.url["update"]);
+            wndw = this.cmpCreateWindow(_("Release addition"), [ _BTN_WNDW_SAVE, _BTN_WNDW_CLOSE ], form);
+            this.components["update-window"] = wndw;
         }
 
-        var form = win.items.first().getForm();
+        var form = wndw.findByType("form")[0].getForm();
         form.reset();
 
-        var record = this.getSelectionModel().getSelected();
+        form.load({
+            url: this.url["read"],
+            scope:this,
+            params: {
+                id: this.cmpGetSelectedNode().id
+            },
+            success: function (form, action) {
+                var record = action.result.data;
+                form.findField('id').setValue(record.id);
+                form.findField('title').setValue(record.title);
+                form.findField('shortcut').setValue(record.shortcut);
+                form.findField('description').setValue(record.description);
+                form.findField('enabled').setValue(record.enabled);
+                form.findField('deadline').setValue( _fmtDate( record.deadline, 'F j, Y' ) );
+                form.findField('advertisement').setValue( _fmtDate( record.advert_deadline, 'F j, Y' ) );
+            },
+            failure: function(form, action) {
+                Ext.Msg.alert("Load failed", action.result.errorMessage);
+            }
+        });
 
-        form.findField('id').setValue(record.data.id);
-        form.findField('name').setValue(record.data.title);
-        form.findField('begindate').setValue( _fmtDate( record.data.begindate, 'F j, Y' ) );
-        form.findField('enddate').setValue( _fmtDate( record.data.enddate, 'F j, Y' ) );
-
-        win.show(this);
-        this.components["update-window"] = win;
+        wndw.show(this);
 
     },
 
-    cmpEnable: function(btn) {
-        Ext.Ajax.request({
-            url: this.url["enable"],
-            params: {
-                ids: this.getValues("id")
-            },
-            scope: this,
-            success: this.cmpReload,
-            failure: this.failure
-        });
-    },
+    cmpCreateAttachment: function(node) {
 
-    cmpDisable: function(btn) {
-        Ext.Ajax.request({
-            url: this.url["disable"],
-            params: {
-                ids: this.getValues("id")
-            },
-            scope: this,
-            success: this.cmpReload,
-            failure: this.failure
-        });
+        var wndw = this.components["create-attachment-window"];
+
+        if (!wndw) {
+            var form = this.cmpCreateForm("create", "attachment", this.url["create"]);
+            wndw = this.cmpCreateWindow(_("Release addition"), [ _BTN_WNDW_ADD, _BTN_WNDW_CLOSE ], form);
+            this.components["create-attachment-window"] = wndw;
+        }
+
+        var form = wndw.findByType("form")[0].getForm();
+        form.reset();
+
+        form.findField("parent").setValue(node.id);
+        form.findField("edition").getStore().baseParams = {
+            parent: node.attributes.edition
+        };
+
+        wndw.show(this);
     },
 
     cmpDelete: function(btn) {
@@ -411,13 +267,172 @@ Inprint.edition.calendar.Grid = Ext.extend(Ext.grid.GridPanel, {
             Ext.Ajax.request({
                 url: this.url["delete"],
                 params: {
-                    ids: this.getValues("id")
+                    id: this.cmpGetSelectedNode().id
                 },
                 scope: this,
                 success: this.cmpReload,
                 failure: this.failure
             });
         }
+    },
+
+    cmpCreateForm: function(mode, type, url) {
+
+        var items = [];
+
+        if (mode == "create" && type == "fascicle") {
+            items.push(_FLD_HDN_EDITION);
+        }
+
+        if (mode == "update") {
+            items.push(_FLD_HDN_ID);
+        }
+
+        if (type == "attachment") {
+            items.push(_FLD_HDN_PARENT);
+        }
+
+        items.push(
+            {
+                xtype: "titlefield",
+                value: _("Basic parameters")
+            }
+        );
+
+        if (type == "attachment") {
+            items.push(
+                Inprint.factory.Combo.create(
+                    "/calendar/combos/editions/",
+                    {
+                        name: "copyfrom",
+                        listeners: {
+                            beforequery: function(qe) {
+                                delete qe.combo.lastQuery;
+                            }
+                        }
+                    })
+            );
+        }
+
+        items.push(
+
+            _FLD_SHORTCUT,
+            _FLD_TITLE,
+            _FLD_DESCRIPTION,
+
+            {
+                xtype: "titlefield",
+                value: _("Deadline")
+            },
+
+            {
+                xtype:"checkbox",
+                fieldLabel: _("State"),
+                boxLabel: _("Enabled"),
+                checked: true,
+                name: "enabled"
+            },
+
+            {
+                xtype: "xdatefield",
+                name: "deadline",
+                format: "F j, Y",
+                submitFormat: "Y-m-d",
+                allowBlank:false,
+                fieldLabel: _("Issue"),
+                listeners: {
+                    scope:this,
+                    change: function(field, value, old)
+                    {
+                        var v = field.getValue();
+
+                        var f1 = field.ownerCt.getForm().findField('title');
+                        if (f1.getValue().length === 0) {
+                            f1.setValue(v.dateFormat('j-M-y'));
+                        }
+
+                        var f2 = field.ownerCt.getForm().findField('shortcut');
+                        if (f2.getValue().length === 0) {
+                            f2.setValue(v.dateFormat('j-M-y'));
+                        }
+                    }
+                }
+            },
+            {
+                xtype: 'xdatefield',
+                name: 'advertisement',
+                format:'F j, Y',
+                submitFormat:'Y-m-d',
+                allowBlank:false,
+                fieldLabel: _("Advertisement")
+            }
+        );
+
+        if (mode == "create") {
+            items.push(
+                {
+                    xtype: "titlefield",
+                    value: _("Copy parameters")
+                },
+
+                Inprint.factory.Combo.create(
+                    "/calendar/combos/sources/",
+                    {
+                        name: "copyfrom",
+                        listeners: {
+                            render: function(combo) {
+                                combo.setValue("00000000-0000-0000-0000-000000000000", _("Defaults"));
+                            },
+                            beforequery: function(qe) {
+                                delete qe.combo.lastQuery;
+                            }
+                        }
+                    })
+            );
+        }
+
+        return {
+            xtype: "form",
+            border:false,
+            labelWidth: 100,
+            url: url,
+            bodyStyle: "padding:5px",
+
+            defaults: {
+                anchor: "100%"
+            },
+
+            items: items,
+
+            listeners: {
+                scope:this,
+                "actioncomplete": function(form, action) {
+                    if (action.type == "submit") {
+                        form.window.hide();
+                        this.getRootNode().reload();
+                    }
+                }
+            }
+        }
+    },
+
+    cmpCreateWindow: function(title, btns, form) {
+        return new Ext.Window({
+            modal:true,
+            layout: "fit",
+            closeAction: "hide",
+            width:400, height:440,
+            title: title,
+            items: form,
+            buttons: btns,
+            listeners: {
+                scope:this,
+                afterrender: function(panel) {
+                    panel.form  = panel.findByType("form")[0];
+                    panel.form.getForm().window = panel;
+                }
+            }
+        });
     }
 
 });

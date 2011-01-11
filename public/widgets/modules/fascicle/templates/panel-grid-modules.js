@@ -1,14 +1,14 @@
 Inprint.fascicle.templates.Modules = Ext.extend(Ext.grid.GridPanel, {
 
     initComponent: function() {
-        
+
         this.pageId = null;
         this.pageW  = null;
         this.pageH  = null;
-        
+
         this.params = {};
         this.components = {};
-        
+
         this.urls = {
             "list":        "/fascicle/templates/modules/list/",
             "create": _url("/fascicle/templates/modules/create/"),
@@ -18,9 +18,9 @@ Inprint.fascicle.templates.Modules = Ext.extend(Ext.grid.GridPanel, {
         }
 
         this.store = Inprint.factory.Store.json(this.urls["list"]);
-        
+
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
-        
+
         this.columns = [
             this.selectionModel,
             {
@@ -29,13 +29,6 @@ Inprint.fascicle.templates.Modules = Ext.extend(Ext.grid.GridPanel, {
                 width: 150,
                 sortable: true,
                 dataIndex: "title"
-            },
-            {
-                id:"shortcut",
-                header: _("Shortcut"),
-                width: 150,
-                sortable: true,
-                dataIndex: "shortcut"
             },
             {
                 id:"description",
@@ -80,7 +73,7 @@ Inprint.fascicle.templates.Modules = Ext.extend(Ext.grid.GridPanel, {
                 dataIndex: "h"
             }
         ];
-        
+
         this.tbar = [
             {
                 disabled:true,
@@ -128,8 +121,8 @@ Inprint.fascicle.templates.Modules = Ext.extend(Ext.grid.GridPanel, {
     onRender: function() {
         Inprint.fascicle.templates.Modules.superclass.onRender.apply(this, arguments);
     },
-    
-    
+
+
     cmpCreate: function() {
         var win = this.components["create-window"];
 
@@ -155,16 +148,15 @@ Inprint.fascicle.templates.Modules = Ext.extend(Ext.grid.GridPanel, {
                         xtype: "titlefield",
                         value: _("Basic options")
                     },
-                    
-                    _FLD_SHORTCUT,
+
                     _FLD_TITLE,
                     _FLD_DESCRIPTION,
-                    
+
                     {
                         xtype: "titlefield",
                         value: _("More options")
                     },
-                    
+
                     {
                         xtype: "numberfield",
                         allowBlank:false,
@@ -193,7 +185,7 @@ Inprint.fascicle.templates.Modules = Ext.extend(Ext.grid.GridPanel, {
                 },
                 keys: [ _KEY_ENTER_SUBMIT ]
             };
-            
+
             var flash =  {
                 xtype: "flash",
                 swfWidth:380,
@@ -213,7 +205,7 @@ Inprint.fascicle.templates.Modules = Ext.extend(Ext.grid.GridPanel, {
                         alert(2);
                     },
                     afterrender: function(panel) {
-                        
+
                         var init = function () {
                             if (panel.swf.init) {
                                 panel.swf.init(panel.getSwfId(), "letter", 0, 0);
@@ -221,13 +213,13 @@ Inprint.fascicle.templates.Modules = Ext.extend(Ext.grid.GridPanel, {
                                 init.defer(10, this);
                             }
                         };
-                        
+
                         init.defer(10, this);
-                        
+
                     }
                 }
             };
-            
+
             win = new Ext.Window({
                 width:700,
                 height:500,
@@ -264,12 +256,12 @@ Inprint.fascicle.templates.Modules = Ext.extend(Ext.grid.GridPanel, {
                 },
                 buttons: [ _BTN_WNDW_ADD, _BTN_WNDW_CLOSE ]
             });
-            
+
         }
-        
+
         win.show(this);
         this.components["create-window"] = win;
-        
+
         if (this.pageW && this.pageH) {
             var configure = function () {
                 if (win.flash.setGrid) {
@@ -282,14 +274,14 @@ Inprint.fascicle.templates.Modules = Ext.extend(Ext.grid.GridPanel, {
             }
             configure.defer(10, this);
         }
-        
+
         var form = win.form.getForm();
-        
+
         form.reset();
-        
+
         form.findField("fascicle").setValue(this.parent.fascicle);
         form.findField("page").setValue(this.pageId);
-        
+
     },
 
     cmpUpdate: function() {
@@ -311,21 +303,20 @@ Inprint.fascicle.templates.Modules = Ext.extend(Ext.grid.GridPanel, {
                 },
                 items: [
                     _FLD_HDN_ID,
-                    
+
                     {
                         xtype: "titlefield",
                         value: _("Basic options")
                     },
-                    
-                    _FLD_SHORTCUT,
+
                     _FLD_TITLE,
                     _FLD_DESCRIPTION,
-                    
+
                     {
                         xtype: "titlefield",
                         value: _("More options")
                     },
-                    
+
                     {
                         xtype: "numberfield",
                         allowBlank:false,
@@ -349,9 +340,9 @@ Inprint.fascicle.templates.Modules = Ext.extend(Ext.grid.GridPanel, {
                     },
                     actioncomplete: function (form, action) {
                         if (action.type == "load") {
-                            
+
                             var swf = this.components["update-window"].findByType("flash")[0].swf;
-                            
+
                             var load = function () {
                                 if (swf.setBlocks) {
                                     var record = action.result.data;
@@ -362,9 +353,9 @@ Inprint.fascicle.templates.Modules = Ext.extend(Ext.grid.GridPanel, {
                                     load.defer(10, this);
                                 }
                             };
-                            
+
                             load.defer(10, this);
-                            
+
                         }
                         if (action.type == "submit") {
                             this.components["update-window"].hide()
@@ -394,7 +385,7 @@ Inprint.fascicle.templates.Modules = Ext.extend(Ext.grid.GridPanel, {
                         alert(2);
                     },
                     afterrender: function(panel) {
-                        
+
                         var init = function () {
                             if (panel.swf.init) {
                                 panel.swf.init(panel.getSwfId(), "letter", 0, 0);
@@ -402,13 +393,13 @@ Inprint.fascicle.templates.Modules = Ext.extend(Ext.grid.GridPanel, {
                                 init.defer(10, this);
                             }
                         };
-                        
+
                         init.defer(10, this);
-                        
+
                     }
                 }
             };
-            
+
             win = new Ext.Window({
                 width:700,
                 height:500,
@@ -445,7 +436,7 @@ Inprint.fascicle.templates.Modules = Ext.extend(Ext.grid.GridPanel, {
                 },
                 buttons: [ _BTN_WNDW_SAVE, _BTN_WNDW_CLOSE ]
             });
-            
+
         }
 
         win.show(this);
@@ -466,7 +457,7 @@ Inprint.fascicle.templates.Modules = Ext.extend(Ext.grid.GridPanel, {
 
         var form = win.form.getForm();
         form.reset();
-        
+
         form.load({
             url: this.urls.read,
             scope:this,
@@ -474,9 +465,9 @@ Inprint.fascicle.templates.Modules = Ext.extend(Ext.grid.GridPanel, {
                 id: this.getValue("id")
             }
         });
-        
+
     },
-    
+
     cmpDelete: function() {
         Ext.MessageBox.confirm(
             _("Warning"),

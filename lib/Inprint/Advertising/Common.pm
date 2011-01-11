@@ -18,19 +18,19 @@ sub editions {
     my $i_node = $c->param("node");
     $i_node = '00000000-0000-0000-0000-000000000000' unless ($i_node);
     $i_node = '00000000-0000-0000-0000-000000000000' if ($i_node eq "root-node");
-    
+
     my @errors;
     my $success = $c->json->false;
-    
+
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_node));
-    
+
     my @result;
-    
+
     unless (@errors) {
         my $sql;
         my @data;
-        
+
         $sql = "
             SELECT edition1.id, 'edition' as type, edition1.id as edition, edition1.shortcut as text, 'blue-folders-stack' as icon,
                 (
@@ -44,9 +44,9 @@ sub editions {
             ORDER BY edition1.shortcut
         ";
         push @data, $i_node;
-        
+
         my $data = $c->sql->Q("$sql", \@data)->Hashes;
-        
+
         foreach my $item (@$data) {
             my $record = {
                 id   => $item->{id},
@@ -64,7 +64,7 @@ sub editions {
     }
 
     $success = $c->json->true unless (@errors);
-    
+
     $c->render_json( \@result );
 }
 
@@ -75,19 +75,19 @@ sub fascicles {
     my $i_node = $c->param("node");
     $i_node = '00000000-0000-0000-0000-000000000000' unless ($i_node);
     $i_node = '00000000-0000-0000-0000-000000000000' if ($i_node eq "root-node");
-    
+
     my @errors;
     my $success = $c->json->false;
-    
+
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_node));
-    
+
     my @result;
-    
+
     unless (@errors) {
         my $sql;
         my @data;
-        
+
         $sql = "
             (
                 SELECT edition1.id, 'edition' as type, edition1.id as edition, null as fascicle, edition1.shortcut as text, 'blue-folders-stack' as icon,
@@ -112,9 +112,9 @@ sub fascicles {
         ";
         push @data, $i_node;
         push @data, $i_node;
-        
+
         my $data = $c->sql->Q("$sql", \@data)->Hashes;
-        
+
         foreach my $item (@$data) {
             my $record = {
                 id   => $item->{id},
@@ -122,7 +122,7 @@ sub fascicles {
                 leaf => $item->{have_childs},
                 icon => $item->{icon},
                 type => $item->{type},
-                
+
                 edition  => $item->{edition},
                 fascicle => $item->{fascicle},
             };
@@ -136,7 +136,7 @@ sub fascicles {
     }
 
     $success = $c->json->true unless (@errors);
-    
+
     $c->render_json( \@result );
 }
 
@@ -147,19 +147,19 @@ sub places {
     my $i_node = $c->param("node");
     $i_node = '00000000-0000-0000-0000-000000000000' unless ($i_node);
     $i_node = '00000000-0000-0000-0000-000000000000' if ($i_node eq "root-node");
-    
+
     my @errors;
     my $success = $c->json->false;
-    
+
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_node));
-    
+
     my @result;
-    
+
     unless (@errors) {
         my $sql;
         my @data;
-        
+
         $sql = "
             (
                 SELECT edition1.id, 'edition' as type, edition1.id as edition, edition1.shortcut as text, 'blue-folders-stack' as icon,
@@ -178,15 +178,15 @@ sub places {
                 SELECT id, 'place' as type, edition, title as text, 'zone' as icon, false as have_childs
                 FROM ad_places
                 WHERE edition=?
-                ORDER BY shortcut
+                ORDER BY title
             )
         ";
-        
+
         push @data, $i_node;
         push @data, $i_node;
-        
+
         my $data = $c->sql->Q("$sql", \@data)->Hashes;
-        
+
         foreach my $item (@$data) {
             my $record = {
                 id      => $item->{id},
@@ -206,7 +206,7 @@ sub places {
     }
 
     $success = $c->json->true unless (@errors);
-    
+
     $c->render_json( \@result );
 }
 

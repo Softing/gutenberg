@@ -7,21 +7,21 @@ Inprint.catalog.indexes.Interaction = function(parent, panels) {
     // Tree
     editions.getSelectionModel().on("selectionchange", function(sm, node) {
         if (node) {
-            parent.edition = node.id;
-            headlines.getRootNode().id = parent.edition;
+            headlines.currentEdition = node.id;
+            headlines.getRootNode().id = node.id;
             headlines.getRootNode().reload();
         }
     });
 
     headlines.getSelectionModel().on("selectionchange", function(sm, node) {
         if (node) {
-            parent.headline = node.id;
             rubrics.enable();
-            rubrics.cmpLoad({ headline: parent.headline });
             rubrics.btnCreate.enable();
+            rubrics.currentHeadline = node.id;
+            rubrics.cmpLoad({ headline: node.id });
         }
     });
-    
+
     rubrics.getSelectionModel().on("selectionchange", function(sm) {
         _disable(rubrics.btnDelete, rubrics.btnUpdate);
         if (parent.access["manage"]) {
@@ -33,5 +33,5 @@ Inprint.catalog.indexes.Interaction = function(parent, panels) {
             }
         }
     });
-    
+
 }

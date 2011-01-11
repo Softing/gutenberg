@@ -52,28 +52,31 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                     nodeType: 'async',
                     expanded: true,
                     draggable: false,
-                    icon: _ico("folder-open"),
+                    icon: _ico("xfn-friend"),
                     text: _("All departments")
                 }
             },
-            
-            xc.getConfig("/documents/filters/fascicles/", {
+            {
                 columnWidth:.125,
-                cacheQuery: false,
-                listeners: {
-                    scope: this,
-                    render: function(combo) {
-                        this.getForm().findField("edition").on("select", function() {
-                            combo.enable();
-                            combo.reset();
-                        }, this);
-                    },
-                    beforequery: function(qe) {
-                        qe.combo.getStore().baseParams = this.getFilterParams();
-                        delete qe.combo.lastQuery;
-                    }
+                xtype: "treecombo",
+                name: "fascicle",
+                fieldLabel: _("Fascicle"),
+                emptyText: _("Fascicle") + "...",
+                minListWidth: 250,
+                url: _url('/documents/trees/fascicles/'),
+                baseParams: {
+                    term: 'editions.documents.work'
+                },
+                rootVisible:true,
+                root: {
+                    id:'00000000-0000-0000-0000-000000000000',
+                    nodeType: 'async',
+                    expanded: true,
+                    draggable: false,
+                    icon: _ico("blue-folder-open-document-text"),
+                    text: _("All fascicles")
                 }
-            }),
+            },
             xc.getConfig("/documents/filters/headlines/", {
                 columnWidth:.125,
                 cacheQuery: false,
@@ -212,7 +215,7 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
         if (state["headline"] && state["headline"].id != "clear") {
             form.findField("rubric").enable();
         }
-        
+
         for (var i in state) {
             if (state[i].id && state[i].id != "clear") {
                 var field = form.findField(i);

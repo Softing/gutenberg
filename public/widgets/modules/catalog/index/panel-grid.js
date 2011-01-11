@@ -12,17 +12,17 @@ Inprint.catalog.indexes.Rubrics = Ext.extend(Ext.grid.GridPanel, {
         };
 
         this.store = Inprint.factory.Store.json("/catalog/rubrics/list/");
-        
+
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
 
         this.columns = [
             this.selectionModel,
             {
-                id:"name",
-                header: _("Shortcut"),
+                id:"title",
+                header: _("Title"),
                 width: 160,
                 sortable: true,
-                dataIndex: "shortcut"
+                dataIndex: "title"
             },
             {
                 id:"description",
@@ -77,7 +77,7 @@ Inprint.catalog.indexes.Rubrics = Ext.extend(Ext.grid.GridPanel, {
     onRender: function() {
         Inprint.catalog.indexes.Rubrics.superclass.onRender.apply(this, arguments);
     },
-    
+
     cmpCreate: function() {
 
         var win = this.components["add-window"];
@@ -98,10 +98,8 @@ Inprint.catalog.indexes.Rubrics = Ext.extend(Ext.grid.GridPanel, {
                 },
                 bodyStyle: "padding:5px 5px",
                 items: [
-                    _FLD_HDN_EDITION,
                     _FLD_HDN_HEADLINE,
                     _FLD_TITLE,
-                    _FLD_SHORTCUT,
                     _FLD_DESCRIPTION
                 ],
                 keys: [ _KEY_ENTER_SUBMIT ],
@@ -128,8 +126,7 @@ Inprint.catalog.indexes.Rubrics = Ext.extend(Ext.grid.GridPanel, {
         var form = win.items.first().getForm();
         form.reset();
 
-        form.findField("edition").setValue(this.parent.edition);
-        form.findField("headline").setValue(this.parent.headline);
+        form.findField("headline").setValue(this.currentHeadline);
 
         win.show(this);
         this.components["add-window"] = win;
@@ -154,7 +151,6 @@ Inprint.catalog.indexes.Rubrics = Ext.extend(Ext.grid.GridPanel, {
                 items: [
                     _FLD_HDN_ID,
                     _FLD_TITLE,
-                    _FLD_SHORTCUT,
                     _FLD_DESCRIPTION
                 ],
                 keys: [ _KEY_ENTER_SUBMIT ],

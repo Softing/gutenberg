@@ -1,4 +1,4 @@
-Inprint.edition.calendar.Interaction = function(panels) {
+Inprint.edition.calendar.Interaction = function(parent, panels) {
 
     var tree = panels.tree;
     var grid = panels.grid;
@@ -10,60 +10,44 @@ Inprint.edition.calendar.Interaction = function(panels) {
 
     tree.getSelectionModel().on("selectionchange", function(sm, node) {
         if (node && node.id) {
+
             grid.enable();
             grid.currentEdition = node.id;
-            grid.cmpLoad({ edition: grid.currentEdition });
+
+            _disable(grid.btnCreate, grid.btnUpdate, grid.btnDelete);
+
+            _a(["editions.calendar.manage"], grid.currentEdition, function(access) {
+
+                if (access["editions.calendar.manage"] == true) {
+                    managed = true;
+                    _enable(grid.btnCreate);
+                } else {
+                    managed = false;
+                    _disable(grid.btnCreate);
+                }
+
+                grid.getLoader().baseParams = {
+                    edition: grid.currentEdition
+                };
+
+                grid.getRootNode().reload();
+
+            });
+
         } else {
             grid.disable();
         }
     });
 
     // Grid
-    
-    grid.getStore().on("load", function(){
-        
-        managed = false;
-        grid.btnCreate.disable();
-        
-        Ext.Ajax.request({
-            url: _url("/access/"),
-            params: {
-                term: "editions.calendar.manage",
-                binding: grid.currentEdition
-            },
-            scope: this,
-            success: function(result) {
-                var data = Ext.util.JSON.decode(result.responseText);
-                if (data.result["editions.calendar.manage"] == true) {
-                    managed = true;
-                    grid.btnCreate.enable();
-                }
-            }
-        });
+
+    grid.getSelectionModel().on("selectionchange", function(sm, node) {
+
+        _disable(grid.btnUpdate, grid.btnDelete, grid.btnEnable, grid.btnDisable);
+        if (node && managed) {
+            _enable(grid.btnUpdate, grid.btnDelete, grid.btnEnable, grid.btnDisable);
+        }
+
     });
-    
-    grid.getSelectionModel().on("selectionchange", function(sm) {
-        
-        this.btnUpdate.disable();
-        this.btnDelete.disable();
-        this.btnEnable.disable();
-        this.btnDisable.disable();
-        
-        if (sm.getCount() == 1 && managed) {
-            this.btnUpdate.enable();
-            this.btnDelete.enable();
-            this.btnEnable.enable();
-            this.btnDisable.enable();
-        }
-        
-        if (sm.getCount() > 1 && managed) {
-            this.btnUpdate.disable();
-            this.btnDelete.enable();
-            this.btnEnable.enable();
-            this.btnDisable.enable();
-        }
-    
-    }, grid);
-    
 
 }

@@ -1,12 +1,13 @@
 Inprint.edition.calendar.Tree = Ext.extend(Ext.tree.TreePanel, {
+
     initComponent: function() {
 
         this.components = {};
 
         this.urls = {
             "tree":    _url("/calendar/tree/")
-
         };
+
         Ext.apply(this, {
             autoScroll:true,
             dataUrl: this.urls.tree,
@@ -26,6 +27,7 @@ Inprint.edition.calendar.Tree = Ext.extend(Ext.tree.TreePanel, {
         });
 
         Inprint.edition.calendar.Tree.superclass.initComponent.apply(this, arguments);
+
         this.on("beforeappend", function(tree, parent, node) {
             if (node.attributes.icon == undefined) {
                 node.attributes.icon = 'folder-open';
@@ -35,7 +37,9 @@ Inprint.edition.calendar.Tree = Ext.extend(Ext.tree.TreePanel, {
                 node.text = "<span style=\"color:#"+ node.attributes.color +"\">" + node.attributes.text + "</span>";
             }
         });
+
     },
+
     onRender: function() {
         Inprint.edition.calendar.Tree.superclass.onRender.apply(this, arguments);
         this.getRootNode().on("expand", function(node) {
@@ -46,4 +50,5 @@ Inprint.edition.calendar.Tree = Ext.extend(Ext.tree.TreePanel, {
         this.getLoader().on("load", function() { this.body.unmask(); }, this);
         this.getRootNode().expand();
     }
+
 });

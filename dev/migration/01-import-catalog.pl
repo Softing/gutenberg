@@ -40,21 +40,9 @@ $sql2->SetConnection($conn2);
 
 my $rootnode = '00000000-0000-0000-0000-000000000000';
 
-$sql->Do(" DELETE FROM catalog ");
-$sql->Do(" DELETE FROM editions ");
+$sql->Do(" DELETE FROM catalog  WHERE id <> '00000000-0000-0000-0000-000000000000' ");
+$sql->Do(" DELETE FROM editions WHERE id <> '00000000-0000-0000-0000-000000000000' ");
 $sql->Do(" DELETE FROM migration WHERE mtype = 'edition' OR mtype='catalog' ");
-
-$sql->Do("
-    INSERT INTO catalog (id, path, title, shortcut, description, type, capables, created, updated)
-    VALUES ('00000000-0000-0000-0000-000000000000', '00000000000000000000000000000000',
-        'Издательский Дом', 'ИД ЗР', 'Издательский дом \"За рулем\"', 'ou', '{default}', '2010-08-03 19:01:13.77+04', '2010-08-03 19:01:13.77+04');
-");
-
-$sql->Do("
-    INSERT INTO editions (id, path, title, shortcut, description, created, updated)
-    VALUES ('00000000-0000-0000-0000-000000000000', '00000000000000000000000000000000',
-        'Все издания', 'Все издания', 'Все издания', '2010-08-03 19:01:13.77+04', '2010-08-03 19:01:13.77+04');
-");
 
 # Import Editions
 

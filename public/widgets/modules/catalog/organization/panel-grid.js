@@ -48,7 +48,7 @@ Inprint.catalog.organization.Grid = Ext.extend(Ext.grid.GridPanel, {
         this.tbar = [
             {
                 xtype: 'buttongroup',
-                title: _("Organization"),
+                title: _("Employees"),
                 defaults: { scale: 'small' },
                 items: [
                     {

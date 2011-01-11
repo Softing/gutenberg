@@ -16,6 +16,7 @@ our %Lexicon = (
     "Access rights management"    => "",
     "Account removal"             => "",
     "Action"                      => "",
+    "Active"                      => "Активно",
     "Active request"              => "Активная заявка",
     "Add"                         => "Добавить",
     "Add a comment"               => "Добавить комментарий",
@@ -196,10 +197,12 @@ our %Lexicon = (
     "Organization"                => "Организация",
     "Page"                        => "Полоса",
     "Pages"                       => "Полосы",
-    "Parent"                      => "",
+    "Paid"                        => "Оплачено",
+    "Parameters"                  => "Параметры",
+    "Parent"                      => "Родитель",
     "Password"                    => "Пароль",
     "Path to image"               => "",
-    "Payment"                     => "",
+    "Payment"                     => "Оплата",
     "Percent"                     => "",
     "Phones"                      => "",
     "Photo"                       => "Фото",
@@ -208,6 +211,7 @@ our %Lexicon = (
     "Please enter your text"      => "Пожалуйста, введите текст",
     "Please wait..."              => "",
     "Position"                    => "Должность",
+    "Possible"                    => "Возможно",
     "Possible request"            => "Возможна заявка",
     "Principals list"             => "",
     "Probably someone has entered in Inprint with your login on other computer. <br/> push F5 what to pass to authorization page"=> "",
@@ -215,7 +219,7 @@ our %Lexicon = (
     "Profile of the employee"     => "",
     "Progress"                    => "Готовность",
     "Publication"                 => "Публикация",
-    "Publishing House"            => "",
+    "Publishing House"            => "Издательский дом",
     "RQ"                          => "",
     "RS"                          => "РС",
     "Readiness"                   => "Готовность",
@@ -228,6 +232,7 @@ our %Lexicon = (
     "Reload"                      => "Обновить",
     "Remove"                      => "Удалить",
     "Rename file"                 => "Переименовать файл",
+    "Request"                     => "Заявка",
     "Reservation"                 => "Резерв",
     "Restore"                     => "Восстановить",
     "Review of access rights"     => "",
@@ -253,6 +258,7 @@ our %Lexicon = (
     "Settings"                    => "Настройки",
     "Shortcut"                    => "Ярлык",
     "Show archvies"               => "Показать архивы",
+    "Squib"                       => "Подверстка",
     "Simple Text (txt)"           => "",
     "Size"                        => "Размер",
     "Stage"                       => "Ступень",
@@ -265,7 +271,8 @@ our %Lexicon = (
     "System profile"              => "Системный профиль",
     "Table format"                => "",
     "Tabular text (txt)"          => "",
-    "Template"                    => "",
+    "Template"                    => "Шаблон",
+    "Templates"                   => "Шаблоны",
     "Templates of pages"          => "Шаблоны полос",
     "Termination of membership"   => "",
     "Text editing"                => "",
@@ -307,7 +314,7 @@ our %Lexicon = (
     "Your session is closed"      => "",
     "Разметка полос"              => "",
     "Сhange fascicle"             => "",
-    
+
     "Can log in to the program"         => "Может входить в программу",
     "Can view the configuration"        => "Может просматривать конфигурацию",
     "Can manage departments"            => "Может управлять отделами",
@@ -337,7 +344,7 @@ our %Lexicon = (
     "Can manage layouts"                => "Может управлять макетами",
     "Can work with documents"           => "Может работать с материалами издания",
 
-	
+
 );
 
 sub get {

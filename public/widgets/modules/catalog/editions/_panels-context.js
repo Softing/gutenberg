@@ -3,7 +3,7 @@ Inprint.catalog.editions.Context = function(parent, panels) {
     var tree = panels.tree;
 
     tree.on("contextmenu", function(node) {
-        
+
         this.selection = node;
 
         var disabled = true;
@@ -45,7 +45,7 @@ Inprint.catalog.editions.Context = function(parent, panels) {
                 handler: function() { this.cmpDelete(node); }
             });
         }
-        
+
         items.push('-', {
             icon: _ico("arrow-circle-double"),
             cls: "x-btn-text-icon",

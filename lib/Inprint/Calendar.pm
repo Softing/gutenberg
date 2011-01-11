@@ -9,6 +9,7 @@ use strict;
 use warnings;
 
 use Inprint::Utils::Documents;
+use Inprint::Models::Fascicle;
 
 use base 'Inprint::BaseController';
 
@@ -19,19 +20,19 @@ sub tree {
     my $i_node = $c->param("node");
     $i_node = '00000000-0000-0000-0000-000000000000' unless ($i_node);
     $i_node = '00000000-0000-0000-0000-000000000000' if ($i_node eq "root-node");
-    
+
     my @errors;
     my $success = $c->json->false;
-    
+
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_node));
-    
+
     my @result;
-    
+
     unless (@errors) {
         my $sql;
         my @data;
-        
+
         $sql = "
             SELECT *, ( SELECT count(*) FROM editions c2 WHERE c2.path ~ ('*.' || replace(?, '-', '')::text || '.*{2}')::lquery ) as have_childs
             FROM editions
@@ -41,15 +42,15 @@ sub tree {
         ";
         push @data, $i_node;
         push @data, $i_node;
-        
+
         my $data = $c->sql->Q("$sql ORDER BY shortcut", \@data)->Hashes;
-        
+
         foreach my $item (@$data) {
             my $record = {
                 id   => $item->{id},
                 text => $item->{shortcut},
                 leaf => $c->json->true,
-                icon => "book",
+                icon => "blue-folders",
                 data => $item
             };
             if ( $item->{have_childs} ) {
@@ -60,7 +61,7 @@ sub tree {
     }
 
     $success = $c->json->true unless (@errors);
-    
+
     $c->render_json( \@result );
 }
 
@@ -70,266 +71,149 @@ sub list {
 
     my @params;
 
-    my $edition     = $c->param("edition") || undef;
-    my $showArchive = $c->param("showArchive") || "false";
+    my $i_edition = $c->param("edition") || undef;
+    my $i_archive = $c->param("showArchive") || "false";
 
+    my $edition  = $c->sql->Q("SELECT * FROM editions WHERE id=?", [ $i_edition ])->Hash;
     my $editions = $c->access->GetChildrens("editions.documents.work");
-    
-    my $sql1 = "
+
+    #    EXTRACT( DAY FROM t1.enddate-t1.begindate) as totaldays,
+    #    EXTRACT( DAY FROM now()-t1.begindate) as passeddays
+
+    # Common sql
+    my $sql = "
         SELECT
-            t1.id, t1.is_system, t1.edition, t2.shortcut as edition_shortcut,
-            t1.title, t1.shortcut, t1.description,
-            to_char(t1.begindate, 'YYYY-MM-DD HH24:MI:SS') as begindate,
-            to_char(t1.enddate, 'YYYY-MM-DD HH24:MI:SS') as enddate,
-            t1.is_enabled, t1.created, t1.updated,
-            EXTRACT( DAY FROM t1.enddate-t1.begindate) as totaldays,
-            EXTRACT( DAY FROM now()-t1.begindate) as passeddays
-        FROM fascicles t1, editions t2
-        WHERE
-            t1.edition = ANY (?)
-            AND t1.is_system = false AND t1.edition = t2.id
+            t1.id,
+            t2.id as edition, t2.shortcut as edition_shortcut,
+            t1.parent, t1.title, t1.shortcut, t1.description, t1.manager, t1.variation,
+            to_char(t1.deadline, 'YYYY-MM-DD HH24:MI:SS') as deadline,
+            to_char(t1.advert_deadline, 'YYYY-MM-DD HH24:MI:SS') as advert_deadline,
+            t1.created, t1.updated
+        FROM fascicles t1, editions t2 WHERE t2.id=t1.edition
     ";
 
-    push @params, $editions;
+    # Parent query
+    my $sql_parent = $sql . " AND edition=? AND t1.edition=t1.parent ";
+    push @params, $edition->{id};
 
-    if ($edition && $edition ne "00000000-0000-0000-0000-000000000000") {
-        $sql1 .= " AND edition=? ";
-        push @params, $edition;
+    # Archive
+    if ($i_archive eq 'true') {
+        $sql_parent .= " AND t1.deadline < now() ";
     }
 
-    if ($showArchive eq 'true') {
-        
-    } else {
-        $sql1 .= " AND t1.is_enabled = true ";
+    if ($i_archive ne 'true') {
+        $sql_parent .= " AND t1.deadline >= now() ";
     }
 
-    $sql1 .= " ORDER BY enddate DESC";
+    $sql_parent .= " ORDER BY t1.deadline DESC ";
 
-    my $result = $c->sql->Q($sql1, \@params)->Hashes;
+    my $result = $c->sql->Q($sql_parent, \@params)->Hashes;
 
-    $c->render_json( { data => $result } );
+    foreach my $node (@{ $result }) {
+
+        $node->{leaf} = $c->json->true;
+        $node->{icon} = "/icons/blue-folder-open.png";
+
+        my $sql_childrens = $sql . " AND t1.parent=? ORDER BY t1.deadline DESC ";
+        $node->{children} = $c->sql->Q($sql_childrens, [ $node->{id} ])->Hashes;
+
+        foreach my $subnode (@{ $node->{children} }) {
+            $node->{leaf} = $c->json->false;
+            $subnode->{icon} = "/icons/blueprint.png";
+            $subnode->{leaf} = $c->json->true;
+            $subnode->{shortcut} = $subnode->{edition_shortcut} ."/". $subnode->{shortcut};
+        }
+
+        $node->{shortcut} = $node->{edition_shortcut} ."/". $node->{shortcut};
+
+    }
+
+    $c->render_json( $result );
 }
 
 sub create {
+
     my $c = shift;
 
-    my $id = $c->uuid();
+    my $id      = $c->uuid();
     my $version = $c->uuid();
 
-    my $i_edition     = $c->param("edition");
-    my $i_title       = $c->param("title");
-    my $i_shortcut    = $c->param("shortcut");
-    my $i_description = $c->param("description");
-    my $i_begindate   = $c->param("begindate");
-    my $i_enddate     = $c->param("enddate");
-    
-    my $i_copyfrom     = $c->param("copyfrom");
-    
+    my $i_edition       = $c->param("edition");
+    my $i_parent        = $c->param("parent");
+
+    my $i_enabled       = $c->param("enabled");
+
+    my $i_title         = $c->param("title");
+    my $i_shortcut      = $c->param("shortcut");
+    my $i_description   = $c->param("description");
+
+    my $i_deadline      = $c->param("deadline");
+    my $i_advertisement = $c->param("advertisement");
+
+    my $i_copyfrom      = $c->param("copyfrom");
+
+    my $enabled = 0;
+    if ($i_enabled eq "on") {
+        $enabled = 1;
+    }
+
     my @errors;
     my $success = $c->json->false;
-    
+
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_edition));
-        
+
     push @errors, { id => "title", msg => "Incorrectly filled field"}
         unless ($c->is_text($i_title));
-    
+
     if ($i_shortcut) {
         push @errors, { id => "shortcut", msg => "Incorrectly filled field"}
             unless ($c->is_text($i_shortcut));
     }
-    
+
     if ($i_description) {
         push @errors, { id => "description", msg => "Incorrectly filled field"}
             unless ($c->is_text($i_description));
     }
-    
+
     if ($i_copyfrom) {
         push @errors, { id => "copypages", msg => "Incorrectly filled field"}
             unless ($c->is_uuid($i_copyfrom));
     }
-    
+
+    unless ($i_parent) {
+        $i_parent = $i_edition;
+    }
+
     #TODO: add date checks
-    
+
     my $edition;
     unless (@errors) {
-        $edition = $c->sql->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
+        $edition = $c->sql->Q("
+            SELECT * FROM editions WHERE id=? ",
+            [ $i_edition ])->Hash;
         push @errors, { id => "edition", msg => "Incorrectly filled field"}
             unless ($edition->{id});
     }
-    
+
     unless (@errors) {
+
         $c->sql->bt;
-    
-        # Create new fascicle
-        $c->sql->Do("
-            INSERT INTO fascicles (
-                id, edition, base_edition, variation, is_system, is_enabled, is_blocked, title, shortcut, description, begindate, enddate, created, updated)
-                VALUES (?, ?, ?, ?, false, true, false, ?, ?, ?, ?, ?, now(), now());
-        ", [ $id, $i_edition, $i_edition, $version, $i_title, $i_title, $i_title, $i_begindate, $i_enddate ]);
-        
-        # Import defaults
+
+        # Create new Fascicle
+        Inprint::Models::Fascicle::create( $c, $id, $i_edition, $i_parent, $enabled, $i_title,
+            $i_shortcut, $i_description, $version, $i_deadline, $i_advertisement );
+
+        # Import from Defaults
         if ($i_copyfrom && $i_copyfrom eq "00000000-0000-0000-0000-000000000000") {
-            
-            my %cache;
-            
-            my $editions = $c->sql->Q("
-                SELECT id FROM editions WHERE path @> ? order by path asc; 
-            ", [ $edition->{path} ])->Values;
-            
-            # import index
-            
-            my $headlines = $c->sql->Q("
-                SELECT id, edition, nature, parent, title, shortcut, description, created, updated
-                FROM index
-                WHERE nature = 'headline' AND edition = ANY(?)
-            ", [ $editions ])->Hashes;
-
-            foreach my $headline (@$headlines) {
-
-                my $headline_id = $c->uuid();
-                
-                my $headline_origin = $headline->{id};
-                if ($headline->{parent} eq "00000000-0000-0000-0000-000000000000") {
-                    $headline_origin = "00000000-0000-0000-0000-000000000000";
-                }
-                
-                $c->sql->Do("
-                    INSERT INTO index_fascicles(id, edition, fascicle, origin, nature, parent, title, shortcut, description, created, updated)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
-                ", [ $headline_id, $edition->{id}, $id, $headline_origin, 'headline', $headline_id, $headline->{title}, $headline->{shortcut}, $headline->{description} ]);
-                
-                $cache{ $headline->{id} } = $headline_id;
-                
-                my $rubrics = $c->sql->Q("
-                    SELECT id, edition, nature, parent, title, shortcut, description, created, updated
-                    FROM index WHERE nature = 'rubric' AND parent = ?
-                ", [ $headline->{id} ])->Hashes;
-
-                foreach my $rubric (@$rubrics) {
-                    
-                    my $rubric_id = $c->uuid();
-
-                    my $rubric_origin = $rubric->{id};
-                    if ($rubric->{parent} eq "00000000-0000-0000-0000-000000000000") {
-                        $rubric_origin = "00000000-0000-0000-0000-000000000000";
-                    }
-                    
-                    $c->sql->Do("
-                        INSERT INTO index_fascicles(id, edition, fascicle, origin, nature, parent, title, shortcut, description, created, updated)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
-                    ", [ $rubric_id, $edition->{id}, $id, $rubric_origin, 'rubric', $headline_id, $rubric->{title}, $rubric->{shortcut}, $rubric->{description} ]);
-                }
-
-            }
-            
-            # import page and modules templates
-            
-            my $tmpl_pages   = $c->sql->Q(" SELECT id, edition, title, shortcut, description, bydefault, w, h, created, updated FROM ad_pages WHERE edition = ANY(?) ", [ $editions ])->Hashes;
-            
-            foreach my $page (@$tmpl_pages) {
-                
-                my $page_id = $c->uuid;
-                
-                $c->sql->Do("
-                    INSERT INTO fascicles_tmpl_pages(id, origin, fascicle, title, shortcut, description, bydefault, w, h, created, updated)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
-                ", [ $page_id, $page->{id}, $id, $page->{title}, $page->{shortcut}, $page->{description}, $page->{bydefault}, $page->{w}, $page->{h} ]);
-                
-                my $tmpl_modules = $c->sql->Q("
-                    SELECT id, edition, page, title, shortcut, description, amount, area, x, y, w, h, created, updated
-                    FROM ad_modules WHERE page=? ", [ $page->{id} ])->Hashes;
-                
-                foreach my $module (@$tmpl_modules) {
-                    
-                    my $module_id = $c->uuid();
-                    
-                    $c->sql->Do("
-                        INSERT INTO fascicles_tmpl_modules(id, origin, fascicle, page, title, shortcut, description, amount, area, x, y, w, h, created, updated)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
-                    ", [ $module_id, $module->{id},  $id, $page_id, $module->{title}, $module->{shortcut}, $module->{description}, $module->{amount}, $module->{area}, $module->{x}, $module->{y}, $module->{w}, $module->{h} ]);
-                    
-                    $cache{ $module->{id} } = $module_id;
-                    
-                }
-            
-            }
-            
-            # Import places
-            
-            my $tmpl_places  = $c->sql->Q(" SELECT id, edition, title, shortcut, description, created, updated FROM ad_places WHERE edition = ANY(?) ", [ $editions ])->Hashes;
-            
-            foreach my $place (@$tmpl_places) {
-                
-                my $place_id = $c->uuid();
-                
-                $c->sql->Do("
-                    INSERT INTO fascicles_tmpl_places(id, origin, fascicle, title, shortcut, description, created, updated)
-                        VALUES (?, ?, ?, ?, ?, ?, now(), now());
-                ", [ $place_id, $place->{id}, $id, $place->{title}, $place->{shortcut}, $place->{description} ]);
-                
-                $cache{ $place->{id} } = $place_id;
-            }
-            
-            # Import places index
-            
-            my $tmpl_places_index = $c->sql->Q("
-                    SELECT id, edition, place, nature, entity, created, updated
-                    FROM ad_index WHERE edition = ?
-                ", [ $edition->{id} ])->Hashes;
-            
-            foreach my $indx (@$tmpl_places_index) {
-                
-                my $indx_id = $c->uuid();
-                #die $indx->{entity} .'-'. $indx->{nature} unless $cache{ $indx->{entity} };
-                
-                my $place_id = $cache{ $indx->{place} };
-                my $entity_id = $cache{ $indx->{entity} };
-                
-                next unless $place_id;
-                next unless $entity_id;
-                
-                $c->sql->Do("
-                    INSERT INTO fascicles_tmpl_index(id, edition, fascicle, place, nature, entity, created, updated)
-                        VALUES (?, ?, ?, ?, ?, ?, now(), now());
-                ", [ $indx_id, $edition->{id}, $id, $place_id, $indx->{nature}, $entity_id ]);
-                
-            }
-            
+            Inprint::Models::Fascicle::importFromDefaults($c, $id);
         }
-        
+
+        # Import from Fascicle
         if ($i_copyfrom && $i_copyfrom ne "00000000-0000-0000-0000-000000000000") {
-            
-            my $headlines = $c->sql->Q("
-                SELECT id, edition, fascicle, origin, nature, parent, title, shortcut, description, created, updated
-                FROM index_fascicles WHERE nature = 'headline' AND fascicle = ?;
-            ", [ $i_copyfrom ])->Hashes;
-            
-            foreach my $headline (@$headlines) {
-                
-                my $headline_id = $c->uuid();
-                
-                $c->sql->Do("
-                    INSERT INTO index_fascicles(id, edition, fascicle, origin, nature, parent, title, shortcut, description, created, updated)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
-                ", [ $headline_id, $headline->{edition}, $id, $headline->{origin}, $headline->{nature}, $headline_id, $headline->{title}, $headline->{shortcut}, $headline->{description} ]);
-                
-                my $rubrics = $c->sql->Q("
-                    SELECT id, edition, fascicle, origin, nature, parent, title, shortcut, description, created, updated
-                    FROM index_fascicles WHERE nature = 'rubric' AND parent = ?
-                ", [ $headline->{id} ])->Hashes;
-                
-                foreach my $rubric (@$rubrics) {
-                    my $rubric_id = $c->uuid();
-                    $c->sql->Do("
-                            INSERT INTO index_fascicles(id, edition, fascicle, origin, nature, parent, title, shortcut, description, created, updated)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
-                        ", [ $rubric_id, $rubric->{edition}, $id, $rubric->{origin}, $rubric->{nature}, $headline_id, $rubric->{title}, $rubric->{shortcut}, $rubric->{description} ]);
-                }
-            }
-            
+            Inprint::Models::Fascicle::importFromFascicle($c, $id, $i_copyfrom);
         }
-        
+
         $c->sql->et;
     }
 
@@ -341,14 +225,9 @@ sub read {
 
     my $c = shift;
 
-    my $id = $c->param("id");
+    my $i_id = $c->param("id");
 
-    my $result = $c->sql->Q("
-        SELECT id, is_system, edition, title, shortcut, description, begindate, enddate,
-            is_enabled, created, updated
-        FROM fascicles
-        WHERE id=? ORDER shortcut
-    ", [ $id ])->Hash;
+    my $result = Inprint::Models::Fascicle::read($c, $i_id);
 
     $c->render_json( { success => $c->json->true, data => $result } );
 }
@@ -357,70 +236,63 @@ sub read {
 sub update {
     my $c = shift;
 
-    my $i_id          = $c->param("id");
-    my $i_title       = $c->param("name");
-    my $i_edition     = $c->param("edition");
-    my $i_shortcut    = $c->param("shortcut");
-    my $i_description = $c->param("description");
-    
-    my $i_begindate   = $c->param("begindate");
-    my $i_enddate     = $c->param("enddate");
+    my $i_id            = $c->param("id");
 
-    $c->sql->Do("
-        UPDATE fascicles
-            SET title=?, shortcut=?, description=?, begindate=?, enddate=?
-        WHERE id =?;
-    ", [ $i_title, $i_title, $i_title, $i_begindate, $i_enddate, $i_id ]);
+    my $i_enabled       = $c->param("enabled");
+
+    my $i_title         = $c->param("title");
+    my $i_shortcut      = $c->param("shortcut");
+    my $i_description   = $c->param("description");
+
+    my $i_deadline      = $c->param("deadline");
+    my $i_advertisement = $c->param("advertisement");
+
+    my $enabled = 0;
+    if ($i_enabled eq "on") {
+        $enabled = 1;
+    }
+
+    Inprint::Models::Fascicle::update( $c, $i_id, $enabled, $i_title,
+            $i_shortcut, $i_description, $i_deadline, $i_advertisement );
 
     $c->render_json( { success => $c->json->true} );
 }
 
 sub delete {
     my $c = shift;
-    my @ids = $c->param("ids");
-    
+
+    my $i_fascicle = $c->param("id");
+
     my @errors;
-    
-    my $fascicle = $c->sql->Q(" SELECT id, shortcut FROM fascicles WHERE id='00000000-0000-0000-0000-000000000000' ")->Hash;
-    
-    foreach my $id (@ids) {
-        $c->sql->bt;
-        $c->sql->Do(" DELETE FROM fascicles WHERE id=? ", [ $id ]);
-        
-        $c->sql->Do(" DELETE FROM fascicles_tmpl_index WHERE fascicle=? ", [ $id ]);
-        $c->sql->Do(" DELETE FROM fascicles_tmpl_modules WHERE fascicle=? ", [ $id ]);
-        $c->sql->Do(" DELETE FROM fascicles_tmpl_pages WHERE fascicle=? ", [ $id ]);
-        $c->sql->Do(" DELETE FROM fascicles_tmpl_places WHERE fascicle=? ", [ $id ]);
-        
-        $c->sql->Do(" DELETE FROM index_fascicles WHERE fascicle=? ", [ $id ]);
-        
-        $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $id ]);
-        Inprint::Utils::Documents::MoveDocumentIndexToFascicle($c, \@errors, $id);
-        $c->sql->et;
-        
-    }
-    $c->render_json( { success => $c->json->true } );
-}
 
-sub enable {
-    my $c = shift;
-    my @ids = $c->param("ids");
-    foreach my $id (@ids) {
-        
-        $c->sql->Do(" UPDATE fascicles SET is_enabled = true WHERE id=? ", [ $id ]);
-        $c->sql->Do(" UPDATE documents SET isopen = true WHERE fascicle=? ", [ $id ]);
-        
-    }
-    $c->render_json( { success => $c->json->true } );
-}
+    # Get fascicle
+    my $fascicle = $c->sql->Q("
+        SELECT id, shortcut FROM fascicles WHERE id=? ",
+        [ $i_fascicle ])->Hash;
+    next unless ($fascicle->{id});
 
-sub disable {
-    my $c = shift;
-    my @ids = $c->param("ids");
-    foreach my $id (@ids) {
-        $c->sql->Do(" UPDATE fascicles SET is_enabled = false WHERE id=? ", [ $id ]);
-        $c->sql->Do(" UPDATE documents SET isopen = false WHERE fascicle=? ", [ $id ]);
-    }
+    # Get childrens
+    my $childrens = $c->sql->Q("
+        SELECT id, shortcut FROM fascicles WHERE parent=? ",
+        [ $i_fascicle ])->Hashes;
+
+    # Begin transaction
+    $c->sql->bt;
+
+        # Delete all childrens
+        foreach my $item (@{ $childrens }) {
+            Inprint::Models::Fascicle::delete($c, $item->{id});
+        }
+
+        # Delete fascicle
+        Inprint::Models::Fascicle::delete($c, $fascicle->{id});
+
+        # Update documents
+        #$c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $id ]);
+        #Inprint::Utils::Documents::MoveDocumentIndexToFascicle($c, \@errors, $fascicle->{id});
+
+    $c->sql->et;
+
     $c->render_json( { success => $c->json->true } );
 }
 

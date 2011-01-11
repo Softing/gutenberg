@@ -10,7 +10,7 @@ Inprint.advert.index.Modules = Ext.extend(Ext.grid.GridPanel, {
         }
 
         this.store = Inprint.factory.Store.json(this.urls["list"]);
-        
+
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
 
         this.columns = [
@@ -20,7 +20,7 @@ Inprint.advert.index.Modules = Ext.extend(Ext.grid.GridPanel, {
                 header: _("Page"),
                 width: 150,
                 sortable: true,
-                dataIndex: "page_shortcut"
+                dataIndex: "page_title"
             },
             {
                 id:"title",
@@ -79,7 +79,7 @@ Inprint.advert.index.Modules = Ext.extend(Ext.grid.GridPanel, {
                 dataIndex: "h"
             }
         ];
-        
+
         this.tbar = [
             {
                 scope:this,
@@ -107,7 +107,7 @@ Inprint.advert.index.Modules = Ext.extend(Ext.grid.GridPanel, {
 
     onRender: function() {
         Inprint.advert.index.Modules.superclass.onRender.apply(this, arguments);
-        
+
         this.getStore().on("load", function() {
             var sm = this.getSelectionModel();
             var ds = this.store;
@@ -119,9 +119,9 @@ Inprint.advert.index.Modules = Ext.extend(Ext.grid.GridPanel, {
                 }
             }
         }, this);
-        
+
     },
-    
+
     cmpSave: function() {
         Ext.MessageBox.confirm(
             _("Warning"),
@@ -142,5 +142,5 @@ Inprint.advert.index.Modules = Ext.extend(Ext.grid.GridPanel, {
                 }
             }, this).setIcon(Ext.MessageBox.WARNING);
     }
-    
+
 });

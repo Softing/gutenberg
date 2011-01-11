@@ -14,15 +14,15 @@ use base 'Inprint::BaseController';
 sub read {
     my $c = shift;
     my $i_id = $c->param("id");
-    
+
     my @errors;
     my $success = $c->json->false;
 
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_id));
-    
+
     my $result = [];
-    
+
     unless (@errors) {
         $result = $c->sql->Q("
             SELECT t1.*,
@@ -31,7 +31,7 @@ sub read {
             FROM editions t1 WHERE t1.id = ?
         ", [ $i_id ])->Hash;
     }
-    
+
     $success = $c->json->true unless (@errors);
     $c->render_json( { success => $success, errors => \@errors, data => $result } );
 }
@@ -39,25 +39,25 @@ sub read {
 sub tree {
 
     my $c = shift;
-    
+
     my $i_node = $c->param("node");
     $i_node = '00000000-0000-0000-0000-000000000000' unless ($i_node);
     $i_node = '00000000-0000-0000-0000-000000000000' if ($i_node eq "root-node");
-    
+
     my $i_show_briefcase = $c->param("show_briefcase");
-    
+
     my @errors;
     my $success = $c->json->false;
-    
+
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_node));
-    
+
     my @result;
-    
+
     unless (@errors) {
         my $sql;
         my @data;
-        
+
         $sql = "
             SELECT *, ( SELECT count(*) FROM editions c2 WHERE c2.path ~ ('*.' || replace(?, '-', '')::text || '.*{2}')::lquery ) as have_childs
             FROM editions
@@ -65,11 +65,12 @@ sub tree {
                 id <> '00000000-0000-0000-0000-000000000000'
                 AND subpath(path, nlevel(path) - 2, 1)::text = replace(?, '-', '')::text
         ";
-        push @data, $i_node;
-        push @data, $i_node;
         
+        push @data, $i_node;
+        push @data, $i_node;
+
         my $data = $c->sql->Q("$sql ORDER BY shortcut", \@data)->Hashes;
-        
+
         foreach my $item (@$data) {
             my $record = {
                 id   => $item->{id},
@@ -83,11 +84,11 @@ sub tree {
             }
             push @result, $record;
         }
-        
+
     }
 
     $success = $c->json->true unless (@errors);
-    
+
     $c->render_json( \@result );
 }
 
@@ -103,29 +104,29 @@ sub create {
 
     my @errors;
     my $success = $c->json->false;
-    
+
     push @errors, { id => "path", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_path));
-    
+
     push @errors, { id => "title", msg => "Incorrectly filled field"}
         unless ($c->is_text($i_title));
-        
+
     push @errors, { id => "shortcut", msg => "Incorrectly filled field"}
         unless ($c->is_text($i_shortcut));
-        
+
     push @errors, { id => "description", msg => "Incorrectly filled field"}
         unless ($c->is_text($i_description));
-        
+
     push @errors, { id => "access", msg => "Not enough permissions"}
         unless ($c->access->Check("domain.editions.manage"));
 
     unless (@errors) {
-        
+
         my $path = $c->sql->Q(" SELECT path FROM editions WHERE id =? ", [ $i_path ])->Value;
-        
+
         push @errors, { id => "path", msg => "Incorrectly filled field"}
             unless ($c->is_path($path));
-        
+
         unless (@errors) {
             $c->sql->Do("
                 INSERT INTO editions (id, title, shortcut, description, path)
@@ -133,7 +134,7 @@ sub create {
             ", [ $id, $i_title, $i_shortcut, $i_description, $path ]);
         }
     }
-    
+
     $success = $c->json->true unless (@errors);
     $c->render_json({ success => $success, errors => \@errors });
 }
@@ -149,32 +150,32 @@ sub update {
 
     my @errors;
     my $success = $c->json->false;
-    
+
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_id));
-    
+
     push @errors, { id => "path", msg => "Incorrectly filled field"}
         unless ($c->is_path($i_path));
-    
+
     push @errors, { id => "title", msg => "Incorrectly filled field"}
         unless ($c->is_text($i_title));
-        
+
     push @errors, { id => "shortcut", msg => "Incorrectly filled field"}
         unless ($c->is_text($i_shortcut));
-        
+
     push @errors, { id => "description", msg => "Incorrectly filled field"}
         unless ($c->is_text($i_description));
-        
+
     push @errors, { id => "access", msg => "Not enough permissions"}
         unless ($c->access->Check("domain.editions.manage"));
 
     unless (@errors) {
-        
+
         my $path = $c->sql->Q(" SELECT path FROM editions WHERE id =? ", [ $i_path ])->Value;
-        
+
         push @errors, { id => "path", msg => "Incorrectly filled field"}
             unless ($c->is_path($path));
-            
+
         unless (@errors) {
             $c->sql->Do(" UPDATE editions SET title=?, shortcut=?, description=?, path=replace(?, '-',  '')::ltree WHERE id=? ",
                 [ $i_title, $i_shortcut, $i_description, "$path.$i_id", $i_id ]);
@@ -203,7 +204,7 @@ sub delete {
     }
 
     $success = $c->json->true unless (@errors);
-    
+
     $c->render_json({ success => $success, errors => \@errors });
 }
 

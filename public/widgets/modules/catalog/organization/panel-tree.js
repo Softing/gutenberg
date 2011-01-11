@@ -17,10 +17,7 @@ Inprint.catalog.organization.Tree = Ext.extend(Ext.tree.TreePanel, {
             autoScroll:true,
             dataUrl: this.urls.tree,
             border:false,
-            //rootVisible: false,
-
-            // DD
-            enableDD:true,
+            enableDD:false,
             ddGroup:'member2catalog',
 
             root: {
@@ -51,11 +48,11 @@ Inprint.catalog.organization.Tree = Ext.extend(Ext.tree.TreePanel, {
     onRender: function() {
 
         Inprint.catalog.organization.Tree.superclass.onRender.apply(this, arguments);
-        
+
         this.on("load", function() {
             this.body.unmask();
         });
-        
+
         this.getRootNode().expand();
         this.getRootNode().on("expand", function(node) {
             node.select();
@@ -63,7 +60,7 @@ Inprint.catalog.organization.Tree = Ext.extend(Ext.tree.TreePanel, {
 
         this.getLoader().on("beforeload", function() { this.body.mask(_("Loading")); }, this);
         this.getLoader().on("load", function() { this.body.unmask(); }, this);
-        
+
     },
 
     cmpCreate: function(node) {
@@ -99,7 +96,7 @@ Inprint.catalog.organization.Tree = Ext.extend(Ext.tree.TreePanel, {
                 title: _("Catalog item creation"),
                 layout: "fit",
                 closeAction: "hide",
-                width:400, height:300,
+                width:400, height:200,
                 items: form
             });
 

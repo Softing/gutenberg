@@ -1,19 +1,19 @@
 Inprint.cmp.adverta.Request = Ext.extend(Ext.FormPanel, {
 
     initComponent: function() {
-        
+
         var xc = Inprint.factory.Combo;
-        
+
         this.items = [
-            
+
             _FLD_HDN_ID,
             _FLD_HDN_FASCICLE,
-            
+
             {
                 xtype: "titlefield",
                 value: "Заявка"
             },
-            
+
             xc.getConfig("/advertising/combo/advertisers/", {
                 hideLabel:true,
                 editable:true,
@@ -27,7 +27,7 @@ Inprint.cmp.adverta.Request = Ext.extend(Ext.FormPanel, {
                     }
                 }
             }),
-            
+
             {
                 xtype: "textfield",
                 allowBlank:false,
@@ -44,15 +44,15 @@ Inprint.cmp.adverta.Request = Ext.extend(Ext.FormPanel, {
                 fieldLabel: _("Description"),
                 emptyText: _("Description")
             },
-            
+
             {
                 xtype: "titlefield",
-                value: "Статусы"
+                value: _("Parameters")
             },
-            
+
             {
                 xtype: 'radiogroup',
-                fieldLabel: _("Заявка"),
+                fieldLabel: _("Request"),
                 style: "margin-bottom:10px",
                 columns: 1,
                 items: [
@@ -61,33 +61,39 @@ Inprint.cmp.adverta.Request = Ext.extend(Ext.FormPanel, {
                     { name: "status", inputValue: "reservation", boxLabel: _("Reservation"), checked: true }
                 ]
             },
-            
+
             {
                 xtype: 'radiogroup',
-                fieldLabel: _("Оплачено"),
+                fieldLabel: _("Squib"),
                 style: "margin-bottom:10px",
                 columns: 1,
                 items: [
-                    { name: "payment", inputValue: "yes", boxLabel: _("Yes") },
-                    { name: "payment", inputValue: "no",  boxLabel: _("No"), checked: true }
+                    { name: "squib", inputValue: "yes",    boxLabel: _("Yes") },
+                    { name: "squib", inputValue: "no", boxLabel: _("No"), checked: true }
                 ]
             },
-            
+
             {
-                xtype: 'radiogroup',
+                xtype: 'checkbox',
+                fieldLabel: _("Paid"),
+                boxLabel: _("Yes"),
+                name: 'payment',
+                checked: false
+            },
+
+            {
+                xtype: 'checkbox',
                 fieldLabel: _("Approved"),
-                columns: 1,
-                items: [
-                    { name: "readiness", inputValue: "yes", boxLabel: _("Yes") },
-                    { name: "readiness", inputValue: "no",  boxLabel: _("No"), checked: true }
-                ]
+                boxLabel: _("Yes"),
+                name: 'approved',
+                checked: false
             }
-            
+
         ];
-        
+
         Ext.apply(this, {
             flex:1,
-            width: 180, 
+            width: 200,
             labelWidth: 90,
             defaults: {
                 anchor: "100%",
@@ -96,17 +102,16 @@ Inprint.cmp.adverta.Request = Ext.extend(Ext.FormPanel, {
             bodyStyle: "padding:5px 5px",
             url: _url("/fascicle/requests/process/")
         });
-        
+
         Inprint.cmp.adverta.Request.superclass.initComponent.apply(this, arguments);
-        
+
         this.getForm().url = this.url;
-        
-        
+
     },
 
     onRender: function() {
         Inprint.cmp.adverta.Request.superclass.onRender.apply(this, arguments);
     }
-    
-    
+
+
 });

@@ -10,29 +10,84 @@ use warnings;
 
 use base 'Inprint::BaseController';
 
-sub fascicles {
+sub editions {
     my $c = shift;
-    
+
+    my $filter = $c->param("parent");
+
+    my @params;
+    my $sql = "
+        SELECT t1.id, t1.shortcut as title, nlevel(path) as nlevel, description,
+            array_to_string( ARRAY( SELECT shortcut FROM editions WHERE path @> t1.path ORDER BY nlevel(path) ), '.') as title_path
+        FROM editions t1 WHERE 1=1
+    ";
+
+    if ($filter) {
+        $sql .= " AND t1.path ~ ('*.' || replace(?, '-', '')::text || '.*')::lquery ";
+        push @params, $filter;
+    }
+
+    $sql .= " ORDER BY title_path ";
+
+    my $result = $c->sql->Q($sql, \@params)->Hashes;
+    $c->render_json( { data => $result } );
+}
+
+sub parents {
+    my $c = shift;
+
     my @errors;
     my $success = $c->json->false;
-    
+
     my @data;
     my $sql = "
-        SELECT t1.id, t2.shortcut || '/' || t1.shortcut as title, t1.shortcut, t1.description,
-            CASE WHEN is_enabled is true THEN  'rocket-fly' ELSE 'book' END as icon
+        SELECT
+            t1.id, t2.shortcut || '/' || t1.shortcut as title, t1.shortcut, t1.description
         FROM fascicles t1, editions t2
-        WHERE t2.id = t1.edition AND is_enabled = true AND is_system = false
+        WHERE
+            ( t1.id <> '00000000-0000-0000-0000-000000000000' AND t1.id <> '99999999-9999-9999-9999-999999999999')
+            AND t1.edition = t1.parent
+            AND t2.id = t1.edition
     ";
-    
+
     my $access = $c->access->GetBindings("editions.calendar.manage");
     $sql .= " AND edition = ANY(?) ";
     push @data, $access;
-    
+
     my $result = $c->sql->Q("
         $sql
-        ORDER BY is_enabled DESC, t2.shortcut, t1.shortcut
+        ORDER BY t2.shortcut, t1.shortcut
     ", \@data)->Hashes;
-    
+
+    $success = $c->json->true unless (@errors);
+    $c->render_json( { data => $result } );
+}
+
+sub sources {
+    my $c = shift;
+
+    my @errors;
+    my $success = $c->json->false;
+
+    my @data;
+    my $sql = "
+        SELECT
+            t1.id, t2.shortcut || '/' || t1.shortcut as title, t1.shortcut, t1.description
+        FROM fascicles t1, editions t2
+        WHERE
+            ( t1.id <> '00000000-0000-0000-0000-000000000000' AND t1.id <> '99999999-9999-9999-9999-999999999999')
+            AND t2.id = t1.edition
+    ";
+
+    my $access = $c->access->GetBindings("editions.calendar.manage");
+    $sql .= " AND edition = ANY(?) ";
+    push @data, $access;
+
+    my $result = $c->sql->Q("
+        $sql
+        ORDER BY t2.shortcut, t1.shortcut
+    ", \@data)->Hashes;
+
     unshift @$result, {
         id=> "00000000-0000-0000-0000-000000000000",
         icon => "marker",
@@ -40,68 +95,9 @@ sub fascicles {
         shortcut=> $c->l("Get defaults"),
         description=> $c->l("Copy from defaults"),
     };
-    
+
     $success = $c->json->true unless (@errors);
     $c->render_json( { data => $result } );
 }
-
-
-sub copypages {
-    my $c = shift;
-    
-    my $i_term = $c->param("term") || undef;
-    
-    my @data;
-    my $sql = "
-        SELECT t1.id, t2.shortcut || '/' || t1.shortcut as title, t1.shortcut, t1.description,
-            CASE WHEN is_enabled is true THEN  'rocket-fly' ELSE 'book' END as icon
-        FROM fascicles t1, editions t2
-        WHERE t2.id = t1.edition AND is_enabled = true AND is_system = false
-    ";
-    
-    my $access = $c->access->GetBindings("editions.calendar.manage");
-    $sql .= " AND edition = ANY(?) ";
-    push @data, $access;
-    
-    my $result = $c->sql->Q("
-        $sql
-        ORDER BY is_enabled DESC, t2.shortcut, t1.shortcut
-    ", \@data)->Hashes;
-    $c->render_json( { data => $result } );
-}
-
-sub copyindex {
-    my $c = shift;
-    
-    my $i_term = $c->param("term") || undef;
-    
-    my @data;
-    my $sql = "
-        SELECT t1.id, t2.shortcut || '/' || t1.shortcut as title, t1.shortcut, t1.description,
-            CASE WHEN is_enabled is true THEN  'rocket-fly' ELSE 'book' END as icon
-        FROM fascicles t1, editions t2
-        WHERE t2.id = t1.edition AND is_enabled = true AND is_system = false
-    ";
-    
-    my $access = $c->access->GetBindings("editions.calendar.manage");
-    $sql .= " AND edition = ANY(?) ";
-    push @data, $access;
-    
-    my $result = $c->sql->Q("
-        $sql
-        ORDER BY is_enabled DESC, t2.shortcut, t1.shortcut
-    ", \@data)->Hashes;
-    
-    unshift @$result, {
-        id=> "00000000-0000-0000-0000-000000000000",
-        icon => "marker",
-        title=> $c->l("From index"),
-        shortcut=> $c->l("From index"),
-        description=> $c->l("Copy from common index"),
-    };
-    
-    $c->render_json( { data => $result } );
-}
-
 
 1;

@@ -3,7 +3,7 @@ Inprint.catalog.organization.Context = function(parent, panels) {
     var tree = panels.tree;
 
     tree.on("contextmenu", function(node) {
-        
+
         this.selection = node;
 
         var disabled = true;
@@ -15,7 +15,7 @@ Inprint.catalog.organization.Context = function(parent, panels) {
 
         items.push(
             {
-                icon: _ico("book--plus"),
+                icon: _ico("folder--plus"),
                 cls: "x-btn-text-icon",
                 text: _("Create"),
                 disabled: disabled,
@@ -24,7 +24,7 @@ Inprint.catalog.organization.Context = function(parent, panels) {
                 handler: function() { this.cmpCreate(node); }
             },
             {
-                icon: _ico("book--pencil"),
+                icon: _ico("folder--pencil"),
                 cls: "x-btn-text-icon",
                 text: _("Edit"),
                 disabled: disabled,
@@ -36,7 +36,7 @@ Inprint.catalog.organization.Context = function(parent, panels) {
 
         if (node.attributes.id != NULLID) {
             items.push({
-                icon: _ico("book--minus"),
+                icon: _ico("folder--minus"),
                 cls: "x-btn-text-icon",
                 text: _("Remove"),
                 disabled: disabled,
@@ -45,7 +45,7 @@ Inprint.catalog.organization.Context = function(parent, panels) {
                 handler: function() { this.cmpDelete(node); }
             });
         }
-        
+
         items.push('-', {
             icon: _ico("arrow-circle-double"),
             cls: "x-btn-text-icon",

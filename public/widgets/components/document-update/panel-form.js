@@ -50,12 +50,13 @@ Inprint.cmp.UpdateDocument.Form = Ext.extend(Ext.FormPanel, {
                     allowBlank:false,
                     fieldLabel: _("Delivery date")
                 },
-                
+
                 {
                     xtype: "titlefield",
                     value: _("Indexation"),
                     style: "margin-top:10px;"
                 },
+                
                 xc.getConfig("/documents/combos/headlines/", {
                     disabled: false,
                     listeners: {
@@ -87,7 +88,7 @@ Inprint.cmp.UpdateDocument.Form = Ext.extend(Ext.FormPanel, {
                         }
                     }
                 })
-                
+
             ]
         });
 

@@ -19,19 +19,19 @@ Inprint.factory.Store = new function() {
 
     var source = {
 
-        "/advertising/index/headlines/":        [ "id", "selected", "title", "shortcut", "description", createDateField("created"), createDateField("updated") ],
-        "/advertising/index/modules/":          [ "id", "selected", "title", "shortcut", "description", "page", "page_shortcut", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
-        "/advertising/requests/list/":          [ "id", "serialnum", "title", "shortcut", "status", "payment", "readiness", "edition", "edition_shortcut",  "fascicle", "fascicle_shortcut", "advertiser", "advertiser_shortcut", "place", "place_shortcut", "manager", "manager_shortcut", "x", "y", "h", "w", "seqnum", createDateField("created"), createDateField("updated") ],
         "/advertising/advertisers/list/":       [ "id", "serialnum", "edition", "edition_shortcut", "title", "shortcut", "description", "address", "contact", "phones", "inn", "kpp", "bank", "rs", "ks", "bik", createDateField("created"), createDateField("updated") ],
-        "/advertising/pages/list/":             [ "id", "edition", "title", "shortcut", "description", "w", "h", createDateField("created"), createDateField("updated") ],
+        "/advertising/index/headlines/":        [ "id", "selected", "title", "description", createDateField("created"), createDateField("updated") ],
+        "/advertising/index/modules/":          [ "id", "selected", "title", "description", "page", "page_title", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
         "/advertising/modules/list/":           [ "id", "edition", "page", "title", "shortcut", "description", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
-        
+        "/advertising/pages/list/":             [ "id", "edition", "title", "description", "w", "h", createDateField("created"), createDateField("updated") ],
+        "/advertising/requests/list/":          [ "id", "serialnum", "title", "shortcut", "status", "payment", "readiness", "edition", "edition_shortcut",  "fascicle", "fascicle_shortcut", "advertiser", "advertiser_shortcut", "place", "place_shortcut", "manager", "manager_shortcut", "x", "y", "h", "w", "seqnum", createDateField("created"), createDateField("updated") ],
+
 
         "/common/transfer/list/":               [ "id", "principal", "type", "title", "description" ],
 
         // Calendar
         '/calendar/list/':                      [ 'id', 'edition', 'edition_shortcut', 'is_enabled', 'title', 'shortcut', 'description', 'begindate', 'enddate', 'totaldays', 'passeddays' ],
-        
+
         // Documents
         '/documents/list/':         [
             'id', 'access',
@@ -51,7 +51,7 @@ Inprint.factory.Store = new function() {
             'images','files',
             'created','updated'
         ],
-        
+
         '/documents/common/fascicles/':                 [ "id", "edition", "edition_shortcut", "title", "shortcut", 'description', "headline", "headline_shortcut", "rubric", "rubric_shortcut" ],
         '/documents/files/list/':                       [ "id", "preview", "filename", "extension", "description", "mimetype", "digest", "draft", "size", "created", "updated" ],
 
@@ -65,51 +65,51 @@ Inprint.factory.Store = new function() {
         "/catalog/stages/principals-mapping/":          [ "id", "type", "catalog", "stage", "principal", "title", "description", "catalog_shortcut", "stage_shortcut" ],
         "/catalog/principals/list/":                    [ "id", "type", "title", "description" ],
         "/catalog/rubrics/list/":                       [ "id", "title", "shortcut", "description" ],
-        
+
         // Fascicles
         "/fascicle/rubrics/list/":
             [ "id", "title", "shortcut", "description" ],
-        
+
         "/fascicle/summary/":
             [ "id", "shortcut", "pages", "place", "module", "place_shortcut", "holes", "requests", "free" ],
-        
+
         "/fascicle/documents/list/": [
                 'id', 'access',    'edition',  'edition_shortcut',    'fascicle',    'fascicle_shortcut',    'headline', 'headline_shortcut',
                 'rubric', 'rubric_shortcut',    'copygroup',    'holder','creator','manager','holder_shortcut','creator_shortcut','manager_shortcut',
                 'workgroup','workgroup_shortcut','ingroups',    'islooked','isopen',    'branch','branch_shortcut','stage','stage_shortcut','color','progress',
                 'title','author','pages',    'pdate','psize','rdate','rsize',    'images','files',    'created','updated'
             ],
-        
+
         "/fascicle/requests/list/": [
-                "id", "serialnum", "edition", "fascicle", "advertiser", "advertiser_shortcut", 
-                "place", "place_shortcut", "manager", "manager_shortcut", 
+                "id", "serialnum", "edition", "fascicle", "advertiser", "advertiser_shortcut",
+                "place", "place_shortcut", "manager", "manager_shortcut",
                 "origin", "origin_shortcut", "origin_area",
-                "origin_x", "origin_y", "origin_w", "origin_h", 
+                "origin_x", "origin_y", "origin_w", "origin_h",
                 "module", "module_shortcut", "pages", "firstpage", "amount", "shortcut", "description", "status", "payment", "readiness",
                 createDateField("created"), createDateField("updated")
             ],
-        
+
         "/fascicle/templates/pages/list/":
             [ "id", "fascicle", "title", "shortcut", "description", "w", "h", createDateField("created"), createDateField("updated") ],
 
         "/fascicle/templates/modules/list/":
             [ "id", "fascicle", "page", "title", "shortcut", "description", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
-        
+
         "/fascicle/templates/index/headlines/":
             [ "id", "selected", "title", "shortcut", "description", createDateField("created"), createDateField("updated") ],
-        
+
         "/fascicle/templates/index/modules/":
             [ "id", "selected", "title", "shortcut", "description", "page", "page_shortcut", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
-        
+
         "/fascicle/templates/modules/":
-            [ "id", "fascicle", "page", "place", "place_shortcut", "title", "shortcut", "description", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
-        
+            [ "id", "fascicle", "page", "place", "place_title", "title", "description", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
+
         "/fascicle/pages/templates/":
-            [ "id", "fascicle", "page", "place", "place_shortcut", "title", "shortcut", "description", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
-        
+            [ "id", "fascicle", "page", "place", "place_title", "title", "description", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
+
         "/fascicle/modules/list/":
-            [ "id", "fascicle", "page", , "place", "place_shortcut", "title", "shortcut", "description", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
-        
+            [ "id", "fascicle", "page", , "place", "place_title", "title", "description", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
+
         // System
         "/system/events/list/":
             [ "id", "initiator", "initiator_login", "initiator_shortcut", "initiator_position", "entity", "entity_type", "message", "message_type", "message_variables", createDateField("created") ],
@@ -127,21 +127,21 @@ Inprint.factory.Store = new function() {
         "/advertising/combo/places/",
         "/advertising/combo/modules/",
 
-        "/calendar/combos/fascicles/",
-        "/calendar/combos/copypages/",
-        "/calendar/combos/copyindex/",
+        "/calendar/combos/editions/",
+        "/calendar/combos/parents/",
+        "/calendar/combos/sources/",
 
         "/catalog/combos/groups/",
         "/catalog/combos/editions/",
         "/catalog/combos/fascicles/",
         "/catalog/combos/readiness/",
         "/catalog/combos/roles/",
-        
+
         "/fascicle/combos/templates/",
         "/fascicle/combos/workgroups/",
         "/fascicle/combos/headlines/",
         "/fascicle/combos/rubrics/",
-        
+
         "/documents/combos/editions/",
         "/documents/combos/stages/",
         "/documents/combos/assignments/",
@@ -207,22 +207,22 @@ Inprint.factory.Store = new function() {
         },
 
         group: function(myclass, storeconfig, readerconfig) {
-            
+
             if (items[myclass]) {
-                
+
                 var configuration = {};
                 configuration = Ext.apply(configuration, defaults);
-                
+
                 var configuration2 = {
                     idProperty: 'id',
                     root: 'data',
                     fields: items[myclass].fields
                 };
-                
+
                 Ext.apply(configuration2, readerconfig);
-                
+
                 var reader = new Ext.data.JsonReader(configuration2);
-                
+
                 configuration = Ext.apply(configuration, {
                     reader: reader,
                     remoteSort: true,
@@ -233,7 +233,7 @@ Inprint.factory.Store = new function() {
                 configuration = Ext.apply(configuration, storeconfig);
 
                 var store = new Ext.data.GroupingStore(configuration);
-                
+
                 return store;
             } else {
                 alert("Can't find group store <" + myclass + ">");

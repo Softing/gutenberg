@@ -1,9 +1,9 @@
 Inprint.fascicle.planner.Requests = Ext.extend(Ext.grid.GridPanel, {
-    
+
     initComponent: function() {
-        
+
         this.components = {};
-        
+
         this.urls = {
             "create": _url("/fascicle/requests/create/"),
             "read":   _url("/fascicle/requests/read/"),
@@ -11,11 +11,11 @@ Inprint.fascicle.planner.Requests = Ext.extend(Ext.grid.GridPanel, {
             "delete": _url("/fascicle/requests/delete/"),
             "move":   _url("/fascicle/requests/move/")
         }
-        
+
         this.store = Inprint.factory.Store.json("/fascicle/requests/list/");
-        
+
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
-        
+
         this.columns = [
             this.selectionModel,
             {
@@ -46,7 +46,7 @@ Inprint.fascicle.planner.Requests = Ext.extend(Ext.grid.GridPanel, {
                 sortable: true,
                 dataIndex: "shortcut"
             },
-            
+
             {
                 id:"position",
                 header: _("Place"),
@@ -96,7 +96,7 @@ Inprint.fascicle.planner.Requests = Ext.extend(Ext.grid.GridPanel, {
                 sortable: true,
                 dataIndex: "readiness"
             },
-            
+
             {
                 id:"modified",
                 header: _("Modified"),
@@ -106,9 +106,9 @@ Inprint.fascicle.planner.Requests = Ext.extend(Ext.grid.GridPanel, {
                 format: "Y-m-d H:i",
                 dataIndex: "updated"
             }
-            
+
         ];
-        
+
         this.tbar = [
             {
                 icon: _ico("plus-button"),
@@ -163,7 +163,7 @@ Inprint.fascicle.planner.Requests = Ext.extend(Ext.grid.GridPanel, {
                 scope:this
             }
         ];
-        
+
         Ext.apply(this, {
             border: false,
             stripeRows: true,
@@ -171,37 +171,37 @@ Inprint.fascicle.planner.Requests = Ext.extend(Ext.grid.GridPanel, {
             sm: this.selectionModel,
             autoExpandColumn: "title"
         });
-        
+
         Inprint.fascicle.planner.Requests.superclass.initComponent.apply(this, arguments);
-        
+
     },
 
     onRender: function() {
         Inprint.fascicle.planner.Requests.superclass.onRender.apply(this, arguments);
     },
-    
+
     cmpCreate: function() {
-        
+
         var pages = this.parent.panels["pages"];
-        
+
         var selection = pages.cmpGetSelected();
-        
+
         if (selection.length > 2) {
             return;
         }
-        
+
         var wndw = new Inprint.cmp.Adverta({
             fascicle: this.parent.fascicle,
             selection: selection
         });
-        
+
         wndw.on("actioncomplete", function() {
             this.parent.cmpReload();
         }, this);
-        
+
         wndw.show();
     },
-    
+
     cmpUpdateProxy: function () {
         Ext.Ajax.request({
             url: this.urls["read"],
@@ -211,40 +211,42 @@ Inprint.fascicle.planner.Requests = Ext.extend(Ext.grid.GridPanel, {
             },
             scope: this,
             success: function(responce) {
-                var record = Ext.util.JSON.decode(responce.responseText); 
+                var record = Ext.util.JSON.decode(responce.responseText);
                 this.cmpUpdate(record);
             }
         });
     },
-    
+
     cmpUpdate: function(record) {
-        
+
         if (!record.data.id) {
             return;
         }
-        
+
         if (record.data.pages.length > 2) {
             return;
         }
-        
+
         var wndw = new Inprint.cmp.Adverta({
             record: record.data,
             fascicle: this.oid,
             selection: record.data.pages
         });
-        
+
+        wndw.cmpFill(record);
+
         wndw.on("actioncomplete", function() {
             this.parent.cmpReload();
         }, this);
-        
+
         wndw.show();
     },
-    
+
     cmpMove: function(inc) {
         var wndw = this.components["move"];
-    
+
         if (!wndw) {
-            
+
             var wndw = new Ext.Window({
                 title: 'Перемещение заявки',
                 width:250,
@@ -290,14 +292,14 @@ Inprint.fascicle.planner.Requests = Ext.extend(Ext.grid.GridPanel, {
                     ]
                 },
                 buttons: [
-                    _BTN_WNDW_OK, 
+                    _BTN_WNDW_OK,
                     _BTN_WNDW_CANCEL
                 ]
             });
-            
+
             this.components["move"] = wndw;
         }
-        
+
         var form = wndw.findByType("form")[0].getForm();
         form.reset();
         form.baseParams = {
@@ -307,13 +309,13 @@ Inprint.fascicle.planner.Requests = Ext.extend(Ext.grid.GridPanel, {
         }
         wndw.show();
     },
-    
+
     cmpDelete: function() {
-        
+
         var wndw = this.components["delete"];
-    
+
         if (!wndw) {
-            
+
             var wndw = new Ext.Window({
                 title: 'Удаление заявки',
                 width:250,
@@ -359,14 +361,14 @@ Inprint.fascicle.planner.Requests = Ext.extend(Ext.grid.GridPanel, {
                     ]
                 },
                 buttons: [
-                    _BTN_WNDW_OK, 
+                    _BTN_WNDW_OK,
                     _BTN_WNDW_CANCEL
                 ]
             });
-            
+
             this.components["delete"] = wndw;
         }
-        
+
         var form = wndw.findByType("form")[0].getForm();
         form.reset();
         form.baseParams = {
@@ -375,5 +377,5 @@ Inprint.fascicle.planner.Requests = Ext.extend(Ext.grid.GridPanel, {
         }
         wndw.show();
     }
-    
+
 });

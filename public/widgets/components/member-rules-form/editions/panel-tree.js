@@ -9,18 +9,16 @@ Inprint.cmp.memberRulesForm.Editions.Tree = Ext.extend(Ext.tree.TreePanel, {
         };
 
         Ext.apply(this, {
-            title:_("Editions1"),
             autoScroll:true,
             dataUrl: this.urls.tree,
             border:false,
-            rootVisible: false,
             root: {
                 id:'00000000-0000-0000-0000-000000000000',
                 nodeType: 'async',
                 expanded: true,
                 draggable: false,
-                icon: _ico("book"),
-                text: _("Editions")
+                icon: _ico("blue-folders"),
+                text: _("All editions")
             }
         });
 
@@ -29,7 +27,7 @@ Inprint.cmp.memberRulesForm.Editions.Tree = Ext.extend(Ext.tree.TreePanel, {
         this.on("beforeappend", function(tree, parent, node) {
             node.attributes.icon = _ico(node.attributes.icon);
         });
-        
+
     },
 
     onRender: function() {
@@ -37,7 +35,7 @@ Inprint.cmp.memberRulesForm.Editions.Tree = Ext.extend(Ext.tree.TreePanel, {
 
         this.getLoader().on("load", function() { this.body.unmask(); }, this);
         this.getLoader().on("beforeload", function() { this.body.mask(_("Loading")); }, this);
-        
+
         this.getRootNode().expand();
     }
 

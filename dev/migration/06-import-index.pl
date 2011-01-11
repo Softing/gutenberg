@@ -40,22 +40,14 @@ $sql2->SetConnection($conn2);
 
 my $rootnode = '00000000-0000-0000-0000-000000000000';
 
-$sql->Do("DELETE FROM index");
+$sql->Do("DELETE FROM indx_rubrics WHERE id <> '00000000-0000-0000-0000-000000000000' ");
+$sql->Do("DELETE FROM indx_headlines WHERE id <> '00000000-0000-0000-0000-000000000000' ");
+$sql->Do("DELETE FROM indx_tags WHERE id <> '00000000-0000-0000-0000-000000000000' ");
 
 # Import index
 
 my $editions = $sql2->Q(" SELECT id, name, sname, description, uuid, deleted
     FROM edition.edition WHERE deleted=false ")->Hashes;
-
-# Import default headline
-$sql->Do("
-        INSERT INTO index(edition, nature, parent, title, shortcut, description, created, updated)
-        VALUES (?, ?, ?, ?, ?, ?, now(), now());
-", ['00000000-0000-0000-0000-000000000000', 'headline', '00000000-0000-0000-0000-000000000000','--', '--', '--' ]);
-$sql->Do("
-        INSERT INTO index(edition, nature, parent, title, shortcut, description, created, updated)
-        VALUES (?, ?, ?, ?, ?, ?, now(), now());
-", ['00000000-0000-0000-0000-000000000000', 'rubric', '00000000-0000-0000-0000-000000000000','--', '--', '--' ]);
 
 foreach my $edition ( @{ $editions } ) {
 
@@ -64,32 +56,65 @@ foreach my $edition ( @{ $editions } ) {
 
     # Import headlines
     my $fascicleIds = $sql2->Q(" SELECT id FROM edition.calendar WHERE edition =? ", [ $edition->{uuid} ])->Values;
-    
+
     my $headlines = $sql2->Q(" SELECT uuid, fascicle, lower(title) as title FROM edition.catchword WHERE fascicle = ANY(?) ", [ $fascicleIds ])->Hashes;
-    
+
     foreach my $headline ( @{ $headlines } ) {
-        
-        my $headline_id = $ug->create_str();
-        
-        $sql->Do(" DELETE FROM index WHERE edition=? AND nature='headline' AND title=initcap(?) ", [ $EditionId, $headline->{title} ]);
-        $sql->Do("
-            INSERT INTO index(id, edition, nature, parent, title, shortcut, description, created, updated)
-            VALUES (?, ?, ?, ?, initcap(?), initcap(?), ?, now(), now());
-        ", [$headline_id, $EditionId, 'headline', $EditionId, $headline->{title}, $headline->{title}, $headline->{description} || "" ]);
-        
-        # Import rubrics
-        
-        my $rubrics = $sql2->Q(" SELECT uuid, lower(title) as title FROM edition.rubric WHERE catchword=? ", [ $headline->{uuid} ])->Hashes;
-        
-        foreach my $rubric ( @{ $rubrics } ) {
-            
-            my $rubric_id = $ug->create_str();
-            
-            $sql->Do(" DELETE FROM index WHERE edition=? AND nature='rubric' AND title=initcap(?) ", [ $EditionId, $rubric->{title}]);
+
+        my $tag1 = getTagByTitle($sql, $headline->{title}, "");
+
+        my $headline_id = $sql->Q(" SELECT id FROM indx_headlines WHERE edition=? AND tag=?", [ $EditionId, $tag1->{id} ])->Value;
+
+        unless ($headline_id) {
+            $headline_id = $ug->create_str();
             $sql->Do("
-                INSERT INTO index(id, edition, nature, parent, title, shortcut, description, created, updated)
-                VALUES (?, ?, ?, ?, initcap(?), initcap(?), ?, now(), now());
-            ", [$rubric_id, $EditionId, 'rubric', $headline_id, $rubric->{title}, $rubric->{title}, $rubric->{description} || "" ]);
+                INSERT INTO indx_headlines(id, edition, tag, title, description, bydefault, created, updated)
+                VALUES (?, ?, ?, ?, ?, false, now(), now());
+            ", [ $headline_id, $EditionId, $tag1->{id}, $headline->{title}, $headline->{description} || "" ]);
+        }
+
+        # Import rubrics
+
+        my $rubrics = $sql2->Q(" SELECT uuid, lower(title) as title FROM edition.rubric WHERE catchword=? ", [ $headline->{uuid} ])->Hashes;
+
+        foreach my $rubric ( @{ $rubrics } ) {
+
+            my $tag2 = getTagByTitle($sql, $rubric->{title}, "");
+
+            my $rubric_id = $sql->Q(" SELECT id FROM indx_rubrics WHERE headline=? AND tag=?", [ $headline_id, $tag2->{id} ])->Value;
+
+            unless ($rubric_id) {
+                $rubric_id = $ug->create_str();
+                $sql->Do("
+                    INSERT INTO indx_rubrics(id, edition, headline, tag, title, description, created, updated)
+                        VALUES (?, ?, ?, ?, ?, ?, now(), now());
+                ", [$rubric_id, $EditionId, $headline_id, $tag2->{id}, $rubric->{title}, $rubric->{description} || "" ]);
+            }
+
         }
     }
+}
+
+sub getTagByTitle {
+    my $sql = shift;
+    my ($title, $description ) = @_;
+
+    my $tag = $sql->Q("
+        SELECT id, title FROM indx_tags WHERE title=? ",
+        [ $title ])->Hash;
+
+    unless ($tag->{id}) {
+
+        $sql->Do("
+            INSERT INTO indx_tags (id, title, description, created, updated)
+            VALUES (?, ?, ?, now(), now()); ",
+            [ $ug->create_str(), $title, $description ]);
+
+        $tag = $sql->Q("
+            SELECT id, title FROM indx_tags WHERE title=? ",
+            [ $title ])->Hash;
+
+    }
+
+    return $tag;
 }

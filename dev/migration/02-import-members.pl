@@ -37,9 +37,9 @@ $sql2->SetConnection($conn2);
 
 my $rootnode = '00000000-0000-0000-0000-000000000000';
 
-$sql->Do("DELETE FROM members WHERE login <> 'root'");
-$sql->Do("DELETE FROM map_member_to_catalog");
-$sql->Do("DELETE FROM profiles");
+$sql->Do("DELETE FROM members WHERE id <> '39d40812-fc54-4342-9b98-e1c1f4222d22' ");
+$sql->Do("DELETE FROM map_member_to_catalog WHERE member <> '39d40812-fc54-4342-9b98-e1c1f4222d22' ");
+$sql->Do("DELETE FROM profiles WHERE id <> '39d40812-fc54-4342-9b98-e1c1f4222d22' ");
 
 # Import Members and Cards
 

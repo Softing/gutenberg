@@ -12,17 +12,17 @@ Inprint.fascicle.indexes.Rubrics = Ext.extend(Ext.grid.GridPanel, {
         };
 
         this.store = Inprint.factory.Store.json("/fascicle/rubrics/list/");
-        
+
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
 
         this.columns = [
             this.selectionModel,
             {
-                id:"name",
-                header: _("Shortcut"),
+                id:"title",
+                header: _("Title"),
                 width: 160,
                 sortable: true,
-                dataIndex: "shortcut"
+                dataIndex: "title"
             },
             {
                 id:"description",
@@ -77,7 +77,7 @@ Inprint.fascicle.indexes.Rubrics = Ext.extend(Ext.grid.GridPanel, {
     onRender: function() {
         Inprint.fascicle.indexes.Rubrics.superclass.onRender.apply(this, arguments);
     },
-    
+
     cmpCreate: function() {
 
         var win = this.components["add-window"];
@@ -101,7 +101,6 @@ Inprint.fascicle.indexes.Rubrics = Ext.extend(Ext.grid.GridPanel, {
                     _FLD_HDN_FASCICLE,
                     _FLD_HDN_HEADLINE,
                     _FLD_TITLE,
-                    _FLD_SHORTCUT,
                     _FLD_DESCRIPTION
                 ],
                 keys: [ _KEY_ENTER_SUBMIT ],
@@ -127,7 +126,7 @@ Inprint.fascicle.indexes.Rubrics = Ext.extend(Ext.grid.GridPanel, {
 
         var form = win.items.first().getForm();
         form.reset();
-        
+
         form.findField("fascicle").setValue(this.parent.fascicle);
         form.findField("headline").setValue(this.parent.headline);
 
@@ -154,7 +153,6 @@ Inprint.fascicle.indexes.Rubrics = Ext.extend(Ext.grid.GridPanel, {
                 items: [
                     _FLD_HDN_ID,
                     _FLD_TITLE,
-                    _FLD_SHORTCUT,
                     _FLD_DESCRIPTION
                 ],
                 keys: [ _KEY_ENTER_SUBMIT ],

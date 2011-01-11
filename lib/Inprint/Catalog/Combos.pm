@@ -12,12 +12,15 @@ use base 'Inprint::BaseController';
 
 sub editions {
     my $c = shift;
-    my $result = $c->sql->Q("
+
+    my @params;
+    my $sql = "
         SELECT t1.id, t1.shortcut as title, nlevel(path) as nlevel, description,
             array_to_string( ARRAY( SELECT shortcut FROM editions WHERE path @> t1.path ORDER BY nlevel(path) ), '.') as title_path
         FROM editions t1
-        ORDER BY title_path
-    ")->Hashes;
+    ";
+
+    my $result = $c->sql->Q(" $sql ORDER BY title_path ", \@params)->Hashes;
     $c->render_json( { data => $result } );
 }
 
@@ -34,9 +37,9 @@ sub groups {
 
 sub fascicles {
     my $c = shift;
-    
+
     my $i_term = $c->param("term") || undef;
-    
+
     my @data;
     my $sql = "
         SELECT t1.id, t2.shortcut || '/' || t1.shortcut as title, t1.shortcut, t1.description,
@@ -44,13 +47,13 @@ sub fascicles {
         FROM fascicles t1, editions t2
         WHERE t2.id = t1.edition AND is_system = false
     ";
-    
+
     if ($i_term) {
         my $access = $c->access->GetBindingsByTerm($i_term);
         $sql .= " AND edition = ANY(?) ";
         push @data, $access;
     }
-    
+
     my $result = $c->sql->Q("
         $sql
         ORDER BY is_enabled DESC, t2.shortcut, t1.shortcut
@@ -59,7 +62,7 @@ sub fascicles {
 }
 
 sub readiness {
-    my $c = shift; #weight || '% ' || 
+    my $c = shift; #weight || '% ' ||
     my $sql = "
         SELECT id, color, shortcut as title, description
         FROM readiness ORDER BY weight, shortcut;

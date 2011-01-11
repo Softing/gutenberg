@@ -24,22 +24,22 @@ Inprint.factory.Combo = new function() {
     var combos = {
 
         //Calendar
-        "/calendar/combos/fascicles/": {
+        "/calendar/combos/editions/": {
+            hiddenName: "edition",
+            icon: "blue-folders",
+            fieldLabel: _("Edition"),
+            emptyText: _("Select") + "..."
+        },
+        "/calendar/combos/sources/": {
             hiddenName: "copyfrom",
             icon: "building",
             fieldLabel: _("Copy from"),
             emptyText: _("Select") + "..."
         },
-        "/calendar/combos/copypages/": {
+        "/calendar/combos/parents/": {
             hiddenName: "copypages",
             icon: "building",
             fieldLabel: _("Copy pages"),
-            emptyText: _("Select") + "..."
-        },
-        "/calendar/combos/copyindex/": {
-            hiddenName: "copyindex",
-            icon: "building",
-            fieldLabel: _("Copy index"),
             emptyText: _("Select") + "..."
         },
 
@@ -106,7 +106,7 @@ Inprint.factory.Combo = new function() {
         //    fieldLabel: _("Edition"),
         //    emptyText: _("Edition") + "..."
         //},
-        
+
         // Fascicles
         "/fascicle/combos/templates/": {
             hiddenName: "template",
@@ -251,7 +251,7 @@ Inprint.factory.Combo = new function() {
             if (!storeconfig) {
                 storeconfig = {};
             }
-            
+
             if (config.baseParams) {
                 storeconfig.baseParams = config.baseParams;
             }

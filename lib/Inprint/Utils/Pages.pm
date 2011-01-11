@@ -3,20 +3,20 @@ use strict;
 use warnings;
 
 sub CompressString {
-    
+
     my $c = shift;
     my $string = shift;
-    
+
     my @pages = split(/[^\d]+/, $string );
     my @string;
     for ( my $i = 0; $i <= $#pages; $i++ ) {
-        
+
         my $cp = int( $pages[$i] );
         my $pp = int( $pages[$i-1] );
         my $fp = int( $pages[$i+1] );
-        
+
         next unless $cp;
-        
+
         if ( !$pp ) {
                 push @string, $cp;
         } elsif (!$fp ) {
@@ -27,29 +27,29 @@ sub CompressString {
                 push @string, $cp;
         }
     };
-    
+
     $string = join (',',@string);
     $string =~ s/,-,/-/g;
     $string =~ s/-,/-/g;
     $string =~ s/-+/-/g;
     $string =~ s/,/, /g;
-    
+
     return $string;
 }
 
 sub UncompressString {
-    
+
     my $c = shift;
     my $string = shift;
-    
+
     my @pairs = split '[^\d|\-|\:|<|>]', $string;
-    
+
     my @source;
-    
+
     foreach my $pair ( @pairs ) {
-        
+
         next unless $pair;
-        
+
         if ( $pair =~ /\-/ ) {
             my ($start, $end) = split '-', $pair;
             my $array = [];
@@ -75,55 +75,48 @@ sub UncompressString {
             push @source, $pair;
         }
     }
-    
+
     my @pages;
-    
+
     my %seen = (); foreach my $item (@source) {    push(@pages, $item) unless $seen{$item}++; }
-    
+
     @pages = sort { $a <=> $b } @pages;
-    
+
     return \@pages;
-    
-    #return {
-    #    allpages => \@allpages || [],
-    #    pages   => \@pages    || [],
-    #    periods => \@periods  || [],
-    #    inserts => \@inserts  || []
-    #}
 }
 
 sub GetChunks {
     my $c = shift;
     my $pages = shift;
-    
+
     my @result;
-    
+
     for (my $c=0; $c <= $#{$pages}; $c++ ) {
-        
+
         my $prev = $$pages[$c-1] || undef;
         my $curr = $$pages[$c] || undef;
         my $next = $$pages[$c+1] || undef;
-        
+
         #die "$prev $curr $next";
-        
+
         if ($c == 0) {
             push @result, [ $curr ];
             next;
         }
-        
+
         if ($prev && $curr-$prev == 1 ) {
             push @{ $result[-1] }, $curr ;
             next;
         }
-        
+
         if ($prev && $curr-$prev > 1 ) {
             push @result, [ $curr ];
             next;
         }
-        
-        
+
+
     }
-    
+
     return \@result;
 }
 

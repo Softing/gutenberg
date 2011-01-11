@@ -9,44 +9,34 @@ Inprint.cmp.memberRulesForm.Organization.Tree = Ext.extend(Ext.tree.TreePanel, {
         };
 
         Ext.apply(this, {
-            title:_("Departments"),
             autoScroll:true,
             dataUrl: this.urls.tree,
             border:false,
-            rootVisible: false,
             root: {
-                id:'root-node',
+                id:'00000000-0000-0000-0000-000000000000',
                 nodeType: 'async',
                 expanded: true,
                 draggable: false,
-                icon: _ico("node"),
-                text: _("Root node")
+                icon: _ico("folders"),
+                text: _("All departments")
             }
         });
 
         Inprint.cmp.memberRulesForm.Organization.Tree.superclass.initComponent.apply(this, arguments);
 
         this.on("beforeappend", function(tree, parent, node) {
-
-            if (node.attributes.icon == undefined) {
-                node.attributes.icon = 'folder-open';
-            }
-
             node.attributes.icon = _ico(node.attributes.icon);
-
-            if (node.attributes.color) {
-                node.text = "<span style=\"color:#"+ node.attributes.color +"\">" + node.attributes.text + "</span>";
-            }
-
         });
 
     },
 
     onRender: function() {
         Inprint.cmp.memberRulesForm.Organization.Tree.superclass.onRender.apply(this, arguments);
-        this.getRootNode().expand();
-        this.getLoader().on("beforeload", function() { this.body.mask(_("Loading")); }, this);
+
         this.getLoader().on("load", function() { this.body.unmask(); }, this);
+        this.getLoader().on("beforeload", function() { this.body.mask(_("Loading")); }, this);
+
+        this.getRootNode().expand();
     }
 
 });

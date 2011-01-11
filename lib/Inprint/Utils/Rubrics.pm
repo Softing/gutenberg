@@ -4,61 +4,61 @@ use strict;
 use warnings;
 
 sub Create {
-    
+
     my $c = shift;
-    
+
     my $edition     = shift;
     my $fascicle    = shift;
     my $headline    = shift;
     my $title       = shift;
     my $shortcut    = shift;
     my $description = shift;
-    
+
     return unless $edition;
     return unless $fascicle;
     return unless $headline;
     return unless $title;
     return unless $shortcut;
-    
+
     my $id = $c->uuid();
     my $errors      = [];
-    
+
     my $exists_title = $c->sql->Q("
             SELECT count(*)
-            FROM index_fascicles
-            WHERE fascicle=? AND parent=? AND nature=? AND lower(title) = lower(?)
-        ", [ $fascicle, $headline, "rubric", $title ])->Value;
-    
+            FROM fascicles_indx_rubrics
+            WHERE fascicle=? AND headline=? AND lower(title)=lower(?)
+        ", [ $fascicle, $headline, $title ])->Value;
+
     push @$errors, { id => "title", msg => "Already exists"}
         if ($exists_title);
-    
+
     my $exists_shortcut = $c->sql->Q("
             SELECT count(*)
-            FROM index_fascicles
-            WHERE fascicle=? AND parent=? AND nature=? AND lower(shortcut) = lower(?)
-        ", [ $fascicle, $headline, "rubric", $shortcut ])->Value;
-    
+            FROM fascicles_indx_rubrics
+            WHERE fascicle=? AND headline=? AND lower(shortcut)=lower(?)
+        ", [ $fascicle, $headline, $shortcut ])->Value;
+
     push @$errors, { id => "shortcut", msg => "Already exists"}
         if ($exists_shortcut);
-    
+
     my $rubric_origin = $c->sql->Q("
-            SELECT id FROM index WHERE nature = 'rubric' AND edition=ANY(
+            SELECT id FROM indx_rubrics WHERE edition=ANY(
                 SELECT id FROM editions WHERE path @> (SELECT path FROM editions WHERE id=?)
             ) AND lower(shortcut)=lower(?)
         ", [ $edition, $shortcut ])->Value;
-    
+
     unless (@$errors) {
         $c->sql->Do("
-            INSERT INTO index_fascicles(id, edition, fascicle, origin, nature, parent, title, shortcut, description, created, updated)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
-        ", [ $id, $edition, $fascicle, $rubric_origin || $id, "rubric", $headline, $title, $shortcut, $description ]);
+            INSERT INTO fascicles_indx_rubrics(id, edition, fascicle, origin, headline, title, shortcut, description, created, updated)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, now(), now());
+        ", [ $id, $edition, $fascicle, $rubric_origin || $id, $headline, $title, $shortcut, $description ]);
     }
-    
+
     my $rubric = $c->sql->Q("
-            SELECT * FROM index_fascicles
-            WHERE fascicle = ? AND parent = ? AND lower(shortcut) = lower(?::text) ",
+            SELECT * FROM fascicles_indx_rubrics
+            WHERE fascicle=? AND headline=? AND lower(shortcut)=lower(?::text) ",
         [ $fascicle, $headline, $shortcut ])->Hash;
-    
+
     return $rubric;
 }
 

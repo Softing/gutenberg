@@ -17,8 +17,12 @@ Ext.tree.TreePanel.prototype.cmpReloadParent = function() {
 }
 
 Ext.tree.TreePanel.prototype.cmpReload = function() {
-    if (this.selection.reload)
-        this.selection.reload();
-    else if (this.selection.parentNode.reload)
-        this.selection.parentNode.reload();
+    if (this.selection) {
+        if (this.selection.reload) {
+            this.selection.reload();
+        }
+        else if (this.selection.parentNode.reload) {
+            this.selection.parentNode.reload();
+        }
+    }
 }

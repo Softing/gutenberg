@@ -34,14 +34,14 @@ Inprint.catalog.indexes.TreeHeadlines = Ext.extend(Ext.tree.TreePanel, {
     },
 
     onRender: function() {
-        
+
         Inprint.catalog.indexes.TreeHeadlines.superclass.onRender.apply(this, arguments);
-        
+
         this.getLoader().on("beforeload", function() { this.body.mask(_("Loading")); }, this);
         this.getLoader().on("load", function() { this.body.unmask(); }, this);
-        
+
     },
-    
+
     cmpCreate: function(node) {
 
         var win = this.components["add-window"];
@@ -63,9 +63,24 @@ Inprint.catalog.indexes.TreeHeadlines = Ext.extend(Ext.tree.TreePanel, {
                 bodyStyle: "padding:5px 5px",
                 items: [
                     _FLD_HDN_EDITION,
+                    {
+                        xtype: "titlefield",
+                        value: _("Basic options")
+                    },
                     _FLD_TITLE,
-                    _FLD_SHORTCUT,
-                    _FLD_DESCRIPTION
+                    _FLD_DESCRIPTION,
+                    {
+                        xtype: "titlefield",
+                        value: _("More options")
+                    },
+                    {
+                        xtype: 'checkbox',
+                        fieldLabel: _(""),
+                        labelSeparator: '',
+                        boxLabel: _("Use by default"),
+                        name: 'bydefault',
+                        checked: false
+                    }
                 ],
                 keys: [ _KEY_ENTER_SUBMIT ],
                 buttons: [ _BTN_ADD,_BTN_CLOSE ]
@@ -75,7 +90,7 @@ Inprint.catalog.indexes.TreeHeadlines = Ext.extend(Ext.tree.TreePanel, {
                 title: _("Adding a new headline"),
                 layout: "fit",
                 closeAction: "hide",
-                width:400, height:220,
+                width:400, height:260,
                 items: form
             });
 
@@ -91,7 +106,7 @@ Inprint.catalog.indexes.TreeHeadlines = Ext.extend(Ext.tree.TreePanel, {
         var form = win.items.first().getForm();
         form.reset();
 
-        form.findField("edition").setValue(this.parent.edition);
+        form.findField("edition").setValue(this.currentEdition);
 
         win.show(this);
         this.components["add-window"] = win;
@@ -115,9 +130,24 @@ Inprint.catalog.indexes.TreeHeadlines = Ext.extend(Ext.tree.TreePanel, {
                 bodyStyle: "padding:5px 5px",
                 items: [
                     _FLD_HDN_ID,
+                    {
+                        xtype: "titlefield",
+                        value: _("Basic options")
+                    },
                     _FLD_TITLE,
-                    _FLD_SHORTCUT,
-                    _FLD_DESCRIPTION
+                    _FLD_DESCRIPTION,
+                    {
+                        xtype: "titlefield",
+                        value: _("More options")
+                    },
+                    {
+                        xtype: 'checkbox',
+                        fieldLabel: _(""),
+                        labelSeparator: '',
+                        boxLabel: _("Use by default"),
+                        name: 'bydefault',
+                        checked: false
+                    }
                 ],
                 keys: [ _KEY_ENTER_SUBMIT ],
                 buttons: [ _BTN_SAVE,_BTN_CLOSE ]
@@ -127,7 +157,7 @@ Inprint.catalog.indexes.TreeHeadlines = Ext.extend(Ext.tree.TreePanel, {
                 title: _("Edit headline"),
                 layout: "fit",
                 closeAction: "hide",
-                width:400, height:220,
+                width:400, height:260,
                 items: form
             });
 
@@ -136,7 +166,7 @@ Inprint.catalog.indexes.TreeHeadlines = Ext.extend(Ext.tree.TreePanel, {
                     win.hide();
                     if (node.parentNode) {
                         node.parentNode.reload();
-                    } else {
+                    } else if (node.reload) {
                         node.reload();
                     }
                 }
@@ -165,7 +195,7 @@ Inprint.catalog.indexes.TreeHeadlines = Ext.extend(Ext.tree.TreePanel, {
 
     cmpDelete: function(node) {
 
-        var title = _("Group removal") +" <"+ node.attributes.shortcut +">";
+        var title = _("Group removal") +" <"+ node.attributes.title +">";
 
         Ext.MessageBox.confirm(
             title,

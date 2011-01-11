@@ -103,7 +103,7 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                         }
                                     }
                                 },
-                                
+
                                 {
                                     disabled: true,
                                     xtype: "treecombo",
@@ -174,19 +174,41 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                     fieldLabel: _("Date")
                                 },
 
-                                xc.getConfig("/documents/combos/fascicles/", {
-                                    disabled: true,
-                                    listeners: {
-                                        scope: this,
-                                        render: function(field) {
-                                            field.setValue("00000000-0000-0000-0000-000000000000", _("Briefcase"));
-                                        },
-                                        beforequery: function(qe) {
-                                            delete qe.combo.lastQuery;
-                                            qe.combo.getStore().baseParams["flt_edition"] = this.getForm().findField("edition").getValue();
-                                        }
+                                {
+                                    columnWidth:.125,
+                                    xtype: "treecombo",
+                                    name: "fascicle",
+                                    fieldLabel: _("Fascicle"),
+                                    emptyText: _("Fascicle") + "...",
+                                    minListWidth: 250,
+                                    url: _url('/documents/trees/fascicles/'),
+                                    baseParams: {
+                                        term: 'editions.documents.work'
+                                    },
+                                    rootVisible:true,
+                                    root: {
+                                        id:'00000000-0000-0000-0000-000000000000',
+                                        nodeType: 'async',
+                                        expanded: true,
+                                        draggable: false,
+                                        icon: _ico("blue-folder-open-document-text"),
+                                        text: _("All fascicles")
                                     }
-                                }, { baseParams: { term: 'editions.documents.assign' } }),
+                                },
+
+                                //xc.getConfig("/documents/combos/fascicles/", {
+                                //    disabled: true,
+                                //    listeners: {
+                                //        scope: this,
+                                //        render: function(field) {
+                                //            field.setValue("00000000-0000-0000-0000-000000000000", _("Briefcase"));
+                                //        },
+                                //        beforequery: function(qe) {
+                                //            delete qe.combo.lastQuery;
+                                //            qe.combo.getStore().baseParams["flt_edition"] = this.getForm().findField("edition").getValue();
+                                //        }
+                                //    }
+                                //}, { baseParams: { term: 'editions.documents.assign' } }),
 
                                 xc.getConfig("/documents/combos/headlines/", {
                                     disabled: false,
