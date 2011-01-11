@@ -179,33 +179,34 @@ sub fascicles {
         my $leaf = $c->json->false;
 
         $sql = "
-            SELECT *, ( SELECT count(*) FROM fascicles c2 WHERE c2.parent = id ) as have_childs
-            FROM fascicles
+            SELECT t1.id, t1.shortcut, t2.shortcut as edition_shortcut, ( SELECT count(*) FROM fascicles c2 WHERE c2.parent = t1.id ) as have_childs
+            FROM fascicles t1, editions t2
             WHERE
-                1=1
-                AND id <> '00000000-0000-0000-0000-000000000000'
-                AND id <> '99999999-9999-9999-9999-999999999999'
+                t1.enabled=true
+                AND t1.id <> '00000000-0000-0000-0000-000000000000'
+                AND t1.id <> '99999999-9999-9999-9999-999999999999'
+                AND t1.deadline >= now()
+                AND t2.id = t1.edition
         ";
 
         if ($i_node eq '00000000-0000-0000-0000-000000000000' ) {
-            $sql .= " AND parent=edition ";
+            $sql .= " AND t1.parent=t1.edition ";
         }
 
         if ($i_node ne '00000000-0000-0000-0000-000000000000' ) {
-            $sql .= " AND parent=? ";
+            $sql .= " AND t1.parent=? ";
             push @data, $i_node;
             $leaf = $c->json->true;
         }
 
-        my $data = $c->sql->Q("$sql ORDER BY shortcut", \@data)->Hashes;
+        my $data = $c->sql->Q("$sql ORDER BY t1.shortcut", \@data)->Hashes;
 
         foreach my $item (@$data) {
             my $record = {
                 id   => $item->{id},
                 icon => "blue-folder-open-document-text",
-                text => $item->{shortcut},
-                leaf => $leaf,
-                data => $item
+                text => $item->{edition_shortcut} .'/'. $item->{shortcut},
+                leaf => $leaf
             };
             if ( $item->{have_childs} ) {
                 $record->{leaf} = $c->json->false;
