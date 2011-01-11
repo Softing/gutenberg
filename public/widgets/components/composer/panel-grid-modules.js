@@ -27,11 +27,11 @@ Inprint.cmp.composer.Modules = Ext.extend(Ext.grid.GridPanel, {
         this.columns = [
             this.selectionModel,
             {
-                id:"place_shortcut",
+                id:"place_title",
                 header: _("Place"),
                 width: 100,
                 sortable: true,
-                dataIndex: "place_shortcut"
+                dataIndex: "place_title"
             },
             {
                 id:"title",

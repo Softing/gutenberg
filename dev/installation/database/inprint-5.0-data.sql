@@ -112,21 +112,21 @@ INSERT INTO fascicles(id, edition, parent, title, shortcut, description, manager
 
 -- Tags
 
-INSERT INTO indx_tags(id, title, shortcut, description, created, updated)
-    VALUES ('00000000-0000-0000-0000-000000000000', '--', '--', '--', now(), now());
+INSERT INTO indx_tags(id, title, description, created, updated)
+    VALUES ('00000000-0000-0000-0000-000000000000', '--', '--', now(), now());
 
 -- Rubricator
 	
-INSERT INTO indx_headlines(id, edition, tag, title, shortcut, description, bydefault, created, updated)
-    VALUES ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '--', '--', '--', true, now(), now());
+INSERT INTO indx_headlines(id, edition, tag, title, description, bydefault, created, updated)
+    VALUES ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '--', '--', true, now(), now());
 	
-INSERT INTO indx_rubrics(id, edition, headline, tag, title, shortcut, description, bydefault, created, updated)
-    VALUES ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '--', '--', '--', true, now(), now());
+INSERT INTO indx_rubrics(id, edition, headline, tag, title, description, bydefault, created, updated)
+    VALUES ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '--', '--', true, now(), now());
 
 -- Briefcase rubricator
 
-INSERT INTO fascicles_indx_headlines(id, edition, fascicle, origin, bydefault, title, shortcut, description, created, updated)
-    VALUES ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', true, '--', '--', '--', now(), now());
+INSERT INTO fascicles_indx_headlines(id, edition, fascicle, tag, bydefault, title, description, created, updated)
+    VALUES ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', true, '--', '--', now(), now());
 
 INSERT INTO fascicles_indx_rubrics(id, edition, fascicle, headline, origin, bydefault, title, shortcut, description, created, updated)
     VALUES ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', true, '--', '--', '--', now(), now());

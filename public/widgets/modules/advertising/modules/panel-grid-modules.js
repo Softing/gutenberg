@@ -172,19 +172,6 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
 
         wndw.show(this);
 
-        //if (this.pageW && this.pageH) {
-        //    var configure = function () {
-        //        var flash = wndw.flash;
-        //        if (flash.setField) {
-        //            //flash.setField("mypage", "letter", 0, 0 );
-        //            //flash.setGrid("mypage",  this.pageW, this.pageH );
-        //        } else {
-        //            configure.defer(10, this);
-        //        }
-        //    }
-        //    configure.defer(10, this);
-        //}
-
         var form = wndw.form.getForm();
         form.reset();
 
@@ -292,7 +279,6 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
                         var load = function () {
                             if (flash.setBlocks) {
                                 var record = action.result.data;
-                                //flash.deleteAllBlocks("mypage");
                                 flash.reset();
                                 flash.setField("mypage", "letter", 0, 0 );
                                 flash.setGrid("mypage",  this.pageW, this.pageH );
