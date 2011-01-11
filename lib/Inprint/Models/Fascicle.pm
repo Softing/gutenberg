@@ -54,6 +54,8 @@ sub delete {
     my $c  = shift;
     my $id = shift;
 
+    $c->sql->Do(" DELETE FROM fascicles_requests WHERE fascicle=? ", [ $id ]);
+
     $c->sql->Do(" DELETE FROM fascicles_modules WHERE fascicle=? ", [ $id ]);
     $c->sql->Do(" DELETE FROM fascicles_options WHERE fascicle=? ", [ $id ]);
     $c->sql->Do(" DELETE FROM fascicles_pages WHERE fascicle=? ", [ $id ]);
