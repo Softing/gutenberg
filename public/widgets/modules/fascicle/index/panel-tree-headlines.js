@@ -24,12 +24,21 @@ Inprint.fascicle.indexes.TreeHeadlines = Ext.extend(Ext.tree.TreePanel, {
             autoScroll:true,
             loader: treeLoader,
             border:false,
-            rootVisible: false,
             root: {
-                id:'00000000-0000-0000-0000-000000000000',
+                id: this.parent.fascicle,
                 nodeType: 'async',
-                draggable: false
+                expanded: true,
+                draggable: false,
+                icon: _ico("blue-folder"),
+                text: _("Fascicle"),
+                type: "fascicle"
             }
+            //rootVisible: false,
+            //root: {
+            //    id:'00000000-0000-0000-0000-000000000000',
+            //    nodeType: 'async',
+            //    draggable: false
+            //}
         });
 
         Inprint.fascicle.indexes.TreeHeadlines.superclass.initComponent.apply(this, arguments);
@@ -107,7 +116,11 @@ Inprint.fascicle.indexes.TreeHeadlines = Ext.extend(Ext.tree.TreePanel, {
             form.on("actioncomplete", function (form, action) {
                 if (action.type == "submit") {
                     win.hide();
-                    node.parentNode.reload();
+                    if (node.parentNode) {
+                        node.parentNode.reload();
+                    } else {
+                        node.reload();
+                    }
                 }
             }, this);
 

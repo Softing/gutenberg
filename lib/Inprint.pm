@@ -76,6 +76,7 @@ sub startup {
 
     # Add routes
     $postinitBridge->route('/login/')->to('session#login');
+    $postinitBridge->route('/workspace/login/')->to('session#login');
     $postinitBridge->route('/locale/')->to('locale#index');
 
     # Add sessionable routes
