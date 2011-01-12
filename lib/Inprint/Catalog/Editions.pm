@@ -65,7 +65,7 @@ sub tree {
                 id <> '00000000-0000-0000-0000-000000000000'
                 AND subpath(path, nlevel(path) - 2, 1)::text = replace(?, '-', '')::text
         ";
-        
+
         push @data, $i_node;
         push @data, $i_node;
 
@@ -154,6 +154,9 @@ sub update {
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_id));
 
+    push @errors, { id => "id", msg => "Incorrectly filled field"}
+        if ($i_id eq "00000000-0000-0000-0000-000000000000");
+
     push @errors, { id => "path", msg => "Incorrectly filled field"}
         unless ($c->is_path($i_path));
 
@@ -195,6 +198,9 @@ sub delete {
 
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_id));
+
+    push @errors, { id => "id", msg => "Incorrectly filled field"}
+        if ($i_id eq "00000000-0000-0000-0000-000000000000");
 
     push @errors, { id => "access", msg => "Not enough permissions"}
         unless ($c->access->Check("domain.editions.manage"));

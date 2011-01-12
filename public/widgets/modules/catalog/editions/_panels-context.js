@@ -13,17 +13,18 @@ Inprint.catalog.editions.Context = function(parent, panels) {
             disabled = false;
         }
 
-        items.push(
-            {
-                icon: _ico("blue-folder--plus"),
-                cls: "x-btn-text-icon",
-                text: _("Create"),
-                disabled: disabled,
-                ref: "../btnCreate",
-                scope:this,
-                handler: function() { this.cmpCreate(node); }
-            },
-            {
+        items.push({
+            icon: _ico("blue-folder--plus"),
+            cls: "x-btn-text-icon",
+            text: _("Create"),
+            disabled: disabled,
+            ref: "../btnCreate",
+            scope:this,
+            handler: function() { this.cmpCreate(node); }
+        });
+
+        if (node.id != NULLID) {
+            items.push({
                 icon: _ico("blue-folder--pencil"),
                 cls: "x-btn-text-icon",
                 text: _("Edit"),
@@ -31,10 +32,7 @@ Inprint.catalog.editions.Context = function(parent, panels) {
                 ref: "../btnEdit",
                 scope:this,
                 handler: function() { this.cmpUpdate(node); }
-            }
-        );
-
-        if (node.attributes.id != NULLID) {
+            });
             items.push({
                 icon: _ico("blue-folder--minus"),
                 cls: "x-btn-text-icon",

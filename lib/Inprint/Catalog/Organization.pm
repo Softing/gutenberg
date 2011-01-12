@@ -148,6 +148,9 @@ sub update {
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_id));
 
+    push @errors, { id => "id", msg => "Incorrectly filled field"}
+        if ($i_id eq "00000000-0000-0000-0000-000000000000");
+
     push @errors, { id => "path", msg => "Incorrectly filled field"}
         unless ($c->is_path($i_path));
 
@@ -173,6 +176,30 @@ sub update {
             $c->sql->Do(" UPDATE catalog SET title=?, shortcut=?, description=?, path=replace(?, '-',  '')::ltree WHERE id=? ",
                 [ $i_title, $i_shortcut, $i_description, "$path.$i_id", $i_id ]);
         }
+    }
+
+    $success = $c->json->true unless (@errors);
+    $c->render_json({ success => $success, errors => \@errors });
+}
+
+sub delete {
+    my $c = shift;
+    my $i_id = $c->param("id");
+
+    my @errors;
+    my $success = $c->json->false;
+
+    push @errors, { id => "id", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_id));
+
+    push @errors, { id => "id", msg => "Incorrectly filled field"}
+        if ($i_id eq "00000000-0000-0000-0000-000000000000");
+
+    push @errors, { id => "access", msg => "Not enough permissions"}
+        unless ($c->access->Check("domain.departments.manage"));
+
+    unless (@errors) {
+        $c->sql->Do(" DELETE FROM catalog WHERE id =? ", [ $i_id ]);
     }
 
     $success = $c->json->true unless (@errors);
@@ -232,28 +259,6 @@ sub unmap {
 
     $success = $c->json->true unless (@errors);
     $c->render_json({ success => $success, errors => \@errors });
-}
-
-sub delete {
-    my $c = shift;
-    my $i_id = $c->param("id");
-
-    my @errors;
-    my $success = $c->json->false;
-
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_id));
-
-    push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.departments.manage"));
-
-    unless (@errors) {
-        $c->sql->Do(" DELETE FROM catalog WHERE id =? ", [ $i_id ]);
-    }
-
-    $success = $c->json->true unless (@errors);
-    $c->render_json({ success => $success, errors => \@errors });
-
 }
 
 1;
