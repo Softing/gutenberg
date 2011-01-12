@@ -11,21 +11,6 @@ use warnings;
 
 use base 'Inprint::BaseController';
 
-sub process {
-
-    my $c = shift;
-
-    if ($c->param("id")) {
-        $c->update();
-    }
-
-    else {
-        $c->create();
-    }
-
-    return $c;
-}
-
 sub read {
     my $c = shift;
     my $i_request = $c->param("request");
@@ -338,7 +323,6 @@ sub update {
 
     my $i_id          = $c->param("id");
 
-    my $i_title       = $c->param("title");
     my $i_shortcut    = $c->param("shortcut");
     my $i_description = $c->param("description");
 
@@ -352,16 +336,13 @@ sub update {
     my $i_status       = $c->param("status") || undef;
     my $i_squib        = $c->param("squib") || undef;
     my $i_payment      = $c->param("payment") || undef;
-    my $i_readiness    = $c->param("readiness") || undef;
+    my $i_approved    = $c->param("approved") || undef;
 
     my @errors;
     my $success = $c->json->false;
 
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_id));
-
-    push @errors, { id => "title", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_title));
 
     push @errors, { id => "shortcut", msg => "Incorrectly filled field"}
         unless ($c->is_text($i_shortcut));
@@ -374,19 +355,19 @@ sub update {
 
     unless (@errors) {
         $c->sql->Do("
-            UPDATE ad_requests SET
-                title=?, shortcut=?, description=?,
+            UPDATE fascicles_requests SET
+                shortcut=?, description=?,
                 advertiser=?, manager=?,
                 fascicle=?, place=?, module=?,
                 status=?, squib=?, payment=?, readiness=?, updated=now()
             WHERE id=?;
 
         ", [
-            $i_title, $i_shortcut, $i_description,
+            $i_shortcut, $i_description,
 
             $i_advertiser, $i_manager,
             $i_fascicle, $i_place, $i_module,
-            $i_status, $i_squib, $i_payment, $i_readiness,
+            $i_status, $i_squib, $i_payment, $i_approved,
 
             $i_id
         ]);

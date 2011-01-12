@@ -51,10 +51,11 @@ Inprint.cmp.adverta.Request = Ext.extend(Ext.FormPanel, {
             },
 
             {
+                columns: 1,
                 xtype: 'radiogroup',
                 fieldLabel: _("Request"),
                 style: "margin-bottom:10px",
-                columns: 1,
+                name: "status",
                 items: [
                     { name: "status", inputValue: "possible",    boxLabel: _("Possible") },
                     { name: "status", inputValue: "active",      boxLabel: _("Active") },
@@ -63,10 +64,11 @@ Inprint.cmp.adverta.Request = Ext.extend(Ext.FormPanel, {
             },
 
             {
+                columns: 1,
                 xtype: 'radiogroup',
                 fieldLabel: _("Squib"),
                 style: "margin-bottom:10px",
-                columns: 1,
+                name: "squib",
                 items: [
                     { name: "squib", inputValue: "yes",    boxLabel: _("Yes") },
                     { name: "squib", inputValue: "no", boxLabel: _("No"), checked: true }
@@ -99,13 +101,10 @@ Inprint.cmp.adverta.Request = Ext.extend(Ext.FormPanel, {
                 anchor: "100%",
                 allowBlank:false
             },
-            bodyStyle: "padding:5px 5px",
-            url: _url("/fascicle/requests/process/")
+            bodyStyle: "padding:5px 5px"
         });
 
         Inprint.cmp.adverta.Request.superclass.initComponent.apply(this, arguments);
-
-        this.getForm().url = this.url;
 
     },
 

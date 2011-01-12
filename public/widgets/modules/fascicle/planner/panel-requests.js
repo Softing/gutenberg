@@ -191,6 +191,7 @@ Inprint.fascicle.planner.Requests = Ext.extend(Ext.grid.GridPanel, {
         }
 
         var wndw = new Inprint.cmp.Adverta({
+            mode: "create",
             fascicle: this.parent.fascicle,
             selection: selection
         });
@@ -228,18 +229,19 @@ Inprint.fascicle.planner.Requests = Ext.extend(Ext.grid.GridPanel, {
         }
 
         var wndw = new Inprint.cmp.Adverta({
+            mode: "update",
             record: record.data,
             fascicle: this.oid,
             selection: record.data.pages
         });
-
-        wndw.cmpFill(record);
 
         wndw.on("actioncomplete", function() {
             this.parent.cmpReload();
         }, this);
 
         wndw.show();
+
+        wndw.cmpFill(record);
     },
 
     cmpMove: function(inc) {

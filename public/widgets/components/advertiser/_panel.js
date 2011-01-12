@@ -33,13 +33,25 @@ Inprint.cmp.Adverta = Ext.extend(Ext.Window, {
 
         var winWidth = (this.selection.length*300) + 600;
 
+        var title;
+        var btn;
+        if (this.mode == "create") {
+            title = _("Добавление рекламной заявки");
+            btn = _("Add");
+        }
+
+        if (this.mode == "update") {
+            title = _("Редактирование заявки");
+            btn = _("Save");
+        }
+
         Ext.apply(this, {
 
             border:false,
 
             modal:true,
             closeAction: "hide",
-            title: _("Добавление рекламной заявки"),
+            title: title,
 
             width: winWidth,
             height:450,
@@ -52,7 +64,7 @@ Inprint.cmp.Adverta = Ext.extend(Ext.Window, {
 
             buttons: [
                 {
-                    text: _("Add"),
+                    text: btn,
                     scope:this,
                     handler: this.cmpSave
                 },
@@ -83,42 +95,58 @@ Inprint.cmp.Adverta = Ext.extend(Ext.Window, {
 
     cmpFill: function(record) {
 
-        //var form = this.panels["request"].getForm();
-        //
-        //if (record.data.advertiser && record.data.advertiser_shortcut) {
-        //    form.findField("advertiser").setValue(record.data.advertiser, record.data.advertiser_shortcut);
-        //}
-        //
-        //if (record.data.shortcut) {
-        //    form.findField("shortcut").setValue(record.data.shortcut);
-        //}
-        //
-        //if (record.data.description) {
-        //    form.findField("description").setValue(record.data.description);
-        //}
-        //
-        //if (record.data.status) {
-        //}
-        //
-        //if (record.data.squib == "yes") {
-        //    form.findField("squib").setValue(true);
-        //}
-        //
-        //if (record.data.payment) {
-        //}
-        //
-        ////readiness
-        //
-        ////this.panels["modules"];
-        ////this.panels["templates"];
-        ////this.panels["flash"];
+        var form = this.panels["request"].getForm();
+
+        if (this.panels["modules"]) {
+            var modules = this.panels["modules"].panels["modules"];
+            if (record.data.module) {
+                if(modules.getNodeById(record.data.module)) {
+                    modules.getNodeById(record.data.module).select();
+                }
+            }
+        }
+
+        if (record.data.id) {
+            form.findField("id").setValue(record.data.id);
+        }
+
+        if (record.data.advertiser && record.data.advertiser_shortcut) {
+            form.findField("advertiser").setValue(record.data.advertiser, record.data.advertiser_shortcut);
+        }
+
+        if (record.data.shortcut) {
+            form.findField("shortcut").setValue(record.data.shortcut);
+        }
+
+        if (record.data.description) {
+            form.findField("description").setValue(record.data.description);
+        }
+
+        if (record.data.status) {
+            form.findField("status").setValue(record.data.status);
+        }
+
+        if (record.data.squib) {
+            form.findField("squib").setValue(record.data.squib);
+        }
+
+        if (record.data.payment) {
+            form.findField("payment").setValue(record.data.payment);
+        }
+
+        if (record.data.readiness) {
+            form.findField("approved").setValue(record.data.readiness);
+        }
+
     },
 
     cmpSave: function() {
 
+        var form = this.panels["request"].getForm();
+
         // No pages selected
         if ( this.selection.length == 0 ) {
-            this.panels["request"].getForm().baseParams = {
+            form.baseParams = {
                 template: this.panels["templates"].getValue("id")
             }
         }
@@ -128,14 +156,22 @@ Inprint.cmp.Adverta = Ext.extend(Ext.Window, {
             this.panels["flash"].cmpSave();
 
             if (this.panels["modules"].panels["modules"].cmpGetSelectedNode()) {
-                this.panels["request"].getForm().baseParams = {
+                form.baseParams = {
                     module: this.panels["modules"].panels["modules"].cmpGetSelectedNode().attributes.module
                 }
             }
 
         }
 
-        this.panels["request"].getForm().submit();
+        if ( this.mode == "create") {
+            form.url = _url("/fascicle/requests/create/");
+        }
+
+        if ( this.mode == "update") {
+            form.url = _url("/fascicle/requests/update/");
+        }
+
+        form.submit();
     }
 
 });
