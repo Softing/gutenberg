@@ -95,7 +95,7 @@ sub importFromDefaults {
     # Import Headlines && Rubrics
 
     my $headlines = $c->sql->Q("
-        SELECT id, tag, title, description
+        SELECT id, tag, bydefault, title, description
         FROM indx_headlines
         WHERE edition = ANY(?) ",
         [ $editions ])->Hashes;
@@ -108,7 +108,7 @@ sub importFromDefaults {
         $c->sql->Do("
             INSERT INTO fascicles_indx_headlines(id, edition, fascicle, tag, bydefault, title, description, created, updated)
             VALUES (?, ?, ?, ?, ?, ?, ?, now(), now()); ",
-            [ $headline_id, $edition->{id}, $fascicle->{id}, $headline->{tag}, $fascicle->{bydefault} || 0, $headline->{title}, $headline->{description} || "" ]);
+            [ $headline_id, $edition->{id}, $fascicle->{id}, $headline->{tag}, $headline->{bydefault}, $headline->{title}, $headline->{description} || "" ]);
 
         my $rubrics = $c->sql->Q("
             SELECT id, tag, title, description
@@ -218,7 +218,7 @@ sub importFromFascicle {
     # Import Headlines && Rubrics
 
     my $headlines = $c->sql->Q("
-        SELECT id, tag, title, description
+        SELECT id, tag, bydefault, title, description
         FROM fascicles_indx_headlines
         WHERE fascicle = ? ",
         [ $source->{id} ])->Hashes;
@@ -231,7 +231,7 @@ sub importFromFascicle {
         $c->sql->Do("
             INSERT INTO fascicles_indx_headlines(id, edition, fascicle, tag, bydefault, title, description, created, updated)
             VALUES (?, ?, ?, ?, ?, ?, ?, now(), now()); ",
-            [ $headline_id, $fascicle->{edition}, $fascicle->{id}, $headline->{tag}, $fascicle->{bydefault} || 0, $headline->{title}, $headline->{description} || "" ]);
+            [ $headline_id, $fascicle->{edition}, $fascicle->{id}, $headline->{tag}, $headline->{bydefault}, $headline->{title}, $headline->{description} || "" ]);
 
         my $rubrics = $c->sql->Q("
             SELECT id, tag, title, description

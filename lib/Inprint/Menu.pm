@@ -121,6 +121,7 @@ sub index
             AND t1.edition = ANY (?)
             AND t1.enabled = true
             AND t1.edition=t1.parent
+            AND t1.deadline >= now()
         ORDER BY t1.deadline, t2.shortcut, t1.shortcut
     ", [ $accessLayoutEditions ])->Hashes;
 
@@ -180,6 +181,7 @@ sub index
                 t1.edition = t2.id
                 AND t1.edition = ANY (?)
                 AND t1.enabled = true
+                AND t1.deadline >= now()
                 AND t1.parent = ?
             ORDER BY t1.deadline, t2.shortcut, t1.shortcut
         ", [ $accessLayoutEditions, $fascicle->{id} ])->Hashes;
