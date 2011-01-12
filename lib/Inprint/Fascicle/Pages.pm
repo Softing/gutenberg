@@ -589,14 +589,21 @@ sub delete {
     unless (@errors) {
         foreach my $item (@i_pages) {
             my ($id, $seqnum) = split "::", $item;
-            my $page = $c->sql->Q(" SELECT * FROM fascicles_pages WHERE id=? AND seqnum=? ", [ $id, $seqnum ])->Hash;
-            if ($page->{id}) {
-                $c->sql->bt;
-                $c->sql->Do(" DELETE FROM fascicles_pages WHERE id=? ", [ $page->{id} ]);
-                $c->sql->Do(" DELETE FROM fascicles_map_documents WHERE page=? ", [ $page->{id} ]);
-                $c->sql->Do(" DELETE FROM fascicles_map_modules WHERE page=? ", [ $page->{id} ]);
-                $c->sql->et;
+
+            my $page    = $c->sql->Q(" SELECT * FROM fascicles_pages WHERE id=? AND seqnum=? ", [ $id, $seqnum ])->Hash;
+            next unless ($page->{id});
+
+            $c->sql->bt;
+
+            my $modules = $c->sql->Q(" SELECT module FROM fascicles_map_modules WHERE page=?", [ $page->{id} ])->Values;
+
+            foreach my $id (@$modules) {
+                $c->sql->Do(" DELETE FROM fascicles_modules WHERE id=? ", [ $id ]);
             }
+
+            $c->sql->Do(" DELETE FROM fascicles_pages WHERE id=? ", [ $page->{id} ]);
+
+            $c->sql->et;
         }
     }
 
