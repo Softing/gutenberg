@@ -13,7 +13,9 @@ use base 'Inprint::BaseController';
 
 sub read {
     my $c = shift;
-    my $i_id = $c->param("id");
+
+    my $i_id    = $c->param("id");
+    my @i_pages = $c->param("page");
 
     my @errors;
     my $success = $c->json->false;
@@ -21,7 +23,13 @@ sub read {
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_id));
 
+    my @pages;
     my $result = [];
+
+    foreach (@i_pages) {
+        my ($page, $seqnum) = split '::', $_;
+        push @pages, $page;
+    }
 
     unless (@errors) {
 
@@ -31,20 +39,20 @@ sub read {
             WHERE id=?;
         ", [ $i_id ])->Hash;
 
-        $result->{pages} = $c->sql->Q("
-            SELECT page, module
-            FROM fascicles_map_modules WHERE module=?
-        ", [ $result->{id} ])->Hashes;
-
-        my $pages = $c->sql->Q("
-            SELECT DISTINCT page FROM fascicles_map_modules WHERE module=?
-        ", [ $result->{id} ])->Values;
+        #$result->{pages} = $c->sql->Q("
+        #    SELECT page, module
+        #    FROM fascicles_map_modules WHERE module=?
+        #", [ $result->{id} ])->Hashes;
+        #
+        #my $pages = $c->sql->Q("
+        #    SELECT DISTINCT page FROM fascicles_map_modules WHERE module=?
+        #", [ $result->{id} ])->Values;
 
         $result->{composition} = $c->sql->Q("
-            SELECT t1.id, t1.title, t1.w, t1.h, t2.page, t2.x, t2.y
+            SELECT t2.page, t1.id, t1.title, t1.w, t1.h, t2.x, t2.y
             FROM fascicles_modules t1, fascicles_map_modules t2
             WHERE page=ANY(?) AND t2.module=t1.id
-        ", [ $pages ])->Hashes;
+        ", [ \@pages ])->Hashes;
 
     }
 

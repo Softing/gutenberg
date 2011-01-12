@@ -131,31 +131,25 @@ Inprint.cmp.composer.Flash = Ext.extend(Ext.Panel, {
 
     },
 
-    cmpMoveBlocks: function(modules) {
-
+    cmpMoveBlocks: function(composition) {
         var flash = this.cmpGetFlashById(this.flashid);
         if (!flash) {
             return;
         }
-
-        for (var p=0; p<this.pages.length; p++) {
-            for (var m=0; m<modules.length; m++) {
-                Ext.each(records, function(c) {
-                    flash.moveBlock( c.page, c.module );
-                }, this);
-            }
+        for (var m=0; m<composition.length; m++) {
+            var module = composition[m];
+            Ext.each(module, function(c) {
+                flash.moveBlock( c.page, c.id );
+            }, this);
         }
     },
 
     cmpSave: function() {
         var flash = this.cmpGetFlashById(this.flashid);
-
         if (!flash) {
             return;
         }
-
         flash.getAllBlocks( "Inprint.flash.Proxy.savePage", this.id );
-
     },
 
     cmpSaveProxy: function(records) {

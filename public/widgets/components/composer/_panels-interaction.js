@@ -1,8 +1,8 @@
 Inprint.cmp.composer.Interaction = function(parent, panels) {
 
-    var modules = panels["modules"];
+    var modules   = panels["modules"];
     var templates = panels["templates"];
-    var flash   = panels["flash"];
+    var flash     = panels["flash"];
 
     modules.getSelectionModel().on("selectionchange", function(sm) {
         if (sm.getCount() != 1) {
@@ -13,9 +13,12 @@ Inprint.cmp.composer.Interaction = function(parent, panels) {
             scope:this,
             success: function ( result, request ) {
                 var responce = Ext.util.JSON.decode(result.responseText);
-                flash.cmpMoveBlocks(responce.data.pages);
+                flash.cmpMoveBlocks(responce.data.composition);
             },
-            params: { id: modules.getValue("id") }
+            params: {
+                id: modules.getValue("id"),
+                page: parent.selection
+            }
         });
     }, parent);
 
