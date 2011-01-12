@@ -34,66 +34,6 @@ sub read {
     $c->render_json({ success => $success, errors => \@errors, data => \@data });
 }
 
-sub templates {
-    my $c = shift;
-
-    my @i_pages = $c->param("page");
-
-    my $amount = $#i_pages+1;
-
-    my $result = [];
-
-    my @errors;
-    my $success = $c->json->false;
-
-    foreach (@i_pages) {
-        push @errors, { id => "page", msg => "Incorrectly filled field"}
-            unless ($c->is_uuid($_));
-    }
-
-    # Get templates from pages
-    my $templates; unless (@errors) {
-        $templates = $c->sql->Q(" SELECT DISTINCT origin FROM fascicles_pages WHERE id= ANY(?) ", [ \@i_pages ])->Values;
-        push @errors, { id => "page", msg => "Can't find object!"}
-            unless (@$templates);
-    }
-
-    my $sql;
-    my @queries;
-    my @params;
-
-    unless (@errors) {
-
-        foreach my $tmpl_id (@$templates) {
-
-            push @queries, "
-                SELECT
-                    t1.id, t1.origin, t1.fascicle, t1.page, t1.title, t1.description,
-                    t1.amount, round(t1.area::numeric, 2) as area, t1.x, t1.y, t1.w, t1.h,
-                    t3.title as place_title,
-                    t1.created, t1.updated
-                FROM fascicles_tmpl_modules t1, fascicles_tmpl_index t2, fascicles_tmpl_places t3
-                WHERE
-                    t1.page=? AND t1.amount=?
-                    AND t2.entity = t1.id AND t2.place = t3.id
-                ";
-            push @params, $tmpl_id;
-            push @params, $amount;
-        }
-
-        $sql = join "\n INTERSECT \n", @queries;
-
-    }
-
-    unless (@errors) {
-        $result = $c->sql->Q(" $sql ", \@params)->Hashes;
-        $c->render_json( { data => $result } );
-    }
-
-    $success = $c->json->true unless (@errors);
-    $c->render_json( { success => $success, errors => \@errors, data => $result } );
-}
-
 sub create {
 
     my $c = shift;
@@ -516,7 +456,6 @@ sub resize {
     unless (@errors) {
 
     }
-
 
     $success = $c->json->true unless (@errors);
     $c->render_json({ success => $success, errors => \@errors, data => [ $data ] });

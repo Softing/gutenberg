@@ -4,25 +4,36 @@ Inprint.cmp.composer.Interaction = function(parent, panels) {
     var templates = panels["templates"];
     var flash     = panels["flash"];
 
-    modules.getSelectionModel().on("selectionchange", function(sm) {
-        if (sm.getCount() != 1) {
-            return;
+    modules.getSelectionModel().on("selectionchange", function(sm, node) {
+        if (node.leaf) {
+            flash.cmpMoveBlocks({
+                module: node.attributes.module,
+                page: node.attributes.page
+            });
         }
-        Ext.Ajax.request({
-            url: _url("/fascicle/modules/read/"),
-            scope:this,
-            success: function ( result, request ) {
-                var responce = Ext.util.JSON.decode(result.responseText);
-                flash.cmpMoveBlocks(responce.data.composition);
-            },
-            params: {
-                id: modules.getValue("id"),
-                page: parent.selection
-            }
-        });
-    }, parent);
+    }, modules);
 
-    modules.on("rowcontextmenu", function(grid, rindex, e) {
+        //modules.getSelectionModel().on("selectionchange", function(sm) {
+    //    if (sm.getCount() != 1) {
+    //        return;
+    //    }
+    //    Ext.Ajax.request({
+    //        url: _url("/fascicle/modules/read/"),
+    //        scope:this,
+    //        success: function ( result, request ) {
+    //            var responce = Ext.util.JSON.decode(result.responseText);
+    //            flash.cmpMoveBlocks(responce.data.composition);
+    //        },
+    //        params: {
+    //            id: modules.getValue("id"),
+    //            page: parent.selection
+    //        }
+    //    });
+    //}, parent);
+
+    //modules.on("rowcontextmenu", function(grid, rindex, e) {
+
+    modules.on("contextmenu", function(node, e) {
         e.stopEvent();
         var items = [];
         items.push({
@@ -34,12 +45,13 @@ Inprint.cmp.composer.Interaction = function(parent, panels) {
             handler: this.cmpDelete
         });
         var coords = e.getXY();
-        new Ext.menu.Menu({ items : items }).showAt([coords[0], coords[1]]);
+    //    new Ext.menu.Menu({ items : items }).showAt([coords[0], coords[1]]);
+        new Ext.menu.Menu({ items : items }).show(node.ui.getAnchor());
     }, modules);
 
     modules.on("afterrender", function() {
 
-        new Ext.dd.DropTarget(modules.getView().scroller.dom, {
+        new Ext.dd.DropTarget(modules.getEl(), {
 
             ddGroup    : 'principals-selector',
             notifyDrop : function(ddSource, e, data){

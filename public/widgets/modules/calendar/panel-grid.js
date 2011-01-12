@@ -14,7 +14,7 @@ Inprint.edition.calendar.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
             'disable': _url('/calendar/disable/')
         };
 
-        this.sm = new Ext.grid.CheckboxSelectionModel();
+        //this.sm = new Ext.grid.CheckboxSelectionModel();
 
         Ext.apply(this, {
 

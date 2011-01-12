@@ -67,11 +67,12 @@ Inprint.factory.Store = new function() {
         "/catalog/rubrics/list/":                       [ "id", "title", "shortcut", "description" ],
 
         // Fascicles
-        "/fascicle/rubrics/list/":
-            [ "id", "title", "shortcut", "description" ],
 
-        "/fascicle/summary/":
-            [ "id", "shortcut", "pages", "place", "module", "place_shortcut", "holes", "requests", "free" ],
+        "/fascicle/composer/templates/":
+            [ "id", "fascicle", "page", "place", "place_title", "title", "description", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
+
+        "/fascicle/composer/modules/":
+            [ "id", "fascicle", "page", , "place", "place_title", "title", "description", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
 
         "/fascicle/documents/list/": [
                 'id', 'access',    'edition',  'edition_shortcut',    'fascicle',    'fascicle_shortcut',    'headline', 'headline_shortcut',
@@ -79,6 +80,9 @@ Inprint.factory.Store = new function() {
                 'workgroup','workgroup_shortcut','ingroups',    'islooked','isopen',    'branch','branch_shortcut','stage','stage_shortcut','color','progress',
                 'title','author','pages',    'pdate','psize','rdate','rsize',    'images','files',    'created','updated'
             ],
+
+        "/fascicle/modules/list/":
+            [ "id", "fascicle", "page", , "place", "place_title", "title", "description", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
 
         "/fascicle/requests/list/": [
                 "id", "serialnum", "edition", "fascicle", "advertiser", "advertiser_shortcut",
@@ -88,6 +92,12 @@ Inprint.factory.Store = new function() {
                 "module", "module_shortcut", "pages", "firstpage", "amount", "shortcut", "description", "status", "payment", "readiness",
                 createDateField("created"), createDateField("updated")
             ],
+
+        "/fascicle/rubrics/list/":
+            [ "id", "title", "shortcut", "description" ],
+
+        "/fascicle/summary/":
+            [ "id", "shortcut", "pages", "place", "module", "place_shortcut", "holes", "requests", "free" ],
 
         "/fascicle/templates/pages/list/":
             [ "id", "fascicle", "title", "shortcut", "description", "w", "h", createDateField("created"), createDateField("updated") ],
@@ -103,12 +113,6 @@ Inprint.factory.Store = new function() {
 
         "/fascicle/templates/modules/":
             [ "id", "fascicle", "page", "place", "place_title", "title", "description", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
-
-        "/fascicle/pages/templates/":
-            [ "id", "fascicle", "page", "place", "place_title", "title", "description", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
-
-        "/fascicle/modules/list/":
-            [ "id", "fascicle", "page", , "place", "place_title", "title", "description", "amount", "area", "x", "y", "w", "h", createDateField("created"), createDateField("updated") ],
 
         // System
         "/system/events/list/":

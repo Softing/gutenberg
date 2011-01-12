@@ -36,15 +36,18 @@ Inprint.cmp.composer.Flash = Ext.extend(Ext.Panel, {
         var flash =  {
             id: this.flashid,
             xtype: "flash",
-            width:flashWidth,
-            hideMode : 'offsets',
-            url      : '/flash/Dispose2.swf',
+            swfWidth:flashWidth,
+            swfHeight:290,
+            //hideMode: 'offsets',
+            url: '/flash/Dispose3.swf',
             expressInstall: true,
+            flashParams: {
+                scale:"noscale"
+            },
             flashVars: {
-                src: '/flash/Dispose2.swf',
-                scale :'noscale',
-                autostart: 'yes',
-                loop: 'yes'
+                src: "/flash/Dispose3.swf",
+                autostart:"yes",
+                loop: "yes"
             }
         };
 
@@ -80,9 +83,7 @@ Inprint.cmp.composer.Flash = Ext.extend(Ext.Panel, {
     },
 
     cmpInit: function() {
-
         this.body.mask(_("Loading..."));
-
         Ext.Ajax.request({
             url: this.urls["init"],
             scope:this,
@@ -90,15 +91,11 @@ Inprint.cmp.composer.Flash = Ext.extend(Ext.Panel, {
                 this.body.unmask();
             },
             success: function ( result, request ) {
-
                 var responce = Ext.util.JSON.decode(result.responseText);
-
                 this.cmpInitFlash(responce);
-
             },
             params: { page: this.pages }
         });
-
     },
 
     cmpInitFlash: function(responce) {
@@ -136,12 +133,7 @@ Inprint.cmp.composer.Flash = Ext.extend(Ext.Panel, {
         if (!flash) {
             return;
         }
-        for (var m=0; m<composition.length; m++) {
-            var module = composition[m];
-            Ext.each(module, function(c) {
-                flash.moveBlock( c.page, c.id );
-            }, this);
-        }
+        flash.moveBlock( composition.page, composition.module );
     },
 
     cmpSave: function() {
