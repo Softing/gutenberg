@@ -1,48 +1,43 @@
-Inprint.cmp.adverta.GridModules = Ext.extend(Ext.grid.GridPanel, {
+Inprint.cmp.adverta.GridModules = Ext.extend(Ext.ux.tree.TreeGrid, {
 
     initComponent: function() {
-
-        this.pageId = null;
-        this.pageW  = null;
-        this.pageH  = null;
 
         this.params = {};
         this.components = {};
 
         this.urls = {
-            "list":        "/fascicle/modules/list/",
+            "list":        "/fascicle/composer/modules/",
             "create": _url("/fascicle/modules/create/"),
             "delete": _url("/fascicle/modules/delete/")
         }
 
-        this.store = Inprint.factory.Store.json(this.urls["list"], {
-            baseParams: {
-                fascicle: this.fascicle,
-                page: this.parent.selection
-            }
-        });
-
-        this.selectionModel = new Ext.grid.CheckboxSelectionModel({
-            singleSelect: true
-        });
-
         this.columns = [
-            this.selectionModel,
+            {
+                id:"title",
+                width: 130,
+                header: _("Title"),
+                dataIndex: "title"
+            },
             {
                 id:"place_title",
+                width: 100,
                 header: _("Place"),
-                width: 80,
-                sortable: true,
                 dataIndex: "place_title"
             },
             {
-                id:"title",
-                header: _("Title"),
-                width: 120,
-                sortable: true,
-                dataIndex: "title"
+                id:"amount",
+                width: 80,
+                header: _("Amount"),
+                dataIndex: "amount"
             }
         ];
+
+        this.loader  = new Ext.tree.TreeLoader({
+            dataUrl: this.urls["list"],
+            baseParams: {
+                page: this.parent.selection
+            }
+        });
 
         Ext.apply(this, {
 
@@ -52,15 +47,7 @@ Inprint.cmp.adverta.GridModules = Ext.extend(Ext.grid.GridPanel, {
             ddGroup: 'principals-selector',
 
             layout:"fit",
-            region: "center",
-
-            viewConfig: {
-                forceFit: true
-            },
-
-            stripeRows: true,
-            columnLines: true,
-            sm: this.selectionModel
+            region: "center"
 
         });
 
@@ -70,8 +57,14 @@ Inprint.cmp.adverta.GridModules = Ext.extend(Ext.grid.GridPanel, {
 
     onRender: function() {
         Inprint.cmp.adverta.GridModules.superclass.onRender.apply(this, arguments);
+    },
 
-        this.getStore().load();
+    cmpGetSelectedNode: function() {
+        return this.getSelectionModel().getSelectedNode();
+    },
+
+    cmpReload: function() {
+        this.getRootNode().reload();
     },
 
     cmpDelete: function() {
@@ -84,10 +77,12 @@ Inprint.cmp.adverta.GridModules = Ext.extend(Ext.grid.GridPanel, {
                         url: this.urls["delete"],
                         scope:this,
                         success: function() {
-                            this.parent.panels["flash"].cmpInit();
                             this.cmpReload();
+                            this.parent.panels["flash"].cmpInit();
                         },
-                        params: { id: this.getValues("id") }
+                        params: {
+                            id: this.cmpGetSelectedNode().attributes.module
+                        }
                     });
                 }
             }, this).setIcon(Ext.MessageBox.WARNING);

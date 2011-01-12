@@ -8,32 +8,30 @@ Inprint.cmp.Adverta = Ext.extend(Ext.Window, {
             parent: this, fascicle: this.fascicle
         });
 
-        this.panels["modules"] = new Inprint.cmp.adverta.Modules({
-            parent: this, fascicle: this.fascicle
-        });
-
-        this.panels["templates"] = new Inprint.cmp.adverta.Templates({
-            parent: this, fascicle: this.fascicle
-        });
-
-        this.panels["flash"]   = new Inprint.cmp.adverta.Flash({
-            parent: this
-        });
-
         this.items = [];
 
         this.items.push(this.panels["request"]);
 
         if ( this.selection.length == 0 ) {
+            this.panels["templates"] = new Inprint.cmp.adverta.Templates({
+                parent: this,
+                fascicle: this.fascicle
+            });
             this.items.push(this.panels["templates"]);
         }
 
         if ( this.selection.length > 0 ) {
+            this.panels["modules"] = new Inprint.cmp.adverta.Modules({
+                parent: this, fascicle: this.fascicle
+            });
+            this.panels["flash"]   = new Inprint.cmp.adverta.Flash({
+                parent: this
+            });
             this.items.push(this.panels["modules"]);
             this.items.push(this.panels["flash"]);
         }
 
-        var winWidth = (this.selection.length*300) + 500;
+        var winWidth = (this.selection.length*300) + 600;
 
         Ext.apply(this, {
 
@@ -76,7 +74,7 @@ Inprint.cmp.Adverta = Ext.extend(Ext.Window, {
     onRender: function() {
 
         Inprint.cmp.Adverta.superclass.onRender.apply(this, arguments);
-        Inprint.cmp.adverta.Interaction(this, this.panels);
+        Inprint.cmp.Adverta.Interaction(this, this.panels);
 
         this.panels["request"].getForm().findField("id").setValue( this.request );
         this.panels["request"].getForm().findField("fascicle").setValue( this.fascicle );
@@ -85,57 +83,56 @@ Inprint.cmp.Adverta = Ext.extend(Ext.Window, {
 
     cmpFill: function(record) {
 
-        var form = this.panels["request"].getForm();
-
-        if (record.data.advertiser && record.data.advertiser_shortcut) {
-            form.findField("advertiser").setValue(record.data.advertiser, record.data.advertiser_shortcut);
-        }
-
-        if (record.data.shortcut) {
-            form.findField("shortcut").setValue(record.data.shortcut);
-        }
-
-        if (record.data.description) {
-            form.findField("description").setValue(record.data.description);
-        }
-
-        if (record.data.status) {
-        }
-
-        if (record.data.squib == "yes") {
-            form.findField("squib").setValue(true);
-        }
-
-        if (record.data.payment) {
-        }
-
-        //readiness
-
-        //this.panels["modules"];
-        //this.panels["templates"];
-        //this.panels["flash"];
+        //var form = this.panels["request"].getForm();
+        //
+        //if (record.data.advertiser && record.data.advertiser_shortcut) {
+        //    form.findField("advertiser").setValue(record.data.advertiser, record.data.advertiser_shortcut);
+        //}
+        //
+        //if (record.data.shortcut) {
+        //    form.findField("shortcut").setValue(record.data.shortcut);
+        //}
+        //
+        //if (record.data.description) {
+        //    form.findField("description").setValue(record.data.description);
+        //}
+        //
+        //if (record.data.status) {
+        //}
+        //
+        //if (record.data.squib == "yes") {
+        //    form.findField("squib").setValue(true);
+        //}
+        //
+        //if (record.data.payment) {
+        //}
+        //
+        ////readiness
+        //
+        ////this.panels["modules"];
+        ////this.panels["templates"];
+        ////this.panels["flash"];
     },
 
     cmpSave: function() {
 
+        // No pages selected
         if ( this.selection.length == 0 ) {
             this.panels["request"].getForm().baseParams = {
                 template: this.panels["templates"].getValue("id")
             }
         }
 
+        // Some pages selected
         if ( this.selection.length > 0 ) {
+            this.panels["flash"].cmpSave();
 
-            Ext.each(this.panels["flash"].pages, function(c) {
-                var flash = this.cmpGetFlashById(c);
-                if (flash) {
-                    flash.getBlocks("Inprint.flash.Proxy.savePage", this.id );
+            if (this.panels["modules"].panels["modules"].cmpGetSelectedNode()) {
+                this.panels["request"].getForm().baseParams = {
+                    module: this.panels["modules"].panels["modules"].cmpGetSelectedNode().attributes.module
                 }
-            }, this.panels["flash"]);
-
-            this.panels["request"].getForm().baseParams = {
-                module: this.panels["modules"].panels["modules"].getValue("id")
             }
+
         }
 
         this.panels["request"].getForm().submit();
