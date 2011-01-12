@@ -72,57 +72,6 @@ Inprint.cmp.composer.Modules = Ext.extend(Ext.grid.GridPanel, {
         Inprint.cmp.composer.Modules.superclass.onRender.apply(this, arguments);
     },
 
-
-    //cmpCreate: function() {
-    //
-    //    var win = this.components["create-window"];
-    //
-    //    if (!win) {
-    //
-    //        var grid = new Inprint.cmp.composer.GridTemplates({
-    //            parent: this.parent
-    //        });
-    //
-    //        win = new Ext.Window({
-    //            width:700,
-    //            height:500,
-    //            modal:true,
-    //            layout: "fit",
-    //            closeAction: "hide",
-    //            title: _("Adding a new category"),
-    //            items: grid,
-    //            buttons: [
-    //                {
-    //                    text: _("Add"),
-    //                    scope:this,
-    //                    handler: function() {
-    //                        Ext.Ajax.request({
-    //                            url: this.urls["create"],
-    //                            scope:this,
-    //                            success: function() {
-    //                                this.components["create-window"].hide();
-    //                                this.parent.panels["flash"].cmpInit();
-    //                                this.cmpReload();
-    //                            },
-    //                            params: {
-    //                                fascicle: this.parent.fascicle,
-    //                                page: this.parent.selection,
-    //                                module: grid.getValues("id")
-    //                            }
-    //                        });
-    //                    }
-    //                },
-    //                _BTN_WNDW_CLOSE
-    //            ]
-    //
-    //        });
-    //
-    //    }
-    //
-    //    win.show(this);
-    //    this.components["create-window"] = win;
-    //},
-
     cmpDelete: function() {
         Ext.MessageBox.confirm(
             _("Warning"),

@@ -62,7 +62,7 @@ Inprint.cmp.composer.Templates = Ext.extend(Ext.grid.GridPanel, {
             stripeRows: true,
             columnLines: true,
             sm: this.selectionModel
-            //autoExpandColumn: "description"
+            
         });
 
         Inprint.cmp.composer.Templates.superclass.initComponent.apply(this, arguments);

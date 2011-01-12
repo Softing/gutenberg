@@ -68,8 +68,8 @@ Inprint.flash.Proxy = {
 
     },
 
-    savePage: function(panel, page, array) {
-        Ext.getCmp(panel).cmpSaveProxy(page, array);
+    savePage: function(panel, data) {
+        Ext.getCmp(panel).cmpSaveProxy(data);
     }
 
 };

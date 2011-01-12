@@ -2165,7 +2165,6 @@ CREATE TABLE ad_places (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
     edition uuid NOT NULL,
     title character varying NOT NULL,
-    shortcut character varying NOT NULL,
     description character varying,
     created timestamp(0) with time zone DEFAULT now(),
     updated timestamp(0) with time zone DEFAULT now()

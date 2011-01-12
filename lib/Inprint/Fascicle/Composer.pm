@@ -47,7 +47,6 @@ sub save {
 
     my $c = shift;
 
-    my $i_page    = $c->param("page");
     my @i_modules  = $c->param("modules");
 
     my @errors;
@@ -57,19 +56,13 @@ sub save {
 
         foreach my $string (@i_modules) {
 
-            my ($id, $x, $y, $w, $h) = split "::", $string;
+            my ($pageid, $moduleid, $x, $y, $w, $h) = split "::", $string;
 
             my $placed = 1;
 
-            #unless ($x eq "0/1") {
-            #    unless ($y eq "0/1") {
-            #        $placed = 1;
-            #    }
-            #}
-
             $c->sql->Do("
-                    UPDATE fascicles_map_modules SET placed=?, x=?, y=? WHERE page=? AND module=?
-                ", [ $placed, $x, $y, $i_page, $id ]);
+                UPDATE fascicles_map_modules SET placed=?, x=?, y=? WHERE page=? AND module=? ",
+                [ $placed, $x, $y, $pageid, $moduleid ]);
 
         }
 
