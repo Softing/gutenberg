@@ -6,10 +6,11 @@ Inprint.documents.Profile.Rss = Ext.extend(Ext.Panel, {
         this.record = {};
 
         this.title = _("Rss");
+        this.initialized = false;
 
         this.urls = {
-            "read":   _url("/documents/files/read/"),
-            "update": _url("/documents/files/update/")
+            "read":   _url("/documents/rss/read/"),
+            "update": _url("/documents/rss/update/")
         }
 
         this.tbar = [
@@ -28,13 +29,19 @@ Inprint.documents.Profile.Rss = Ext.extend(Ext.Panel, {
             xtype: "form",
             url: this.urls["update"],
             border:false,
-            labelWidth: 75,
+            labelWidth: 100,
             bodyStyle: "padding:5px 5px",
             defaults: {
                 anchor: "100%",
                 allowBlank:false
             },
             items: [
+                {
+                    xtype: "hidden",
+                    name: "document",
+                    value: this.oid,
+                    allowBlank:false
+                },
                 {
                     xtype:"checkbox",
                     fieldLabel: _("Published"),
@@ -44,7 +51,7 @@ Inprint.documents.Profile.Rss = Ext.extend(Ext.Panel, {
                 {
                     xtype:"textfield",
                     fieldLabel: _("URL"),
-                    name: "url"
+                    name: "link"
                 },
                 {
                     xtype:"textfield",
@@ -75,24 +82,44 @@ Inprint.documents.Profile.Rss = Ext.extend(Ext.Panel, {
     },
 
     onRender: function() {
-
         Inprint.documents.Profile.Rss.superclass.onRender.apply(this, arguments);
+        this.form = this.findByType("form")[0].getForm();
 
+        this.on("activate", function() {
+            this.cmpInitialize();
+        }, this);
     },
 
-    cmpFill: function(record) {
-        if (record){
-            this.record = record;
-            if (record.access){
-                this.cmpAccess(record.access);
-            }
+    cmpInitialize: function() {
+        if (this.initialized == true) {
+            return;
         }
+        this.cmpFill();
+    },
+
+    cmpFill: function() {
+        this.form.load({
+            url: this.urls["read"],
+            scope:this,
+            params: {
+                document: this.oid
+            },
+            success: function(form, action) {
+                this.initialized = true;
+                this.record = action.result.data;
+                //this.form.findField("id").setValue(action.result.data.id);
+            }
+        });
     },
 
     cmpAccess: function(access) {
         this.access = access;
         _disable(this.btnSave);
         if (access["documents.update"] == true) this.btnSave.enable();
+    },
+
+    cmpSave: function() {
+        this.form.submit();
     }
 
 });

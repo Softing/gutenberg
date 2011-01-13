@@ -128,8 +128,8 @@ INSERT INTO indx_rubrics(id, edition, headline, tag, title, description, bydefau
 INSERT INTO fascicles_indx_headlines(id, edition, fascicle, tag, bydefault, title, description, created, updated)
     VALUES ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', true, '--', '--', now(), now());
 
-INSERT INTO fascicles_indx_rubrics(id, edition, fascicle, headline, origin, bydefault, title, shortcut, description, created, updated)
-    VALUES ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', true, '--', '--', '--', now(), now());
+INSERT INTO fascicles_indx_rubrics(id, edition, fascicle, headline, tag, title, description, created, updated)
+    VALUES ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '--', '--', now(), now());
 	
 -------------------------------------------------------------------------------------------------
 -- Default user

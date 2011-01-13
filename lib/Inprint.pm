@@ -112,6 +112,7 @@ sub startup {
     $self->createRoutes($sessionBridge, "documents/profile",        [ "read" ]);
     $self->createRoutes($sessionBridge, "documents/files",          [ "list", "create", "read", "update", "delete", "upload" ]);
     $self->createRoutes($sessionBridge, "documents/text",           [ "get", "set" ]);
+    $self->createRoutes($sessionBridge, "documents/rss",            [ "read", "update" ]);
 
     $sessionBridge->route('/documents/files/preview/:document/:file')->to('documents-files#preview', document => "", file => "");
     $sessionBridge->route('/documents/:document/zip/:type')->to('documents-files#createzip', document => "", type => "");

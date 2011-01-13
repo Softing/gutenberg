@@ -85,8 +85,9 @@ Inprint.documents.Profile = Ext.extend(Ext.Panel, {
                     this.document = response.data.id;
                     this.panels["profile"].cmpFill(response.data);
                     this.panels["files"].cmpFill(response.data);
-                    this.panels["rss"].cmpFill(response.data);
                     this.panels["comments"].cmpFill(response.data);
+
+                    this.panels["rss"].cmpAccess(response.data.access);
                 }
             }
         });
