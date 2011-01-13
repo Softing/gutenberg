@@ -12,7 +12,7 @@ sub read {
 
     my $result = $c->sql->Q("
             SELECT id, document, link, title, description, fulltext,
-                enabled, created, updated
+                published, created, updated
             FROM rss
             WHERE document=? ",
         [ $id ])->Hash;
@@ -31,7 +31,7 @@ sub update {
     if ($record->{id}) {
         $c->sql->Do("
             UPDATE rss
-                SET link=?, title=?, description=?, fulltext=?,  enabled=?,
+                SET link=?, title=?, description=?, fulltext=?,  published=?,
                     updated=now()
                 WHERE id=?; ",
             [ $link, $title, $description, $fulltext, $published, $record->{id} ]);
@@ -43,7 +43,7 @@ sub update {
         $c->sql->Do("
             INSERT
                 INTO rss (id, document, link, title, description, fulltext,
-                    enabled, created,  updated)
+                    published, created,  updated)
                 VALUES (?, ?, ?, ?, ?, ?, ?, now(), now()); ",
             [ $record_id, $document, $link, $title, $description, $fulltext, $published ]);
     }

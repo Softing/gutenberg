@@ -107,7 +107,7 @@ Inprint.documents.Profile.Rss = Ext.extend(Ext.Panel, {
             success: function(form, action) {
                 this.initialized = true;
                 this.record = action.result.data;
-                //this.form.findField("id").setValue(action.result.data.id);
+                //this.form.findField("published").setValue(action.result.data.id);
             }
         });
     },
