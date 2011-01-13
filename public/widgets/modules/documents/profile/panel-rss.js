@@ -22,6 +22,14 @@ Inprint.documents.Profile.Rss = Ext.extend(Ext.Panel, {
                 ref: "../btnSave",
                 scope:this,
                 handler: this.cmpSave
+            },
+            "->",
+            {
+                icon: _ico("arrow-circle-double"),
+                cls: "x-btn-text-icon",
+                text: _("Reload"),
+                scope:this,
+                handler: this.cmpFill
             }
         ];
 

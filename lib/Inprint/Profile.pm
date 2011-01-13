@@ -20,7 +20,7 @@ sub image {
     if ($i_id eq "self") {
         $i_id = $c->QuerySessionGet("member.id");
     }
-    
+
     my $path = $c->config->get("store.path");
 
     if ( -r "$path/profiles/$i_id/profile.png") {
@@ -65,7 +65,7 @@ sub update {
     my $c = shift;
 
     my $i_id = $c->param("id");
-    
+
     my $i_login    = $c->param("login");
     my $i_password = $c->param("password");
 
@@ -78,55 +78,64 @@ sub update {
     my @errors;
     my $result = {};
 
-    # Upload image
-    if ($i_image) {
-
-        my $path = $c->config->get("store.path");
-        my $upload_max_size = 3 * 1024 * 1024;
-
-        my $image_type = $i_image->headers->content_type;
-        my %valid_types = map {$_ => 1} qw(image/gif image/jpeg image/png);
-
-        # Content type is wrong
-        if ($valid_types{$image_type}) {
-
-            unless (-d "$path/profiles/$i_id/") {
-                make_path "$path/profiles/$i_id/";
-            }
-
-            if (-d -w "$path/profiles/$i_id/") {
-                $i_image->move_to("$path/profiles/$i_id/profile.new");
-                system("convert -resize 200 $path/profiles/$i_id/profile.new $path/profiles/$i_id/profile.png");
-            }
-        }
-    }
-
-    # Process profile
     if ($i_login) {
-        # Do nothing
+        my $login_exists = $c->sql->Q(" SELECT id FROM members WHERE login=? ", [ $i_login ])->Value;
+        push @errors, { id => "login", msg => "Incorrectly filled field"}
+            if ($login_exists);
     }
-    if ($i_password) {
-        $c->sql->Do("UPDATE members SET password=encode( digest(?, 'sha256'), 'hex') WHERE id=?",[ $i_password, $i_id ]);
-    }
-
-    # Update Profile
-    my $count = $c->sql->Q("SELECT count(*) FROM profiles WHERE id=?",[$i_id])->Value;
-    
-    if ($count) {
-        $c->sql->Do("UPDATE profiles SET title=?, shortcut=?, job_position=?, updated=now() WHERE id=?",[$i_title, $i_shortcut, $i_position, $i_id]);
-    } else {
-        $c->sql->Do("
-            INSERT INTO profiles(id, title, shortcut, job_position, created, updated)
-            VALUES (?, ?, ?, ?, now(), now());",
-        [ $i_id, $i_title, $i_shortcut, $i_position]);
-    }
-    
-    # Update Documents
-    $c->sql->Do("UPDATE documents SET creator_shortcut=? WHERE creator=?",  [ $i_shortcut, $i_id ]);
-    $c->sql->Do("UPDATE documents SET manager_shortcut=? WHERE manager=?",  [ $i_shortcut, $i_id ]);
-    $c->sql->Do("UPDATE documents SET holder_shortcut=? WHERE holder=?",    [ $i_shortcut, $i_id ]);
 
     unless (@errors) {
+
+        # Upload image
+        if ($i_image) {
+
+            my $path = $c->config->get("store.path");
+            my $upload_max_size = 3 * 1024 * 1024;
+
+            my $image_type = $i_image->headers->content_type;
+            my %valid_types = map {$_ => 1} qw(image/gif image/jpeg image/png);
+
+            # Content type is wrong
+            if ($valid_types{$image_type}) {
+
+                unless (-d "$path/profiles/$i_id/") {
+                    make_path "$path/profiles/$i_id/";
+                }
+
+                if (-d -w "$path/profiles/$i_id/") {
+                    $i_image->move_to("$path/profiles/$i_id/profile.new");
+                    system("convert -resize 200 $path/profiles/$i_id/profile.new $path/profiles/$i_id/profile.png");
+                }
+
+            }
+        }
+
+        # Process profile
+        if ($i_login) {
+            $c->sql->Do("UPDATE members SET login=? WHERE id=? ",[ $i_login, $i_id ]);
+        }
+        if ($i_password) {
+            $c->sql->Do("UPDATE members SET password=encode( digest(?, 'sha256'), 'hex') WHERE id=?",[ $i_password, $i_id ]);
+        }
+
+        # Update Profile
+
+        my $count = $c->sql->Q("SELECT count(*) FROM profiles WHERE id=?",[$i_id])->Value;
+
+        if ($count) {
+            $c->sql->Do("UPDATE profiles SET title=?, shortcut=?, job_position=?, updated=now() WHERE id=?",[$i_title, $i_shortcut, $i_position, $i_id]);
+        } else {
+            $c->sql->Do("
+                INSERT INTO profiles(id, title, shortcut, job_position, created, updated)
+                VALUES (?, ?, ?, ?, now(), now());",
+            [ $i_id, $i_title, $i_shortcut, $i_position]);
+        }
+
+        # Update Documents
+        $c->sql->Do("UPDATE documents SET creator_shortcut=? WHERE creator=?",  [ $i_shortcut, $i_id ]);
+        $c->sql->Do("UPDATE documents SET manager_shortcut=? WHERE manager=?",  [ $i_shortcut, $i_id ]);
+        $c->sql->Do("UPDATE documents SET holder_shortcut=? WHERE holder=?",    [ $i_shortcut, $i_id ]);
+
         $result->{success} = 1;
     }
 
