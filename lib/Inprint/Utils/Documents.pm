@@ -4,6 +4,8 @@ use warnings;
 
 sub MoveDocumentIndexToFascicle {
 
+    die 1;
+
     my $c = shift;
     my $errors = shift;
     my $i_document = shift;

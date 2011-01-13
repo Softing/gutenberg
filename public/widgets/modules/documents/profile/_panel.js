@@ -1,15 +1,19 @@
 Inprint.documents.Profile = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
-        
+
         this.document = this.oid;
-        
+
         this.panels = {};
         this.panels["profile"]  = new Inprint.documents.Profile.View({
             oid: this.oid,
             parent: this
         });
         this.panels["files"]    = new Inprint.documents.Profile.Files({
+            oid: this.oid,
+            parent: this
+        });
+        this.panels["rss"]    = new Inprint.documents.Profile.Rss({
             oid: this.oid,
             parent: this
         });
@@ -34,7 +38,15 @@ Inprint.documents.Profile = Ext.extend(Ext.Panel, {
                 },
                 {   region: "center",
                     layout:"fit",
-                    items: this.panels["files"]
+                    items: {
+                        activeTab: 0,
+                        border: false,
+                        xtype: "tabpanel",
+                        items:[
+                            this.panels["files"],
+                            this.panels["rss"]
+                        ]
+                    }
                 },
                 {   region: "east",
                     layout:"fit",
@@ -57,7 +69,7 @@ Inprint.documents.Profile = Ext.extend(Ext.Panel, {
     getValues: function() {
         return [ this.oid ];
     },
-    
+
     getValue: function() {
         return this.oid;
     },
@@ -73,13 +85,14 @@ Inprint.documents.Profile = Ext.extend(Ext.Panel, {
                     this.document = response.data.id;
                     this.panels["profile"].cmpFill(response.data);
                     this.panels["files"].cmpFill(response.data);
+                    this.panels["rss"].cmpFill(response.data);
                     this.panels["comments"].cmpFill(response.data);
                 }
             }
         });
-        
+
         this.panels["files"].cmpReload();
-        
+
     }
 
 });

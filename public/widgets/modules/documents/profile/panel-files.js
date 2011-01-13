@@ -1,10 +1,12 @@
 Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
 
     initComponent: function() {
-        
+
         this.access = {};
         this.record = {};
-        
+
+        this.title = _("Files");
+
         this.urls = {
             "list":        "/documents/files/list/",
             "create": _url("/documents/files/create/"),
@@ -19,9 +21,9 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                 document: this.oid
             }
         });
-        
+
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
-        
+
         // Column model
         this.columns = [
             this.selectionModel,
@@ -48,7 +50,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                 sortable: true,
                 dataIndex: "description"
             },
-            
+
             {
                 id:"size",
                 header: _("Size"),
@@ -70,7 +72,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                 sortable: true,
                 dataIndex: "updated"
             }
-            
+
         ];
 
         this.tbar = [
@@ -143,19 +145,19 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
         // Call parent (required)
         Inprint.documents.Profile.Files.superclass.initComponent.apply(this, arguments);
     },
-    
+
     onRender: function() {
-        
+
         Inprint.documents.Profile.Files.superclass.onRender.apply(this, arguments);
-        
+
         this.on("rowdblclick", function(thisGrid, rowIndex, evtObj) {
-        
+
             thisGrid.selModel.selectRow(rowIndex);
             evtObj.stopEvent();
-            
+
             var record = thisGrid.getStore().getAt(rowIndex);
             var extension = record.get("extension");
-            
+
             if (["doc", "rtf", "odt", "txt"].contains(extension)) {
                 Inprint.ObjectResolver.resolve({
                     aid: "document-editor",
@@ -164,20 +166,20 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                     description: _("Text editing")
                 });
             }
-            
+
         }, this);
-        
+
         this.on("rowcontextmenu", function(thisGrid, rowIndex, evtObj) {
-            
+
             thisGrid.selModel.selectRow(rowIndex);
             evtObj.stopEvent();
-            
+
             var rowCtxMenuItems = [];
-            
+
             var record = thisGrid.getStore().getAt(rowIndex);
-            
+
             var extension = record.get("extension");
-            
+
             if (["doc", "rtf", "odt", "txt"].contains(extension)) {
                 rowCtxMenuItems.push({
                     icon: _ico("pencil"),
@@ -193,7 +195,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                         });
                     }
                 });
-                
+
                 rowCtxMenuItems.push("-");
             }
             rowCtxMenuItems.push({
@@ -203,7 +205,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                 scope:this,
                 handler : this.cmpRenameFile
             });
-            
+
             rowCtxMenuItems.push({
                 icon: _ico("edit-column"),
                 cls: "x-btn-text-icon",
@@ -211,17 +213,17 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                 scope:this,
                 handler : this.cmpChangeDescription
             });
-            
+
             thisGrid.rowCtxMenu = new Ext.menu.Menu({
                 items : rowCtxMenuItems
             });
-            
+
             thisGrid.rowCtxMenu.showAt(evtObj.getXY());
-            
+
         }, this);
-        
+
     },
-    
+
     cmpFill: function(record) {
         if (record){
             this.record = record;
@@ -230,7 +232,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
             }
         }
     },
-    
+
     cmpAccess: function(access) {
         this.access = access;
         _disable(this.btnCreate, this.btnUpload, this.btnDelete);
@@ -238,7 +240,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
         if (access["files.add"]     == true) this.btnUpload.enable();
         if (access["files.delete"]  == true) this.btnDelete.enable();
     },
-    
+
     cmpCreate: function() {
 
         var form = new Ext.form.FormPanel({
@@ -282,7 +284,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
 
         win.show();
     },
-    
+
     cmpUpdate: function() {
 
         var form = new Ext.FormPanel({
@@ -319,7 +321,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
 
         win.show();
     },
-    
+
     cmpUpload: function() {
 
         var cookies = document.cookie.split(";");
@@ -332,7 +334,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                 Session = nvp[1];
             }
         });
-        
+
         var AwesomeUploader = new Ext.Window({
             title:'Awesome Uploader in a Window!',
             modal:true,
@@ -361,12 +363,12 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                     }
             }
         });
-        
+
         AwesomeUploader.show();
-  
-        
+
+
     },
-    
+
     cmpRenameFile: function() {
         Ext.MessageBox.prompt(
             _("Warning"),
@@ -386,7 +388,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                 }
             }, this);
     },
-    
+
     cmpChangeDescription: function() {
         Ext.MessageBox.show({
             width:300,
@@ -411,7 +413,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
             }
         });
     },
-    
+
     cmpDelete: function() {
         Ext.MessageBox.confirm(
             _("Warning"),
@@ -430,5 +432,5 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                 }
             }, this).setIcon(Ext.MessageBox.WARNING);
     }
-    
+
 });
