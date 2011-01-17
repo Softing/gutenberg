@@ -101,7 +101,19 @@ Inprint.fascicle.indexes.Rubrics = Ext.extend(Ext.grid.GridPanel, {
                     _FLD_HDN_FASCICLE,
                     _FLD_HDN_HEADLINE,
                     _FLD_TITLE,
-                    _FLD_DESCRIPTION
+                    _FLD_DESCRIPTION,
+                    {
+                        xtype: "titlefield",
+                        value: _("More options")
+                    },
+                    {
+                        xtype: 'checkbox',
+                        fieldLabel: _(""),
+                        labelSeparator: '',
+                        boxLabel: _("Use by default"),
+                        name: 'bydefault',
+                        checked: false
+                    }
                 ],
                 keys: [ _KEY_ENTER_SUBMIT ],
                 buttons: [ _BTN_ADD,_BTN_CLOSE ]
@@ -111,7 +123,7 @@ Inprint.fascicle.indexes.Rubrics = Ext.extend(Ext.grid.GridPanel, {
                 title: _("Adding a new category"),
                 layout: "fit",
                 closeAction: "hide",
-                width:400, height:220,
+                width:400, height:260,
                 items: form
             });
 
@@ -153,7 +165,19 @@ Inprint.fascicle.indexes.Rubrics = Ext.extend(Ext.grid.GridPanel, {
                 items: [
                     _FLD_HDN_ID,
                     _FLD_TITLE,
-                    _FLD_DESCRIPTION
+                    _FLD_DESCRIPTION,
+                    {
+                        xtype: "titlefield",
+                        value: _("More options")
+                    },
+                    {
+                        xtype: 'checkbox',
+                        fieldLabel: _(""),
+                        labelSeparator: '',
+                        boxLabel: _("Use by default"),
+                        name: 'bydefault',
+                        checked: false
+                    }
                 ],
                 keys: [ _KEY_ENTER_SUBMIT ],
                 buttons: [ _BTN_SAVE,_BTN_CLOSE ]
@@ -163,7 +187,7 @@ Inprint.fascicle.indexes.Rubrics = Ext.extend(Ext.grid.GridPanel, {
                 title: _("Edit category"),
                 layout: "fit",
                 closeAction: "hide",
-                width:400, height:220,
+                width:400, height:260,
                 items: form
             });
 

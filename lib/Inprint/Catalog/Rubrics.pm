@@ -61,6 +61,7 @@ sub create {
 
     my $id            = $c->uuid();
 
+    my $i_bydefault   = $c->param("bydefault");
     my $i_headline    = $c->param("headline");
     my $i_title       = $c->param("title");
     my $i_description = $c->param("description");
@@ -85,7 +86,7 @@ sub create {
         unless ($headline->{id});
 
     unless (@errors) {
-        Inprint::Models::Rubric::create($c, $id, $headline->{edition}, $headline->{id}, $i_title, $i_description);
+        Inprint::Models::Rubric::create($c, $id, $headline->{edition}, $headline->{id}, $i_bydefault, $i_title, $i_description);
     }
 
     $success = $c->json->true unless (@errors);
@@ -98,6 +99,7 @@ sub update {
     my $i_id          = $c->param("id");
     my $i_title       = $c->param("title");
     my $i_description = $c->param("description");
+    my $i_bydefault   = $c->param("bydefault");
 
     my @errors;
     my $success = $c->json->false;
@@ -121,7 +123,7 @@ sub update {
         unless ($headline->{id});
 
     unless (@errors) {
-        Inprint::Models::Rubric::update($c, $i_id, $i_title, $i_description);
+        Inprint::Models::Rubric::update($c, $i_id, $headline->{id}, $i_bydefault, $i_title, $i_description);
     }
 
     $success = $c->json->true unless (@errors);

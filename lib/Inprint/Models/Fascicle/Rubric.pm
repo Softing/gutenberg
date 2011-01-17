@@ -8,7 +8,7 @@ use Inprint::Models::Tag;
 sub create {
     my $c = shift;
 
-    my ($id, $edition, $fascicle, $headline, $title, $description ) = @_;
+    my ($id, $edition, $fascicle, $headline, $bydefault, $title, $description ) = @_;
 
     my $tag = Inprint::Models::Tag::getByTitle($c, $title, $description);
 
@@ -17,6 +17,14 @@ sub create {
             INSERT INTO fascicles_indx_rubrics (id, edition, fascicle, headline, tag, title, description, created, updated)
                 VALUES (?, ?, ?, ?, ?, ?, ?, now(), now());
             ", [ $id, $edition, $fascicle, $headline, $tag->{id}, $tag->{title}, $tag->{description} || "" ]);
+        if ($bydefault eq "on") {
+            $c->sql->Do("
+                UPDATE fascicles_indx_rubrics SET bydefault=false WHERE fascicle=? AND headline=?;
+                ", [ $fascicle, $headline ]);
+            $c->sql->Do("
+                UPDATE fascicles_indx_rubrics SET bydefault=true WHERE id=?;
+                ", [ $id ]);
+        }
     }
 
     return $c;
@@ -36,13 +44,21 @@ sub read {
 
 sub update {
     my $c = shift;
-    my ($id, $title, $description ) = @_;
+    my ($id, $fascicle, $headline, $bydefault, $title, $description ) = @_;
 
     my $tag = Inprint::Models::Tag::getByTitle($c, $title, $description);
 
     if ($tag->{id}) {
         $c->sql->Do(" UPDATE fascicles_indx_rubrics SET title=?, description=? WHERE id=? ",
             [ $tag->{title}, $tag->{description} || "", $id ]);
+        if ($bydefault eq "on") {
+            $c->sql->Do("
+                UPDATE fascicles_indx_rubrics SET bydefault=false WHERE fascicle=? AND headline=?;
+                ", [ $fascicle, $headline ]);
+            $c->sql->Do("
+                UPDATE fascicles_indx_rubrics SET bydefault=true WHERE id=?;
+                ", [ $id ]);
+        }
     }
 
     return $c;
