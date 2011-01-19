@@ -52,14 +52,17 @@ sub editions {
             FROM editions
             WHERE
                 id <> '00000000-0000-0000-0000-000000000000'
-                AND subpath(path, nlevel(path) - 2, 1)::text = replace(?, '-', '')::text
                 AND EXISTS(
                     SELECT true
                     FROM cache_access access
                     WHERE access.path @> editions.path AND access.type = 'editions' AND 'editions.documents.work' = ANY(access.terms)
                 )
         ";
-        push @data, $i_node;
+
+        if ($i_node ne "00000000-0000-0000-0000-000000000000") {
+            $sql .= " AND subpath(path, nlevel(path) - 2, 1)::text = replace(?, '-', '')::text ";
+            push @data, $i_node;
+        }
 
         my $data = $c->sql->Q("$sql ORDER BY shortcut ", \@data)->Hashes;
 
