@@ -35,14 +35,16 @@ sub managers {
 
         my @params;
         my $sql = "
-            SELECT DISTINCT
+            SELECT
                 t1.id,
-                t1.shortcut as title,
+                t3.shortcut || '/' || t1.shortcut as title,
                 t1.description as description,
                 'user' as icon
-            FROM view_principals t1, map_member_to_catalog t2
+            FROM view_principals t1, map_member_to_catalog t2, catalog t3
             WHERE
-                t2.member = t1.id AND t1.type = 'member'
+                t1.type = 'member'
+                AND t1.id = t2.member
+                AND t3.id = t2.catalog
         ";
 
         # Filter by ruleS
@@ -67,8 +69,8 @@ sub managers {
 
         $result = $c->sql->Q($sql, \@params)->Hashes;
 
-        if ($i_edition) {
-            if ($c->access->Check("editions.documents.assign", $i_edition)) {
+        if ($i_workgroup) {
+            if ($c->access->Check("catalog.documents.assign", $i_workgroup)) {
                 unshift @$result, {
                     "icon" => "users",
                     "title" => $c->l("Add to the department"),

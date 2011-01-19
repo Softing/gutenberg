@@ -1,29 +1,29 @@
 Ext.BLANK_IMAGE_URL = '/ext-3.2.1/resources/images/default/s.gif';
 
-Ext.data.Connection.prototype._handleFailure = Ext.data.Connection.prototype.handleFailure;
-
-Ext.data.Connection.prototype.handleFailure = function(response, e) {
-
-    var errorText = null;
-    var jsonData = Ext.util.JSON.decode(response.responseText);
-
-    if (jsonData.error) {
-        errorText = jsonData.error;
-    }
-
-    if (errorText) {
-        errorText = errorText.replace(/%br%/g, "<br/>");
-        Ext.Msg.show({
-            title:_("Software error"),
-            minWidth:900,
-            maxWidth:900,
-            msg: errorText,
-            buttons: Ext.Msg.OK
-        });
-    }
-
-    Ext.data.Connection.prototype._handleFailure.call(this, response, e);
-};
+//Ext.data.Connection.prototype._handleFailure = Ext.data.Connection.prototype.handleFailure;
+//
+//Ext.data.Connection.prototype.handleFailure = function(response, e) {
+//
+//    var errorText = null;
+//    var jsonData = Ext.util.JSON.decode(response.responseText);
+//
+//    if (jsonData.error) {
+//        errorText = jsonData.error;
+//    }
+//
+//    if (errorText) {
+//        errorText = errorText.replace(/%br%/g, "<br/>");
+//        Ext.Msg.show({
+//            title:_("Software error"),
+//            minWidth:900,
+//            maxWidth:900,
+//            msg: errorText,
+//            buttons: Ext.Msg.OK
+//        });
+//    }
+//
+//    Ext.data.Connection.prototype._handleFailure.call(this, response, e);
+//};
 
 //Ajax
 
@@ -58,11 +58,20 @@ Ext.Ajax.on('requestcomplete', function(conn, response, options) {
 }, this);
 
 Ext.Ajax.on('requestexception', function(conn, response, options) {
+
+    var errorText = _("Error communicating with server");
+    var jsonData = Ext.util.JSON.decode(response.responseText);
+
+    if (jsonData.error) {
+        errorText = jsonData.error;
+        errorText = errorText.replace(/%br%/g, "<br/>");
+    }
+
     Ext.Msg.show({
         title:_("Communication error"),
         minWidth:900,
         maxWidth:900,
-        msg: _("Error communicating with server"),
+        msg: errorText,
         buttons: Ext.Msg.OK
     });
 }, this);
