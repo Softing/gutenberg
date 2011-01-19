@@ -120,14 +120,37 @@ sub workgroups {
         my $sql;
         my @data;
 
+        ##
+
         $sql = "
-            SELECT *, ( SELECT count(*) FROM catalog c2 WHERE c2.path ~ ('*.' || catalog.path::text || '.*{1}')::lquery ) as have_childs
+            SELECT *,
+                ( SELECT count(*) FROM catalog c2 WHERE c2.path ~ ('*.' || catalog.path::text || '.*{1}')::lquery ) as have_childs
             FROM catalog
             WHERE
                 id <> '00000000-0000-0000-0000-000000000000'
-                AND subpath(path, nlevel(path) - 2, 1)::text = replace(?, '-', '')::text
+                AND EXISTS(
+                    SELECT true
+                    FROM cache_access access
+                    WHERE access.path @> catalog.path AND access.type = 'catalog' AND
+                    (   'catalog.documents.create:member' = ANY(access.terms) OR 'catalog.documents.create:group' = ANY(access.terms) )
+                )
         ";
-        push @data, $i_node;
+
+        if ($i_node ne "00000000-0000-0000-0000-000000000000") {
+            $sql .= " AND subpath(path, nlevel(path) - 2, 1)::text = replace(?, '-', '')::text ";
+            push @data, $i_node;
+        }
+
+        ##
+
+        #$sql = "
+        #    SELECT *, ( SELECT count(*) FROM catalog c2 WHERE c2.path ~ ('*.' || catalog.path::text || '.*{1}')::lquery ) as have_childs
+        #    FROM catalog
+        #    WHERE
+        #        id <> '00000000-0000-0000-0000-000000000000'
+        #        AND subpath(path, nlevel(path) - 2, 1)::text = replace(?, '-', '')::text
+        #";
+        #push @data, $i_node;
 
         my $data = $c->sql->Q("$sql ORDER BY shortcut", \@data)->Hashes;
 
