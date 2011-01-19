@@ -75,7 +75,7 @@ sub managers {
         $result = $c->sql->Q($sql, \@params)->Hashes;
 
         if ($i_workgroup) {
-            if ($c->access->Check("catalog.documents.assign", $i_workgroup)) {
+            if ($c->access->Check("catalog.documents.assign:*", $i_workgroup)) {
                 unshift @$result, {
                     "icon" => "users",
                     "title" => $c->l("Add to the department"),
