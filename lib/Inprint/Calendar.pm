@@ -39,6 +39,12 @@ sub tree {
             WHERE
                 id <> '00000000-0000-0000-0000-000000000000'
                 AND subpath(path, nlevel(path) - 2, 1)::text = replace(?, '-', '')::text
+                AND EXISTS(
+                    SELECT true
+                    FROM cache_access access
+                    WHERE access.path @> editions.path AND access.type = 'editions'
+                        AND ('editions.calendar.manage' = ANY(access.terms) OR 'editions.calendar.view' = ANY(access.terms) )
+                )
         ";
         push @data, $i_node;
         push @data, $i_node;
