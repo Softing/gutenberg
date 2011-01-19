@@ -47,20 +47,6 @@ sub managers {
                 AND t3.id = t2.catalog
         ";
 
-        # Filter by ruleS
-        my $create_bindings = $c->access->GetChildrens("catalog.documents.create:*");
-        $sql .= " AND ( t2.catalog = ANY(?) ";
-        push @params, $create_bindings;
-
-        # Self
-        my $member = $c->QuerySessionGet("member.id");
-        $sql .= " OR t1.id=? ";
-        push @params, $member;
-
-        my $assign_bindings = $c->access->GetChildrens("catalog.documents.assign:*");
-        $sql .= " OR t2.catalog = ANY(?) ) ";
-        push @params, $assign_bindings;
-
         # Filter by workgroup
         if ($i_workgroup) {
             my $bindings = $c->sql->Q("
@@ -70,7 +56,19 @@ sub managers {
             push @params, $bindings;
         }
 
-        $sql  .= " ORDER BY icon, t1.shortcut; ";
+        $sql .= " AND ( 1=1 ";
+
+        # Filter by rules
+        my $create_bindings = $c->access->GetChildrens("catalog.documents.create:*");
+        $sql .= " OR t2.catalog = ANY(?) ";
+        push @params, $create_bindings;
+
+        my $assign_bindings = $c->access->GetChildrens("catalog.documents.assign:*");
+        $sql .= " OR  t2.catalog = ANY(?) ";
+        push @params, $assign_bindings;
+
+        $sql .= " ) ";
+        $sql .= " ORDER BY icon, t1.shortcut; ";
 
         $result = $c->sql->Q($sql, \@params)->Hashes;
 
