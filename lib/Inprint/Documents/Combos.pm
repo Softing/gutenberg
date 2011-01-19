@@ -37,8 +37,8 @@ sub managers {
         my $sql = "
             SELECT
                 t1.id,
-                t3.shortcut || '/' || t1.shortcut as title,
-                t1.description as description,
+                t1.shortcut as title,
+                t3.shortcut || '/' || t1.description as description,
                 'user' as icon
             FROM view_principals t1, map_member_to_catalog t2, catalog t3
             WHERE
