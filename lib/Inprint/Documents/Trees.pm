@@ -120,8 +120,6 @@ sub workgroups {
         my $sql;
         my @data;
 
-        ##
-
         $sql = "
             SELECT *,
                 ( SELECT count(*) FROM catalog c2 WHERE c2.path ~ ('*.' || catalog.path::text || '.*{1}')::lquery ) as have_childs
@@ -140,17 +138,6 @@ sub workgroups {
             $sql .= " AND subpath(path, nlevel(path) - 2, 1)::text = replace(?, '-', '')::text ";
             push @data, $i_node;
         }
-
-        ##
-
-        #$sql = "
-        #    SELECT *, ( SELECT count(*) FROM catalog c2 WHERE c2.path ~ ('*.' || catalog.path::text || '.*{1}')::lquery ) as have_childs
-        #    FROM catalog
-        #    WHERE
-        #        id <> '00000000-0000-0000-0000-000000000000'
-        #        AND subpath(path, nlevel(path) - 2, 1)::text = replace(?, '-', '')::text
-        #";
-        #push @data, $i_node;
 
         my $data = $c->sql->Q("$sql ORDER BY shortcut", \@data)->Hashes;
 
@@ -245,6 +232,14 @@ sub fascicles {
             }
             push @result, $record;
         }
+
+        unshift @result, {
+            id => "00000000-0000-0000-0000-000000000000",
+            icon => "briefcase",
+            text => $c->l("Briefcase"),
+            leaf => $c->json->true
+        };
+
     }
 
     $success = $c->json->true unless (@errors);
