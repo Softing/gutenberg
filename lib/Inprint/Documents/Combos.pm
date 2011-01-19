@@ -52,6 +52,11 @@ sub managers {
         $sql .= " AND ( t2.catalog = ANY(?) ";
         push @params, $create_bindings;
 
+        # Self
+        my $member = $c->QuerySessionGet("member.id");
+        $sql .= " OR t1.id=? ";
+        push @params, $member;
+
         my $assign_bindings = $c->access->GetChildrens("catalog.documents.assign:*");
         $sql .= " OR t2.catalog = ANY(?) ) ";
         push @params, $assign_bindings;
