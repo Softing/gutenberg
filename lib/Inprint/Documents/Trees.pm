@@ -46,21 +46,48 @@ sub editions {
         my $sql;
         my @data;
 
-        $sql = "
-            SELECT *,
-                ( SELECT count(*) FROM editions c2 WHERE c2.path ~ ('*.' || editions.path::text || '.*{1}')::lquery ) as have_childs
-            FROM editions
-            WHERE
-                id <> '00000000-0000-0000-0000-000000000000'
-                AND EXISTS(
-                    SELECT true
-                    FROM cache_access access
-                    WHERE access.path @> editions.path AND access.type = 'editions' AND 'editions.documents.work' = ANY(access.terms)
-                )
-        ";
+        #$sql = "
+        #    SELECT *,
+        #        ( SELECT count(*) FROM editions c2 WHERE c2.path ~ ('*.' || editions.path::text || '.*{1}')::lquery ) as have_childs
+        #    FROM editions
+        #    WHERE
+        #        id <> '00000000-0000-0000-0000-000000000000'
+        #        AND EXISTS(
+        #            SELECT true
+        #            FROM cache_access access
+        #            WHERE access.path @> editions.path AND access.type = 'editions' AND 'editions.documents.work' = ANY(access.terms)
+        #        )
+        #";
+        #
+        #if ($i_node ne "00000000-0000-0000-0000-000000000000") {
+        #    $sql .= " AND subpath(path, nlevel(path) - 2, 1)::text = replace(?, '-', '')::text ";
+        #    push @data, $i_node;
+        #}
+
+        if ($i_node eq "00000000-0000-0000-0000-000000000000") {
+            $sql = "
+                SELECT t1.*,
+                    ( SELECT count(*) FROM editions c2 WHERE c2.path ~ ('*.' || t1.path::text || '.*{1}')::lquery ) as have_childs
+                FROM editions t1, map_member_to_rule t2, view_rules t3
+                WHERE
+                    t1.id <> '00000000-0000-0000-0000-000000000000'
+                    AND t1.id = t2.binding
+                    AND t3.id = t2.term
+                    AND t3.term_text = 'editions.documents.work'
+                    AND t2.member=?
+            ";
+            push @data, $c->QuerySessionGet("member.id");
+        }
 
         if ($i_node ne "00000000-0000-0000-0000-000000000000") {
-            $sql .= " AND subpath(path, nlevel(path) - 2, 1)::text = replace(?, '-', '')::text ";
+            $sql .= "
+                SELECT t1.*,
+                    ( SELECT count(*) FROM editions c2 WHERE c2.path ~ ('*.' || t1.path::text || '.*{1}')::lquery ) as have_childs
+                FROM editions t1
+                WHERE
+                    t1.id <> '00000000-0000-0000-0000-000000000000'
+                    AND subpath(t1.path, nlevel(t1.path) - 2, 1)::text = replace(?, '-', '')::text
+                ";
             push @data, $i_node;
         }
 
@@ -120,22 +147,30 @@ sub workgroups {
         my $sql;
         my @data;
 
-        $sql = "
-            SELECT *,
-                ( SELECT count(*) FROM catalog c2 WHERE c2.path ~ ('*.' || catalog.path::text || '.*{1}')::lquery ) as have_childs
-            FROM catalog
-            WHERE
-                id <> '00000000-0000-0000-0000-000000000000'
-                AND EXISTS(
-                    SELECT true
-                    FROM cache_access access
-                    WHERE access.path @> catalog.path AND access.type = 'catalog' AND
-                    (   'catalog.documents.create:member' = ANY(access.terms) OR 'catalog.documents.create:group' = ANY(access.terms) )
-                )
-        ";
+        if ($i_node eq "00000000-0000-0000-0000-000000000000") {
+            $sql = "
+                SELECT t1.*,
+                    ( SELECT count(*) FROM catalog c2 WHERE c2.path ~ ('*.' || t1.path::text || '.*{1}')::lquery ) as have_childs
+                FROM catalog t1, map_member_to_rule t2, view_rules t3
+                WHERE
+                    t1.id <> '00000000-0000-0000-0000-000000000000'
+                    AND t1.id = t2.binding
+                    AND t3.id = t2.term
+                    AND t3.term_text = 'catalog.documents.create'
+                    AND t2.member=?
+            ";
+            push @data, $c->QuerySessionGet("member.id");
+        }
 
         if ($i_node ne "00000000-0000-0000-0000-000000000000") {
-            $sql .= " AND subpath(path, nlevel(path) - 2, 1)::text = replace(?, '-', '')::text ";
+            $sql .= "
+                SELECT t1.*,
+                    ( SELECT count(*) FROM catalog c2 WHERE c2.path ~ ('*.' || t1.path::text || '.*{1}')::lquery ) as have_childs
+                FROM catalog t1
+                WHERE
+                    t1.id <> '00000000-0000-0000-0000-000000000000'
+                    AND subpath(t1.path, nlevel(t1.path) - 2, 1)::text = replace(?, '-', '')::text
+                ";
             push @data, $i_node;
         }
 

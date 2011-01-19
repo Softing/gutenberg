@@ -34,20 +34,20 @@ sub Check {
     my $terms   = shift;
     my $binding = shift;
     my $member  = shift;
-    
+
     my @rules;
     my $result = 0;
-    
+
     unless ($member) {
         $member = $c->{handler}->QuerySessionGet("member.id");
     }
-    
+
     if (ref $terms eq "ARRAY") {
         @rules = @$terms;
     } else {
         push @rules, $terms;
     }
-    
+
     for (my $i=0; $i <= $#rules; $i++) {
         my ($term, $area) = split /:/, $rules[$i];
         if ($area eq "*") {
@@ -55,9 +55,9 @@ sub Check {
         }
     }
     my %seen;@rules = grep { ! $seen{$_}++ } @rules;
-    
+
     #die $member;
-    
+
     if ($member && @rules) {
         my @data;
         my $sql = " SELECT true FROM cache_access WHERE member=? AND ? && terms ";
@@ -67,7 +67,7 @@ sub Check {
             $sql .= " AND binding=?";
             push @data, $binding;
         }
-        
+
         $result = $c->{handler}->sql->Q("SELECT EXISTS ($sql)", \@data)->Value();
     }
 
@@ -75,32 +75,32 @@ sub Check {
 }
 
 sub GetBindings {
-    
+
     my $c = shift;
     my $terms    = shift;
     my $member  = shift;
-    
+
     my $result = [];
-    
+
     unless ($member) {
         $member = $c->{handler}->QuerySessionGet("member.id");
     }
-    
+
     my @rules;
-    
+
     if (ref $terms eq "ARRAY") {
         @rules = @$terms;
     } else {
         push @rules, $terms;
     }
-    
+
     for (my $i=0; $i <= $#rules; $i++) {
         my ($term, $area) = split /:/, $rules[$i];
         if ($area eq "*") {
             splice @rules, $i, $i, "$term:member", "$term:group";
         }
     }
-    
+
     my %seen;
     @rules = grep { ! $seen{$_}++ } @rules;
 
@@ -117,41 +117,41 @@ sub GetBindings {
 }
 
 sub GetChildrens {
-    
+
     my $c = shift;
     my $terms    = shift;
     my $member  = shift;
-    
+
     my $result = [];
-    
+
     unless ($member) {
         $member = $c->{handler}->QuerySessionGet("member.id");
     }
-    
+
     my @rules;
-    
+
     if (ref $terms eq "ARRAY") {
         @rules = @$terms;
     } else {
         push @rules, $terms;
     }
-    
+
     for (my $i=0; $i <= $#rules; $i++) {
         my ($term, $area) = split /:/, $rules[$i];
         if ($area eq "*") {
             splice @rules, $i, $i, "$term:member", "$term:group";
         }
     }
-    
+
     my %seen;
     @rules = grep { ! $seen{$_}++ } @rules;
-    
+
     if (@rules && $member) {
         $result = $c->{handler}->sql->Q("
             SELECT childrens FROM cache_visibility WHERE member=? AND term = ANY(?)
         ", [ $member, \@rules ])->Value();
     }
-    
+
     return $result || [];
 }
 
