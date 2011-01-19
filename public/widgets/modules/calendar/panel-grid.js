@@ -54,7 +54,7 @@ Inprint.edition.calendar.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
             },
             {
                 id: 'update',
-                text: _("Update"),
+                text: _("Edit"),
                 disabled: true,
                 icon: _ico("pencil"),
                 cls: 'x-btn-text-icon',

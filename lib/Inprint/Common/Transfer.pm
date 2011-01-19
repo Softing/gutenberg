@@ -11,48 +11,59 @@ use warnings;
 use base 'Inprint::BaseController';
 
 sub editions {
-
-    my $c = shift;
+     my $c = shift;
 
     my $i_node = $c->param("node");
     $i_node = '00000000-0000-0000-0000-000000000000' unless ($i_node);
     $i_node = '00000000-0000-0000-0000-000000000000' if ($i_node eq "root-node");
-    
+
     my @errors;
     my $success = $c->json->false;
-    
+
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_node));
-    
+
     my @result;
-    
+
     unless (@errors) {
-        
-        my $sql = "
-            SELECT *, ( SELECT count(*) FROM editions c2 WHERE c2.path ~ ('*.' || replace(?, '-', '')::text || '.*{2}')::lquery ) as have_childs
-            FROM editions
-            WHERE
-                id <> '00000000-0000-0000-0000-000000000000'
-                AND subpath(path, nlevel(path) - 2, 1)::text = replace(?, '-', '')::text
-        ";
-        
-        my @params;
-        push @params, $i_node;
-        push @params, $i_node;
-        
-        #my $editions = $c->access->GetChildrens("editions.documents.work");
-        #$sql .= " AND id = ANY(?) ";
-        #push @params, $editions;
-        
-        my $data = $c->sql->Q("$sql ORDER BY shortcut", \@params)->Hashes;
-        
+        my $sql;
+        my @data;
+
+        if ($i_node eq "00000000-0000-0000-0000-000000000000") {
+            $sql = "
+                SELECT t1.*,
+                    ( SELECT count(*) FROM editions c2 WHERE c2.path ~ ('*.' || t1.path::text || '.*{1}')::lquery ) as have_childs
+                FROM editions t1, map_member_to_rule t2, view_rules t3
+                WHERE
+                    t1.id <> '00000000-0000-0000-0000-000000000000'
+                    AND t1.id = t2.binding
+                    AND t3.id = t2.term
+                    AND ( t3.term_text = 'editions.documents.work' )
+                    AND t2.member=?
+            ";
+            push @data, $c->QuerySessionGet("member.id");
+        }
+
+        if ($i_node ne "00000000-0000-0000-0000-000000000000") {
+            $sql .= "
+                SELECT t1.*,
+                    ( SELECT count(*) FROM editions c2 WHERE c2.path ~ ('*.' || t1.path::text || '.*{1}')::lquery ) as have_childs
+                FROM editions t1
+                WHERE
+                    t1.id <> '00000000-0000-0000-0000-000000000000'
+                    AND subpath(t1.path, nlevel(t1.path) - 2, 1)::text = replace(?, '-', '')::text
+                ";
+            push @data, $i_node;
+        }
+
+        my $data = $c->sql->Q("$sql ORDER BY shortcut", \@data)->Hashes;
+
         foreach my $item (@$data) {
             my $record = {
                 id   => $item->{id},
                 text => $item->{shortcut},
                 leaf => $c->json->true,
-                singleClickExpand => $c->json->true,
-                icon => "book",
+                icon => "blue-folders",
                 data => $item
             };
             if ( $item->{have_childs} ) {
@@ -63,10 +74,67 @@ sub editions {
     }
 
     $success = $c->json->true unless (@errors);
-    
-    $c->render_json( \@result );
 
+    $c->render_json( \@result );
 }
+
+#sub editions {
+#
+#    my $c = shift;
+#
+#    my $i_node = $c->param("node");
+#    $i_node = '00000000-0000-0000-0000-000000000000' unless ($i_node);
+#    $i_node = '00000000-0000-0000-0000-000000000000' if ($i_node eq "root-node");
+#
+#    my @errors;
+#    my $success = $c->json->false;
+#
+#    push @errors, { id => "id", msg => "Incorrectly filled field"}
+#        unless ($c->is_uuid($i_node));
+#
+#    my @result;
+#
+#    unless (@errors) {
+#
+#        my $sql = "
+#            SELECT *, ( SELECT count(*) FROM editions c2 WHERE c2.path ~ ('*.' || replace(?, '-', '')::text || '.*{2}')::lquery ) as have_childs
+#            FROM editions
+#            WHERE
+#                id <> '00000000-0000-0000-0000-000000000000'
+#                AND subpath(path, nlevel(path) - 2, 1)::text = replace(?, '-', '')::text
+#        ";
+#
+#        my @params;
+#        push @params, $i_node;
+#        push @params, $i_node;
+#
+#        #my $editions = $c->access->GetChildrens("editions.documents.work");
+#        #$sql .= " AND id = ANY(?) ";
+#        #push @params, $editions;
+#
+#        my $data = $c->sql->Q("$sql ORDER BY shortcut", \@params)->Hashes;
+#
+#        foreach my $item (@$data) {
+#            my $record = {
+#                id   => $item->{id},
+#                text => $item->{shortcut},
+#                leaf => $c->json->true,
+#                singleClickExpand => $c->json->true,
+#                icon => "book",
+#                data => $item
+#            };
+#            if ( $item->{have_childs} ) {
+#                $record->{leaf} = $c->json->false;
+#            }
+#            push @result, $record;
+#        }
+#    }
+#
+#    $success = $c->json->true unless (@errors);
+#
+#    $c->render_json( \@result );
+#
+#}
 
 sub branches {
 

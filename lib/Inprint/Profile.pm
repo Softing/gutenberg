@@ -78,12 +78,6 @@ sub update {
     my @errors;
     my $result = {};
 
-    if ($i_login) {
-        my $login_exists = $c->sql->Q(" SELECT id FROM members WHERE login=? ", [ $i_login ])->Value;
-        push @errors, { id => "login", msg => "Incorrectly filled field"}
-            if ($login_exists);
-    }
-
     unless (@errors) {
 
         # Upload image
@@ -112,7 +106,10 @@ sub update {
 
         # Process profile
         if ($i_login) {
-            $c->sql->Do("UPDATE members SET login=? WHERE id=? ",[ $i_login, $i_id ]);
+            my $login_exists = $c->sql->Q(" SELECT id FROM members WHERE login=? ", [ $i_login ])->Value;
+            unless ($login_exists) {
+                $c->sql->Do("UPDATE members SET login=? WHERE id=? ",[ $i_login, $i_id ]);
+            }
         }
         if ($i_password) {
             $c->sql->Do("UPDATE members SET password=encode( digest(?, 'sha256'), 'hex') WHERE id=?",[ $i_password, $i_id ]);
@@ -136,8 +133,9 @@ sub update {
         $c->sql->Do("UPDATE documents SET manager_shortcut=? WHERE manager=?",  [ $i_shortcut, $i_id ]);
         $c->sql->Do("UPDATE documents SET holder_shortcut=? WHERE holder=?",    [ $i_shortcut, $i_id ]);
 
-        $result->{success} = 1;
     }
+
+    $result->{success} = $c->json->true;
 
     $c->render_json($result);
 }

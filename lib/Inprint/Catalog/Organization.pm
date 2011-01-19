@@ -153,7 +153,7 @@ sub update {
         if ($i_id eq "00000000-0000-0000-0000-000000000000");
 
     push @errors, { id => "path", msg => "Incorrectly filled field"}
-        unless ($c->is_path($i_path));
+        unless ($c->is_uuid($i_path));
 
     push @errors, { id => "title", msg => "Incorrectly filled field"}
         unless ($c->is_text($i_title));
