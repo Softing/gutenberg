@@ -118,12 +118,12 @@ sub update {
 
     my $edition;
 
-    my $headline = Inprint::Models::Rubric::read($c, $i_id);
+    my $rubric = Inprint::Models::Rubric::read($c, $i_id);
     push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($headline->{id});
+        unless ($rubric->{id});
 
     unless (@errors) {
-        Inprint::Models::Rubric::update($c, $i_id, $headline->{id}, $i_bydefault, $i_title, $i_description);
+        Inprint::Models::Rubric::update($c, $rubric->{id}, $rubric->{headline}, $i_bydefault, $i_title, $i_description);
     }
 
     $success = $c->json->true unless (@errors);

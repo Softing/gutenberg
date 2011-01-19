@@ -56,7 +56,7 @@ Inprint.cmp.UpdateDocument.Form = Ext.extend(Ext.FormPanel, {
                     value: _("Indexation"),
                     style: "margin-top:10px;"
                 },
-                
+
                 xc.getConfig("/documents/combos/headlines/", {
                     disabled: false,
                     listeners: {
@@ -78,13 +78,13 @@ Inprint.cmp.UpdateDocument.Form = Ext.extend(Ext.FormPanel, {
                                 combo.enable();
                                 combo.reset();
                                 combo.resetValue();
-                                combo.getStore().baseParams["flt_headline"] = this.getForm().findField("headline").getValue();
                             }, this);
                         },
                         beforequery: function(qe) {
                             delete qe.combo.lastQuery;
                             qe.combo.getStore().baseParams["flt_edition"]  = this.edition;
                             qe.combo.getStore().baseParams["flt_fascicle"] = this.fascicle;
+                            qe.combo.getStore().baseParams["flt_headline"] = this.getForm().findField("headline").getValue();
                         }
                     }
                 })

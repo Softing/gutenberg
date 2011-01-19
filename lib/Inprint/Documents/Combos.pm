@@ -14,22 +14,12 @@ sub managers {
 
     my $c = shift;
 
-    #my $i_term      = $c->param("term") || undef;
     my $i_edition   = $c->param("edition") || undef;
     my $i_workgroup = $c->param("workgroup") || undef;
 
     my $result;
     my @errors;
     my $success = $c->json->false;
-
-    #push @errors, { id => "edition", msg => "Incorrectly filled field"}
-    #    unless ($c->is_uuid($i_edition));
-
-    #push @errors, { id => "workgroup", msg => "Incorrectly filled field"}
-    #    unless ($c->is_uuid($i_workgroup));
-
-    #push @errors, { id => "term", msg => "Incorrectly filled field"}
-    #    unless ($c->is_rule($i_term));
 
     unless (@errors) {
 
@@ -49,11 +39,6 @@ sub managers {
 
         # Filter by workgroup
         if ($i_workgroup) {
-            #my $bindings = $c->sql->Q("
-            #    SELECT id FROM catalog WHERE path ~ ('*.'|| replace(?, '-', '')::text ||'.*')::lquery ",
-            #    [$i_workgroup])->Values;
-            #$sql .= " AND t2.catalog = ANY(?) ";
-            #push @params, $bindings;
             $sql .= " AND t2.catalog = ? ";
             push @params, $i_workgroup;
         }
@@ -162,43 +147,27 @@ sub headlines {
     push @errors, { id => "edition", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_edition));
 
-    my $edition = $c->sql->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
-
-    push @errors, { id => "edition", msg => "Incorrectly filled field"}
-        unless ($edition->{id});
-
     push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_fascicle));
 
-    my $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
+    my $edition; unless (@errors) {
+        $edition = $c->sql->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
+        push @errors, { id => "edition", msg => "Incorrectly filled field"}
+            unless ($edition->{id});
+    }
 
-    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
-        unless ($fascicle->{id});
+    my $fascicle; unless (@errors) {
+        $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
+        push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
+            unless ($fascicle->{id});
+    }
 
     unless (@errors) {
-
-        if ($i_fascicle eq "00000000-0000-0000-0000-000000000000") {
-
-            my $editions = $c->sql->Q("
-                SELECT id FROM editions WHERE path @> ? order by path asc
-            ", [ $edition->{path} ])->Values;
-
-            $result = $c->sql->Q("
-                SELECT DISTINCT id, title FROM indx_headlines
-                WHERE edition=ANY(?)
-                ORDER BY title",
-                [ $editions ])->Hashes;
-
-        } else {
-
-            $result = $c->sql->Q("
-                SELECT DISTINCT id, title FROM fascicles_indx_headlines
-                WHERE fascicle=?
-                ORDER BY title",
-                [ $i_fascicle ])->Hashes;
-
-        }
-
+        $result = $c->sql->Q("
+            SELECT DISTINCT id, title FROM fascicles_indx_headlines
+            WHERE fascicle=?
+            ORDER BY title",
+            [ $i_fascicle ])->Hashes;
     }
 
     $success = $c->json->true unless (@errors);
@@ -218,48 +187,21 @@ sub rubrics {
     push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_fascicle));
 
-    my $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
-
-    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
-        unless ($fascicle->{id});
-
     push @errors, { id => "headline", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_headline));
 
+    my $fascicle; unless (@errors) {
+        $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
+        push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
+            unless ($fascicle->{id});
+    }
+
     unless (@errors) {
-
-        if ($i_fascicle eq "00000000-0000-0000-0000-000000000000") {
-
-            $result = $c->sql->Q("
-                SELECT DISTINCT id, title FROM indx_rubrics
-                WHERE headline=?
-                ORDER BY title",
-                [ $i_headline ])->Hashes;
-
-            unless (@$result) {
-
-                my $headline = $c->sql->Q("
-                    SELECT * FROM fascicles_indx_headlines WHERE id=? ",
-                    [ $i_headline ])->Hash;
-
-                $result = $c->sql->Q("
-                    SELECT DISTINCT id, title FROM indx_rubrics
-                    WHERE headline=?
-                    ORDER BY title",
-                    [ $headline->{origin} ])->Hashes;
-
-            }
-
-        } else {
-
-            $result = $c->sql->Q("
-                SELECT DISTINCT id, title FROM fascicles_indx_rubrics
-                WHERE fascicle=? AND headline = ?
-                ORDER BY title",
-                [ $i_fascicle, $i_headline ])->Hashes;
-
-        }
-
+        $result = $c->sql->Q("
+            SELECT DISTINCT id, title FROM fascicles_indx_rubrics
+            WHERE fascicle=? AND headline = ?
+            ORDER BY title",
+            [ $i_fascicle, $i_headline ])->Hashes;
     }
 
     $success = $c->json->true unless (@errors);

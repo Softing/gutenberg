@@ -8,14 +8,14 @@ Inprint.cmp.MoveDocument = Ext.extend(Ext.Window, {
         });
 
         Ext.apply(this, {
-            title: _("Сhange fascicle"),
+            title: _("Move document"),
             modal:true,
             layout: "fit",
             width:380, height:350,
             items: this.form,
             buttons:[
                 {
-                    text: _("Create"),
+                    text: _("Move"),
                     scope:this,
                     handler: function() {
                         this.form.getForm().submit();
@@ -39,14 +39,14 @@ Inprint.cmp.MoveDocument = Ext.extend(Ext.Window, {
         }, this);
 
         Inprint.cmp.MoveDocument.superclass.initComponent.apply(this, arguments);
-        
+
     },
 
     onRender: function() {
         Inprint.cmp.MoveDocument.superclass.onRender.apply(this, arguments);
         Inprint.cmp.MoveDocument.Interaction(this, this.panels);
     },
-    
+
     setId: function(data) {
         this.form.getForm().baseParams = {
             id: data

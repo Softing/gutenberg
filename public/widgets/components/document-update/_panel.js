@@ -52,7 +52,7 @@ Inprint.cmp.UpdateDocument = Ext.extend(Ext.Window, {
     },
 
     cmpFill: function(result, request) {
-        
+
         var json = Ext.util.JSON.decode(result.responseText);
         var form = this.panel.getForm();
 
@@ -78,13 +78,13 @@ Inprint.cmp.UpdateDocument = Ext.extend(Ext.Window, {
         if (json.data.pdate) {
             form.findField("enddate").setValue(json.data.pdate);
         }
-        
+
         if (json.data.headline && json.data.headline_shortcut) {
             form.findField("headline").setValue(json.data.headline, json.data.headline_shortcut);
+            form.findField("rubric").enable();
             if (json.data.rubric && json.data.rubric_shortcut) {
                 form.findField("rubric").setValue(json.data.rubric, json.data.rubric_shortcut);
                 form.findField("rubric").getStore().baseParams["flt_headline"] = json.data.headline;
-                form.findField("rubric").enable();
             }
         }
 

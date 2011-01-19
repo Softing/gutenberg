@@ -87,7 +87,8 @@ sub create {
         unless ($headline->{id});
 
     unless (@errors) {
-        Inprint::Models::Fascicle::Rubric::create($c, $id, $headline->{edition}, $headline->{fascicle}, $i_bydefault, $headline->{id}, $i_title, $i_description);
+        Inprint::Models::Fascicle::Rubric::create(
+            $c, $id, $headline->{edition}, $headline->{fascicle}, $headline->{id}, $i_bydefault, $i_title, $i_description);
     }
 
     $success = $c->json->true unless (@errors);
