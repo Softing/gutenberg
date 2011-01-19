@@ -246,7 +246,7 @@ sub index
 
     my $employee = {
         id => "employee",
-        text => $c->session("stitle")
+        text => $c->QuerySessionGet("member.shortcut")
     };
 
     push @{ $employee->{menu} }, { id => "employee-card" };
