@@ -126,6 +126,9 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                     },
                                     listeners: {
                                         scope: this,
+                                        select: function(field) {
+                                            this.getForm().findField("manager").resetValue();
+                                        },
                                         render: function(field) {
                                             var id = Inprint.session.options["default.workgroup"];
                                             var title = Inprint.session.options["default.workgroup.name"] || _("Unknown department");
