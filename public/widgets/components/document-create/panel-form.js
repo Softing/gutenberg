@@ -189,7 +189,7 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                     baseParams: {
                                         term: 'editions.documents.work'
                                     },
-                                    rootVisible:true,
+                                    //rootVisible:false,
                                     root: {
                                         id:'00000000-0000-0000-0000-000000000000',
                                         nodeType: 'async',
