@@ -83,6 +83,7 @@ sub startup {
     my $sessionBridge  = $postinitBridge->bridge->to('filters#mysession');
 
     $sessionBridge->route('/logout/')->to('session#logout');
+    $sessionBridge->route('/workspace/logout/')->to('session#logout');
 
     # Advertising
 

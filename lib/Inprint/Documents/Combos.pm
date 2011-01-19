@@ -49,11 +49,13 @@ sub managers {
 
         # Filter by workgroup
         if ($i_workgroup) {
-            my $bindings = $c->sql->Q("
-                SELECT id FROM catalog WHERE path ~ ('*.'|| replace(?, '-', '')::text ||'.*')::lquery ",
-                [$i_workgroup])->Values;
-            $sql .= " AND t2.catalog = ANY(?) ";
-            push @params, $bindings;
+            #my $bindings = $c->sql->Q("
+            #    SELECT id FROM catalog WHERE path ~ ('*.'|| replace(?, '-', '')::text ||'.*')::lquery ",
+            #    [$i_workgroup])->Values;
+            #$sql .= " AND t2.catalog = ANY(?) ";
+            #push @params, $bindings;
+            $sql .= " AND t2.catalog = ? ";
+            push @params, $i_workgroup;
         }
 
         $sql .= " AND ( 1=1 ";
