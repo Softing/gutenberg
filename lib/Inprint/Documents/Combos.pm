@@ -14,7 +14,7 @@ sub managers {
 
     my $c = shift;
 
-    my $i_term      = $c->param("term") || undef;
+    #my $i_term      = $c->param("term") || undef;
     my $i_edition   = $c->param("edition") || undef;
     my $i_workgroup = $c->param("workgroup") || undef;
 
@@ -28,8 +28,8 @@ sub managers {
     #push @errors, { id => "workgroup", msg => "Incorrectly filled field"}
     #    unless ($c->is_uuid($i_workgroup));
 
-    push @errors, { id => "term", msg => "Incorrectly filled field"}
-        unless ($c->is_rule($i_term));
+    #push @errors, { id => "term", msg => "Incorrectly filled field"}
+    #    unless ($c->is_rule($i_term));
 
     unless (@errors) {
 
@@ -42,23 +42,30 @@ sub managers {
                 'user' as icon
             FROM view_principals t1, map_member_to_catalog t2
             WHERE
-                t2.member = t1.id
-                AND t1.type = 'member'
+                t2.member = t1.id AND t1.type = 'member'
         ";
 
-        my $bindings = $c->access->GetChildrens($i_term);
-        $sql .= " AND t2.catalog = ANY(?) ";
-        push @params, $bindings;
+        # Filter by ruleS
+        my $create_bindings = $c->access->GetChildrens("catalog.documents.create:*");
+        $sql .= " AND ( t2.catalog = ANY(?) ";
+        push @params, $create_bindings;
 
+        my $assign_bindings = $c->access->GetChildrens("catalog.documents.assign:*");
+        $sql .= " OR t2.catalog = ANY(?) ) ";
+        push @params, $assign_bindings;
+
+        # Filter by workgroup
         if ($i_workgroup) {
             my $bindings = $c->sql->Q("
-                SELECT id FROM catalog WHERE path ~ ('*.'|| replace(?, '-', '')::text ||'.*')::lquery
-            ", [$i_workgroup])->Values;
+                SELECT id FROM catalog WHERE path ~ ('*.'|| replace(?, '-', '')::text ||'.*')::lquery ",
+                [$i_workgroup])->Values;
             $sql .= " AND t2.catalog = ANY(?) ";
             push @params, $bindings;
         }
 
-        $result = $c->sql->Q(" $sql ORDER BY icon, t1.shortcut; ", \@params)->Hashes;
+        $sql  .= " ORDER BY icon, t1.shortcut; ";
+
+        $result = $c->sql->Q($sql, \@params)->Hashes;
 
         if ($i_edition) {
             if ($c->access->Check("editions.documents.assign", $i_edition)) {

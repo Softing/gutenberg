@@ -70,6 +70,7 @@ sub tree {
         foreach my $item (@$data) {
             my $record = {
                 id   => $item->{id},
+                icon => "folders",
                 text => $item->{shortcut},
                 leaf => $c->json->true,
                 data => $item
