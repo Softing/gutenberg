@@ -46,24 +46,6 @@ sub editions {
         my $sql;
         my @data;
 
-        #$sql = "
-        #    SELECT *,
-        #        ( SELECT count(*) FROM editions c2 WHERE c2.path ~ ('*.' || editions.path::text || '.*{1}')::lquery ) as have_childs
-        #    FROM editions
-        #    WHERE
-        #        id <> '00000000-0000-0000-0000-000000000000'
-        #        AND EXISTS(
-        #            SELECT true
-        #            FROM cache_access access
-        #            WHERE access.path @> editions.path AND access.type = 'editions' AND 'editions.documents.work' = ANY(access.terms)
-        #        )
-        #";
-        #
-        #if ($i_node ne "00000000-0000-0000-0000-000000000000") {
-        #    $sql .= " AND subpath(path, nlevel(path) - 2, 1)::text = replace(?, '-', '')::text ";
-        #    push @data, $i_node;
-        #}
-
         if ($i_node eq "00000000-0000-0000-0000-000000000000") {
             $sql = "
                 SELECT t1.*,
