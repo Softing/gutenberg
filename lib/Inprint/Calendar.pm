@@ -34,7 +34,8 @@ sub tree {
         my @data;
 
         $sql = "
-            SELECT *, ( SELECT count(*) FROM editions c2 WHERE c2.path ~ ('*.' || replace(?, '-', '')::text || '.*{2}')::lquery ) as have_childs
+            SELECT *,
+                ( SELECT count(*) FROM editions c2 WHERE c2.path ~ ('*.' || editions.path::text || '.*{1}')::lquery ) as have_childs
             FROM editions
             WHERE
                 id <> '00000000-0000-0000-0000-000000000000'
@@ -46,7 +47,6 @@ sub tree {
                         AND ('editions.calendar.manage' = ANY(access.terms) OR 'editions.calendar.view' = ANY(access.terms) )
                 )
         ";
-        push @data, $i_node;
         push @data, $i_node;
 
         my $data = $c->sql->Q("$sql ORDER BY shortcut", \@data)->Hashes;

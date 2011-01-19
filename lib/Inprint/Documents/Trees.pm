@@ -47,7 +47,8 @@ sub editions {
         my @data;
 
         $sql = "
-            SELECT *, ( SELECT count(*) FROM editions c2 WHERE c2.path ~ ('*.' || editions.path::text || '.*{1}')::lquery ) as have_childs
+            SELECT *,
+                ( SELECT count(*) FROM editions c2 WHERE c2.path ~ ('*.' || editions.path::text || '.*{1}')::lquery ) as have_childs
             FROM editions
             WHERE
                 id <> '00000000-0000-0000-0000-000000000000'
