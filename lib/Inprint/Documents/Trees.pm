@@ -215,7 +215,8 @@ sub fascicles {
         my $leaf = $c->json->false;
 
         $sql = "
-            SELECT t1.id, t1.shortcut, t2.shortcut as edition_shortcut, ( SELECT count(*) FROM fascicles c2 WHERE c2.parent = t1.id ) as have_childs
+            SELECT t1.id, t1.shortcut, t2.shortcut as edition_shortcut,
+                ( SELECT count(*) FROM fascicles c2 WHERE c2.parent = t1.id ) as have_childs
             FROM fascicles t1, editions t2
             WHERE
                 t1.enabled=true
@@ -250,12 +251,14 @@ sub fascicles {
             push @result, $record;
         }
 
-        unshift @result, {
-            id => "00000000-0000-0000-0000-000000000000",
-            icon => "briefcase",
-            text => $c->l("Briefcase"),
-            leaf => $c->json->true
-        };
+        if ($i_node eq "00000000-0000-0000-0000-000000000000") {
+            unshift @result, {
+                id => "00000000-0000-0000-0000-000000000000",
+                icon => "briefcase",
+                text => $c->l("Briefcase"),
+                leaf => $c->json->true
+            };
+        }
 
     }
 

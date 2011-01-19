@@ -171,6 +171,7 @@ sub list {
     # Set Restrictions
 
     $sql_filters .= " AND ( ";
+
     my $editions = $c->access->GetChildrens("editions.documents.work");
     my $departments = $c->access->GetChildrens("catalog.documents.view:*");
 
@@ -180,8 +181,10 @@ sub list {
     $sql_filters .= " ) ";
     push @params, $editions;
     push @params, $departments;
+
     $sql_filters .= " OR manager=? ";
     push @params, $current_member;
+
     $sql_filters .= " OR holder=? ";
     push @params, $current_member;
     $sql_filters .= " ) ";
@@ -190,15 +193,13 @@ sub list {
 
     if ($mode eq "todo") {
 
+        # get documents fpor departments
         my @holders;
         $sql_filters .= " AND holder = ANY(?) ";
-
-        my $departments = $c->sql->Q(" SELECT catalog FROM map_member_to_catalog WHERE member =? ", [ $current_member ])->Values;
-
+        my $departments = $c->sql->Q(" SELECT catalog FROM map_member_to_catalog WHERE member=? ", [ $current_member ])->Values;
         foreach (@$departments) {
             push @holders, $_;
         }
-
         push @holders, $current_member;
         push @params, \@holders;
 

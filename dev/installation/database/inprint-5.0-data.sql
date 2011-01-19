@@ -31,19 +31,19 @@ VALUES ('aa4e74ad-116e-4bb2-a910-899c4f288f40', 'domain', 'readiness', 'manage',
 -- Documents Rules
 
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
-VALUES ('ac0a0d95-c4d3-4bd7-93c3-cc0fc230936f', 'catalog', 'documents', 'view', 10, 'Can view materials', 'key', '');
+VALUES ('ac0a0d95-c4d3-4bd7-93c3-cc0fc230936f', 'catalog', 'documents', 'view', 10, 'Can view documents', 'key', '');
 
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
-VALUES ('ee992171-d275-4d24-8def-7ff02adec408', 'catalog', 'documents', 'create', 20, 'Can create materials', 'key', '');
+VALUES ('ee992171-d275-4d24-8def-7ff02adec408', 'catalog', 'documents', 'create', 20, 'Can create documents', 'key', '');
 
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
 VALUES ('6033984a-a762-4392-b086-a8d2cdac4221', 'catalog', 'documents', 'assign', 30, 'Can assign the editor', 'key', '');
 
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
-VALUES ('3040f8e1-051c-4876-8e8e-0ca4910e7e45', 'catalog', 'documents', 'delete', 40, 'Can delete materials', 'key', '');
+VALUES ('3040f8e1-051c-4876-8e8e-0ca4910e7e45', 'catalog', 'documents', 'delete', 40, 'Can delete documents', 'key', '');
 
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
-VALUES ('beba3e8d-86e5-4e98-b3eb-368da28dba5f', 'catalog', 'documents', 'recover', 50, 'Can recover materials', 'key', '');
+VALUES ('beba3e8d-86e5-4e98-b3eb-368da28dba5f', 'catalog', 'documents', 'recover', 50, 'Can recover documents', 'key', '');
 
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
 VALUES ('5b27108a-2108-4846-a0a8-3c369f873590', 'catalog', 'documents', 'update', 60, 'Can edit the profile', 'key', '');
@@ -58,19 +58,19 @@ INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, descrip
 VALUES ('fe9cd446-2f4b-4844-9b91-5092c0cabece', 'catalog', 'files', 'delete', 90, 'Can delete files', 'key', '');
 
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
-VALUES ('d782679e-3f0a-4499-bda6-8c2600a3e761', 'catalog', 'documents', 'capture', 100, 'Can capture materials', 'key', '');
+VALUES ('d782679e-3f0a-4499-bda6-8c2600a3e761', 'catalog', 'documents', 'capture', 100, 'Can capture documents', 'key', '');
 
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
-VALUES ('b946bd84-93fc-4a70-b325-d23c2804b2e9', 'catalog', 'documents', 'transfer', 110, 'Can transfer materials', 'key', '');
+VALUES ('b946bd84-93fc-4a70-b325-d23c2804b2e9', 'catalog', 'documents', 'transfer', 110, 'Can transfer documents', 'key', '');
 
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
-VALUES ('b7adafe9-2d5b-44f3-aa87-681fd48466fa', 'catalog', 'documents', 'move', 120, 'Can move materials', 'key', '');
+VALUES ('b7adafe9-2d5b-44f3-aa87-681fd48466fa', 'catalog', 'documents', 'move', 120, 'Can move documents', 'key', '');
 
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
 VALUES ('6d590a90-58a1-447f-b5ad-e3c62f80a2ef', 'catalog', 'documents', 'briefcase', 130, 'Can put in a briefcase', 'key', '');
 
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
-VALUES ('6d590a90-58a1-447f-b5ad-b0582b64571a', 'catalog', 'documents', 'discuss', 140, 'Can discuss the materials', 'key', '');
+VALUES ('6d590a90-58a1-447f-b5ad-b0582b64571a', 'catalog', 'documents', 'discuss', 140, 'Can discuss the documents', 'key', '');
 
 -- Editions Rules
 
@@ -87,7 +87,7 @@ INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, descrip
 VALUES ('ed9580be-1f36-45d1-9b60-36a2a85e5589', 'editions', 'layouts', 'manage', 20, 'Can manage layouts', 'key', '');
 
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
-VALUES ('133743df-52ab-4277-b320-3ede5222cb12', 'editions', 'documents', 'work', 30, 'Can work with documents', 'key', '');
+VALUES ('133743df-52ab-4277-b320-3ede5222cb12', 'editions', 'documents', 'work', 30, 'Can view documents', 'key', '');
 
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
 VALUES ('52dc7f72-2057-43c0-831d-55e458d84f39', 'editions', 'documents', 'assign', 40, 'Can assign the fascicle', 'key', '');

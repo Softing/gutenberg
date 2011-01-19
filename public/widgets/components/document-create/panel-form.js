@@ -99,7 +99,7 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                             if (id && title) field.setValue(id, title);
                                         },
                                         select: function(field) {
-                                            this.getForm().findField("fascicle").reset();
+                                            this.getForm().findField("fascicle").getTree().getRootNode().reload();
                                         }
                                     }
                                 },
@@ -164,7 +164,6 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                             defaults: {
                                 anchor: "100%"
                             },
-                            //autoHeight:true,
                             items :[
 
                                 {
@@ -189,7 +188,6 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                     baseParams: {
                                         term: 'editions.documents.work'
                                     },
-                                    //rootVisible:false,
                                     root: {
                                         id:'00000000-0000-0000-0000-000000000000',
                                         nodeType: 'async',
@@ -199,20 +197,6 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                         text: _("All fascicles")
                                     }
                                 },
-
-                                //xc.getConfig("/documents/combos/fascicles/", {
-                                //    disabled: true,
-                                //    listeners: {
-                                //        scope: this,
-                                //        render: function(field) {
-                                //            field.setValue("00000000-0000-0000-0000-000000000000", _("Briefcase"));
-                                //        },
-                                //        beforequery: function(qe) {
-                                //            delete qe.combo.lastQuery;
-                                //            qe.combo.getStore().baseParams["flt_edition"] = this.getForm().findField("edition").getValue();
-                                //        }
-                                //    }
-                                //}, { baseParams: { term: 'editions.documents.assign' } }),
 
                                 xc.getConfig("/documents/combos/headlines/", {
                                     disabled: false,
