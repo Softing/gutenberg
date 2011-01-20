@@ -56,7 +56,8 @@ sub read {
                 dcm.images, dcm.files,
                 to_char(dcm.created, 'YYYY-MM-DD HH24:MI:SS') as created,
                 to_char(dcm.updated, 'YYYY-MM-DD HH24:MI:SS') as updated
-            FROM documents dcm WHERE dcm.id=?
+            FROM documents dcm
+            WHERE dcm.id=?
         ", [ $i_id ])->Hash;
 
 
@@ -157,16 +158,18 @@ sub list {
             to_char(dcm.created, 'YYYY-MM-DD HH24:MI:SS') as created,
             to_char(dcm.updated, 'YYYY-MM-DD HH24:MI:SS') as updated
 
-        FROM documents dcm
+        FROM documents dcm, fascicles fsc
+        WHERE fsc.id = dcm.fascicle
 
     ";
 
     my $sql_total = "
         SELECT count(*)
-        FROM documents dcm
+        FROM documents dcm, fascicles fsc
+        WHERE fsc.id = dcm.fascicle
     ";
 
-    my $sql_filters = " WHERE 1=1 ";
+    my $sql_filters = " ";
 
     #$sql_filters .= " AND id = '296f7e02-9728-46a4-9dc1-b38f8d9e1335' ";
 
@@ -184,20 +187,19 @@ sub list {
     push @params, $editions;
     push @params, $departments;
 
-    $sql_filters .= " OR manager=? ";
+    $sql_filters .= " OR dcm.manager=? ";
     push @params, $current_member;
 
-    $sql_filters .= " OR holder=? ";
+    $sql_filters .= " OR dcm.holder=? ";
     push @params, $current_member;
     $sql_filters .= " ) ";
 
     # Set Filters
 
     if ($mode eq "todo") {
-
         # get documents fpor departments
         my @holders;
-        $sql_filters .= " AND holder = ANY(?) ";
+        $sql_filters .= " AND dcm.holder = ANY(?) ";
         my $departments = $c->sql->Q(" SELECT catalog FROM map_member_to_catalog WHERE member=? ", [ $current_member ])->Values;
         foreach (@$departments) {
             push @holders, $_;
@@ -205,36 +207,36 @@ sub list {
         push @holders, $current_member;
         push @params, \@holders;
 
-        $sql_filters .= " AND isopen = true ";
-        $sql_filters .= " AND fascicle <> '99999999-9999-9999-9999-999999999999' ";
+        $sql_filters .= " AND fsc.deadline >= now() ";
+        $sql_filters .= " AND dcm.fascicle <> '99999999-9999-9999-9999-999999999999' ";
     }
 
     if ($mode eq "all") {
-        $sql_filters .= " AND isopen is true ";
-        $sql_filters .= " AND fascicle <> '99999999-9999-9999-9999-999999999999' ";
+        $sql_filters .= " AND fsc.deadline >= now() ";
+        $sql_filters .= " AND dcm.fascicle <> '99999999-9999-9999-9999-999999999999' ";
         if ($fascicle && $fascicle ne 'clear' && $fascicle ne '00000000-0000-0000-0000-000000000000') {
-            $sql_filters .= " AND fascicle <> '00000000-0000-0000-0000-000000000000' ";
+            $sql_filters .= " AND dcm.fascicle <> '00000000-0000-0000-0000-000000000000' ";
         }
     }
 
     if ($mode eq "archive") {
-        $sql_filters .= " AND isopen = false ";
-        $sql_filters .= " AND fascicle <> '99999999-9999-9999-9999-999999999999' ";
-        $sql_filters .= " AND fascicle <> '00000000-0000-0000-0000-000000000000' ";
+        $sql_filters .= " AND fsc.deadline < now() ";
+        $sql_filters .= " AND dcm.fascicle <> '99999999-9999-9999-9999-999999999999' ";
+        $sql_filters .= " AND dcm.fascicle <> '00000000-0000-0000-0000-000000000000' ";
     }
 
     if ($mode eq "briefcase") {
-        $sql_filters .= " AND fascicle = '00000000-0000-0000-0000-000000000000' ";
+        $sql_filters .= " AND dcm.fascicle = '00000000-0000-0000-0000-000000000000' ";
     }
 
     if ($mode eq "recycle") {
-        $sql_filters .= " AND fascicle = '99999999-9999-9999-9999-999999999999' ";
+        $sql_filters .= " AND dcm.fascicle = '99999999-9999-9999-9999-999999999999' ";
     }
 
     # Set Filters
 
     if ($title) {
-        $sql_filters .= " AND title LIKE ? ";
+        $sql_filters .= " AND dcm.title LIKE ? ";
         push @params, "%$title%";
     }
 
@@ -249,32 +251,32 @@ sub list {
     }
 
     if ($fascicle && $fascicle ne "clear") {
-        $sql_filters .= " AND fascicle = ? ";
+        $sql_filters .= " AND dcm.fascicle = ? ";
         push @params, $fascicle;
     }
 
     if ($headline && $headline ne "clear") {
-        $sql_filters .= " AND headline_shortcut = ? ";
+        $sql_filters .= " AND dcm.headline_shortcut = ? ";
         push @params, $headline;
     }
 
     if ($rubric && $rubric ne "clear") {
-        $sql_filters .= " AND rubric_shortcut = ? ";
+        $sql_filters .= " AND dcm.rubric_shortcut = ? ";
         push @params, $rubric;
     }
 
     if ($manager && $manager ne "clear") {
-        $sql_filters .= " AND manager=? ";
+        $sql_filters .= " AND dcm.manager=? ";
         push @params, $manager;
     }
 
     if ($holder && $holder ne "clear") {
-        $sql_filters .= " AND holder=? ";
+        $sql_filters .= " AND dcm.holder=? ";
         push @params, $holder;
     }
 
     if ($progress && $progress ne "clear") {
-        $sql_filters .= " AND readiness=? ";
+        $sql_filters .= " AND dcm.readiness=? ";
         push @params, $progress;
     }
 
