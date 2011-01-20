@@ -43,11 +43,13 @@ sub create {
         SELECT id FROM fascicles_indx_headlines WHERE fascicle=? AND tag=? ",
         [ "00000000-0000-0000-0000-000000000000", $headline->{tag} ])->Value;
 
+    print "\t HEADLINE TAG = $headline->{shortcut} = $headline->{tag} \n";
+
     unless ($briefcase_headline) {
-        $briefcase_headline = $c->{uuid};
+        $briefcase_headline = $c->uuid;
         Inprint::Models::Fascicle::Headline::create(
             $c, $briefcase_headline,
-            "00000000-0000-0000-0000-000000000000", "00000000-0000-0000-0000-000000000000", undef, $headline->{title}, $headline->{description});
+            "00000000-0000-0000-0000-000000000000", "00000000-0000-0000-0000-000000000000", 0, $headline->{title}, $headline->{description});
     }
 
     my $exists = $c->sql->Q("
@@ -56,8 +58,8 @@ sub create {
 
     unless ($exists) {
         Inprint::Models::Fascicle::Rubric::create(
-            $c, $c->{uuid},
-            "00000000-0000-0000-0000-000000000000", "00000000-0000-0000-0000-000000000000", $briefcase_headline, undef, $tag->{title}, $tag->{description});
+            $c, $c->uuid,
+            "00000000-0000-0000-0000-000000000000", "00000000-0000-0000-0000-000000000000", $briefcase_headline, 0, $tag->{title}, $tag->{description});
     }
 
     return $c;
@@ -108,16 +110,17 @@ sub update {
             ", [ $rubric->{id} ]);
     }
 
+
     # Update Briefcase Headline
     my $briefcase_headline = $c->sql->Q("
-        SELECT id FROM fascicles_indx_headlines WHERE fascicle=? AND id=? ",
-        [ "00000000-0000-0000-0000-000000000000", $headline->{id} ])->Value;
+        SELECT id FROM fascicles_indx_headlines WHERE fascicle=? AND tag=? ",
+        [ "00000000-0000-0000-0000-000000000000", $headline->{tag} ])->Value;
 
     unless ($briefcase_headline) {
-        $briefcase_headline = $c->{uuid};
+        $briefcase_headline = $c->uuid;
         Inprint::Models::Fascicle::Headline::create(
             $c, $briefcase_headline,
-            "00000000-0000-0000-0000-000000000000", "00000000-0000-0000-0000-000000000000", undef, $headline->{title}, $headline->{description});
+            "00000000-0000-0000-0000-000000000000", "00000000-0000-0000-0000-000000000000", 0, $headline->{title}, $headline->{description});
     }
 
     my $exists = $c->sql->Q("
@@ -126,13 +129,14 @@ sub update {
 
     unless ($exists) {
         Inprint::Models::Fascicle::Rubric::create(
-            $c, $c->{uuid},
-            "00000000-0000-0000-0000-000000000000", "00000000-0000-0000-0000-000000000000", $headline->{id}, undef, $tag->{title}, $tag->{description});
+            $c, $c->uuid,
+            "00000000-0000-0000-0000-000000000000", "00000000-0000-0000-0000-000000000000", $briefcase_headline, 0, $tag->{title}, $tag->{description});
     } else {
         Inprint::Models::Fascicle::Rubric::update(
             $c, $exists,
-            "00000000-0000-0000-0000-000000000000", $briefcase_headline, undef, $tag->{title}, $tag->{description});
+            "00000000-0000-0000-0000-000000000000", $briefcase_headline, 0, $tag->{title}, $tag->{description});
     }
+
 
     return $c;
 }
