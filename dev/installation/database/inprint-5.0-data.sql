@@ -28,7 +28,33 @@ VALUES ('9d057494-c2c6-41f5-9276-74b33b55c6e3', 'domain', 'roles', 'manage', 70,
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
 VALUES ('aa4e74ad-116e-4bb2-a910-899c4f288f40', 'domain', 'readiness', 'manage', 80, 'Can manage the readiness', 'key', '');
 
--- Documents Rules
+INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
+VALUES ('9a756e9c-243a-4f5e-b814-fe3d1162a5e9', 'domain', 'index', 'manage', 90, 'Can manage the index', 'key', '');
+
+-- Editions Rules
+
+INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
+VALUES ('76323a53-1c22-4ff4-8f19-5e43d5aa0bd4', 'editions', 'calendar', 'view', 10, 'Can view calendar', 'key', '');
+
+INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
+VALUES ('0eecba74-ca40-4b8d-a710-03382483b0f4', 'editions', 'calendar', 'manage', 10, 'Can manage the calendar', 'key', '');
+
+INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
+VALUES ('2d34dbb9-db14-4fe8-a2c8-9a57e328b0b5', 'editions', 'layouts', 'view', 20, 'Can view layouts', 'key', '');
+
+INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
+VALUES ('ed9580be-1f36-45d1-9b60-36a2a85e5589', 'editions', 'layouts', 'manage', 20, 'Can manage layouts', 'key', '');
+
+INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
+VALUES ('133743df-52ab-4277-b320-3ede5222cb12', 'editions', 'documents', 'work', 30, 'Can view documents', 'key', '');
+
+INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
+VALUES ('52dc7f72-2057-43c0-831d-55e458d84f39', 'editions', 'documents', 'assign', 40, 'Can assign the fascicle', 'key', '');
+
+INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
+VALUES ('331895b6-5bbf-4222-a3a4-570b02c2aebe', 'editions', 'index', 'manage', 50, 'Can manage the index', 'key', '');
+
+-- Catalog Rules
 
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
 VALUES ('ac0a0d95-c4d3-4bd7-93c3-cc0fc230936f', 'catalog', 'documents', 'view', 10, 'Can view documents', 'key', '');
@@ -72,25 +98,6 @@ VALUES ('6d590a90-58a1-447f-b5ad-e3c62f80a2ef', 'catalog', 'documents', 'briefca
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
 VALUES ('6d590a90-58a1-447f-b5ad-b0582b64571a', 'catalog', 'documents', 'discuss', 140, 'Can discuss the documents', 'key', '');
 
--- Editions Rules
-
-INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
-VALUES ('76323a53-1c22-4ff4-8f19-5e43d5aa0bd4', 'editions', 'calendar', 'view', 10, 'Can view calendar', 'key', '');
-
-INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
-VALUES ('0eecba74-ca40-4b8d-a710-03382483b0f4', 'editions', 'calendar', 'manage', 10, 'Can manage the calendar', 'key', '');
-
-INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
-VALUES ('2d34dbb9-db14-4fe8-a2c8-9a57e328b0b5', 'editions', 'layouts', 'view', 20, 'Can view layouts', 'key', '');
-
-INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
-VALUES ('ed9580be-1f36-45d1-9b60-36a2a85e5589', 'editions', 'layouts', 'manage', 20, 'Can manage layouts', 'key', '');
-
-INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
-VALUES ('133743df-52ab-4277-b320-3ede5222cb12', 'editions', 'documents', 'work', 30, 'Can view documents', 'key', '');
-
-INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
-VALUES ('52dc7f72-2057-43c0-831d-55e458d84f39', 'editions', 'documents', 'assign', 40, 'Can assign the fascicle', 'key', '');
 
 -- Defaults
 
@@ -197,7 +204,7 @@ INSERT INTO map_member_to_rule VALUES ('4c134f39-ebbb-4fd4-99cf-522ca5fc38b2', '
 
 
 -------------------------------------------------------------------------------------------------
--- i18n Russian
+-- i18n Russian - Common
 -------------------------------------------------------------------------------------------------
 
 UPDATE catalog SET title = 'Издательский дом', shortcut = 'Издательский дом', description = 'Издательский дом'
@@ -214,3 +221,44 @@ UPDATE fascicles SET title = 'Корзина', shortcut = 'Корзина', desc
 
 UPDATE options SET option_value = 'Издательский дом' WHERE option_name = 'default.workgroup.name';
 UPDATE options SET option_value = 'Все издания'      WHERE option_name = 'default.edition.name';
+
+-------------------------------------------------------------------------------------------------
+-- i18n Russian - Rules
+-------------------------------------------------------------------------------------------------
+
+UPDATE rules SET sortorder=10, title = 'Может входит в программу' WHERE id = '2fde426b-ed30-4376-9a7b-25278e8f104a';
+UPDATE rules SET sortorder=20, title = 'Может просматривать конфигурацию' WHERE id = '6406ad57-c889-47c5-acc6-0cd552e9cf5e';
+UPDATE rules SET sortorder=30, title = 'Может управлять отделами' WHERE id = 'e55d9548-36fe-4e51-bec2-663235b5383e';
+UPDATE rules SET sortorder=40, title = 'Может управлять сотрудниками' WHERE id = '32e0bb97-2bae-4ce8-865e-cdf0edb3fd93';
+UPDATE rules SET sortorder=50, title = 'Может управлять изданиями' WHERE id = '2a3cae11-23ea-41c3-bdb8-d3dfdc0d486a';
+UPDATE rules SET sortorder=60, title = 'Может управлять движением' WHERE id = '086993e0-56aa-441f-8eaf-437c1c5c9691';
+UPDATE rules SET sortorder=70, title = 'Может управлять ролями' WHERE id = '9d057494-c2c6-41f5-9276-74b33b55c6e3';
+UPDATE rules SET sortorder=80, title = 'Может управлять готовностью' WHERE id = 'aa4e74ad-116e-4bb2-a910-899c4f288f40';
+UPDATE rules SET sortorder=10, title = 'Может управлять рубрикатором' WHERE id = '9a756e9c-243a-4f5e-b814-fe3d1162a5e9';
+
+-- Editions Rules
+
+UPDATE rules SET sortorder=10, title = 'Может просматривать календарь' WHERE id = '76323a53-1c22-4ff4-8f19-5e43d5aa0bd4';
+UPDATE rules SET sortorder=20, title = 'Может управлять календарем' WHERE id = '0eecba74-ca40-4b8d-a710-03382483b0f4';
+UPDATE rules SET sortorder=30, title = 'Может просматривать полосы' WHERE id = '2d34dbb9-db14-4fe8-a2c8-9a57e328b0b5';
+UPDATE rules SET sortorder=40, title = 'Может управлять полосами' WHERE id = 'ed9580be-1f36-45d1-9b60-36a2a85e5589';
+UPDATE rules SET sortorder=50, title = 'Может просматривать документы' WHERE id = '133743df-52ab-4277-b320-3ede5222cb12';
+UPDATE rules SET sortorder=60, title = 'Может назначать выпуск' WHERE id = '52dc7f72-2057-43c0-831d-55e458d84f39';
+UPDATE rules SET sortorder=70, title = 'Может управлять рубрикатором' WHERE id = '331895b6-5bbf-4222-a3a4-570b02c2aebe';
+
+-- Catalog Rules
+
+UPDATE rules SET sortorder=10, title = 'Может просматривать документы' WHERE id = 'ac0a0d95-c4d3-4bd7-93c3-cc0fc230936f';
+UPDATE rules SET sortorder=20, title = 'Может создавать документы' WHERE id = 'ee992171-d275-4d24-8def-7ff02adec408';
+UPDATE rules SET sortorder=30, title = 'Может назначать в отдел' WHERE id = '6033984a-a762-4392-b086-a8d2cdac4221';
+UPDATE rules SET sortorder=40, title = 'Может удалять документы' WHERE id = '3040f8e1-051c-4876-8e8e-0ca4910e7e45';
+UPDATE rules SET sortorder=50, title = 'Может восстанавливать документы' WHERE id = 'beba3e8d-86e5-4e98-b3eb-368da28dba5f';
+UPDATE rules SET sortorder=60, title = 'Может редактировать профиль документа' WHERE id = '5b27108a-2108-4846-a0a8-3c369f873590';
+UPDATE rules SET sortorder=70, title = 'Может работать с файлами документа' WHERE id = 'bff78ebf-2cba-466e-9e3c-89f13a0882fc';
+UPDATE rules SET sortorder=80, title = 'Мжет добавлять файлы в документ' WHERE id = 'f4ad42ed-b46b-4b4e-859f-1b69b918a64a';
+UPDATE rules SET sortorder=90, title = 'Может удалять документы' WHERE id = 'fe9cd446-2f4b-4844-9b91-5092c0cabece';
+UPDATE rules SET sortorder=100, title = 'Может захватывать документы' WHERE id = 'd782679e-3f0a-4499-bda6-8c2600a3e761';
+UPDATE rules SET sortorder=110, title = 'Может передавать документы другим сотрудникам' WHERE id = 'b946bd84-93fc-4a70-b325-d23c2804b2e9';
+UPDATE rules SET sortorder=120, title = 'Может перемещать документы между выпусками' WHERE id = 'b7adafe9-2d5b-44f3-aa87-681fd48466fa';
+UPDATE rules SET sortorder=130, title = 'Может перемещать документы в портфель' WHERE id = '6d590a90-58a1-447f-b5ad-e3c62f80a2ef';
+UPDATE rules SET sortorder=140, title = 'Может учавствовать в обсуждении документов' WHERE id = '6d590a90-58a1-447f-b5ad-b0582b64571a';
