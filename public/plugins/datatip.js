@@ -38,7 +38,7 @@ Ext.ux.DataTip = Ext.extend(Ext.ToolTip, (function() {
             }
         }
     }
-    
+
     function beforeTreeTipShow(tip) {
         var e = Ext.fly(tip.triggerElement).findParent('div.x-tree-node-el', null, true),
             node = e ? tip.host.getNodeById(e.getAttribute('tree-node-id', 'ext')) : null;
@@ -114,3 +114,5 @@ Ext.ux.DataTip = Ext.extend(Ext.ToolTip, (function() {
         }
     };
 })());
+
+//

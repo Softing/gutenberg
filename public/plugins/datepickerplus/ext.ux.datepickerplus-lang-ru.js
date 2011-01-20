@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Ext.ux.DatePickerPlus  Addon
  * Ext.ux.form.DateFieldPlus  Addon
  *
