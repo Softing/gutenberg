@@ -168,7 +168,7 @@ sub delete {
 
     $c->sql->Do("
         DELETE FROM fascicles_indx_rubrics
-        WHERE AND fascicle == '00000000-0000-0000-0000-000000000000' AND id=? ",
+        WHERE AND fascicle = '00000000-0000-0000-0000-000000000000' AND id=? ",
         [ $briefcase_rubric->{id} ]);
 
     return $c;

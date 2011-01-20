@@ -138,12 +138,12 @@ sub delete {
 
     $c->sql->Do("
         DELETE FROM fascicles_indx_rubrics
-        WHERE fascicle == '00000000-0000-0000-0000-000000000000' AND headline=? ",
+        WHERE fascicle = '00000000-0000-0000-0000-000000000000' AND headline=? ",
         [ $briefcase_headline->{id} ]);
 
     $c->sql->Do("
         DELETE FROM fascicles_indx_headlines
-        WHERE fascicle == '00000000-0000-0000-0000-000000000000' AND id=? ",
+        WHERE fascicle = '00000000-0000-0000-0000-000000000000' AND id=? ",
         [ $briefcase_headline->{id} ]);
 
     return $c;
