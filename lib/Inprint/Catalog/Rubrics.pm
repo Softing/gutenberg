@@ -79,7 +79,7 @@ sub create {
         unless ($c->is_text($i_description));
 
     push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.editions.manage"));
+        unless ($c->access->Check("domain.index.manage"));
 
     my $headline = $c->sql->Q(" SELECT * FROM indx_headlines WHERE id=? ", [ $i_headline ])->Hash;
     push @errors, { id => "headline", msg => "Incorrectly filled field"}
@@ -114,16 +114,14 @@ sub update {
         unless ($c->is_text($i_description));
 
     push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.editions.manage"));
-
-    my $edition;
+        unless ($c->access->Check("domain.index.manage"));
 
     my $rubric = Inprint::Models::Rubric::read($c, $i_id);
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         unless ($rubric->{id});
 
     unless (@errors) {
-        Inprint::Models::Rubric::update($c, $rubric->{id}, $rubric->{headline}, $i_bydefault, $i_title, $i_description);
+        Inprint::Models::Rubric::update($c, $rubric->{id}, $rubric->{edition}, $rubric->{headline}, $i_bydefault, $i_title, $i_description);
     }
 
     $success = $c->json->true unless (@errors);
@@ -141,7 +139,7 @@ sub delete {
         unless ($c->is_uuid($i_id));
 
     push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.editions.manage"));
+        unless ($c->access->Check("domain.index.manage"));
 
     unless (@errors) {
         Inprint::Models::Rubric::delete($c, $i_id);

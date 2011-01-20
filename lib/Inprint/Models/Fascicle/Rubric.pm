@@ -44,7 +44,7 @@ sub read {
 
 sub update {
     my $c = shift;
-    my ($id, $fascicle, $headline, $bydefault, $title, $description ) = @_;
+    my ($id, $edition, $fascicle, $headline, $bydefault, $title, $description ) = @_;
 
     my $tag = Inprint::Models::Tag::getByTitle($c, $title, $description);
 

@@ -78,12 +78,12 @@ sub create {
     push @errors, { id => "description", msg => "Incorrectly filled field"}
         unless ($c->is_text($i_description));
 
-    push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.departments.manage"));
-
     my $headline = $c->sql->Q(" SELECT * FROM fascicles_indx_headlines WHERE id=? ", [ $i_headline ])->Hash;
     push @errors, { id => "headline", msg => "Incorrectly filled field"}
         unless ($headline->{id});
+
+    push @errors, { id => "access", msg => "Not enough permissions"}
+        unless ($c->access->Check("editions.index.manage", $headline->{edition}));
 
     unless (@errors) {
         Inprint::Models::Fascicle::Rubric::create(
@@ -114,35 +114,15 @@ sub update {
     push @errors, { id => "description", msg => "Incorrectly filled field"}
         unless ($c->is_text($i_description));
 
-    push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.editions.manage"));
-
-    my $edition;
-
-    my $headline = Inprint::Models::Fascicle::Rubric::read($c, $i_id);
+    my $rubric = Inprint::Models::Fascicle::Rubric::read($c, $i_id);
     push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($headline->{id});
+        unless ($rubric->{id});
+
+    push @errors, { id => "access", msg => "Not enough permissions"}
+        unless ($c->access->Check("editions.index.manage", $rubric->{edition}));
 
     unless (@errors) {
-
-        my $editions = $c->sql->Q("
-            SELECT id FROM editions WHERE path @> ? OR path <@ ? order by path asc; ",
-            [ $edition->{path}, $edition->{path} ])->Values;
-
-        my $exists_title = $c->sql->Q("
-            SELECT EXISTS(
-                    SELECT id FROM indx_headlines WHERE edition=ANY(?)
-                    AND lower(title) = lower(?)
-                )",
-            [ $editions, $i_title ])->Value;
-
-        push @errors, { id => "title", msg => "Already exists"}
-            if ($exists_title);
-
-    }
-
-    unless (@errors) {
-        Inprint::Models::Fascicle::Rubric::update($c, $headline->{fascicle}, $headline->{id}, $i_bydefault, $i_id, $i_title, $i_description);
+        Inprint::Models::Fascicle::Rubric::update($c, $rubric->{id}, $rubric->{edition}, $rubric->{fascicle}, $rubric->{headline}, $i_bydefault, $i_title, $i_description);
     }
 
     $success = $c->json->true unless (@errors);
@@ -159,8 +139,12 @@ sub delete {
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_id));
 
+    my $rubric = Inprint::Models::Fascicle::Rubric::read($c, $i_id);
+    push @errors, { id => "id", msg => "Incorrectly filled field"}
+        unless ($rubric->{id});
+
     push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.editions.manage"));
+        unless ($c->access->Check("editions.index.manage", $rubric->{edition}));
 
     unless (@errors) {
         Inprint::Models::Fascicle::Rubric::delete($c, $i_id);

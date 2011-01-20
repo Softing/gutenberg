@@ -46,7 +46,7 @@ my $cl = new C;
 foreach my $item (@$rubrics) {
 
     print "$item->{id}, $item->{headline}, $item->{bydefault}, $item->{title}, $item->{description} \n";
-    Inprint::Models::Rubric::update($cl, $item->{id}, $item->{headline}, $item->{bydefault}, $item->{title}, $item->{description} );
+    Inprint::Models::Rubric::update($cl, $item->{id}, $item->{edition}, $item->{headline}, $item->{bydefault}, $item->{title}, $item->{description} );
 
 }
 

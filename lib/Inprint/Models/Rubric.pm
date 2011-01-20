@@ -43,8 +43,6 @@ sub create {
         SELECT id FROM fascicles_indx_headlines WHERE fascicle=? AND tag=? ",
         [ "00000000-0000-0000-0000-000000000000", $headline->{tag} ])->Value;
 
-    print "\t HEADLINE TAG = $headline->{shortcut} = $headline->{tag} \n";
-
     unless ($briefcase_headline) {
         $briefcase_headline = $c->uuid;
         Inprint::Models::Fascicle::Headline::create(
@@ -79,7 +77,7 @@ sub read {
 
 sub update {
     my $c = shift;
-    my ($id, $headline, $bydefault, $title, $description ) = @_;
+    my ($id, $edition, $headline, $bydefault, $title, $description ) = @_;
 
     # Validate input
 
@@ -134,7 +132,7 @@ sub update {
     } else {
         Inprint::Models::Fascicle::Rubric::update(
             $c, $exists,
-            "00000000-0000-0000-0000-000000000000", $briefcase_headline, 0, $tag->{title}, $tag->{description});
+            "00000000-0000-0000-0000-000000000000", "00000000-0000-0000-0000-000000000000", $briefcase_headline, 0, $tag->{title}, $tag->{description});
     }
 
 

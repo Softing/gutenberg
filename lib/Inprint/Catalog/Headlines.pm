@@ -118,7 +118,7 @@ sub create {
         unless ($c->is_text($i_description));
 
     push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.editions.manage"));
+        unless ($c->access->Check("domain.index.manage"));
 
     my $edition = $c->sql->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
     push @errors, { id => "edition", msg => "Incorrectly filled field"}
@@ -153,24 +153,14 @@ sub update {
         unless ($c->is_text($i_description));
 
     push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.editions.manage"));
-
-    my $edition;
+        unless ($c->access->Check("domain.index.manage"));
 
     my $headline = Inprint::Models::Headline::read($c, $i_id);
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         unless ($headline->{id});
 
     unless (@errors) {
-        $edition = $c->sql->Q("
-            SELECT * FROM editions WHERE id=? ",
-            [ $headline->{edition} ])->Hash;
-        push @errors, { id => "edition", msg => "Incorrectly filled field"}
-            unless ($edition->{id});
-    }
-
-    unless (@errors) {
-        Inprint::Models::Headline::update($c, $i_id, $edition->{id}, $i_bydefault, $i_title, $i_description);
+        Inprint::Models::Headline::update($c, $i_id, $headline->{edition}, $i_bydefault, $i_title, $i_description);
     }
 
     $success = $c->json->true unless (@errors);
@@ -188,7 +178,7 @@ sub delete {
         unless ($c->is_uuid($i_id));
 
     push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.editions.manage"));
+        unless ($c->access->Check("domain.index.manage"));
 
     unless (@errors) {
         Inprint::Models::Headline::delete($c, $i_id);

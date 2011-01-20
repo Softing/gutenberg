@@ -39,7 +39,7 @@ sub create {
 
     unless ($exists) {
         Inprint::Models::Fascicle::Headline::create(
-            $c, $c->{uuid},
+            $c, $c->uuid,
             "00000000-0000-0000-0000-000000000000", "00000000-0000-0000-0000-000000000000", undef, $tag->{title}, $tag->{description});
     }
 
@@ -97,7 +97,7 @@ sub update {
             "00000000-0000-0000-0000-000000000000", "00000000-0000-0000-0000-000000000000", undef, $tag->{title}, $tag->{description});
     } else {
         Inprint::Models::Fascicle::Headline::create(
-            $c, $c->{uuid},
+            $c, $c->uuid,
             "00000000-0000-0000-0000-000000000000", "00000000-0000-0000-0000-000000000000", undef, $tag->{title}, $tag->{description});
     }
 
