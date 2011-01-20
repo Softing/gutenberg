@@ -17,48 +17,68 @@ sub index
 {
     my $c = shift;
 
+    my $cacheable = $c->config->get("webengine.cached");
+
     my $path = $c->app->home->to_string;
 
-    # Find css files
-    my @cssfiles;
-    find({ wanted => sub {
-        if ( -r $File::Find::name && (/\.css$/) ) {
-            my $file = $File::Find::name;
-            $file  =~ s/\/+/\//g;
-            $file = substr ($file, length("$path/public"), length($file));
-            return if ( $file =~ /\/css\/themes\// );
-            return if ( $file =~ /\/css\/engines\// );
-            push @cssfiles, $file;
-        }
-    }}, "$path/public/css");
-    @cssfiles = sort { $a cmp $b } @cssfiles;
-
-    # Find js files
     my @jsfiles;
-    find({ wanted => sub {
-        if ( -r $File::Find::name && (/\.js$/) ) {
+    my @cssfiles;
+    my @jsplugins;
+    my @cssplugins;
+
+    if (
+        $cacheable eq "true"
+        && -r "$path/public/cache/inprint.min.js"
+        && -r "$path/public/cache/inprint.min.css"
+        && -r "$path/public/cache/plugins.min.js"
+        && -r "$path/public/cache/plugins.min.css"
+        ) {
+
+            push @jsfiles, "/cache/inprint.min.js";
+            push @cssfiles, "/cache/inprint.min.css";
+            push @jsplugins, "/cache/plugins.min.js";
+            push @cssplugins, "/cache/plugins.min.css";
+
+    } else {
+
+        # Find css files
+        find({ wanted => sub {
+            if ( -r $File::Find::name && (/\.css$/) ) {
                 my $file = $File::Find::name;
                 $file  =~ s/\/+/\//g;
                 $file = substr ($file, length("$path/public"), length($file));
-                push @jsfiles, $file;
-        }
-    }}, "$path/public/widgets");
-    @jsfiles = sort { $a cmp $b } @jsfiles;
+                return if ( $file =~ /\/css\/themes\// );
+                return if ( $file =~ /\/css\/engines\// );
+                push @cssfiles, $file;
+            }
+        }}, "$path/public/css");
+        @cssfiles = sort { $a cmp $b } @cssfiles;
 
-    # Find plugins
-    my @jsplugins;
-    my @cssplugins;
-    find({ wanted => sub {
-        if ( -r $File::Find::name && ((/\.js$/) || (/\.css$/)) ) {
-            my $file = $File::Find::name;
-            $file  =~ s/\/+/\//g;
-            $file = substr ($file, length("$path/public"), length($file));
-            push @jsplugins, $file if ($file =~ m/\.js$/);
-            push @cssplugins, $file if ($file =~ m/\.css$/);
-        }
-    }}, "$path/public/plugins");
-    @jsplugins = sort { $a cmp $b } @jsplugins;
-    @cssplugins = sort { $a cmp $b } @cssplugins;
+        # Find js files
+        find({ wanted => sub {
+            if ( -r $File::Find::name && (/\.js$/) ) {
+                    my $file = $File::Find::name;
+                    $file  =~ s/\/+/\//g;
+                    $file = substr ($file, length("$path/public"), length($file));
+                    push @jsfiles, $file;
+            }
+        }}, "$path/public/widgets");
+        @jsfiles = sort { $a cmp $b } @jsfiles;
+
+        # Find plugins
+        find({ wanted => sub {
+            if ( -r $File::Find::name && ((/\.js$/) || (/\.css$/)) ) {
+                my $file = $File::Find::name;
+                $file  =~ s/\/+/\//g;
+                $file = substr ($file, length("$path/public"), length($file));
+                push @jsplugins, $file if ($file =~ m/\.js$/);
+                push @cssplugins, $file if ($file =~ m/\.css$/);
+            }
+        }}, "$path/public/plugins");
+        @jsplugins = sort { $a cmp $b } @jsplugins;
+        @cssplugins = sort { $a cmp $b } @cssplugins;
+
+    }
 
     $c->render(
         js  => \@jsfiles,
@@ -88,14 +108,14 @@ sub appsession {
         $result->{options}->{$item->{option_name}} = $item->{option_value};
         $c->QuerySessionSet("options.". $item->{option_name}, $item->{option_value});
     }
-    
+
     my $edition   = $c->sql->Q(" SELECT id, shortcut FROM editions WHERE id=? ", [$result->{options}->{"default.edition"}])->Hash;
-    
+
     $result->{options}->{"default.edition"} = $edition->{id};
     $result->{options}->{"default.edition.name"} = $edition->{shortcut};
-    
+
     my $workgroup = $c->sql->Q(" SELECT id, shortcut FROM catalog WHERE id=? ", [$result->{options}->{"default.workgroup"}])->Hash;
-    
+
     $result->{options}->{"default.workgroup"} = $workgroup->{id};
     $result->{options}->{"default.workgroup.name"} = $workgroup->{shortcut};
 
@@ -106,24 +126,6 @@ sub appsession {
 sub online
 {
     my $c = shift;
-=cut
- $data = $rh_data->{SqlDrive}->Query({
-	type	=> 'array_hashref',
-        query 	=> "
-	SELECT DISTINCT t1.uuid, t1.updated, t2.title, t2.stitle, t2.job_position ,
-	(extract( epoch FROM now() - t1.updated )/60)::integer as isonline
-	FROM passport.session t1, passport.card t2
-	WHERE
-	    t1.uuid=t2.uuid  AND t1.edition=?
-		AND TO_CHAR ( t1.updated, 'mm/dd/yyyy') = TO_CHAR (now(), 'mm/dd/yyyy')
-		AND t1.updated = ( SELECT max(updated) from passport.session WHERE uuid = t1.uuid AND edition=t1.edition )
-
-		ORDER BY isonline ASC, t1.updated DESC
-
-	",
-        value	=> [ $edition ]
-    });
-=cut
     $c->render_json({});
 }
 
