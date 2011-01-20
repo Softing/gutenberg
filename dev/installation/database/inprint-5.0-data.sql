@@ -252,23 +252,23 @@ UPDATE rules SET sortorder=10, title = 'Может просматривать к
 UPDATE rules SET sortorder=20, title = 'Может управлять календарем' WHERE id = '0eecba74-ca40-4b8d-a710-03382483b0f4';
 UPDATE rules SET sortorder=30, title = 'Может просматривать полосы' WHERE id = '2d34dbb9-db14-4fe8-a2c8-9a57e328b0b5';
 UPDATE rules SET sortorder=40, title = 'Может управлять полосами' WHERE id = 'ed9580be-1f36-45d1-9b60-36a2a85e5589';
-UPDATE rules SET sortorder=50, title = 'Может просматривать документы' WHERE id = '133743df-52ab-4277-b320-3ede5222cb12';
+UPDATE rules SET sortorder=50, title = 'Может просматривать материалы' WHERE id = '133743df-52ab-4277-b320-3ede5222cb12';
 UPDATE rules SET sortorder=60, title = 'Может назначать выпуск' WHERE id = '52dc7f72-2057-43c0-831d-55e458d84f39';
 UPDATE rules SET sortorder=70, title = 'Может управлять рубрикатором' WHERE id = '331895b6-5bbf-4222-a3a4-570b02c2aebe';
 
 -- Catalog Rules
 
-UPDATE rules SET sortorder=10, title = 'Может просматривать документы' WHERE id = 'ac0a0d95-c4d3-4bd7-93c3-cc0fc230936f';
-UPDATE rules SET sortorder=20, title = 'Может создавать документы' WHERE id = 'ee992171-d275-4d24-8def-7ff02adec408';
+UPDATE rules SET sortorder=10, title = 'Может просматривать материалы' WHERE id = 'ac0a0d95-c4d3-4bd7-93c3-cc0fc230936f';
+UPDATE rules SET sortorder=20, title = 'Может создавать материалы' WHERE id = 'ee992171-d275-4d24-8def-7ff02adec408';
 UPDATE rules SET sortorder=30, title = 'Может назначать в отдел' WHERE id = '6033984a-a762-4392-b086-a8d2cdac4221';
-UPDATE rules SET sortorder=40, title = 'Может удалять документы' WHERE id = '3040f8e1-051c-4876-8e8e-0ca4910e7e45';
-UPDATE rules SET sortorder=50, title = 'Может восстанавливать документы' WHERE id = 'beba3e8d-86e5-4e98-b3eb-368da28dba5f';
-UPDATE rules SET sortorder=60, title = 'Может редактировать профиль документа' WHERE id = '5b27108a-2108-4846-a0a8-3c369f873590';
-UPDATE rules SET sortorder=70, title = 'Может работать с файлами документа' WHERE id = 'bff78ebf-2cba-466e-9e3c-89f13a0882fc';
-UPDATE rules SET sortorder=80, title = 'Мжет добавлять файлы в документ' WHERE id = 'f4ad42ed-b46b-4b4e-859f-1b69b918a64a';
-UPDATE rules SET sortorder=90, title = 'Может удалять документы' WHERE id = 'fe9cd446-2f4b-4844-9b91-5092c0cabece';
-UPDATE rules SET sortorder=100, title = 'Может захватывать документы' WHERE id = 'd782679e-3f0a-4499-bda6-8c2600a3e761';
-UPDATE rules SET sortorder=110, title = 'Может передавать документы другим сотрудникам' WHERE id = 'b946bd84-93fc-4a70-b325-d23c2804b2e9';
-UPDATE rules SET sortorder=120, title = 'Может перемещать документы между выпусками' WHERE id = 'b7adafe9-2d5b-44f3-aa87-681fd48466fa';
-UPDATE rules SET sortorder=130, title = 'Может перемещать документы в портфель' WHERE id = '6d590a90-58a1-447f-b5ad-e3c62f80a2ef';
-UPDATE rules SET sortorder=140, title = 'Может учавствовать в обсуждении документов' WHERE id = '6d590a90-58a1-447f-b5ad-b0582b64571a';
+UPDATE rules SET sortorder=40, title = 'Может удалять материалы' WHERE id = '3040f8e1-051c-4876-8e8e-0ca4910e7e45';
+UPDATE rules SET sortorder=50, title = 'Может восстанавливать материалы' WHERE id = 'beba3e8d-86e5-4e98-b3eb-368da28dba5f';
+UPDATE rules SET sortorder=60, title = 'Может редактировать профиль материала' WHERE id = '5b27108a-2108-4846-a0a8-3c369f873590';
+UPDATE rules SET sortorder=70, title = 'Может работать с файлами материала' WHERE id = 'bff78ebf-2cba-466e-9e3c-89f13a0882fc';
+UPDATE rules SET sortorder=80, title = 'Мжет добавлять файлы в материал' WHERE id = 'f4ad42ed-b46b-4b4e-859f-1b69b918a64a';
+UPDATE rules SET sortorder=90, title = 'Может удалять материалы' WHERE id = 'fe9cd446-2f4b-4844-9b91-5092c0cabece';
+UPDATE rules SET sortorder=100, title = 'Может захватывать материалы' WHERE id = 'd782679e-3f0a-4499-bda6-8c2600a3e761';
+UPDATE rules SET sortorder=110, title = 'Может передавать материалы другим сотрудникам' WHERE id = 'b946bd84-93fc-4a70-b325-d23c2804b2e9';
+UPDATE rules SET sortorder=120, title = 'Может перемещать материалы между выпусками' WHERE id = 'b7adafe9-2d5b-44f3-aa87-681fd48466fa';
+UPDATE rules SET sortorder=130, title = 'Может перемещать материалы в портфель' WHERE id = '6d590a90-58a1-447f-b5ad-e3c62f80a2ef';
+UPDATE rules SET sortorder=140, title = 'Может учавствовать в обсуждении материалов' WHERE id = '6d590a90-58a1-447f-b5ad-b0582b64571a';
