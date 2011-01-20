@@ -108,7 +108,6 @@ sub update {
             ", [ $rubric->{id} ]);
     }
 
-
     # Update Briefcase Headline
     my $briefcase_headline = $c->sql->Q("
         SELECT id FROM fascicles_indx_headlines WHERE fascicle=? AND tag=? ",
@@ -145,7 +144,7 @@ sub delete {
 
     my $rubric = $c->sql->Q("
         SELECT * FROM indx_rubrics WHERE id =? ",
-        [ $id ])->Value;
+        [ $id ])->Hash;
 
     return unless ($rubric->{id});
 
@@ -157,7 +156,7 @@ sub delete {
     my $briefcase_rubric = $c->sql->Q("
         SELECT * FROM fascicles_indx_rubrics
         WHERE fascicle = '00000000-0000-0000-0000-000000000000' AND tag=?",
-        [ $rubric->{tag} ])->Value;
+        [ $rubric->{tag} ])->Hash;
 
     return unless ($briefcase_rubric->{id});
 
