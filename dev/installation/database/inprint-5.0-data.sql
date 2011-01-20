@@ -98,8 +98,9 @@ VALUES ('6d590a90-58a1-447f-b5ad-e3c62f80a2ef', 'catalog', 'documents', 'briefca
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
 VALUES ('6d590a90-58a1-447f-b5ad-b0582b64571a', 'catalog', 'documents', 'discuss', 140, 'Can discuss the documents', 'key', '');
 
-
+-------------------------------------------------------------------------------------------------
 -- Defaults
+-------------------------------------------------------------------------------------------------
 
 INSERT INTO catalog (id, path, title, shortcut, description, type, capables, created, updated)
     VALUES ('00000000-0000-0000-0000-000000000000', '00000000000000000000000000000000', 'Publishing House', 'Publishing House', 'Publishing House', 'ou', '{default}', now(), now());
@@ -112,6 +113,12 @@ INSERT INTO fascicles(id, edition, parent, title, shortcut, description, manager
 
 INSERT INTO fascicles(id, edition, parent, title, shortcut, description, manager, variation, deadline, advert_deadline, created, updated)
     VALUES ('99999999-9999-9999-9999-999999999999', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', 'Recycle bin', 'Recycle bin', 'Recycle bin', null, '00000000-0000-0000-0000-000000000000', now(), now(), now(), now());
+
+UPDATE documents SET deadline='2020-01-01 16:23:10+03'
+ 	WHERE id = '00000000-0000-0000-0000-000000000000';
+	
+UPDATE fascicles SET deadline='2020-01-01 16:23:10+03'
+ 	WHERE id = '99999999-9999-9999-9999-999999999999';
 	
 -------------------------------------------------------------------------------------------------
 -- Rubrication
@@ -209,15 +216,18 @@ INSERT INTO map_member_to_rule VALUES ('4c134f39-ebbb-4fd4-99cf-522ca5fc38b2', '
 
 UPDATE catalog SET title = 'Издательский дом', shortcut = 'Издательский дом', description = 'Издательский дом'
 	WHERE id = '00000000-0000-0000-0000-000000000000';
-
 UPDATE editions SET title = 'Все издания', shortcut = 'Все издания', description = 'Все издания'
  	WHERE id = '00000000-0000-0000-0000-000000000000';
-	
+
 UPDATE fascicles SET title = 'Портфель', shortcut = 'Портфель', description = 'Портфель'
  	WHERE id = '00000000-0000-0000-0000-000000000000';
-	
 UPDATE fascicles SET title = 'Корзина', shortcut = 'Корзина', description = 'Корзина'
  	WHERE id = '99999999-9999-9999-9999-999999999999';
+
+UPDATE documents SET fascicle_shortcut = 'Портфель'
+ 	WHERE fascicle = '00000000-0000-0000-0000-000000000000';
+UPDATE documents SET fascicle_shortcut = 'Корзина'
+ 	WHERE fascicle = '99999999-9999-9999-9999-999999999999';
 
 UPDATE options SET option_value = 'Издательский дом' WHERE option_name = 'default.workgroup.name';
 UPDATE options SET option_value = 'Все издания'      WHERE option_name = 'default.edition.name';

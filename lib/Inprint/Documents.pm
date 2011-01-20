@@ -70,11 +70,13 @@ sub read {
             files.add files.delete files.work
         );
         foreach (@rules) {
+
             if ($document->{holder} eq $current_member) {
                 if ($c->access->Check(["catalog.$_:member"], $document->{workgroup})) {
                     $document->{access}->{$_} = $c->json->true;
                 }
             }
+            
             if ($document->{holder} ne $current_member) {
                 if ($c->access->Check("catalog.$_:group", $document->{workgroup})) {
                     $document->{access}->{$_} = $c->json->true;
