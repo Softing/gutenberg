@@ -1,4 +1,4 @@
-Inprint.documents.profile.rss.Form = Ext.extend(Ext.FormPanel, {
+Inprint.plugins.rss.profile.Form = Ext.extend(Ext.FormPanel, {
 
     initComponent: function() {
 
@@ -49,11 +49,11 @@ Inprint.documents.profile.rss.Form = Ext.extend(Ext.FormPanel, {
             ]
         });
 
-        Inprint.documents.profile.rss.Form.superclass.initComponent.apply(this, arguments);
+        Inprint.plugins.rss.profile.Form.superclass.initComponent.apply(this, arguments);
     },
 
     onRender: function() {
-        Inprint.documents.profile.rss.Form.superclass.onRender.apply(this, arguments);
+        Inprint.plugins.rss.profile.Form.superclass.onRender.apply(this, arguments);
     }
 
 });

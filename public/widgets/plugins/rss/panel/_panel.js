@@ -1,4 +1,4 @@
-Inprint.documents.profile.Rss = Ext.extend(Ext.Panel, {
+Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
 
@@ -14,11 +14,11 @@ Inprint.documents.profile.Rss = Ext.extend(Ext.Panel, {
         }
 
         this.children = {
-            "form": new Inprint.documents.profile.rss.Form({
+            "form": new Inprint.plugins.rss.profile.Form({
                 parent: this,
                 oid: this.oid
             }),
-            "grid": new Inprint.documents.profile.rss.Grid({
+            "grid": new Inprint.plugins.rss.profile.Grid({
                 parent: this,
                 oid: this.oid
             })
@@ -71,11 +71,11 @@ Inprint.documents.profile.Rss = Ext.extend(Ext.Panel, {
         });
 
         // Call parent (required)
-        Inprint.documents.profile.Rss.superclass.initComponent.apply(this, arguments);
+        Inprint.plugins.rss.Profile.superclass.initComponent.apply(this, arguments);
     },
 
     onRender: function() {
-        Inprint.documents.profile.Rss.superclass.onRender.apply(this, arguments);
+        Inprint.plugins.rss.Profile.superclass.onRender.apply(this, arguments);
         this.form = this.children["form"].getForm();
         this.form.url = this.urls["update"];
         this.on("activate", function() {

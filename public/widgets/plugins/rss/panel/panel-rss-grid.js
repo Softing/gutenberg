@@ -1,4 +1,4 @@
-Inprint.documents.profile.rss.Grid = Ext.extend(Ext.grid.GridPanel, {
+Inprint.plugins.rss.profile.Grid = Ext.extend(Ext.grid.GridPanel, {
 
     initComponent: function() {
 
@@ -22,11 +22,11 @@ Inprint.documents.profile.rss.Grid = Ext.extend(Ext.grid.GridPanel, {
         });
 
         // Call parent (required)
-        Inprint.documents.profile.rss.Grid.superclass.initComponent.apply(this, arguments);
+        Inprint.plugins.rss.profile.Grid.superclass.initComponent.apply(this, arguments);
     },
 
     onRender: function() {
-        Inprint.documents.profile.rss.Grid.superclass.onRender.apply(this, arguments);
+        Inprint.plugins.rss.profile.Grid.superclass.onRender.apply(this, arguments);
     }
 
 });
