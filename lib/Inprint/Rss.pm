@@ -59,7 +59,7 @@ sub list {
             $rss_feed .= "<media:description type=\"plain\">У Владимира Путина скоро будет новый холодильник</media:description>";
             $rss_feed .= "</media:content>";
         $rss_feed .= "</item>";
-        
+
     }
 
     $rss_feed .= "</channel>";

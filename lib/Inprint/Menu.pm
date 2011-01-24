@@ -66,6 +66,8 @@ sub index
 
         push @{ $documents->{menu} }, { id => "documents-recycle" };
 
+        push @{ $documents->{menu} }, { id => "documents-rss" };
+
         push @result, $documents;
         push @result, "-";
     }
