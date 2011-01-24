@@ -13,7 +13,7 @@ Inprint.documents.Profile = Ext.extend(Ext.Panel, {
             oid: this.oid,
             parent: this
         });
-        this.panels["rss"]    = new Inprint.documents.Profile.Rss({
+        this.panels["rss"]    = new Inprint.documents.profile.Rss({
             oid: this.oid,
             parent: this
         });

@@ -98,6 +98,9 @@ VALUES ('6d590a90-58a1-447f-b5ad-e3c62f80a2ef', 'catalog', 'documents', 'briefca
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
 VALUES ('6d590a90-58a1-447f-b5ad-b0582b64571a', 'catalog', 'documents', 'discuss', 140, 'Can discuss the documents', 'key', '');
 
+INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
+VALUES ('b98fb3fd-2593-44c8-bcd8-12da48693ef7', 'catalog', 'documents', 'rss', 150, 'Can manage rss', 'key', '');
+
 -------------------------------------------------------------------------------------------------
 -- Defaults
 -------------------------------------------------------------------------------------------------
@@ -209,7 +212,6 @@ INSERT INTO map_member_to_rule VALUES ('d1c6f391-2ede-403c-8dc9-af5987993645', '
 INSERT INTO map_member_to_rule VALUES ('66c7862c-1e65-4042-abad-bfbf52d60225', '39d40812-fc54-4342-9b98-e1c1f4222d22', 'catalog', 'member', '00000000-0000-0000-0000-000000000000', '6d590a90-58a1-447f-b5ad-e3c62f80a2ef');
 INSERT INTO map_member_to_rule VALUES ('4c134f39-ebbb-4fd4-99cf-522ca5fc38b2', '39d40812-fc54-4342-9b98-e1c1f4222d22', 'catalog', 'member', '00000000-0000-0000-0000-000000000000', '6d590a90-58a1-447f-b5ad-b0582b64571a');
 
-
 -------------------------------------------------------------------------------------------------
 -- i18n Russian - Common
 -------------------------------------------------------------------------------------------------
@@ -272,3 +274,4 @@ UPDATE rules SET sortorder=110, title = 'Может передавать мат�
 UPDATE rules SET sortorder=120, title = 'Может перемещать материалы между выпусками' WHERE id = 'b7adafe9-2d5b-44f3-aa87-681fd48466fa';
 UPDATE rules SET sortorder=130, title = 'Может перемещать материалы в портфель' WHERE id = '6d590a90-58a1-447f-b5ad-e3c62f80a2ef';
 UPDATE rules SET sortorder=140, title = 'Может учавствовать в обсуждении материалов' WHERE id = '6d590a90-58a1-447f-b5ad-b0582b64571a';
+UPDATE rules SET sortorder=150, title = 'Может редактировать RSS' WHERE id = 'b98fb3fd-2593-44c8-bcd8-12da48693ef7';

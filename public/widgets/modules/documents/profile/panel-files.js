@@ -326,8 +326,8 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
 
         var cookies = document.cookie.split(";");
         var Session;
-        Ext.each(cookies, function(cookie)
-        {
+
+        Ext.each(cookies, function(cookie) {
             var nvp = cookie.split("=");
             if (nvp[0].trim() == 'sid')
             {
@@ -335,37 +335,42 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
             }
         });
 
-        var AwesomeUploader = new Ext.Window({
-            title:'Awesome Uploader in a Window!',
+        var UploadPanel = {
+            xtype:'awesomeuploader',
+            border:false,
+            gridWidth:470,
+            gridHeight:120,
+            height:180,
+            extraPostData: {
+                sid: Session,
+                document: this.parent.document
+            },
+            flashUploadUrl:_url("/documents/files/upload/"),
+            standardUploadUrl:_url("/documents/files/upload/"),
+            xhrUploadUrl:_url("/documents/files/upload/"),
+            awesomeUploaderRoot: "/plugins/uploader/",
+            listeners:{
+                scope:this,
+                fileupload:function(uploader, success, result){
+                    if(success){
+                        this.cmpReload();
+                    }
+                }
+            }
+        }
+
+        var Uploader = new Ext.Window({
+            title: _('Download files'),
             modal:true,
             layout:"fit",
-            width:500,
-            height:200,
-            items:{
-                    xtype:'awesomeuploader',
-                    gridHeight:100,
-                    height:160,
-                    extraPostData: {
-                        sid: Session,
-                        document: this.parent.document
-                    },
-                    flashUploadUrl:_url("/documents/files/upload/"),
-                    standardUploadUrl:_url("/documents/files/upload/"),
-                    xhrUploadUrl:_url("/documents/files/upload/"),
-                    awesomeUploaderRoot: "/plugins/uploader/",
-                    listeners:{
-                        scope:this,
-                        fileupload:function(uploader, success, result){
-                            if(success){
-                                this.cmpReload();
-                            }
-                        }
-                    }
-            }
+            width: 500,
+            height: 200,
+            bodyBorder:false,
+            border:false,
+            items: UploadPanel
         });
 
-        AwesomeUploader.show();
-
+        Uploader.show();
 
     },
 

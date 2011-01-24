@@ -7,25 +7,20 @@
  */
 
 Ext.onReady(function() {
-
     Ext.BLANK_IMAGE_URL = '/ext-3.3.1/resources/images/default/s.gif';
-
     Ext.data.Connection.prototype._handleFailure = Ext.data.Connection.prototype.handleFailure;
     Ext.data.Connection.prototype.handleFailure = function(response, e) {
-	var jsonData = Ext.util.JSON.decode(response.responseText);
+        var jsonData = Ext.util.JSON.decode(response.responseText);
         var errorText = jsonData.error;
-
         errorText = errorText.replace(/%br%/g, "<br/>");
-
-	Ext.Msg.show({
+        Ext.Msg.show({
             title:_("Communication error"),
             minWidth:900,
             maxWidth:900,
             msg: errorText,
-            //icon: Ext.MessageBox.ERROR,
             buttons: Ext.Msg.OK
         });
-	Ext.data.Connection.prototype._handleFailure.call(this, response, e);
+        Ext.data.Connection.prototype._handleFailure.call(this, response, e);
     };
 
     Passport();
@@ -60,7 +55,6 @@ var Passport =  function ()
         {
             name: 'login',
             fieldLabel: _("Login"),
-            emptyText: _("Enter login"),
             listeners: {
                 scope:this,
                 render: function( cmp ) {
@@ -144,7 +138,7 @@ var Passport =  function ()
             errorBox.show();
 
             Ext.each( r.errors , function (c) {
-                this.getEl().update( _(c.msg) || c.msg );
+                this.getEl().update(_(c.msg));
             }, errorBox);
 
         }

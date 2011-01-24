@@ -79,6 +79,10 @@ sub startup {
     $postinitBridge->route('/workspace/login/')->to('session#login');
     $postinitBridge->route('/locale/')->to('locale#index');
 
+    # RSS routes
+
+    $postinitBridge->route('/rss/:feed')->to('rss#list');
+
     # Add sessionable routes
     my $sessionBridge  = $postinitBridge->bridge->to('filters#mysession');
 
