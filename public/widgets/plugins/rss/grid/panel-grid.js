@@ -8,13 +8,22 @@ Inprint.plugins.rss.Grid = Ext.extend(Ext.grid.GridPanel, {
         this.components = {};
 
         this.urls = {
-            "list":       "/documents/list/"
+            "list":       "/rss/list/"
         }
 
-        this.store = Inprint.factory.Store.json(this.urls.list, {
-            remoteSort: true,
-            totalProperty: 'total'
-        });
+        var fields = Inprint.factory.StoreFields["/documents/list/"];
+        fields.push("rss_id", "rss_published");
+
+        this.store = new Ext.data.JsonStore(Ext.apply(
+            Inprint.factory.StoreDefaults, {
+                autoLoad:true,
+                remoteSort: true,
+                totalProperty: 'total',
+                url: _url('/rss/list/'),
+                baseParams: { flt_rssonly: false },
+                fields: fields
+            })
+        );
 
         this.sm = new Ext.grid.CheckboxSelectionModel();
 
@@ -35,136 +44,40 @@ Inprint.plugins.rss.Grid = Ext.extend(Ext.grid.GridPanel, {
             columns.size
         ];
 
-        //this.filter = new Inprint.plugins.rss.GridFilter({
-        //    stateId: this.stateId,
-        //    gridmode: "rss"
-        //});
-        //this.filter.on("filter", function(filter, params) {
-        //    this.cmpLoad(params);
-        //}, this);
-
-        //this.tbar = {
-        //    xtype    : 'container',
-        //    layout   : 'anchor',
-        //    height   : 27 * 2,
-        //    defaults : { height : 27, anchor : '100%' },
-        //    items    : [
-        //        {
-        //            xtype: "toolbar",
-        //            items : [
-        //                {
-        //                    icon: _ico("plus-button"),
-        //                    cls: "x-btn-text-icon",
-        //                    text: _("Add"),
-        //                    tooltip : _("Adding of the new document"),
-        //                    disabled:true,
-        //                    ref: "../../btnCreate",
-        //                    scope:this,
-        //                    handler: actions.Create
-        //                },
-        //                {
-        //                    icon: _ico("pencil"),
-        //                    cls: "x-btn-text-icon",
-        //                    text: _("Edit"),
-        //                    disabled:true,
-        //                    ref: "../../btnUpdate",
-        //                    scope:this,
-        //                    handler: actions.Update
-        //                },
-        //                '-',
-        //                {
-        //                    icon: _ico("hand"),
-        //                    cls: "x-btn-text-icon",
-        //                    text: _("Capture"),
-        //                    disabled:true,
-        //                    ref: "../../btnCapture",
-        //                    scope:this,
-        //                    handler: actions.Capture
-        //                },
-        //                {
-        //                    icon: _ico("arrow"),
-        //                    cls: "x-btn-text-icon",
-        //                    text: _("Transfer"),
-        //                    disabled:true,
-        //                    ref: "../../btnTransfer",
-        //                    scope:this,
-        //                    handler: actions.Transfer
-        //                },
-        //                '-',
-        //                {
-        //                    icon: _ico("blue-folder-import"),
-        //                    cls: "x-btn-text-icon",
-        //                    text: _("Move"),
-        //                    disabled:true,
-        //                    ref: "../../btnMove",
-        //                    scope:this,
-        //                    handler: actions.Move
-        //                },
-        //                {
-        //                    icon: _ico("briefcase"),
-        //                    cls: "x-btn-text-icon",
-        //                    text: _("Briefcase"),
-        //                    disabled:true,
-        //                    ref: "../../btnBriefcase",
-        //                    scope:this,
-        //                    handler: actions.Briefcase
-        //                },
-        //                "-",
-        //                {
-        //                    icon: _ico("document-copy"),
-        //                    cls: "x-btn-text-icon",
-        //                    text: _("Copy"),
-        //                    disabled:true,
-        //                    ref: "../../btnCopy",
-        //                    scope:this,
-        //                    handler: actions.Copy
-        //                },
-        //                {
-        //                    icon: _ico("documents"),
-        //                    cls: "x-btn-text-icon",
-        //                    text: _("Duplicate"),
-        //                    disabled:true,
-        //                    ref: "../../btnDuplicate",
-        //                    scope:this,
-        //                    handler: actions.Duplicate
-        //                },
-        //                "-",
-        //                {
-        //                    icon: _ico("bin--plus"),
-        //                    cls: "x-btn-text-icon",
-        //                    text: _("Recycle Bin"),
-        //                    disabled:true,
-        //                    ref: "../../btnRecycle",
-        //                    scope:this,
-        //                    handler: actions.Recycle
-        //                },
-        //                {
-        //                    icon: _ico("bin--arrow"),
-        //                    cls: "x-btn-text-icon",
-        //                    text: _("Restore"),
-        //                    disabled:true,
-        //                    ref: "../../btnRestore",
-        //                    scope:this,
-        //                    handler: actions.Restore
-        //                },
-        //                {
-        //                    icon: _ico("minus-button"),
-        //                    cls: "x-btn-text-icon",
-        //                    text: _("Delete"),
-        //                    disabled:true,
-        //                    ref: "../../btnDelete",
-        //                    scope:this,
-        //                    handler: actions.Delete
-        //                }
-        //
-        //            ]
-        //        },
-        //        {
-        //            xtype: "toolbar",
-        //            items : this.filter
-        //        }
-        //    ]
-        //};
+        this.tbar = [
+            {
+                icon: _ico("light-bulb"),
+                cls: "x-btn-text-icon",
+                text: _("Publish"),
+                ref: "../btnPublish",
+                disabled:true,
+                scope:this,
+                handler: this.cmpPublish
+            },
+            {
+                icon: _ico("light-bulb-off"),
+                cls: "x-btn-text-icon",
+                text: _("Unpublish"),
+                ref: "../btnUnpublish",
+                disabled:true,
+                scope:this,
+                handler: this.cmpUnpublish
+            },
+            "-",
+            {
+                icon: _ico("funnel"),
+                cls: "x-btn-text-icon",
+                text: _("Show only with RSS"),
+                ref: "../btnSwitch",
+                pressed: false,
+                enableToggle: true,
+                scope:this,
+                toggleHandler: function(btn, tgle) {
+                    this.store.baseParams["flt_rssonly"] = tgle;
+                    this.store.reload();
+                }
+            }
+        ];
 
         this.bbar = new Ext.PagingToolbar({
             pageSize: 60,
@@ -186,15 +99,15 @@ Inprint.plugins.rss.Grid = Ext.extend(Ext.grid.GridPanel, {
 
                     var css = '';
 
-                    if (Inprint.session.member && Inprint.session.member.id == record.get("manager") ) {
-                        css = 'inprint-document-grid-current-manager-bg';
-                    }
+                    //if (Inprint.session.member && Inprint.session.member.id == record.get("manager") ) {
+                    //    css = 'inprint-document-grid-current-manager-bg';
+                    //}
 
-                    if (record.get("workgroup") == record.get("holder")) {
+                    if (record.get("rss_id") ) {
                         css = 'inprint-document-grid-current-department-bg';
                     }
 
-                    if (Inprint.session.member && Inprint.session.member.id == record.get("holder") ) {
+                    if (record.get("rss_published") ) {
                         css = 'inprint-document-grid-current-user-bg';
                     }
 
@@ -204,20 +117,41 @@ Inprint.plugins.rss.Grid = Ext.extend(Ext.grid.GridPanel, {
         });
 
         Inprint.plugins.rss.Grid.superclass.initComponent.apply(this, arguments);
-
     },
 
     onRender: function() {
-
         Inprint.plugins.rss.Grid.superclass.onRender.apply(this, arguments);
+    },
 
-        //this.filter.on("restore", function(filter, params) {
-        //    this.store.load({ params: Ext.apply({start:0, limit:60}, params) });
-        //}, this);
-        //
-        //this.on("dblclick", function(e){
-        //    Inprint.ObjectResolver.resolve({ aid:'document-profile', oid:this.getValue("id"), text:this.getValue("title") });
-        //}, this);
+        cmpPublish: function() {
+        Ext.MessageBox.confirm(
+            _("Irreversible removal"),
+            _("You can't cancel this action!"),
+            function(btn) {
+                if (btn == "yes") {
+                    Ext.Ajax.request({
+                        url: _url("/rss/publish/"),
+                        scope:this,
+                        success: this.cmpReload,
+                        params: { id: this.getValues("id") }
+                    });
+                }
+            }, this).setIcon(Ext.MessageBox.WARNING);
+    },
 
+    cmpUnpublish: function() {
+        Ext.MessageBox.confirm(
+            _("Irreversible removal"),
+            _("You can't cancel this action!"),
+            function(btn) {
+                if (btn == "yes") {
+                    Ext.Ajax.request({
+                        url: _url("/rss/unpublish/"),
+                        scope:this,
+                        success: this.cmpReload,
+                        params: { id: this.getValues("id") }
+                    });
+                }
+            }, this).setIcon(Ext.MessageBox.WARNING);
     }
 });

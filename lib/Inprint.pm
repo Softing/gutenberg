@@ -79,10 +79,6 @@ sub startup {
     $postinitBridge->route('/workspace/login/')->to('session#login');
     $postinitBridge->route('/locale/')->to('locale#index');
 
-    # RSS routes
-
-    $postinitBridge->route('/rss/:feed')->to('rss#list');
-
     # Add sessionable routes
     my $sessionBridge  = $postinitBridge->bridge->to('filters#mysession');
 
@@ -117,7 +113,6 @@ sub startup {
     $self->createRoutes($sessionBridge, "documents/profile",        [ "read" ]);
     $self->createRoutes($sessionBridge, "documents/files",          [ "list", "create", "read", "update", "delete", "upload" ]);
     $self->createRoutes($sessionBridge, "documents/text",           [ "get", "set" ]);
-    $self->createRoutes($sessionBridge, "documents/rss",            [ "read", "update" ]);
 
     $sessionBridge->route('/documents/files/preview/:document/:file')->to('documents-files#preview', document => "", file => "");
     $sessionBridge->route('/documents/:document/zip/:type')->to('documents-files#createzip', document => "", type => "");
@@ -169,14 +164,27 @@ sub startup {
     $sessionBridge->route('/profile/image/:id')->to('profile#image', id => "00000000-0000-0000-0000-000000000000");
 
     # Options routes
-    $self->createRoutes($sessionBridge, "options",                  [ "update" ]);
-    $self->createRoutes($sessionBridge, "options/combos",           [ "capture-destination" ]);
+    $self->createRoutes($sessionBridge, "options",
+        [ "update" ]);
+    $self->createRoutes($sessionBridge, "options/combos",
+        [ "capture-destination" ]);
+
+    # RSS routes
+    $postinitBridge->route('/rss/:feed')->to('rss#feed');
+    $sessionBridge->route('/rss/list/')->to('rss#list');
+    $sessionBridge->route('/rss/files/')->to('rss#files');
+    $sessionBridge->route('/rss/read/')->to('rss#read');
+    $sessionBridge->route('/rss/update/')->to('rss#update');
+    $sessionBridge->route('/rss/publish/')->to('rss#publish');
+    $sessionBridge->route('/rss/unpublish/')->to('rss#unpublish');
 
     # State route
-    $self->createRoutes($sessionBridge, "state",                    [ "index", "read", "update" ]);
+    $self->createRoutes($sessionBridge, "state",
+        [ "index", "read", "update" ]);
 
     # System routess
-    $self->createRoutes($sessionBridge, "system/events",            [ "list" ]);
+    $self->createRoutes($sessionBridge, "system/events",
+        [ "list" ]);
 
     # Workspace routess
     $self->createRoutes($sessionBridge, "access",                   [ "index" ]);

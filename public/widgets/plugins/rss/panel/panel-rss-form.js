@@ -3,14 +3,15 @@ Inprint.plugins.rss.profile.Form = Ext.extend(Ext.FormPanel, {
     initComponent: function() {
 
         Ext.apply(this, {
-            flex:1,
             xtype: "form",
+            width: 600,
             border:false,
             labelWidth: 100,
             bodyStyle: "padding:5px 5px",
             defaults: {
                 anchor: "100%",
-                allowBlank:false
+                allowBlank:false,
+                hideLabel:true
             },
             items: [
                 {
@@ -20,30 +21,26 @@ Inprint.plugins.rss.profile.Form = Ext.extend(Ext.FormPanel, {
                     allowBlank:false
                 },
                 {
-                    xtype:"checkbox",
-                    fieldLabel: _("Published"),
-                    boxLabel: _("Yes"),
-                    name: "published"
-                },
-                {
                     xtype:"textfield",
-                    fieldLabel: _("URL"),
+                    emptyText: _("URL"),
                     name: "link"
                 },
                 {
                     xtype:"textfield",
-                    fieldLabel: _("Title"),
+                    emptyText: _("Title"),
                     name: "title"
                 },
                 {
                     xtype:"textarea",
-                    fieldLabel: _("Description"),
-                    name: "description"
+                    emptyText: _("Description"),
+                    name: "description",
+                    height:36
                 },
                 {
                     xtype:'htmleditor',
                     name: "fulltext",
-                    fieldLabel: _("Text"),
+                    allowBlank:false,
+                    hideLabel:true,
                     height:200
                 }
             ]

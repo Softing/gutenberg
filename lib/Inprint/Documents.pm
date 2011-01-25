@@ -76,7 +76,7 @@ sub read {
                     $document->{access}->{$_} = $c->json->true;
                 }
             }
-            
+
             if ($document->{holder} ne $current_member) {
                 if ($c->access->Check("catalog.$_:group", $document->{workgroup})) {
                     $document->{access}->{$_} = $c->json->true;
@@ -292,7 +292,7 @@ sub list {
         if ( $dir ~~ ["ASC", "DESC"] ) {
             if ( $sort ~~ ["title", "maingroup_shortcut", "fascicle_shortcut", "headline_shortcut", "created",
                            "rubric_shortcut", "pages", "manager_shortcut", "progress", "holder_shortcut", "images", "rsize" ] ) {
-                $sql_query .= " ORDER BY $sort $dir ";
+                $sql_query .= " ORDER BY dcm.$sort $dir ";
             }
         }
     }
@@ -303,8 +303,6 @@ sub list {
         push @params, $limit;
         push @params, $start;
     }
-
-    #die $sql_query;
 
     my $result = $c->sql->Q($sql_query, \@params)->Hashes;
 

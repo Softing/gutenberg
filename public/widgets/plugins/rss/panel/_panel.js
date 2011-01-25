@@ -2,25 +2,19 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
 
-        this.access = {};
-        this.record = {};
-
-        this.title = _("Rss");
         this.initialized = false;
 
         this.urls = {
-            "read":   _url("/documents/rss/read/"),
-            "update": _url("/documents/rss/update/")
+            "read":   _url("/rss/read/"),
+            "update": _url("/rss/update/")
         }
 
         this.children = {
             "form": new Inprint.plugins.rss.profile.Form({
-                parent: this,
-                oid: this.oid
+                parent: this
             }),
             "grid": new Inprint.plugins.rss.profile.Grid({
-                parent: this,
-                oid: this.oid
+                parent: this
             })
         }
 
@@ -44,6 +38,19 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
                 scope:this,
                 handler: this.cmpUpload
             },
+
+            //"|",
+            //{
+            //    icon: _ico("printer"),
+            //    cls: "x-btn-text-icon",
+            //    text: _("Published"),
+            //    disabled:true,
+            //    ref: "../btnPublish",
+            //    scope:this,
+            //    pressed: false,
+            //    enableToggle: true,
+            //    toggleHandler: this.cmpPublish
+            //},
 
             "->",
             {
@@ -76,42 +83,67 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
 
     onRender: function() {
         Inprint.plugins.rss.Profile.superclass.onRender.apply(this, arguments);
+
+        this.grid = this.children["grid"];
         this.form = this.children["form"].getForm();
         this.form.url = this.urls["update"];
-        this.on("activate", function() {
-            this.cmpInitialize();
+
+        this.children["form"].on("actioncomplete", function (form, action) {
+            if (action.type == "submit") {
+                //this.children["grid"].getStore().reload();
+            }
         }, this);
+
     },
 
-    cmpInitialize: function() {
-        if (this.initialized == true) {
-            return;
-        }
-        this.cmpFill();
-    },
+    cmpFill: function(id) {
 
-    cmpFill: function() {
+        this.oid = id;
+
+        this.form.reset();
+        this.form.baseParams = {
+            document: id
+        };
+
+        this.cmpAccess();
+        this.getEl().mask(_("Loading") + "...");
+
         this.form.load({
             url: this.urls["read"],
             scope:this,
             params: {
-                document: this.oid
+                document: id
             },
             success: function(form, action) {
                 this.initialized = true;
-                this.record = action.result.data;
+                this.cmpAccess(action.result.data.access);
+                if (action.result.data.published) {
+                    this.btnPublish.toggle(true);
+                } else {
+                    this.btnPublish.toggle(false);
+                }
             }
         });
+
+        this.grid.getStore().baseParams = { oid: id };
+        this.grid.getStore().reload();
+
     },
 
     cmpAccess: function(access) {
-        this.access = access;
-        _disable(this.btnSave);
-        if (access["documents.update"] == true) this.btnSave.enable();
+        _disable(this.btnSave, this.btnUpload, this.btnPublish);
+        if (access && access["rss"] == true) {
+            _enable(this.btnSave, this.btnUpload, this.btnPublish);
+            this.getEl().unmask();
+        } else {
+            this.getEl().mask(_("Access denide"));
+        }
     },
 
     cmpSave: function() {
+        this.getEl().mask(_("Saving")+"...");
         this.form.submit();
+        this.getEl().unmask();
     },
 
     cmpUpload: function() {
@@ -163,6 +195,22 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
         });
 
         Uploader.show();
+
+    },
+
+    cmpPublish: function(btn, tgl) {
+
+        var url = _url("/rss/publish/");
+        if (tgl == false) {
+            url = _url("/rss/unpublish/");
+        }
+
+        Ext.Ajax.request({
+            url: url,
+            scope:this,
+            success: this.cmpReload,
+            params: { id: this.oid }
+        });
 
     }
 

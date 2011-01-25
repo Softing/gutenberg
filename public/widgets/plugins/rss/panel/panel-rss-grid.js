@@ -3,7 +3,8 @@ Inprint.plugins.rss.profile.Grid = Ext.extend(Ext.grid.GridPanel, {
     initComponent: function() {
 
         this.store = new Ext.data.JsonStore({
-            idProperty: 'id',
+            autoLoad:false,
+            url: _url('/rss/files/'),
             fields: ['id','name','size','status','progress']
         });
 
@@ -14,10 +15,12 @@ Inprint.plugins.rss.profile.Grid = Ext.extend(Ext.grid.GridPanel, {
         ];
 
         Ext.apply(this, {
+            flex:1,
             xtype:'grid',
-            width:300,
             border:false,
             enableHdMenu:false,
+            maskDisabled: true,
+            loadMask: false,
             bodyStyle: "padding:5px 5px"
         });
 
