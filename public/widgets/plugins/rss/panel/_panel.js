@@ -117,11 +117,11 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
             success: function(form, action) {
                 this.initialized = true;
                 this.cmpAccess(action.result.data.access);
-                if (action.result.data.published) {
-                    this.btnPublish.toggle(true);
-                } else {
-                    this.btnPublish.toggle(false);
-                }
+                //if (action.result.data.published) {
+                //    this.btnPublish.toggle(true);
+                //} else {
+                //    this.btnPublish.toggle(false);
+                //}
             }
         });
 
@@ -167,17 +167,17 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
             height:180,
             extraPostData: {
                 sid: Session,
-                document: this.parent.document
+                document: this.oid
             },
-            flashUploadUrl:_url("/documents/files/upload/"),
-            standardUploadUrl:_url("/documents/files/upload/"),
-            xhrUploadUrl:_url("/documents/files/upload/"),
-            awesomeUploaderRoot: "/plugins/uploader/",
+            xhrUploadUrl: _url("/rss/upload/"),
+            flashUploadUrl: _url("/rss/upload/"),
+            standardUploadUrl: _url("/rss/upload/"),
+            awesomeUploaderRoot: _url("/rss/uploader/"),
             listeners:{
                 scope:this,
                 fileupload:function(uploader, success, result){
                     if(success){
-                        this.cmpReload();
+                        alert("success");
                     }
                 }
             }

@@ -165,7 +165,7 @@ sub headlines {
 
     unless (@errors) {
         $result = $c->sql->Q("
-            SELECT DISTINCT id, title FROM fascicles_indx_headlines
+            SELECT DISTINCT tag as id, title FROM fascicles_indx_headlines
             WHERE fascicle=?
             ORDER BY title",
             [ $i_fascicle ])->Hashes;
@@ -197,12 +197,18 @@ sub rubrics {
             unless ($fascicle->{id});
     }
 
+    my $headline; unless (@errors) {
+        $headline = $c->sql->Q(" SELECT * FROM fascicles_indx_headlines WHERE fascicle=? AND tag=? ", [ $i_fascicle, $i_headline ])->Hash;
+        push @errors, { id => "headline", msg => "Incorrectly filled field"}
+            unless ($headline->{id});
+    }
+
     unless (@errors) {
         $result = $c->sql->Q("
-            SELECT DISTINCT id, title FROM fascicles_indx_rubrics
+            SELECT DISTINCT tag as id, title FROM fascicles_indx_rubrics
             WHERE fascicle=? AND headline = ?
             ORDER BY title",
-            [ $i_fascicle, $i_headline ])->Hashes;
+            [ $fascicle->{id}, $headline->{id} ])->Hashes;
     }
 
     $success = $c->json->true unless (@errors);

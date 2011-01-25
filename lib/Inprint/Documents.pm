@@ -12,6 +12,8 @@ use File::Copy::Recursive qw(fcopy rcopy dircopy fmove rmove dirmove);
 
 use Inprint::Utils;
 use Inprint::Utils::Files;
+
+use Inprint::Models::Tag;
 use Inprint::Models::Fascicle::Headline;
 use Inprint::Models::Fascicle::Rubric;
 
@@ -618,7 +620,7 @@ sub create {
         if ($i_headline) {
 
             $headline = $c->sql->Q("
-                SELECT * FROM fascicles_indx_headlines WHERE fascicle=? AND id=? ",
+                SELECT * FROM fascicles_indx_headlines WHERE fascicle=? AND tag=? ",
                 [ $fascicle->{id}, $i_headline ])->Hash;
 
             push @errors, { id => "headline", msg => "Object not found"}
@@ -632,7 +634,7 @@ sub create {
         if ($i_rubric) {
 
             $rubric = $c->sql->Q("
-                SELECT * FROM fascicles_indx_rubrics WHERE fascicle=? AND id=? ",
+                SELECT * FROM fascicles_indx_rubrics WHERE fascicle=? AND tag=? ",
                 [ $fascicle->{id}, $i_rubric ])->Hash;
 
             push @errors, { id => "rubric", msg => "Object not found"}
@@ -644,17 +646,19 @@ sub create {
     unless ( @errors ) {
 
         if ($headline->{id}) {
+            my $tag = Inprint::Models::Tag::getById($c, $headline->{tag});
             push @fields, "headline";
             push @fields, "headline_shortcut";
-            push @data, $headline->{id};
-            push @data, $headline->{title};
+            push @data, $tag->{id};
+            push @data, $tag->{title};
         }
 
         if ($headline->{id} && $rubric->{id}) {
+            my $tag = Inprint::Models::Tag::getById($c, $rubric->{tag});
             push @fields, "rubric";
             push @fields, "rubric_shortcut";
-            push @data, $rubric->{id};
-            push @data, $rubric->{title};
+            push @data, $tag->{id};
+            push @data, $tag->{title};
         }
 
     }
@@ -771,7 +775,7 @@ sub update {
     my $headline; unless ( @errors ) {
         if ($i_headline) {
             $headline = $c->sql->Q("
-                SELECT * FROM fascicles_indx_headlines WHERE fascicle=? AND id=? ",
+                SELECT * FROM fascicles_indx_headlines WHERE fascicle=? AND tag=? ",
                 [ $document->{fascicle}, $i_headline ])->Hash;
             push @errors, { id => "headline", msg => "Object not found"}
                 unless ($headline->{id});
@@ -781,7 +785,7 @@ sub update {
     my $rubric; unless ( @errors ) {
         if ($i_rubric) {
             $rubric = $c->sql->Q("
-                SELECT * FROM fascicles_indx_rubrics WHERE fascicle=? AND id=? ",
+                SELECT * FROM fascicles_indx_rubrics WHERE fascicle=? AND tag=? ",
                 [ $document->{fascicle}, $i_rubric ])->Hash;
             push @errors, { id => "rubric", msg => "Object not found"}
                 unless ($rubric->{id});
@@ -802,13 +806,15 @@ sub update {
 
         # Update headline and rubric
         if ($headline->{id}) {
-            $c->sql->Do(" UPDATE documents SET headline=?, headline_shortcut=? WHERE id=? ", [ $headline->{id}, $headline->{title}, $document->{id} ]);
+            my $tag = Inprint::Models::Tag::getById($c, $headline->{tag});
+            $c->sql->Do(" UPDATE documents SET headline=?, headline_shortcut=? WHERE id=? ", [ $tag->{id}, $tag->{title}, $document->{id} ]);
         } else {
             $c->sql->Do(" UPDATE documents SET headline=null, headline_shortcut=null WHERE id=? ", [ $document->{id} ]);
         }
 
         if ($headline->{id} && $rubric->{id}) {
-            $c->sql->Do(" UPDATE documents SET rubric=?, rubric_shortcut=? WHERE id=? ", [ $rubric->{id}, $rubric->{title}, $document->{id} ]);
+            my $tag = Inprint::Models::Tag::getById($c, $rubric->{tag});
+            $c->sql->Do(" UPDATE documents SET rubric=?, rubric_shortcut=? WHERE id=? ", [ $tag->{id}, $tag->{title}, $document->{id} ]);
         } else {
             $c->sql->Do(" UPDATE documents SET rubric=null, rubric_shortcut=null WHERE id=? ", [ $document->{id} ]);
         }
@@ -1070,8 +1076,8 @@ sub move {
     push @errors, { id => "edition", msg => "Can't find object"}
         unless ( $edition->{id} || $edition->{shortcut} );
 
-    my $headline = Inprint::Models::Fascicle::Headline::read($c, $i_headline);
-    my $rubric   = Inprint::Models::Fascicle::Rubric::read($c, $i_rubric);
+    #my $headline = Inprint::Models::Fascicle::Headline::findByTag($c, $fascicle->{id}, $i_headline);
+    #my $rubric   = Inprint::Models::Fascicle::Rubric::findByTag($c, $fascicle->{id}, $headline->{id}, $i_rubric);
 
     unless (@errors) {
 
@@ -1092,10 +1098,11 @@ sub move {
 
             # Update indexation
             if ($i_change eq "yes") {
-                $c->reindex($document->{id}, $edition->{id}, $fascicle->{id}, $headline->{id}, $rubric->{id});
-            } else {
-                $c->reindex($document->{id}, $edition->{id}, $fascicle->{id}, $document->{headline}, $document->{rubric});
+                $c->reindex($document->{id}, $edition->{id}, $fascicle->{id}, $i_headline, $i_rubric);
             }
+            #else {
+            #    $c->reindex($document->{id}, $edition->{id}, $fascicle->{id}, $document->{headline}, $document->{rubric});
+            #}
 
         }
     }
@@ -1199,11 +1206,11 @@ sub copy {
                     $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $new_id ]);
 
                     # Change Index
-                    if ($headline->{id}) {
-                        $c->reindex($document->{id}, $edition->{id}, $fascicle->{id}, $headline->{id}, $rubric->{id});
-                    } else {
-                        $c->reindex($document->{id}, $edition->{id}, $fascicle->{id}, $document->{headline}, $document->{rubric});
-                    }
+                    #if ($headline->{id}) {
+                        $c->reindex($document->{id}, $edition->{id}, $fascicle->{id}, $headline_id, $rubric_id);
+                    #} else {
+                    #    $c->reindex($document->{id}, $edition->{id}, $fascicle->{id}, $document->{headline}, $document->{rubric});
+                    #}
 
                     $c->sql->et();
                 }
@@ -1235,8 +1242,8 @@ sub duplicate {
         my $edition  = Inprint::Utils::GetEditionById($c, id => $fascicle->{edition});
         next unless $edition->{id};
 
-        my $headline = Inprint::Utils::GetHeadlineById($c, id => $headline_id);
-        my $rubric   = Inprint::Utils::GetRubricById($c,   id => $rubric_id);
+        #my $headline = Inprint::Utils::GetHeadlineById($c, id => $headline_id);
+        #my $rubric   = Inprint::Utils::GetRubricById($c,   id => $rubric_id);
 
         foreach my $document_id (@ids) {
 
@@ -1314,11 +1321,11 @@ sub duplicate {
                 $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $new_id ]);
 
                 # Indexation
-                if ($headline->{id}) {
-                    $c->reindex($document->{id}, $edition->{id}, $fascicle->{id}, $headline->{id}, $rubric->{id});
-                } else {
-                    $c->reindex($document->{id}, $edition->{id}, $fascicle->{id}, $document->{headline}, $document->{rubric});
-                }
+                #if ($headline->{id}) {
+                    $c->reindex($document->{id}, $edition->{id}, $fascicle->{id}, $headline_id, $rubric_id);
+                #} else {
+                #    $c->reindex($document->{id}, $edition->{id}, $fascicle->{id}, $document->{headline}, $document->{rubric});
+                #}
 
                 # Datastore
 
@@ -1476,7 +1483,7 @@ sub reindex {
             SELECT t1.id, t1.edition, t1.fascicle,
                 t2.id as tag, t2.title, t2.description
             FROM fascicles_indx_headlines t1, indx_tags t2
-            WHERE t1.tag=t2.id AND t1.id=? ",
+            WHERE t1.tag=t2.id AND t1.tag=? ",
             [ $headline ])->Hash;
 
         if ($old_headline->{id}) {
@@ -1504,7 +1511,7 @@ sub reindex {
             SELECT t1.id, t1.edition, t1.fascicle,
                 t2.id as tag, t2.title, t2.description
             FROM fascicles_indx_rubrics t1, indx_tags t2
-            WHERE t1.tag=t2.id AND t1.id=? ",
+            WHERE t1.tag=t2.id AND t1.tag=? ",
             [ $rubric ])->Hash;
 
         if ($old_rubric->{id}) {
@@ -1529,11 +1536,13 @@ sub reindex {
     # update
 
     if ($new_headline->{id}) {
-        $c->sql->Do(" UPDATE documents SET headline=?, headline_shortcut=? WHERE id=? ", [ $new_headline->{id}, $new_headline->{title}, $document ]);
+        my $tag = Inprint::Models::Tag::getById($c, $new_headline->{tag});
+        $c->sql->Do(" UPDATE documents SET headline=?, headline_shortcut=? WHERE id=? ", [ $tag->{id}, $tag->{title}, $document ]);
     }
 
     if ($new_rubric->{id}) {
-        $c->sql->Do(" UPDATE documents SET rubric=?, rubric_shortcut=? WHERE id=? ", [ $new_rubric->{id}, $new_rubric->{title}, $document ]);
+        my $tag = Inprint::Models::Tag::getById($c, $new_rubric->{tag});
+        $c->sql->Do(" UPDATE documents SET rubric=?, rubric_shortcut=? WHERE id=? ", [ $tag->{id}, $tag->{title}, $document ]);
     }
 
 

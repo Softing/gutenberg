@@ -42,6 +42,16 @@ sub read {
     return $result;
 }
 
+sub findByTag {
+    my $c = shift;
+    my ($fascicle, $headline, $tag) = shift;
+    my $result = $c->sql->Q("
+        SELECT id, edition, headline, tag, title, description, created, updated
+        FROM fascicles_indx_rubrics WHERE fascicle=? AND headline=? AND tag=? ",
+        [ $fascicle, $headline, $tag ])->Hash;
+    return $result;
+}
+
 sub update {
     my $c = shift;
     my ($id, $edition, $fascicle, $headline, $bydefault, $title, $description ) = @_;

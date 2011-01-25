@@ -27,4 +27,15 @@ sub getByTitle {
     return $tag;
 }
 
+sub getById {
+    my $c = shift;
+    my ($id) = @_;
+
+    my $tag = $c->sql->Q("
+        SELECT id, title FROM indx_tags WHERE id=? ",
+        [ $id ])->Hash;
+
+    return $tag;
+}
+
 1;

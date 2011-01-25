@@ -10,7 +10,7 @@ Inprint.cmp.CreateDocument.Access = function(parent, form) {
         }
         if(terms["editions.documents.assign"]) {
             form.getForm().findField("fascicle").enable();
-            form.getForm().findField("headline").enable();
+            //form.getForm().findField("headline").enable();
         }
     });
 

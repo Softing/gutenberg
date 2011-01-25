@@ -36,12 +36,20 @@ sub create {
 sub read {
     my $c = shift;
     my $id = shift;
-
     my $result = $c->sql->Q("
         SELECT id, edition, fascicle, tag, title, description, bydefault, created, updated
         FROM fascicles_indx_headlines WHERE id=? ",
         [ $id ])->Hash;
+    return $result;
+}
 
+sub findByTag {
+    my $c = shift;
+    my ($fascicle, $tag) = shift;
+    my $result = $c->sql->Q("
+        SELECT id, edition, fascicle, tag, title, description, bydefault, created, updated
+        FROM fascicles_indx_headlines WHERE fascicle=? AND tag=? ",
+        [ $fascicle, $tag ])->Hash;
     return $result;
 }
 
