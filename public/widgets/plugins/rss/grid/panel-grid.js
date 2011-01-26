@@ -130,7 +130,7 @@ Inprint.plugins.rss.Grid = Ext.extend(Ext.grid.GridPanel, {
             function(btn) {
                 if (btn == "yes") {
                     Ext.Ajax.request({
-                        url: _url("/rss/publish/"),
+                        url: _url("/plugin/rss/publish/"),
                         scope:this,
                         success: this.cmpReload,
                         params: { id: this.getValues("id") }
@@ -146,7 +146,7 @@ Inprint.plugins.rss.Grid = Ext.extend(Ext.grid.GridPanel, {
             function(btn) {
                 if (btn == "yes") {
                     Ext.Ajax.request({
-                        url: _url("/rss/unpublish/"),
+                        url: _url("/plugin/rss/unpublish/"),
                         scope:this,
                         success: this.cmpReload,
                         params: { id: this.getValues("id") }
