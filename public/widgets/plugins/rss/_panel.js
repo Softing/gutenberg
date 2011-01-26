@@ -46,8 +46,8 @@ Inprint.plugins.rss.Panel = Ext.extend(Ext.Panel, {
 
 });
 
-Inprint.registry.register("documents-rss", {
+Inprint.registry.register("plugin-rss", {
     icon: "feed",
-    text:  _("Rss feeds"),
+    text:  _("RSS feeds"),
     xobject: Inprint.plugins.rss.Panel
 });

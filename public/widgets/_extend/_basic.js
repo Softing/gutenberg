@@ -62,7 +62,7 @@ Ext.Ajax.on('requestexception', function(conn, response, options) {
     var errorText = _("Error communicating with server");
     var jsonData = Ext.util.JSON.decode(response.responseText);
 
-    if (jsonData.error) {
+    if (jsonData && jsonData.error) {
         errorText = jsonData.error;
         errorText = errorText.replace(/%br%/g, "<br/>");
     }
@@ -157,6 +157,13 @@ _FLD_DESCRIPTION = {
     name: "description",
     fieldLabel: _("Description"),
     emptyText: _("Description")
+};
+
+_FLD_URL = {
+    xtype: "textfield",
+    allowBlank:false,
+    name: "url",
+    fieldLabel: _("URL")
 };
 
 _FLD_COLOR = {

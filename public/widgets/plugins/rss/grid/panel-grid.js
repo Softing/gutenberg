@@ -8,7 +8,7 @@ Inprint.plugins.rss.Grid = Ext.extend(Ext.grid.GridPanel, {
         this.components = {};
 
         this.urls = {
-            "list":       "/rss/list/"
+            "list": _url("/plugin/rss/list/")
         }
 
         var fields = Inprint.factory.StoreFields["/documents/list/"];
@@ -19,7 +19,7 @@ Inprint.plugins.rss.Grid = Ext.extend(Ext.grid.GridPanel, {
                 autoLoad:true,
                 remoteSort: true,
                 totalProperty: 'total',
-                url: _url('/rss/list/'),
+                url: this.urls["list"],
                 baseParams: { flt_rssonly: false },
                 fields: fields
             })

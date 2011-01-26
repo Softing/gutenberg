@@ -107,14 +107,14 @@ Inprint.catalog.organization.Grid = Ext.extend(Ext.grid.GridPanel, {
                     {
                         disabled:true,
                         icon: _ico("card--pencil"),
-                        cls: "x-bt  n-text-icon",
+                        cls: "x-btn-text-icon",
                         text: _("Edit"),
                         ref: "../../btnUpdateProfile"
                     },
                     {
                         disabled:true,
                         icon: _ico("key-solid"),
-                        cls: "x-bt  n-text-icon",
+                        cls: "x-btn-text-icon",
                         text: _("Rights"),
                         ref: "../../btnManageRules"
                     }

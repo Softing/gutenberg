@@ -4,7 +4,7 @@ Inprint.plugins.rss.profile.Grid = Ext.extend(Ext.grid.GridPanel, {
 
         this.store = new Ext.data.JsonStore({
             autoLoad:false,
-            url: _url('/rss/files/'),
+            url: _url('/plugin/rss/files/'),
             fields: ['id','name','size','status','progress']
         });
 

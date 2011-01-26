@@ -66,7 +66,7 @@ sub index
 
         push @{ $documents->{menu} }, { id => "documents-recycle" };
 
-        push @{ $documents->{menu} }, { id => "documents-rss" };
+        push @{ $documents->{menu} }, { id => "plugin-rss" };
 
         push @result, $documents;
         push @result, "-";
@@ -270,6 +270,7 @@ sub index
     my $accessViewSettings = $c->access->Check("domain.configuration.view");
 
     if ($accessViewSettings) {
+
         my $settings = {
             id => "settings"
         };
@@ -279,6 +280,7 @@ sub index
         push @{ $settings->{menu} }, { id => "settings-roles" };
         push @{ $settings->{menu} }, { id => "settings-readiness" };
         push @{ $settings->{menu} }, { id => "settings-index" };
+        push @{ $settings->{menu} }, { id => "plugin-rss-control" };
 
         push @result, $settings;
     }

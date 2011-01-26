@@ -169,15 +169,6 @@ sub startup {
     $self->createRoutes($sessionBridge, "options/combos",
         [ "capture-destination" ]);
 
-    # RSS routes
-    $postinitBridge->route('/rss/:feed')->to('rss#feed');
-    $sessionBridge->route('/rss/list/')->to('rss#list');
-    $sessionBridge->route('/rss/files/')->to('rss#files');
-    $sessionBridge->route('/rss/read/')->to('rss#read');
-    $sessionBridge->route('/rss/update/')->to('rss#update');
-    $sessionBridge->route('/rss/publish/')->to('rss#publish');
-    $sessionBridge->route('/rss/unpublish/')->to('rss#unpublish');
-
     # State route
     $self->createRoutes($sessionBridge, "state",
         [ "index", "read", "update" ]);
@@ -193,6 +184,24 @@ sub startup {
 
     # Main route
     $sessionBridge->route('/')->to('workspace#index');
+
+    # Plugin RSS routes
+    $postinitBridge->route('/plugin/rss/:feed')->to('plugins-rss#feed');
+    $sessionBridge->route('/plugin/rss/list/')->to('plugins-rss#list');
+    $sessionBridge->route('/plugin/rss/files/')->to('plugins-rss#files');
+    $sessionBridge->route('/plugin/rss/read/')->to('plugins-rss#read');
+    $sessionBridge->route('/plugin/rss/update/')->to('plugins-rss#update');
+    $sessionBridge->route('/plugin/rss/publish/')->to('plugins-rss#publish');
+    $sessionBridge->route('/plugin/rss/unpublish/')->to('plugins-rss#unpublish');
+
+    $sessionBridge->route('/plugin/rss/control/create/')->to('plugins-rss-control#create');
+    $sessionBridge->route('/plugin/rss/control/read/')->to('plugins-rss-control#read');
+    $sessionBridge->route('/plugin/rss/control/update/')->to('plugins-rss-control#update');
+    $sessionBridge->route('/plugin/rss/control/delete/')->to('plugins-rss-control#delete');
+    $sessionBridge->route('/plugin/rss/control/list/')->to('plugins-rss-control#list');
+    $sessionBridge->route('/plugin/rss/control/tree/')->to('plugins-rss-control#tree');
+    $sessionBridge->route('/plugin/rss/control/save/')->to('plugins-rss-control#save');
+    $sessionBridge->route('/plugin/rss/control/fill/')->to('plugins-rss-control#fill');
 
     return $self;
 }

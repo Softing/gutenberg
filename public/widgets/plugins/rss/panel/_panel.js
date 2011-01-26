@@ -5,8 +5,7 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
         this.initialized = false;
 
         this.urls = {
-            "read":   _url("/rss/read/"),
-            "update": _url("/rss/update/")
+            "read":   _url("/plugin/rss/read/")
         }
 
         this.children = {
@@ -86,7 +85,6 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
 
         this.grid = this.children["grid"];
         this.form = this.children["form"].getForm();
-        this.form.url = this.urls["update"];
 
         this.children["form"].on("actioncomplete", function (form, action) {
             if (action.type == "submit") {

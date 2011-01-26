@@ -15,13 +15,13 @@ sub index {
     my $c = shift;
     my @terms     = $c->param("term");
     my $binding  = $c->param("binding");
-    
+
     if ($binding eq 'domain') {
         $binding = '00000000-0000-0000-0000-000000000000';
     }
-    
+
     my $result = {};
-    
+
     foreach my $term (@terms) {
         my $exists = $c->access->Check($term, $binding);
         my ($prefix, $suffix) = split /:/, $term;
@@ -31,7 +31,7 @@ sub index {
             $result->{$prefix} = $c->json->false;
         }
     }
-    
+
     return $c->render_json({
         success => $c->json->true,
         result  => $result

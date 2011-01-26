@@ -1,4 +1,4 @@
-package Inprint::Rss;
+package Inprint::Plugins::Rss;
 
 # Inprint Content 4.5
 # Copyright(c) 2001-2010, Softing, LLC.
