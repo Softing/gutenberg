@@ -42,7 +42,7 @@ sub tree {
         foreach my $item (@$data) {
             my $record = {
                 id   => $item->{id},
-                text => $item->{title},
+                text => $item->{title} . " (". $item->{url} .")",
                 leaf => $c->json->true,
                 icon => "feed",
                 data => $item
@@ -80,7 +80,6 @@ sub list {
                             AND indx.id <> '00000000-0000-0000-0000-000000000000'
                     ) as leaf
                 FROM editions edtns
-                WHERE id <> '00000000-0000-0000-0000-000000000000'
                 ORDER BY edtns.shortcut
             ", [])->Hashes;
 
@@ -118,7 +117,7 @@ sub list {
                     title => $headline->{title},
                     description => $headline->{description},
                     _id => $headline->{tag} . "::headline",
-                    _parent => $edition->{id},
+                    _parent => $edition->{id} . "::edition",
                     _is_leaf => $headline->{leaf}? $c->json->false : $c->json->true
                 };
 
@@ -139,7 +138,7 @@ sub list {
                         title => $rubric->{title},
                         description => $rubric->{description},
                         _id => $rubric->{tag} . "::rubric",
-                        _parent => $headline->{id},
+                        _parent => $headline->{id} . "::headline",
                         _is_leaf => $c->json->true
                     };
 
