@@ -186,7 +186,8 @@ sub startup {
     $sessionBridge->route('/')->to('workspace#index');
 
     # Plugin RSS routes
-    $postinitBridge->route('/plugin/rss/:feed')->to('plugins-rss#feed');
+    $postinitBridge->route('/plugin/rss/feeds/')->to('plugins-rss#feeds');
+    $postinitBridge->route('/plugin/rss/feeds/:feed')->to('plugins-rss#feed');
     $sessionBridge->route('/plugin/rss/list/')->to('plugins-rss#list');
     $sessionBridge->route('/plugin/rss/files/')->to('plugins-rss#files');
     $sessionBridge->route('/plugin/rss/read/')->to('plugins-rss#read');
