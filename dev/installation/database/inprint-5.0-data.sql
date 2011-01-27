@@ -98,9 +98,6 @@ VALUES ('6d590a90-58a1-447f-b5ad-e3c62f80a2ef', 'catalog', 'documents', 'briefca
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
 VALUES ('6d590a90-58a1-447f-b5ad-b0582b64571a', 'catalog', 'documents', 'discuss', 140, 'Can discuss the documents', 'key', '');
 
-INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
-VALUES ('b98fb3fd-2593-44c8-bcd8-12da48693ef7', 'catalog', 'documents', 'rss', 150, 'Can manage rss', 'key', '');
-
 -------------------------------------------------------------------------------------------------
 -- Defaults
 -------------------------------------------------------------------------------------------------
@@ -274,4 +271,3 @@ UPDATE rules SET sortorder=110, title = 'Может передавать мат�
 UPDATE rules SET sortorder=120, title = 'Может перемещать материалы между выпусками' WHERE id = 'b7adafe9-2d5b-44f3-aa87-681fd48466fa';
 UPDATE rules SET sortorder=130, title = 'Может перемещать материалы в портфель' WHERE id = '6d590a90-58a1-447f-b5ad-e3c62f80a2ef';
 UPDATE rules SET sortorder=140, title = 'Может учавствовать в обсуждении материалов' WHERE id = '6d590a90-58a1-447f-b5ad-b0582b64571a';
-UPDATE rules SET sortorder=150, title = 'Может редактировать RSS' WHERE id = 'b98fb3fd-2593-44c8-bcd8-12da48693ef7';
