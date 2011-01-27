@@ -185,24 +185,22 @@ sub startup {
     # Main route
     $sessionBridge->route('/')->to('workspace#index');
 
-    # Plugin RSS routes
-    $postinitBridge->route('/plugin/rss/feeds/')->to('plugins-rss#feeds');
-    $postinitBridge->route('/plugin/rss/feeds/:feed')->to('plugins-rss#feed');
-    $sessionBridge->route('/plugin/rss/list/')->to('plugins-rss#list');
-    $sessionBridge->route('/plugin/rss/files/')->to('plugins-rss#files');
-    $sessionBridge->route('/plugin/rss/read/')->to('plugins-rss#read');
-    $sessionBridge->route('/plugin/rss/update/')->to('plugins-rss#update');
-    $sessionBridge->route('/plugin/rss/publish/')->to('plugins-rss#publish');
-    $sessionBridge->route('/plugin/rss/unpublish/')->to('plugins-rss#unpublish');
+    # Plugin routes
+    my $routes = $sql->Q("SELECT * FROM plugins.routes WHERE route_enabled=true")->Hashes;
+    foreach my $route (@$routes) {
 
-    $sessionBridge->route('/plugin/rss/control/create/')->to('plugins-rss-control#create');
-    $sessionBridge->route('/plugin/rss/control/read/')->to('plugins-rss-control#read');
-    $sessionBridge->route('/plugin/rss/control/update/')->to('plugins-rss-control#update');
-    $sessionBridge->route('/plugin/rss/control/delete/')->to('plugins-rss-control#delete');
-    $sessionBridge->route('/plugin/rss/control/list/')->to('plugins-rss-control#list');
-    $sessionBridge->route('/plugin/rss/control/tree/')->to('plugins-rss-control#tree');
-    $sessionBridge->route('/plugin/rss/control/save/')->to('plugins-rss-control#save');
-    $sessionBridge->route('/plugin/rss/control/fill/')->to('plugins-rss-control#fill');
+        my $url = "/plugin" . $route->{route_url};
+        my $action = $route->{route_controller} ."#". $route->{route_action};
+
+        if ($route->{route_authentication}) {
+            $sessionBridge->route($url)->to($action);
+            print STDERR "with session => $url => $action\n";
+        }
+        unless ($route->{route_authentication}) {
+            $postinitBridge->route($url)->to($action);
+            print STDERR "without session => $url => $action\n";
+        }
+    }
 
     return $self;
 }

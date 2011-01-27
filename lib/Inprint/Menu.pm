@@ -17,29 +17,14 @@ sub index
 {
     my $c = shift;
 
-    sub AddItem {
-        my ($id, $icon, $text, $path, $type) = @_;
-        my $result = {};
-        $result->{id}   = $id   if $id;
-        $result->{icon} = $icon if $icon;
-        $result->{text} = $text if $text;
-        $result->{path} = $path if $path;
-        $result->{type} = $type if $type;
-        return $result;
-    }
-
-    my @result;
-
     # About programm
-    my $about = {
+    my $AboutSection = {
         id => "core",
         menu => [
             { id=> "core-help" },
             { id=> "core-about" }
         ]
     };
-    push @result, $about;
-    push @result, "-";
 
     #
     # Documents menu items
@@ -48,48 +33,32 @@ sub index
     my $accessViewDocuments   = $c->access->Check(["catalog.documents.view:*"]);
     my $accessCreateDocuments = $c->access->Check(["catalog.documents.create:*"]);
 
+    my $DocumentsSection = {
+        id => "documents"
+    };
     if ($accessViewDocuments) {
-
-        my $documents = {
-            id => "documents"
-        };
-
         if ($accessCreateDocuments) {
-            push @{ $documents->{menu} }, { id => "documents-create" };
+            push @{ $DocumentsSection->{menu} }, { id => "documents-create" };
         }
-
-        push @{ $documents->{menu} }, { id => "documents-todo" };
-        push @{ $documents->{menu} }, '-';
-        push @{ $documents->{menu} }, { id => "documents-all" };
-        push @{ $documents->{menu} }, { id => "documents-archive" };
-        push @{ $documents->{menu} }, { id => "documents-briefcase" };
-
-        push @{ $documents->{menu} }, { id => "documents-recycle" };
-
-        push @{ $documents->{menu} }, { id => "plugin-rss" };
-
-        push @result, $documents;
-        push @result, "-";
+        push @{ $DocumentsSection->{menu} }, { id => "documents-todo" };
+        push @{ $DocumentsSection->{menu} }, '-';
+        push @{ $DocumentsSection->{menu} }, { id => "documents-all" };
+        push @{ $DocumentsSection->{menu} }, { id => "documents-archive" };
+        push @{ $DocumentsSection->{menu} }, { id => "documents-briefcase" };
+        push @{ $DocumentsSection->{menu} }, { id => "documents-recycle" };
     }
 
     ############################################################################
     # Advertising
     ############################################################################
 
-    my $advertising = {
+    my $AdvertisingSection = {
         id => "advertising"
     };
-    #push @{ $advertising->{menu} }, { id => "advert-requests" };
-    push @{ $advertising->{menu} }, { id => "advert-advertisers" };
-    push @{ $advertising->{menu} }, "-";
-    push @{ $advertising->{menu} }, { id => "advert-modules" };
-    push @{ $advertising->{menu} }, { id => "advert-index" };
-    #push @{ $advertising->{menu} }, { id => "advert-archive" };
-
-    push @result, $advertising;
-    push @result, "-";
-
-
+    push @{ $AdvertisingSection->{menu} }, { id => "advert-advertisers" };
+    push @{ $AdvertisingSection->{menu} }, "-";
+    push @{ $AdvertisingSection->{menu} }, { id => "advert-modules" };
+    push @{ $AdvertisingSection->{menu} }, { id => "advert-index" };
 
     ############################################################################
     # Fascicles and Composition
@@ -98,19 +67,12 @@ sub index
     my $accessCalendarEditions = $c->access->Check("editions.calendar.view");
     my $accessLayoutEditions   = $c->access->GetBindings("editions.layouts.view");
 
+    my $CalendarSection = {
+        id => "fascicles"
+    };
     if ( $accessCalendarEditions ) {
-        push @result, {
-            id => 'fascicles',
-            menu => [
-                {
-                    id   => "composition-calendar"
-                },
-                {
-                    id   => "briefcase-index",
-                    oid  => "00000000-0000-0000-0000-000000000000"
-                }
-            ]
-        };
+        push @{ $CalendarSection->{menu} }, { id => "composition-calendar" };
+        push @{ $CalendarSection->{menu} }, { id => "briefcase-index", oid  => "00000000-0000-0000-0000-000000000000" };
     }
 
     ## Выбираем выпуски
@@ -131,6 +93,7 @@ sub index
         id => "composition"
     };
 
+    my @FasciclesSection;
     foreach my $fascicle (@$fascicles) {
 
         my $accessLayoutView     = $c->access->Check("editions.layouts.view",   $fascicle->{edition});
@@ -236,54 +199,120 @@ sub index
             push @{ $fascicle_menu->{menu} }, $children_menu;
         }
 
-        push @result, $fascicle_menu;
+        push @FasciclesSection, $fascicle_menu;
 
     }
 
-    push @result, '->';
+
 
     ############################################################################
     # Employee
     ############################################################################
 
-    my $employee = {
+    my $EmployeeSection = {
         id => "employee",
         text => $c->QuerySessionGet("member.shortcut")
     };
-
-    push @{ $employee->{menu} }, { id => "employee-card" };
-    push @{ $employee->{menu} }, { id => "employee-settings" };
-    push @{ $employee->{menu} }, "-";
-    push @{ $employee->{menu} }, { id => "employee-access" };
-    push @{ $employee->{menu} }, { id => "employee-logs" };
-    push @{ $employee->{menu} }, "-";
-    push @{ $employee->{menu} }, { id => "employee-logout" };
-
-    push @result, $employee;
-
-
+    push @{ $EmployeeSection->{menu} }, { id => "employee-card" };
+    push @{ $EmployeeSection->{menu} }, { id => "employee-settings" };
+    push @{ $EmployeeSection->{menu} }, "-";
+    push @{ $EmployeeSection->{menu} }, { id => "employee-access" };
+    push @{ $EmployeeSection->{menu} }, { id => "employee-logs" };
+    push @{ $EmployeeSection->{menu} }, "-";
+    push @{ $EmployeeSection->{menu} }, { id => "employee-logout" };
 
     ############################################################################
     # Settings
     ############################################################################
 
+    my $SettingsSection = {
+        id => "settings"
+    };
     my $accessViewSettings = $c->access->Check("domain.configuration.view");
-
     if ($accessViewSettings) {
-
-        my $settings = {
-            id => "settings"
-        };
-
-        push @{ $settings->{menu} }, { id => "settings-organization" };
-        push @{ $settings->{menu} }, { id => "settings-editions" };
-        push @{ $settings->{menu} }, { id => "settings-roles" };
-        push @{ $settings->{menu} }, { id => "settings-readiness" };
-        push @{ $settings->{menu} }, { id => "settings-index" };
-        push @{ $settings->{menu} }, { id => "plugin-rss-control" };
-
-        push @result, $settings;
+        push @{ $SettingsSection->{menu} }, { id => "settings-organization" };
+        push @{ $SettingsSection->{menu} }, { id => "settings-editions" };
+        push @{ $SettingsSection->{menu} }, { id => "settings-roles" };
+        push @{ $SettingsSection->{menu} }, { id => "settings-readiness" };
+        push @{ $SettingsSection->{menu} }, { id => "settings-index" };
     }
+
+    ############################################################################
+    # Plugins
+    ############################################################################
+
+    my $plugs = $c->sql->Q("SELECT * FROM plugins.menu WHERE menu_enabled=true ORDER BY menu_section, menu_sortorder")->Hashes;
+    foreach my $item (@$plugs) {
+        my $exists = {};
+        if ($item->{menu_section} eq "about") {
+            unless ($exists->{about}) {
+                $exists->{about} = 1;
+                push @{ $AboutSection->{menu} }, "-";
+            }
+            push @{ $AboutSection->{menu} }, { id => $item->{menu_id} };
+        }
+        if ($item->{menu_section} eq "documents") {
+            unless ($exists->{documents}) {
+                $exists->{documents} = 1;
+                push @{ $DocumentsSection->{menu} }, "-";
+            }
+            push @{ $DocumentsSection->{menu} }, { id => $item->{menu_id} };
+        }
+        if ($item->{menu_section} eq "advertisig") {
+            unless ($exists->{advertisig}) {
+                $exists->{advertisig} = 1;
+                push @{ $AdvertisingSection->{menu} }, "-";
+            }
+            push @{ $AdvertisingSection->{menu} }, { id => $item->{menu_id} };
+        }
+        if ($item->{menu_section} eq "calendar") {
+            unless ($exists->{calendar}) {
+                $exists->{calendar} = 1;
+                push @{ $CalendarSection->{menu} }, "-";
+            }
+            push @{ $CalendarSection->{menu} }, { id => $item->{menu_id} };
+        }
+        if ($item->{menu_section} eq "employee") {
+            unless ($exists->{employee}) {
+                $exists->{employee} = 1;
+                push @{ $EmployeeSection->{menu} }, "-";
+            }
+            push @{ $EmployeeSection->{menu} }, { id => $item->{menu_id} };
+        }
+        if ($item->{menu_section} eq "settings") {
+            unless ($exists->{settings}) {
+                $exists->{settings} = 1;
+                push @{ $SettingsSection->{menu} }, "-";
+            }
+            push @{ $SettingsSection->{menu} }, { id => $item->{menu_id} };
+        }
+    }
+
+    ############################################################################
+    # Render Menu
+    ############################################################################
+
+    my @result;
+
+    push @result, $AboutSection;
+    push @result, "-";
+
+    push @result, $DocumentsSection;
+    push @result, "-";
+
+    push @result, $AdvertisingSection;
+    push @result, "-";
+
+    push @result, $CalendarSection if $accessCalendarEditions;
+
+    foreach my $item (@FasciclesSection) {
+        push @result, $item;
+    }
+
+    push @result, '->';
+
+    push @result, $EmployeeSection;
+    push @result, $SettingsSection if $accessViewSettings;
 
     $c->render_json({ data => \@result });
 }
