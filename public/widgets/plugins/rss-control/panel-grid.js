@@ -1,4 +1,4 @@
-Inprint.plugins.rss.control.Grid = Ext.extend(Ext.ux.maximgb.tg.GridPanel, {
+Inprint.plugins.rss.control.Grid = Ext.extend(Ext.grid.GridPanel, {
 
     initComponent: function() {
 
@@ -15,16 +15,17 @@ Inprint.plugins.rss.control.Grid = Ext.extend(Ext.ux.maximgb.tg.GridPanel, {
             {name: 'id'},
             {name: 'title'},
             {name: 'description'},
-            {name: '_id', type: 'int'},
-            {name: '_parent', type: 'auto'},
-            {name: '_is_leaf', type: 'bool'}
+            {name: 'level'},
+            //{name: '_id', type: 'int'},
+            //{name: '_parent', type: 'auto'},
+            //{name: '_is_leaf', type: 'bool'}
         ]);
 
-        var store = new Ext.ux.maximgb.tg.AdjacencyListStore({
+        var store = new Ext.data.Store({
             url: this.urls["load"],
             autoLoad:true,
             reader: new Ext.data.JsonReader({
-                id: '_id',
+                id: 'id',
                 root: 'data',
                 successProperty: 'success'
             }, record )
@@ -47,10 +48,21 @@ Inprint.plugins.rss.control.Grid = Ext.extend(Ext.ux.maximgb.tg.GridPanel, {
         Ext.apply(this, {
             border:false,
             store: store,
-            master_column_id : 'title',
+            //master_column_id : 'title',
             columns: [
                 this.selModel,
-                {id:'title',header: _("Title"), width: 160, sortable: true, dataIndex: 'title'},
+                {id:'title',header: _("Title"), width: 160, sortable: true, dataIndex: 'title',
+                    renderer: function(v, p, r) {
+
+                        if (r.data.level == 1) {
+                            return v;
+                        }
+
+                        var ico = "/ext-3.3.1/resources/images/default/tree/elbow-end.gif";
+                        var padding = r.data.level*2*10 - r.data.level;
+
+                        return "<div style=\"background: url("+ ico +") "+ (padding-22) +"px 1px no-repeat;padding-left:" + padding + "px;\">"+ v +"</div>";
+                    }},
                 {id:'description',header: _("Description"), width: 160, sortable: true, dataIndex: 'description'},
             ],
             stripeRows: true,

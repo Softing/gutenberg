@@ -89,9 +89,10 @@ sub list {
                 id => $edition->{id} . "::edition",
                 title => $edition->{shortcut},
                 description => $edition->{description},
-                _id => $edition->{id} . "::edition",
-                _parent => undef,
-                _is_leaf => $edition->{leaf} ? $c->json->false : $c->json->true
+                level => 1
+                #_id => $edition->{id} . "::edition",
+                #_parent => undef,
+                #_is_leaf => $edition->{leaf} ? $c->json->false : $c->json->true
             };
 
             push @$result, $record;
@@ -116,9 +117,10 @@ sub list {
                     id => $headline->{tag} . "::headline",
                     title => $headline->{title},
                     description => $headline->{description},
-                    _id => $headline->{tag} . "::headline",
-                    _parent => $edition->{id} . "::edition",
-                    _is_leaf => $headline->{leaf}? $c->json->false : $c->json->true
+                    level => 2
+                    #_id => $headline->{tag} . "::headline",
+                    #_parent => $edition->{id} . "::edition",
+                    #_is_leaf => $headline->{leaf}? $c->json->false : $c->json->true
                 };
 
                 push @$result, $record2;
@@ -137,9 +139,10 @@ sub list {
                         id => $rubric->{tag} . "::rubric",
                         title => $rubric->{title},
                         description => $rubric->{description},
-                        _id => $rubric->{tag} . "::rubric",
-                        _parent => $headline->{id} . "::headline",
-                        _is_leaf => $c->json->true
+                        level => 3
+                        #_id => $rubric->{tag} . "::rubric",
+                        #_parent => $headline->{tag} . "::headline",
+                        #_is_leaf => $c->json->true
                     };
 
                     push @$result, $record3;
