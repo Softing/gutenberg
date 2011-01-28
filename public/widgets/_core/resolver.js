@@ -42,7 +42,7 @@ Inprint.ObjectResolver = function() {
             if (item.oid) {
                 panelId += "-" + item.oid;
             }
-            
+
             var panel = objectHash[panelId];
             if (!panel) {
                 panel = this.create(item, panelId);
@@ -66,9 +66,9 @@ Inprint.ObjectResolver = function() {
             if (item.icon) { config.icon = item.icon; }
             if (item.oid) { config.oid = item.oid; }
             if (item.aid) { config.aid = item.aid; }
-            
+
             config.title = this.makeTitle(config.oid, config.aid, config.icon, item.text, item.description);
-            
+
             // Create panel Tools
             var tools = [];
             tools.push({
@@ -100,14 +100,14 @@ Inprint.ObjectResolver = function() {
 
             var panel = new Ext.Panel(config);
             panel.items.first().parent = panel;
-            
+
             // Register the panel
-            
+
             Inprint.layout.getPanel().add(panel);
             panel.taskBtn = Inprint.layout.getTaskbar().addButton({
                 panel: panel,
                 icon:  panel.icon,
-                text:  item.text,
+                text:  Ext.util.Format.ellipsis(_(item.text), 10),
                 description: item.description
             });
             panel.taskBtn.toggle();
@@ -120,29 +120,29 @@ Inprint.ObjectResolver = function() {
         },
 
         makeTitle: function(oid, aid, icon, text, description) {
-            
+
             var title = "<div style=\"padding-left:21px;background:url(" + icon + ") 0px -2px no-repeat;\">";
-            title += text;
+            title += _(text) ;
             title += "&nbsp;<a href=\"?aid="+ aid +"";
-            
+
             if (oid) {
                 title += "&oid=" + oid;
             }
-    
+
             if (text) {
                 title += "&text=" + text;
             }
-            
+
             if (description) {
                 title += "&description=" + description;
             }
-            
+
             title += "\" onClick=\"return false;\">[#]</a>";
             if (description) {
                 title += "&nbsp;-&nbsp;" + description;
             }
             title += "</div>";
-            
+
             return title;
         },
 
