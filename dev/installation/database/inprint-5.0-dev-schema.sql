@@ -2804,6 +2804,17 @@ CREATE TABLE fascicles_tmpl_places (
 
 
 --
+-- Name: filesmask; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE filesmask (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    filepath character varying NOT NULL,
+    created timestamp(6) with time zone DEFAULT now() NOT NULL
+);
+
+
+--
 -- Name: history; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3472,6 +3483,22 @@ ALTER TABLE ONLY fascicles_tmpl_pages
 
 ALTER TABLE ONLY fascicles_tmpl_places
     ADD CONSTRAINT fascicles_tmpl_places_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: filesmask_entity_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY filesmask
+    ADD CONSTRAINT filesmask_entity_key UNIQUE (filepath);
+
+
+--
+-- Name: filesmask_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY filesmask
+    ADD CONSTRAINT filesmask_pkey PRIMARY KEY (id);
 
 
 --
