@@ -182,8 +182,13 @@ sub startup {
     $self->createRoutes($sessionBridge, "menu",                     [ "index" ]);
     $self->createRoutes($sessionBridge, "workspace",                [ "index", "access", "state", "online", "appsession" ]);
 
+    $sessionBridge->route('/files/preview/:id/:size/')->to('files#preview');
+    $sessionBridge->route('/files/download/:id/')->to('files#download');
+
     # Main route
     $sessionBridge->route('/')->to('workspace#index');
+
+
 
     # Plugin routes
     my $routes = $sql->Q("SELECT * FROM plugins.routes WHERE route_enabled=true")->Hashes;
@@ -194,11 +199,11 @@ sub startup {
 
         if ($route->{route_authentication}) {
             $sessionBridge->route($url)->to($action);
-            print STDERR "with session => $url => $action\n";
+            #print STDERR "with session => $url => $action\n";
         }
         unless ($route->{route_authentication}) {
             $postinitBridge->route($url)->to($action);
-            print STDERR "without session => $url => $action\n";
+            #print STDERR "without session => $url => $action\n";
         }
     }
 

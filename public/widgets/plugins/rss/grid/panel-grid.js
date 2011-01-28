@@ -123,7 +123,7 @@ Inprint.plugins.rss.Grid = Ext.extend(Ext.grid.GridPanel, {
         Inprint.plugins.rss.Grid.superclass.onRender.apply(this, arguments);
     },
 
-        cmpPublish: function() {
+    cmpPublish: function() {
         Ext.MessageBox.confirm(
             _("Irreversible removal"),
             _("You can't cancel this action!"),

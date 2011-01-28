@@ -38,19 +38,6 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
                 handler: this.cmpUpload
             },
 
-            //"|",
-            //{
-            //    icon: _ico("printer"),
-            //    cls: "x-btn-text-icon",
-            //    text: _("Published"),
-            //    disabled:true,
-            //    ref: "../btnPublish",
-            //    scope:this,
-            //    pressed: false,
-            //    enableToggle: true,
-            //    toggleHandler: this.cmpPublish
-            //},
-
             "->",
             {
                 icon: _ico("arrow-circle-double"),
@@ -115,15 +102,10 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
             success: function(form, action) {
                 this.initialized = true;
                 this.cmpAccess(action.result.data.access);
-                //if (action.result.data.published) {
-                //    this.btnPublish.toggle(true);
-                //} else {
-                //    this.btnPublish.toggle(false);
-                //}
             }
         });
 
-        this.grid.getStore().baseParams = { oid: id };
+        this.grid.getStore().baseParams = { document: id };
         this.grid.getStore().reload();
 
     },
@@ -167,10 +149,10 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
                 sid: Session,
                 document: this.oid
             },
-            xhrUploadUrl: _url("/rss/upload/"),
-            flashUploadUrl: _url("/rss/upload/"),
-            standardUploadUrl: _url("/rss/upload/"),
-            awesomeUploaderRoot: _url("/rss/uploader/"),
+            xhrUploadUrl: _url("/plugin/rss/files/upload/"),
+            flashUploadUrl: _url("/plugin/rss/files/upload/"),
+            standardUploadUrl: _url("/plugin/rss/files/upload/"),
+            awesomeUploaderRoot: _url("/plugins/uploader/"),
             listeners:{
                 scope:this,
                 fileupload:function(uploader, success, result){
@@ -193,22 +175,6 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
         });
 
         Uploader.show();
-
-    },
-
-    cmpPublish: function(btn, tgl) {
-
-        var url = _url("/rss/publish/");
-        if (tgl == false) {
-            url = _url("/rss/unpublish/");
-        }
-
-        Ext.Ajax.request({
-            url: url,
-            scope:this,
-            success: this.cmpReload,
-            params: { id: this.oid }
-        });
 
     }
 
