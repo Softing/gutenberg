@@ -10,6 +10,13 @@ SET client_min_messages = warning;
 SET escape_string_warning = off;
 
 --
+-- Name: plugins; Type: SCHEMA; Schema: -; Owner: -
+--
+
+CREATE SCHEMA plugins;
+
+
+--
 -- Name: plpgsql; Type: PROCEDURAL LANGUAGE; Schema: -; Owner: -
 --
 
@@ -2077,7 +2084,72 @@ CREATE OPERATOR CLASS ltree_ops
     FUNCTION 1 ltree_cmp(ltree,ltree);
 
 
+SET search_path = plugins, pg_catalog;
+
 SET default_with_oids = false;
+
+--
+-- Name: l18n; Type: TABLE; Schema: plugins; Owner: -
+--
+
+CREATE TABLE l18n (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    plugin character varying NOT NULL,
+    l18n_language character varying NOT NULL,
+    l18n_original character varying NOT NULL,
+    l18n_translation character varying NOT NULL
+);
+
+
+--
+-- Name: menu; Type: TABLE; Schema: plugins; Owner: -
+--
+
+CREATE TABLE menu (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    plugin character varying NOT NULL,
+    menu_section character varying NOT NULL,
+    menu_id character varying NOT NULL,
+    menu_sortorder integer DEFAULT 0 NOT NULL,
+    menu_enabled boolean DEFAULT false NOT NULL
+);
+
+
+--
+-- Name: routes; Type: TABLE; Schema: plugins; Owner: -
+--
+
+CREATE TABLE routes (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    plugin character varying NOT NULL,
+    route_url character varying NOT NULL,
+    route_controller character varying NOT NULL,
+    route_action character varying NOT NULL,
+    route_name character varying,
+    route_enabled boolean DEFAULT false NOT NULL,
+    route_authentication boolean DEFAULT true NOT NULL
+);
+
+
+--
+-- Name: rules; Type: TABLE; Schema: plugins; Owner: -
+--
+
+CREATE TABLE rules (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    plugin character varying NOT NULL,
+    rule_term character varying NOT NULL,
+    rule_section character varying,
+    rule_subsection character varying,
+    rule_icon character varying NOT NULL,
+    rule_title character varying NOT NULL,
+    rule_description character varying NOT NULL,
+    rule_sortorder integer DEFAULT 0 NOT NULL,
+    rule_enabled boolean DEFAULT false NOT NULL
+);
+
+
+SET search_path = public, pg_catalog;
 
 --
 -- Name: ad_advertisers; Type: TABLE; Schema: public; Owner: -
@@ -2972,6 +3044,7 @@ CREATE TABLE rss_feeds (
 CREATE TABLE rss_feeds_mapping (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
     feed uuid NOT NULL,
+    nature character varying NOT NULL,
     tag uuid NOT NULL
 );
 
@@ -3092,6 +3165,74 @@ ALTER TABLE ad_requests ALTER COLUMN serialnum SET DEFAULT nextval('ad_requests_
 
 ALTER TABLE fascicles_requests ALTER COLUMN serialnum SET DEFAULT nextval('fascicles_requests_serialnum_seq'::regclass);
 
+
+SET search_path = plugins, pg_catalog;
+
+--
+-- Name: l18n_l18n_original_key; Type: CONSTRAINT; Schema: plugins; Owner: -
+--
+
+ALTER TABLE ONLY l18n
+    ADD CONSTRAINT l18n_l18n_original_key UNIQUE (l18n_original);
+
+
+--
+-- Name: l18n_pkey; Type: CONSTRAINT; Schema: plugins; Owner: -
+--
+
+ALTER TABLE ONLY l18n
+    ADD CONSTRAINT l18n_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: menu_pkey; Type: CONSTRAINT; Schema: plugins; Owner: -
+--
+
+ALTER TABLE ONLY menu
+    ADD CONSTRAINT menu_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: menu_plugin_key; Type: CONSTRAINT; Schema: plugins; Owner: -
+--
+
+ALTER TABLE ONLY menu
+    ADD CONSTRAINT menu_plugin_key UNIQUE (plugin, menu_section, menu_id);
+
+
+--
+-- Name: routes_pkey; Type: CONSTRAINT; Schema: plugins; Owner: -
+--
+
+ALTER TABLE ONLY routes
+    ADD CONSTRAINT routes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: routes_plugin_key; Type: CONSTRAINT; Schema: plugins; Owner: -
+--
+
+ALTER TABLE ONLY routes
+    ADD CONSTRAINT routes_plugin_key UNIQUE (plugin, route_url);
+
+
+--
+-- Name: rules_pkey; Type: CONSTRAINT; Schema: plugins; Owner: -
+--
+
+ALTER TABLE ONLY rules
+    ADD CONSTRAINT rules_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: rules_plugin_key; Type: CONSTRAINT; Schema: plugins; Owner: -
+--
+
+ALTER TABLE ONLY rules
+    ADD CONSTRAINT rules_plugin_key UNIQUE (plugin, rule_term);
+
+
+SET search_path = public, pg_catalog;
 
 --
 -- Name: ad_advertisers_pkey; Type: CONSTRAINT; Schema: public; Owner: -
