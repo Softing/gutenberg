@@ -51,7 +51,7 @@ sub feed {
 
     my $feed = $c->sql->Q("
         SELECT id, url, title, description, published, created, updated
-        FROM rss_feeds WHERE published = true AND url=?
+        FROM rss_feeds WHERE url=?
         ", [ $i_feed ])->Hash;
 
     $c->render(status => 404) unless $feed->{id};
