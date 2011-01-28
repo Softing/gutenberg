@@ -144,7 +144,7 @@ sub feed {
     $rss_feed .= "</channel>";
     $rss_feed .= "</rss>";
 
-    $c->render(text => $rss_feed, format => 'rss');
+    $c->render(text => $rss_feed, format => 'xml');
 }
 
 1;
