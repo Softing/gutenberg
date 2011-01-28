@@ -124,7 +124,7 @@ sub feed {
             $rss_feed .= "<category>Экономика</category>";
             $rss_feed .= "<pubDate>". $item->{updated} ."</pubDate>";#Sun, 28 Nov 2010 12:50:00 +0300
             $rss_feed .= "<author>".  $item->{author} ."</author>";
-            $rss_feed .= "<content:encoded><![CDATA[". $item->{text} ."]]></content:encoded>";
+            $rss_feed .= "<content:encoded><![CDATA[". $item->{fulltext} ."]]></content:encoded>";
 
             my $folder = Inprint::Store::Embedded::getFolderPath($c, "rss-plugin", $item->{created}, $item->{id}, 1);
             my $files = Inprint::Store::Embedded::list($c, $folder, ['png', 'jpg', 'gif']);
