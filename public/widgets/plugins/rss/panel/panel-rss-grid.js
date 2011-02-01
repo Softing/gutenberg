@@ -17,7 +17,7 @@ Inprint.plugins.rss.profile.Grid = Ext.extend(Ext.grid.GridPanel, {
                 dataIndex: "preview",
                 sortable: false,
                 renderer: function(v) {
-                    return '<img src="/files/preview'+ v +'/" style="border:1px solid silver;"/>';
+                    return '<img src="/files/preview/'+ v +'" style="border:1px solid silver;"/>';
                 }
             },
             { id:'name', header:'File',dataIndex:'name', width:250},

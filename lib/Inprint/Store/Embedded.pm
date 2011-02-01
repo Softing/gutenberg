@@ -19,52 +19,66 @@ use Inprint::Store::Embedded::Metadata;
 use Inprint::Store::Embedded::Navigation;
 use Inprint::Store::Embedded::Versioning;
 
+# Get list of files from folder ################################################
+
 sub list {
     my $c = shift;
 
     my $path   = shift;
     my $filter = shift;
 
+    # Check folder for existence and the ability to create files
     &checkFolderPath($c, $path);
 
     my @files;
-    opendir DIR, $path;
 
+    # Read folder
+    opendir DIR, $path;
     while( my $filename = readdir(DIR)){
 
+        # Skip hidden files
         next if $filename ~~ ['.', '..'];
         next if $filename =~ m/^\./;
 
+        # Get file extension
         my $extension = Inprint::Store::Embedded::File::getExtension($c, $filename);
 
+        # Apply a filter, if specified
         if ($filter) {
             next unless $extension ~~ $filter;
         }
 
-        # Create SQL record
+        # Create SQLite record
         my $dbh = Inprint::Store::Embedded::Metadata::connect($c, $path);
         my $record = Inprint::Store::Embedded::Metadata::getFileRecord($c, $dbh, $path, $filename);
         Inprint::Store::Embedded::Metadata::disconnect($c, $dbh);
 
+        # Create SQL Cache record
+
+        # Create File record
+
+
         my $relativePath = Inprint::Store::Embedded::Navigation::getRelativePath($c, $path);
-        $relativePath = "$relativePath/$filename";
 
-        my $filemask = $c->sql->Q("SELECT id FROM filesmask WHERE filepath=?", [ $relativePath ])->Value;
-        unless ($filemask) {
-            $filemask = $c->uuid();
-            $c->sql->Do("INSERT INTO filesmask (id, filepath) VALUES (?,?)", [ $filemask, $relativePath ]);
+        my $cache_id = $c->sql->Q("
+            SELECT id FROM cache_files WHERE file_path=? AND file_name=?
+            ", [ $relativePath, $filename ])->Value;
+
+        unless ($cache_id) {
+            $cache_id = $c->uuid();
+            $c->sql->Do("
+                INSERT INTO cache_files (id, file_path, file_name, file_extension, file_mime, file_digest )
+                VALUES (?,?,?,?,?,?)
+                ", [ $cache_id, $relativePath, $filename, $extension, $record->{mimetype}, $record->{digest} ]);
         }
-
-        my $mime = Inprint::Store::Embedded::getMimeData($c, "$path/$filename");
 
         my $filehash = {
             name => $filename,
 
-            mime => $mime,
+            cache => $cache_id,
+            preview  => $cache_id . "x80.$extension",
 
-            filemask => $filemask,
-            preview => "/$filemask/80",
-
+            mime => $record->{mimetype},
             description => $record->{file_description} || "",
             extension => $extension,
             digest => $record->{digest},
@@ -80,7 +94,6 @@ sub list {
         push @files, $filehash;
 
     }
-
     closedir DIR;
 
     return \@files;
@@ -91,6 +104,8 @@ sub create {
 
     return $c;
 }
+
+# Upload file to folder ########################################################
 
 sub upload {
     my $c = shift;
@@ -220,13 +235,13 @@ sub uploadArchive {
 
 ################################################################################
 
-sub getMimeData {
-    my $c = shift;
-    my $filepath = shift;
-
-    my $mime = Inprint::Store::Embedded::Metadata::getMimeType($c, $filepath);
-    return $mime;
-}
+#sub getMimeData {
+#    my $c = shift;
+#    my $filepath = shift;
+#
+#    my $mime = Inprint::Store::Embedded::Metadata::getMimeType($c, $filepath);
+#    return $mime;
+#}
 
 sub getFolderPath {
     my $c = shift;
@@ -273,6 +288,7 @@ sub getFolderPath {
     return $path;
 }
 
+# Make some test
 sub checkFolderPath {
     my $c = shift;
     my $path = shift;

@@ -73,6 +73,7 @@ sub getFileRecord {
         if ($dbh->err()) { die "$DBI::errstr\n"; }
     }
 
+    $record->{mimetype} = getMimeType($c, "$path/$filename");
     $record->{filesize} = $filesize;
     $record->{digest}   = $digest;
     $record->{created}  = $created;

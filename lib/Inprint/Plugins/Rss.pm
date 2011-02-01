@@ -9,6 +9,8 @@ use utf8;
 use strict;
 use warnings;
 
+use HTML::Scrubber;
+
 use Inprint::Store::Embedded;
 
 use base 'Inprint::BaseController';
@@ -32,7 +34,7 @@ sub feeds {
     $html .= '<h1>RSS Feeds</h1>';
     $html .= "<ul>";
     foreach (@$feeds) {
-        $html .= "<li><a href=\"$$_{url}\">$$_{url}</li>";
+        $html .= "<li><a href=\"$$_{url}.xml\">$$_{url}.xml</li>";
     }
     $html .= "</ul>";
     $html .= '</body>';
@@ -47,7 +49,7 @@ sub feed {
 
     my $i_feed = $c->param("feed");
 
-    my $url = $c->config->get("public.url");
+    my $siteurl = $c->config->get("public.url");
 
     my $feed = $c->sql->Q("
         SELECT id, url, title, description, published, created, updated
@@ -84,9 +86,9 @@ sub feed {
     $rss_feed .= "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
     $rss_feed .= "<rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\" xmlns:media=\"http://search.yahoo.com/mrss/\" xmlns:blogChannel=\"http://backend.userland.com/blogChannelModule\" xmlns:content=\"http://purl.org/rss/1.0/modules/content/\">";
     $rss_feed .= "<channel>";
-    $rss_feed .= "<link>". $url ."</link>";
+    $rss_feed .= "<link>$siteurl</link>";
     $rss_feed .= "<title>". $feed->{title} ."</title>";
-    $rss_feed .= "<atom:link href=\"". $url ."\" rel=\"self\" type=\"application/rss+xml\" />";
+    $rss_feed .= "<atom:link href=\"$siteurl\" rel=\"self\" type=\"application/rss+xml\" />";
     $rss_feed .= "<description>". $feed->{description} ."</description>";
 
     my @params; my $sql = "
@@ -118,21 +120,29 @@ sub feed {
         $rss_feed .= "<item>";
 
             $rss_feed .= "<title>". $item->{title} ."</title>";
-            $rss_feed .= "<link>".  $url ."/". $item->{url} ."</link>";
-            $rss_feed .= "<guid>".  $url ."/". $item->{url} ."</guid>";
+            $rss_feed .= "<link>".  $siteurl ."/". $item->{url} ."</link>";
+            $rss_feed .= "<guid>".  $siteurl ."/". $item->{url} ."</guid>";
             $rss_feed .= "<description>". $item->{description} ."</description>";
             $rss_feed .= "<category>Экономика</category>";
             $rss_feed .= "<pubDate>". $item->{updated} ."</pubDate>";#Sun, 28 Nov 2010 12:50:00 +0300
             $rss_feed .= "<author>".  $item->{author} ."</author>";
-            $rss_feed .= "<content:encoded><![CDATA[". $item->{fulltext} ."]]></content:encoded>";
+
+            my $scrubber = HTML::Scrubber->new( allow => [ qw[ p b i u hr br ] ] );
+            my $fulltext = $scrubber->scrub($item->{fulltext});
+            $rss_feed .= "<content:encoded><![CDATA[$fulltext]]></content:encoded>";
 
             my $folder = Inprint::Store::Embedded::getFolderPath($c, "rss-plugin", $item->{created}, $item->{id}, 1);
-            my $files = Inprint::Store::Embedded::list($c, $folder, ['png', 'jpg', 'gif']);
+            my $files = Inprint::Store::Embedded::list($c, $folder, ['png', 'jpg', 'jpeg', 'gif']);
 
             foreach my $file (@$files) {
-                $rss_feed .= "<media:content url=\"$url/files/download/". $file->{filemask} ."\" type=\"". $file->{mime} ."\" expression=\"full\">";
+
+                my $fileurl  = "$siteurl/files/download/". $file->{cache} .".". $file->{extension};
+                my $filemime = $file->{mime};
+                my $filedesc = $file->{description};
+
+                $rss_feed .= "<media:content url=\"$fileurl\" type=\"$filemime\" expression=\"full\">";
                 if ($file->{description}) {
-                    $rss_feed .= "<media:description type=\"plain\">" . $file->{description} . "</media:description>";
+                    $rss_feed .= "<media:description type=\"plain\">$filedesc</media:description>";
                 }
                 $rss_feed .= "</media:content>";
             }

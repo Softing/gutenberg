@@ -183,7 +183,8 @@ sub startup {
     $self->createRoutes($sessionBridge, "workspace",                [ "index", "access", "state", "online", "appsession" ]);
 
     $sessionBridge->route('/files/preview/:id/:size/')->to('files#preview');
-    $sessionBridge->route('/files/download/:id/')->to('files#download');
+    $sessionBridge->route('/files/preview/:id')->to('files#preview');
+    $sessionBridge->route('/files/download/:id')->to('files#download');
 
     # Main route
     $sessionBridge->route('/')->to('workspace#index');

@@ -16,10 +16,11 @@ use base 'Inprint::BaseController';
 sub download {
     my $c = shift;
 
-    my $i_id = $c->param("id");
+
+    my $id = $c->param("id");
 
     my $rootpath = $c->config->get("store.path");
-    my $filepath = $c->sql->Q("SELECT filepath FROM filesmask WHERE id=?", [ $i_id ])->Value;
+    my $filepath = $c->sql->Q("SELECT file_path || '/' || file_name FROM cache_files WHERE id=?", [ $id ])->Value;
 
     $filepath = "$rootpath/$filepath";
 
@@ -32,7 +33,7 @@ sub download {
         $filepath =~ s/\\/\//g;
         $filepath =~ s/\/+/\//g;
     }
-    
+
     $c->tx->res->headers->content_type('image/png');
     $c->res->content->asset(Mojo::Asset::File->new(path => $filepath));
     $c->render_static();
@@ -42,14 +43,15 @@ sub preview {
 
     my $c = shift;
 
-    my $i_id = $c->param("id");
-    my $i_size = $c->param("size");
+    my ($id, $size) = split 'x', $c->param("id");
+
+    #die "$id, $size" . $c->{stash}->{format};
 
     my @errors;
     my $success = $c->json->false;
 
     my $rootpath = $c->config->get("store.path");
-    my $filepath = $c->sql->Q("SELECT filepath FROM filesmask WHERE id=?", [ $i_id ])->Value;
+    my $filepath = $c->sql->Q("SELECT file_path || '/' || file_name FROM cache_files WHERE id=?", [ $id ])->Value;
 
     $filepath = "$rootpath/$filepath";
 
@@ -68,21 +70,21 @@ sub preview {
         $extension =~ s/^.//g;
         if ($extension ~~ ['jpg', 'jpeg', 'png', 'gif']) {
             if (-w "$path/.thumbnails") {
-                unless (-r "$path/.thumbnails/$name-$i_size.png") {
+                unless (-r "$path/.thumbnails/$name-$size.png") {
                     my $image = Image::Magick->new;
                     my $x = $image->Read($filepath);
                     warn "$x" if "$x";
 
-                    $x = $image->AdaptiveResize(geometry=>$i_size);
+                    $x = $image->AdaptiveResize(geometry=>$size);
                     warn "$x" if "$x";
 
-                    $x = $image->Write("$path/.thumbnails/$name-$i_size.png");
+                    $x = $image->Write("$path/.thumbnails/$name-$size.png");
                     warn "$x" if "$x";
                 }
             }
-            if (-r "$path/.thumbnails/$name-$i_size.png") {
+            if (-r "$path/.thumbnails/$name-$size.png") {
                 $c->tx->res->headers->content_type('image/png');
-                $c->res->content->asset(Mojo::Asset::File->new(path => "$path/.thumbnails/$name-$i_size.png"));
+                $c->res->content->asset(Mojo::Asset::File->new(path => "$path/.thumbnails/$name-$size.png"));
                 $c->render_static();
             }
         }
