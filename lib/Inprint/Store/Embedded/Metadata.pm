@@ -18,11 +18,46 @@ sub connect {
     my $path = shift;
 
     my $dbargs = { RaiseError => 1, sqlite_unicode => 1 };
-    my $dbh = DBI->connect("dbi:SQLite:dbname=$path/.database/main.db","","",$dbargs);
+    my $dbpath = clearPath($c, "$path/.database/main.db");
+    my $dbh = DBI->connect("dbi:SQLite:dbname=$dbpath","","",$dbargs);
 
     &createDefaults($c, $dbh);
 
     return $dbh;
+}
+
+sub createDefaults {
+    my $c = shift;
+    my $dbh = shift;
+
+    $dbh->do("
+        CREATE TABLE IF NOT EXISTS files (
+            file_name TEXT primary key,
+            file_description TEXT,
+            file_digest TEXT,
+            isdraft INTEGER DEFAULT 1,
+            isapproved INTEGER DEFAULT 0,
+            created TEXT,
+            updated TEXT
+        );
+    ");
+
+    $dbh->do("
+        CREATE TABLE IF NOT EXISTS versions (
+            id TEXT primary key,
+            file_id TEXT,
+            file_name TEXT,
+            file_digest TEXT,
+            version_text TEXT,
+            ischeckpoint INTEGER DEFAULT 0,
+            created TEXT
+        );
+    ");
+
+    $dbh->commit();
+    if ($dbh->err()) { die "$DBI::errstr\n"; }
+
+    return $c;
 }
 
 sub disconnect {
@@ -34,7 +69,9 @@ sub disconnect {
 
 sub getFileRecord {
     my $c = shift;
+
     my $dbh = shift;
+
     my $path = shift;
     my $filename = shift;
 
@@ -82,37 +119,63 @@ sub getFileRecord {
     return $record;
 }
 
-sub createDefaults {
+sub createFileRecord {
     my $c = shift;
+
     my $dbh = shift;
 
-    $dbh->do("
-        CREATE TABLE IF NOT EXISTS files (
-            file_name TEXT primary key,
-            file_description TEXT,
-            file_digest TEXT,
-            isdraft INTEGER DEFAULT 1,
-            isapproved INTEGER DEFAULT 0,
-            created TEXT,
-            updated TEXT
-        );
-    ");
+    my $filename = shift;
+    my $digest = shift;
+    my $created = shift;
+    my $updated = shift;
 
     $dbh->do("
-        CREATE TABLE IF NOT EXISTS versions (
-            id TEXT primary key,
-            file_id TEXT,
-            file_name TEXT,
-            file_digest TEXT,
-            version_text TEXT,
-            ischeckpoint INTEGER DEFAULT 0,
-            created TEXT
-        );
-    ");
+        INSERT OR REPLACE INTO files
+        (file_name, file_digest, created, updated) VALUES (?,?,?,?)", undef,
+        $filename, $digest, $created, $updated
+    );
 
-    $dbh->commit();
     if ($dbh->err()) { die "$DBI::errstr\n"; }
 
+    return $c;
+}
+
+sub deleteFileRecord {
+    my $c = shift;
+    my $dbh = shift;
+    my $filename = shift;
+
+    $dbh->do(" DELETE FROM files WHERE file_name=?", undef, $filename );
+    if ($dbh->err()) { die "$DBI::errstr\n"; }
+
+    return $c;
+}
+
+sub publishRecord {
+    my $c = shift;
+    my $dbh = shift;
+    my $filename = shift;
+    $dbh->do(" UPDATE files SET isapproved=1 WHERE file_name=?", undef, $filename );
+    if ($dbh->err()) { die "$DBI::errstr\n"; }
+    return $c;
+}
+
+sub unpublishRecord {
+    my $c = shift;
+    my $dbh = shift;
+    my $filename = shift;
+    $dbh->do(" UPDATE files SET isapproved=0 WHERE file_name=?", undef, $filename );
+    if ($dbh->err()) { die "$DBI::errstr\n"; }
+    return $c;
+}
+
+sub changeRecordDesciption {
+    my $c = shift;
+    my $dbh = shift;
+    my $filename = shift;
+    my $text = shift;
+    $dbh->do(" UPDATE files SET file_description=? WHERE file_name=?", undef, $text, $filename );
+    if ($dbh->err()) { die "$DBI::errstr\n"; }
     return $c;
 }
 
@@ -371,6 +434,24 @@ sub _extractMimeType {
     };
 
     return $MimeTypes->{$suffix} || undef;
+}
+
+sub clearPath {
+
+    my $c = shift;
+    my $path = shift;
+
+    if ($^O eq "MSWin32") {
+        $path =~ s/\//\\/g;
+        $path =~ s/\\+/\\/g;
+    }
+
+    if ($^O eq "linux") {
+        $path =~ s/\\/\//g;
+        $path =~ s/\/+/\//g;
+    }
+
+    return $path;
 }
 
 1;

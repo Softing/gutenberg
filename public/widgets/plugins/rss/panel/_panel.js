@@ -44,7 +44,7 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
                 cls: "x-btn-text-icon",
                 text: _("Reload"),
                 scope:this,
-                handler: this.cmpFill
+                handler: this.cmpReload
             }
         ];
 
@@ -81,13 +81,19 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
 
     },
 
+    cmpReload: function(id) {
+        this.grid.getStore().reload();
+    },
+
     cmpFill: function(id) {
 
-        this.oid = id;
+        if (id) {
+            this.oid = id;
+        }
 
         this.form.reset();
         this.form.baseParams = {
-            document: id
+            document: this.oid
         };
 
         this.cmpAccess();
@@ -97,7 +103,7 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
             url: this.urls["read"],
             scope:this,
             params: {
-                document: id
+                document: this.oid
             },
             success: function(form, action) {
                 this.initialized = true;
@@ -105,7 +111,7 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
             }
         });
 
-        this.grid.getStore().baseParams = { document: id };
+        this.grid.getStore().baseParams = { document: this.oid };
         this.grid.getStore().reload();
 
     },

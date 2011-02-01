@@ -28,14 +28,29 @@ sub list {
     push @errors, { id => "feed", msg => "Can't find object"}
         unless ($feed->{id});
 
-    my $files;
+    my @result;
     unless (@errors) {
+
         my $folder = Inprint::Store::Embedded::getFolderPath($c, "rss-plugin", $feed->{created}, $feed->{id}, 1);
-        $files = Inprint::Store::Embedded::list($c, $folder, ['png', 'jpg', 'gif']);
+        my $files = Inprint::Store::Embedded::findFiles($c, $folder, 'all', ['png', 'jpg', 'gif']);
+
+        foreach my $record (@$files) {
+            push @result, {
+                name         => $record->{name},
+                description  => $record->{description},
+                cache        => $record->{cache},
+                isdraft      => $record->{isdraft},
+                isapproved   => $record->{isapproved},
+                size         => $record->{size},
+                created      => $record->{created},
+                updated      => $record->{updated},
+            };
+        }
+
     }
 
     $success = $c->json->true unless (@errors);
-    $c->render_json({ success => $success, errors => \@errors, data => $files });
+    $c->render_json({ success => $success, errors => \@errors, data => \@result });
 }
 
 sub upload {
@@ -57,7 +72,7 @@ sub upload {
 
     unless (@errors) {
         my $folder = Inprint::Store::Embedded::getFolderPath($c, "rss-plugin", $feed->{created}, $feed->{id}, 1);
-        Inprint::Store::Embedded::upload($c, $folder, $i_filename);
+        Inprint::Store::Embedded::fileUpload($c, $folder, $i_filename);
     }
 
     $success = $c->json->true unless (@errors);
@@ -82,9 +97,8 @@ sub publish {
         unless ($feed->{id});
 
     unless (@errors) {
-        my $folder = Inprint::Store::Embedded::getFolderPath($c, "rss-plugin", $feed->{created}, $feed->{id}, 1);
         foreach my $file(@i_files) {
-            Inprint::Store::Embedded::publish($c, $folder, $file);
+            Inprint::Store::Embedded::filePublish($c, $file);
         }
     }
 
@@ -109,9 +123,62 @@ sub unpublish {
         unless ($feed->{id});
 
     unless (@errors) {
+        foreach my $file(@i_files) {
+            Inprint::Store::Embedded::fileUnpublish($c, $file);
+        }
+    }
+
+    $c->render_json({});
+}
+
+sub description {
+    my $c = shift;
+
+    my $i_document = $c->param("document");
+    my @i_files = $c->param("file");
+    my $i_text  = $c->param("text");
+
+    my @errors;
+    my $success = $c->json->false;
+
+    push @errors, { id => "document", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_document));
+
+    my $feed = $c->sql->Q(" SELECT * FROM rss WHERE document=? ", [ $i_document ])->Hash;
+
+    push @errors, { id => "feed", msg => "Can't find object"}
+        unless ($feed->{id});
+
+    unless (@errors) {
+        foreach my $file (@i_files) {
+            Inprint::Store::Embedded::fileChangeDescription($c, $file, $i_text);
+        }
+    }
+
+    $c->render_json({});
+}
+
+sub rename {
+    my $c = shift;
+
+    my $i_document = $c->param("document");
+    my @i_files = $c->param("file");
+
+    my @errors;
+    my $success = $c->json->false;
+
+    push @errors, { id => "document", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_document));
+
+    my $feed = $c->sql->Q(" SELECT * FROM rss WHERE document=? ", [ $i_document ])->Hash;
+
+    push @errors, { id => "feed", msg => "Can't find object"}
+        unless ($feed->{id});
+
+    unless (@errors) {
         my $folder = Inprint::Store::Embedded::getFolderPath($c, "rss-plugin", $feed->{created}, $feed->{id}, 1);
         foreach my $file(@i_files) {
-            Inprint::Store::Embedded::unpublish($c, $folder, $file);
+            Inprint::Store::Embedded::fileRename($c, $folder, $file);
         }
     }
 
@@ -136,9 +203,8 @@ sub delete {
         unless ($feed->{id});
 
     unless (@errors) {
-        my $folder = Inprint::Store::Embedded::getFolderPath($c, "rss-plugin", $feed->{created}, $feed->{id}, 1);
         foreach my $file(@i_files) {
-            Inprint::Store::Embedded::delete($c, $folder, $file);
+            Inprint::Store::Embedded::fileDelete($c, $file);
         }
     }
 

@@ -7,25 +7,36 @@ Inprint.plugins.rss.profile.Grid = Ext.extend(Ext.grid.GridPanel, {
             root: "data",
             idProperty: "name",
             url: _url('/plugin/rss/files/list/'),
-            fields: [ "preview", "extension", "isdraft", "isapproved", "name", "description", "size", "created", "digest", "updated" ]
+            fields: [ "name", "description", "cache", "preview", "isdraft", "isapproved",  "size", "created", "updated" ]
         });
 
         this.columns = [
             {
-                id:"preview",
-                width: 100,
-                dataIndex: "preview",
+                id:"approved",
+                width: 32,
+                dataIndex: "isapproved",
                 sortable: false,
                 renderer: function(v) {
-                    return '<img src="/files/preview/'+ v +'" style="border:1px solid silver;"/>';
+                    var image = '';
+                    if (v==1) { image = '<img src="'+ _ico("light-bulb") +'"/>'; }
+                    return image;
                 }
             },
-            { id:'name', header:'File',dataIndex:'name', width:250},
-            { id: 'description', header:'Description',dataIndex:'description', width:150},
-            { id: 'size', header:'Size',dataIndex:'size', width:100, renderer:Ext.util.Format.fileSize},
-            { id: 'approved', header:'Approved',dataIndex:'isapproved', width:60},
-            { id: 'created', header:'Created',dataIndex:'created', width:120 },
-            { id: 'updated', header:'Updated',dataIndex:'updated', width:120 }
+            {
+                id:"preview",
+                header:_("Preview"),
+                width: 100,
+                dataIndex: "cache",
+                sortable: false,
+                renderer: function(v) {
+                    return '<img src="/files/preview/'+ v +'x80" style="border:1px solid silver;"/>';
+                }
+            },
+            { id:'name', header: _("File"),dataIndex:'name', width:250},
+            { id: 'description', header: _("Description"),dataIndex:'description', width:150},
+            { id: 'size', header: _("Size"), dataIndex:'size', width:100, renderer:Ext.util.Format.fileSize},
+            { id: 'created', header: _("Created"), dataIndex:'created', width:120 },
+            { id: 'updated', header: _("Updated") ,dataIndex:'updated', width:120 }
         ];
 
         Ext.apply(this, {
@@ -70,6 +81,23 @@ Inprint.plugins.rss.profile.Grid = Ext.extend(Ext.grid.GridPanel, {
             });
 
             rowCtxMenuItems.push("-");
+
+            rowCtxMenuItems.push({
+                icon: _ico("edit-drop-cap"),
+                cls: "x-btn-text-icon",
+                text: _("Rename file"),
+                scope:this,
+                handler : this.cmpRenameFile
+            });
+            rowCtxMenuItems.push({
+                icon: _ico("edit-column"),
+                cls: "x-btn-text-icon",
+                text: _("Change description"),
+                scope:this,
+                handler : this.cmpChangeDescription
+            });
+
+            rowCtxMenuItems.push("-");
             rowCtxMenuItems.push({
                 icon: _ico("minus-button"),
                 cls: "x-btn-text-icon",
@@ -88,38 +116,85 @@ Inprint.plugins.rss.profile.Grid = Ext.extend(Ext.grid.GridPanel, {
 
     },
 
+    cmpPublish: function() {
+        var document = this.getStore().baseParams.document;
+        var file = this.getValues("cache");
+        Ext.Ajax.request({
+            url: _url("/plugin/rss/files/publish/"),
+            scope:this,
+            success: this.cmpReload,
+            params: { document: document, file: file }
+        });
+    },
+
+    cmpUnpublish: function() {
+        var document = this.getStore().baseParams.document;
+        var file = this.getValues("cache");
+        Ext.Ajax.request({
+            url: _url("/plugin/rss/files/unpublish/"),
+            scope:this,
+            success: this.cmpReload,
+            params: { document: document, file: file }
+        });
+    },
+
+    cmpRenameFile: function() {
+        var document = this.getStore().baseParams.document;
+        var file = this.getValues("cache");
+        Ext.MessageBox.prompt(
+            _("Modification of the file"),
+            _("Change the file name"),
+            function(btn, text) {
+                if (btn == "ok") {
+                    Ext.Ajax.request({
+                        url: _url("/plugin/rss/files/rename/"),
+                        scope:this,
+                        success: this.cmpReload,
+                        params: { document: document, file: file, text: text }
+                    });
+                }
+            }, this);
+    },
+
+    cmpChangeDescription: function() {
+        var document = this.getStore().baseParams.document;
+        var file = this.getValues("cache");
+        Ext.MessageBox.show({
+            width:300,
+            scope:this,
+            multiline: true,
+            buttons: Ext.MessageBox.OKCANCEL,
+            title: _("Modification of the file"),
+            msg: _("Change the file description"),
+            fn: function(btn, text) {
+                if (btn == "ok") {
+                    Ext.Ajax.request({
+                        url: _url("/plugin/rss/files/description/"),
+                        scope:this,
+                        success: this.cmpReload,
+                        params: { document: document, file: file, text: text }
+                    });
+                }
+            }
+        });
+    },
+
     cmpDelete: function() {
+        var document = this.getStore().baseParams.document;
+        var file = this.getValues("cache");
         Ext.MessageBox.confirm(
-            _("Irreversible removal"),
-            _("You can't cancel this action!"),
+            _("Delete the file?"),
+            _("This change can not be undone!"),
             function(btn) {
                 if (btn == "yes") {
                     Ext.Ajax.request({
                         url: _url("/plugin/rss/files/delete/"),
                         scope:this,
                         success: this.cmpReload,
-                        params: { document: this.getStore().baseParams.document, file: this.getValues("name") }
+                        params: { document: document, file: file }
                     });
                 }
             }, this).setIcon(Ext.MessageBox.WARNING);
-    },
-
-    cmpPublish: function() {
-        Ext.Ajax.request({
-            url: _url("/plugin/rss/files/publish/"),
-            scope:this,
-            success: this.cmpReload,
-            params: { document: this.getStore().baseParams.document, file: this.getValues("name") }
-        });
-    },
-
-    cmpUnpublish: function() {
-        Ext.Ajax.request({
-            url: _url("/plugin/rss/files/unpublish/"),
-            scope:this,
-            success: this.cmpReload,
-            params: { document: this.getStore().baseParams.document, file: this.getValues("name") }
-        });
     }
 
 });

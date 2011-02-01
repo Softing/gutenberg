@@ -43,6 +43,10 @@ INSERT INTO plugins.routes(plugin, route_url, route_controller, route_action, ro
 INSERT INTO plugins.routes(plugin, route_url, route_controller, route_action, route_name, route_enabled, route_authentication)
     VALUES ('rss', '/rss/files/unpublish/', 'plugins-rss-files', 'unpublish', null, true, true);
 INSERT INTO plugins.routes(plugin, route_url, route_controller, route_action, route_name, route_enabled, route_authentication)
+    VALUES ('rss', '/rss/files/rename/', 'plugins-rss-files', 'rename', null, true, true);
+INSERT INTO plugins.routes(plugin, route_url, route_controller, route_action, route_name, route_enabled, route_authentication)
+    VALUES ('rss', '/rss/files/description/', 'plugins-rss-files', 'description', null, true, true);
+INSERT INTO plugins.routes(plugin, route_url, route_controller, route_action, route_name, route_enabled, route_authentication)
     VALUES ('rss', '/rss/files/delete/', 'plugins-rss-files', 'delete', null, true, true);
 
 -- Insert settings Routes

@@ -132,7 +132,7 @@ sub feed {
             $rss_feed .= "<content:encoded><![CDATA[$fulltext]]></content:encoded>";
 
             my $folder = Inprint::Store::Embedded::getFolderPath($c, "rss-plugin", $item->{created}, $item->{id}, 1);
-            my $files = Inprint::Store::Embedded::list($c, $folder, ['png', 'jpg', 'jpeg', 'gif']);
+            my $files = Inprint::Store::Embedded::findFiles($c, $folder, 'published', ['png', 'jpg', 'jpeg', 'gif']);
 
             foreach my $file (@$files) {
 

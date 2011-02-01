@@ -29,7 +29,18 @@ Inprint.plugins.rss.Grid = Ext.extend(Ext.grid.GridPanel, {
 
         this.columns = [
             this.sm,
-            columns.viewed,
+            {
+                id:"publihed",
+                width: 32,
+                dataIndex: "rss_published",
+                sortable: false,
+                renderer: function(v) {
+                    var image = '';
+                    if (v==1) { image = '<img src="'+ _ico("light-bulb") +'"/>'; }
+                    return image;
+                }
+
+            },
             columns.title,
             columns.edition,
             columns.workgroup,

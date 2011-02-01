@@ -12,6 +12,7 @@ use strict;
 use File::Copy qw(copy move);
 use File::Path qw(make_path remove_tree);
 
+use Inprint::Store::Cache;
 use Inprint::Store::Embedded::Converter;
 use Inprint::Store::Embedded::Editor;
 use Inprint::Store::Embedded::File;
@@ -21,10 +22,11 @@ use Inprint::Store::Embedded::Versioning;
 
 # Get list of files from folder ################################################
 
-sub list {
+sub findFiles {
     my $c = shift;
 
     my $path   = shift;
+    my $status = shift;
     my $filter = shift;
 
     # Check folder for existence and the ability to create files
@@ -41,7 +43,8 @@ sub list {
         next if $filename =~ m/^\./;
 
         # Get file extension
-        my $extension = Inprint::Store::Embedded::File::getExtension($c, $filename);
+        my $extension
+            = Inprint::Store::Embedded::File::getExtension($c, $filename);
 
         # Apply a filter, if specified
         if ($filter) {
@@ -53,30 +56,21 @@ sub list {
         my $record = Inprint::Store::Embedded::Metadata::getFileRecord($c, $dbh, $path, $filename);
         Inprint::Store::Embedded::Metadata::disconnect($c, $dbh);
 
-        # Create SQL Cache record
+        # Create Cache record
+        my $relativePath =
+            Inprint::Store::Embedded::Navigation::getRelativePath($c, $path);
+
+        my $cache_id = Inprint::Store::Cache::createRecord($c, $relativePath,
+            $filename, $extension, $record->{mimetype}, $record->{digest});
+
+        next if ($status eq "published" && $record->{isapproved} != 1);
+        next if ($status eq "unpublished" && $record->{isapproved} != 0);
 
         # Create File record
-
-
-        my $relativePath = Inprint::Store::Embedded::Navigation::getRelativePath($c, $path);
-
-        my $cache_id = $c->sql->Q("
-            SELECT id FROM cache_files WHERE file_path=? AND file_name=?
-            ", [ $relativePath, $filename ])->Value;
-
-        unless ($cache_id) {
-            $cache_id = $c->uuid();
-            $c->sql->Do("
-                INSERT INTO cache_files (id, file_path, file_name, file_extension, file_mime, file_digest )
-                VALUES (?,?,?,?,?,?)
-                ", [ $cache_id, $relativePath, $filename, $extension, $record->{mimetype}, $record->{digest} ]);
-        }
-
         my $filehash = {
             name => $filename,
 
             cache => $cache_id,
-            preview  => $cache_id . "x80.$extension",
 
             mime => $record->{mimetype},
             description => $record->{file_description} || "",
@@ -99,15 +93,9 @@ sub list {
     return \@files;
 }
 
-sub create {
-    my $c = shift;
-
-    return $c;
-}
-
 # Upload file to folder ########################################################
 
-sub upload {
+sub fileUpload {
     my $c = shift;
     my $path = shift;
     my $filename = shift;
@@ -126,35 +114,43 @@ sub upload {
     my $created  = Inprint::Store::Embedded::Metadata::getFileCreateDate($c, "$path/$filename");
     my $updated  = Inprint::Store::Embedded::Metadata::getFileModifyDate($c, "$path/$filename");
 
+    # Create metadata record
     my $dbh = Inprint::Store::Embedded::Metadata::connect($c, $path);
-
-    $dbh->do("
-        INSERT OR REPLACE INTO files
-        (file_name, file_digest, created, updated) VALUES (?,?,?,?)", undef,
-        $filename, $digest, $created, $updated
-    );
-
-    if ($dbh->err()) { die "$DBI::errstr\n"; }
-
+    Inprint::Store::Embedded::Metadata::createFileRecord($c, $dbh, $filename, $digest, $created, $updated);
+    my $record = Inprint::Store::Embedded::Metadata::getFileRecord($c, $dbh, $path, $filename);
     Inprint::Store::Embedded::Metadata::disconnect($c, $dbh);
+
+    # Create cache record
+    my $relativePath =
+        Inprint::Store::Embedded::Navigation::getRelativePath($c, $path);
+
+    my $extension
+        = Inprint::Store::Embedded::File::getExtension($c, $filename);
+
+    my $cache_id = Inprint::Store::Cache::createRecord($c, $relativePath,
+            $filename, $extension, $record->{mimetype}, $record->{digest});
 
     return $c;
 }
 
-sub read {
+sub fileCreate {
     my $c = shift;
-    my $path = shift;
-    my $filename = shift;
+
+    return $c;
+}
+
+sub fileRead {
+    my $c = shift;
+    my $fid = shift;
 
     die "read";
 
     return $c;
 }
 
-sub save {
+sub fileSave {
     my $c = shift;
-    my $path = shift;
-    my $filename = shift;
+    my $fid = shift;
     my $text = shift;
 
     die "save";
@@ -162,43 +158,86 @@ sub save {
     return $c;
 }
 
-sub rename {
+sub fileRename {
     my $c = shift;
-    my $path = shift;
+    my $fid = shift;
     my $filename = shift;
-    my $newfilename = shift;
 
     die "rename";
 
     return $c;
 }
 
-sub delete {
+sub fileChangeDescription {
     my $c = shift;
-    my $path = shift;
-    my $filename = shift;
+    my $fid = shift;
+    my $text = shift;
 
-    die "delete";
+    my $root = Inprint::Store::Embedded::Navigation::getRootPath($c);
+    my $cache = Inprint::Store::Cache::getRecordById($c, $fid);
+    return unless $cache->{id};
+
+    my $folderpath = clearPath( $c, $root, $cache->{file_path} );
+
+    my $dbh = Inprint::Store::Embedded::Metadata::connect($c, $folderpath);
+    Inprint::Store::Embedded::Metadata::changeRecordDesciption($c, $dbh, $cache->{file_name}, $text);
+    Inprint::Store::Embedded::Metadata::disconnect($c, $dbh);
 
     return $c;
 }
 
-sub publish {
+sub fileDelete {
     my $c = shift;
-    my $path = shift;
-    my $filename = shift;
+    my $fid = shift;
 
-    die "publish";
+    my $root = Inprint::Store::Embedded::Navigation::getRootPath($c);
+    my $cache = Inprint::Store::Cache::getRecordById($c, $fid);
+    return unless $cache->{id};
+
+    my $folderpath = clearPath( $c, $root, $cache->{file_path} );
+    my $filepath = clearPath( $c, $root, $cache->{file_path}, $cache->{file_name} );
+
+    my $dbh = Inprint::Store::Embedded::Metadata::connect($c, $folderpath);
+    Inprint::Store::Embedded::Metadata::deleteFileRecord($c, $dbh, $cache->{file_name});
+    Inprint::Store::Embedded::Metadata::disconnect($c, $dbh);
+
+    Inprint::Store::Cache::deleteRecordById($c, $fid);
+    unlink ($filepath);
 
     return $c;
 }
 
-sub unpublish {
+sub filePublish {
     my $c = shift;
-    my $path = shift;
-    my $filename = shift;
+    my $fid = shift;
 
-    die "unpublish";
+    my $root = Inprint::Store::Embedded::Navigation::getRootPath($c);
+    my $cache = Inprint::Store::Cache::getRecordById($c, $fid);
+    return unless $cache->{id};
+
+    my $folderpath = clearPath( $c, $root, $cache->{file_path} );
+
+    my $dbh = Inprint::Store::Embedded::Metadata::connect($c, $folderpath);
+    Inprint::Store::Embedded::Metadata::publishRecord($c, $dbh, $cache->{file_name});
+    Inprint::Store::Embedded::Metadata::disconnect($c, $dbh);
+
+    return $c;
+}
+
+sub fileUnpublish {
+    my $c = shift;
+    my $fid = shift;
+
+    my $root = Inprint::Store::Embedded::Navigation::getRootPath($c);
+    my $cache = Inprint::Store::Cache::getRecordById($c, $fid);
+    return unless $cache->{id};
+
+    my $folderpath = clearPath( $c, $root, $cache->{file_path} );
+
+    my $dbh = Inprint::Store::Embedded::Metadata::connect($c, $folderpath);
+    Inprint::Store::Embedded::Metadata::unpublishRecord($c, $dbh, $cache->{file_name});
+    Inprint::Store::Embedded::Metadata::disconnect($c, $dbh);
+
 
     return $c;
 }
@@ -235,14 +274,6 @@ sub uploadArchive {
 
 ################################################################################
 
-#sub getMimeData {
-#    my $c = shift;
-#    my $filepath = shift;
-#
-#    my $mime = Inprint::Store::Embedded::Metadata::getMimeType($c, $filepath);
-#    return $mime;
-#}
-
 sub getFolderPath {
     my $c = shift;
 
@@ -274,6 +305,31 @@ sub getFolderPath {
             make_path("$path/.$item");
         }
     }
+
+    if ($^O eq "MSWin32") {
+        $path =~ s/\//\\/g;
+        $path =~ s/\\+/\\/g;
+    }
+
+    if ($^O eq "linux") {
+        $path =~ s/\\/\//g;
+        $path =~ s/\/+/\//g;
+    }
+
+    return $path;
+}
+
+sub clearPath {
+
+    my $c = shift;
+    my $root = shift;
+
+    my $path;
+    foreach (@_) {
+        $path .= '\\' . $_;
+    }
+
+    $path = $root ."\\". $path;
 
     if ($^O eq "MSWin32") {
         $path =~ s/\//\\/g;
