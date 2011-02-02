@@ -75,7 +75,7 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
 
         this.children["form"].on("actioncomplete", function (form, action) {
             if (action.type == "submit") {
-                //this.children["grid"].getStore().reload();
+                this.btnUpload.enable();
             }
         }, this);
 
@@ -120,11 +120,11 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
         _disable(this.btnSave, this.btnUpload);
 
         if (access && access["rss"] == true) {
-            _enable(this.btnSave);
+            this.btnSave.enable();
         }
 
         if (access && access["rss"] == true && access["upload"] == true) {
-            _enable(this.btnUpload);
+            this.btnUpload.enable();
         }
 
         if (access && access["rss"] == true) {
