@@ -25,26 +25,28 @@ sub list {
 
     my $feed = $c->sql->Q(" SELECT * FROM rss WHERE document=? ", [ $i_document ])->Hash;
 
-    push @errors, { id => "feed", msg => "Can't find object"}
-        unless ($feed->{id});
+    #push @errors, { id => "feed", msg => "Can't find object"}
+    #    unless ($feed->{id});
 
     my @result;
     unless (@errors) {
 
-        my $folder = Inprint::Store::Embedded::getFolderPath($c, "rss-plugin", $feed->{created}, $feed->{id}, 1);
-        my $files = Inprint::Store::Embedded::findFiles($c, $folder, 'all', ['png', 'jpg', 'gif']);
+        if ($feed->{id}) {
+            my $folder = Inprint::Store::Embedded::getFolderPath($c, "rss-plugin", $feed->{created}, $feed->{id}, 1);
+            my $files = Inprint::Store::Embedded::findFiles($c, $folder, 'all', ['png', 'jpg', 'gif']);
 
-        foreach my $record (@$files) {
-            push @result, {
-                name         => $record->{name},
-                description  => $record->{description},
-                cache        => $record->{cache},
-                isdraft      => $record->{isdraft},
-                isapproved   => $record->{isapproved},
-                size         => $record->{size},
-                created      => $record->{created},
-                updated      => $record->{updated},
-            };
+            foreach my $record (@$files) {
+                push @result, {
+                    name         => $record->{name},
+                    description  => $record->{description},
+                    cache        => $record->{cache},
+                    isdraft      => $record->{isdraft},
+                    isapproved   => $record->{isapproved},
+                    size         => $record->{size},
+                    created      => $record->{created},
+                    updated      => $record->{updated},
+                };
+            }
         }
 
     }
@@ -98,6 +100,7 @@ sub publish {
 
     unless (@errors) {
         foreach my $file(@i_files) {
+            next unless ($c->is_uuid($file));
             Inprint::Store::Embedded::filePublish($c, $file);
         }
     }
@@ -124,6 +127,7 @@ sub unpublish {
 
     unless (@errors) {
         foreach my $file(@i_files) {
+            next unless ($c->is_uuid($file));
             Inprint::Store::Embedded::fileUnpublish($c, $file);
         }
     }
