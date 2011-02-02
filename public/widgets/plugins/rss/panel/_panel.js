@@ -118,8 +118,16 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
 
     cmpAccess: function(access) {
         _disable(this.btnSave, this.btnUpload);
+
         if (access && access["rss"] == true) {
-            _enable(this.btnSave, this.btnUpload);
+            _enable(this.btnSave);
+        }
+
+        if (access && access["rss"] == true && access["upload"] == true) {
+            _enable(this.btnUpload);
+        }
+
+        if (access && access["rss"] == true) {
             this.getEl().unmask();
         } else {
             this.getEl().mask(_("Access denide"));
