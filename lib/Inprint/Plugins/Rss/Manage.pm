@@ -71,9 +71,15 @@ sub list {
     my $total  = $c->sql->Q($sql_total, [])->Value;
 
     foreach my $item (@$result) {
-        $item->{access} = {};
+        $item->{access} = {
+            rss => $c->json->false,
+            upload => $c->json->false,
+        };
         if ($item->{workgroup} && $c->access->Check("catalog.documents.rss:*", $item->{workgroup})) {
             $item->{access}->{rss} = $c->json->true;
+            if ($item->{id}) {
+                $item->{access}->{upload} = $c->json->true;
+            }
         }
     }
 
@@ -102,12 +108,20 @@ sub read {
     my $result;
 
     unless (@errors) {
+
         $result = Inprint::Models::Rss::read($c, $document->{id});
+
+        $result->{access} = {
+            rss => $c->json->false,
+            upload => $c->json->false,
+        };
+
         if ($document->{workgroup} && $c->access->Check("catalog.documents.rss:*", $document->{workgroup})) {
             $result->{access}->{rss} = $c->json->true;
-        } else {
-            $result->{access}->{rss} = $c->json->false;
-	}
+            if ($result->{id}) {
+                $result->{access}->{upload} = $c->json->true;
+            }
+        }
     }
 
     $success = $c->json->true unless (@errors);

@@ -155,6 +155,7 @@ sub description {
 
     unless (@errors) {
         foreach my $file (@i_files) {
+            next unless ($c->is_uuid($file));
             Inprint::Store::Embedded::fileChangeDescription($c, $file, $i_text);
         }
     }
@@ -180,10 +181,10 @@ sub rename {
         unless ($feed->{id});
 
     unless (@errors) {
-        my $folder = Inprint::Store::Embedded::getFolderPath($c, "rss-plugin", $feed->{created}, $feed->{id}, 1);
-        foreach my $file(@i_files) {
-            Inprint::Store::Embedded::fileRename($c, $folder, $file);
-        }
+        #my $folder = Inprint::Store::Embedded::getFolderPath($c, "rss-plugin", $feed->{created}, $feed->{id}, 1);
+        #foreach my $file(@i_files) {
+        #    Inprint::Store::Embedded::fileRename($c, $folder, $file);
+        #}
     }
 
     $c->render_json({});
@@ -208,6 +209,7 @@ sub delete {
 
     unless (@errors) {
         foreach my $file(@i_files) {
+            next unless ($c->is_uuid($file));
             Inprint::Store::Embedded::fileDelete($c, $file);
         }
     }
