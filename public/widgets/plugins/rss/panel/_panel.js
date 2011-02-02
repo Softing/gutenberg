@@ -76,6 +76,7 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
         this.children["form"].on("actioncomplete", function (form, action) {
             if (action.type == "submit") {
                 this.btnUpload.enable();
+                this.grid.getStore().reload();
             }
         }, this);
 
