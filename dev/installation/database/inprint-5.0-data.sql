@@ -114,7 +114,7 @@ INSERT INTO fascicles(id, edition, parent, title, shortcut, description, manager
 INSERT INTO fascicles(id, edition, parent, title, shortcut, description, manager, variation, deadline, advert_deadline, created, updated)
     VALUES ('99999999-9999-9999-9999-999999999999', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', 'Recycle bin', 'Recycle bin', 'Recycle bin', null, '00000000-0000-0000-0000-000000000000', now(), now(), now(), now());
 
-UPDATE documents SET deadline='2020-01-01 16:23:10+03'
+UPDATE fascicles SET deadline='2020-01-01 16:23:10+03'
  	WHERE id = '00000000-0000-0000-0000-000000000000';
 	
 UPDATE fascicles SET deadline='2020-01-01 16:23:10+03'

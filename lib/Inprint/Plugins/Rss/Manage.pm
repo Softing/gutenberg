@@ -105,7 +105,9 @@ sub read {
         $result = Inprint::Models::Rss::read($c, $document->{id});
         if ($document->{workgroup} && $c->access->Check("catalog.documents.rss:*", $document->{workgroup})) {
             $result->{access}->{rss} = $c->json->true;
-        }
+        } else {
+            $result->{access}->{rss} = $c->json->false;
+	}
     }
 
     $success = $c->json->true unless (@errors);

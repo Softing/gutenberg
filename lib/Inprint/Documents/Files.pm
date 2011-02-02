@@ -369,9 +369,10 @@ sub preview {
 
             my $filepath = "$storePath/$record->{filename}";
 
+	    #die "$storePath/$record->{filename}";
+
             my $request = POST "$url", Content_Type => 'form-data',
                 Content => [ inputDocument =>  [  "$storePath/$record->{filename}" ] ];
-
 
             $ua->timeout($timeout);
             my $response = $ua->request($request);
