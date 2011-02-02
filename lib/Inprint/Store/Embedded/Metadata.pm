@@ -5,6 +5,9 @@ package Inprint::Store::Embedded::Metadata;
 # licensing@softing.ru
 # http://softing.ru/license
 
+use utf8;
+use Encode;
+
 use strict;
 
 use DBI;
@@ -18,7 +21,7 @@ sub connect {
     my $path = shift;
 
     my $dbargs = { RaiseError => 1, sqlite_unicode => 1 };
-    my $dbpath = clearPath($c, "$path/.database/main.db");
+    my $dbpath = &clearPath($c, "$path/.database/main.db");
     my $dbh = DBI->connect("dbi:SQLite:dbname=$dbpath","","",$dbargs);
 
     &createDefaults($c, $dbh);
@@ -75,37 +78,50 @@ sub getFileRecord {
     my $path = shift;
     my $filename = shift;
 
+    my $filename_utf8 = $filename;
+
+    if ($^O eq "MSWin32") {
+        $filename_utf8 = Encode::decode("cp1251", $filename_utf8);
+    }
+
+    if ($^O eq "linux") {
+        $filename_utf8 = Encode::decode("utf8", $filename_utf8);
+    }
+
+    my $filepath = "$path/$filename";
+
     my $sth  = $dbh->prepare("SELECT * FROM files WHERE file_name = ?");
-    $sth->execute( $filename );
+    $sth->execute( $filename_utf8 );
     my $record = $sth->fetchrow_hashref;
     $sth->finish();
 
-    my $digest   = Inprint::Store::Embedded::Metadata::getDigest($c, "$path/$filename");
-    my $filesize = Inprint::Store::Embedded::Metadata::getFileSize($c, "$path/$filename");
-    my $created  = Inprint::Store::Embedded::Metadata::getFileCreateDate($c, "$path/$filename");
-    my $updated  = Inprint::Store::Embedded::Metadata::getFileModifyDate($c, "$path/$filename");
+    my $digest   = Inprint::Store::Embedded::Metadata::getDigest($c, $filepath);
+    my $filesize = Inprint::Store::Embedded::Metadata::getFileSize($c, $filepath);
+    my $created  = Inprint::Store::Embedded::Metadata::getFileCreateDate($c, $filepath);
+    my $updated  = Inprint::Store::Embedded::Metadata::getFileModifyDate($c, $filepath);
 
     # Create new record
     unless ($record->{file_name}) {
         $dbh->do("
             INSERT OR REPLACE INTO files
             (file_name, file_digest, created, updated) VALUES (?,?,?,?)", undef,
-            $filename, $digest, $created, $updated
+            $filename_utf8, $digest, $created, $updated
         );
         if ($dbh->err()) { die "$DBI::errstr\n"; }
-    }
 
-    $sth  = $dbh->prepare("SELECT * FROM files WHERE file_name = ?");
-    $sth->execute( $filename );
-    $record = $sth->fetchrow_hashref;
-    $sth->finish();
+        $sth  = $dbh->prepare("SELECT * FROM files WHERE file_name = ?");
+        $sth->execute( $filename_utf8 );
+        $record = $sth->fetchrow_hashref;
+        $sth->finish();
+
+    }
 
     # Update record
     if ($record->{file_digest} && $record->{file_digest} ne $digest) {
         $dbh->do("
             UPDATE files
             SET file_digest = ?, updated=? WHERE file_name=?", undef,
-            $digest, $updated, $filename
+            $digest, $updated, $filename_utf8
         );
         if ($dbh->err()) { die "$DBI::errstr\n"; }
     }
@@ -129,10 +145,20 @@ sub createFileRecord {
     my $created = shift;
     my $updated = shift;
 
+    my $filename_utf8 = $filename;
+
+    if ($^O eq "MSWin32") {
+        $filename_utf8 = Encode::decode("cp1251", $filename_utf8);
+    }
+
+    if ($^O eq "linux") {
+        $filename_utf8 = Encode::decode("utf8", $filename_utf8);
+    }
+
     $dbh->do("
         INSERT OR REPLACE INTO files
         (file_name, file_digest, created, updated) VALUES (?,?,?,?)", undef,
-        $filename, $digest, $created, $updated
+        $filename_utf8, $digest, $created, $updated
     );
 
     if ($dbh->err()) { die "$DBI::errstr\n"; }
@@ -155,6 +181,7 @@ sub publishRecord {
     my $c = shift;
     my $dbh = shift;
     my $filename = shift;
+
     $dbh->do(" UPDATE files SET isapproved=1 WHERE file_name=?", undef, $filename );
     if ($dbh->err()) { die "$DBI::errstr\n"; }
     return $c;
@@ -181,9 +208,40 @@ sub changeRecordDesciption {
 
 ################################################################################
 
+
+sub clearPath {
+
+    my $c = shift;
+    my $path = shift;
+
+    if ($^O eq "MSWin32") {
+        $path =~ s/\//\\/g;
+        $path =~ s/\\+/\\/g;
+    }
+
+    if ($^O eq "linux") {
+        $path =~ s/\\/\//g;
+        $path =~ s/\/+/\//g;
+    }
+
+    return $path;
+}
+
 sub getDigest {
     my $c = shift;
     my $filepath = shift;
+
+    $filepath = clearPath($c, $filepath);
+
+    #die Lingua::DetectCharset::Detect ($filepath);
+
+    #$filepath = Convert::Cyrillic::cstocs ("WIN", "DOS", $filepath );
+
+    #if ($^O eq "MSWin32") {
+    #    $filepath = Encode::decode("cp1251", $filepath);
+    #}
+    #if ($^O eq "linux") {
+    #}
 
     return digest_file_hex($filepath, "MD5");
 }
@@ -434,24 +492,6 @@ sub _extractMimeType {
     };
 
     return $MimeTypes->{$suffix} || undef;
-}
-
-sub clearPath {
-
-    my $c = shift;
-    my $path = shift;
-
-    if ($^O eq "MSWin32") {
-        $path =~ s/\//\\/g;
-        $path =~ s/\\+/\\/g;
-    }
-
-    if ($^O eq "linux") {
-        $path =~ s/\\/\//g;
-        $path =~ s/\/+/\//g;
-    }
-
-    return $path;
 }
 
 1;

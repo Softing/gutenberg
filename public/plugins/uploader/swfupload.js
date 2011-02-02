@@ -40,7 +40,6 @@ SWFUpload.prototype.initSWFUpload = function (settings) {
 		this.loadFlash();
 		this.displayDebugInfo();
 	} catch (ex) {
-//		console.log('Exception!!');
 		delete SWFUpload.instances[this.movieName];
 		throw ex;
 	}
@@ -210,14 +209,13 @@ SWFUpload.prototype.loadFlash = function () {
 
 	// Get the element where we will be placing the flash movie
 	targetElement = document.getElementById(this.settings.button_placeholder_id) || this.settings.button_placeholder;
-	
+
 	if (targetElement == undefined) {
 		throw "Could not find the placeholder element: " + this.settings.button_placeholder_id;
 	}
 
 	// Append the container and load the flash
 	tempParent = document.createElement("div");
-//	console.log('Adding flash HTML');
 	tempParent.innerHTML = this.getFlashHTML();	// Using innerHTML is non-standard but the only sensible way to dynamically add Flash in IE (and maybe other browsers)
 	targetElement.parentNode.replaceChild(tempParent.firstChild, targetElement);
 

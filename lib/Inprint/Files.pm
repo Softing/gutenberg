@@ -51,40 +51,65 @@ sub preview {
     my $success = $c->json->false;
 
     my $rootpath = $c->config->get("store.path");
-    my $filepath = $c->sql->Q("SELECT file_path || '/' || file_name FROM cache_files WHERE id=?", [ $id ])->Value;
+    my $sqlfilepath = $c->sql->Q("SELECT file_path || '/' || file_name FROM cache_files WHERE id=?", [ $id ])->Value;
 
-    $filepath = "$rootpath/$filepath";
+    my $filepath_encoded;
+    my $filepath_original = "$rootpath/$sqlfilepath";
 
     if ($^O eq "MSWin32") {
-        $filepath =~ s/\//\\/g;
-        $filepath =~ s/\\+/\\/g;
+        $sqlfilepath = Encode::encode("cp1251", $sqlfilepath);
+        $rootpath = Encode::encode("cp1251", $rootpath);
+        $filepath_encoded = "$rootpath/$sqlfilepath";
+        $filepath_encoded =~ s/\//\\/g;
+        $filepath_encoded =~ s/\\+/\\/g;
     }
 
     if ($^O eq "linux") {
-        $filepath =~ s/\\/\//g;
-        $filepath =~ s/\/+/\//g;
+        $filepath_encoded = "$rootpath/$sqlfilepath";
+        $filepath_encoded =~ s/\\/\//g;
+        $filepath_encoded =~ s/\/+/\//g;
     }
 
-    if (-r $filepath) {
-        my ($name, $path, $extension) = fileparse($filepath, qr/(\.[^.]+){1}?/);
-        $extension =~ s/^.//g;
-        if ($extension ~~ ['jpg', 'jpeg', 'png', 'gif']) {
-            if (-w "$path/.thumbnails") {
-                unless (-r "$path/.thumbnails/$name-$size.png") {
+    if (-r $filepath_encoded) {
+
+        my ($name1, $path1, $extension1) = fileparse($filepath_original, qr/(\.[^.]+){1}?/);
+        my ($name2, $path2, $extension2) = fileparse($filepath_encoded, qr/(\.[^.]+){1}?/);
+
+        $extension1 =~ s/^.//g;
+        $extension2 =~ s/^.//g;
+
+        if ($extension1 ~~ ['jpg', 'jpeg', 'png', 'gif']) {
+            if (-w "$path1/.thumbnails") {
+                unless (-r "$path1/.thumbnails/$name1-$size.png") {
+
+
                     my $image = Image::Magick->new;
-                    my $x = $image->Read($filepath);
-                    warn "$x" if "$x";
+                    my $x = $image->Read($filepath_original);
+                    die "$x" if "$x";
 
                     $x = $image->AdaptiveResize(geometry=>$size);
-                    warn "$x" if "$x";
+                    die "$x" if "$x";
 
-                    $x = $image->Write("$path/.thumbnails/$name-$size.png");
-                    warn "$x" if "$x";
+                    $x = $image->Write("$path1/.thumbnails/$name1-$size.png");
+                    die "$x" if "$x";
                 }
             }
-            if (-r "$path/.thumbnails/$name-$size.png") {
+
+            my $thumbnail_src1 = "$path1/.thumbnails/$name1-$size.png";
+
+            if ($^O eq "MSWin32") {
+                $thumbnail_src1 =~ s/\//\\/g;
+                $thumbnail_src1 =~ s/\\+/\\/g;
+                $thumbnail_src1 = Encode::encode("cp1251", $thumbnail_src1);
+            }
+            if ($^O eq "linux") {
+                $thumbnail_src1 =~ s/\\/\//g;
+                $thumbnail_src1 =~ s/\/+/\//g;
+            }
+
+            if (-r $thumbnail_src1) {
                 $c->tx->res->headers->content_type('image/png');
-                $c->res->content->asset(Mojo::Asset::File->new(path => "$path/.thumbnails/$name-$size.png"));
+                $c->res->content->asset(Mojo::Asset::File->new(path => $thumbnail_src1 ));
                 $c->render_static();
             }
         }

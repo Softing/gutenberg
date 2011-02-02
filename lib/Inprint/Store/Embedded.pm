@@ -7,6 +7,9 @@ package Inprint::Store::Embedded;
 
 # This is Public Store API
 
+use utf8;
+use Encode;
+
 use strict;
 
 use File::Copy qw(copy move);
@@ -42,6 +45,16 @@ sub findFiles {
         next if $filename ~~ ['.', '..'];
         next if $filename =~ m/^\./;
 
+        my $filename_utf8 = $filename;
+
+        if ($^O eq "MSWin32") {
+            $filename_utf8 = Encode::decode("cp1251", $filename_utf8);
+        }
+
+        if ($^O eq "linux") {
+            $filename_utf8 = Encode::decode("utf8", $filename_utf8);
+        }
+
         # Get file extension
         my $extension
             = Inprint::Store::Embedded::File::getExtension($c, $filename);
@@ -61,14 +74,14 @@ sub findFiles {
             Inprint::Store::Embedded::Navigation::getRelativePath($c, $path);
 
         my $cache_id = Inprint::Store::Cache::createRecord($c, $relativePath,
-            $filename, $extension, $record->{mimetype}, $record->{digest});
+            $filename_utf8, $extension, $record->{mimetype}, $record->{digest});
 
         next if ($status eq "published" && $record->{isapproved} != 1);
         next if ($status eq "unpublished" && $record->{isapproved} != 0);
 
         # Create File record
         my $filehash = {
-            name => $filename,
+            name => $filename_utf8,
 
             cache => $cache_id,
 
@@ -104,20 +117,29 @@ sub fileUpload {
     &checkFolderPath($c, $path);
 
     my $upload = $c->req->upload($fieldname);
-
     $filename = Inprint::Store::Embedded::File::normalizeFilename($c, $path, $filename);
 
-    $upload->move_to("$path/$filename");
+    my $filename_utf8 = $filename;
+
+    if ($^O eq "MSWin32") {
+        $filename_utf8 = Encode::encode("cp1251", $filename_utf8);
+    }
+
+    if ($^O eq "linux") {
+        $filename_utf8 = Encode::encode("utf8", $filename_utf8);
+    }
+
+    $upload->move_to("$path/$filename_utf8");
 
     my $id = $c->uuid;
-    my $digest   = Inprint::Store::Embedded::Metadata::getDigest($c, "$path/$filename");
-    my $created  = Inprint::Store::Embedded::Metadata::getFileCreateDate($c, "$path/$filename");
-    my $updated  = Inprint::Store::Embedded::Metadata::getFileModifyDate($c, "$path/$filename");
+    my $digest   = Inprint::Store::Embedded::Metadata::getDigest($c, "$path/$filename_utf8");
+    my $created  = Inprint::Store::Embedded::Metadata::getFileCreateDate($c, "$path/$filename_utf8");
+    my $updated  = Inprint::Store::Embedded::Metadata::getFileModifyDate($c, "$path/$filename_utf8");
 
     # Create metadata record
     my $dbh = Inprint::Store::Embedded::Metadata::connect($c, $path);
-    Inprint::Store::Embedded::Metadata::createFileRecord($c, $dbh, $filename, $digest, $created, $updated);
-    my $record = Inprint::Store::Embedded::Metadata::getFileRecord($c, $dbh, $path, $filename);
+    Inprint::Store::Embedded::Metadata::createFileRecord($c, $dbh, $filename_utf8, $digest, $created, $updated);
+    my $record = Inprint::Store::Embedded::Metadata::getFileRecord($c, $dbh, $path, $filename_utf8);
     Inprint::Store::Embedded::Metadata::disconnect($c, $dbh);
 
     # Create cache record
@@ -187,6 +209,7 @@ sub fileChangeDescription {
 }
 
 sub fileDelete {
+
     my $c = shift;
     my $fid = shift;
 
@@ -195,14 +218,26 @@ sub fileDelete {
     return unless $cache->{id};
 
     my $folderpath = clearPath( $c, $root, $cache->{file_path} );
-    my $filepath = clearPath( $c, $root, $cache->{file_path}, $cache->{file_name} );
 
     my $dbh = Inprint::Store::Embedded::Metadata::connect($c, $folderpath);
     Inprint::Store::Embedded::Metadata::deleteFileRecord($c, $dbh, $cache->{file_name});
     Inprint::Store::Embedded::Metadata::disconnect($c, $dbh);
 
     Inprint::Store::Cache::deleteRecordById($c, $fid);
-    unlink ($filepath);
+
+    my $filepath = $cache->{file_path};
+    my $filename = $cache->{file_name};
+
+    if ($^O eq "MSWin32") {
+        $filepath = Encode::encode("cp1251", $filepath);
+        $filename = Encode::encode("cp1251", $filename);
+    }
+
+    if ($^O eq "linux") {
+        #$filepath = Encode::decode("utf8", $filepath);
+    }
+
+    unlink clearPath( $c, $root, $filepath, $filename );
 
     return $c;
 }
@@ -237,7 +272,6 @@ sub fileUnpublish {
     my $dbh = Inprint::Store::Embedded::Metadata::connect($c, $folderpath);
     Inprint::Store::Embedded::Metadata::unpublishRecord($c, $dbh, $cache->{file_name});
     Inprint::Store::Embedded::Metadata::disconnect($c, $dbh);
-
 
     return $c;
 }
