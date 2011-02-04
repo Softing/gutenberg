@@ -46,8 +46,8 @@ sub list {
     # Filters
 
     if ($i_filter eq "true") {
-        $sql_query .= " AND rss.id is not null";
-        $sql_total .= " AND rss.id is not null";
+        $sql_query .= " AND rss.id is not null AND rss.published=true";
+        $sql_total .= " AND rss.id is not null AND rss.published=true";
     }
 
     # Sorting
