@@ -154,8 +154,7 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
             }
         });
 
-        var UploadPanel = {
-            xtype:'awesomeuploader',
+        var UploadPanel = new AwesomeUploader({
             border:false,
             gridWidth:470,
             gridHeight:120,
@@ -167,16 +166,8 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
             xhrUploadUrl: _url("/plugin/rss/files/upload/"),
             flashUploadUrl: _url("/plugin/rss/files/upload/"),
             standardUploadUrl: _url("/plugin/rss/files/upload/"),
-            awesomeUploaderRoot: _url("/plugins/uploader/"),
-            listeners:{
-                scope:this,
-                fileupload:function(uploader, success, result){
-                    if(success){
-                        alert("success");
-                    }
-                }
-            }
-        }
+            awesomeUploaderRoot: _url("/plugins/uploader/")
+        });
 
         var Uploader = new Ext.Window({
             title: _('Download files'),
@@ -188,6 +179,13 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
             border:false,
             items: UploadPanel
         });
+
+        UploadPanel.on("fileupload", function(uploader, success, result){
+            if(success){
+                this.children["grid"].cmpReload();
+                Uploader.hide();
+            }
+        }, this);
 
         Uploader.show();
 

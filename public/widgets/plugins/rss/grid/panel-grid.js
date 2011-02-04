@@ -41,7 +41,18 @@ Inprint.plugins.rss.Grid = Ext.extend(Ext.grid.GridPanel, {
                 }
 
             },
-            columns.title,
+            {
+                id:"title",
+                width: 32,
+                header:_("Titl"),
+                dataIndex: "title",
+                sortable: false,
+                renderer: function(v) {
+                    return '<b>'+ v +'</b>';
+                }
+
+            },
+            //columns.title,
             columns.edition,
             columns.workgroup,
             columns.fascicle,
