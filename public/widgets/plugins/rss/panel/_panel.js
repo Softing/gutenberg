@@ -183,7 +183,6 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
         UploadPanel.on("fileupload", function(uploader, success, result){
             if(success){
                 this.children["grid"].cmpReload();
-                Uploader.hide();
             }
         }, this);
 
