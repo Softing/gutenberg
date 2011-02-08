@@ -99,7 +99,7 @@ Inprint.plugins.rss.profile.Grid = Ext.extend(Ext.grid.GridPanel, {
 
             rowCtxMenuItems.push("-");
             rowCtxMenuItems.push({
-                icon: _ico("minus-button"),
+                icon: _ico("document-shred"),
                 cls: "x-btn-text-icon",
                 text: _("Delete file"),
                 scope:this,

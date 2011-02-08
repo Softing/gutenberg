@@ -111,8 +111,19 @@ sub startup {
     $self->createRoutes($sessionBridge, "documents/trees",          [ "editions", "workgroups", "fascicles" ]);
     $self->createRoutes($sessionBridge, "documents/filters",        [ "editions", "groups", "fascicles", "headlines", "rubrics", "holders", "managers", "progress" ]);
     $self->createRoutes($sessionBridge, "documents/profile",        [ "read" ]);
-    $self->createRoutes($sessionBridge, "documents/files",          [ "list", "create", "read", "update", "delete", "upload" ]);
+    #$self->createRoutes($sessionBridge, "documents/files",          [ "list", "create", "read", "update", "delete", "upload" ]);
     $self->createRoutes($sessionBridge, "documents/text",           [ "get", "set" ]);
+
+    # Document files
+    $sessionBridge->route('/documents/files/list/')         ->to('documents-files#list');
+    $sessionBridge->route('/documents/files/create/')       ->to('documents-files#create');
+    $sessionBridge->route('/documents/files/upload/')       ->to('documents-files#upload');
+    $sessionBridge->route('/documents/files/read/')         ->to('documents-files#read');
+    $sessionBridge->route('/documents/files/update/')       ->to('documents-files#update');
+    $sessionBridge->route('/documents/files/delete/')       ->to('documents-files#delete');
+    $sessionBridge->route('/documents/files/publish/')      ->to('documents-files#publish');
+    $sessionBridge->route('/documents/files/unpublish/')    ->to('documents-files#unpublish');
+    $sessionBridge->route('/documents/files/description/')  ->to('documents-files#description');
 
     $sessionBridge->route('/documents/files/preview/:document/:file')->to('documents-files#preview', document => "", file => "");
     $sessionBridge->route('/documents/:document/zip/:type')->to('documents-files#createzip', document => "", type => "");
@@ -155,6 +166,7 @@ sub startup {
     $sessionBridge->route('/aimgs/fascicle/page/:id/:w/:h')->to('images#fascicle_page');
     $sessionBridge->route('/aimgs/fascicle/template/:id/:w/:h')->to('images#fascicle_page');
     $sessionBridge->route('/aimgs/fascicle/module/:id/:w/:h')->to('images#fascicle_page');
+
     $sessionBridge->route('/aimgs/advert/page/:id/:w/:h')->to('images#fascicle_page');
     $sessionBridge->route('/aimgs/advert/template/:id/:w/:h')->to('images#fascicle_page');
     $sessionBridge->route('/aimgs/advert/module/:id/:w/:h')->to('images#fascicle_page');

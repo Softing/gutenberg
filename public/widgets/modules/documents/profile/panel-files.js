@@ -7,72 +7,60 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
 
         this.title = _("Files");
 
-        this.urls = {
-            "list":        "/documents/files/list/",
-            "create": _url("/documents/files/create/"),
-            "read":   _url("/documents/files/read/"),
-            "update": _url("/documents/files/update/"),
-            "delete": _url("/documents/files/delete/")
+        this.config = {
+            document: this.oid
         }
 
-        this.store = Inprint.factory.Store.json(this.urls["list"], {
-            autoLoad:true,
-            baseParams: {
-                document: this.oid
-            }
-        });
+        this.urls = {
+            "create":       _url("/documents/files/create/"),
+            "read":         _url("/documents/files/read/"),
+            "update":       _url("/documents/files/update/"),
+            "delete":       _url("/documents/files/delete/"),
+            "rename":       _url("/documents/files/rename/"),
+            "publish":      _url("/documents/files/publish/"),
+            "unpublish":    _url("/documents/files/unpublish/"),
+            "description":  _url("/documents/files/description/")
+        }
 
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
+
+        this.store = new Ext.data.JsonStore({
+            root: "data",
+            autoLoad:true,
+            url: _url("/documents/files/list/"),
+            baseParams: { document: this.config.document },
+            fields: [ "name", "description", "cache", "preview", "isdraft", "isapproved",  "size", "created", "updated" ]
+        });
 
         // Column model
         this.columns = [
             this.selectionModel,
             {
-                id:"preview",
-                width: 100,
-                dataIndex: "preview",
+                id:"approved",
+                width: 32,
+                dataIndex: "isapproved",
                 sortable: false,
                 renderer: function(v) {
-                    return '<img src="'+ v +'" style="border:1px solid silver;"/>';
+                    var image = '';
+                    if (v==1) { image = '<img src="'+ _ico("light-bulb") +'"/>'; }
+                    return image;
                 }
             },
             {
-                id:"title",
-                header: _("File name"),
-                width: 200,
-                sortable: true,
-                dataIndex: "filename"
-            },
-            {
-                id:"description",
-                header: _("Description"),
-                width: 300,
-                sortable: true,
-                dataIndex: "description"
-            },
-
-            {
-                id:"size",
-                header: _("Size"),
-                width: 80,
-                sortable: true,
-                dataIndex: "size"
-            },
-            {
-                id:"created",
-                header: _("Created"),
+                id:"preview",
+                header:_("Preview"),
                 width: 100,
-                sortable: true,
-                dataIndex: "created"
+                dataIndex: "cache",
+                sortable: false,
+                renderer: function(v) {
+                    return '<img src="/files/preview/'+ v +'x80" style="border:1px solid silver;"/>';
+                }
             },
-            {
-                id:"updated",
-                header: _("Updated"),
-                width: 100,
-                sortable: true,
-                dataIndex: "updated"
-            }
-
+            { id:'name', header: _("File"),dataIndex:'name', width:250},
+            { id: 'description', header: _("Description"),dataIndex:'description', width:150},
+            { id: 'size', header: _("Size"), dataIndex:'size', width:100, renderer:Ext.util.Format.fileSize},
+            { id: 'created', header: _("Created"), dataIndex:'created', width:120 },
+            { id: 'updated', header: _("Updated") ,dataIndex:'updated', width:120 }
         ];
 
         this.tbar = [
@@ -85,25 +73,31 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                 scope:this,
                 handler: this.cmpCreate
             },
+            "-",
             {
                 icon: _ico("document-globe"),
                 cls: "x-btn-text-icon",
-                text: _("Upload"),
+                text: _("Upload multiple"),
                 disabled:true,
                 ref: "../btnUpload",
                 scope:this,
                 handler: this.cmpUpload
             },
-            "-",
-            {
-                icon: _ico("document-shred"),
-                cls: "x-btn-text-icon",
-                text: _("Delete"),
-                disabled:true,
-                ref: "../btnDelete",
-                scope:this,
-                handler: this.cmpDelete
-            },
+
+            //{
+            //    xtype: "fileuploadfield",
+            //    buttonOnly: true,
+            //    buttonText: _("Upload quickly"),
+            //    buttonCfg: {
+            //        icon: _ico("document-globe"),
+            //        cls: "x-btn-text-icon"
+            //    },
+            //    listeners: {
+            //        'fileselected': function(fb, v){
+            //        }
+            //    }
+            //},
+
             "->",
             {
                 icon: _ico("arrow-270-medium"),
@@ -152,16 +146,14 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
 
         this.on("rowdblclick", function(thisGrid, rowIndex, evtObj) {
 
-            thisGrid.selModel.selectRow(rowIndex);
             evtObj.stopEvent();
 
             var record = thisGrid.getStore().getAt(rowIndex);
-            var extension = record.get("extension");
 
-            if (["doc", "rtf", "odt", "txt"].contains(extension)) {
+            if(record.get("name").match(/^.+\.(doc?x|odt|rtf|txt)$/i)) {
                 Inprint.ObjectResolver.resolve({
                     aid: "document-editor",
-                    oid:  this.oid +"::"+ record.get("id"),
+                    oid:  record.get("cache"),
                     text: record.get("filename"),
                     description: _("Text editing")
                 });
@@ -171,33 +163,48 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
 
         this.on("rowcontextmenu", function(thisGrid, rowIndex, evtObj) {
 
-            thisGrid.selModel.selectRow(rowIndex);
             evtObj.stopEvent();
-
-            var rowCtxMenuItems = [];
 
             var record = thisGrid.getStore().getAt(rowIndex);
 
-            var extension = record.get("extension");
+            var rowCtxMenuItems = [];
 
-            if (["doc", "rtf", "odt", "txt"].contains(extension)) {
+            if(record.get("name").match(/^.+\.(doc?x|odt|rtf|txt)$/i)) {
                 rowCtxMenuItems.push({
                     icon: _ico("pencil"),
                     cls: "x-btn-text-icon",
-                    text: _("Edit"),
+                    text: _("Edit Text"),
                     scope:this,
                     handler : function() {
                         Inprint.ObjectResolver.resolve({
                             aid: "document-editor",
-                            oid:  this.oid +"::"+ record.get("id"),
+                            oid:  record.get("cache"),
                             text: record.get("filename"),
                             description: _("Text editing")
                         });
                     }
                 });
-
                 rowCtxMenuItems.push("-");
             }
+
+            rowCtxMenuItems.push({
+                icon: _ico("light-bulb"),
+                cls: "x-btn-text-icon",
+                text: _("Publish"),
+                scope:this,
+                handler: this.cmpPublish
+            });
+
+            rowCtxMenuItems.push({
+                icon: _ico("light-bulb-off"),
+                cls: "x-btn-text-icon",
+                text: _("Unpublish"),
+                scope:this,
+                handler: this.cmpUnpublish
+            });
+
+            rowCtxMenuItems.push("-");
+
             rowCtxMenuItems.push({
                 icon: _ico("edit-drop-cap"),
                 cls: "x-btn-text-icon",
@@ -213,6 +220,17 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                 scope:this,
                 handler : this.cmpChangeDescription
             });
+
+            if (this.access["files.delete"]  == true) {
+                rowCtxMenuItems.push("-");
+                rowCtxMenuItems.push({
+                    icon: _ico("document-shred"),
+                    cls: "x-btn-text-icon",
+                    text: _("Delete file"),
+                    scope:this,
+                    handler : this.cmpDelete
+                });
+            }
 
             thisGrid.rowCtxMenu = new Ext.menu.Menu({
                 items : rowCtxMenuItems
@@ -238,7 +256,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
         _disable(this.btnCreate, this.btnUpload, this.btnDelete);
         if (access["files.add"]     == true) this.btnCreate.enable();
         if (access["files.add"]     == true) this.btnUpload.enable();
-        if (access["files.delete"]  == true) this.btnDelete.enable();
+        //if (access["files.delete"]  == true) this.btnDelete.enable();
     },
 
     cmpCreate: function() {
@@ -258,20 +276,20 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                 {
                     xtype: "hidden",
                     name: "document",
-                    value: this.oid
+                    value: this.config.document
                 },
-                _FLD_TITLE,
+                _FLD_FILENAME,
                 _FLD_DESCRIPTION
             ],
             keys: [ _KEY_ENTER_SUBMIT ],
-            buttons: [ _BTN_SAVE,_BTN_CLOSE ]
+            buttons: [ _BTN_SAVE, _BTN_CLOSE ]
         });
 
         var win = new Ext.Window({
-            title: _("Add file"),
+            title: _("Create a new file" + " [RTF]"),
             layout: "fit",
             closeAction: "hide",
-            width:400, height:200,
+            width:400, height:180,
             items: form
         });
 
@@ -286,109 +304,69 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
     },
 
     cmpUpdate: function() {
-
-        var form = new Ext.FormPanel({
-            border:false,
-            labelWidth: 75,
-            url: _url("/documents/files/update/"),
-            bodyStyle: "padding:5px 5px",
-            defaults: {
-                anchor: "100%",
-                allowBlank:false
-            },
-            items: [
-                _FLD_HDN_ID,
-                _FLD_TITLE,
-                _FLD_DESCRIPTION
-            ],
-            keys: [ _KEY_ENTER_SUBMIT ],
-            buttons: [ _BTN_SAVE,_BTN_CLOSE ]
+        var Uploader = new Inprint.cmp.Uploader({
+            config: {
+                document: this.config.document,
+                uploadUrl: _url("/documents/files/upload/")
+            }
         });
 
-        var win = new Ext.Window({
-            title: _("Add file"),
-            layout: "fit",
-            closeAction: "hide",
-            width:400, height:260,
-            items: form
-        });
-
-        form.on("actioncomplete", function (form, action) {
-            if (action.type == "submit")
-                win.hide();
-            this.getStore().load();
+        Uploader.on("fileUploaded", function() {
+            Uploader.hide();
+            this.cmpReload();
         }, this);
 
-        win.show();
+        Uploader.show();
     },
 
     cmpUpload: function() {
-
-        var cookies = document.cookie.split(";");
-        var Session;
-
-        Ext.each(cookies, function(cookie) {
-            var nvp = cookie.split("=");
-            if (nvp[0].trim() == 'sid')
-            {
-                Session = nvp[1];
+        var Uploader = new Inprint.cmp.Uploader({
+            config: {
+                document: this.config.document,
+                uploadUrl: _url("/documents/files/upload/")
             }
         });
 
-        var UploadPanel = {
-            xtype:'awesomeuploader',
-            border:false,
-            gridWidth:470,
-            gridHeight:120,
-            height:180,
-            extraPostData: {
-                sid: Session,
-                document: this.parent.document
-            },
-            flashUploadUrl:_url("/documents/files/upload/"),
-            standardUploadUrl:_url("/documents/files/upload/"),
-            xhrUploadUrl:_url("/documents/files/upload/"),
-            awesomeUploaderRoot: "/plugins/uploader/",
-            listeners:{
-                scope:this,
-                fileupload:function(uploader, success, result){
-                    if(success){
-                        this.cmpReload();
-                    }
-                }
-            }
-        }
-
-        var Uploader = new Ext.Window({
-            title: _('Download files'),
-            modal:true,
-            layout:"fit",
-            width: 500,
-            height: 200,
-            bodyBorder:false,
-            border:false,
-            items: UploadPanel
-        });
+        Uploader.on("fileUploaded", function() {
+            Uploader.hide();
+            this.cmpReload();
+        }, this);
 
         Uploader.show();
-
     },
 
+    // Publish and unpublish file
+    cmpPublish: function() {
+        Ext.Ajax.request({
+            url: this.urls["publish"],
+            scope:this,
+            success: this.cmpReload,
+            params: { document: this.config.document, file: this.getValues("cache") }
+        });
+    },
+    cmpUnpublish: function() {
+        var document = this.getStore().baseParams.document;
+        var file = this.getValues("cache");
+        Ext.Ajax.request({
+            url: this.urls["unpublish"],
+            scope:this,
+            success: this.cmpReload,
+            params: { document: this.config.document, file: this.getValues("cache") }
+        });
+    },
+
+    // Rename file
     cmpRenameFile: function() {
         Ext.MessageBox.prompt(
-            _("Warning"),
-            _("You really wish to do this?"),
+            _("Renaming a file"),
+            _("Enter a new filename"),
             function(btn, text) {
                 if (btn == "ok") {
                     Ext.Ajax.request({
-                        url: _url("/documents/files/rename/"),
-                        scope:this,
+                        url: this.urls["rename"],
                         success: this.cmpReload,
-                        params: {
-                            document: this.parent.document,
-                            file: this.getValue("id"),
-                            text: text
-                        }
+                        scope:this,
+                        params: { document: this.config.document, file: this.getValues("cache"), filename: text }
                     });
                 }
             }, this);
@@ -399,20 +377,16 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
             width:300,
             scope:this,
             multiline: true,
-            title: _("Warning"),
             buttons: Ext.MessageBox.OKCANCEL,
-            msg: _("You really wish to do this?"),
+            title: _("Modification of the file description"),
+            msg: _("Enter a new description for file"),
             fn: function(btn, text) {
                 if (btn == "ok") {
                     Ext.Ajax.request({
-                        url: _url("/documents/files/description/"),
+                        url: this.urls["description"],
                         scope:this,
                         success: this.cmpReload,
-                        params: {
-                            document: this.parent.document,
-                            file: this.getValue("id"),
-                            text: text
-                        }
+                        params: { document: this.config.document, file: this.getValues("cache"), description: text }
                     });
                 }
             }
@@ -421,18 +395,15 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
 
     cmpDelete: function() {
         Ext.MessageBox.confirm(
-            _("Warning"),
-            _("You really wish to do this?"),
+            _("Irrevocable action!"),
+            _("Remove selected files?"),
             function(btn) {
                 if (btn == "yes") {
                     Ext.Ajax.request({
-                        url: _url("/documents/files/delete/"),
+                        url: this.urls["delete"],
                         scope:this,
                         success: this.cmpReload,
-                        params: {
-                            document: this.parent.document,
-                            files: this.getValues("id")
-                        }
+                        params: { document: this.config.document, file: this.getValues("cache") }
                     });
                 }
             }, this).setIcon(Ext.MessageBox.WARNING);

@@ -54,5 +54,34 @@ sub deleteRecordById {
     return $c;
 }
 
+sub cleanup {
+
+    my ($c, $folder, $relativePath) = @_;
+
+    my $cacheRecords = $c->sql->Q("
+            SELECT * FROM cache_files WHERE file_path=?
+            ", [ $relativePath ])->Hashes;
+
+    foreach my $record (@$cacheRecords) {
+
+        my $filepath = $folder ."/". $record->{file_name};
+
+        if ($^O eq "MSWin32") {
+            $filepath =~ s/\//\\/g;
+            $filepath =~ s/\\+/\\/g;
+        }
+
+        if ($^O eq "linux") {
+            $filepath =~ s/\\/\//g;
+            $filepath =~ s/\/+/\//g;
+        }
+
+        unless (-e $filepath) {
+            $c->sql->Do(" DELETE FROM cache_files WHERE id=? ", [ $record->{id} ]);
+        }
+    }
+
+    return;
+}
 
 1;

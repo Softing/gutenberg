@@ -35,6 +35,9 @@ sub findFiles {
     # Check folder for existence and the ability to create files
     &checkFolderPath($c, $path);
 
+    my $relativePath =
+            Inprint::Store::Embedded::Navigation::getRelativePath($c, $path);
+
     my @files;
 
     # Read folder
@@ -61,7 +64,7 @@ sub findFiles {
 
         # Apply a filter, if specified
         if ($filter) {
-            next unless $extension ~~ $filter;
+            next unless lc($extension) ~~ $filter;
         }
 
         # Create SQLite record
@@ -70,8 +73,6 @@ sub findFiles {
         Inprint::Store::Embedded::Metadata::disconnect($c, $dbh);
 
         # Create Cache record
-        my $relativePath =
-            Inprint::Store::Embedded::Navigation::getRelativePath($c, $path);
 
         my $cache_id = Inprint::Store::Cache::createRecord($c, $relativePath,
             $filename_utf8, $extension, $record->{mimetype}, $record->{digest});
@@ -103,6 +104,9 @@ sub findFiles {
     }
     closedir DIR;
 
+    # Clear cache
+    my $cache_id = Inprint::Store::Cache::cleanup($c, $path, $relativePath);
+
     return \@files;
 }
 
@@ -114,9 +118,9 @@ sub fileUpload {
     my $filename = shift;
     my $fieldname = shift || "Filedata";
 
-    &checkFolderPath($c, $path);
-
     my $upload = $c->req->upload($fieldname);
+
+    &checkFolderPath($c, $path);
     $filename = Inprint::Store::Embedded::File::normalizeFilename($c, $path, $filename);
 
     my $filename_utf8 = $filename;
@@ -156,7 +160,53 @@ sub fileUpload {
 }
 
 sub fileCreate {
-    my $c = shift;
+    my ($c, $folder, $filename, $description) = @_;
+
+    &checkFolderPath($c, $folder);
+    $filename = Inprint::Store::Embedded::File::normalizeFilename($c, $folder, "$filename.rtf");
+
+    my $filename_utf8 = $filename;
+
+    if ($^O eq "MSWin32") {
+        $filename_utf8 = Encode::encode("cp1251", $filename_utf8);
+    }
+
+    if ($^O eq "linux") {
+        $filename_utf8 = Encode::encode("utf8", $filename_utf8);
+    }
+
+    my $templateFile = $c->config->get("store.path") . "/templates/template.rtf";
+    die "Can't find path <$templateFile>" unless -e $templateFile;
+    die "Can't read path <$templateFile>" unless -r $templateFile;
+
+    copy $templateFile, "$folder/$filename_utf8";
+
+    die "Can't find path <$filename_utf8>" unless -e "$folder/$filename_utf8";
+    die "Can't read path <$filename_utf8>" unless -r "$folder/$filename_utf8";
+
+    my $id = $c->uuid;
+    my $digest   = Inprint::Store::Embedded::Metadata::getDigest($c, "$folder/$filename_utf8");
+    my $created  = Inprint::Store::Embedded::Metadata::getFileCreateDate($c, "$folder/$filename_utf8");
+    my $updated  = Inprint::Store::Embedded::Metadata::getFileModifyDate($c, "$folder/$filename_utf8");
+
+    # Create metadata record
+    my $dbh = Inprint::Store::Embedded::Metadata::connect($c, $folder);
+    Inprint::Store::Embedded::Metadata::createFileRecord($c, $dbh, $filename_utf8, $digest, $created, $updated);
+    Inprint::Store::Embedded::Metadata::changeRecordDesciption($c, $dbh, $filename_utf8, $description);
+    my $record = Inprint::Store::Embedded::Metadata::getFileRecord($c, $dbh, $folder, $filename_utf8);
+    Inprint::Store::Embedded::Metadata::disconnect($c, $dbh);
+
+    die "Can't find record <$filename_utf8>" unless $record->{digest};
+
+    # Create cache record
+    my $relativePath =
+        Inprint::Store::Embedded::Navigation::getRelativePath($c, $folder);
+
+    my $extension
+        = Inprint::Store::Embedded::File::getExtension($c, $filename);
+
+    my $cache_id = Inprint::Store::Cache::createRecord($c, $relativePath,
+            $filename, $extension, $record->{mimetype}, $record->{digest});
 
     return $c;
 }
@@ -165,9 +215,19 @@ sub fileRead {
     my $c = shift;
     my $fid = shift;
 
-    die "read";
+    my $cacheRecord = Inprint::Store::Cache::getRecordById($c, $fid);
 
-    return $c;
+    die "Can't find cache record <$fid>" unless $cacheRecord->{file_digest};
+
+    my $rootpath = Inprint::Store::Embedded::Navigation::getRootPath($c);
+    my $filepath = clearPath( $c, $rootpath, $cacheRecord->{file_path}, $cacheRecord->{file_name} );
+
+    die "Can't find file <$filepath>" unless -e $filepath;
+    die "Can't read file <$filepath>" unless -r $filepath;
+
+    my $text = Inprint::Store::Embedded::Editor::read($c, "html", $filepath);
+
+    return $text ;
 }
 
 sub fileSave {
@@ -175,7 +235,17 @@ sub fileSave {
     my $fid = shift;
     my $text = shift;
 
-    die "save";
+    my $cacheRecord = Inprint::Store::Cache::getRecordById($c, $fid);
+
+    die "Can't find cache record <$fid>" unless $cacheRecord->{file_digest};
+
+    my $rootpath = Inprint::Store::Embedded::Navigation::getRootPath($c);
+    my $filepath = clearPath( $c, $rootpath, $cacheRecord->{file_path}, $cacheRecord->{file_name} );
+
+    die "Can't find file <$filepath>" unless -e $filepath;
+    die "Can't read file <$filepath>" unless -r $filepath;
+
+    Inprint::Store::Embedded::Editor::write($c, $cacheRecord->{file_extension}, $filepath, $text);
 
     return $c;
 }
