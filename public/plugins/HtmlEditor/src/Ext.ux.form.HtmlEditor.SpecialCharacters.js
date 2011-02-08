@@ -14,12 +14,12 @@ Ext.ux.form.HtmlEditor.SpecialCharacters = Ext.extend(Ext.util.Observable, {
      * @cfg {Array} specialChars
      * An array of additional characters to display for user selection.  Uses numeric portion of the ASCII HTML Character Code only. For example, to use the Copyright symbol, which is &#169; we would just specify <tt>169</tt> (ie: <tt>specialChars:[169]</tt>).
      */
-    specialChars: [153],
+    specialChars: [171, 187, 132, 147, 148, 150, 151, 169, 174, 153, 176, 177, 215, 167, 180, 160],
     /**
      * @cfg {Array} charRange
      * Two numbers specifying a range of ASCII HTML Characters to display for user selection. Defaults to <tt>[160, 256]</tt>.
      */
-    charRange: [160, 256],
+    charRange: [], //160, 256
     // private
     chars: [],
     // private
