@@ -174,8 +174,24 @@ sub _generatePreviewFile {
         $filepathEncoded =~ s/\/+/\//g;
     }
 
-    if ($filextenOriginal ~~ ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff']) {
-        if (-w "$folderEncoded/.thumbnails") {
+    my $thumbnailFolder = "$folderEncoded/.thumbnails";
+    my $thumbnailFile   = "$folderOriginal/.thumbnails/$filenameOriginal-$size.png";
+    if ($^O eq "MSWin32") {
+        $thumbnailFolder =~ s/\//\\/g;
+        $thumbnailFolder =~ s/\\+/\\/g;
+        $thumbnailFile  =~ s/\//\\/g;
+        $thumbnailFile  =~ s/\\+/\\/g;
+    }
+    if ($^O eq "linux") {
+        $thumbnailFolder =~ s/\\/\//g;
+        $thumbnailFolder =~ s/\/+/\//g;
+        $thumbnailFile  =~ s/\\/\//g;
+        $thumbnailFile  =~ s/\/+/\//g;
+    }
+
+    if ( lc($filextenOriginal) ~~ ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff']) {
+    
+        if (-w $thumbnailFolder) {
 
             my $image = Image::Magick->new;
             my $x = $image->Read($filepathOriginal);
@@ -184,7 +200,7 @@ sub _generatePreviewFile {
             $x = $image->AdaptiveResize(geometry=>$size);
             die "$x" if "$x";
 
-            $x = $image->Write("$folderOriginal/.thumbnails/$filenameOriginal-$size.png");
+            $x = $image->Write($thumbnailFile);
 
             die "$x" if "$x";
 
@@ -192,7 +208,7 @@ sub _generatePreviewFile {
 
     }
 
-    if ($filextenOriginal ~~ ['doc', 'docx', 'txt', 'rtf', 'odt', 'xls', 'xlsx', 'odp', 'ods' ]) {
+    if (lc($filextenOriginal) ~~ ['doc', 'docx', 'txt', 'rtf', 'odt', 'xls', 'xlsx', 'odp', 'ods' ]) {
 
         my $ooHost = $c->config->get("openoffice.host");
         my $ooPort = $c->config->get("openoffice.port");
@@ -237,21 +253,6 @@ sub _generatePreviewFile {
 
         # Crete thumbnail
         
-        my $thumbnailFolder = "$folderEncoded/.thumbnails";
-        my $thumbnailFile   = "$folderEncoded/.thumbnails/$filenameOriginal-$size.png";
-        if ($^O eq "MSWin32") {
-            $thumbnailFolder =~ s/\//\\/g;
-            $thumbnailFolder =~ s/\\+/\\/g;
-            $thumbnailFile  =~ s/\//\\/g;
-            $thumbnailFile  =~ s/\\+/\\/g;
-        }
-        if ($^O eq "linux") {
-            $thumbnailFolder =~ s/\\/\//g;
-            $thumbnailFolder =~ s/\/+/\//g;
-            $thumbnailFile  =~ s/\\/\//g;
-            $thumbnailFile  =~ s/\/+/\//g;
-        }
-
         if (-w $thumbnailFolder) {
                 
             if (-r $pdfPath) {
