@@ -14,6 +14,7 @@ use File::Basename;
 use HTTP::Request::Common qw(POST);
 use LWP::UserAgent;
 use Image::Magick;
+use Digest::file qw(digest_file_hex);
 
 use base 'Inprint::BaseController';
 
@@ -74,25 +75,72 @@ sub preview {
     my $success = $c->json->false;
 
     my $rootpath = $c->config->get("store.path");
-    my $sqlfilepath = $c->sql->Q("SELECT id, file_path, file_name, file_extension FROM cache_files WHERE id=?", [ $id ])->Hash;
+    my $sqlfilepath = $c->sql->Q("SELECT id, file_path, file_name, file_extension, file_thumbnail FROM cache_files WHERE id=?", [ $id ])->Hash;
 
-
-
-    my $filepathEncoded;
-    my $filepathOriginal = "$rootpath/" . $sqlfilepath->{file_path} . "/". $sqlfilepath->{file_name};
-
-    my $fileid           = $sqlfilepath->{id};
     my $folderOriginal   = $sqlfilepath->{file_path};
     my $filenameOriginal = $sqlfilepath->{file_name};
-    my $filextenOriginal = $sqlfilepath->{file_extension};
+
+    my $filepath = "$rootpath/$folderOriginal/$filenameOriginal";
+    my $thumbnailsSrc = "$rootpath/$folderOriginal/.thumbnails/$filenameOriginal-$size.png";
+
+    if ($^O eq "MSWin32") {
+
+        $filepath =~ s/\//\\/g;
+        $filepath =~ s/\\+/\\/g;
+        $filepath = Encode::encode("cp1251", $filepath);
+
+        $thumbnailsSrc =~ s/\//\\/g;
+        $thumbnailsSrc =~ s/\\+/\\/g;
+        $thumbnailsSrc   = Encode::encode("cp1251", $thumbnailsSrc);
+    }
+    if ($^O eq "linux") {
+
+        $filepath =~ s/\\/\//g;
+        $filepath =~ s/\/+/\//g;
+        $filepath = Encode::encode("utf8", $filepath);
+
+        $thumbnailsSrc =~ s/\\/\//g;
+        $thumbnailsSrc =~ s/\/+/\//g;
+        $thumbnailsSrc   = Encode::encode("utf8", $thumbnailsSrc);
+    }
+
+    # Generate preview
+    if (-r $filepath) {
+        my $digest = digest_file_hex($filepath, "MD5");
+        if ($digest ne $sqlfilepath->{file_thumbnail} || !$sqlfilepath->{file_thumbnail} || ! -r $thumbnailsSrc) {
+            _generatePreviewFile( $c, $size, $rootpath, $sqlfilepath->{file_path}, $sqlfilepath->{file_name}, $sqlfilepath->{file_extension} );
+            $c->sql->Do("UPDATE cache_files SET file_thumbnail=? WHERE id=?", [ $digest, $id ]);
+        }
+    }
+
+    if (-r $thumbnailsSrc) {
+        $c->tx->res->headers->content_type('image/png');
+        $c->res->content->asset(Mojo::Asset::File->new(path => $thumbnailsSrc ));
+        $c->render_static();
+    }
+
+
+    $c->render_json({  });
+}
+
+sub _generatePreviewFile {
+
+    my ($c, $size, $rootpath, $path, $file, $extension) = @_;
+
+    my $filepathEncoded;
+    my $filepathOriginal = $rootpath ."/" . $path . "/". $file;
+
+    my $folderOriginal   = $path;
+    my $filenameOriginal = $file;
+    my $filextenOriginal = $extension;
 
     $folderOriginal = "$rootpath/$folderOriginal";
     $folderOriginal =~ s/\//\\/g;
     $folderOriginal =~ s/\\+/\\/g;
 
-    my $folderEncoded   = $sqlfilepath->{file_path};
-    my $filenameEncoded = $sqlfilepath->{file_name};
-    my $filextenEncoded = $sqlfilepath->{file_extension};
+    my $folderEncoded   = $path;
+    my $filenameEncoded = $file;
+    my $filextenEncoded = $extension;
 
     if ($^O eq "MSWin32") {
 
@@ -126,118 +174,90 @@ sub preview {
         $filepathEncoded =~ s/\/+/\//g;
     }
 
-    if (-r $filepathEncoded) {
+    if ($filextenOriginal ~~ ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff']) {
+        if (-w "$folderEncoded/.thumbnails") {
 
-        if ($filextenOriginal ~~ ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff']) {
-            if (-w "$folderEncoded/.thumbnails") {
+            my $image = Image::Magick->new;
+            my $x = $image->Read($filepathOriginal);
+            die "$x" if "$x";
 
-                my $image = Image::Magick->new;
-                my $x = $image->Read($filepathOriginal);
-                die "$x" if "$x";
+            $x = $image->AdaptiveResize(geometry=>$size);
+            die "$x" if "$x";
 
-                $x = $image->AdaptiveResize(geometry=>$size);
-                die "$x" if "$x";
+            $x = $image->Write("$folderOriginal/.thumbnails/$filenameOriginal-$size.png");
 
-                $x = $image->Write("$folderOriginal/.thumbnails/$filenameOriginal-$size.png");
+            die "$x" if "$x";
 
-                die "$x" if "$x";
-
-            }
-
-        }
-
-        if ($filextenOriginal ~~ ['doc', 'docx', 'txt', 'rtf', 'odt', 'xls', 'xlsx', 'odp', 'ods' ]) {
-
-            my $ooHost = $c->config->get("openoffice.host");
-            my $ooPort = $c->config->get("openoffice.port");
-            my $ooTimeout = $c->config->get("openoffice.timeout");
-
-            die "Cant read configuration <openoffice.host>" unless $ooHost;
-            die "Cant read configuration <openoffice.port>" unless $ooPort;
-            die "Cant read configuration <openoffice.timeout>" unless $ooTimeout;
-
-            my $ooUrl = "http://$ooHost:$ooPort/api/converter/";
-            my $ooUagent = LWP::UserAgent->new();
-
-            my $pdfPath = "$folderEncoded/.thumbnails/$filenameEncoded.pdf";
-
-            if ($^O eq "MSWin32") {
-                $pdfPath =~ s/\//\\/g;
-                $pdfPath =~ s/\\+/\\/g;
-            }
-            if ($^O eq "linux") {
-                $pdfPath =~ s/\\/\//g;
-                $pdfPath =~ s/\/+/\//g;
-            }
-
-            # Create pdf
-            my $ooRequest = POST(
-                $ooUrl, Content_Type => 'form-data',
-                Content => [ outputFormat => "pdf", inputDocument =>  [ $filepathEncoded ] ]
-            );
-
-            my $ooResponse = $ooUagent->request($ooRequest);
-            if ($ooResponse->is_success()) {
-
-                open FILE, "> $pdfPath" or die "Can't open <$pdfPath> : $!";
-                binmode FILE;
-                    print FILE $ooResponse->content;
-                close FILE;
-
-            } else {
-                die $ooResponse->as_string;
-            }
-
-            # Crete thumbnail
-            if (-w "$folderEncoded/.thumbnails") {
-                if (-r $pdfPath) {
-
-                    my $image = Image::Magick->new;
-                    my $x = $image->Read($pdfPath);
-                    die "$x" if "$x";
-
-                    my $image2 = $image->[0];
-
-                    $x = $image2->Normalize();
-                    die "$x" if "$x";
-
-                    $x = $image2->AdaptiveResize(geometry=>$size);
-                    die "$x" if "$x";
-
-                    $x = $image2->Write("$folderOriginal/.thumbnails/$filenameOriginal-$size.png");
-                    die "$x" if "$x";
-
-                    unlink $pdfPath;
-                }
-            }
-        }
-
-        my $thumbnailsSrc = "$folderOriginal/.thumbnails/$filenameOriginal-$size.png";
-
-        if ($^O eq "MSWin32") {
-            $thumbnailsSrc =~ s/\//\\/g;
-            $thumbnailsSrc =~ s/\\+/\\/g;
-            $thumbnailsSrc   = Encode::encode("cp1251", $thumbnailsSrc);
-        }
-        if ($^O eq "linux") {
-            $thumbnailsSrc =~ s/\\/\//g;
-            $thumbnailsSrc =~ s/\/+/\//g;
-            $thumbnailsSrc   = Encode::encode("utf8", $thumbnailsSrc);
-        }
-
-        if (-r $thumbnailsSrc) {
-            #die $thumbnailsSrc;
-        }
-
-        if (-r $thumbnailsSrc) {
-            $c->tx->res->headers->content_type('image/png');
-            $c->res->content->asset(Mojo::Asset::File->new(path => $thumbnailsSrc ));
-            $c->render_static();
         }
 
     }
 
-    $c->render_json({  });
+    if ($filextenOriginal ~~ ['doc', 'docx', 'txt', 'rtf', 'odt', 'xls', 'xlsx', 'odp', 'ods' ]) {
+
+        my $ooHost = $c->config->get("openoffice.host");
+        my $ooPort = $c->config->get("openoffice.port");
+        my $ooTimeout = $c->config->get("openoffice.timeout");
+
+        die "Cant read configuration <openoffice.host>" unless $ooHost;
+        die "Cant read configuration <openoffice.port>" unless $ooPort;
+        die "Cant read configuration <openoffice.timeout>" unless $ooTimeout;
+
+        my $ooUrl = "http://$ooHost:$ooPort/api/converter/";
+        my $ooUagent = LWP::UserAgent->new();
+
+        my $pdfPath = "$folderEncoded/.thumbnails/$filenameEncoded.pdf";
+
+        if ($^O eq "MSWin32") {
+            $pdfPath =~ s/\//\\/g;
+            $pdfPath =~ s/\\+/\\/g;
+        }
+        if ($^O eq "linux") {
+            $pdfPath =~ s/\\/\//g;
+            $pdfPath =~ s/\/+/\//g;
+        }
+
+        # Create pdf
+        my $ooRequest = POST(
+            $ooUrl, Content_Type => 'form-data',
+            Content => [ outputFormat => "pdf", inputDocument =>  [ $filepathEncoded ] ]
+        );
+
+        my $ooResponse = $ooUagent->request($ooRequest);
+        if ($ooResponse->is_success()) {
+
+            open FILE, "> $pdfPath" or die "Can't open <$pdfPath> : $!";
+            binmode FILE;
+                print FILE $ooResponse->content;
+            close FILE;
+
+        } else {
+            die $ooResponse->as_string;
+        }
+
+        # Crete thumbnail
+        if (-w "$folderEncoded/.thumbnails") {
+            if (-r $pdfPath) {
+
+                my $image = Image::Magick->new;
+                my $x = $image->Read($pdfPath);
+                die "$x" if "$x";
+
+                my $image2 = $image->[0];
+
+                $x = $image2->Normalize();
+                die "$x" if "$x";
+
+                $x = $image2->AdaptiveResize(geometry=>$size);
+                die "$x" if "$x";
+
+                $x = $image2->Write("$folderOriginal/.thumbnails/$filenameOriginal-$size.png");
+                die "$x" if "$x";
+
+                unlink $pdfPath;
+            }
+        }
+    }
+
 }
 
 1;

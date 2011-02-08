@@ -10,6 +10,8 @@ sub createRecord {
 
     my ( $path, $filename, $extension, $mimetype, $digest) = @_;
 
+    $filename =~ s/\s+/_/g;
+
     my $cache_id = $c->sql->Q("
             SELECT id FROM cache_files WHERE file_path=? AND file_name=?
             ", [ $path, $filename ])->Value;
@@ -51,7 +53,7 @@ sub deleteRecordById {
     my $c = shift;
     my $id = shift;
 
-    my $record = $c->sql->Do(" DELETE FROM cache_files WHERE id=? ", [ $id ]);
+    $c->sql->Do(" UPDATE cache_files SET file_exists = false WHERE id=? ", [ $id ]);
 
     return $c;
 }
@@ -80,7 +82,7 @@ sub cleanup {
         }
 
         unless (-e $filepath) {
-            $c->sql->Do(" DELETE FROM cache_files WHERE id=? ", [ $record->{id} ]);
+            deleteRecordById($c, $record->{id});
         }
     }
 

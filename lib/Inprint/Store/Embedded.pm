@@ -294,6 +294,8 @@ sub fileChangeDescription {
     Inprint::Store::Embedded::Metadata::changeRecordDesciption($c, $dbh, $cache->{file_name}, $text);
     Inprint::Store::Embedded::Metadata::disconnect($c, $dbh);
 
+    $c->sql->Do("UPDATE cache_files SET file_description=? WHERE id=?", [ $text, $fid ]);
+
     return $c;
 }
 
@@ -323,8 +325,11 @@ sub fileDelete {
     }
 
     if ($^O eq "linux") {
-        #$filepath = Encode::decode("utf8", $filepath);
+        $filepath = Encode::encode("utf8", $filepath);
+        $filename = Encode::encode("utf8", $filename);
     }
+
+    $c->sql->Do("UPDATE cache_files SET file_exists=false WHERE id=?", [ $fid ]);
 
     unlink clearPath( $c, $root, $filepath, $filename );
 
@@ -345,6 +350,8 @@ sub filePublish {
     Inprint::Store::Embedded::Metadata::publishRecord($c, $dbh, $cache->{file_name});
     Inprint::Store::Embedded::Metadata::disconnect($c, $dbh);
 
+    $c->sql->Do("UPDATE cache_files SET file_published=true WHERE id=?", [ $fid ]);
+
     return $c;
 }
 
@@ -361,6 +368,8 @@ sub fileUnpublish {
     my $dbh = Inprint::Store::Embedded::Metadata::connect($c, $folderpath);
     Inprint::Store::Embedded::Metadata::unpublishRecord($c, $dbh, $cache->{file_name});
     Inprint::Store::Embedded::Metadata::disconnect($c, $dbh);
+
+    $c->sql->Do("UPDATE cache_files SET file_published=false WHERE id=?", [ $fid ]);
 
     return $c;
 }
