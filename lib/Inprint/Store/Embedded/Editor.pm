@@ -68,7 +68,7 @@ sub read {
         $result =~ s/\r?\n/<br>/g;
     }
 
-    my $scrubber = HTML::Scrubber->new( allow => [ qw[ p b i u hr ul ol li sub sup ] ] );
+    my $scrubber = HTML::Scrubber->new( allow => [ qw[ p b i u hr ul ol li sub sup table tr td ] ] );
     $result = $scrubber->scrub($result);
 
     $result =~ s/\s+/ /g;
@@ -95,7 +95,7 @@ sub write {
 
     # Create hotsave
 
-    my $scrubber = HTML::Scrubber->new( allow => [ qw[ p b i u hr ul ol li sub sup ] ] );
+    my $scrubber = HTML::Scrubber->new( allow => [ qw[ p b i u hr ul ol li sub sup table tr td ] ] );
 
     my $hotSaveText = $scrubber->scrub($text);
 
