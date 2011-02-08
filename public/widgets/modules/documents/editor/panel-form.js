@@ -13,6 +13,9 @@ Inprint.documents.Editor.Form = Ext.extend(Ext.form.HtmlEditor,
             name: 'text',
             enableFont: false,
             enableLinks: false,
+            enableColors: false,
+            enableFontSize: false,
+            enableAlignments: false,
             fontFamilies: ['Times New Roman'],
             defaultFont: 'times new roman',
             plugins: [
@@ -21,6 +24,7 @@ Inprint.documents.Editor.Form = Ext.extend(Ext.form.HtmlEditor,
                 new Ext.ux.form.HtmlEditor.UndoRedo(),
                 new Ext.ux.form.HtmlEditor.Divider(),
                 new Ext.ux.form.HtmlEditor.SpecialCharacters(),
+                new Ext.ux.form.HtmlEditor.SubSuperScript()
             ]
         });
 
