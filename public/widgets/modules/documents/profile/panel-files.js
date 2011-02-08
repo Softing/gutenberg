@@ -160,7 +160,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
 
             var record = thisGrid.getStore().getAt(rowIndex);
 
-            if(record.get("name").match(/^.+\.(doc?x|odt|rtf|txt)$/i)) {
+            if(record.get("name").match(/^.+\.(doc|docx|odt|rtf|txt)$/i)) {
                 Inprint.ObjectResolver.resolve({
                     aid: "document-editor",
                     oid:  record.get("cache"),
@@ -179,7 +179,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
 
             var rowCtxMenuItems = [];
 
-            if(record.get("name").match(/^.+\.(doc?x|odt|rtf|txt)$/i)) {
+            if(record.get("name").match(/^.+\.(doc|docx|odt|rtf|txt)$/i)) {
                 rowCtxMenuItems.push({
                     icon: _ico("pencil"),
                     cls: "x-btn-text-icon",
