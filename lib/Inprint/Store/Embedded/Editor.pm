@@ -246,7 +246,7 @@ sub clearHtml {
 
     my $html = shift;
 
-    my $scrubber = HTML::Scrubber->new( allow => [ qw[ p b i u ol ul li table col tr td th tbody ] ]);
+    my $scrubber = HTML::Scrubber->new( allow => [ qw[ p b i u ol ul li sub sup table col tr td th tbody ] ]);
     $scrubber->rules(
 
         table =>{
