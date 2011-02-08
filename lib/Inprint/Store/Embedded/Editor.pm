@@ -74,7 +74,6 @@ sub read {
             0 => {
                 "*"    => 0,
                 border => 1,
-                style => 1
             }
         ]
     );
@@ -82,6 +81,8 @@ sub read {
 
     $result =~ s/\s+/ /g;
     $result =~ s/\t//g;
+    $result =~ s/<td>/<td border=1>/g;
+    $result =~ s/<table>/<table border=1>/g;
 
     return $result;
 }
