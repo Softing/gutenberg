@@ -52,6 +52,8 @@ sub normalizeFilename {
     my $path = shift;
     my $file = shift;
 
+    $file =~ s/\s+/_/g;
+
     my ($cname,$cpath,$cextension) = fileparse("$path/$file", qr/(\.[^.]+){1}?/);
 
     my $baseName = $cname;
