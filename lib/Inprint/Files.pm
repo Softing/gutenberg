@@ -11,6 +11,8 @@ use warnings;
 
 use Encode;
 use File::Basename;
+use HTTP::Request::Common qw(POST);
+use LWP::UserAgent;
 use Image::Magick;
 
 use base 'Inprint::BaseController';
@@ -72,147 +74,168 @@ sub preview {
     my $success = $c->json->false;
 
     my $rootpath = $c->config->get("store.path");
-    my $sqlfilepath = $c->sql->Q("SELECT file_path || '/' || file_name FROM cache_files WHERE id=?", [ $id ])->Value;
+    my $sqlfilepath = $c->sql->Q("SELECT id, file_path, file_name, file_extension FROM cache_files WHERE id=?", [ $id ])->Hash;
 
-    my $filepath_encoded;
-    my $filepath_original = "$rootpath/$sqlfilepath";
+
+
+    my $filepathEncoded;
+    my $filepathOriginal = "$rootpath/" . $sqlfilepath->{file_path} . "/". $sqlfilepath->{file_name};
+
+    my $fileid           = $sqlfilepath->{id};
+    my $folderOriginal   = $sqlfilepath->{file_path};
+    my $filenameOriginal = $sqlfilepath->{file_name};
+    my $filextenOriginal = $sqlfilepath->{file_extension};
+
+    $folderOriginal = "$rootpath/$folderOriginal";
+    $folderOriginal =~ s/\//\\/g;
+    $folderOriginal =~ s/\\+/\\/g;
+
+    my $folderEncoded   = $sqlfilepath->{file_path};
+    my $filenameEncoded = $sqlfilepath->{file_name};
+    my $filextenEncoded = $sqlfilepath->{file_extension};
 
     if ($^O eq "MSWin32") {
-        $sqlfilepath = Encode::encode("cp1251", $sqlfilepath);
+
         $rootpath = Encode::encode("cp1251", $rootpath);
-        $filepath_encoded = "$rootpath/$sqlfilepath";
-        $filepath_encoded =~ s/\//\\/g;
-        $filepath_encoded =~ s/\\+/\\/g;
+        $folderEncoded   = Encode::encode("cp1251", $folderEncoded);
+        $filenameEncoded = Encode::encode("cp1251", $filenameEncoded);
+        $filextenEncoded = Encode::encode("cp1251", $filextenEncoded);
+
+        $folderEncoded = "$rootpath/$folderEncoded";
+        $folderEncoded =~ s/\//\\/g;
+        $folderEncoded =~ s/\\+/\\/g;
+
+        $filepathEncoded = "$folderEncoded/$filenameEncoded";
+        $filepathEncoded =~ s/\//\\/g;
+        $filepathEncoded =~ s/\\+/\\/g;
     }
 
     if ($^O eq "linux") {
-        $filepath_encoded = "$rootpath/$sqlfilepath";
-        $filepath_encoded =~ s/\\/\//g;
-        $filepath_encoded =~ s/\/+/\//g;
+
+        $rootpath = Encode::encode("utf8", $rootpath);
+        $folderEncoded   = Encode::encode("utf8", $folderEncoded);
+        $filenameEncoded = Encode::encode("utf8", $filenameEncoded);
+        $filextenEncoded = Encode::encode("utf8", $filextenEncoded);
+
+        $folderEncoded = "$rootpath/$folderEncoded";
+        $folderEncoded =~ s/\//\\/g;
+        $folderEncoded =~ s/\\+/\\/g;
+
+        $filepathEncoded = "$folderEncoded/$filenameEncoded";
+        $filepathEncoded =~ s/\\/\//g;
+        $filepathEncoded =~ s/\/+/\//g;
     }
 
-    if (-r $filepath_encoded) {
+    if (-r $filepathEncoded) {
 
-        my ($name1, $path1, $extension1) = fileparse($filepath_original, qr/(\.[^.]+){1}?/);
-        my ($name2, $path2, $extension2) = fileparse($filepath_encoded, qr/(\.[^.]+){1}?/);
+        if ($filextenOriginal ~~ ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff']) {
+            if (-w "$folderEncoded/.thumbnails") {
 
-        $extension1 =~ s/^.//g;
-        $extension2 =~ s/^.//g;
+                my $image = Image::Magick->new;
+                my $x = $image->Read($filepathOriginal);
+                die "$x" if "$x";
 
-        if ($extension1 ~~ ['jpg', 'jpeg', 'png', 'gif']) {
-            if (-w "$path1/.thumbnails") {
-                unless (-r "$path1/.thumbnails/$name1-$size.png") {
+                $x = $image->AdaptiveResize(geometry=>$size);
+                die "$x" if "$x";
 
+                $x = $image->Write("$folderOriginal/.thumbnails/$filenameOriginal-$size.png");
 
-                    my $image = Image::Magick->new;
-                    my $x = $image->Read($filepath_original);
-                    die "$x" if "$x";
+                die "$x" if "$x";
 
-                    $x = $image->AdaptiveResize(geometry=>$size);
-                    die "$x" if "$x";
-
-                    $x = $image->Write("$path1/.thumbnails/$name1-$size.png");
-                    die "$x" if "$x";
-                }
             }
 
-            my $thumbnail_src1 = "$path1/.thumbnails/$name1-$size.png";
+        }
+
+        if ($filextenOriginal ~~ ['doc', 'docx', 'txt', 'rtf', 'odt', 'xls', 'xlsx', 'odp', 'ods' ]) {
+
+            my $ooHost = $c->config->get("openoffice.host");
+            my $ooPort = $c->config->get("openoffice.port");
+            my $ooTimeout = $c->config->get("openoffice.timeout");
+
+            die "Cant read configuration <openoffice.host>" unless $ooHost;
+            die "Cant read configuration <openoffice.port>" unless $ooPort;
+            die "Cant read configuration <openoffice.timeout>" unless $ooTimeout;
+
+            my $ooUrl = "http://$ooHost:$ooPort/api/converter/";
+            my $ooUagent = LWP::UserAgent->new();
+
+            my $pdfPath = "$folderEncoded/.thumbnails/$filenameEncoded.pdf";
 
             if ($^O eq "MSWin32") {
-                $thumbnail_src1 =~ s/\//\\/g;
-                $thumbnail_src1 =~ s/\\+/\\/g;
-                $thumbnail_src1 = Encode::encode("cp1251", $thumbnail_src1);
+                $pdfPath =~ s/\//\\/g;
+                $pdfPath =~ s/\\+/\\/g;
             }
             if ($^O eq "linux") {
-                $thumbnail_src1 =~ s/\\/\//g;
-                $thumbnail_src1 =~ s/\/+/\//g;
+                $pdfPath =~ s/\\/\//g;
+                $pdfPath =~ s/\/+/\//g;
             }
 
-            if (-r $thumbnail_src1) {
-                $c->tx->res->headers->content_type('image/png');
-                $c->res->content->asset(Mojo::Asset::File->new(path => $thumbnail_src1 ));
-                $c->render_static();
+            # Create pdf
+            my $ooRequest = POST(
+                $ooUrl, Content_Type => 'form-data',
+                Content => [ outputFormat => "pdf", inputDocument =>  [ $filepathEncoded ] ]
+            );
+
+            my $ooResponse = $ooUagent->request($ooRequest);
+            if ($ooResponse->is_success()) {
+
+                open FILE, "> $pdfPath" or die "Can't open <$pdfPath> : $!";
+                binmode FILE;
+                    print FILE $ooResponse->content;
+                close FILE;
+
+            } else {
+                die $ooResponse->as_string;
+            }
+
+            # Crete thumbnail
+            if (-w "$folderEncoded/.thumbnails") {
+                if (-r $pdfPath) {
+
+                    my $image = Image::Magick->new;
+                    my $x = $image->Read($pdfPath);
+                    die "$x" if "$x";
+
+                    my $image2 = $image->[0];
+
+                    $x = $image2->Normalize();
+                    die "$x" if "$x";
+
+                    $x = $image2->AdaptiveResize(geometry=>$size);
+                    die "$x" if "$x";
+
+                    $x = $image2->Write("$folderOriginal/.thumbnails/$filenameOriginal-$size.png");
+                    die "$x" if "$x";
+
+                    unlink $pdfPath;
+                }
             }
         }
-    }
 
-    #my $storePath = $c->getDocumentPath($document->{filepath}, \@errors);
-    #my $sqlite = $c->getSQLiteHandler($storePath);
-    #
-    #$sqlite->{sqlite_unicode} = 0;
-    #
-    #my $sth  = $sqlite->prepare("SELECT * FROM files WHERE id = ?");
-    #$sth->execute( $i_file );
-    #my $record = $sth->fetchrow_hashref;
-    #$sth->finish();
-    #
-    #if ($^O eq "MSWin32") {
-    #    my $converter = Text::Iconv->new("utf-8", "windows-1251");
-    #    $record->{filename} = $converter->convert($record->{filename});
-    #}
-    #
-    #if ($record->{id} && -r "$storePath/$record->{filename}") {
-    #
-    #    unless (-r "$storePath/.thumbnails/$record->{id}.png") {
-    #
-    #        my $host = $c->config->get("openoffice.host");
-    #        my $port = $c->config->get("openoffice.port");
-    #        my $timeout = $c->config->get("openoffice.timeout");
-    #
-    #        my $url = "http://$host:$port/api/thumbnail/";
-    #
-    #        my $ua  = LWP::UserAgent->new();
-    #
-    #        my $filepath = "$storePath/$record->{filename}";
-    #
-    #        my $request = POST "$url", Content_Type => 'form-data',
-    #            Content => [ inputDocument =>  [  "$storePath/$record->{filename}" ] ];
-    #
-    #
-    #        $ua->timeout($timeout);
-    #        my $response = $ua->request($request);
-    #
-    #        if ($response->is_success()) {
-    #            open FILE, "> $storePath/.thumbnails/$record->{id}.png" or die "Can't open $storePath/.thumbnails/$record->{id}.png : $!";
-    #                binmode FILE;
-    #                print FILE $response->content;
-    #            close FILE;
-    #        } else {
-    #            push @errors, { id => "responce", msg => $response->status_line };
-    #        }
-    #
-    #        if (-w "$storePath/.thumbnails/$record->{id}.png") {
-    #            my $image = Image::Magick->new;
-    #            my $x = $image->Read("$storePath/.thumbnails/$record->{id}.png");
-    #            warn "$x" if "$x";
-    #
-    #            $x = $image->AdaptiveResize(geometry=>"100x80");
-    #            warn "$x" if "$x";
-    #
-    #            $x = $image->Write("$storePath/.thumbnails/$record->{id}.png");
-    #            warn "$x" if "$x";
-    #        }
-    #
-    #    }
-    #
-    #    if (-r "$storePath/.thumbnails/$record->{id}.png") {
-    #        $c->tx->res->headers->content_type('image/png');
-    #        $c->res->content->asset(Mojo::Asset::File->new(path => "$storePath/.thumbnails/$record->{id}.png"));
-    #        $c->render_static();
-    #    }
-    #    unless (-r "$storePath/.thumbnails/$record->{id}.png") {
-    #        push @errors, { id => "result", msg => "Cant read file thumbnail"}
-    #            unless -e -r "$storePath/.thumbnails/$record->{id}.png";
-    #    }
-    #
-    #}
-    #
-    #$sqlite->disconnect();
-    #
-    #if (@errors) {
-    #    $success = $c->json->true unless (@errors);
-    #    $c->render_json( { success => $success, errors => \@errors } );
-    #}
+        my $thumbnailsSrc = "$folderOriginal/.thumbnails/$filenameOriginal-$size.png";
+
+        if ($^O eq "MSWin32") {
+            $thumbnailsSrc =~ s/\//\\/g;
+            $thumbnailsSrc =~ s/\\+/\\/g;
+            $thumbnailsSrc   = Encode::encode("cp1251", $thumbnailsSrc);
+        }
+        if ($^O eq "linux") {
+            $thumbnailsSrc =~ s/\\/\//g;
+            $thumbnailsSrc =~ s/\/+/\//g;
+            $thumbnailsSrc   = Encode::encode("utf8", $thumbnailsSrc);
+        }
+
+        if (-r $thumbnailsSrc) {
+            #die $thumbnailsSrc;
+        }
+
+        if (-r $thumbnailsSrc) {
+            $c->tx->res->headers->content_type('image/png');
+            $c->res->content->asset(Mojo::Asset::File->new(path => $thumbnailsSrc ));
+            $c->render_static();
+        }
+
+    }
 
     $c->render_json({  });
 }

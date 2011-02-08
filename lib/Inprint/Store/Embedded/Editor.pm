@@ -316,8 +316,8 @@ sub clearHtml {
     #$data =~ s/<font>(.*?)<\/font>/$1/ig;
     #$data =~ s/<font \w+="#\w+"> <\/font>/ /isg;
 
-    #$data =~ s/\t+/ /ig;
-    #$data =~ s/\s+/ /ig;
+    $html =~ s/\t+/ /ig;
+    $html =~ s/\s+/ /ig;
 
   return $html;
 
