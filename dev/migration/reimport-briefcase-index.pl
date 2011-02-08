@@ -4,7 +4,6 @@ use utf8;
 use strict;
 
 use Data::UUID;
-use Data::Dump qw /dump/;
 use DBIx::Connector;
 
 use lib "../../lib";
@@ -41,13 +40,9 @@ my $rubrics = $sql->Q("
 
 my $cl = new C;
 
-
-
 foreach my $item (@$rubrics) {
-
     print "$item->{id}, $item->{headline}, $item->{bydefault}, $item->{title}, $item->{description} \n";
     Inprint::Models::Rubric::update($cl, $item->{id}, $item->{edition}, $item->{headline}, $item->{bydefault}, $item->{title}, $item->{description} );
-
 }
 
 package C;
@@ -59,5 +54,6 @@ package C;
   }
 
   sub sql { return $sql; }
+  sub uuid { return $ug->create_str(); }
 
 1;

@@ -227,7 +227,7 @@ sub fileRead {
     }
 
     if ($^O eq "linux") {
-
+        $filepath = encode("utf8", $filepath);
     }
 
     die "Can't find file <$filepath>" unless -e $filepath;
@@ -255,7 +255,7 @@ sub fileSave {
     }
 
     if ($^O eq "linux") {
-
+        $filepath = encode("utf8", $filepath);
     }
 
 
