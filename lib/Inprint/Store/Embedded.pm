@@ -222,6 +222,14 @@ sub fileRead {
     my $rootpath = Inprint::Store::Embedded::Navigation::getRootPath($c);
     my $filepath = clearPath( $c, $rootpath, $cacheRecord->{file_path}, $cacheRecord->{file_name} );
 
+    if ($^O eq "MSWin32") {
+        $filepath = encode("cp1251", $filepath);
+    }
+
+    if ($^O eq "linux") {
+
+    }
+
     die "Can't find file <$filepath>" unless -e $filepath;
     die "Can't read file <$filepath>" unless -r $filepath;
 
@@ -241,6 +249,15 @@ sub fileSave {
 
     my $rootpath = Inprint::Store::Embedded::Navigation::getRootPath($c);
     my $filepath = clearPath( $c, $rootpath, $cacheRecord->{file_path}, $cacheRecord->{file_name} );
+
+    if ($^O eq "MSWin32") {
+        $filepath = encode("cp1251", $filepath);
+    }
+
+    if ($^O eq "linux") {
+
+    }
+
 
     die "Can't find file <$filepath>" unless -e $filepath;
     die "Can't read file <$filepath>" unless -r $filepath;

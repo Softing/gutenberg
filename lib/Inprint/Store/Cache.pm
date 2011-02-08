@@ -1,6 +1,8 @@
 package Inprint::Store::Cache;
 
+use utf8;
 use strict;
+use Encode;
 
 sub createRecord {
 
@@ -69,6 +71,7 @@ sub cleanup {
         if ($^O eq "MSWin32") {
             $filepath =~ s/\//\\/g;
             $filepath =~ s/\\+/\\/g;
+            $filepath = encode("cp1251", $filepath);
         }
 
         if ($^O eq "linux") {

@@ -12,9 +12,9 @@ use HTML::Scrubber;
 sub read {
     my ($c, $filetype, $filepath) = @_;
 
-    my $extension = getExtension($c, $filepath);
-
     my $result;
+
+    my $extension = getExtension($c, $filepath);
 
     if ($extension ~~ ["doc", "odt", "rtf"]) {
 
