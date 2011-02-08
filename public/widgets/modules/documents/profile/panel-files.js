@@ -56,6 +56,16 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                     return '<img src="/files/preview/'+ v +'x80" style="border:1px solid silver;"/>';
                 }
             },
+            {
+                id:"download",
+                header:_(""),
+                width: 30,
+                dataIndex: "cache",
+                sortable: false,
+                renderer: function(v) {
+                    return '<a href="/files/download/'+ v +'"><img src="'+ _ico("arrow-transition-270") +'" style="border:1px solid silver;"/></a>';
+                }
+            },
             { id:'name', header: _("File"),dataIndex:'name', width:250},
             { id: 'description', header: _("Description"),dataIndex:'description', width:150},
             { id: 'size', header: _("Size"), dataIndex:'size', width:100, renderer:Ext.util.Format.fileSize},

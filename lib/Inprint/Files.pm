@@ -5,9 +5,11 @@ package Inprint::Files;
 # licensing@softing.ru
 # http://softing.ru/license
 
+use utf8;
 use strict;
 use warnings;
 
+use Encode;
 use File::Basename;
 use Image::Magick;
 
@@ -20,22 +22,41 @@ sub download {
     my $id = $c->param("id");
 
     my $rootpath = $c->config->get("store.path");
-    my $filepath = $c->sql->Q("SELECT file_path || '/' || file_name FROM cache_files WHERE id=?", [ $id ])->Value;
+    my $cacheRecord = $c->sql->Q("SELECT file_path || '/' || file_name as file_path, file_name, file_extension, file_mime FROM cache_files WHERE id=?", [ $id ])->Hash;
 
-    $filepath = "$rootpath/$filepath";
+    my $filename  = $cacheRecord->{file_name};
+    my $extension = $cacheRecord->{file_extension};
+    my $mimetype  = $cacheRecord->{file_mime};
+
+    my $filepath = "$rootpath/" . $cacheRecord->{file_path};
 
     if ($^O eq "MSWin32") {
         $filepath =~ s/\//\\/g;
         $filepath =~ s/\\+/\\/g;
+
+        $filepath  = encode("cp1251", $filepath);
+        $filename  = encode("cp1251", $filename);
     }
 
     if ($^O eq "linux") {
         $filepath =~ s/\\/\//g;
         $filepath =~ s/\/+/\//g;
+
+        $filepath  = encode("utf8", $filepath);
+        $filename  = encode("utf8", $filename);
     }
 
-    $c->tx->res->headers->content_type('image/png');
+    $filename =~ s/\s+/_/g;
+
+    $c->tx->res->headers->content_type($cacheRecord->{file_mime});
     $c->res->content->asset(Mojo::Asset::File->new(path => $filepath));
+
+    my $headers = Mojo::Headers->new;
+    $headers->add("Content-Type", "$mimetype;name=$filename");
+    $headers->add("Content-Disposition", "attachment;filename=$filename");
+    $headers->add("Content-Description", $extension);
+    $c->res->content->headers($headers);
+
     $c->render_static();
 }
 

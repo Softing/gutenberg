@@ -133,6 +133,8 @@ sub fileUpload {
         $filename_utf8 = Encode::encode("utf8", $filename_utf8);
     }
 
+    $filename_utf8 =~ s/\s+/_/g;
+
     $upload->move_to("$path/$filename_utf8");
 
     my $id = $c->uuid;
