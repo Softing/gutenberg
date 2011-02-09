@@ -2335,6 +2335,29 @@ CREATE TABLE cache_access (
 
 
 --
+-- Name: cache_files; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE cache_files (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    file_path character varying NOT NULL,
+    file_name character varying NOT NULL,
+    file_extension character varying NOT NULL,
+    file_mime character varying NOT NULL,
+    file_digest character varying NOT NULL,
+    file_thumbnail character varying,
+    file_description character varying,
+    file_size integer DEFAULT 0 NOT NULL,
+    file_length integer DEFAULT 0 NOT NULL,
+    file_meta character varying,
+    file_exists boolean DEFAULT true NOT NULL,
+    file_published boolean DEFAULT false NOT NULL,
+    created timestamp(6) with time zone DEFAULT now() NOT NULL,
+    updated timestamp(6) with time zone DEFAULT now() NOT NULL
+);
+
+
+--
 -- Name: catalog; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2800,17 +2823,6 @@ CREATE TABLE fascicles_tmpl_places (
     description character varying,
     created timestamp(0) with time zone DEFAULT now(),
     updated timestamp(0) with time zone DEFAULT now()
-);
-
-
---
--- Name: filesmask; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE filesmask (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    filepath character varying NOT NULL,
-    created timestamp(6) with time zone DEFAULT now() NOT NULL
 );
 
 
@@ -3302,6 +3314,22 @@ ALTER TABLE ONLY cache_access
 
 
 --
+-- Name: cache_files_entity_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY cache_files
+    ADD CONSTRAINT cache_files_entity_key UNIQUE (file_path, file_name);
+
+
+--
+-- Name: cache_files_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY cache_files
+    ADD CONSTRAINT cache_files_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: cache_visibility_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3483,22 +3511,6 @@ ALTER TABLE ONLY fascicles_tmpl_pages
 
 ALTER TABLE ONLY fascicles_tmpl_places
     ADD CONSTRAINT fascicles_tmpl_places_pkey PRIMARY KEY (id);
-
-
---
--- Name: filesmask_entity_key; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY filesmask
-    ADD CONSTRAINT filesmask_entity_key UNIQUE (filepath);
-
-
---
--- Name: filesmask_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY filesmask
-    ADD CONSTRAINT filesmask_pkey PRIMARY KEY (id);
 
 
 --
