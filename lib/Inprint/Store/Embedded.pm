@@ -115,10 +115,13 @@ sub findFiles {
 sub fileUpload {
     my $c = shift;
     my $path = shift;
-    my $filename = shift;
-    my $fieldname = shift || "Filedata";
+    my $upload = shift;
 
-    my $upload = $c->req->upload($fieldname);
+    return unless $upload;
+
+    my $filename = $upload->filename;
+
+    return unless $filename;
 
     &checkFolderPath($c, $path);
     $filename = Inprint::Store::Embedded::File::normalizeFilename($c, $path, $filename);
