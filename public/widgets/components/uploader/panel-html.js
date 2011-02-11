@@ -2,6 +2,7 @@ Inprint.cmp.uploader.Html = Ext.extend(Ext.FormPanel, {
 
     initComponent: function() {
 
+
         Ext.apply(this, {
             border:false,
             title: _("Html mode"),
@@ -16,10 +17,15 @@ Inprint.cmp.uploader.Html = Ext.extend(Ext.FormPanel, {
             },
             items: [
                 {
+                    xtype: "hidden",
+                    name: "document",
+                    value: this.config.document
+                },
+                {
                     xtype: "fileuploadfield",
                     emptyText: _("Select an file"),
                     fieldLabel: _("File") + " 1",
-                    name: "file-1",
+                    name: "file1",
                     buttonText: _("Select"),
                     buttonCfg: {
                         width: 100
@@ -29,7 +35,7 @@ Inprint.cmp.uploader.Html = Ext.extend(Ext.FormPanel, {
                     xtype: "fileuploadfield",
                     emptyText: _("Select an file"),
                     fieldLabel: _("File") + " 2",
-                    name: "file-2",
+                    name: "file2",
                     buttonText: _("Select"),
                     buttonCfg: {
                         width: 100
@@ -39,7 +45,7 @@ Inprint.cmp.uploader.Html = Ext.extend(Ext.FormPanel, {
                     xtype: "fileuploadfield",
                     emptyText: _("Select an file"),
                     fieldLabel: _("File") + " 3",
-                    name: "file-3",
+                    name: "file3",
                     buttonText: _("Select"),
                     buttonCfg: {
                         width: 100
@@ -49,7 +55,7 @@ Inprint.cmp.uploader.Html = Ext.extend(Ext.FormPanel, {
                     xtype: "fileuploadfield",
                     emptyText: _("Select an file"),
                     fieldLabel: _("File") + " 4",
-                    name: "file-4",
+                    name: "file4",
                     buttonText: _("Select"),
                     buttonCfg: {
                         width: 100
@@ -59,7 +65,7 @@ Inprint.cmp.uploader.Html = Ext.extend(Ext.FormPanel, {
                     xtype: "fileuploadfield",
                     emptyText: _("Select an file"),
                     fieldLabel: _("File") + " 5",
-                    name: "file-5",
+                    name: "file5",
                     buttonText: _("Select"),
                     buttonCfg: {
                         width: 100
@@ -68,31 +74,28 @@ Inprint.cmp.uploader.Html = Ext.extend(Ext.FormPanel, {
             ],
             buttons: [
                 {
-                    text: 'Save',
+                    text: _("Save"),
+                    scope:this,
                     handler: function(){
-                        //if(fp.getForm().isValid()){
-                        //        fp.getForm().submit({
-                        //            url: 'file-upload.php',
-                        //            waitMsg: 'Uploading your photo...',
-                        //            success: function(fp, o){
-                        //                msg('Success', 'Processed file "'+o.result.file+'" on the server');
-                        //            }
-                        //        });
-                        //}
+                        this.getForm().submit();
                     }
                 },{
-                    text: 'Reset',
+                    text: _("Reset"),
+                    scope:this,
                     handler: function(){
-                        //fp.getForm().reset();
+                        this.getForm().reset();
                     }
                 }
             ]
         });
 
         Inprint.cmp.uploader.Html.superclass.initComponent.apply(this, arguments);
+
     },
 
     onRender: function() {
         Inprint.cmp.uploader.Html.superclass.onRender.apply(this, arguments);
+        this.getForm().url = this.config.uploadUrl;
     }
+
 });

@@ -76,6 +76,17 @@ sub create {
 sub upload {
     my $c = shift;
 
+    if ( $c->param("Filename") ) {
+        uploadFlash($c);
+    } else {
+        uploadHtml($c);
+    }
+
+}
+
+sub uploadFlash {
+    my $c = shift;
+
     my $i_document = $c->param("document");
     my $i_filename = $c->param("Filename");
 
@@ -93,6 +104,32 @@ sub upload {
     $success = $c->json->true unless (@errors);
     $c->render_json({ success => $success, errors => \@errors });
 }
+
+sub uploadHtml {
+    my $c = shift;
+
+    my $i_document = $c->param("document");
+
+    my @errors;
+    my $success = $c->json->false;
+
+    Inprint::Check::uuid($c, \@errors, "document", $i_document);
+    my $document = Inprint::Check::document($c, \@errors, $i_document);
+
+    unless (@errors) {
+        my $folder = Inprint::Store::Embedded::getFolderPath($c, "documents", $document->{created}, $document->{id}, 1);
+        for ( 1 .. 5 ) {
+            my $filename =  $c->param("file$_");
+            if ($filename) {
+                Inprint::Store::Embedded::fileUpload($c, $folder, $filename);
+            }
+        }
+    }
+
+    $success = $c->json->true unless (@errors);
+    $c->render_json({ success => $success, errors => \@errors });
+}
+
 
 sub publish {
     my $c = shift;
