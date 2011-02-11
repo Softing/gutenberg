@@ -88,7 +88,6 @@ sub uploadFlash {
     my $c = shift;
 
     my $i_document = $c->param("document");
-    my $i_filename = $c->param("Filename");
 
     my @errors;
     my $success = $c->json->false;
@@ -97,8 +96,9 @@ sub uploadFlash {
     my $document = Inprint::Check::document($c, \@errors, $i_document);
 
     unless (@errors) {
+        my $upload = $c->req->upload("Filedata");
         my $folder = Inprint::Store::Embedded::getFolderPath($c, "documents", $document->{created}, $document->{id}, 1);
-        Inprint::Store::Embedded::fileUpload($c, $folder, $i_filename);
+        Inprint::Store::Embedded::fileUpload($c, $folder, $upload);
     }
 
     $success = $c->json->true unless (@errors);
@@ -119,10 +119,8 @@ sub uploadHtml {
     unless (@errors) {
         my $folder = Inprint::Store::Embedded::getFolderPath($c, "documents", $document->{created}, $document->{id}, 1);
         for ( 1 .. 5 ) {
-            my $filename =  $c->param("file$_");
-            if ($filename) {
-                Inprint::Store::Embedded::fileUpload($c, $folder, $filename);
-            }
+            my $upload = $c->req->upload("file$_");
+            Inprint::Store::Embedded::fileUpload($c, $folder, $upload) if ($upload);
         }
     }
 
