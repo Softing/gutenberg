@@ -129,7 +129,8 @@ Inprint.documents.GridColumns = function() {
                 return String.format(
                     '<div class="x-progress-wrap">'+
                         '<div class="x-progress-inner" style="border:1px solid {4};background:{3}!important;">'+
-                            '<div class="x-progress-bar{0}" style="width:{1}%;background:{4}!important;color:{5} !important;">{2}</div>'+
+                    	    '{2}'+
+                            '<div class="x-progress-bar{0}" style="width:{1}%;background:{4}!important;color:{5} !important;">&nbsp;</div>'+
                     '</div>',
                     style, v, text, bgcolor.rgb(), fgcolor.rgb(), txtcolor);
             }
