@@ -1,7 +1,7 @@
 Inprint.documents.GridColumns = function() {
-    
+
     return {
-        
+
         viewed: {
             id : 'viewed',
             fixed : true,
@@ -15,6 +15,7 @@ Inprint.documents.GridColumns = function() {
                 return '';
             }
         },
+
         title: {
             id:"title",
             dataIndex: "title",
@@ -22,12 +23,12 @@ Inprint.documents.GridColumns = function() {
             width: 210,
             sortable: true,
             renderer : function(value, p, record){
-    
+
                 var color = 'blue';
-    
+
                 if (!record.data.isopen)
                     color = 'gray';
-    
+
                 value = String.format(
                     '<a style="color:{2}" href="/?aid=document-profile&oid={0}&text={1}" '+
                         'onClick="'+
@@ -39,6 +40,7 @@ Inprint.documents.GridColumns = function() {
                 return value;
             }
         },
+
         edition: {
             id:"edition",
             dataIndex: "edition_shortcut",
@@ -46,6 +48,15 @@ Inprint.documents.GridColumns = function() {
             width: 80,
             sortable: true
         },
+
+        maingroup: {
+            id:"maingroup",
+            dataIndex: "maingroup_shortcut",
+            header: _("Main group"),
+            width: 80,
+            sortable: true
+        },
+
         workgroup: {
             id:"workgroup",
             dataIndex: "workgroup_shortcut",
@@ -53,6 +64,7 @@ Inprint.documents.GridColumns = function() {
             width: 80,
             sortable: true
         },
+
         fascicle: {
             id:"fascicle",
             dataIndex: "fascicle_shortcut",
@@ -63,6 +75,7 @@ Inprint.documents.GridColumns = function() {
                 return value;
             }
         },
+
         headline: {
             id:"headline",
             dataIndex: "headline_shortcut",
@@ -70,6 +83,7 @@ Inprint.documents.GridColumns = function() {
             width: 90,
             sortable: true
         },
+
         rubric: {
             id:"rubric",
             dataIndex: "rubric_shortcut",
@@ -77,6 +91,7 @@ Inprint.documents.GridColumns = function() {
             width: 80,
             sortable: true
         },
+
         pages: {
             id:"pages",
             dataIndex: "pages",
@@ -98,6 +113,7 @@ Inprint.documents.GridColumns = function() {
                 return v;
             }
         },
+
         progress:{
             id:"progress",
             dataIndex: "progress",
@@ -105,27 +121,27 @@ Inprint.documents.GridColumns = function() {
             sortable: true,
             width: 75,
             renderer : function(v, p, record) {
-    
+
                 p.css += ' x-grid3-progresscol ';
                 var string = '';
-    
+
                 if (record.data.pdate) {
                     string = _fmtDate(record.data.pdate, 'M j');
                 }
                 else if (record.data.rdate) {
                     string = _fmtDate(record.data.rdate, 'M j');
                 }
-    
+
                 var style = '';
                 var textClass = (v < 55) ? 'x-progress-text-back' : 'x-progress-text-front' + (Ext.isIE6 ? '-ie6' : '');
-    
+
                 // ugly hack to deal with IE6 issue
                 var text = String.format('<div><div class="x-progress-text {0}" style="width:100%;" id="{1}">{2}</div></div>', textClass, Ext.id(), string);
-    
+
                 var bgcolor  = Color('#' + record.data.color).setSaturation(30);
                 var fgcolor  = Color('#' + record.data.color);
                 var txtcolor = Color('#' + inverse(record.data.color));
-    
+
                 return String.format(
                     '<div class="x-progress-wrap">'+
                         '<div class="x-progress-inner" style="border:1px solid {4};background:{3}!important;">'+
@@ -135,6 +151,7 @@ Inprint.documents.GridColumns = function() {
                     style, v, text, bgcolor.rgb(), fgcolor.rgb(), txtcolor);
             }
         },
+
         holder:{
             id:"holder",
             dataIndex: "holder_shortcut",
@@ -148,6 +165,7 @@ Inprint.documents.GridColumns = function() {
                 return v;
             }
         },
+
         images:{
             id:"images",
             dataIndex: "images",
@@ -155,6 +173,7 @@ Inprint.documents.GridColumns = function() {
             width:30,
             sortable: true
         },
+
         size:{
             id:"size",
             dataIndex: "rsize",
@@ -168,7 +187,39 @@ Inprint.documents.GridColumns = function() {
                     return String.format('<span style="color:silver">{0}</span>', record.data.psize);
                 return '';
             }
+        },
+
+        created: {
+            id:"created",
+            dataIndex: "created",
+            header: _("Created"),
+            width: 80,
+            sortable: true
+        },
+
+        updated: {
+            id:"Updated",
+            dataIndex: "updated",
+            header: _("Updated"),
+            width: 80,
+            sortable: true
+        },
+
+        uploaded: {
+            id:"uploaded",
+            dataIndex: "uploaded",
+            header: _("Uploaded"),
+            width: 80,
+            sortable: true
+        },
+
+        moved: {
+            id:"moved",
+            dataIndex: "moved",
+            header: _("Moved"),
+            width: 80,
+            sortable: true
         }
-    
+
     }
 };

@@ -32,9 +32,9 @@ sub list {
 
         foreach my $record (@$files) {
             push @result, {
+                id           => $record->{id},
                 name         => $record->{name},
                 description  => $record->{description},
-                cache        => $record->{cache},
                 isdraft      => $record->{isdraft},
                 isapproved   => $record->{isapproved},
                 size         => $record->{size},
@@ -231,6 +231,7 @@ sub delete {
     my $document = Inprint::Check::document($c, \@errors, $i_document);
 
     unless (@errors) {
+
         foreach my $file(@i_files) {
             next unless ($c->is_uuid($file));
             Inprint::Store::Embedded::fileDelete($c, $file);

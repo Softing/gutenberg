@@ -4,7 +4,7 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
 
         var actions = new Inprint.documents.GridActions();
         var columns = new Inprint.documents.GridColumns();
-        
+
         this.components = {};
 
         this.urls = {
@@ -32,6 +32,7 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
             columns.viewed,
             columns.title,
             columns.edition,
+            columns.maingroup,
             columns.workgroup,
             columns.fascicle,
             columns.headline,
@@ -41,7 +42,11 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
             columns.progress,
             columns.holder,
             columns.images,
-            columns.size
+            columns.size,
+            columns.created,
+            columns.updated,
+            columns.uploaded,
+            columns.moved
         ];
 
         this.filter = new Inprint.documents.GridFilter({
@@ -195,21 +200,21 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
             bbar: this.bbar,
             viewConfig: {
                 getRowClass: function(record, rowIndex, rp, ds) {
-                    
+
                     var css = '';
-                    
+
                     if (Inprint.session.member && Inprint.session.member.id == record.get("manager") ) {
                         css = 'inprint-document-grid-current-manager-bg';
                     }
-                    
+
                     if (record.get("workgroup") == record.get("holder")) {
                         css = 'inprint-document-grid-current-department-bg';
                     }
-                    
+
                     if (Inprint.session.member && Inprint.session.member.id == record.get("holder") ) {
                         css = 'inprint-document-grid-current-user-bg';
                     }
-                    
+
                     return css;
                 }
             }
@@ -222,7 +227,7 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
     onRender: function() {
 
         Inprint.documents.Grid.superclass.onRender.apply(this, arguments);
-        
+
         this.filter.on("restore", function(filter, params) {
             this.store.load({ params: Ext.apply({start:0, limit:60}, params) });
         }, this);

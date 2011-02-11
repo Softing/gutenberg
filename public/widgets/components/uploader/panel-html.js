@@ -2,6 +2,7 @@ Inprint.cmp.uploader.Html = Ext.extend(Ext.FormPanel, {
 
     initComponent: function() {
 
+        this.addEvents( 'fileUploaded' );
 
         Ext.apply(this, {
             border:false,
@@ -72,6 +73,14 @@ Inprint.cmp.uploader.Html = Ext.extend(Ext.FormPanel, {
                     }
                 }
             ],
+            listeners: {
+                actioncomplete: function() {
+                    this.fireEvent('fileUploaded', this);
+                },
+                actionfailed: function() {
+
+                }
+            },
             buttons: [
                 {
                     text: _("Save"),

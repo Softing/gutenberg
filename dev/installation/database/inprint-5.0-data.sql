@@ -114,6 +114,15 @@ INSERT INTO fascicles(id, edition, parent, title, shortcut, description, manager
 INSERT INTO fascicles(id, edition, parent, title, shortcut, description, manager, variation, deadline, advert_deadline, created, updated)
     VALUES ('99999999-9999-9999-9999-999999999999', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', 'Recycle bin', 'Recycle bin', 'Recycle bin', null, '00000000-0000-0000-0000-000000000000', now(), now(), now(), now());
 
+INSERT INTO branches(id, edition, mtype, title, shortcut, description, created, updated)
+    VALUES ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', 'Default branch', 'Default', 'This is default branch for everything', now(), now());
+
+INSERT INTO readiness(id, color, weight, title, shortcut, description, created, updated)
+	VALUES ('00000000-0000-0000-0000-000000000000', 'cc0033', 0, 'Default readiness' , 'Default', 'This is default readiness', now(), now());
+
+INSERT INTO stages(id, branch, readiness, weight, title, shortcut, description, created, updated)
+	VALUES ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', 0, 'Default stage' , 'Default', 'This is default stage', now(), now());
+
 UPDATE fascicles SET deadline='2020-01-01 16:23:10+03'
  	WHERE id = '00000000-0000-0000-0000-000000000000';
 	
@@ -215,18 +224,25 @@ INSERT INTO map_member_to_rule VALUES ('4c134f39-ebbb-4fd4-99cf-522ca5fc38b2', '
 
 UPDATE catalog SET title = 'Издательский дом', shortcut = 'Издательский дом', description = 'Издательский дом'
 	WHERE id = '00000000-0000-0000-0000-000000000000';
+
 UPDATE editions SET title = 'Все издания', shortcut = 'Все издания', description = 'Все издания'
  	WHERE id = '00000000-0000-0000-0000-000000000000';
 
 UPDATE fascicles SET title = 'Портфель', shortcut = 'Портфель', description = 'Портфель'
  	WHERE id = '00000000-0000-0000-0000-000000000000';
+
 UPDATE fascicles SET title = 'Корзина', shortcut = 'Корзина', description = 'Корзина'
  	WHERE id = '99999999-9999-9999-9999-999999999999';
 
 UPDATE documents SET fascicle_shortcut = 'Портфель'
  	WHERE fascicle = '00000000-0000-0000-0000-000000000000';
+
 UPDATE documents SET fascicle_shortcut = 'Корзина'
  	WHERE fascicle = '99999999-9999-9999-9999-999999999999';
+
+UPDATE branches  SET title = 'Ветвь по умолчанию', shortcut = 'По умолчанию', description = 'Это ветвь по умолчанию' WHERE id = '00000000-0000-0000-0000-000000000000';
+UPDATE readiness SET title = 'Готовность по умолчанию', shortcut = 'По умолчанию', description = 'Это готовность по умолчанию' WHERE id = '00000000-0000-0000-0000-000000000000';
+UPDATE stages       SET title = 'Ступень по умолчанию', shortcut = 'По умолчанию', description = 'Это ступень по умолчанию' WHERE id = '00000000-0000-0000-0000-000000000000';
 
 UPDATE options SET option_value = 'Издательский дом' WHERE option_name = 'default.workgroup.name';
 UPDATE options SET option_value = 'Все издания'      WHERE option_name = 'default.edition.name';

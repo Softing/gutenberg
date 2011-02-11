@@ -29,7 +29,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
             autoLoad:true,
             url: _url("/documents/files/list/"),
             baseParams: { document: this.config.document },
-            fields: [ "name", "description", "cache", "preview", "isdraft", "isapproved",  "size", "created", "updated" ]
+            fields: [ "id", "name", "description", "id", "preview", "isdraft", "isapproved",  "size", "created", "updated" ]
         });
 
         // Column model
@@ -50,7 +50,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                 id:"preview",
                 header:_("Preview"),
                 width: 100,
-                dataIndex: "cache",
+                dataIndex: "id",
                 sortable: false,
                 renderer: function(v) {
                     return '<img src="/files/preview/'+ v +'x80" style="border:1px solid silver;"/>';
@@ -60,7 +60,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                 id:"download",
                 header:_(""),
                 width: 30,
-                dataIndex: "cache",
+                dataIndex: "id",
                 sortable: false,
                 renderer: function(v) {
                     return '<a href="/files/download/'+ v +'"><img src="'+ _ico("arrow-transition-270") +'" style="border:1px solid silver;"/></a>';
@@ -163,7 +163,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
             if(record.get("name").match(/^.+\.(doc|docx|odt|rtf|txt)$/i)) {
                 Inprint.ObjectResolver.resolve({
                     aid: "document-editor",
-                    oid:  record.get("cache"),
+                    oid:  record.get("id"),
                     text: record.get("filename"),
                     description: _("Text editing")
                 });
@@ -188,7 +188,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                     handler : function() {
                         Inprint.ObjectResolver.resolve({
                             aid: "document-editor",
-                            oid:  record.get("cache"),
+                            oid:  record.get("id"),
                             text: record.get("filename"),
                             description: _("Text editing")
                         });
@@ -351,17 +351,17 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
             url: this.urls["publish"],
             scope:this,
             success: this.cmpReload,
-            params: { document: this.config.document, file: this.getValues("cache") }
+            params: { document: this.config.document, file: this.getValues("id") }
         });
     },
     cmpUnpublish: function() {
         var document = this.getStore().baseParams.document;
-        var file = this.getValues("cache");
+        var file = this.getValues("id");
         Ext.Ajax.request({
             url: this.urls["unpublish"],
             scope:this,
             success: this.cmpReload,
-            params: { document: this.config.document, file: this.getValues("cache") }
+            params: { document: this.config.document, file: this.getValues("id") }
         });
     },
 
@@ -376,7 +376,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                         url: this.urls["rename"],
                         success: this.cmpReload,
                         scope:this,
-                        params: { document: this.config.document, file: this.getValues("cache"), filename: text }
+                        params: { document: this.config.document, file: this.getValues("id"), filename: text }
                     });
                 }
             }, this);
@@ -396,7 +396,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                         url: this.urls["description"],
                         scope:this,
                         success: this.cmpReload,
-                        params: { document: this.config.document, file: this.getValues("cache"), description: text }
+                        params: { document: this.config.document, file: this.getValues("id"), description: text }
                     });
                 }
             }
@@ -413,7 +413,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                         url: this.urls["delete"],
                         scope:this,
                         success: this.cmpReload,
-                        params: { document: this.config.document, file: this.getValues("cache") }
+                        params: { document: this.config.document, file: this.getValues("id") }
                     });
                 }
             }, this).setIcon(Ext.MessageBox.WARNING);

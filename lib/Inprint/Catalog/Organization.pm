@@ -8,6 +8,8 @@ package Inprint::Catalog::Organization;
 use strict;
 use warnings;
 
+use Inprint::Check;
+
 use base 'Inprint::BaseController';
 
 sub read {
@@ -100,34 +102,19 @@ sub create {
     my @errors;
     my $success = $c->json->false;
 
-    push @errors, { id => "path", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_path));
+    Inprint::Check::path($c, \@errors, "path", $i_path);
+    Inprint::Check::text($c, \@errors, "title", $i_title);
+    Inprint::Check::text($c, \@errors, "shortcut", $i_shortcut);
 
-    push @errors, { id => "title", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_title));
+    Inprint::Check::access($c, \@errors, "domain.departments.manage");
 
-    push @errors, { id => "shortcut", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_shortcut));
-
-    push @errors, { id => "description", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_description));
-
-    push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.departments.manage"));
+    my $parent = Inprint::Check::department($c, \@errors, $i_path);
 
     unless (@errors) {
-
-        my $path = $c->sql->Q(" SELECT path FROM catalog WHERE id =? ", [ $i_path ])->Value;
-
-        push @errors, { id => "path", msg => "Can't find object"}
-            unless ($c->is_path($path));
-
-        unless (@errors) {
-            $c->sql->Do("
-                INSERT INTO catalog (id, title, shortcut, description, path, type, capables)
-                    VALUES (?, ?, ?, ?, replace(?, '-',  '')::ltree, ?, ?)
-            ", [ $id, $i_title, $i_shortcut, $i_description, $path, 'default', [] ]);
-        }
+        $c->sql->Do("
+            INSERT INTO catalog (id, title, shortcut, description, path, type, capables)
+                VALUES (?, ?, ?, ?, replace(?, '-',  '')::ltree, ?, ?)
+        ", [ $id, $i_title, $i_shortcut, $i_description, $parent->{path}, 'default', [] ]);
     }
 
     $success = $c->json->true unless (@errors);
@@ -146,36 +133,22 @@ sub update {
     my @errors;
     my $success = $c->json->false;
 
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_id));
+    Inprint::Check::uuid($c, \@errors, "id", $i_id);
+    Inprint::Check::path($c, \@errors, "path", $i_path);
+    Inprint::Check::text($c, \@errors, "title", $i_title);
+    Inprint::Check::text($c, \@errors, "shortcut", $i_shortcut);
+
+    Inprint::Check::access($c, \@errors, "domain.departments.manage");
 
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         if ($i_id eq "00000000-0000-0000-0000-000000000000");
 
-    push @errors, { id => "path", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_path));
-
-    push @errors, { id => "title", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_title));
-
-    push @errors, { id => "shortcut", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_shortcut));
-
-    push @errors, { id => "description", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_description));
-
-    push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.departments.manage"));
+    my $parent = Inprint::Check::department($c, \@errors, $i_path);
 
     unless (@errors) {
-        my $path = $c->sql->Q(" SELECT path FROM catalog WHERE id =? ", [ $i_path ])->Value;
-
-        push @errors, { id => "path", msg => "Incorrectly filled field"}
-            unless ($c->is_path($path));
-
         unless (@errors) {
             $c->sql->Do(" UPDATE catalog SET title=?, shortcut=?, description=?, path=replace(?, '-',  '')::ltree WHERE id=? ",
-                [ $i_title, $i_shortcut, $i_description, "$path.$i_id", $i_id ]);
+                [ $i_title, $i_shortcut, $i_description, $parent->{path} . ".$i_id", $i_id ]);
         }
     }
 
@@ -190,14 +163,11 @@ sub delete {
     my @errors;
     my $success = $c->json->false;
 
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_id));
+    Inprint::Check::uuid($c, \@errors, "id", $i_id);
+    Inprint::Check::access($c, \@errors, "domain.departments.manage");
 
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         if ($i_id eq "00000000-0000-0000-0000-000000000000");
-
-    push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.departments.manage"));
 
     unless (@errors) {
         $c->sql->Do(" DELETE FROM catalog WHERE id =? ", [ $i_id ]);
@@ -216,18 +186,17 @@ sub map {
     my @errors;
     my $success = $c->json->false;
 
-    push @errors, { id => "group", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_group));
+    Inprint::Check::uuid($c, \@errors, "group", $i_group);
+    Inprint::Check::access($c, \@errors, "domain.departments.manage");
 
-    push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.departments.manage"));
+    foreach my $member (@i_members) {
+        Inprint::Check::uuid($c, \@errors, "member", $member);
+    }
 
     unless (@errors) {
         foreach my $member (@i_members) {
-            if ($c->is_uuid($member)) {
-                $c->sql->Do(" DELETE FROM map_member_to_catalog WHERE member=? AND catalog=? ", [ $member, $i_group ]);
-                $c->sql->Do(" INSERT INTO map_member_to_catalog( member, catalog) VALUES (?, ?) ", [ $member, $i_group ]);
-            }
+            $c->sql->Do(" DELETE FROM map_member_to_catalog WHERE member=? AND catalog=? ", [ $member, $i_group ]);
+            $c->sql->Do(" INSERT INTO map_member_to_catalog( member, catalog) VALUES (?, ?) ", [ $member, $i_group ]);
         }
     }
 
@@ -244,17 +213,16 @@ sub unmap {
     my @errors;
     my $success = $c->json->false;
 
-    push @errors, { id => "group", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_group));
+    Inprint::Check::uuid($c, \@errors, "group", $i_group);
+    Inprint::Check::access($c, \@errors, "domain.departments.manage");
 
-    push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.departments.manage"));
+    foreach my $member (@i_members) {
+        Inprint::Check::uuid($c, \@errors, "member", $member);
+    }
 
     unless (@errors) {
         foreach my $member (@i_members) {
-            if ($c->is_uuid($member)) {
-                $c->sql->Do(" DELETE FROM map_member_to_catalog WHERE member=? AND catalog=? ", [ $member, $i_group ]);
-            }
+            $c->sql->Do(" DELETE FROM map_member_to_catalog WHERE member=? AND catalog=? ", [ $member, $i_group ]);
         }
     }
 

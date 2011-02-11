@@ -1,14 +1,14 @@
 Inprint.documents.GridActions = function() {
-    
+
     return {
-        
+
         // Create new document
         Create: function() {
             var panel = new Inprint.cmp.CreateDocument();
             panel.show();
             panel.on("complete", function() { this.cmpReload(); }, this);
         },
-        
+
         // Update document's short profile
         Update: function() {
             var panel = new Inprint.cmp.UpdateDocument({
@@ -19,7 +19,7 @@ Inprint.documents.GridActions = function() {
                 this.cmpReload();
             }, this);
         },
-        
+
         // Capture document from another user
         Capture: function() {
             Ext.MessageBox.confirm(
@@ -36,7 +36,7 @@ Inprint.documents.GridActions = function() {
                     }
                 }, this).setIcon(Ext.MessageBox.WARNING);
         },
-        
+
         // Move document(s) to another user
         Transfer: function() {
             var panel = new Inprint.cmp.ExcahngeBrowser().show();
@@ -49,7 +49,7 @@ Inprint.documents.GridActions = function() {
                 });
             }, this);
         },
-        
+
         // Move document(s) to briefcase
         Briefcase: function() {
             Ext.MessageBox.confirm(
@@ -68,7 +68,7 @@ Inprint.documents.GridActions = function() {
                     }
                 }, this).setIcon(Ext.MessageBox.WARNING);
         },
-        
+
         // Move document(s) to another fascicle
         Move: function() {
             var cmp = new Inprint.cmp.MoveDocument();
@@ -78,7 +78,7 @@ Inprint.documents.GridActions = function() {
                 this.cmpReload();
             }, this);
         },
-        
+
         // Copy document(s) to another fascicle(s)
         Copy: function() {
             var cmp = new Inprint.cmp.CopyDocument();
@@ -88,7 +88,7 @@ Inprint.documents.GridActions = function() {
                 this.cmpReload();
             }, this);
         },
-        
+
         // Duplicate document(s) to another fascicle(s)
         Duplicate: function() {
             var cmp = new Inprint.cmp.DuplicateDocument();
@@ -98,7 +98,7 @@ Inprint.documents.GridActions = function() {
                 this.cmpReload();
             }, this);
         },
-        
+
         // Move document(s) to Recycle Bin
         Recycle: function() {
             Ext.MessageBox.confirm(
@@ -115,7 +115,7 @@ Inprint.documents.GridActions = function() {
                     }
                 }, this).setIcon(Ext.MessageBox.WARNING);
         },
-        
+
         // Restore documents from Recycle Bin
         Restore: function() {
             Ext.MessageBox.confirm(
@@ -132,7 +132,7 @@ Inprint.documents.GridActions = function() {
                     }
                 }, this).setIcon(Ext.MessageBox.WARNING);
         },
-        
+
         // Delete document from DB and Filesystem
         Delete: function() {
             Ext.MessageBox.confirm(

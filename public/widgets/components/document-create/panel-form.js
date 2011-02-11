@@ -189,12 +189,20 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                         term: 'editions.documents.work'
                                     },
                                     root: {
-                                        id:'00000000-0000-0000-0000-000000000000',
+                                        id: '00000000-0000-0000-0000-000000000000',
                                         nodeType: 'async',
                                         expanded: true,
                                         draggable: false,
                                         icon: _ico("blue-folder-open-document-text"),
                                         text: _("All fascicles")
+                                    },
+                                    listeners: {
+                                        scope: this,
+                                        render: function(field) {
+                                            var id = '00000000-0000-0000-0000-000000000000';
+                                            var title = _("Briefcase");
+                                            if (id && title) field.setValue(id, title);
+                                        }
                                     }
                                 },
 

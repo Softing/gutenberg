@@ -9,7 +9,7 @@ use utf8;
 use strict;
 use warnings;
 
-use base 'Inprint::BaseController';
+use Inprint::Frameworks::Access;
 
 sub exists {
     my ($c, $errors, $field, $value) = @_;
@@ -67,7 +67,7 @@ sub text {
 
 sub path{
     my ($c, $errors, $field, $value) = @_;
-    unless (length($value) > 0 && $value =~ m/^[\w|\d|\.]+$/) {
+    unless (length($value) > 0 && $value =~ m/^[\w|\d|\.|-]+$/) {
         push @$errors, { id => $field, msg => "Incorrectly filled field"};
         return 0;
     }
@@ -83,12 +83,91 @@ sub rule {
     return 1;
 }
 
+# Access checks
+
+sub access {
+    my ($c, $errors, $terms, $binding, $member) = @_;
+
+    my @rules;
+    my $result = 0;
+
+    $member = $c->QuerySessionGet("member.id") unless ($member);
+
+    if (ref $terms eq "ARRAY") {
+        @rules = @$terms;
+    } else {
+        push @rules, $terms;
+    }
+
+    for (my $i=0; $i <= $#rules; $i++) {
+        my ($term, $area) = split /:/, $rules[$i];
+        if ($area eq "*") {
+            splice @rules, $i, $i, "$term:member", "$term:group";
+        }
+    }
+    my %seen;@rules = grep { ! $seen{$_}++ } @rules;
+
+    if ($member && @rules) {
+        my @data;
+        my $sql = " SELECT true FROM cache_access WHERE member=? AND ? && terms ";
+        push @data, $member;
+        push @data, \@rules;
+        if ($binding) {
+            $sql .= " AND binding=?";
+            push @data, $binding;
+        }
+
+        $result = $c->sql->Q("SELECT EXISTS ($sql)", \@data)->Value();
+    }
+
+    unless ($result) {
+        my $terms = join ', ', @rules;
+        push @$errors, { id => "access", msg => "Not enough permissions <$terms>"};
+    }
+
+    return $result;
+}
+
+# Objects checks
+
 sub document {
     my ($c, $errors, $id) = @_;
-    undef my $document;
-    $document = $c->sql->Q(" SELECT * FROM documents WHERE id=? ", [ $id ])->Hash unless (@$errors);
-    push @$errors, { id => "document", msg => "Can't find object"} unless ($document->{id});
-    return $document;
+    undef my $item;
+    $item = $c->sql->Q(" SELECT * FROM documents WHERE id=? ", [ $id ])->Hash unless (@$errors);
+    push @$errors, { id => "document", msg => "Can't find object"} unless ($item->{id});
+    return $item;
+}
+
+sub department {
+    my ($c, $errors, $id) = @_;
+    undef my $item;
+    $item = $c->sql->Q(" SELECT * FROM catalog WHERE id=? ", [ $id ])->Hash unless (@$errors);
+    push @$errors, { id => "document", msg => "Can't find object"} unless ($item->{id});
+    return $item;
+}
+
+sub edition {
+    my ($c, $errors, $id) = @_;
+    undef my $item;
+    $item = $c->sql->Q(" SELECT * FROM editions WHERE id=? ", [ $id ])->Hash unless (@$errors);
+    push @$errors, { id => "document", msg => "Can't find object"} unless ($item->{id});
+    return $item;
+}
+
+sub fascicle {
+    my ($c, $errors, $id) = @_;
+    undef my $item;
+    $item = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $id ])->Hash unless (@$errors);
+    push @$errors, { id => "document", msg => "Can't find object"} unless ($item->{id});
+    return $item;
+}
+
+sub principal {
+    my ($c, $errors, $id) = @_;
+    undef my $item;
+    $item = $c->sql->Q(" SELECT * FROM view_principals WHERE id=? ", [ $id ])->Hash unless (@$errors);
+    push @$errors, { id => "document", msg => "Can't find object"} unless ($item->{id});
+    return $item;
 }
 
 

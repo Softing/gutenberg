@@ -14,21 +14,20 @@ use base 'Inprint::BaseController';
 sub read {
     my $c = shift;
     my $i_id = $c->param("id");
-    
+
     my @errors;
     my $success = $c->json->false;
 
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_id));
-    
+    Inprint::Check::uuid($c, \@errors, "id", $i_id);
+
     my $result = [];
-    
+
     unless (@errors) {
         $result = $c->sql->Q(" SELECT id, branch, readiness, weight, title, shortcut, description FROM stages WHERE id=? ", [ $i_id ])->Hash;
     }
-    
+
     $success = $c->json->true unless (@errors);
-    
+
     $c->render_json( { success => $success, errors => \@errors, data => $result } );
 }
 
@@ -41,17 +40,16 @@ sub list {
     my @errors;
     my $success = $c->json->false;
 
-    push @errors, { id => "branch", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_edition));
-    
+    Inprint::Check::uuid($c, \@errors, "id", $i_edition);
+
     my $result = [];
 
     unless (@errors) {
-        
+
         my $idBranch = $c->sql->Q("
             SELECT id FROM branches WHERE edition=? LIMIT 1
         ", [$i_edition])->Value;
-    
+
         $result = $c->sql->Q("
             SELECT t1.id, t1.branch, t1.readiness, t1.weight, t1.title, t1.shortcut, t1.description,
                 t2.shortcut as readiness_shortcut, t2.color as readiness_color
@@ -59,7 +57,7 @@ sub list {
             WHERE t1.branch=? AND t1.readiness=t2.id
             ORDER BY t1.weight, t1.shortcut
         ", [ $idBranch ])->Hashes;
-    
+
         foreach my $stage (@$result) {
             $stage->{members} = $c->sql->Q("
                 SELECT t1.id, t1.stage, t1.catalog, t1.principal,
@@ -79,7 +77,7 @@ sub list {
     }
 
     $success = $c->json->true unless (@errors);
-    
+
     $c->render_json( { success => $success, errors => \@errors, data => $result } );
 }
 
@@ -89,42 +87,29 @@ sub create {
 
     my $id = $c->uuid();
 
-    my $i_edition      = $c->param("branch");
+    my $i_edition     = $c->param("branch");
     my $i_readiness   = $c->param("readiness");
     my $i_weight      = $c->param("weight");
 
     my $i_title       = $c->param("title");
     my $i_shortcut    = $c->param("shortcut");
     my $i_description = $c->param("description");
-    
+
     my @errors;
     my $success = $c->json->false;
-    
-    push @errors, { id => "branch", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_edition));
-    
-    push @errors, { id => "readiness", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_readiness));
-        
-    push @errors, { id => "weight", msg => "Incorrectly filled field"}
-        unless ($c->is_int($i_weight));
-    
-    push @errors, { id => "title", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_title));
-        
-    push @errors, { id => "shortcut", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_shortcut));
-        
-    push @errors, { id => "description", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_description));
-        
-    push @errors, { id => "access", msg => "Not enough permissions [domain.exchange.manage]"}
-        unless ($c->access->Check("domain.exchange.manage"));
+
+    Inprint::Check::uuid($c, \@errors, "branch", $i_edition);
+    Inprint::Check::uuid($c, \@errors, "readiness", $i_readiness);
+    Inprint::Check::int($c, \@errors, "weight", $i_weight);
+    Inprint::Check::text($c, \@errors, "title", $i_title);
+    Inprint::Check::text($c, \@errors, "shortcut", $i_shortcut);
+
+    Inprint::Check::access($c, \@errors, "domain.exchange.manage");
 
     unless (@errors) {
-        
+
         my $idBranch = $c->sql->Q(" SELECT id FROM branches WHERE edition=? LIMIT 1 ", [$i_edition])->Value;
-        
+
         unless ($idBranch) {
             my $edition = $c->sql->Q(" SELECT * FROM editions WHERE id=? ", [$i_edition])->Hash;
             $c->sql->Do("
@@ -133,10 +118,10 @@ sub create {
              ", [ $edition->{id}, "document", $edition->{title}, $edition->{shortcut}, $edition->{description} ]);
             $idBranch = $c->sql->Q(" SELECT id FROM branches WHERE edition=? LIMIT 1 ", [$i_edition])->Value;
         }
-        
+
         push @errors, { id => "access", msg => "Not enough permissions <$idBranch>"}
             unless ($c->is_uuid($idBranch));
-        
+
         unless (@errors) {
             $c->sql->Do("
                 INSERT INTO stages (id, branch, readiness, weight, title, shortcut, description)
@@ -144,9 +129,9 @@ sub create {
             ", [ $id, $idBranch, $i_readiness, $i_weight, $i_title, $i_shortcut, $i_description ]);
         }
     }
-    
+
     $success = $c->json->true unless (@errors);
-    
+
     $c->render_json({ success => $success, errors => \@errors });
 }
 
@@ -164,27 +149,14 @@ sub update {
 
     my @errors;
     my $success = $c->json->false;
-    
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_id));
-    
-    push @errors, { id => "readiness", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_readiness));
-        
-    push @errors, { id => "weight", msg => "Incorrectly filled field"}
-        unless ($c->is_int($i_weight));
-    
-    push @errors, { id => "title", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_title));
-        
-    push @errors, { id => "shortcut", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_shortcut));
-        
-    push @errors, { id => "description", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_description));
-        
-    push @errors, { id => "access", msg => "Not enough permissions for [domain.exchange.manage]"}
-        unless ($c->access->Check("domain.exchange.manage"));
+
+    Inprint::Check::uuid($c, \@errors, "id", $i_id);
+    Inprint::Check::uuid($c, \@errors, "readiness", $i_readiness);
+    Inprint::Check::int($c, \@errors, "weight", $i_weight);
+    Inprint::Check::text($c, \@errors, "title", $i_title);
+    Inprint::Check::text($c, \@errors, "shortcut", $i_shortcut);
+
+    Inprint::Check::access($c, \@errors, "domain.exchange.manage");
 
     unless (@errors) {
         $c->sql->Do("
@@ -205,12 +177,11 @@ sub principalsMapping {
 
     my @errors;
     my $success = $c->json->false;
-    
-    push @errors, { id => "stage", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_stage));
+
+    Inprint::Check::uuid($c, \@errors, "stage", $i_stage);
 
     my $result = [];
-    
+
     unless (@errors) {
         $result = $c->sql->Q("
             SELECT t1.id, t1.stage, t1.catalog, t1.principal,
@@ -241,22 +212,20 @@ sub mapPrincipals {
 
     my @errors;
     my $success = $c->json->false;
-    
-    push @errors, { id => "stage", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_stage));
-        
-    push @errors, { id => "catalog", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_catalog));
-    
-    push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.exchange.manage"));
+
+    Inprint::Check::uuid($c, \@errors, "stage", $i_stage);
+    Inprint::Check::uuid($c, \@errors, "catalog", $i_catalog);
+
+    Inprint::Check::access($c, \@errors, "domain.exchange.manage");
+
+    foreach my $member (@i_members) {
+        Inprint::Check::uuid($c, \@errors, "member", $member);
+    }
 
     unless (@errors) {
         foreach my $member (@i_members) {
-            if ($c->is_uuid($member)) {
-                $c->sql->Do(" DELETE FROM map_principals_to_stages WHERE stage=? AND catalog=? AND principal=? ", [ $i_stage, $i_catalog, $member ]);
-                $c->sql->Do(" INSERT INTO map_principals_to_stages(stage, catalog, principal) VALUES (?, ?, ?) ", [ $i_stage, $i_catalog, $member ]);
-            }
+            $c->sql->Do(" DELETE FROM map_principals_to_stages WHERE stage=? AND catalog=? AND principal=? ", [ $i_stage, $i_catalog, $member ]);
+            $c->sql->Do(" INSERT INTO map_principals_to_stages(stage, catalog, principal) VALUES (?, ?, ?) ", [ $i_stage, $i_catalog, $member ]);
         }
     }
 
@@ -271,7 +240,7 @@ sub unmapPrincipals {
 
     my @errors;
     my $success = $c->json->false;
-    
+
     push @errors, { id => "access", msg => "Not enough permissions"}
         unless ($c->access->Check("domain.exchange.manage"));
 
@@ -294,7 +263,7 @@ sub delete {
 
     my @errors;
     my $success = $c->json->false;
-    
+
     push @errors, { id => "access", msg => "Not enough permissions"}
         unless ($c->access->Check("domain.exchange.manage"));
 
@@ -305,7 +274,7 @@ sub delete {
             }
         }
     }
-    
+
     $success = $c->json->true unless (@errors);
     $c->render_json({ success => $success, errors => \@errors });
 }

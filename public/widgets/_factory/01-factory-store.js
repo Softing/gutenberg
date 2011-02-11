@@ -49,13 +49,14 @@ Inprint.factory.StoreFields = {
         'copygroup',
 
         'holder','creator','manager','holder_shortcut','creator_shortcut','manager_shortcut',
+        'maingroup','maingroup_shortcut',
         'workgroup','workgroup_shortcut','ingroups',
         'islooked','isopen',
         'branch','branch_shortcut','stage','stage_shortcut','color','progress',
         'title','author','pages',
         'pdate','psize','rdate','rsize',
         'images','files',
-        'created','updated'
+        Inprint.factory.createDateField("created"), Inprint.factory.createDateField("updated"), Inprint.factory.createDateField("uploaded"), Inprint.factory.createDateField("moved")
     ],
 
     '/documents/common/fascicles/':                 [ "id", "edition", "edition_shortcut", "title", "shortcut", 'description', "headline", "headline_shortcut", "rubric", "rubric_shortcut" ],
@@ -133,7 +134,7 @@ Inprint.factory.Store = new function() {
     var defaults = Inprint.factory.StoreDefaults;
     var source = Inprint.factory.StoreFields;
     var items = {};
-    
+
     var combos = new Array(
 
         "/advertising/combo/managers/",

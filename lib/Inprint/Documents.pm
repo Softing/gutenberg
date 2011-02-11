@@ -10,6 +10,8 @@ use warnings;
 
 use File::Copy::Recursive qw(fcopy rcopy dircopy fmove rmove dirmove);
 
+use Inprint::Check;
+
 use Inprint::Utils;
 use Inprint::Utils::Files;
 
@@ -29,8 +31,7 @@ sub read {
     my @errors;
     my $success = $c->json->false;
 
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_id));
+    Inprint::Check::uuid($c, \@errors, "id", $i_id);
 
     my $document;
     unless (@errors) {
@@ -41,6 +42,7 @@ sub read {
                 dcm.fascicle, dcm.fascicle_shortcut,
                 dcm.headline, dcm.headline_shortcut,
                 dcm.rubric, dcm.rubric_shortcut,
+                dcm.maingroup, dcm.maingroup_shortcut,
                 dcm.workgroup, dcm.workgroup_shortcut,
                 dcm.inworkgroups, dcm.copygroup,
                 dcm.holder,  dcm.holder_shortcut,
@@ -57,7 +59,9 @@ sub read {
                 dcm.psize, dcm.rsize,
                 dcm.images, dcm.files,
                 to_char(dcm.created, 'YYYY-MM-DD HH24:MI:SS') as created,
-                to_char(dcm.updated, 'YYYY-MM-DD HH24:MI:SS') as updated
+                to_char(dcm.updated, 'YYYY-MM-DD HH24:MI:SS') as updated,
+                to_char(dcm.uploaded, 'YYYY-MM-DD HH24:MI:SS') as uploaded,
+                to_char(dcm.moved, 'YYYY-MM-DD HH24:MI:SS') as moved
             FROM documents dcm
             WHERE dcm.id=?
         ", [ $i_id ])->Hash;
@@ -142,6 +146,7 @@ sub list {
             dcm.headline, dcm.headline_shortcut,
             dcm.rubric, dcm.rubric_shortcut,
 
+            dcm.maingroup, dcm.maingroup_shortcut,
             dcm.workgroup, dcm.workgroup_shortcut,
             dcm.inworkgroups, dcm.copygroup,
 
@@ -160,7 +165,9 @@ sub list {
             dcm.psize, dcm.rsize,
             dcm.images, dcm.files,
             to_char(dcm.created, 'YYYY-MM-DD HH24:MI:SS') as created,
-            to_char(dcm.updated, 'YYYY-MM-DD HH24:MI:SS') as updated
+            to_char(dcm.updated, 'YYYY-MM-DD HH24:MI:SS') as updated,
+            to_char(dcm.uploaded, 'YYYY-MM-DD HH24:MI:SS') as uploaded,
+            to_char(dcm.moved, 'YYYY-MM-DD HH24:MI:SS') as moved
 
         FROM documents dcm, fascicles fsc
         WHERE fsc.id = dcm.fascicle
@@ -174,8 +181,6 @@ sub list {
     ";
 
     my $sql_filters = " ";
-
-    #$sql_filters .= " AND id = '296f7e02-9728-46a4-9dc1-b38f8d9e1335' ";
 
     # Set Restrictions
 
@@ -374,46 +379,23 @@ sub create {
         $manager = $current_member;
     }
 
-    push @errors, { id => "title", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_title));
-
-    push @errors, { id => "enddate", msg => "Incorrectly filled field"}
-        unless ($c->is_date($i_enddate));
-
-    push @errors, { id => "edition", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_edition));
-
-    push @errors, { id => "workgroup", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_workgroup));
-
-    push @errors, { id => "manager", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($manager));
-
-    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_fascicle));
-
-    if ($i_fascicle && $i_fascicle ne  "00000000-0000-0000-0000-000000000000") {
-        $i_edition = $c->sql->Q(" SELECT edition FROM fascicles WHERE id = ?", [ $i_fascicle ])->Value;
-        push @errors, { id => "edition", msg => "Incorrectly filled field"}
-            unless ($c->is_uuid($i_edition));
-    }
+    Inprint::Check::text($c, \@errors, "title", $i_title);
+    Inprint::Check::date($c, \@errors, "enddate", $i_enddate);
+    Inprint::Check::uuid($c, \@errors, "edition", $i_edition);
+    Inprint::Check::uuid($c, \@errors, "workgroup", $i_workgroup);
+    Inprint::Check::uuid($c, \@errors, "manager", $manager);
+    Inprint::Check::uuid($c, \@errors, "fascicle", $i_fascicle);
 
     # Check user access to this function
     unless ( @errors ) {
-
         if ( $i_workgroup ) {
-            push @errors, { id => "access", msg => "Access denied for [catalog.documents.create:*]"}
-                unless ($c->access->Check("catalog.documents.create:*",  $i_workgroup));
+            Inprint::Check::access($c, \@errors, "catalog.documents.create:*",  $i_workgroup);
         }
-
         if ( $i_fascicle && $i_fascicle ne "00000000-0000-0000-0000-000000000000") {
-            push @errors, { id => "access", msg => "Access denied for [editions.documents.assign]"}
-                unless ($c->access->Check("editions.documents.assign", $i_edition));
+            Inprint::Check::access($c, \@errors, "editions.documents.assign", $i_edition);
         }
-
         if ($current_member ne $manager) {
-            push @errors, { id => "access", msg => "Access denied for [catalog.documents.assign:*]"}
-                unless ($c->access->Check("catalog.documents.assign:*",  $i_workgroup));
+            Inprint::Check::access($c, \@errors, "catalog.documents.assign:*",  $i_workgroup);
         }
     }
 
@@ -472,33 +454,26 @@ sub create {
 
     }
 
-    my $edition;
+    my $edition = Inprint::Check::edition($c, \@errors, $i_edition);
     unless ( @errors ) {
-        # Set edition
 
-        $edition = $c->sql->Q(" SELECT id, path, shortcut FROM editions WHERE id = ?", [ $i_edition ])->Hash;
+        push @fields, "edition";
+        push @data, $edition->{id};
+        push @fields, "edition_shortcut";
+        push @data, $edition->{shortcut};
 
-        if ($edition->{id} && $edition->{shortcut}) {
-            push @fields, "edition";
-            push @data, $edition->{id};
-            push @fields, "edition_shortcut";
-            push @data, $edition->{shortcut};
-            # Set ineditions[]
-            my $editions = $c->sql->Q("
-                SELECT ARRAY( select id from editions where path @> ( select path from editions where id = ? ) )
-            ", [ $edition->{id} ])->Array;
-            push @fields, "ineditions";
-            push @data, $editions;
-        }
+        # Set ineditions[]
+        my $editions = $c->sql->Q("
+            SELECT ARRAY( select id from editions where path @> ( select path from editions where id = ? ) ) ",
+            [ $edition->{id} ])->Array;
 
-        push @errors, { id => "edition", msg => "Object not found"}
-            unless ($edition);
+        push @fields, "ineditions";
+        push @data, $editions;
+
     }
 
-    my $workgroup;
+    my $workgroup = Inprint::Check::department($c, \@errors, $i_workgroup);
     unless ( @errors ) {
-        # Set Workgroup
-        $workgroup = $c->sql->Q(" SELECT id, shortcut FROM catalog WHERE id = ?", [ $i_workgroup ])->Hash;
 
         push @fields, "workgroup";
         push @data, $workgroup->{id};
@@ -506,112 +481,99 @@ sub create {
         push @fields, "workgroup_shortcut";
         push @data, $workgroup->{shortcut};
 
-        push @errors, { id => "workgroup", msg => "Object not found"}
-            unless ($workgroup);
-    }
+        push @fields, "maingroup";
+        push @data, $workgroup->{id};
 
-    unless ( @errors ) {
+        push @fields, "maingroup_shortcut";
+        push @data, $workgroup->{shortcut};
+
         # Set Inworkgroups[]
-        my $workgroups = $c->sql->Q(" SELECT ARRAY( select id from catalog where path @> ( select path from catalog where id = ? ) ) ", [ $workgroup->{id} ])->Array;
+        my $workgroups = $c->sql->Q("
+            SELECT ARRAY( select id from catalog where path @> ( select path from catalog where id = ? ) ) ",
+            [ $workgroup->{id} ])->Array;
+
         push @fields, "inworkgroups";
         push @data, $workgroups;
 
-        push @errors, { id => "workgroups", msg => "Object not found"}
-            unless ($workgroups);
     }
 
     unless ( @errors ) {
-        # Creator
         push @fields, "creator";
         push @fields, "creator_shortcut";
         push @data, $c->QuerySessionGet("member.id");
         push @data, $c->QuerySessionGet("member.shortcut") || "<Unknown>";
     }
 
-    my $manager_obj;
+    my $holder = Inprint::Check::principal($c, \@errors, $manager);
     unless ( @errors ) {
-        # Set manager
-        $manager_obj = $c->sql->Q(" SELECT id, shortcut FROM view_principals WHERE id = ?", [ $manager ])->Hash;
-
         push @fields, "manager";
-        push @fields, "manager_shortcut";
-        push @data, $manager_obj->{id};
-        push @data, $manager_obj->{shortcut};
-
-        push @errors, { id => "manager", msg => "Object not found"}
-            unless ($manager_obj->{id});
-    }
-
-    unless ( @errors ) {
-        # Set Holder
-        my $holder = $c->sql->Q(" SELECT id, shortcut FROM view_principals WHERE id = ?", [ $manager_obj->{id} ])->Hash;
-        push @fields, "holder";
-        push @fields, "holder_shortcut";
         push @data, $holder->{id};
+
+        push @fields, "manager_shortcut";
         push @data, $holder->{shortcut};
 
-        push @errors, { id => "holder", msg => "Object not found"}
-            unless ($holder);
+        push @fields, "holder";
+        push @data, $holder->{id};
+
+        push @fields, "holder_shortcut";
+        push @data, $holder->{shortcut};
     }
 
-    unless ( @errors ) {
-        my $stage = $c->sql->Q("
+    my $stage; unless ( @errors ) {
+
+        my $parents = $c->sql->Q(" SELECT id FROM editions WHERE path @> ?", [ $edition->{path} ])->Values;
+
+        $stage = $c->sql->Q("
             SELECT
                 t1.id as branch, t1.shortcut as branch_shortcut,
                 t2.id as stage, t2.shortcut as stage_shortcut,
                 t3.id as readiness, t3.shortcut as readiness_shortcut, t3.color, t3.weight as progress
                 FROM branches t1, stages t2, readiness t3
-            WHERE edition = ? AND t2.branch = t1.id AND t3.id = t2.readiness
+            WHERE edition = ANY(?) AND t2.branch = t1.id AND t3.id = t2.readiness
             ORDER BY t2.weight LIMIT 1
-        ", [ $i_edition ])->Hash;
+        ", [ $parents ])->Hash;
 
         push @errors, { id => "stage", msg => "Object not found"}
             unless ($stage);
-
-        if ($stage->{stage}) {
-
-            # Set Branch
-            push @fields, "branch";
-            push @fields, "branch_shortcut";
-            push @data, $stage->{branch};
-            push @data, $stage->{branch_shortcut};
-
-            # Set Stage
-            push @fields, "stage";
-            push @fields, "stage_shortcut";
-            push @data, $stage->{stage};
-            push @data, $stage->{stage_shortcut};
-
-            # Set Readiness
-            push @fields, "readiness";
-            push @fields, "readiness_shortcut";
-            push @data, $stage->{readiness};
-            push @data, $stage->{readiness_shortcut};
-
-            # Set Color
-            push @fields, "color";
-            push @data, $stage->{color};
-
-            # Set Progress
-            push @fields, "progress";
-            push @data, $stage->{progress};
-        }
-    }
-
-    # Fascicle
-    my $fascicle; unless ( @errors ) {
-        $fascicle = $c->sql->Q(" SELECT id, edition, shortcut FROM fascicles WHERE id = ?", [ $i_fascicle ])->Hash;
-        push @errors, { id => "fascicle", msg => "Object not found"}
-            unless ($fascicle);
     }
 
     unless ( @errors ) {
-        if ($fascicle->{id} && $fascicle->{shortcut}) {
-            push @fields, "fascicle";
-            push @fields, "fascicle_shortcut";
-            push @data, $fascicle->{id};
-            push @data, $fascicle->{shortcut};
-        }
+
+        # Set Branch
+        push @fields, "branch";
+        push @fields, "branch_shortcut";
+        push @data, $stage->{branch};
+        push @data, $stage->{branch_shortcut};
+
+        # Set Stage
+        push @fields, "stage";
+        push @fields, "stage_shortcut";
+        push @data, $stage->{stage};
+        push @data, $stage->{stage_shortcut};
+
+        # Set Readiness
+        push @fields, "readiness";
+        push @fields, "readiness_shortcut";
+        push @data, $stage->{readiness};
+        push @data, $stage->{readiness_shortcut};
+
+        # Set Color
+        push @fields, "color";
+        push @data, $stage->{color};
+
+        # Set Progress
+        push @fields, "progress";
+        push @data, $stage->{progress};
+
+    }
+
+    # Fascicle
+    my $fascicle = Inprint::Check::fascicle($c, \@errors, $i_fascicle);
+    unless ( @errors ) {
+        push @fields, "fascicle";
+        push @fields, "fascicle_shortcut";
+        push @data, $fascicle->{id};
+        push @data, $fascicle->{shortcut};
     }
 
     # Rubrication
