@@ -26,7 +26,7 @@ sub read {
 
     unless (@errors) {
         $result = $c->sql->Q("
-            SELECT t1.*,yf
+            SELECT t1.*,
                 subpath(path, -2,1) as parent,
                 (select shortcut from editions where subpath(path, -1,1) = subpath(t1.path, -2,1) ) as parent_shortcut
             FROM editions t1 WHERE t1.id = ?

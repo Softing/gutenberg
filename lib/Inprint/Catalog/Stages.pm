@@ -9,6 +9,8 @@ use utf8;
 use strict;
 use warnings;
 
+use Inprint::Check;
+
 use base 'Inprint::BaseController';
 
 sub read {

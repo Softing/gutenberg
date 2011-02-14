@@ -215,7 +215,7 @@ Inprint.documents.GridColumns = function() {
             header: _("Created"),
             width: 80,
             sortable: true,
-            xtype: 'datecolumn', format: 'M d h:m'
+            xtype: 'datecolumn', format: 'M d H:i'
         },
 
         updated: {
@@ -225,7 +225,7 @@ Inprint.documents.GridColumns = function() {
             header: _("Updated"),
             width: 80,
             sortable: true,
-            xtype: 'datecolumn', format: 'M d h:m'
+            xtype: 'datecolumn', format: 'M d H:i'
         },
 
         uploaded: {
@@ -235,7 +235,7 @@ Inprint.documents.GridColumns = function() {
             header: _("Uploaded"),
             width: 80,
             sortable: true,
-            xtype: 'datecolumn', format: 'M d h:m'
+            xtype: 'datecolumn', format: 'M d H:i'
         },
 
         moved: {
@@ -245,7 +245,7 @@ Inprint.documents.GridColumns = function() {
             header: _("Moved"),
             width: 80,
             sortable: true,
-            xtype: 'datecolumn', format: 'M d h:m'
+            xtype: 'datecolumn', format: 'M d H:i'
         }
 
     }

@@ -123,7 +123,7 @@ sub list {
 
     # Sorting
     my $dir      = $c->param("dir")          || "DESC";
-    my $sort     = $c->param("sort")         || "created";
+    my $sort     = $c->param("sort")         || "uploaded";
 
     # Filters
     my $edition  = $c->param("flt_edition")  || undef;
@@ -297,10 +297,14 @@ sub list {
     # Calculate total param
     my $total = $c->sql->Q($sql_total, \@params)->Value || 0;
 
+    # Setup soting
     if ($dir && $sort) {
         if ( $dir ~~ ["ASC", "DESC"] ) {
-            if ( $sort ~~ ["title", "maingroup_shortcut", "fascicle_shortcut", "headline_shortcut", "created",
-                           "rubric_shortcut", "pages", "manager_shortcut", "progress", "holder_shortcut", "images", "rsize" ] ) {
+            if ( $sort ~~ [
+                    "title", "maingroup_shortcut", "fascicle_shortcut",
+                    "headline_shortcut", "created", "updated", "uploaded", "moved",
+                    "rubric_shortcut", "pages", "manager_shortcut", "progress",
+                    "holder_shortcut", "images", "rsize" ] ) {
                 $sql_query .= " ORDER BY dcm.$sort $dir ";
             }
         }
