@@ -19,6 +19,9 @@ use Inprint::Models::Tag;
 use Inprint::Models::Fascicle::Headline;
 use Inprint::Models::Fascicle::Rubric;
 
+use Inprint::Store::Embedded;
+use Inprint::Store::Cache;
+
 use base 'Inprint::BaseController';
 
 # Read document
@@ -65,7 +68,6 @@ sub read {
             FROM documents dcm
             WHERE dcm.id=?
         ", [ $i_id ])->Hash;
-
 
         $document->{access} = {};
         my $current_member = $c->QuerySessionGet("member.id");
@@ -315,8 +317,21 @@ sub list {
 
     foreach my $document (@$result) {
 
+        # Get files list
+        my $folder = Inprint::Store::Embedded::getFolderPath($c, "documents", $document->{created}, $document->{id}, 1);
+        my $files  = Inprint::Store::Cache::getRecordsByPath($c, $folder, "all", [ 'doc', 'rtf', 'odt', 'txt' ]);
+
+        foreach my $file (@$files) {
+            push @{ $document->{links} }, {
+                id => $file->{id},
+                name => $file->{name}
+            };
+        }
+
+        # Get document pages
         $document->{pages} = Inprint::Utils::CollapsePagesToString($document->{pages});
 
+        # get copyes count
         my $copy_count = $c->sql->Q(" SELECT count(*) FROM documents WHERE copygroup=? ", [ $document->{copygroup} ])->Value;
         if ($copy_count > 1) {
             $document->{title} = $document->{title} . " ($copy_count)";
@@ -696,42 +711,29 @@ sub update {
 
     my $c = shift;
 
-    my $i_id      = $c->param("id");
-    my $i_title   = $c->param("title");
-    my $i_author  = $c->param("author");
-    my $i_size    = $c->param("size") || 0;
-    my $i_enddate = $c->param("enddate");
+    my $i_id        = $c->param("id");
+    my $i_title     = $c->param("title");
+    my $i_author    = $c->param("author");
+    my $i_size      = $c->param("size") || 0;
+    my $i_enddate   = $c->param("enddate");
 
-    my $i_headline = $c->param("headline");
-    my $i_rubric   = $c->param("rubric");
+    my $i_maingroup = $c->param("maingroup");
+    my $i_manager   = $c->param("manager");
+
+    my $i_headline  = $c->param("headline");
+    my $i_rubric    = $c->param("rubric");
 
     my @errors;
     my $success = $c->json->false;
 
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_id));
+    Inprint::Check::uuid($c, \@errors, "id", $i_id);
+    Inprint::Check::text($c, \@errors, "title", $i_title);
 
-    push @errors, { id => "title", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_title));
+    Inprint::Check::text($c, \@errors, "author", $i_author) if ($i_author);
+    Inprint::Check::int($c, \@errors, "size", $i_size) if ($i_size);
+    Inprint::Check::date($c, \@errors, "enddate", $i_enddate) if ($i_enddate);
 
-    if ($i_author) {
-        push @errors, { id => "author", msg => "Incorrectly filled field"}
-            unless ($c->is_text($i_author));
-    }
-
-    if ($i_size) {
-        push @errors, { id => "size", msg => "Incorrectly filled field"}
-            unless ($c->is_int($i_size));
-    }
-
-    if ($i_enddate) {
-        push @errors, { id => "enddate", msg => "Incorrectly filled field"}
-            unless ($c->is_date($i_enddate));
-    }
-
-    my $document = Inprint::Utils::GetDocumentById($c, id => $i_id);
-    push @errors, { id => "document", msg => "Can't find document object"}
-        unless ($document->{id});
+    my $document = Inprint::Check::document($c, \@errors, $i_id);
 
     # Rubrication
     my $headline; unless ( @errors ) {
@@ -754,31 +756,42 @@ sub update {
         }
     }
 
+    my $canAssign = Inprint::Check::access($c, undef, "catalog.documents.assign:*", $document->{workgroup});
+    my $maingroup = Inprint::Check::principal($c, \@errors, $i_maingroup) if ($canAssign);
+    my $manager   = Inprint::Check::principal($c, \@errors, $i_manager) if ($canAssign);
+
+    # Update assignation
     unless (@errors) {
-        push @errors, { id => "access", msg => "Not enough permissions"}
-            unless ($c->access->Check("catalog.documents.update:*", $document->{workgroup}));
+        if ($canAssign) {
+            $c->sql->Do(" UPDATE documents SET maingroup=?, maingroup_shortcut=? WHERE id=? OR copygroup=?; ",
+                [ $maingroup->{id}, $maingroup->{shortcut}, $document->{id}, $document->{id} ]);
+            $c->sql->Do(" UPDATE documents SET manager=?, manager_shortcut=? WHERE id=? OR copygroup=?; ",
+                [ $manager->{id}, $manager->{shortcut}, $document->{id}, $document->{id} ]);
+        }
     }
 
     unless (@errors) {
+        my $canUpdate = Inprint::Check::access($c, undef, "catalog.documents.update:*", $document->{workgroup});
+        if ($canUpdate) {
 
-        # Update workgroup
+            # Update workgroup
+            $c->sql->Do(" UPDATE documents SET title=?, author=?, psize=?, pdate=? WHERE id=? OR copygroup=?; ",
+                [ $i_title, $i_author, $i_size, $i_enddate, $document->{id}, $document->{id} ]);
 
-        $c->sql->Do(" UPDATE documents SET title=?, author=?, psize=?, pdate=? WHERE id=? OR copygroup=?; ",
-            [ $i_title, $i_author, $i_size, $i_enddate, $document->{id}, $document->{id} ]);
+            # Update headline and rubric
+            if ($headline->{id}) {
+                my $tag = Inprint::Models::Tag::getById($c, $headline->{tag});
+                $c->sql->Do(" UPDATE documents SET headline=?, headline_shortcut=? WHERE id=? ", [ $tag->{id}, $tag->{title}, $document->{id} ]);
+            } else {
+                $c->sql->Do(" UPDATE documents SET headline=null, headline_shortcut=null WHERE id=? ", [ $document->{id} ]);
+            }
 
-        # Update headline and rubric
-        if ($headline->{id}) {
-            my $tag = Inprint::Models::Tag::getById($c, $headline->{tag});
-            $c->sql->Do(" UPDATE documents SET headline=?, headline_shortcut=? WHERE id=? ", [ $tag->{id}, $tag->{title}, $document->{id} ]);
-        } else {
-            $c->sql->Do(" UPDATE documents SET headline=null, headline_shortcut=null WHERE id=? ", [ $document->{id} ]);
-        }
-
-        if ($headline->{id} && $rubric->{id}) {
-            my $tag = Inprint::Models::Tag::getById($c, $rubric->{tag});
-            $c->sql->Do(" UPDATE documents SET rubric=?, rubric_shortcut=? WHERE id=? ", [ $tag->{id}, $tag->{title}, $document->{id} ]);
-        } else {
-            $c->sql->Do(" UPDATE documents SET rubric=null, rubric_shortcut=null WHERE id=? ", [ $document->{id} ]);
+            if ($headline->{id} && $rubric->{id}) {
+                my $tag = Inprint::Models::Tag::getById($c, $rubric->{tag});
+                $c->sql->Do(" UPDATE documents SET rubric=?, rubric_shortcut=? WHERE id=? ", [ $tag->{id}, $tag->{title}, $document->{id} ]);
+            } else {
+                $c->sql->Do(" UPDATE documents SET rubric=null, rubric_shortcut=null WHERE id=? ", [ $document->{id} ]);
+            }
         }
 
     }
@@ -932,7 +945,9 @@ sub transfer {
                 UPDATE documents SET
                     holder=?, holder_shortcut=?,
                     workgroup=?, workgroup_shortcut=?, inworkgroups=?,
-                    readiness=?, readiness_shortcut=?, color=?, progress=?, fdate=now()
+                    readiness=?, readiness_shortcut=?, color=?, progress=?,
+                    islooked = false,
+                    moved=now()
                 WHERE id=?
             ", [
                 $assignment->{principal}, $assignment->{principal_shortcut},

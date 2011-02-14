@@ -34,7 +34,7 @@ sub read {
             Content_Type => 'form-data',
             Content => [
                 outputFormat => $filetype,
-                inputDocument =>  [ $filepath ]
+                inputDocument =>  [ Encode::encode("utf8", $filepath) ]
             ]
         );
 

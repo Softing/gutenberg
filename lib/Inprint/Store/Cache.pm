@@ -15,6 +15,8 @@ sub makeRecord {
     $filepath = getRelativePath($c, $filepath);
 
     my ($filename, $filepath, $extension) = fileparse($filepath, qr/(\.[^.]+){1}?/);
+
+    $filename = "$filename$extension";
     $extension =~ s/^.//g;
 
     my $mimetype = extractMimeType($c, $extension);
@@ -57,6 +59,41 @@ sub getRecordByPath {
     my $record = $c->sql->Q("
             SELECT * FROM cache_files WHERE file_path=? AND file_name=?
             ", [ $path, $filename ])->Hash;
+
+    return $record;
+}
+
+sub getRecordsByPath {
+
+    my ($c, $path, $status, $filter) = @_;
+
+    my @params;
+    my $sql = "
+        SELECT
+            id, file_name as name, file_mime as mime,
+            file_description as description, file_extension as extension,
+            file_size as size, file_published as published,
+            created as created, updated as updated
+        FROM cache_files
+        WHERE file_exists = true AND file_path=? ";
+
+    push @params, getRelativePath($c, "$path/");
+
+    if ($status eq 'published') {
+        $sql .= " AND file_published = true ";
+    }
+    if ($status eq 'unpublished') {
+        $sql .= " AND file_published = false ";
+    }
+
+    if ($filter) {
+        $sql .= " AND file_extension = ANY (?) ";
+        push @params, $filter;
+    }
+
+    $sql .= " ORDER BY file_published DESC, file_extension, file_name";
+
+    my $record = $c->sql->Q($sql, \@params)->Hashes;
 
     return $record;
 }
@@ -241,6 +278,7 @@ sub extractMimeType {
         "pml" => "application/x-perfmon",
         "pmr" => "application/x-perfmon",
         "pmw" => "application/x-perfmon",
+        "png" => "image/png",
         "pnm" => "image/x-portable-anymap",
         "pot," => "application/vnd.ms-powerpoint",
         "ppm" => "image/x-portable-pixmap",

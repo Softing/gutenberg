@@ -35,7 +35,7 @@ sub SetDBH {
 
 sub Q {
     my $c = shift;
-    
+
     my $query = shift;
     my $value = shift;
     my $trace = shift;
@@ -47,29 +47,33 @@ sub Q {
 
 sub Do {
     my $c = shift;
-    
+
     my $query = shift;
     my $value = shift;
     my $trace = shift;
-    
+
+    unless (ref($value) eq "ARRAY") {
+        $value = [ $value ];
+    }
+
     my $count = $c->{conn}->dbh->do($query, undef, @{$value});
     say STDERR $c->{conn}->dbh->{Statement} if $trace;
-    
+
     return 0 if $count eq '0E0';
     return $count;
 }
 
 #Utils
 
-sub ArrayToString 
+sub ArrayToString
 {
    my $class = shift;
    my $array = shift;
    my $string;
-   
+
    $string = join("','", @$array );
    $string = "'$string'";
-   
+
    return $string;
 }
 

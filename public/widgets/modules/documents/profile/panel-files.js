@@ -29,16 +29,16 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
             autoLoad:true,
             url: _url("/documents/files/list/"),
             baseParams: { document: this.config.document },
-            fields: [ "id", "name", "description", "id", "preview", "isdraft", "isapproved",  "size", "created", "updated" ]
+            fields: [ "id", "name", "description", "mime", "extension", "published",  "size", "created", "updated" ]
         });
 
         // Column model
         this.columns = [
             this.selectionModel,
             {
-                id:"approved",
+                id:"published",
                 width: 32,
-                dataIndex: "isapproved",
+                dataIndex: "published",
                 sortable: false,
                 renderer: function(v) {
                     var image = '';
@@ -53,19 +53,19 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                 dataIndex: "id",
                 sortable: false,
                 renderer: function(v) {
-                    return '<img src="/files/preview/'+ v +'x80" style="border:1px solid silver;"/>';
+                    return '<a target="_blank" href="/files/preview/'+ v +'"><img src="/files/preview/'+ v +'x80" style="border:1px solid silver;"/></a>';
                 }
             },
-            {
-                id:"download",
-                header:_(""),
-                width: 30,
-                dataIndex: "id",
-                sortable: false,
-                renderer: function(v) {
-                    return '<a href="/files/download/'+ v +'"><img src="'+ _ico("arrow-transition-270") +'" style="border:1px solid silver;"/></a>';
-                }
-            },
+            //{
+            //    id:"download",
+            //    header:_(""),
+            //    width: 30,
+            //    dataIndex: "id",
+            //    sortable: false,
+            //    renderer: function(v) {
+            //        return '<a href="/files/download/'+ v +'"><img src="'+ _ico("arrow-transition-270") +'"/></a>';
+            //    }
+            //},
             { id:'name', header: _("File"),dataIndex:'name', width:250},
             { id: 'description', header: _("Description"),dataIndex:'description', width:150},
             { id: 'size', header: _("Size"), dataIndex:'size', width:100, renderer:Ext.util.Format.fileSize},
@@ -175,72 +175,103 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
 
             evtObj.stopEvent();
 
-            var record = thisGrid.getStore().getAt(rowIndex);
-
             var rowCtxMenuItems = [];
 
-            if(record.get("name").match(/^.+\.(doc|docx|odt|rtf|txt)$/i)) {
-                rowCtxMenuItems.push({
-                    icon: _ico("pencil"),
-                    cls: "x-btn-text-icon",
-                    text: _("Edit Text"),
-                    scope:this,
-                    handler : function() {
-                        Inprint.ObjectResolver.resolve({
-                            aid: "document-editor",
-                            oid:  record.get("id"),
-                            text: record.get("filename"),
-                            description: _("Text editing")
+            var record = thisGrid.getStore().getAt(rowIndex);
+            var selCount = thisGrid.getSelectionModel().getCount();
+
+            if ( selCount > 0 ) {
+
+                if ( selCount == 1 ) {
+
+                    if(record.get("name").match(/^.+\.(doc|docx|odt|rtf|txt)$/i)) {
+                        rowCtxMenuItems.push({
+                            icon: _ico("pencil"),
+                            cls: "x-btn-text-icon",
+                            text: _("Edit Text"),
+                            scope:this,
+                            handler : function() {
+                                Inprint.ObjectResolver.resolve({
+                                    aid: "document-editor",
+                                    oid:  record.get("id"),
+                                    text: record.get("filename"),
+                                    description: _("Text editing")
+                                });
+                            }
                         });
                     }
-                });
-                rowCtxMenuItems.push("-");
-            }
 
-            rowCtxMenuItems.push({
-                icon: _ico("light-bulb"),
-                cls: "x-btn-text-icon",
-                text: _("Publish"),
-                scope:this,
-                handler: this.cmpPublish
-            });
+                    rowCtxMenuItems.push({
+                        icon: _ico("arrow-transition-270"),
+                        cls: "x-btn-text-icon",
+                        text: _("Download file"),
+                        scope:this,
+                        handler : function() {
+                            window.location = "/files/download/" + record.get("id");
+                        }
+                    });
+                    rowCtxMenuItems.push("-");
 
-            rowCtxMenuItems.push({
-                icon: _ico("light-bulb-off"),
-                cls: "x-btn-text-icon",
-                text: _("Unpublish"),
-                scope:this,
-                handler: this.cmpUnpublish
-            });
+                }
 
-            rowCtxMenuItems.push("-");
-
-            rowCtxMenuItems.push({
-                icon: _ico("edit-drop-cap"),
-                cls: "x-btn-text-icon",
-                text: _("Rename file"),
-                scope:this,
-                handler : this.cmpRenameFile
-            });
-
-            rowCtxMenuItems.push({
-                icon: _ico("edit-column"),
-                cls: "x-btn-text-icon",
-                text: _("Change description"),
-                scope:this,
-                handler : this.cmpChangeDescription
-            });
-
-            if (this.access["files.delete"]  == true) {
-                rowCtxMenuItems.push("-");
                 rowCtxMenuItems.push({
-                    icon: _ico("document-shred"),
+                    icon: _ico("light-bulb"),
                     cls: "x-btn-text-icon",
-                    text: _("Delete file"),
+                    text: _("Publish"),
                     scope:this,
-                    handler : this.cmpDelete
+                    handler: this.cmpPublish
                 });
+
+                rowCtxMenuItems.push({
+                    icon: _ico("light-bulb-off"),
+                    cls: "x-btn-text-icon",
+                    text: _("Unpublish"),
+                    scope:this,
+                    handler: this.cmpUnpublish
+                });
+
+                rowCtxMenuItems.push("-");
+
+                if ( selCount == 1 ) {
+                    //rowCtxMenuItems.push({
+                    //    icon: _ico("edit-drop-cap"),
+                    //    cls: "x-btn-text-icon",
+                    //    text: _("Rename file"),
+                    //    scope:this,
+                    //    handler : this.cmpRenameFile
+                    //});
+                    rowCtxMenuItems.push({
+                        icon: _ico("edit-column"),
+                        cls: "x-btn-text-icon",
+                        text: _("Change description"),
+                        scope:this,
+                        handler : this.cmpChangeDescription
+                    });
+
+                }
+
+                if (this.access["files.delete"]  == true) {
+                    rowCtxMenuItems.push("-");
+                    rowCtxMenuItems.push({
+                        icon: _ico("document-shred"),
+                        cls: "x-btn-text-icon",
+                        text: _("Delete file"),
+                        scope:this,
+                        handler : this.cmpDelete
+                    });
+                }
+
+                rowCtxMenuItems.push("-");
+
             }
+
+            rowCtxMenuItems.push({
+                icon: _ico("arrow-circle-double"),
+                cls: "x-btn-text-icon",
+                text: _("Reload"),
+                scope:this,
+                handler : this.cmpReload
+            });
 
             thisGrid.rowCtxMenu = new Ext.menu.Menu({
                 items : rowCtxMenuItems

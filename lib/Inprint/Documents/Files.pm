@@ -9,6 +9,7 @@ use strict;
 use warnings;
 
 use Inprint::Check;
+use Inprint::Store::Cache;
 use Inprint::Store::Embedded;
 
 use base 'Inprint::BaseController';
@@ -24,29 +25,15 @@ sub list {
     Inprint::Check::uuid($c, \@errors, "document", $i_document);
     my $document = Inprint::Check::document($c, \@errors, $i_document);
 
-    my @result;
+    my $result = [];
     unless (@errors) {
-
         my $folder = Inprint::Store::Embedded::getFolderPath($c, "documents", $document->{created}, $document->{id}, 1);
-        my $files = Inprint::Store::Embedded::findFiles($c, $folder, 'all', ['doc', 'xls', 'rtf', 'odt', 'png', 'jpg', 'gif']);
-
-        foreach my $record (@$files) {
-            push @result, {
-                id           => $record->{id},
-                name         => $record->{name},
-                description  => $record->{description},
-                isdraft      => $record->{isdraft},
-                isapproved   => $record->{isapproved},
-                size         => $record->{size},
-                created      => $record->{created},
-                updated      => $record->{updated},
-            };
-        }
-
+        Inprint::Store::Embedded::updateCache($c, $folder);
+        $result = Inprint::Store::Cache::getRecordsByPath($c, $folder, "all", ['doc', 'xls', 'rtf', 'odt', 'png', 'jpg', 'gif']);
     }
 
     $success = $c->json->true unless (@errors);
-    $c->render_json({ success => $success, errors => \@errors, data => \@result });
+    $c->render_json({ success => $success, errors => \@errors, data => $result });
 }
 
 sub create {
@@ -67,6 +54,8 @@ sub create {
     unless (@errors) {
         my $folder = Inprint::Store::Embedded::getFolderPath($c, "documents", $document->{created}, $document->{id}, 1);
         Inprint::Store::Embedded::fileCreate($c, $folder, $i_filename, $i_description);
+
+        $c->sql->Do("UPDATE documents SET uploaded=now() WHERE id=?", [ $i_document ]);
     }
 
     $success = $c->json->true unless (@errors);
@@ -74,6 +63,7 @@ sub create {
 }
 
 sub upload {
+
     my $c = shift;
 
     if ( $c->param("Filename") ) {
@@ -99,6 +89,7 @@ sub uploadFlash {
         my $upload = $c->req->upload("Filedata");
         my $folder = Inprint::Store::Embedded::getFolderPath($c, "documents", $document->{created}, $document->{id}, 1);
         Inprint::Store::Embedded::fileUpload($c, $folder, $upload);
+        $c->sql->Do("UPDATE documents SET uploaded=now() WHERE id=?", [ $i_document ]);
     }
 
     $success = $c->json->true unless (@errors);
@@ -122,12 +113,12 @@ sub uploadHtml {
             my $upload = $c->req->upload("file$_");
             Inprint::Store::Embedded::fileUpload($c, $folder, $upload) if ($upload);
         }
+        $c->sql->Do("UPDATE documents SET uploaded=now() WHERE id=?", [ $i_document ]);
     }
 
     $success = $c->json->true unless (@errors);
     $c->render_json({ success => $success, errors => \@errors });
 }
-
 
 sub publish {
     my $c = shift;

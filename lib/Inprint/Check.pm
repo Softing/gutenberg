@@ -58,10 +58,10 @@ sub float {
 
 sub text {
     my ($c, $errors, $field, $value) = @_;
-    unless (length($value) > 0 && $value =~ m/^[\w|\d|\s|:|\\|\/|"|'|#|\-|.|,|?]+$/) {
-        push @$errors, { id => $field, msg => "Incorrectly filled field"};
-        return 0;
-    }
+    #unless (length($value) > 0 && $value =~ m/^[\w|\d|\s|:|\\|\/|"|'|#|\-|.|,|?]+$/) {
+    #    push @$errors, { id => $field, msg => "Incorrectly filled field"};
+    #    return 0;
+    #}
     return 1;
 }
 
@@ -120,9 +120,11 @@ sub access {
         $result = $c->sql->Q("SELECT EXISTS ($sql)", \@data)->Value();
     }
 
-    unless ($result) {
-        my $terms = join ', ', @rules;
-        push @$errors, { id => "access", msg => "Not enough permissions <$terms>"};
+    if ($errors) {
+        unless ($result) {
+            my $terms = join ', ', @rules;
+            push @$errors, { id => "access", msg => "Not enough permissions <$terms>"};
+        }
     }
 
     return $result;
@@ -142,7 +144,7 @@ sub department {
     my ($c, $errors, $id) = @_;
     undef my $item;
     $item = $c->sql->Q(" SELECT * FROM catalog WHERE id=? ", [ $id ])->Hash unless (@$errors);
-    push @$errors, { id => "document", msg => "Can't find object"} unless ($item->{id});
+    push @$errors, { id => "department", msg => "Can't find object"} unless ($item->{id});
     return $item;
 }
 
@@ -150,7 +152,7 @@ sub edition {
     my ($c, $errors, $id) = @_;
     undef my $item;
     $item = $c->sql->Q(" SELECT * FROM editions WHERE id=? ", [ $id ])->Hash unless (@$errors);
-    push @$errors, { id => "document", msg => "Can't find object"} unless ($item->{id});
+    push @$errors, { id => "edition", msg => "Can't find object"} unless ($item->{id});
     return $item;
 }
 
@@ -158,7 +160,7 @@ sub fascicle {
     my ($c, $errors, $id) = @_;
     undef my $item;
     $item = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $id ])->Hash unless (@$errors);
-    push @$errors, { id => "document", msg => "Can't find object"} unless ($item->{id});
+    push @$errors, { id => "fascicle", msg => "Can't find object"} unless ($item->{id});
     return $item;
 }
 
@@ -166,7 +168,7 @@ sub principal {
     my ($c, $errors, $id) = @_;
     undef my $item;
     $item = $c->sql->Q(" SELECT * FROM view_principals WHERE id=? ", [ $id ])->Hash unless (@$errors);
-    push @$errors, { id => "document", msg => "Can't find object"} unless ($item->{id});
+    push @$errors, { id => "principal", msg => "Can't find object"} unless ($item->{id});
     return $item;
 }
 

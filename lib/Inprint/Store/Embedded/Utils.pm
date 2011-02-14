@@ -36,7 +36,7 @@ sub encode {
     }
 
     if ($^O eq "linux") {
-        $path = Encode::decode("utf8", $path);
+        #$path = Encode::decode("utf8", $path);
     }
 
     return $path;

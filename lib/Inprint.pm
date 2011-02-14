@@ -110,9 +110,13 @@ sub startup {
     $self->createRoutes($sessionBridge, "documents/combos",         [ "stages", "assignments", "managers", "fascicles", "headlines", "rubrics" ]);
     $self->createRoutes($sessionBridge, "documents/trees",          [ "editions", "workgroups", "fascicles" ]);
     $self->createRoutes($sessionBridge, "documents/filters",        [ "editions", "groups", "fascicles", "headlines", "rubrics", "holders", "managers", "progress" ]);
-    $self->createRoutes($sessionBridge, "documents/profile",        [ "read" ]);
-    #$self->createRoutes($sessionBridge, "documents/files",          [ "list", "create", "read", "update", "delete", "upload" ]);
-    $self->createRoutes($sessionBridge, "documents/text",           [ "get", "set" ]);
+    #$self->createRoutes($sessionBridge, "documents/profile",        [ "read" ]);
+    #$self->createRoutes($sessionBridge, "documents/text",           [ "get", "set" ]);
+
+    $sessionBridge->route('/documents/profile/read/')        ->to('documents-profile#read');
+
+    $sessionBridge->route('/documents/text/get/')           ->to('documents-text#get');
+    $sessionBridge->route('/documents/text/set/')           ->to('documents-text#set');
 
     # Document files
     $sessionBridge->route('/documents/files/list/')         ->to('documents-files#list');

@@ -69,7 +69,9 @@ sub preview {
 
     my ($id, $size) = split 'x', $c->param("id");
 
-    #die "$id, $size" . $c->{stash}->{format};
+#    die "$id, $size" . $c->{stash}->{format};
+
+    $size = 0 unless $size;
 
     my @errors;
     my $success = $c->json->false;
@@ -97,11 +99,11 @@ sub preview {
 
         $filepath =~ s/\\/\//g;
         $filepath =~ s/\/+/\//g;
-        #$filepath = Encode::encode("utf8", $filepath);
+        $filepath = Encode::encode("utf8", $filepath);
 
         $thumbnailsSrc =~ s/\\/\//g;
         $thumbnailsSrc =~ s/\/+/\//g;
-        #$thumbnailsSrc   = Encode::encode("utf8", $thumbnailsSrc);
+        $thumbnailsSrc   = Encode::encode("utf8", $thumbnailsSrc);
     }
 
     # Generate preview
@@ -163,7 +165,7 @@ sub _generatePreviewFile {
         $rootpath = Encode::encode("utf8", $rootpath);
         $folderEncoded   = Encode::encode("utf8", $folderEncoded);
         $filenameEncoded = Encode::encode("utf8", $filenameEncoded);
-	$filextenEncoded = Encode::encode("utf8", $filextenEncoded);
+        $filextenEncoded = Encode::encode("utf8", $filextenEncoded);
 
         $folderEncoded = "$rootpath/$folderEncoded";
         $folderEncoded =~ s/\//\\/g;
@@ -190,15 +192,17 @@ sub _generatePreviewFile {
     }
 
     if ( lc($filextenOriginal) ~~ ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff']) {
-    
+
         if (-w $thumbnailFolder) {
 
             my $image = Image::Magick->new;
             my $x = $image->Read($filepathOriginal);
             die "$x" if "$x";
 
-            $x = $image->AdaptiveResize(geometry=>$size);
-            die "$x" if "$x";
+            if ($size > 0) {
+                $x = $image->AdaptiveResize(geometry=>$size);
+                die "$x" if "$x";
+            }
 
             $x = $image->Write($thumbnailFile);
 
@@ -231,13 +235,13 @@ sub _generatePreviewFile {
             $pdfPath =~ s/\\/\//g;
             $pdfPath =~ s/\/+/\//g;
         }
-        
+
         # Create pdf
         my $ooRequest = POST(
             $ooUrl, Content_Type => 'form-data',
             Content => [ outputFormat => "pdf", inputDocument =>  [ $filepathEncoded ] ]
         );
-        
+
         my $ooResponse = $ooUagent->request($ooRequest);
         if ($ooResponse->is_success()) {
 
@@ -249,12 +253,12 @@ sub _generatePreviewFile {
         } else {
             die $ooResponse->as_string;
         }
-        
+
 
         # Crete thumbnail
-        
+
         if (-w $thumbnailFolder) {
-                
+
             if (-r $pdfPath) {
 
                 my $image = Image::Magick->new;
@@ -266,8 +270,10 @@ sub _generatePreviewFile {
                 $x = $image2->Normalize();
                 die "$x" if "$x";
 
-                $x = $image2->AdaptiveResize(geometry=>$size);
-                die "$x" if "$x";
+                if ($size > 0) {
+                    $x = $image2->AdaptiveResize(geometry=>$size);
+                    die "$x" if "$x";
+                }
 
                 $x = $image2->Write($thumbnailFile );
                 die "$x" if "$x";

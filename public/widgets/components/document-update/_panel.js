@@ -2,20 +2,20 @@ Inprint.cmp.UpdateDocument = Ext.extend(Ext.Window, {
 
     initComponent: function() {
 
-        this.panel = new Inprint.cmp.UpdateDocument.Form();
+        this.form = new Inprint.cmp.UpdateDocument.Form();
 
         Ext.apply(this, {
             title: _("Edit Document Properties"),
             modal:true,
             layout: "fit",
-            width:400, height:380,
-            items: this.panel,
+            width:400, height:460,
+            items: this.form,
             buttons:[
                 {
                     text: _("Save"),
                     scope:this,
                     handler: function() {
-                        this.panel.getForm().submit();
+                        this.form.getForm().submit();
                     }
                 },
                 {
@@ -27,17 +27,22 @@ Inprint.cmp.UpdateDocument = Ext.extend(Ext.Window, {
                 }
             ]
         });
+
         Inprint.cmp.UpdateDocument.superclass.initComponent.apply(this, arguments);
 
         this.addEvents('complete');
     },
 
     onRender: function() {
+
         Inprint.cmp.UpdateDocument.superclass.onRender.apply(this, arguments);
-        this.panel.on("actioncomplete", function (form, action) {
+
+        Inprint.cmp.UpdateDocument.Access(this, this.form);
+
+        this.form.on("actioncomplete", function (form, action) {
             if (action.type == "submit") {
                 this.hide();
-                this.fireEvent("complete", this, this.panel);
+                this.fireEvent("complete", this, this.form);
             }
         }, this);
     },
@@ -54,10 +59,10 @@ Inprint.cmp.UpdateDocument = Ext.extend(Ext.Window, {
     cmpFill: function(result, request) {
 
         var json = Ext.util.JSON.decode(result.responseText);
-        var form = this.panel.getForm();
+        var form = this.form.getForm();
 
-        this.panel.edition  = json.data.edition;
-        this.panel.fascicle = json.data.fascicle;
+        this.form.edition  = json.data.edition;
+        this.form.fascicle = json.data.fascicle;
 
         if (json.data.id) {
             form.findField("id").setValue(json.data.id);
@@ -77,6 +82,13 @@ Inprint.cmp.UpdateDocument = Ext.extend(Ext.Window, {
 
         if (json.data.pdate) {
             form.findField("enddate").setValue(json.data.pdate);
+        }
+
+        if (json.data.maingroup && json.data.maingroup_shortcut) {
+            form.findField("maingroup").setValue(json.data.maingroup, json.data.maingroup_shortcut);
+        }
+        if (json.data.manager && json.data.manager_shortcut) {
+            form.findField("manager").setValue(json.data.manager, json.data.manager_shortcut);
         }
 
         if (json.data.headline && json.data.headline_shortcut) {

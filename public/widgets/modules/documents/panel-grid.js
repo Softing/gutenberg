@@ -78,9 +78,9 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                             handler: actions.Create
                         },
                         {
-                            icon: _ico("pencil"),
+                            icon: _ico("card--pencil"),
                             cls: "x-btn-text-icon",
-                            text: _("Edit"),
+                            text: _("Properties"),
                             disabled:true,
                             ref: "../../btnUpdate",
                             scope:this,
@@ -192,7 +192,8 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
         Ext.apply(this, {
             border:false,
             stripeRows: true,
-            columnLines: true,
+            //columnLines: true,
+            trackMouseOver: false,
             autoExpandColumn: "title",
             sm: this.sm,
             tbar: this.tbar,

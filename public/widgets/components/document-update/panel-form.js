@@ -17,7 +17,9 @@ Inprint.cmp.UpdateDocument.Form = Ext.extend(Ext.FormPanel, {
                 anchor: "100%"
             },
             items: [
+
                 _FLD_HDN_ID,
+
                 {
                     xtype: "titlefield",
                     value: _("Basic options")
@@ -53,10 +55,69 @@ Inprint.cmp.UpdateDocument.Form = Ext.extend(Ext.FormPanel, {
 
                 {
                     xtype: "titlefield",
+                    value: _("Appointment"),
+                    style: "margin-top:10px;"
+                },
+
+                {
+                    disabled: true,
+                    xtype: "treecombo",
+                    name: "maingroup-shortcut",
+                    hiddenName: "maingroup",
+                    fieldLabel: _("Department"),
+                    emptyText: _("Department") + "...",
+                    minListWidth: 250,
+                    url: _url('/documents/trees/workgroups/'),
+                    baseParams: {
+                        term: 'catalog.documents.view:*'
+                    },
+                    root: {
+                        id:'00000000-0000-0000-0000-000000000000',
+                        nodeType: 'async',
+                        expanded: true,
+                        draggable: false,
+                        icon: _ico("folder-open"),
+                        text: _("All departments")
+                    },
+                    listeners: {
+                        scope: this,
+                        select: function(field) {
+                            this.getForm().findField("manager").resetValue();
+                        },
+                        render: function(field) {
+                            //var id = Inprint.session.options["default.workgroup"];
+                            //var title = Inprint.session.options["default.workgroup.name"] || _("Unknown department");
+                            //if (id && title) field.setValue(id, title);
+                        }
+                    }
+                },
+
+
+                // Assign
+                xc.getConfig("/documents/combos/managers/", {
+                    disabled: true,
+                    listeners: {
+                        scope: this,
+                        render: function(field) {
+                            //var id = Inprint.session.member["id"];
+                            //var title = Inprint.session.member["title"] || _("Unknown employee");
+                            //if (id && title) field.setValue(id, title);
+                        },
+                        beforequery: function(qe) {
+                            delete qe.combo.lastQuery;
+                            qe.combo.getStore().baseParams["term"] = "catalog.documents.create:*";
+                            qe.combo.getStore().baseParams["workgroup"] = this.getForm().findField("workgroup").getValue();
+                        }
+                    }
+                }),
+
+                {
+                    xtype: "titlefield",
                     value: _("Indexation"),
                     style: "margin-top:10px;"
                 },
 
+                // Rubrication
                 xc.getConfig("/documents/combos/headlines/", {
                     disabled: false,
                     listeners: {

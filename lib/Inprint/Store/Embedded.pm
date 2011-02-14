@@ -24,13 +24,13 @@ use Inprint::Store::Embedded::Utils;
 
 # Get list of files from folder ################################################
 
-sub findFiles {
+sub updateCache {
 
     my $c = shift;
 
     my $path   = shift;
-    my $status = shift;
-    my $filter = shift;
+    #my $status = shift;
+    #my $filter = shift;
 
     # Check folder for existence and the ability to create files
     Inprint::Store::Embedded::Utils::checkFolder($c, $path);
@@ -49,9 +49,9 @@ sub findFiles {
         my $extension = Inprint::Store::Embedded::Utils::getExtension($c, $filename);
 
         # Apply a filter, if specified
-        if ($filter) {
-            next unless lc($extension) ~~ $filter;
-        }
+        #if ($filter) {
+        #    next unless lc($extension) ~~ $filter;
+        #}
 
         my $filepath = Inprint::Store::Embedded::Utils::makePath($c, $path,$filename);
         my $filepath_encoded = Inprint::Store::Embedded::Utils::encode($c, $filepath);
@@ -68,13 +68,13 @@ sub findFiles {
                 $digest, $filesize, $created, $updated
             );
 
-        next if ($status eq "published" && $cacheRecord->{isapproved} != 1);
-        next if ($status eq "unpublished" && $cacheRecord->{isapproved} != 0);
+        #next if ($status eq "published" && $cacheRecord->{isapproved} != 1);
+        #next if ($status eq "unpublished" && $cacheRecord->{isapproved} != 0);
 
         ## Create File record
         my $filehash = {
             id          => $cacheRecord->{id},
-            name        => $cacheRecord->{file_name} .".". $cacheRecord->{file_extension},
+            name        => $cacheRecord->{file_name},
             mime        => $cacheRecord->{file_mime},
             description => $cacheRecord->{file_description},
             extension   => $cacheRecord->{file_extension},
@@ -177,7 +177,7 @@ sub fileRead {
     my $rootpath = Inprint::Store::Embedded::Utils::getRootPath($c);
     return unless $rootpath;
 
-    my $filepath = Inprint::Store::Embedded::Utils::makePath($c, $rootpath, $cacheRecord->{file_path}, $cacheRecord->{file_name} .".". $cacheRecord->{file_extension});
+    my $filepath = Inprint::Store::Embedded::Utils::makePath($c, $rootpath, $cacheRecord->{file_path}, $cacheRecord->{file_name});
     my $filepath_encoded = Inprint::Store::Embedded::Utils::encode($c, $filepath);
 
     die "Can't find file <$filepath_encoded>" unless -e $filepath_encoded;
@@ -199,7 +199,7 @@ sub fileSave {
     my $rootpath = Inprint::Store::Embedded::Utils::getRootPath($c);
     return unless $rootpath;
 
-    my $filepath = Inprint::Store::Embedded::Utils::makePath($c, $rootpath, $cacheRecord->{file_path}, $cacheRecord->{file_name} .".". $cacheRecord->{file_extension});
+    my $filepath = Inprint::Store::Embedded::Utils::makePath($c, $rootpath, $cacheRecord->{file_path}, $cacheRecord->{file_name});
     my $filepath_encoded = Inprint::Store::Embedded::Utils::encode($c, $filepath);
 
     die "Can't find file <$filepath_encoded>" unless -e $filepath_encoded;
@@ -243,7 +243,7 @@ sub fileDelete {
     my $rootpath = Inprint::Store::Embedded::Utils::getRootPath($c);
     return unless $rootpath;
 
-    my $filepath = Inprint::Store::Embedded::Utils::makePath($c, $rootpath, $cacheRecord->{file_path}, $cacheRecord->{file_name} .".". $cacheRecord->{file_extension});
+    my $filepath = Inprint::Store::Embedded::Utils::makePath($c, $rootpath, $cacheRecord->{file_path}, $cacheRecord->{file_name});
     my $filepath_encoded = Inprint::Store::Embedded::Utils::encode($c, $filepath);
 
     Inprint::Store::Cache::deleteRecordById($c, $fid);

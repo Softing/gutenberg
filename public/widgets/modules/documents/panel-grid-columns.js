@@ -24,12 +24,13 @@ Inprint.documents.GridColumns = function() {
             sortable: true,
             renderer : function(value, p, record){
 
-                var color = 'blue';
+                var color = 'black';
 
-                if (!record.data.isopen)
+                if (!record.get("isopen")) {
                     color = 'gray';
+                }
 
-                value = String.format(
+                var header = String.format(
                     '<a style="color:{2}" href="/?aid=document-profile&oid={0}&text={1}" '+
                         'onClick="'+
                             "Inprint.ObjectResolver.resolve({aid:'document-profile',oid:'{0}',text:'{1}'});"+
@@ -37,7 +38,25 @@ Inprint.documents.GridColumns = function() {
                     '</a>',
                     record.data.id, value, color
                 );
-                return value;
+
+                var links = record.get("links");
+                var linksResult = [];
+                for (var f=0; f<links.length;f++) {
+
+                    var file  = String.format(
+                        "<a style=\"color:{2}\" href=\"/?aid=document-editor&oid={0}&text={1}\" "+
+                            "onClick=\"Inprint.ObjectResolver.resolve({aid:'document-editor',oid:'{0}',text:'{1}'});"+
+                            "return false;\"><nobr>{1}</nobr></a>",
+                        links[f].id, links[f].name, "gray"
+                    );
+
+                    linksResult.push(file);
+                }
+
+                var result = "<div style=\"font-size:12px;font-weight:bold;\">"+ header +"</div>"+
+                    "<div style=\"margin-top:6px;\">"+ linksResult.join(",&nbsp; ") + "</div>";
+
+                return result;
             }
         },
 
@@ -145,7 +164,7 @@ Inprint.documents.GridColumns = function() {
                 return String.format(
                     '<div class="x-progress-wrap">'+
                         '<div class="x-progress-inner" style="border:1px solid {4};background:{3}!important;">'+
-                    	    '{2}'+
+                            '{2}'+
                             '<div class="x-progress-bar{0}" style="width:{1}%;background:{4}!important;color:{5} !important;">&nbsp;</div>'+
                     '</div>',
                     style, v, text, bgcolor.rgb(), fgcolor.rgb(), txtcolor);
@@ -191,34 +210,42 @@ Inprint.documents.GridColumns = function() {
 
         created: {
             id:"created",
+            hidden:true,
             dataIndex: "created",
             header: _("Created"),
             width: 80,
-            sortable: true
+            sortable: true,
+            xtype: 'datecolumn', format: 'M d h:m'
         },
 
         updated: {
             id:"Updated",
+            hidden:true,
             dataIndex: "updated",
             header: _("Updated"),
             width: 80,
-            sortable: true
+            sortable: true,
+            xtype: 'datecolumn', format: 'M d h:m'
         },
 
         uploaded: {
             id:"uploaded",
+            hidden:true,
             dataIndex: "uploaded",
             header: _("Uploaded"),
             width: 80,
-            sortable: true
+            sortable: true,
+            xtype: 'datecolumn', format: 'M d h:m'
         },
 
         moved: {
             id:"moved",
+            hidden:true,
             dataIndex: "moved",
             header: _("Moved"),
             width: 80,
-            sortable: true
+            sortable: true,
+            xtype: 'datecolumn', format: 'M d h:m'
         }
 
     }

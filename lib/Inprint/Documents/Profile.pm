@@ -18,13 +18,13 @@ sub read {
 
     my @errors;
     my $success = $c->json->false;
-    
+
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_id));
 
     my $document;
     unless (@errors) {
-        
+
         $document = $c->sql->Q("
             SELECT
                 dcm.id,
@@ -51,11 +51,15 @@ sub read {
                 to_char(dcm.updated, 'YYYY-MM-DD HH24:MI:SS') as updated
             FROM documents dcm WHERE dcm.id=?
         ", [ $i_id ])->Hash;
-        
-        
+
+
         $document->{access} = {};
         my $current_member = $c->QuerySessionGet("member.id");
-        
+
+        if ($document->{holder} eq $current_member) {
+            $c->sql->Do("UPDATE documents SET islooked=true WHERE id=?", $document->{id});
+        }
+
         my @rules = qw(
            documents.update documents.capture documents.move documents.transfer
            documents.briefcase documents.delete documents.recover
@@ -73,9 +77,9 @@ sub read {
                 }
             }
         }
-        
+
     }
-    
+
     # Get history
     unless (@errors) {
         $document->{history} = $c->sql->Q("
@@ -87,7 +91,7 @@ sub read {
             FROM history WHERE entity=? ORDER BY created
         ", [ $document->{id} ])->Hashes;
     }
-    
+
     # Get co-documents
     unless (@errors) {
         $document->{fascicles} = $c->sql->Q("
@@ -96,11 +100,11 @@ sub read {
                 dcm.fascicle, dcm.fascicle_shortcut,
                 dcm.headline, dcm.headline_shortcut,
                 dcm.rubric, dcm.rubric_shortcut
-            FROM documents dcm WHERE dcm.copygroup=? 
+            FROM documents dcm WHERE dcm.copygroup=?
             ORDER BY edition_shortcut, fascicle_shortcut
         ", [ $document->{copygroup} ])->Hashes;
     }
-    
+
     # Get comments
     unless (@errors) {
         $document->{comments} = $c->sql->Q("
@@ -112,7 +116,7 @@ sub read {
             FROM comments WHERE entity = ? ORDER BY created DESC
         ", [ $document->{id} ])->Hashes;
     }
-    
+
     $success = $c->json->true unless (@errors);
     $c->render_json({ success => $success, errors => \@errors, data => $document || {} });
 }

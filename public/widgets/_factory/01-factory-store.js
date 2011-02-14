@@ -55,8 +55,11 @@ Inprint.factory.StoreFields = {
         'branch','branch_shortcut','stage','stage_shortcut','color','progress',
         'title','author','pages',
         'pdate','psize','rdate','rsize',
-        'images','files',
-        Inprint.factory.createDateField("created"), Inprint.factory.createDateField("updated"), Inprint.factory.createDateField("uploaded"), Inprint.factory.createDateField("moved")
+        'images','files', 'links',
+        Inprint.factory.createDateField("created"),
+        Inprint.factory.createDateField("updated"),
+        Inprint.factory.createDateField("uploaded"),
+        Inprint.factory.createDateField("moved")
     ],
 
     '/documents/common/fascicles/':                 [ "id", "edition", "edition_shortcut", "title", "shortcut", 'description', "headline", "headline_shortcut", "rubric", "rubric_shortcut" ],
