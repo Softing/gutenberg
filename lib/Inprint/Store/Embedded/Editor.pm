@@ -1,11 +1,12 @@
 package Inprint::Store::Embedded::Editor;
 
-use strict;
-
-use utf8;
 use Encode;
+
+use strict;
+use utf8;
+
+use MIME::Base64;
 use HTTP::Request;
-use HTTP::Request::Common qw(POST);
 use LWP::UserAgent;
 use File::Basename;
 use HTML::Scrubber;
@@ -50,7 +51,9 @@ sub read {
         my $fileContent;
         open FILE, "<", $filepath || die "Can't open <$filepath> : $!";
         binmode FILE;
-        while (<FILE>) {  $fileContent .= $_;   }
+        while (read(FILE, my $buf, 60*57)) {
+            $fileContent .= encode_base64($buf);
+        }
         close FILE;
 
         $ooRequest->content( $fileContent );
@@ -58,7 +61,8 @@ sub read {
         my $ooResponse = $ooUagent->request($ooRequest);
         if ($ooResponse->is_success()) {
 
-            $result = $ooResponse->content ;
+            my $decoded = MIME::Base64::decode($ooResponse->content);
+            $result = $decoded;
 
             if ($^O eq "linux") {
                 $result = Encode::decode_utf8( $result );
@@ -157,7 +161,9 @@ sub write {
         my $fileContent;
         open FILE, "<", $hotSaveFilePath || die "Can't open <$hotSaveFilePath> : $!";
         binmode FILE;
-        while (<FILE>) {  $fileContent .= $_;   }
+        while (read(FILE, my $buf, 60*57)) {
+            $fileContent .= encode_base64($buf);
+        }
         close FILE;
 
         $ooRequest->content( $fileContent );
@@ -167,7 +173,8 @@ sub write {
 
             open FILE, "> $filepath.$extension" or die "Can't open <$filepath> : $!";
             binmode FILE;
-                print FILE $ooResponse->content;
+                my $decoded = MIME::Base64::decode($ooResponse->content);
+                print FILE $decoded;
             close FILE;
 
         } else {
@@ -204,7 +211,9 @@ sub write {
         my $fileContent;
         open FILE, "<", $hotSaveFilePath || die "Can't open <$hotSaveFilePath> : $!";
         binmode FILE;
-        while (<FILE>) {  $fileContent .= $_;   }
+        while (read(FILE, my $buf, 60*57)) {
+            $fileContent .= encode_base64($buf);
+        }
         close FILE;
 
         $ooRequest->content( $fileContent );
@@ -213,7 +222,8 @@ sub write {
         if ($ooResponse->is_success()) {
             open FILE, "> $tmpFilePath" or die "Can't open <$tmpFilePath> : $!";
             binmode FILE;
-                print FILE $ooResponse->content;
+                my $decoded = MIME::Base64::decode($ooResponse->content);
+                print FILE $decoded;
             close FILE;
         } else {
             die $ooResponse->as_string;
@@ -237,7 +247,9 @@ sub write {
         my $fileContent2;
         open FILE, "<", $tmpFilePath || die "Can't open <$tmpFilePath>: $!";
         binmode FILE;
-        while (<FILE>) {  $fileContent2 .= $_;   }
+        while (read(FILE, my $buf, 60*57)) {
+            $fileContent2 .= encode_base64($buf);
+        }
         close FILE;
 
         $ooRequest->content( $fileContent2 );
@@ -245,9 +257,11 @@ sub write {
         my $ooResponse2 = $ooUagent->request($ooRequest2);
         if ($ooResponse2->is_success()) {
 
+            my $decoded = MIME::Base64::decode($ooResponse->content);
+
             open FILE, "> $filepath" or die "Can't open <$filepath> : $!";
             binmode FILE;
-                print FILE $ooResponse2->content;
+                print FILE $decoded;
             close FILE;
 
         } else {
