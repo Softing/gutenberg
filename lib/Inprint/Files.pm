@@ -19,39 +19,75 @@ use Digest::file qw(digest_file_hex);
 use base 'Inprint::BaseController';
 
 sub download {
+
     my $c = shift;
-
-
-    my $id = $c->param("id");
+    my @files = $c->param("id");
 
     my $rootpath = $c->config->get("store.path");
-    my $cacheRecord = $c->sql->Q("SELECT file_path || '/' || file_name as file_path, file_name, file_extension, file_mime FROM cache_files WHERE id=?", [ $id ])->Hash;
 
-    my $filename  = $cacheRecord->{file_name};
-    my $extension = $cacheRecord->{file_extension};
-    my $mimetype  = $cacheRecord->{file_mime};
+    my @input;
 
-    my $filepath = "$rootpath/" . $cacheRecord->{file_path};
+    foreach my $file (@files) {
 
-    if ($^O eq "MSWin32") {
-        $filepath =~ s/\//\\/g;
-        $filepath =~ s/\\+/\\/g;
+        my $cacheRecord = $c->sql->Q("SELECT file_path || '/' || file_name as file_path, file_name, file_extension, file_mime FROM cache_files WHERE id=?", [ $file ])->Hash;
 
-        $filepath  = encode("cp1251", $filepath);
-        $filename  = encode("cp1251", $filename);
+        my $filename  = $cacheRecord->{file_name};
+        my $extension = $cacheRecord->{file_extension};
+        my $mimetype  = $cacheRecord->{file_mime};
+
+        my $filepath = "$rootpath/" . $cacheRecord->{file_path};
+
+        if ($^O eq "MSWin32") {
+            $filepath =~ s/\//\\/g;
+            $filepath =~ s/\\+/\\/g;
+
+            $filepath  = encode("cp1251", $filepath);
+            $filename  = encode("cp1251", $filename);
+        }
+
+        if ($^O eq "linux") {
+            $filepath =~ s/\\/\//g;
+            $filepath =~ s/\/+/\//g;
+
+            $filepath  = encode("utf8", $filepath);
+            $filename  = encode("utf8", $filename);
+
+        }
+
+        $filename =~ s/\s+/_/g;
+
+        push @input, {
+
+            filepath => $filepath,
+            filename => $filename,
+            mimetype => $cacheRecord->{file_mime},
+            extension => $cacheRecord->{file_extension},
+
+        }
+
     }
 
-    if ($^O eq "linux") {
-        $filepath =~ s/\\/\//g;
-        $filepath =~ s/\/+/\//g;
-
-        $filepath  = encode("utf8", $filepath);
-        $filename  = encode("utf8", $filename);
+    if ($#files == 0 ) {
+        _downloadFile($c, $input[0]);
     }
 
-    $filename =~ s/\s+/_/g;
+    if ($#files > 0 ) {
+        _downloadArchvie($c, \@input);
+    }
 
-    $c->tx->res->headers->content_type($cacheRecord->{file_mime});
+    $c->render_json({  });
+
+}
+
+sub _downloadFile {
+    my ($c, $file) = @_;
+
+    my $filepath  = $file->{filepath};
+    my $filename  = $file->{filename};
+    my $mimetype  = $file->{mimetype};
+    my $extension = $file->{extension};
+
+    $c->tx->res->headers->content_type($mimetype);
     $c->res->content->asset(Mojo::Asset::File->new(path => $filepath));
 
     my $headers = Mojo::Headers->new;
@@ -61,6 +97,45 @@ sub download {
     $c->res->content->headers($headers);
 
     $c->render_static();
+
+}
+
+sub _downloadArchvie {
+
+    my ($c, $files) = @_;
+
+    my $tmpfname = $c->uuid . ".7z";
+    my $tmpfpath = "/tmp/inprint-$tmpfname";
+
+    foreach my $file (@$files) {
+
+        my $filepath  = $file->{filepath};
+        my $filename  = $file->{filename};
+        my $mimetype  = $file->{mimetype};
+        my $extension = $file->{extension};
+
+        if (-e -r $filepath) {
+            if ($^O eq "MSWin32") {
+                system ("LANG=ru_RU.UTF-8 7z a \"$tmpfpath\" \"$filepath\" >/dev/null 2>&1");
+            }
+            if ($^O eq "linux") {
+                system ("LANG=ru_RU.UTF-8 7z a \"$tmpfpath\" \"$filepath\" >/dev/null 2>&1");
+            }
+        }
+
+    }
+
+    $c->tx->res->headers->content_type("application/x-7z-compressed");
+    $c->res->content->asset(Mojo::Asset::File->new(path => $tmpfpath));
+
+    my $headers = Mojo::Headers->new;
+    $headers->add("Content-Type", "application/x-7z-compressed;name=$tmpfname");
+    $headers->add("Content-Disposition", "attachment;filename=$tmpfname");
+    $headers->add("Content-Description", "7z");
+    $c->res->content->headers($headers);
+
+    $c->render_static();
+
 }
 
 sub preview {
@@ -68,8 +143,6 @@ sub preview {
     my $c = shift;
 
     my ($id, $size) = split 'x', $c->param("id");
-
-#    die "$id, $size" . $c->{stash}->{format};
 
     $size = 0 unless $size;
 

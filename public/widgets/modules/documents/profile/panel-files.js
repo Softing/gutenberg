@@ -52,20 +52,13 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                 width: 100,
                 dataIndex: "id",
                 sortable: false,
-                renderer: function(v) {
-                    return '<a target="_blank" href="/files/preview/'+ v +'"><img src="/files/preview/'+ v +'x80" style="border:1px solid silver;"/></a>';
+                renderer: function(v, p, record) {
+                    if(record.get("name").match(/^.+\.(jpg|jpeg|png|gif|tiff|png)$/i)) {
+                        return  '<a target="_blank" href="/files/preview/'+ v +'"><img src="/files/preview/'+ v +'x80" style="border:1px solid silver;"/></a>';
+                    }
+                    return  '<a target="_blank" href="/files/download/'+ v +'"><img src="/files/preview/'+ v +'x80" style="border:1px solid silver;"/></a>';
                 }
             },
-            //{
-            //    id:"download",
-            //    header:_(""),
-            //    width: 30,
-            //    dataIndex: "id",
-            //    sortable: false,
-            //    renderer: function(v) {
-            //        return '<a href="/files/download/'+ v +'"><img src="'+ _ico("arrow-transition-270") +'"/></a>';
-            //    }
-            //},
             { id:'name', header: _("File"),dataIndex:'name', width:250},
             { id: 'description', header: _("Description"),dataIndex:'description', width:150},
             { id: 'size', header: _("Size"), dataIndex:'size', width:100, renderer:Ext.util.Format.fileSize},
@@ -93,21 +86,6 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                 scope:this,
                 handler: this.cmpUpload
             },
-
-            //{
-            //    xtype: "fileuploadfield",
-            //    buttonOnly: true,
-            //    buttonText: _("Upload quickly"),
-            //    buttonCfg: {
-            //        icon: _ico("document-globe"),
-            //        cls: "x-btn-text-icon"
-            //    },
-            //    listeners: {
-            //        'fileselected': function(fb, v){
-            //        }
-            //    }
-            //},
-
             "->",
             {
                 icon: _ico("arrow-270-medium"),
@@ -201,18 +179,22 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                         });
                     }
 
-                    rowCtxMenuItems.push({
-                        icon: _ico("arrow-transition-270"),
-                        cls: "x-btn-text-icon",
-                        text: _("Download file"),
-                        scope:this,
-                        handler : function() {
-                            window.location = "/files/download/" + record.get("id");
-                        }
-                    });
-                    rowCtxMenuItems.push("-");
-
                 }
+
+                rowCtxMenuItems.push({
+                    icon: _ico("arrow-transition-270"),
+                    cls: "x-btn-text-icon",
+                    text: _("Download file"),
+                    scope:this,
+                    handler : function() {
+                        var items = [];
+                        Ext.each(this.getSelectionModel().getSelections(), function(record) {
+                            items.push("id="+ record.get("id"));
+                        });
+                        window.location = "/files/download/?" + items.join("&");
+                    }
+                });
+                rowCtxMenuItems.push("-");
 
                 rowCtxMenuItems.push({
                     icon: _ico("light-bulb"),
@@ -414,7 +396,10 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
     },
 
     cmpChangeDescription: function() {
-        Ext.MessageBox.show({
+
+        var record = this.getSelectionModel().getSelected();
+
+        var box = Ext.MessageBox.show({
             width:300,
             scope:this,
             multiline: true,
@@ -432,6 +417,8 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                 }
             }
         });
+
+
     },
 
     cmpDelete: function() {

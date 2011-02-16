@@ -4,6 +4,7 @@ use strict;
 
 use utf8;
 use Encode;
+use HTTP::Request;
 use HTTP::Request::Common qw(POST);
 use LWP::UserAgent;
 use File::Basename;
@@ -196,7 +197,7 @@ sub write {
             die $ooResponse2->as_string;
         }
 
-        unlink $tmpFilePath;
+        #unlink $tmpFilePath;
 
     }
 

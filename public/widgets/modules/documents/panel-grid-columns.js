@@ -133,7 +133,7 @@ Inprint.documents.GridColumns = function() {
             }
         },
 
-        progress:{
+        progress: {
             id:"progress",
             dataIndex: "progress",
             header: _("Progress"),
@@ -154,7 +154,6 @@ Inprint.documents.GridColumns = function() {
                 var style = '';
                 var textClass = (v < 55) ? 'x-progress-text-back' : 'x-progress-text-front' + (Ext.isIE6 ? '-ie6' : '');
 
-                // ugly hack to deal with IE6 issue
                 var text = String.format('<div><div class="x-progress-text {0}" style="width:100%;" id="{1}">{2}</div></div>', textClass, Ext.id(), string);
 
                 var bgcolor  = Color('#' + record.data.color).setSaturation(30);

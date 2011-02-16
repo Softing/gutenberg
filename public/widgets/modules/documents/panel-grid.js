@@ -9,12 +9,6 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
 
         this.urls = {
             "list":       "/documents/list/"
-            //"briefcase":  "/documents/briefcase/",
-            //"capture":    "/documents/capture/",
-            //"transfer":   "/documents/transfer/",
-            //"recycle":    "/documents/recycle/",
-            //"restore":    "/documents/restore/",
-            //"delete":     "/documents/delete/"
         }
 
         this.store = Inprint.factory.Store.json(this.urls.list, {

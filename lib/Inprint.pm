@@ -82,11 +82,10 @@ sub startup {
     # Add sessionable routes
     my $sessionBridge  = $postinitBridge->bridge->to('filters#mysession');
 
-    $sessionBridge->route('/logout/')->to('session#logout');
-    $sessionBridge->route('/workspace/logout/')->to('session#logout');
+    # Access Framework
+    $sessionBridge->route('/access/')                       ->to('access#index');
 
     # Advertising
-
     $self->createRoutes($sessionBridge, "advertising/archive",      [ "list" ]);
     $self->createRoutes($sessionBridge, "advertising/advertisers",  [ "list", "create", "read", "update", "delete" ]);
     $self->createRoutes($sessionBridge, "advertising/common",       [ "editions", "fascicles", "places" ]);
@@ -98,41 +97,19 @@ sub startup {
     $self->createRoutes($sessionBridge, "advertising/requests",     [ "list", "create", "read", "update", "delete" ]);
 
     # Calendar routes
-    $self->createRoutes($sessionBridge, "calendar",                 [ "create", "read", "update", "delete", "list", "tree", "enable", "disable" ]);
-    $self->createRoutes($sessionBridge, "calendar/combos",          [ "editions", "parents", "sources" ]);
+    $sessionBridge->route('/calendar/create/')              ->to('calendar#create');
+    $sessionBridge->route('/calendar/read/')                ->to('calendar#read');
+    $sessionBridge->route('/calendar/update/')              ->to('calendar#update');
+    $sessionBridge->route('/calendar/delete/')              ->to('calendar#delete');
+    $sessionBridge->route('/calendar/list/')                ->to('calendar#list');
+    $sessionBridge->route('/calendar/tree/')                ->to('calendar#tree');
+    $sessionBridge->route('/calendar/enable/')              ->to('calendar#enable');
+    $sessionBridge->route('/calendar/disable/')             ->to('calendar#disable');
 
-    # Common routes
-    $self->createRoutes($sessionBridge, "common/transfer",          [ "editions", "branches", "list" ]);
-
-    # Documents routes
-    $self->createRoutes($sessionBridge, "documents",                [ "create", "read", "update", "delete", "list", "capture", "transfer", "briefcase", "move", "copy", "duplicate", "recycle", "restore", "say" ]);
-    $self->createRoutes($sessionBridge, "documents/common",         [ "fascicles" ]);
-    $self->createRoutes($sessionBridge, "documents/combos",         [ "stages", "assignments", "managers", "fascicles", "headlines", "rubrics" ]);
-    $self->createRoutes($sessionBridge, "documents/trees",          [ "editions", "workgroups", "fascicles" ]);
-    $self->createRoutes($sessionBridge, "documents/filters",        [ "editions", "groups", "fascicles", "headlines", "rubrics", "holders", "managers", "progress" ]);
-    #$self->createRoutes($sessionBridge, "documents/profile",        [ "read" ]);
-    #$self->createRoutes($sessionBridge, "documents/text",           [ "get", "set" ]);
-
-    $sessionBridge->route('/documents/profile/read/')        ->to('documents-profile#read');
-
-    $sessionBridge->route('/documents/text/get/')           ->to('documents-text#get');
-    $sessionBridge->route('/documents/text/set/')           ->to('documents-text#set');
-
-    # Document files
-    $sessionBridge->route('/documents/files/list/')         ->to('documents-files#list');
-    $sessionBridge->route('/documents/files/create/')       ->to('documents-files#create');
-    $sessionBridge->route('/documents/files/upload/')       ->to('documents-files#upload');
-    $sessionBridge->route('/documents/files/read/')         ->to('documents-files#read');
-    $sessionBridge->route('/documents/files/update/')       ->to('documents-files#update');
-    $sessionBridge->route('/documents/files/delete/')       ->to('documents-files#delete');
-    $sessionBridge->route('/documents/files/publish/')      ->to('documents-files#publish');
-    $sessionBridge->route('/documents/files/unpublish/')    ->to('documents-files#unpublish');
-    $sessionBridge->route('/documents/files/description/')  ->to('documents-files#description');
-
-    $sessionBridge->route('/documents/files/preview/:document/:file')->to('documents-files#preview', document => "", file => "");
-    $sessionBridge->route('/documents/:document/zip/:type')->to('documents-files#createzip', document => "", type => "");
-
-    #$sessionBridge->route('/documents/files/upload/:document')->to('documents-files#upload', document => "");
+    # Calendar combos
+    $sessionBridge->route('/calendar/combos/editions/')     ->to('calendar-combos#editions');
+    $sessionBridge->route('/calendar/combos/parents/')      ->to('calendar-combos#parents');
+    $sessionBridge->route('/calendar/combos/sources/')      ->to('calendar-combos#sources');
 
     # Catalog routes
     $self->createRoutes($sessionBridge, "catalog/combos",                   [ "editions", "groups", "fascicles", "roles", "readiness" ]);
@@ -147,6 +124,71 @@ sub startup {
     $self->createRoutes($sessionBridge, "catalog/indexes",                  [ "editions" ]);
     $self->createRoutes($sessionBridge, "catalog/headlines",                [ "tree", "read", "create", "update", "delete" ]);
     $self->createRoutes($sessionBridge, "catalog/rubrics",                  [ "list", "read", "create", "update", "delete" ]);
+
+    # Common routes
+    $sessionBridge->route('/common/transfer/editions/')     ->to('common-transfer#editions');
+    $sessionBridge->route('/common/transfer/branches/')     ->to('common-transfer#branches');
+    $sessionBridge->route('/common/transfer/list/')         ->to('common-transfer#list');
+
+    # Documents routes
+    $sessionBridge->route('/documents/create/')             ->to('documents#create');
+    $sessionBridge->route('/documents/read/')               ->to('documents#read');
+    $sessionBridge->route('/documents/update/')             ->to('documents#update');
+    $sessionBridge->route('/documents/delete/')             ->to('documents#delete');
+    $sessionBridge->route('/documents/list/')               ->to('documents#list');
+    $sessionBridge->route('/documents/capture/')            ->to('documents#capture');
+    $sessionBridge->route('/documents/transfer/')           ->to('documents#transfer');
+    $sessionBridge->route('/documents/briefcase/')          ->to('documents#briefcase');
+    $sessionBridge->route('/documents/move/')               ->to('documents#move');
+    $sessionBridge->route('/documents/copy/')               ->to('documents#copy');
+    $sessionBridge->route('/documents/duplicate/')          ->to('documents#duplicate');
+    $sessionBridge->route('/documents/recycle/')            ->to('documents#recycle');
+    $sessionBridge->route('/documents/restore/')            ->to('documents#restore');
+    $sessionBridge->route('/documents/say/')                ->to('documents#say');
+
+    # Document common
+    $sessionBridge->route('/documents/common/fascicles/')   ->to('documents-common#fascicles');
+
+    # Document combos
+    $sessionBridge->route('/documents/combos/stages/')      ->to('documents-combos#stages');
+    $sessionBridge->route('/documents/combos/assignments/') ->to('documents-combos#assignments');
+    $sessionBridge->route('/documents/combos/managers/')    ->to('documents-combos#managers');
+    $sessionBridge->route('/documents/combos/fascicles/')   ->to('documents-combos#fascicles');
+    $sessionBridge->route('/documents/combos/headlines/')   ->to('documents-combos#headlines');
+    $sessionBridge->route('/documents/combos/rubrics/')     ->to('documents-combos#rubrics');
+
+    # Document trees
+    $sessionBridge->route('/documents/trees/editions/')     ->to('documents-trees#editions');
+    $sessionBridge->route('/documents/trees/workgroups/')   ->to('documents-trees#workgroups');
+    $sessionBridge->route('/documents/trees/fascicles/')    ->to('documents-trees#fascicles');
+
+    # Document filters
+    $sessionBridge->route('/documents/filters/editions/')   ->to('documents-filters#editions');
+    $sessionBridge->route('/documents/filters/groups/')     ->to('documents-filters#groups');
+    $sessionBridge->route('/documents/filters/fascicles/')  ->to('documents-filters#fascicles');
+    $sessionBridge->route('/documents/filters/headlines/')  ->to('documents-filters#headlines');
+    $sessionBridge->route('/documents/filters/rubrics/')    ->to('documents-filters#rubrics');
+    $sessionBridge->route('/documents/filters/holders/')    ->to('documents-filters#holders');
+    $sessionBridge->route('/documents/filters/managers/')   ->to('documents-filters#managers');
+    $sessionBridge->route('/documents/filters/progress/')   ->to('documents-filters#progress');
+
+    # Document profile
+    $sessionBridge->route('/documents/profile/read/')       ->to('documents-profile#read');
+
+    # Document editor
+    $sessionBridge->route('/documents/text/get/')           ->to('documents-text#get');
+    $sessionBridge->route('/documents/text/set/')           ->to('documents-text#set');
+
+    # Document files
+    $sessionBridge->route('/documents/files/list/')         ->to('documents-files#list');
+    $sessionBridge->route('/documents/files/create/')       ->to('documents-files#create');
+    $sessionBridge->route('/documents/files/upload/')       ->to('documents-files#upload');
+    $sessionBridge->route('/documents/files/read/')         ->to('documents-files#read');
+    $sessionBridge->route('/documents/files/update/')       ->to('documents-files#update');
+    $sessionBridge->route('/documents/files/delete/')       ->to('documents-files#delete');
+    $sessionBridge->route('/documents/files/publish/')      ->to('documents-files#publish');
+    $sessionBridge->route('/documents/files/unpublish/')    ->to('documents-files#unpublish');
+    $sessionBridge->route('/documents/files/description/')  ->to('documents-files#description');
 
     # Fascicles routes
     $self->createRoutes($sessionBridge, "fascicle",                         [ "seance", "check", "open", "close", "save", "capture" ]);
@@ -166,46 +208,52 @@ sub startup {
     $self->createRoutes($sessionBridge, "fascicle/templates/places",        [ "tree", "create", "read", "update", "delete" ]);
     $self->createRoutes($sessionBridge, "fascicle/templates/index",         [ "headlines", "modules", "save" ]);
 
-    # Images
-    $sessionBridge->route('/aimgs/fascicle/page/:id/:w/:h')->to('images#fascicle_page');
-    $sessionBridge->route('/aimgs/fascicle/template/:id/:w/:h')->to('images#fascicle_page');
-    $sessionBridge->route('/aimgs/fascicle/module/:id/:w/:h')->to('images#fascicle_page');
+    # Files
+    $sessionBridge->route('/files/preview/:id')             ->to('files#preview');
+    $sessionBridge->route('/files/download/:id')            ->to('files#download');
+    $sessionBridge->route('/files/download/')                   ->to('files#download');
 
-    $sessionBridge->route('/aimgs/advert/page/:id/:w/:h')->to('images#fascicle_page');
-    $sessionBridge->route('/aimgs/advert/template/:id/:w/:h')->to('images#fascicle_page');
-    $sessionBridge->route('/aimgs/advert/module/:id/:w/:h')->to('images#fascicle_page');
+    # Images
+    $sessionBridge->route('/aimgs/fascicle/page/:id/:w/:h')     ->to('images#fascicle_page');
+    $sessionBridge->route('/aimgs/fascicle/template/:id/:w/:h') ->to('images#fascicle_page');
+    $sessionBridge->route('/aimgs/fascicle/module/:id/:w/:h')   ->to('images#fascicle_page');
+
+    $sessionBridge->route('/aimgs/advert/page/:id/:w/:h')       ->to('images#fascicle_page');
+    $sessionBridge->route('/aimgs/advert/template/:id/:w/:h')   ->to('images#fascicle_page');
+    $sessionBridge->route('/aimgs/advert/module/:id/:w/:h')     ->to('images#fascicle_page');
+
+    # Logout
+    $sessionBridge->route('/logout/')->to('session#logout');
+
+    # Inprint menu
+    $sessionBridge->route('/menu/')                         ->to('menu#index');
 
     # Profile routes
-    $self->createRoutes($sessionBridge, "profile",                          [ "read", "update" ]);
-    $sessionBridge->route('/profile/image/:id')->to('profile#image', id => "00000000-0000-0000-0000-000000000000");
+    $sessionBridge->route('/profile/read/')                 ->to('profile#read');
+    $sessionBridge->route('/profile/update/')               ->to('profile#update');
+    $sessionBridge->route('/profile/image/:id')             ->to('profile#image', id => "00000000-0000-0000-0000-000000000000");
 
     # Options routes
-    $self->createRoutes($sessionBridge, "options",
-        [ "update" ]);
-    $self->createRoutes($sessionBridge, "options/combos",
-        [ "capture-destination" ]);
+    $sessionBridge->route('/options/update/')               ->to('options#update');
+    $self->createRoutes($sessionBridge, "options/combos", [ "capture-destination" ]);
 
     # State route
-    $self->createRoutes($sessionBridge, "state",
-        [ "index", "read", "update" ]);
+    $sessionBridge->route('/state/')                        ->to('state#index');
+    $sessionBridge->route('/state/read/')                   ->to('state#read');
+    $sessionBridge->route('/state/update/')                 ->to('state#update');
 
     # System routess
-    $self->createRoutes($sessionBridge, "system/events",
-        [ "list" ]);
+    $sessionBridge->route('/system/events/')                ->to('system-events#list');
 
     # Workspace routess
-    $self->createRoutes($sessionBridge, "access",                   [ "index" ]);
-    $self->createRoutes($sessionBridge, "menu",                     [ "index" ]);
-    $self->createRoutes($sessionBridge, "workspace",                [ "index", "access", "state", "online", "appsession" ]);
-
-    $sessionBridge->route('/files/preview/:id/:size/')->to('files#preview');
-    $sessionBridge->route('/files/preview/:id')->to('files#preview');
-    $sessionBridge->route('/files/download/:id')->to('files#download');
+    $sessionBridge->route('/workspace/')                    ->to('workspace#index');
+    $sessionBridge->route('/workspace/access/')             ->to('workspace#access');
+    $sessionBridge->route('/workspace/state/')              ->to('workspace#state');
+    $sessionBridge->route('/workspace/appsession/')         ->to('workspace#appsession');
+    $sessionBridge->route('/workspace/logout/')             ->to('session#logout');
 
     # Main route
     $sessionBridge->route('/')->to('workspace#index');
-
-
 
     # Plugin routes
     my $routes = $sql->Q("SELECT * FROM plugins.routes WHERE route_enabled=true")->Hashes;
@@ -216,11 +264,9 @@ sub startup {
 
         if ($route->{route_authentication}) {
             $sessionBridge->route($url)->to($action);
-            #print STDERR "with session => $url => $action\n";
         }
         unless ($route->{route_authentication}) {
             $postinitBridge->route($url)->to($action);
-            #print STDERR "without session => $url => $action\n";
         }
     }
 
