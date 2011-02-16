@@ -31,15 +31,6 @@ sub read {
         my $ooUrl = "http://$ooHost:$ooPort/api/converter2/";
         my $ooUagent = LWP::UserAgent->new();
 
-        #my $ooRequest = POST(
-        #    $ooUrl,
-        #    Content_Type => 'form-data',
-        #    Content => [
-        #        outputFormat => $filetype,
-        #        inputDocument =>  [ Encode::encode("utf8", $filepath) ]
-        #    ]
-        #);
-
         my $ooRequest = HTTP::Request->new();
         $ooRequest->method("POST");
         $ooRequest->uri( $ooUrl );
@@ -145,11 +136,6 @@ sub write {
         my $ooUrl = "http://$ooHost:$ooPort/api/converter/";
         my $ooUagent = LWP::UserAgent->new();
 
-        #my $ooRequest = POST(
-        #    $ooUrl, Content_Type => 'form-data',
-        #    Content => [ outputFormat => $filetype, inputDocument =>  [ $hotSaveFilePath ] ]
-        #);
-
         my $ooRequest = HTTP::Request->new();
         $ooRequest->method("POST");
         $ooRequest->uri( $ooUrl );
@@ -195,11 +181,6 @@ sub write {
         die "Can't find hot save folder <$tmpFolderPath>" unless -e $tmpFolderPath;
         die "Can't write to hot save folder <$tmpFolderPath>" unless -w $tmpFolderPath;
 
-        #my $ooRequest = POST(
-        #    $ooUrl, Content_Type => 'form-data',
-        #    Content => [ outputFormat => "odt", inputDocument =>  [ $hotSaveFilePath ] ]
-        #);
-
         my $ooRequest = HTTP::Request->new();
         $ooRequest->method("POST");
         $ooRequest->uri( $ooUrl );
@@ -230,11 +211,6 @@ sub write {
         }
 
         die "Can't read tmp file <$tmpFilePath>" unless -r $tmpFilePath;
-
-        #my $ooRequest2 = POST(
-        #    $ooUrl, Content_Type => 'form-data',
-        #    Content => [ outputFormat => $filetype, inputDocument =>  [ $tmpFilePath ] ]
-        #);
 
         my $ooRequest2 = HTTP::Request->new();
         $ooRequest2->method("POST");
@@ -268,20 +244,7 @@ sub write {
             die $ooResponse2->as_string;
         }
 
-        #unlink $tmpFilePath;
-
-    }
-
-    if ($extension ~~ ["txt"]) {
-
-        #my $converter = Text::Iconv->new("utf-8", "windows-1251");
-        #my $text = $converter->convert($i_text);
-        #
-        #$text =~ s/<br>/\r\n/g;
-        #
-        #open FILE, "> $storePath/$baseName$baseExtension" or die "Can't open $storePath/$baseName$baseExtension : $!";
-        #    print FILE $text;
-        #close FILE;
+        unlink $tmpFilePath;
 
     }
 
