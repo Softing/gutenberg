@@ -69,7 +69,7 @@ Inprint.cmp.UpdateDocument.Form = Ext.extend(Ext.FormPanel, {
                     minListWidth: 250,
                     url: _url('/documents/trees/workgroups/'),
                     baseParams: {
-                        term: 'catalog.documents.view:*'
+                        term: 'catalog.documents.assign:*'
                     },
                     root: {
                         id:'00000000-0000-0000-0000-000000000000',
@@ -105,8 +105,8 @@ Inprint.cmp.UpdateDocument.Form = Ext.extend(Ext.FormPanel, {
                         },
                         beforequery: function(qe) {
                             delete qe.combo.lastQuery;
-                            qe.combo.getStore().baseParams["term"] = "catalog.documents.create:*";
-                            qe.combo.getStore().baseParams["workgroup"] = this.getForm().findField("workgroup").getValue();
+                            qe.combo.getStore().baseParams["term"] = "catalog.documents.assign:*";
+                            qe.combo.getStore().baseParams["workgroup"] = this.getForm().findField("maingroup").getValue();
                         }
                     }
                 }),

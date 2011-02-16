@@ -207,7 +207,7 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                 },
 
                                 xc.getConfig("/documents/combos/headlines/", {
-                                    disabled: true,
+                                    disabled: false,
                                     listeners: {
                                         scope: this,
                                         render: function(field) {

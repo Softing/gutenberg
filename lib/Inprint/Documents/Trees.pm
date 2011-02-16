@@ -96,7 +96,7 @@ sub workgroups {
     Inprint::Check::rule($c, \@errors, "node", $i_term);
 
     my $bindings = $c->access->GetBindings($i_term);
-
+    
     unless (@errors) {
 
         my $sql;

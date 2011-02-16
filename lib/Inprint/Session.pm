@@ -100,7 +100,7 @@ sub logout {
 
     $c->events->Create("system", undef, "logout", "The user has quitted the program", []);
     $c->sql->Do("DELETE FROM sessions WHERE id=?", [ $c->session("sid") ] );
-    $c->redirect_to("../login");
+    $c->redirect_to("/login");
     $c->rendered;
 
 }
