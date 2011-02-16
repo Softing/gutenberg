@@ -17,7 +17,7 @@ sub read {
 
     my $extension = getExtension($c, $filepath);
 
-    if ($extension ~~ ["doc", "odt", "rtf"]) {
+    if ($extension ~~ ["doc", "docx", "odt", "rtf"]) {
 
         my $ooHost = $c->config->get("openoffice.host");
         my $ooPort = $c->config->get("openoffice.port");
@@ -27,17 +27,33 @@ sub read {
         die "Cant read configuration <openoffice.port>" unless $ooPort;
         die "Cant read configuration <openoffice.timeout>" unless $ooTimeout;
 
-        my $ooUrl = "http://$ooHost:$ooPort/api/converter/";
+        my $ooUrl = "http://$ooHost:$ooPort/api/converter2/";
         my $ooUagent = LWP::UserAgent->new();
 
-        my $ooRequest = POST(
-            $ooUrl,
-            Content_Type => 'form-data',
-            Content => [
-                outputFormat => $filetype,
-                inputDocument =>  [ Encode::encode("utf8", $filepath) ]
-            ]
-        );
+        #my $ooRequest = POST(
+        #    $ooUrl,
+        #    Content_Type => 'form-data',
+        #    Content => [
+        #        outputFormat => $filetype,
+        #        inputDocument =>  [ Encode::encode("utf8", $filepath) ]
+        #    ]
+        #);
+
+        my $ooRequest = HTTP::Request->new();
+        $ooRequest->method("POST");
+        $ooRequest->uri( $ooUrl );
+
+        $ooRequest->header("InputFormat", $extension);
+        $ooRequest->header("OutputFormat", "html");
+        $ooRequest->header("Content-type", "application/octet-stream");
+
+        my $fileContent;
+        open FILE, "<", $filepath || die "Can't open <$filepath> : $!";
+        binmode FILE;
+        while (<FILE>) {  $fileContent .= $_;   }
+        close FILE;
+
+        $ooRequest->content( $fileContent );
 
         my $ooResponse = $ooUagent->request($ooRequest);
         if ($ooResponse->is_success()) {
@@ -105,14 +121,6 @@ sub write {
     </HEAD>
     <BODY LANG="ru-RU" LINK="#000080" VLINK="#800000" DIR="LTR">'. $hotSaveText .'</BODY></HTML>';
 
-    #$hotSaveText =~ s/charset=windows-1251/charset=utf8/;
-    #$hotSaveText =~ s/charset=iso-8859-1/charset=utf8/;
-    #
-    ##TODO: add more meta tags
-    #
-    #$hotSaveText = '<meta name="GENERATOR" content="OpenOffice.org 3.2 (Win32)">' . $hotSaveText;
-    #$hotSaveText = '<meta http-equiv="CONTENT-TYPE" content="text/html; charset=utf8">' . $hotSaveText;
-
     open VERSION, ">:utf8", $hotSaveFilePath;
     print VERSION $hotSaveText;
     close VERSION;
@@ -133,10 +141,26 @@ sub write {
         my $ooUrl = "http://$ooHost:$ooPort/api/converter/";
         my $ooUagent = LWP::UserAgent->new();
 
-        my $ooRequest = POST(
-            $ooUrl, Content_Type => 'form-data',
-            Content => [ outputFormat => $filetype, inputDocument =>  [ $hotSaveFilePath ] ]
-        );
+        #my $ooRequest = POST(
+        #    $ooUrl, Content_Type => 'form-data',
+        #    Content => [ outputFormat => $filetype, inputDocument =>  [ $hotSaveFilePath ] ]
+        #);
+
+        my $ooRequest = HTTP::Request->new();
+        $ooRequest->method("POST");
+        $ooRequest->uri( $ooUrl );
+
+        $ooRequest->header("InputFormat", "html");
+        $ooRequest->header("OutputFormat", $extension);
+        $ooRequest->header("Content-type", "application/octet-stream");
+
+        my $fileContent;
+        open FILE, "<", $hotSaveFilePath || die "Can't open <$hotSaveFilePath> : $!";
+        binmode FILE;
+        while (<FILE>) {  $fileContent .= $_;   }
+        close FILE;
+
+        $ooRequest->content( $fileContent );
 
         my $ooResponse = $ooUagent->request($ooRequest);
         if ($ooResponse->is_success()) {
@@ -152,9 +176,9 @@ sub write {
 
     }
 
-    if ($extension ~~ ["doc", "docx", "rtf"]) {
+    if ($extension ~~ ["doc", "docx", "rtf", "txt"]) {
 
-        my $ooUrl = "http://$ooHost:$ooPort/api/converter/";
+        my $ooUrl = "http://$ooHost:$ooPort/api/converter2/";
         my $ooUagent = LWP::UserAgent->new();
 
         # create tmp odt file
@@ -164,10 +188,27 @@ sub write {
         die "Can't find hot save folder <$tmpFolderPath>" unless -e $tmpFolderPath;
         die "Can't write to hot save folder <$tmpFolderPath>" unless -w $tmpFolderPath;
 
-        my $ooRequest = POST(
-            $ooUrl, Content_Type => 'form-data',
-            Content => [ outputFormat => "odt", inputDocument =>  [ $hotSaveFilePath ] ]
-        );
+        #my $ooRequest = POST(
+        #    $ooUrl, Content_Type => 'form-data',
+        #    Content => [ outputFormat => "odt", inputDocument =>  [ $hotSaveFilePath ] ]
+        #);
+
+        my $ooRequest = HTTP::Request->new();
+        $ooRequest->method("POST");
+        $ooRequest->uri( $ooUrl );
+
+        $ooRequest->header("InputFormat", "html");
+        $ooRequest->header("OutputFormat", "odt");
+        $ooRequest->header("Content-type", "application/octet-stream");
+
+        my $fileContent;
+        open FILE, "<", $hotSaveFilePath || die "Can't open <$hotSaveFilePath> : $!";
+        binmode FILE;
+        while (<FILE>) {  $fileContent .= $_;   }
+        close FILE;
+
+        $ooRequest->content( $fileContent );
+
         my $ooResponse = $ooUagent->request($ooRequest);
         if ($ooResponse->is_success()) {
             open FILE, "> $tmpFilePath" or die "Can't open <$tmpFilePath> : $!";
@@ -180,10 +221,26 @@ sub write {
 
         die "Can't read tmp file <$tmpFilePath>" unless -r $tmpFilePath;
 
-        my $ooRequest2 = POST(
-            $ooUrl, Content_Type => 'form-data',
-            Content => [ outputFormat => $filetype, inputDocument =>  [ $tmpFilePath ] ]
-        );
+        #my $ooRequest2 = POST(
+        #    $ooUrl, Content_Type => 'form-data',
+        #    Content => [ outputFormat => $filetype, inputDocument =>  [ $tmpFilePath ] ]
+        #);
+
+        my $ooRequest2 = HTTP::Request->new();
+        $ooRequest2->method("POST");
+        $ooRequest2->uri( $ooUrl );
+
+        $ooRequest2->header("InputFormat", "odt");
+        $ooRequest2->header("OutputFormat", $extension);
+        $ooRequest2->header("Content-type", "application/octet-stream");
+
+        my $fileContent2;
+        open FILE, "<", $tmpFilePath || die "Can't open <$tmpFilePath>: $!";
+        binmode FILE;
+        while (<FILE>) {  $fileContent2 .= $_;   }
+        close FILE;
+
+        $ooRequest->content( $fileContent2 );
 
         my $ooResponse2 = $ooUagent->request($ooRequest2);
         if ($ooResponse2->is_success()) {
