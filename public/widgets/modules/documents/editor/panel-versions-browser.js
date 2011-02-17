@@ -69,6 +69,16 @@ Inprint.documents.editor.versions.Browser = Ext.extend( Ext.list.ListView, {
             }
 
         }, this);
+
+        this.on("dblclick", function(dataview, number, node, e) {
+
+            this.parent.btnView.enable();
+            var record = this.getRecord(node);
+            this.config.selection = record.get("id");
+
+            this.parent.cmpClick();
+
+        }, this);
     },
 
     cmpReload: function() {

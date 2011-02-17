@@ -42,24 +42,7 @@ Inprint.documents.editor.Versions = Ext.extend( Ext.Panel, {
                     disabled:true,
                     ref: "../btnView",
                     scope:this,
-                    handler: function() {
-
-                        this.btnBack.enable();
-                        this.btnView.disable();
-                        this.layout.setActiveItem(1);
-
-                        this.children["viewer"].load({
-
-                            scripts: false,
-                            nocache: true,
-                            text: _("Loading") + "...",
-                            timeout: 30,
-
-                            url: this.url + "/read/",
-                            params: { version: this.children["browser"].config.selection }
-                        });
-
-                    }
+                    handler: this.cmpClick
                 }
             ],
 
@@ -71,6 +54,29 @@ Inprint.documents.editor.Versions = Ext.extend( Ext.Panel, {
         });
 
         Inprint.documents.editor.Versions.superclass.initComponent.apply(this, arguments);
+
+    },
+
+    cmpClick: function() {
+
+        this.btnBack.enable();
+        this.btnView.disable();
+        this.layout.setActiveItem(1);
+
+        this.children["viewer"].load({
+
+            //scripts: false,
+            //nocache: true,
+
+            text: _("Loading") + "...",
+            timeout: 30,
+
+            mode: "iframe",
+
+            url: this.url + "/read/",
+            params: { version: this.children["browser"].config.selection }
+
+        });
 
     },
 

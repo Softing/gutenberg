@@ -5,6 +5,8 @@ package Inprint::Documents::Hotsave;
 # licensing@softing.ru
 # http://softing.ru/license
 
+use Encode;
+
 use strict;
 use warnings;
 
@@ -76,6 +78,8 @@ sub read {
     $success = $c->json->true unless (@errors);
 
     $fileContent = __clearHtml($fileContent);
+
+    $fileContent = Encode::decode("utf8", $fileContent);
 
     $c->render( text => "$fileContent" );
 }

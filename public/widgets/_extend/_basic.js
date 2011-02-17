@@ -39,21 +39,21 @@ Ext.Ajax.on('beforerequest', function(conn, options) {
 
 Ext.Ajax.on('requestcomplete', function(conn, response, options) {
 
-    var jsonData = Ext.util.JSON.decode(response.responseText);
-
-    if (jsonData.errors) {
-        Ext.each(jsonData.errors, function(c) {
-            var title = _("Software error");
-            var msg = _(c.msg) + " ["+ c.id +"]";
-            Ext.Msg.show({
-                title: title,
-                minWidth:100,
-                maxWidth:900,
-                msg: msg,
-                buttons: Ext.Msg.OK
-            });
-        });
-    }
+    //var jsonData = Ext.util.JSON.decode(response.responseText);
+    //
+    //if (jsonData.errors) {
+    //    Ext.each(jsonData.errors, function(c) {
+    //        var title = _("Software error");
+    //        var msg = _(c.msg) + " ["+ c.id +"]";
+    //        Ext.Msg.show({
+    //            title: title,
+    //            minWidth:100,
+    //            maxWidth:900,
+    //            msg: msg,
+    //            buttons: Ext.Msg.OK
+    //        });
+    //    });
+    //}
 
 }, this);
 
