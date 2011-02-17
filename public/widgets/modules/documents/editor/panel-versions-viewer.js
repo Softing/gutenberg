@@ -7,7 +7,7 @@ Inprint.documents.editor.versions.Viewer = Ext.extend( Ext.Panel, {
             layout:'fit',
             border:false,
             autoScroll:true,
-            bodyStyle: "padding:20px 20px;"
+            bodyStyle: "padding:20px 20px;font-size:14px;"
         });
 
         Inprint.documents.editor.versions.Viewer.superclass.initComponent.apply(this, arguments);
