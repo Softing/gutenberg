@@ -47,6 +47,16 @@ sub encode {
     return $path;
 }
 
+sub getExtension {
+    my $c = shift;
+    my $filepath = shift;
+
+    my ($name,$path,$suffix) = fileparse($filepath, qr/(\.[^.]+){1}?/);
+    $suffix =~ s/^.//g;
+
+    return $suffix;
+}
+
 sub checkFolder {
     my $c = shift;
     my $path = shift;
@@ -89,14 +99,24 @@ sub getRootPath {
     return $path;
 }
 
-sub getExtension {
+sub getRelativePath {
     my $c = shift;
-    my $filepath = shift;
 
-    my ($name,$path,$suffix) = fileparse($filepath, qr/(\.[^.]+){1}?/);
-    $suffix =~ s/^.//g;
+    my $path = shift;
 
-    return $suffix;
+    die "Can't find configuration of datastore folder" unless $path;
+    die "Can't find datastore folder in filesystem" unless -e $path;
+    die "Can't read datastore folder" unless -r $path;
+    die "Can't write to datastore folder" unless -w $path;
+
+    my $basepath = $c->config->get("store.path");
+
+    $path = substr $path, length($basepath), length($path)-length($basepath);
+
+    $path =~ s/\\/\//;
+    $path =~ s/\/$//;
+
+    return $path;
 }
 
 1;

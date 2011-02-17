@@ -6,7 +6,8 @@ Inprint.documents.editor.versions.Viewer = Ext.extend( Ext.Panel, {
         Ext.apply(this, {
             layout:'fit',
             border:false,
-            autoScroll:true
+            autoScroll:true,
+            bodyStyle: "padding:20px 20px;"
         });
 
         Inprint.documents.editor.versions.Viewer.superclass.initComponent.apply(this, arguments);

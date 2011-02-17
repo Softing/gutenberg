@@ -65,6 +65,8 @@ Inprint.documents.editor.FormPanel = Ext.extend( Ext.form.FormPanel,
             this.body.unmask();
             this.btnSave.enable();
 
+            this.parent.cmpReload();
+
             //new Ext.ux.ToastWindow({
             //    title: 'Все в порядке!',
             //    html: 'Ваш текст успешно сохранен',

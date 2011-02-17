@@ -34,14 +34,13 @@ sub set {
     my $i_oid  = $c->param("oid");
     my $i_text = $c->param("text");
 
-    my $data;
     my @errors;
     my $success = $c->json->false;
 
     my $html = Inprint::Store::Embedded::fileSave($c, $i_oid, $i_text);
 
     $success = $c->json->true unless (@errors);
-    $c->render_json( { success => $success, errors => \@errors, data => $data } );
+    $c->render_json( { success => $success, errors => \@errors, data => $html } );
 
 }
 

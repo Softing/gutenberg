@@ -147,7 +147,8 @@ sub cleanup {
 }
 
 sub getRelativePath {
-    my ($c, $path) = @_;
+    my $c = shift;
+    my $path = shift;
 
     die "Can't find configuration of datastore folder" unless $path;
     die "Can't find datastore folder in filesystem" unless -e $path;

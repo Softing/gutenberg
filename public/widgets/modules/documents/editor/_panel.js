@@ -11,14 +11,14 @@ Inprint.documents.Editor = Ext.extend(Ext.Panel, {
 
         this.children["versions"] = new Inprint.documents.editor.Versions({
             title: _("Hot save"),
-            url: _url("/documents/hotsave/list/"),
+            url: _url("/documents/hotsave"),
             parent:this,
             oid: this.oid
         });
 
         this.children["hotsaves"] = new Inprint.documents.editor.Versions({
             title: _("Versions"),
-            url: _url("/documents/versions/list/"),
+            url: _url("/documents/versions"),
             parent:this,
             oid: this.oid
         });
@@ -30,7 +30,12 @@ Inprint.documents.Editor = Ext.extend(Ext.Panel, {
             items: [
                 this.children["versions"],
                 this.children["hotsaves"]
-            ]
+            ],
+            listeners: {
+                "tabchange": function(tabpanel, panel) {
+                    panel.cmpReload();
+                }
+            }
         });
 
         Ext.apply(this, {
@@ -62,6 +67,11 @@ Inprint.documents.Editor = Ext.extend(Ext.Panel, {
     onRender: function() {
         Inprint.documents.Editor.superclass.onRender.apply(this, arguments);
         Inprint.documents.Editor.Interaction(this, this.children);
+    },
+
+    cmpReload: function() {
+        if (this.children["versions"].cmpReload) { this.children["versions"].cmpReload(); }
+        if (this.children["hotsaves"].cmpReload) { this.children["hotsaves"].cmpReload(); }
     }
 
 });

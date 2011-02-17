@@ -147,7 +147,11 @@ sub startup {
     $sessionBridge->route('/documents/say/')                ->to('documents#say');
 
     $sessionBridge->route('/documents/hotsave/list/')        ->to('documents-hotsave#list');
+    $sessionBridge->route('/documents/hotsave/read/')        ->to('documents-hotsave#read');
+
     $sessionBridge->route('/documents/versions/list/')       ->to('documents-versions#list');
+    $sessionBridge->route('/documents/versions/read/')       ->to('documents-versions#read');
+
 
     # Document common
     $sessionBridge->route('/documents/common/fascicles/')   ->to('documents-common#fascicles');

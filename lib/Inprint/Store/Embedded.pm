@@ -25,9 +25,9 @@ use Inprint::Store::Embedded::Utils;
 
 sub updateCache {
 
-    my ($c, $document) = @_;
+    my $c = shift;
 
-    my $path = __getFolderPath($c, $document, 1);
+    my $path   = shift;
 
     # Check folder for existence and the ability to create files
     Inprint::Store::Embedded::Utils::checkFolder($c, $path);
@@ -88,9 +88,9 @@ sub updateCache {
 # Upload file to folder ########################################################
 
 sub fileUpload {
-    my ($c, $document, $upload) = @_;
-
-    my $path = __getFolderPath($c, $document, 1);
+    my $c = shift;
+    my $path = shift;
+    my $upload = shift;
 
     return unless $upload;
 
@@ -123,10 +123,7 @@ sub fileUpload {
 }
 
 sub fileCreate {
-
-    my ($c, $document, $filename, $description) = @_;
-
-    my $folder = __getFolderPath($c, $document, 1);
+    my ($c, $folder, $filename, $description) = @_;
 
     Inprint::Store::Embedded::Utils::checkFolder($c, $folder);
 
@@ -160,8 +157,8 @@ sub fileCreate {
 }
 
 sub fileRead {
-
-    my ($c, $document, $fid) = @_;
+    my $c = shift;
+    my $fid = shift;
 
     my $cacheRecord = Inprint::Store::Cache::getRecordById($c, $fid);
     return unless $cacheRecord->{id};
@@ -181,8 +178,9 @@ sub fileRead {
 }
 
 sub fileSave {
-
-    my ($c, $document, $fid, $text) = @_;
+    my $c = shift;
+    my $fid = shift;
+    my $text = shift;
 
     my $cacheRecord = Inprint::Store::Cache::getRecordById($c, $fid);
     return unless $cacheRecord->{id};
@@ -196,9 +194,9 @@ sub fileSave {
     die "Can't find file <$filepath_encoded>" unless -e $filepath_encoded;
     die "Can't read file <$filepath_encoded>" unless -r $filepath_encoded;
 
-    Inprint::Store::Embedded::Editor::write($c, $cacheRecord->{file_extension}, $filepath_encoded, $text);
+    my $returnText = Inprint::Store::Embedded::Editor::write($c, $cacheRecord->{file_extension}, $filepath_encoded, $text);
 
-    return $c;
+    return $returnText;
 }
 
 sub fileRename {
@@ -212,20 +210,21 @@ sub fileRename {
 }
 
 sub fileChangeDescription {
-
-    my ($c, $document, $fid, $description) = @_;
+    my $c = shift;
+    my $fid = shift;
+    my $text = shift;
 
     my $cache = Inprint::Store::Cache::getRecordById($c, $fid);
     return unless $cache->{id};
 
-    $c->sql->Do("UPDATE cache_files SET file_description=? WHERE id=?", [ $description, $fid ]);
+    $c->sql->Do("UPDATE cache_files SET file_description=? WHERE id=?", [ $text, $fid ]);
 
     return $c;
 }
 
 sub fileDelete {
 
-    my ($c, $document, $fid) = @_;
+    my ($c, $fid) = @_;
 
     my $cacheRecord = Inprint::Store::Cache::getRecordById($c, $fid);
     return unless $cacheRecord->{id};
@@ -243,8 +242,8 @@ sub fileDelete {
 }
 
 sub filePublish {
-
-    my ($c, $document, $fid) = @_;
+    my $c = shift;
+    my $fid = shift;
 
     my $cache = Inprint::Store::Cache::getRecordById($c, $fid);
     return unless $cache->{id};
@@ -255,8 +254,8 @@ sub filePublish {
 }
 
 sub fileUnpublish {
-
-    my ($c, $document, $fid) = @_;
+    my $c = shift;
+    my $fid = shift;
 
     my $cache = Inprint::Store::Cache::getRecordById($c, $fid);
     return unless $cache->{id};
@@ -266,23 +265,61 @@ sub fileUnpublish {
     return $c;
 }
 
-sub getFolderPath {
-    my ($c, $document, $create) = @_;
-    return __getFolderPath($c, $document, $create);
-}
 
 ################################################################################
 
-sub __getFolderPath {
+sub createHotsave {
+    my ($c, $fileid, $i_text);
 
-    my ($c, $document, $create) = @_;
+    return $c;
+}
 
-    die "Cant find record id" unless ($document->{id});
-    die "Cant find record creation date" unless ($document->{created});
+sub readHotsave {
+    my $c = shift;
 
-    my $area    = $document->{area} || "documents";
-    my $date    = $document->{created};
-    my $storeid = $document->{id};
+    return $c;
+}
+
+sub listHotsaves {
+    my $c = shift;
+
+    return $c;
+}
+
+
+################################################################################
+
+sub getRelativePath {
+    my $c = shift;
+
+    my $area    = shift;
+    my $date    = shift;
+    my $storeid = shift;
+    my $create  = shift;
+
+    my $path = getFolderPath($c, $area, $date, $storeid, $create);
+
+    die "Can't find configuration of datastore folder" unless $path;
+    die "Can't find datastore folder in filesystem" unless -e $path;
+    die "Can't read datastore folder" unless -r $path;
+    die "Can't write to datastore folder" unless -w $path;
+
+    my $basepath = $c->config->get("store.path");
+
+    $path = substr $path, length($basepath), length($path)-length($basepath);
+
+    $path =~ s/\\/\//g;
+
+    return $path;
+}
+
+sub getFolderPath {
+    my $c = shift;
+
+    my $area    = shift;
+    my $date    = shift;
+    my $storeid = shift;
+    my $create  = shift;
 
     die "Can't read <area>" unless $area;
     die "Can't read <date>" unless $date;
@@ -320,5 +357,7 @@ sub __getFolderPath {
 
     return $path;
 }
+
+
 
 1;

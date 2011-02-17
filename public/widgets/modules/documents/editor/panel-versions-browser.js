@@ -2,51 +2,47 @@ Inprint.documents.editor.versions.Browser = Ext.extend( Ext.list.ListView, {
 
     initComponent: function() {
 
+        this.config = {};
+
         var store = new Ext.data.JsonStore({
-            url: this.url,
+            url: this.url + "/list/",
             root: 'data',
+            baseParams: {
+                file: this.oid
+            },
             fields: [
-                'name', 'url',
-                {name:'size', type: 'float'},
-                {name:'lastmod', type:'date', dateFormat:'timestamp'}
+                'id', 'creator', 'branch', 'stage', 'color', 'created'
             ]
         });
-
-        store.load();
 
         Ext.apply(this, {
 
             border:false,
-            //autoScroll:true,
-
             store: store,
-
-            multiSelect: false,
-
-            emptyText: 'No HotSave files to display',
-
-            //reserveScrollOffset: false,
+            singleSelect: true,
+            emptyText: _("No versions to display"),
 
             columns: [
                 {
+                    header: _(""),
+                    width: .03,
+                    dataIndex: "color",
+                    tpl: '<div style="background:#{color};width:20px;">&nbsp;</div>'
+                },
+
+                {
                     header: _("Stage"),
-                    width: .35,
-                    dataIndex: 'stage'
+                    width: .15,
+                    dataIndex: "stage"
                 },
                 {
                     header: _("Empoyee"),
-                    width: .35,
-                    dataIndex: 'employee'
-                },
-                {
-                    header: _("File"),
-                    width: .5,
-                    dataIndex: "file"
+                    width: .15,
+                    dataIndex: "creator"
                 },
                 {
                     header: _("Date"),
-                    dataIndex: "date",
-                    tpl: '{lastmod:date("m-d h:i a")}'
+                    dataIndex: "created"
                 }
             ]
 
@@ -59,6 +55,24 @@ Inprint.documents.editor.versions.Browser = Ext.extend( Ext.list.ListView, {
     // Override other inherited methods
     onRender: function(){
         Inprint.documents.editor.versions.Browser.superclass.onRender.apply(this, arguments);
+
+        this.on("selectionchange", function(dataview, selection) {
+
+            if (selection.length == 1){
+                this.parent.btnView.enable();
+                var record = this.getRecord(selection[0]);
+                this.config.selection = record.get("id");
+            }
+
+            else if (selection.length != 0){
+                this.parent.btnView.disable();
+            }
+
+        }, this);
+    },
+
+    cmpReload: function() {
+        this.getStore().reload();
     }
 
 });

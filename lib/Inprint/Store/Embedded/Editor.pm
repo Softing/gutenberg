@@ -16,6 +16,8 @@ use LWP::UserAgent;
 use File::Basename;
 use HTML::Scrubber;
 
+use Inprint::Store::Embedded::Utils;
+
 sub read {
     my ($c, $filetype, $filepath) = @_;
 
@@ -55,41 +57,13 @@ sub read {
 }
 
 sub write {
+
     my ($c, $filetype, $filepath, $text) = @_;
 
     my ($basename, $basepath, $extension) = fileparse($filepath, qr/(\.[^.]+){1}?/);
     $extension =~ s/^.//g;
 
-    my $hotSaveFolderPath = __clearPath($c, "$basepath/.hotsave");
-    my $hotSaveFilePath   = __clearPath($c, "$basepath/.hotsave/$basename.$extension~". time() .".html");
-    mkdir $hotSaveFolderPath unless (-e $hotSaveFolderPath) ;
-    die "Can't find hot save folder <$hotSaveFolderPath>" unless -e $hotSaveFolderPath;
-    die "Can't write to hot save folder <$hotSaveFolderPath>" unless -w $hotSaveFolderPath;
-
-    # Create hotsave
-
-    my $hotSaveText = $text;
-    $hotSaveText = __clearHtml($hotSaveText);
-
-    $hotSaveText = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-    <HTML>
-    <HEAD>
-        <META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
-        <TITLE></TITLE>
-        <STYLE TYPE="text/css">
-        <!--
-            @page { size: 21cm 29.7cm; margin: 2cm }
-            P { margin-bottom: 0.21cm }
-        -->
-        </STYLE>
-    </HEAD>
-    <BODY LANG="ru-RU" LINK="#000080" VLINK="#800000" DIR="LTR">'. $hotSaveText .'</BODY></HTML>';
-
-    open my $VERSION, ">:utf8", $hotSaveFilePath;
-    print $VERSION $hotSaveText;
-    close $VERSION;
-
-    die "Can't find hotsave file <$hotSaveFilePath>" unless -r $hotSaveFilePath;
+    my $hotSaveFilePath = createHotSave($c, $basepath, "$basename.$extension", $text);
 
     if ($extension ~~ ["odt"]) {
 
@@ -131,7 +105,72 @@ sub write {
 
     }
 
-    return $c;
+    return $text;
+}
+
+sub createHotSave {
+
+    my ($c, $basepath, $basename, $text) = @_;
+
+    my $hotSaveFileName = "$basename~". time() .".html";
+
+    my $hotSaveFolderPath = __clearPath($c, "$basepath/.hotsave");
+    my $hotSaveFilePath   = __clearPath($c, "$basepath/.hotsave/$hotSaveFileName");
+
+    mkdir $hotSaveFolderPath unless (-e $hotSaveFolderPath) ;
+    die "Can't find hot save folder <$hotSaveFolderPath>" unless -e $hotSaveFolderPath;
+    die "Can't write to hot save folder <$hotSaveFolderPath>" unless -w $hotSaveFolderPath;
+
+    # Create hotsave
+
+    my $hotSaveText = $text;
+    $hotSaveText = __clearHtml($hotSaveText);
+
+    $hotSaveText = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+    <HTML>
+    <HEAD>
+        <META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+        <TITLE></TITLE>
+        <STYLE TYPE="text/css">
+        <!--
+            @page { size: 21cm 29.7cm; margin: 2cm }
+            P { margin-bottom: 0.21cm }
+        -->
+        </STYLE>
+    </HEAD>
+    <BODY LANG="ru-RU" LINK="#000080" VLINK="#800000" DIR="LTR">'. $hotSaveText .'</BODY></HTML>';
+
+    open my $VERSION, ">:utf8", $hotSaveFilePath;
+    print $VERSION $hotSaveText;
+    close $VERSION;
+
+    die "Can't find hotsave file <$hotSaveFilePath>" unless -r $hotSaveFilePath;
+
+    # create metadata
+
+    my $relativePath = Inprint::Store::Embedded::Utils::getRelativePath($c, $basepath);
+
+    my $cmember  = $c->QuerySessionGet("member.id");
+
+    my $member  = $c->sql->Q("SELECT * FROM profiles WHERE id=?", [ $cmember ])->Hash;
+    my $copyid  = $c->sql->Q("SELECT copygroup FROM documents WHERE filepath=?", [ $relativePath ])->Value;
+    my $history = $c->sql->Q("SELECT * FROM history WHERE entity=? ORDER BY created LIMIT 1", [ $copyid ])->Hash;
+
+    $c->sql->Do("
+        INSERT INTO cache_hotsave(
+            hotsave_origin, hotsave_path,
+            hotsave_branch, hotsave_branch_shortcut,
+            hotsave_stage, hotsave_stage_shortcut,
+            hotsave_color, hotsave_creator, hotsave_creator_shortcut, created)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, now());
+        ", [
+            "$relativePath/$basename", "$relativePath/.hotsave/$hotSaveFileName",
+            $history->{branch}, $history->{branch_shortcut},
+            $history->{stage}, $history->{stage_shortcut},
+            $history->{color}, $member->{id}, $member->{shortcut}
+        ]);
+
+    return $hotSaveFilePath;
 }
 
 sub convert {
@@ -193,6 +232,7 @@ sub convert {
     }
 }
 
+################################################################################
 
 sub __getExtension {
     my ($c, $filepath) = @_;

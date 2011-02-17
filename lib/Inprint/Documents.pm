@@ -322,8 +322,11 @@ sub list {
     foreach my $document (@$result) {
 
         # Get files list
-        my $folder = Inprint::Store::Embedded::getFolderPath($c, $document, 1);
+        my $folder = Inprint::Store::Embedded::getFolderPath($c, "documents", $document->{created}, $document->{id}, 1);
         my $files  = Inprint::Store::Cache::getRecordsByPath($c, $folder, "all", [ 'doc', 'rtf', 'odt', 'txt' ]);
+
+        my $relativePath = Inprint::Store::Embedded::getRelativePath($c, "documents", $document->{created}, $document->{id}, 1);
+        $c->sql->Do("UPDATE documents SET filepath=? WHERE copygroup=?", [ $relativePath, $document->{copygroup} ]);
 
         foreach my $file (@$files) {
             push @{ $document->{links} }, {
@@ -469,7 +472,7 @@ sub create {
         $mon += 1;
 
         push @fields, "filepath";
-        push @data, "/$year/$mon/$id";
+        push @data, Inprint::Store::Embedded::getFolderPath($c, "documents", "$year-$mon", $id, 1);
 
     }
 
