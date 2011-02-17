@@ -1,4 +1,4 @@
-Inprint.documents.Editor.Form = Ext.extend(Ext.form.HtmlEditor,
+Inprint.documents.editor.Form = Ext.extend(Ext.form.HtmlEditor,
 {
 
     initComponent: function()
@@ -28,12 +28,12 @@ Inprint.documents.Editor.Form = Ext.extend(Ext.form.HtmlEditor,
             ]
         });
 
-        Inprint.documents.Editor.Form.superclass.initComponent.apply(this, arguments);
+        Inprint.documents.editor.Form.superclass.initComponent.apply(this, arguments);
     },
 
     // Override other inherited methods
     onRender: function() {
-        Inprint.documents.Editor.Form.superclass.onRender.apply(this, arguments);
+        Inprint.documents.editor.Form.superclass.onRender.apply(this, arguments);
     }
 
 });

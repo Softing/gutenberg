@@ -27,9 +27,8 @@ sub list {
 
     my $result = [];
     unless (@errors) {
-        my $folder = Inprint::Store::Embedded::getFolderPath($c, "documents", $document->{created}, $document->{id}, 1);
-        Inprint::Store::Embedded::updateCache($c, $folder);
-        $result = Inprint::Store::Cache::getRecordsByPath($c, $folder, "all", ['doc', 'xls', 'rtf', 'odt', 'png', 'jpg', 'gif']);
+        Inprint::Store::Embedded::updateCache($c, $document);
+        $result = Inprint::Store::Cache::getRecordsByPath($c, $document, "all", ['doc', 'xls', 'rtf', 'odt', 'png', 'jpg', 'gif']);
     }
 
     $success = $c->json->true unless (@errors);
@@ -52,9 +51,7 @@ sub create {
     my $document = Inprint::Check::document($c, \@errors, $i_document);
 
     unless (@errors) {
-        my $folder = Inprint::Store::Embedded::getFolderPath($c, "documents", $document->{created}, $document->{id}, 1);
-        Inprint::Store::Embedded::fileCreate($c, $folder, $i_filename, $i_description);
-
+        Inprint::Store::Embedded::fileCreate($c, $document, $i_filename, $i_description);
         $c->sql->Do("UPDATE documents SET uploaded=now() WHERE id=?", [ $i_document ]);
     }
 
@@ -87,8 +84,7 @@ sub uploadFlash {
 
     unless (@errors) {
         my $upload = $c->req->upload("Filedata");
-        my $folder = Inprint::Store::Embedded::getFolderPath($c, "documents", $document->{created}, $document->{id}, 1);
-        Inprint::Store::Embedded::fileUpload($c, $folder, $upload);
+        Inprint::Store::Embedded::fileUpload($c, $document, $upload);
         $c->sql->Do("UPDATE documents SET uploaded=now() WHERE id=?", [ $i_document ]);
     }
 
@@ -108,10 +104,9 @@ sub uploadHtml {
     my $document = Inprint::Check::document($c, \@errors, $i_document);
 
     unless (@errors) {
-        my $folder = Inprint::Store::Embedded::getFolderPath($c, "documents", $document->{created}, $document->{id}, 1);
         for ( 1 .. 5 ) {
             my $upload = $c->req->upload("file$_");
-            Inprint::Store::Embedded::fileUpload($c, $folder, $upload) if ($upload);
+            Inprint::Store::Embedded::fileUpload($c, $document, $upload) if ($upload);
         }
         $c->sql->Do("UPDATE documents SET uploaded=now() WHERE id=?", [ $i_document ]);
     }
@@ -135,7 +130,7 @@ sub publish {
     unless (@errors) {
         foreach my $file(@i_files) {
             next unless ($c->is_uuid($file));
-            Inprint::Store::Embedded::filePublish($c, $file);
+            Inprint::Store::Embedded::filePublish($c, $document, $file);
         }
     }
 
@@ -157,7 +152,7 @@ sub unpublish {
     unless (@errors) {
         foreach my $file(@i_files) {
             next unless ($c->is_uuid($file));
-            Inprint::Store::Embedded::fileUnpublish($c, $file);
+            Inprint::Store::Embedded::fileUnpublish($c, $document, $file);
         }
     }
 
@@ -180,7 +175,7 @@ sub description {
     unless (@errors) {
         foreach my $file (@i_files) {
             next unless ($c->is_uuid($file));
-            Inprint::Store::Embedded::fileChangeDescription($c, $file, $i_text);
+            Inprint::Store::Embedded::fileChangeDescription($c, $document, $file, $i_text);
         }
     }
 
@@ -200,10 +195,6 @@ sub rename {
     my $document = Inprint::Check::document($c, \@errors, $i_document);
 
     unless (@errors) {
-        #my $folder = Inprint::Store::Embedded::getFolderPath($c, "rss-plugin", $feed->{created}, $feed->{id}, 1);
-        #foreach my $file(@i_files) {
-        #    Inprint::Store::Embedded::fileRename($c, $folder, $file);
-        #}
     }
 
     $c->render_json({});
@@ -222,10 +213,9 @@ sub delete {
     my $document = Inprint::Check::document($c, \@errors, $i_document);
 
     unless (@errors) {
-
         foreach my $file(@i_files) {
             next unless ($c->is_uuid($file));
-            Inprint::Store::Embedded::fileDelete($c, $file);
+            Inprint::Store::Embedded::fileDelete($c, $document, $file);
         }
     }
 

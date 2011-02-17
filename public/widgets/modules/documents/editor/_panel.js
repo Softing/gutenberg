@@ -2,21 +2,35 @@ Inprint.documents.Editor = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
 
-        this.panels = {};
+        this.children = {};
 
-        this.panels["form"]     = new Inprint.documents.Editor.FormPanel({
+        this.children["form"]     = new Inprint.documents.editor.FormPanel({
             parent:this,
             oid: this.oid
         });
 
-        this.panels["versions"] = new Inprint.documents.Editor.Versions({
+        this.children["versions"] = new Inprint.documents.editor.Versions({
+            title: _("Hot save"),
+            url: _url("/documents/hotsave/list/"),
             parent:this,
             oid: this.oid
         });
 
-        this.panels["hotsaves"] = new Inprint.documents.Editor.Versions({
+        this.children["hotsaves"] = new Inprint.documents.editor.Versions({
+            title: _("Versions"),
+            url: _url("/documents/versions/list/"),
             parent:this,
             oid: this.oid
+        });
+
+        this.tabpanel = new Ext.TabPanel({
+            activeTab: 0,
+            border:false,
+            defaults: { autoScroll: true, border:false },
+            items: [
+                this.children["versions"],
+                this.children["hotsaves"]
+            ]
         });
 
         Ext.apply(this, {
@@ -30,16 +44,13 @@ Inprint.documents.Editor = Ext.extend(Ext.Panel, {
                 {
                     region: "center",
                     layout:"fit",
-                    items: this.panels["form"]
+                    items: this.children["form"]
                 },
                 {   region: "east",
                     layout:"fit",
                     split:true,
                     width:"50%",
-                    items: [
-                        this.panels["versions"],
-                        this.panels["hotsaves"]
-                    ]
+                    items: this.tabpanel
                 }
             ]
         });
@@ -50,7 +61,7 @@ Inprint.documents.Editor = Ext.extend(Ext.Panel, {
 
     onRender: function() {
         Inprint.documents.Editor.superclass.onRender.apply(this, arguments);
-        Inprint.documents.Editor.Interaction(this, this.panels);
+        Inprint.documents.Editor.Interaction(this, this.children);
     }
 
 });

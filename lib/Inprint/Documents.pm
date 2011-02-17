@@ -322,7 +322,7 @@ sub list {
     foreach my $document (@$result) {
 
         # Get files list
-        my $folder = Inprint::Store::Embedded::getFolderPath($c, "documents", $document->{created}, $document->{id}, 1);
+        my $folder = Inprint::Store::Embedded::getFolderPath($c, $document, 1);
         my $files  = Inprint::Store::Cache::getRecordsByPath($c, $folder, "all", [ 'doc', 'rtf', 'odt', 'txt' ]);
 
         foreach my $file (@$files) {

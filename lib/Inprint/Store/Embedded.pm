@@ -25,9 +25,9 @@ use Inprint::Store::Embedded::Utils;
 
 sub updateCache {
 
-    my $c = shift;
+    my ($c, $document) = @_;
 
-    my $path   = shift;
+    my $path = __getFolderPath($c, $document, 1);
 
     # Check folder for existence and the ability to create files
     Inprint::Store::Embedded::Utils::checkFolder($c, $path);
@@ -88,9 +88,9 @@ sub updateCache {
 # Upload file to folder ########################################################
 
 sub fileUpload {
-    my $c = shift;
-    my $path = shift;
-    my $upload = shift;
+    my ($c, $document, $upload) = @_;
+
+    my $path = __getFolderPath($c, $document, 1);
 
     return unless $upload;
 
@@ -123,7 +123,10 @@ sub fileUpload {
 }
 
 sub fileCreate {
-    my ($c, $folder, $filename, $description) = @_;
+
+    my ($c, $document, $filename, $description) = @_;
+
+    my $folder = __getFolderPath($c, $document, 1);
 
     Inprint::Store::Embedded::Utils::checkFolder($c, $folder);
 
@@ -157,8 +160,8 @@ sub fileCreate {
 }
 
 sub fileRead {
-    my $c = shift;
-    my $fid = shift;
+
+    my ($c, $document, $fid) = @_;
 
     my $cacheRecord = Inprint::Store::Cache::getRecordById($c, $fid);
     return unless $cacheRecord->{id};
@@ -178,9 +181,8 @@ sub fileRead {
 }
 
 sub fileSave {
-    my $c = shift;
-    my $fid = shift;
-    my $text = shift;
+
+    my ($c, $document, $fid, $text) = @_;
 
     my $cacheRecord = Inprint::Store::Cache::getRecordById($c, $fid);
     return unless $cacheRecord->{id};
@@ -210,21 +212,20 @@ sub fileRename {
 }
 
 sub fileChangeDescription {
-    my $c = shift;
-    my $fid = shift;
-    my $text = shift;
+
+    my ($c, $document, $fid, $description) = @_;
 
     my $cache = Inprint::Store::Cache::getRecordById($c, $fid);
     return unless $cache->{id};
 
-    $c->sql->Do("UPDATE cache_files SET file_description=? WHERE id=?", [ $text, $fid ]);
+    $c->sql->Do("UPDATE cache_files SET file_description=? WHERE id=?", [ $description, $fid ]);
 
     return $c;
 }
 
 sub fileDelete {
 
-    my ($c, $fid) = @_;
+    my ($c, $document, $fid) = @_;
 
     my $cacheRecord = Inprint::Store::Cache::getRecordById($c, $fid);
     return unless $cacheRecord->{id};
@@ -242,8 +243,8 @@ sub fileDelete {
 }
 
 sub filePublish {
-    my $c = shift;
-    my $fid = shift;
+
+    my ($c, $document, $fid) = @_;
 
     my $cache = Inprint::Store::Cache::getRecordById($c, $fid);
     return unless $cache->{id};
@@ -254,8 +255,8 @@ sub filePublish {
 }
 
 sub fileUnpublish {
-    my $c = shift;
-    my $fid = shift;
+
+    my ($c, $document, $fid) = @_;
 
     my $cache = Inprint::Store::Cache::getRecordById($c, $fid);
     return unless $cache->{id};
@@ -265,45 +266,23 @@ sub fileUnpublish {
     return $c;
 }
 
-
-################################################################################
-
-sub readVersion {
-    my $c = shift;
-
-    return $c;
-}
-
-sub listVersions {
-    my $c = shift;
-
-    return $c;
-}
-
-################################################################################
-
-sub downloadArchive {
-    my $c = shift;
-    my $filter = shift;
-
-    return $c;
-}
-
-sub uploadArchive {
-    my $c = shift;
-
-    return $c;
-}
-
-################################################################################
-
 sub getFolderPath {
-    my $c = shift;
+    my ($c, $document, $create) = @_;
+    return __getFolderPath($c, $document, $create);
+}
 
-    my $area    = shift;
-    my $date    = shift;
-    my $storeid = shift;
-    my $create  = shift;
+################################################################################
+
+sub __getFolderPath {
+
+    my ($c, $document, $create) = @_;
+
+    die "Cant find record id" unless ($document->{id});
+    die "Cant find record creation date" unless ($document->{created});
+
+    my $area    = $document->{area} || "documents";
+    my $date    = $document->{created};
+    my $storeid = $document->{id};
 
     die "Can't read <area>" unless $area;
     die "Can't read <date>" unless $date;
@@ -341,7 +320,5 @@ sub getFolderPath {
 
     return $path;
 }
-
-
 
 1;

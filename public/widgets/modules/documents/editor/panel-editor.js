@@ -1,10 +1,10 @@
-Inprint.documents.Editor.FormPanel = Ext.extend( Ext.form.FormPanel,
+Inprint.documents.editor.FormPanel = Ext.extend( Ext.form.FormPanel,
 {
 
     initComponent: function()
     {
 
-        this.editor = new Inprint.documents.Editor.Form();
+        this.editor = new Inprint.documents.editor.Form();
 
         this.charCounter = new Ext.Toolbar.TextItem('Знаков: 0');
 
@@ -34,7 +34,7 @@ Inprint.documents.Editor.FormPanel = Ext.extend( Ext.form.FormPanel,
             }
         });
 
-        Inprint.documents.Editor.FormPanel.superclass.initComponent.apply(this, arguments);
+        Inprint.documents.editor.FormPanel.superclass.initComponent.apply(this, arguments);
 
         this.on('beforeaction', function() {
             this.body.mask('Идет сохранение текста...');
@@ -52,7 +52,7 @@ Inprint.documents.Editor.FormPanel = Ext.extend( Ext.form.FormPanel,
     // Override other inherited methods
     onRender: function() {
 
-        Inprint.documents.Editor.FormPanel.superclass.onRender.apply(this, arguments);
+        Inprint.documents.editor.FormPanel.superclass.onRender.apply(this, arguments);
 
         this.getForm().timeout = 5;
         this.getForm().url = '/documents/text/set/';

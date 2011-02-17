@@ -1,1 +1,1 @@
-Ext.namespace("Inprint.documents");
+Ext.namespace("Inprint.documents.editor.versions");
