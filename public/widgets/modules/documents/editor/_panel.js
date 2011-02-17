@@ -14,6 +14,11 @@ Inprint.documents.Editor = Ext.extend(Ext.Panel, {
             oid: this.oid
         });
 
+        this.panels["hotsaves"] = new Inprint.documents.Editor.Versions({
+            parent:this,
+            oid: this.oid
+        });
+
         Ext.apply(this, {
             border:false,
             layout: "border",
@@ -31,7 +36,10 @@ Inprint.documents.Editor = Ext.extend(Ext.Panel, {
                     layout:"fit",
                     split:true,
                     width:"50%",
-                    items: this.panels["versions"]
+                    items: [
+                        this.panels["versions"],
+                        this.panels["hotsaves"]
+                    ]
                 }
             ]
         });

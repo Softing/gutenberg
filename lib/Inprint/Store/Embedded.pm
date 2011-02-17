@@ -16,7 +16,6 @@ use File::Copy qw(copy move);
 use File::Path qw(make_path remove_tree);
 
 use Inprint::Store::Cache;
-use Inprint::Store::Embedded::Converter;
 use Inprint::Store::Embedded::Editor;
 use Inprint::Store::Embedded::Metadata;
 use Inprint::Store::Embedded::Versioning;
@@ -29,8 +28,6 @@ sub updateCache {
     my $c = shift;
 
     my $path   = shift;
-    #my $status = shift;
-    #my $filter = shift;
 
     # Check folder for existence and the ability to create files
     Inprint::Store::Embedded::Utils::checkFolder($c, $path);
@@ -48,11 +45,6 @@ sub updateCache {
         # Get file extension
         my $extension = Inprint::Store::Embedded::Utils::getExtension($c, $filename);
 
-        # Apply a filter, if specified
-        #if ($filter) {
-        #    next unless lc($extension) ~~ $filter;
-        #}
-
         my $filepath = Inprint::Store::Embedded::Utils::makePath($c, $path,$filename);
         my $filepath_encoded = Inprint::Store::Embedded::Utils::encode($c, $filepath);
 
@@ -67,9 +59,6 @@ sub updateCache {
                 $filepath_encoded,
                 $digest, $filesize, $created, $updated
             );
-
-        #next if ($status eq "published" && $cacheRecord->{isapproved} != 1);
-        #next if ($status eq "unpublished" && $cacheRecord->{isapproved} != 0);
 
         ## Create File record
         my $filehash = {

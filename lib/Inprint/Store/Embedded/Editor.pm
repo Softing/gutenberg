@@ -1,5 +1,10 @@
 package Inprint::Store::Embedded::Editor;
 
+# Inprint Content 5.0
+# Copyright(c) 2001-2010, Softing, LLC.
+# licensing@softing.ru
+# http://softing.ru/license
+
 use Encode;
 
 use strict;
@@ -16,62 +21,26 @@ sub read {
 
     my $result;
 
-    my $extension = getExtension($c, $filepath);
+    my $extension = __getExtension($c, $filepath);
 
     if ($extension ~~ ["doc", "docx", "odt", "rtf"]) {
 
-        my $ooHost = $c->config->get("openoffice.host");
-        my $ooPort = $c->config->get("openoffice.port");
-        my $ooTimeout = $c->config->get("openoffice.timeout");
+        my $response = convert($c, $filepath, $extension, "html");
 
-        die "Cant read configuration <openoffice.host>" unless $ooHost;
-        die "Cant read configuration <openoffice.port>" unless $ooPort;
-        die "Cant read configuration <openoffice.timeout>" unless $ooTimeout;
-
-        my $ooUrl = "http://$ooHost:$ooPort/api/converter2/";
-        my $ooUagent = LWP::UserAgent->new();
-
-        my $ooRequest = HTTP::Request->new();
-        $ooRequest->method("POST");
-        $ooRequest->uri( $ooUrl );
-
-        $ooRequest->header("InputFormat", $extension);
-        $ooRequest->header("OutputFormat", "html");
-        $ooRequest->header("Content-type", "application/octet-stream");
-
-        my $fileContent;
-        open FILE, "<", $filepath || die "Can't open <$filepath> : $!";
-        binmode FILE;
-        while (read(FILE, my $buf, 60*57)) {
-            $fileContent .= encode_base64($buf);
+        if ($^O eq "linux") {
+            $result = Encode::decode_utf8( $response->{responseBody} );
         }
-        close FILE;
-
-        $ooRequest->content( $fileContent );
-
-        my $ooResponse = $ooUagent->request($ooRequest);
-        if ($ooResponse->is_success()) {
-
-            my $decoded = MIME::Base64::decode($ooResponse->content);
-            $result = $decoded;
-
-            if ($^O eq "linux") {
-                $result = Encode::decode_utf8( $result );
-            }
-            if ($^O eq "MSWin32") {
-                $result = Encode::decode("windows-1251", $result);
-            }
-
-        } else {
-            die $ooResponse->as_string;
+        if ($^O eq "MSWin32") {
+            $result = Encode::decode("windows-1251", $response->{responseBody} );
         }
+
     }
 
     if ($extension ~~ ["txt"]) {
 
-        open FILE, "<", $filepath;
-        while (<FILE>) { $result .= $_; }
-        close FILE;
+        open my $FILE, "<", $filepath;
+        while (<$FILE>) { $result .= $_; }
+        close $FILE;
 
         if ($^O eq "MSWin32") {
             $result = Encode::decode("windows-1251", $result);
@@ -80,7 +49,7 @@ sub read {
         $result =~ s/\r?\n/<br>/g;
     }
 
-    $result = clearHtml($result);
+    $result = __clearHtml($result);
 
     return $result;
 }
@@ -91,8 +60,8 @@ sub write {
     my ($basename, $basepath, $extension) = fileparse($filepath, qr/(\.[^.]+){1}?/);
     $extension =~ s/^.//g;
 
-    my $hotSaveFolderPath = clearPath($c, "$basepath/.hotsave");
-    my $hotSaveFilePath   = clearPath($c, "$basepath/.hotsave/$basename.$extension~". time() .".html");
+    my $hotSaveFolderPath = __clearPath($c, "$basepath/.hotsave");
+    my $hotSaveFilePath   = __clearPath($c, "$basepath/.hotsave/$basename.$extension~". time() .".html");
     mkdir $hotSaveFolderPath unless (-e $hotSaveFolderPath) ;
     die "Can't find hot save folder <$hotSaveFolderPath>" unless -e $hotSaveFolderPath;
     die "Can't write to hot save folder <$hotSaveFolderPath>" unless -w $hotSaveFolderPath;
@@ -100,7 +69,7 @@ sub write {
     # Create hotsave
 
     my $hotSaveText = $text;
-    $hotSaveText = clearHtml($hotSaveText);
+    $hotSaveText = __clearHtml($hotSaveText);
 
     $hotSaveText = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
     <HTML>
@@ -116,133 +85,47 @@ sub write {
     </HEAD>
     <BODY LANG="ru-RU" LINK="#000080" VLINK="#800000" DIR="LTR">'. $hotSaveText .'</BODY></HTML>';
 
-    open VERSION, ">:utf8", $hotSaveFilePath;
-    print VERSION $hotSaveText;
-    close VERSION;
+    open my $VERSION, ">:utf8", $hotSaveFilePath;
+    print $VERSION $hotSaveText;
+    close $VERSION;
 
     die "Can't find hotsave file <$hotSaveFilePath>" unless -r $hotSaveFilePath;
 
-    # Update file
-    my $ooHost = $c->config->get("openoffice.host");
-    my $ooPort = $c->config->get("openoffice.port");
-    my $ooTimeout = $c->config->get("openoffice.timeout");
-
-    die "Cant read configuration <openoffice.host>" unless $ooHost;
-    die "Cant read configuration <openoffice.port>" unless $ooPort;
-    die "Cant read configuration <openoffice.timeout>" unless $ooTimeout;
-
     if ($extension ~~ ["odt"]) {
 
-        my $ooUrl = "http://$ooHost:$ooPort/api/converter/";
-        my $ooUagent = LWP::UserAgent->new();
+        my $response = convert($c, $hotSaveFilePath, "html", $extension);
 
-        my $ooRequest = HTTP::Request->new();
-        $ooRequest->method("POST");
-        $ooRequest->uri( $ooUrl );
-
-        $ooRequest->header("InputFormat", "html");
-        $ooRequest->header("OutputFormat", $extension);
-        $ooRequest->header("Content-type", "application/octet-stream");
-
-        my $fileContent;
-        open FILE, "<", $hotSaveFilePath || die "Can't open <$hotSaveFilePath> : $!";
-        binmode FILE;
-        while (read(FILE, my $buf, 60*57)) {
-            $fileContent .= encode_base64($buf);
-        }
-        close FILE;
-
-        $ooRequest->content( $fileContent );
-
-        my $ooResponse = $ooUagent->request($ooRequest);
-        if ($ooResponse->is_success()) {
-
-            open FILE, "> $filepath.$extension" or die "Can't open <$filepath> : $!";
-            binmode FILE;
-                my $decoded = MIME::Base64::decode($ooResponse->content);
-                print FILE $decoded;
-            close FILE;
-
-        } else {
-            die $ooResponse->as_string;
-        }
+        open my $FILE, ">", "$filepath.$extension" || die "Can't open <$filepath> : $!";
+        binmode $FILE;
+            print $FILE $response->{responseBody};
+        close $FILE;
 
     }
 
     if ($extension ~~ ["doc", "docx", "rtf", "txt"]) {
 
-        my $ooUrl = "http://$ooHost:$ooPort/api/converter2/";
-        my $ooUagent = LWP::UserAgent->new();
-
         # create tmp odt file
-        my $tmpFolderPath = clearPath($c, "$basepath/.hotsave");
-        my $tmpFilePath   = clearPath($c, "$basepath/.hotsave/$basename.$extension~". time() .".odt");
+        my $tmpFolderPath = __clearPath($c, "$basepath/.hotsave");
+        my $tmpFilePath   = __clearPath($c, "$basepath/.hotsave/$basename.$extension~". time() .".odt");
         mkdir $tmpFolderPath unless (-e $tmpFolderPath) ;
         die "Can't find hot save folder <$tmpFolderPath>" unless -e $tmpFolderPath;
         die "Can't write to hot save folder <$tmpFolderPath>" unless -w $tmpFolderPath;
 
-        my $ooRequest = HTTP::Request->new();
-        $ooRequest->method("POST");
-        $ooRequest->uri( $ooUrl );
+        my $response1 = convert($c, $hotSaveFilePath, "html", "odt");
 
-        $ooRequest->header("InputFormat", "html");
-        $ooRequest->header("OutputFormat", "odt");
-        $ooRequest->header("Content-type", "application/octet-stream");
-
-        my $fileContent;
-        open FILE, "<", $hotSaveFilePath || die "Can't open <$hotSaveFilePath> : $!";
-        binmode FILE;
-        while (read(FILE, my $buf, 60*57)) {
-            $fileContent .= encode_base64($buf);
-        }
-        close FILE;
-
-        $ooRequest->content( $fileContent );
-
-        my $ooResponse = $ooUagent->request($ooRequest);
-        if ($ooResponse->is_success()) {
-            open FILE, "> $tmpFilePath" or die "Can't open <$tmpFilePath> : $!";
-            binmode FILE;
-                my $decoded = MIME::Base64::decode($ooResponse->content);
-                print FILE $decoded;
-            close FILE;
-        } else {
-            die $ooResponse->as_string;
-        }
+        open my $TMPFILE, ">", $tmpFilePath || die "Can't open <$tmpFilePath> : $!";
+        binmode $TMPFILE;
+            print $TMPFILE $response1->{responseBody};
+        close $TMPFILE;
 
         die "Can't read tmp file <$tmpFilePath>" unless -r $tmpFilePath;
 
-        my $ooRequest2 = HTTP::Request->new();
-        $ooRequest2->method("POST");
-        $ooRequest2->uri( $ooUrl );
+        my $response2 = convert($c, $tmpFilePath, "odt", $extension);
 
-        $ooRequest2->header("InputFormat", "odt");
-        $ooRequest2->header("OutputFormat", $extension);
-        $ooRequest2->header("Content-type", "application/octet-stream");
-
-        my $fileContent2;
-        open FILE, "<", $tmpFilePath || die "Can't open <$tmpFilePath>: $!";
-        binmode FILE;
-        while (read(FILE, my $buf, 60*57)) {
-            $fileContent2 .= encode_base64($buf);
-        }
-        close FILE;
-
-        $ooRequest->content( $fileContent2 );
-
-        my $ooResponse2 = $ooUagent->request($ooRequest2);
-        if ($ooResponse2->is_success()) {
-
-            my $decoded = MIME::Base64::decode($ooResponse->content);
-
-            open FILE, "> $filepath" or die "Can't open <$filepath> : $!";
-            binmode FILE;
-                print FILE $decoded;
-            close FILE;
-
-        } else {
-            die $ooResponse2->as_string;
-        }
+        open my $FILE, ">", $filepath || die "Can't read <$filepath> : $!";
+        binmode $FILE;
+            print $FILE $response2->{responseBody};
+        close $FILE;
 
         unlink $tmpFilePath;
 
@@ -251,7 +134,67 @@ sub write {
     return $c;
 }
 
-sub getExtension {
+sub convert {
+
+    my ($c, $filepath, $input, $output) = @_;
+
+    my $ooHost = $c->config->get("openoffice.host");
+    my $ooPort = $c->config->get("openoffice.port");
+    my $ooTimeout = $c->config->get("openoffice.timeout");
+
+    die "Cant read configuration <openoffice.host>" unless $ooHost;
+    die "Cant read configuration <openoffice.port>" unless $ooPort;
+    die "Cant read configuration <openoffice.timeout>" unless $ooTimeout;
+
+    my $ooUrl = "http://$ooHost:$ooPort/api/converter2/";
+    my $ooUagent = LWP::UserAgent->new();
+
+    my $ooRequest = HTTP::Request->new();
+    $ooRequest->method("POST");
+    $ooRequest->uri( $ooUrl );
+
+    $ooRequest->header("InputFormat", $input);
+    $ooRequest->header("OutputFormat", $output);
+    $ooRequest->header("Content-type", "application/octet-stream");
+
+    my $fileContent;
+    open my $INPUT, "<", $filepath || die "Can't open <$filepath> : $!";
+    binmode $INPUT;
+    while (read($INPUT, my $buf, 60*57)) {
+        $fileContent .= encode_base64($buf);
+    }
+    close $INPUT;
+
+    $ooRequest->content( $fileContent );
+
+    my $responseBody;
+    my $ParagraphCount = 0;
+    my $CharacterCount = 0;
+    my $WordCount = 0;
+
+    my $ooResponse = $ooUagent->request($ooRequest);
+    if ($ooResponse->is_success()) {
+
+        $ParagraphCount = $ooResponse->header("Softing-Meta-WordCount");
+        $CharacterCount = $ooResponse->header("Softing-Meta-CharacterCount");
+        $WordCount = $ooResponse->header("Softing-Meta-WordCount");
+
+        $responseBody = MIME::Base64::decode($ooResponse->content);
+
+    } else {
+        die $ooResponse->as_string;
+    }
+
+    return {
+        responseBody => $responseBody,
+        ParagraphCount => $ParagraphCount,
+        CharacterCount => $CharacterCount,
+        WordCount => $WordCount
+    }
+}
+
+
+sub __getExtension {
     my ($c, $filepath) = @_;
 
     my ($name,$path,$suffix) = fileparse($filepath, qr/(\.[^.]+){1}?/);
@@ -260,7 +203,7 @@ sub getExtension {
     return $suffix;
 }
 
-sub clearPath {
+sub __clearPath {
 
     my ($c, $filepath) = @_;
 
@@ -277,7 +220,7 @@ sub clearPath {
     return $filepath;
 }
 
-sub clearHtml {
+sub __clearHtml {
 
     my $html = shift;
 
@@ -355,8 +298,6 @@ sub clearHtml {
     $html =~ s/\s+/ /ig;
 
   return $html;
-
-
 }
 
 1;

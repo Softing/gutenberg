@@ -211,38 +211,24 @@ sub changeRecordDesciption {
 
 sub clearPath {
 
-    my $c = shift;
-    my $path = shift;
+    my ($c, $filepath) = @_;
 
     if ($^O eq "MSWin32") {
-        $path =~ s/\//\\/g;
-        $path =~ s/\\+/\\/g;
+        $filepath =~ s/\//\\/g;
+        $filepath =~ s/\\+/\\/g;
     }
 
     if ($^O eq "linux") {
-        $path =~ s/\\/\//g;
-        $path =~ s/\/+/\//g;
+        $filepath =~ s/\\/\//g;
+        $filepath =~ s/\/+/\//g;
     }
 
-    return $path;
+    return $filepath;
 }
 
 sub getDigest {
-    my $c = shift;
-    my $filepath = shift;
-
+    my ($c, $filepath) = @_;
     $filepath = clearPath($c, $filepath);
-
-    #die Lingua::DetectCharset::Detect ($filepath);
-
-    #$filepath = Convert::Cyrillic::cstocs ("WIN", "DOS", $filepath );
-
-    #if ($^O eq "MSWin32") {
-    #    $filepath = Encode::decode("cp1251", $filepath);
-    #}
-    #if ($^O eq "linux") {
-    #}
-
     return digest_file_hex($filepath, "MD5");
 }
 
@@ -255,18 +241,14 @@ sub getFileCreateDate {
 }
 
 sub getFileModifyDate {
-    my $c = shift;
-    my $filepath = shift;
+    my ($c, $filepath) = @_;
     my $date = File::Util::last_modified($filepath);
     return strftime("%Y-%m-%d %H:%M:%S", gmtime($date));
 }
 
 sub getFileSize {
-    my $c = shift;
-    my $filepath = shift;
-
+    my ($c, $filepath) = @_;
     my $filesize = File::Util::size($filepath);
-
     return $filesize;
 }
 

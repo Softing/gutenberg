@@ -1,5 +1,10 @@
 package Inprint::Store::Embedded::Utils;
 
+# Inprint Content 5.0
+# Copyright(c) 2001-2010, Softing, LLC.
+# licensing@softing.ru
+# http://softing.ru/license
+
 use utf8;
 use strict;
 
@@ -83,8 +88,6 @@ sub getRootPath {
 
     return $path;
 }
-
-
 
 sub getExtension {
     my $c = shift;
