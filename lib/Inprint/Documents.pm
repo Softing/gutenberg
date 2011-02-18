@@ -1060,9 +1060,6 @@ sub move {
     push @errors, { id => "edition", msg => "Can't find object"}
         unless ( $edition->{id} || $edition->{shortcut} );
 
-    #my $headline = Inprint::Models::Fascicle::Headline::findByTag($c, $fascicle->{id}, $i_headline);
-    #my $rubric   = Inprint::Models::Fascicle::Rubric::findByTag($c, $fascicle->{id}, $headline->{id}, $i_rubric);
-
     unless (@errors) {
 
         foreach my $id (@ids) {
@@ -1138,6 +1135,7 @@ sub copy {
                             manager, manager_shortcut,
                             edition, edition_shortcut, ineditions,
                             copygroup,
+                            maingroup, maingroup_shortcut,
                             workgroup, workgroup_shortcut, inworkgroups,
                             fascicle, fascicle_shortcut,
                             headline, headline_shortcut,
@@ -1155,7 +1153,7 @@ sub copy {
                             created, updated
                         )
                         VALUES (
-                            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                             ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now()
                         );
                     ", [
@@ -1164,7 +1162,8 @@ sub copy {
                             $document->{holder},  $document->{holder_shortcut},
                             $document->{manager}, $document->{manager_shortcut},
                             $document->{edition}, $document->{edition_shortcut},  $document->{ineditions},
-                        $document->{copygroup},
+                            $document->{copygroup},
+                            $document->{maingroup}, $document->{maingroup_shortcut},
                             $document->{workgroup}, $document->{workgroup_shortcut}, $document->{inworkgroups},
                             $document->{fascicle}, $document->{fascicle_shortcut},
                             $document->{headline}, $document->{headline_shortcut},
@@ -1253,6 +1252,7 @@ sub duplicate {
                         manager, manager_shortcut,
                         edition, edition_shortcut, ineditions,
                         copygroup, movegroup,
+                        maingroup, maingroup_shortcut,
                         workgroup, workgroup_shortcut, inworkgroups,
                         fascicle, fascicle_shortcut,
                         headline, headline_shortcut,
@@ -1270,7 +1270,7 @@ sub duplicate {
                         created, updated
                     )
                     VALUES (
-                        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                         ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now()
                     );
                 ", [
@@ -1280,6 +1280,7 @@ sub duplicate {
                         $document->{manager}, $document->{manager_shortcut},
                         $document->{edition}, $document->{edition_shortcut},  $document->{ineditions},
                         $new_id, $document->{movegroup} || $new_id,
+                        $document->{maingroup}, $document->{maingroup_shortcut},
                         $document->{workgroup}, $document->{workgroup_shortcut}, $document->{inworkgroups},
                         $document->{fascicle}, $document->{fascicle_shortcut},
                         $document->{headline}, $document->{headline_shortcut},
