@@ -22,6 +22,8 @@ sub editions {
     my @errors;
     my $success = $c->json->false;
 
+    $i_node = "00000000-0000-0000-0000-000000000000" if $i_node eq "all";
+
     Inprint::Check::uuid($c, \@errors, "node", $i_node);
     Inprint::Check::rule($c, \@errors, "term", $i_term);
 
@@ -92,11 +94,13 @@ sub workgroups {
     my @errors;
     my $success = $c->json->false;
 
+    $i_node = "00000000-0000-0000-0000-000000000000" if $i_node eq "all";
+
     Inprint::Check::uuid($c, \@errors, "node", $i_node);
     Inprint::Check::rule($c, \@errors, "node", $i_term);
 
     my $bindings = $c->access->GetBindings($i_term);
-    
+
     unless (@errors) {
 
         my $sql;
@@ -158,6 +162,8 @@ sub fascicles {
     my @result;
     my @errors;
     my $success = $c->json->false;
+
+    $i_node = "00000000-0000-0000-0000-000000000000" if $i_node eq "all";
 
     Inprint::Check::uuid($c, \@errors, "node", $i_node);
 

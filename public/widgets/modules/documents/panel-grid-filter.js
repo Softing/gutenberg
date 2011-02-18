@@ -27,7 +27,7 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                 },
                 rootVisible:true,
                 root: {
-                    id:'00000000-0000-0000-0000-000000000000',
+                    id:'all',
                     nodeType: 'async',
                     expanded: true,
                     draggable: false,
@@ -48,7 +48,7 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                 },
                 rootVisible:true,
                 root: {
-                    id:'00000000-0000-0000-0000-000000000000',
+                    id:'all',
                     nodeType: 'async',
                     expanded: true,
                     draggable: false,
@@ -69,7 +69,7 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                 },
                 rootVisible:true,
                 root: {
-                    id:'00000000-0000-0000-0000-000000000000',
+                    id:'all',
                     nodeType: 'async',
                     expanded: true,
                     draggable: false,

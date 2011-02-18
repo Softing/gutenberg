@@ -225,7 +225,7 @@ sub list {
     if ($mode eq "all") {
         $sql_filters .= " AND fsc.deadline >= now() ";
         $sql_filters .= " AND dcm.fascicle <> '99999999-9999-9999-9999-999999999999' ";
-        if ($fascicle && $fascicle ne 'clear' && $fascicle ne '00000000-0000-0000-0000-000000000000') {
+        if ($fascicle && $fascicle ne "all" && $fascicle ne '00000000-0000-0000-0000-000000000000') {
             $sql_filters .= " AND dcm.fascicle <> '00000000-0000-0000-0000-000000000000' ";
         }
     }
@@ -251,42 +251,42 @@ sub list {
         push @params, "%$title%";
     }
 
-    if ($edition && $edition ne "clear") {
+    if ($edition && $edition ne "all") {
         $sql_filters .= " AND ? = ANY(dcm.ineditions) ";
         push @params, $edition;
     }
 
-    if ($group && $group ne "clear") {
+    if ($group && $group ne "all") {
         $sql_filters .= " AND ? = ANY(dcm.inworkgroups) ";
         push @params, $group;
     }
 
-    if ($fascicle && $fascicle ne "clear") {
+    if ($fascicle && $fascicle ne "all") {
         $sql_filters .= " AND dcm.fascicle = ? ";
         push @params, $fascicle;
     }
 
-    if ($headline && $headline ne "clear") {
+    if ($headline && $headline ne "all") {
         $sql_filters .= " AND dcm.headline_shortcut = ? ";
         push @params, $headline;
     }
 
-    if ($rubric && $rubric ne "clear") {
+    if ($rubric && $rubric ne "all") {
         $sql_filters .= " AND dcm.rubric_shortcut = ? ";
         push @params, $rubric;
     }
 
-    if ($manager && $manager ne "clear") {
+    if ($manager && $manager ne "all") {
         $sql_filters .= " AND dcm.manager=? ";
         push @params, $manager;
     }
 
-    if ($holder && $holder ne "clear") {
+    if ($holder && $holder ne "all") {
         $sql_filters .= " AND dcm.holder=? ";
         push @params, $holder;
     }
 
-    if ($progress && $progress ne "clear") {
+    if ($progress && $progress ne "all") {
         $sql_filters .= " AND dcm.readiness=? ";
         push @params, $progress;
     }
@@ -324,16 +324,21 @@ sub list {
         # Get files list
         my $folder = Inprint::Store::Embedded::getFolderPath($c, "documents", $document->{created}, $document->{id}, 1);
         my $files  = Inprint::Store::Cache::getRecordsByPath($c, $folder, "all", [ 'doc', 'rtf', 'odt', 'txt' ]);
-
-        my $relativePath = Inprint::Store::Embedded::getRelativePath($c, "documents", $document->{created}, $document->{id}, 1);
-        $c->sql->Do("UPDATE documents SET filepath=? WHERE copygroup=?", [ $relativePath, $document->{copygroup} ]);
-
         foreach my $file (@$files) {
             push @{ $document->{links} }, {
                 id => $file->{id},
                 name => $file->{name}
             };
         }
+
+        ## Fix filepath
+        my $relativePath = Inprint::Store::Embedded::getRelativePath($c, "documents", $document->{created}, $document->{id}, 1);
+        $c->sql->Do("UPDATE documents SET filepath=? WHERE copygroup=?", [ $relativePath, $document->{copygroup} ]);
+
+        # Update images count
+        my @images = ("jpg", "jpeg", "png", "gif", "bmp", "tiff" );
+        my $imgCount = $c->sql->Q(" SELECT count(*) FROM cache_files WHERE file_path=? AND file_extension=ANY(?) ", [ $relativePath, \@images ])->Value;
+        $c->sql->Do("UPDATE documents SET images=? WHERE filepath=? ", [ $imgCount, $relativePath ]);
 
         # Get document pages
         $document->{pages} = Inprint::Utils::CollapsePagesToString($document->{pages});

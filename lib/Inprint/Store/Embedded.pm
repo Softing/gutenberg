@@ -308,6 +308,7 @@ sub getRelativePath {
     $path = substr $path, length($basepath), length($path)-length($basepath);
 
     $path =~ s/\\/\//g;
+    $path =~ s/\/$//;
 
     return $path;
 }

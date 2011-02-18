@@ -82,7 +82,7 @@ sub getRecordsByPath {
         FROM cache_files
         WHERE file_exists = true AND file_path=? ";
 
-    push @params, getRelativePath($c, "$path/");
+    push @params, getRelativePath($c, $path);
 
     if ($status eq 'published') {
         $sql .= " AND file_published = true ";
@@ -160,6 +160,7 @@ sub getRelativePath {
     $path = substr $path, length($basepath), length($path)-length($basepath);
 
     $path =~ s/\\/\//g;
+    $path =~ s/\/$//;
 
     return $path;
 }

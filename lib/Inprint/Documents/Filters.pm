@@ -43,7 +43,7 @@ sub fascicles {
     $sql .= " ORDER BY t1.enddate ASC, t2.shortcut, t1.title ";
 
     my $result;
-    
+
     if ( $i_gridmode ne "briefcase" ){
         $result = $c->sql->Q($sql, \@data)->Hashes;
     }
@@ -60,7 +60,7 @@ sub fascicles {
 
     if ( $i_gridmode ne "briefcase" ){
         unshift @$result, {
-            id => "clear",
+            id => "all",
             icon => "folders",
             spacer => $c->json->true,
             bold => $c->json->true,
@@ -78,37 +78,40 @@ sub headlines {
     my $cgi_edition  = $c->param("flt_edition")  || undef;
     my $cgi_fascicle = $c->param("flt_fascicle") || undef;
 
+    $cgi_edition  = "00000000-0000-0000-0000-000000000000" if $cgi_edition  eq "all";
+    $cgi_fascicle = undef if $cgi_fascicle eq "all";
+
     my @params;
     my $sql = "
         SELECT DISTINCT t1.headline_shortcut as id, t1.headline_shortcut as title
         FROM documents t1
         WHERE t1.edition=ANY(?) AND t1.headline_shortcut is not null
     ";
-    
+
     my $editions = $c->access->GetChildrens("editions.documents.work");
     push @params, $editions;
 
-    if ($cgi_edition &&  $cgi_edition ne "clear") {
+    if ($cgi_edition && $cgi_edition ne "all") {
         my $editions = $c->sql->Q(" SELECT id FROM editions WHERE path <@ ( SELECT path FROM editions WHERE id=?)", [ $cgi_edition ])->Values;
         $sql .= " AND t1.edition = ANY(?) ";
         push @params, $editions;
     }
 
-    if ($cgi_fascicle &&  $cgi_fascicle ne "clear") {
+    if ($cgi_fascicle &&  $cgi_fascicle ne "all") {
         $sql .= " AND t1.fascicle = ? ";
         push @params, $cgi_fascicle;
     }
-    
+
     my $sql_filter = $c->createSqlFilter();
     $sql .= " $sql_filter->{sql} ";
     @params = (@params, @{ $sql_filter->{params} });
-    
+
     $sql .= " ORDER BY t1.headline_shortcut ";
-    
+
     my $result = $c->sql->Q($sql, \@params)->Hashes;
 
     unshift @$result, {
-        id => "clear",
+        id => "all",
         icon => "marker",
         spacer => $c->json->true,
         bold => $c->json->true,
@@ -121,47 +124,47 @@ sub headlines {
 sub rubrics {
 
     my $c = shift;
-    
+
     my $cgi_edition  = $c->param("flt_edition")  || undef;
     my $cgi_fascicle = $c->param("flt_fascicle") || undef;
     my $cgi_headline = $c->param("flt_headline") || undef;
-    
+
     my @params;
     my $sql = "
         SELECT DISTINCT t1.rubric_shortcut as id, t1.rubric_shortcut as title
         FROM documents t1
         WHERE t1.edition=ANY(?) AND t1.rubric_shortcut is not null
     ";
-    
+
     my $editions = $c->access->GetChildrens("editions.documents.work");
     push @params, $editions;
-    
-    if ($cgi_edition &&  $cgi_edition ne "clear") {
+
+    if ($cgi_edition &&  $cgi_edition ne "all") {
         my $editions = $c->sql->Q(" SELECT id FROM editions WHERE path <@ ( SELECT path FROM editions WHERE id=?)", [ $cgi_edition ])->Values;
         $sql .= " AND t1.edition = ANY(?) ";
         push @params, $editions;
     }
-    
-    if ($cgi_fascicle &&  $cgi_fascicle ne "clear") {
+
+    if ($cgi_fascicle &&  $cgi_fascicle ne "all") {
         $sql .= " AND t1.fascicle = ? ";
         push @params, $cgi_fascicle;
     }
-    
-    if ($cgi_headline &&  $cgi_headline ne "clear") {
+
+    if ($cgi_headline &&  $cgi_headline ne "all") {
         $sql .= " AND t1.headline_shortcut = ? ";
         push @params, $cgi_headline;
     }
-    
+
     my $sql_filter = $c->createSqlFilter();
     $sql .= " $sql_filter->{sql} ";
     @params = (@params, @{ $sql_filter->{params} });
-    
+
     $sql .= " ORDER BY t1.rubric_shortcut ";
 
     my $result = $c->sql->Q($sql, \@params)->Hashes;
 
     unshift @$result, {
-        id => "clear",
+        id => "all",
         icon => "marker",
         spacer => $c->json->true,
         bold => $c->json->true,
@@ -185,17 +188,17 @@ sub managers {
             CASE WHEN t2.type='group' THEN 'folders' ELSE 'user' END as icon
         FROM documents t1, view_principals t2 WHERE t2.id = t1.manager
     ";
-    
+
     my $sql_filter = $c->createSqlFilter();
     $sql .= " $sql_filter->{sql} ";
     @params = (@params, @{ $sql_filter->{params} });
-    
+
     $sql .= " ORDER BY icon, t2.shortcut; ";
-    
+
     my $result = $c->sql->Q($sql, \@params)->Hashes;
 
     unshift @$result, {
-        id => "clear",
+        id => "all",
         icon => "user-silhouette",
         spacer => $c->json->true,
         bold => $c->json->true,
@@ -209,7 +212,7 @@ sub managers {
 sub holders {
 
     my $c = shift;
-    
+
     my @params;
     my $sql = "
         SELECT DISTINCT
@@ -219,17 +222,17 @@ sub holders {
             CASE WHEN t2.type='group' THEN 'folders' ELSE 'user' END as icon
         FROM documents t1, view_principals t2 WHERE t2.id = t1.holder
     ";
-    
+
     my $sql_filter = $c->createSqlFilter();
     $sql .= " $sql_filter->{sql} ";
     @params = (@params, @{ $sql_filter->{params} });
-    
+
     $sql .= " ORDER BY icon, t2.shortcut; ";
-    
+
     my $result = $c->sql->Q($sql, \@params)->Hashes;
 
     unshift @$result, {
-        id => "clear",
+        id => "all",
         icon => "user-silhouette",
         spacer => $c->json->true,
         bold => $c->json->true,
@@ -247,17 +250,17 @@ sub progress {
     my $sql = "
         SELECT DISTINCT t1.readiness as id, t1.progress || '% - ' || t1.readiness_shortcut as title, t1.color, t1.progress
         FROM documents t1 WHERE 1=1 ";
-    
+
     my $sql_filter = $c->createSqlFilter();
     $sql .= " $sql_filter->{sql} ";
     @params = (@params, @{ $sql_filter->{params} });
-    
+
     $sql .= " ORDER BY progress, title ";
 
     my $result = $c->sql->Q($sql, \@params)->Hashes;
 
     unshift @$result, {
-        id => "clear",
+        id => "all",
         icon => "category",
         spacer => $c->json->true,
         bold => $c->json->true,
@@ -271,8 +274,6 @@ sub createSqlFilter {
 
     my $c       = shift;
     my $filters = shift;
-    #my $sql     = shift;
-    #my $order   = shift;
 
     my $sql;
     my @params;
@@ -283,11 +284,6 @@ sub createSqlFilter {
     my $group    = $c->param("flt_group")    || undef;
     my $title    = $c->param("flt_title")    || undef;
     my $fascicle = $c->param("flt_fascicle") || undef;
-    
-    #my $editions = $c->access->GetChildrens("editions.documents.work");
-    #push @params, $editions;
-    #
-    #$sql .= " AND t1.edition = ANY (?)";
 
     # Modes
 
@@ -310,16 +306,16 @@ sub createSqlFilter {
     if ($mode eq "todo") {
         my @holders;
         $sql .= " AND t1.holder = ANY(?) ";
-        
+
         my $departments = $c->sql->Q(" SELECT catalog FROM map_member_to_catalog WHERE member =? ", [ $current_member ])->Values;
-        
+
         foreach (@$departments) {
             push @holders, $_;
         }
-        
+
         push @holders, $current_member;
         push @params, \@holders;
-        
+
         $sql .= " AND t1.isopen = true ";
         $sql .= " AND t1.fascicle <> '99999999-9999-9999-9999-999999999999' ";
     }
@@ -327,7 +323,7 @@ sub createSqlFilter {
     if ($mode eq "all") {
         $sql .= " AND t1.isopen is true ";
         $sql .= " AND t1.fascicle <> '99999999-9999-9999-9999-999999999999' ";
-        if ($fascicle && $fascicle ne 'clear' && $fascicle ne '00000000-0000-0000-0000-000000000000') {
+        if ($fascicle && $fascicle ne "all" && $fascicle ne '00000000-0000-0000-0000-000000000000') {
             $sql .= " AND fascicle <> '00000000-0000-0000-0000-000000000000' ";
         }
     }
@@ -354,23 +350,21 @@ sub createSqlFilter {
         push @params, "%$title%";
     }
 
-    if ($edition && $edition ne "clear") {
+    if ($edition && $edition ne "all") {
         $sql .= " AND ? = ANY(t1.ineditions) ";
         push @params, $edition;
     }
 
-    if ($group && $group ne "clear") {
+    if ($group && $group ne "all") {
         $sql .= " AND ? = ANY(t1.inworkgroups) ";
         push @params, $group;
     }
 
-    if ($fascicle && $fascicle ne "clear") {
+    if ($fascicle && $fascicle ne "all") {
         $sql .= " AND t1.fascicle = ? ";
         push @params, $fascicle;
     }
-    
-    #$sql .= $order;
-    
+
     return { sql => $sql, params => \@params };
 }
 
