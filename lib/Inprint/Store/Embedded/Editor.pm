@@ -65,6 +65,8 @@ sub write {
 
     my $hotSaveFilePath = createHotSave($c, $basepath, "$basename.$extension", $text);
 
+    $basepath =~ s/\/$//;
+
     if ($extension ~~ ["odt"]) {
 
         my $response = convert($c, $hotSaveFilePath, "html", $extension);
@@ -100,6 +102,12 @@ sub write {
         binmode $FILE;
             print $FILE $response2->{responseBody};
         close $FILE;
+
+        my $relativePath = Inprint::Store::Embedded::Utils::getRelativePath($c, $basepath);
+
+        $c->sql->Do(
+            "UPDATE cache_files SET file_length=? WHERE file_path=? AND file_name=?",
+            [ $response2->{"CharacterCount"}, $relativePath, "$basename.$extension" ]);
 
         unlink $tmpFilePath;
 

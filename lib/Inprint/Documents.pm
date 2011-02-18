@@ -340,6 +340,11 @@ sub list {
         my $imgCount = $c->sql->Q(" SELECT count(*) FROM cache_files WHERE file_path=? AND file_extension=ANY(?) ", [ $relativePath, \@images ])->Value;
         $c->sql->Do("UPDATE documents SET images=? WHERE filepath=? ", [ $imgCount, $relativePath ]);
 
+        # Update rsize count
+        my @documents = ("doc", "docx", "odt", "rtf", "txt" );
+        my $lengthCount = $c->sql->Q(" SELECT sum(file_length) FROM cache_files WHERE file_path=? AND file_extension=ANY(?) ", [ $relativePath, \@documents ])->Value;
+        $c->sql->Do("UPDATE documents SET rsize=? WHERE filepath=? ", [ $lengthCount, $relativePath ]);
+
         # Get document pages
         $document->{pages} = Inprint::Utils::CollapsePagesToString($document->{pages});
 
