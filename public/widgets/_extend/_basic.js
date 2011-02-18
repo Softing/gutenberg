@@ -1,5 +1,3 @@
-Ext.BLANK_IMAGE_URL = '/ext-3.2.1/resources/images/default/s.gif';
-
 //Ext.data.Connection.prototype._handleFailure = Ext.data.Connection.prototype.handleFailure;
 //
 //Ext.data.Connection.prototype.handleFailure = function(response, e) {

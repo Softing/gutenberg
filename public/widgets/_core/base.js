@@ -150,7 +150,7 @@ function giveHex(s){
 
 // Executor
 
-Ext.BLANK_IMAGE_URL = '/ext-3.3.0/resources/images/default/s.gif';
+Ext.BLANK_IMAGE_URL = '/ext-3.3.1/resources/images/default/s.gif';
 
 Ext.ns('Inprint');
 
