@@ -49,11 +49,10 @@ sub updateCache {
         my $filepath_encoded = Inprint::Store::Embedded::Utils::encode($c, $filepath);
 
         # Create Cache record
-
-        my $digest   = Inprint::Store::Embedded::Metadata::getDigest($c, $filepath_encoded);
-        my $filesize = Inprint::Store::Embedded::Metadata::getFileSize($c, $filepath_encoded);
-        my $created  = Inprint::Store::Embedded::Metadata::getFileCreateDate($c, $filepath_encoded);
-        my $updated  = Inprint::Store::Embedded::Metadata::getFileModifyDate($c, $filepath_encoded);
+        my $digest   = Inprint::Store::Embedded::Metadata::getDigest($c, $filepath);
+        my $filesize = Inprint::Store::Embedded::Metadata::getFileSize($c, $filepath);
+        my $created  = Inprint::Store::Embedded::Metadata::getFileCreateDate($c, $filepath);
+        my $updated  = Inprint::Store::Embedded::Metadata::getFileModifyDate($c, $filepath);
 
         my $cacheRecord = Inprint::Store::Cache::makeRecord( $c,
                 $filepath_encoded,
@@ -109,10 +108,10 @@ sub fileUpload {
 
     $upload->move_to($filepath_encoded);
 
-    my $digest   = Inprint::Store::Embedded::Metadata::getDigest($c, $filepath_encoded);
-    my $filesize = Inprint::Store::Embedded::Metadata::getFileSize($c, $filepath_encoded);
-    my $created  = Inprint::Store::Embedded::Metadata::getFileCreateDate($c, $filepath_encoded);
-    my $updated  = Inprint::Store::Embedded::Metadata::getFileModifyDate($c, $filepath_encoded);
+    my $digest   = Inprint::Store::Embedded::Metadata::getDigest($c, $filepath);
+    my $filesize = Inprint::Store::Embedded::Metadata::getFileSize($c, $filepath);
+    my $created  = Inprint::Store::Embedded::Metadata::getFileCreateDate($c, $filepath);
+    my $updated  = Inprint::Store::Embedded::Metadata::getFileModifyDate($c, $filepath);
 
     my $cacheRecord = Inprint::Store::Cache::makeRecord( $c,
             $filepath_encoded,
@@ -143,10 +142,10 @@ sub fileCreate {
     die "Can't find path <$filepath_encoded>" unless -e $filepath_encoded;
     die "Can't read path <$filepath_encoded>" unless -r $filepath_encoded;
 
-    my $digest   = Inprint::Store::Embedded::Metadata::getDigest($c, $filepath_encoded);
-    my $filesize = Inprint::Store::Embedded::Metadata::getFileSize($c, $filepath_encoded);
-    my $created  = Inprint::Store::Embedded::Metadata::getFileCreateDate($c, $filepath_encoded);
-    my $updated  = Inprint::Store::Embedded::Metadata::getFileModifyDate($c, $filepath_encoded);
+    my $digest   = Inprint::Store::Embedded::Metadata::getDigest($c, $filepath);
+    my $filesize = Inprint::Store::Embedded::Metadata::getFileSize($c, $filepath);
+    my $created  = Inprint::Store::Embedded::Metadata::getFileCreateDate($c, $filepath);
+    my $updated  = Inprint::Store::Embedded::Metadata::getFileModifyDate($c, $filepath);
 
     my $cacheRecord = Inprint::Store::Cache::makeRecord( $c,
             $filepath_encoded,

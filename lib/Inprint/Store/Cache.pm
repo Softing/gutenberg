@@ -17,9 +17,9 @@ sub makeRecord {
 
     my ( $filepath, $digest, $filesize, $created, $updated) = @_;
 
-    $filepath = getRelativePath($c, $filepath);
-
     my ($filename, $filepath, $extension) = fileparse($filepath, qr/(\.[^.]+){1}?/);
+
+    $filepath = getRelativePath($c, $filepath);
 
     $filename = "$filename$extension";
     $extension =~ s/^.//g;

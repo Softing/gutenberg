@@ -80,7 +80,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
             {
                 icon: _ico("document-globe"),
                 cls: "x-btn-text-icon",
-                text: _("Upload multiple"),
+                text: _("Upload files"),
                 disabled:true,
                 ref: "../btnUpload",
                 scope:this,

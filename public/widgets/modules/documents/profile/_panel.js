@@ -13,10 +13,6 @@ Inprint.documents.Profile = Ext.extend(Ext.Panel, {
             oid: this.oid,
             parent: this
         });
-        //this.panels["rss"]    = new Inprint.documents.profile.Rss({
-        //    oid: this.oid,
-        //    parent: this
-        //});
         this.panels["comments"] = new Inprint.documents.Profile.Comments({
             oid: this.oid,
             parent: this
@@ -44,7 +40,6 @@ Inprint.documents.Profile = Ext.extend(Ext.Panel, {
                         xtype: "tabpanel",
                         items:[
                             this.panels["files"]
-                            //this.panels["rss"]
                         ]
                     }
                 },
@@ -86,8 +81,6 @@ Inprint.documents.Profile = Ext.extend(Ext.Panel, {
                     this.panels["profile"].cmpFill(response.data);
                     this.panels["files"].cmpFill(response.data);
                     this.panels["comments"].cmpFill(response.data);
-
-                    //this.panels["rss"].cmpAccess(response.data.access);
                 }
             }
         });

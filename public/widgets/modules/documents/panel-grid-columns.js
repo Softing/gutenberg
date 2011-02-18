@@ -71,7 +71,7 @@ Inprint.documents.GridColumns = function() {
         maingroup: {
             id:"maingroup",
             dataIndex: "maingroup_shortcut",
-            header: _("Main group"),
+            header: _("Linked"),
             width: 80,
             sortable: true
         },
@@ -79,7 +79,7 @@ Inprint.documents.GridColumns = function() {
         workgroup: {
             id:"workgroup",
             dataIndex: "workgroup_shortcut",
-            header: _("Group"),
+            header: _("Department"),
             width: 80,
             sortable: true
         },

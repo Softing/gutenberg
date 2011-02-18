@@ -1,14 +1,14 @@
 Inprint.documents.Profile.View = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
-        
+
         var actions = new Inprint.documents.GridActions();
-        
+
         this.tbar = [
             {
-                icon: _ico("pencil"),
+                icon: _ico("card--pencil"),
                 cls: "x-btn-text-icon",
-                text: _("Edit"),
+                text: _("Properties"),
                 disabled:true,
                 ref: "../btnUpdate",
                 scope:this.parent,
@@ -100,7 +100,7 @@ Inprint.documents.Profile.View = Ext.extend(Ext.Panel, {
                 handler: actions.Delete
             }
         ];
-        
+
         Ext.apply(this, {
             border: false,
             autoScroll:true,
@@ -129,7 +129,7 @@ Inprint.documents.Profile.View = Ext.extend(Ext.Panel, {
         // Call parent (required)
         Inprint.documents.Profile.View.superclass.onRender.apply(this, arguments);
     },
-    
+
     tmpl1: new Ext.XTemplate(
         '<table width="99%" align="center">',
         '<tr style="background:#f5f5f5;">',
@@ -167,9 +167,9 @@ Inprint.documents.Profile.View = Ext.extend(Ext.Panel, {
             fmtDate : function(date) { return _fmtDate(date, 'M j, H:i'); }
         }
     ),
-    
+
     tmpl2: new Ext.XTemplate(
-        '<tpl if="fascicles">', 
+        '<tpl if="fascicles">',
             '<table width="99%" align="center">',
             '<tr style="background:#f5f5f5;">',
                 '<th width="70">Издание</th>',
@@ -177,26 +177,26 @@ Inprint.documents.Profile.View = Ext.extend(Ext.Panel, {
                 '<th width="90">Раздел</th>',
                 '<th>Рубрика</th>',
             '</tr>',
-            '<tpl for="fascicles">', 
+            '<tpl for="fascicles">',
                 '<tr>',
                     '<td>{edition_shortcut}</td>',
                     '<td>{fascicle_shortcut}</td>',
                     '<td>{headline_shortcut}</td>',
                     '<td>{rubric_shortcut}</td>',
                 '</tr>',
-            '</tpl>', 
+            '</tpl>',
             '</table>',
         '</tpl>',
         {
             fmtDate : function(date) { return _fmtDate(date, 'M j, H:i'); }
         }
     ),
-    
+
     tmpl3: new Ext.XTemplate(
         '<tpl if="history">',
             '<table width="99%" align="center" style="border:0px;">',
             '<td style="border:0px;">',
-                '<tpl for="history">', 
+                '<tpl for="history">',
                     '<div style="display: inline;padding:3px;padding-left:12px;margin-right:10px;float:left;background:url(/icons/arrow-000-small.png) -3px 2px  no-repeat;">',
                         '<div style="font-weight:bold;border-bottom:2px solid #{color};">{destination_shortcut}</div>',
                         '<div style="font-size:90%;">{stage_shortcut}</div>',
@@ -211,7 +211,7 @@ Inprint.documents.Profile.View = Ext.extend(Ext.Panel, {
             fmtDate : function(date) { return _fmtDate(date, 'M j, H:i'); }
         }
     ),
-    
+
     cmpFill: function(record) {
         if (record) {
             if (record.access) {
@@ -226,20 +226,20 @@ Inprint.documents.Profile.View = Ext.extend(Ext.Panel, {
             }
         }
     },
-    
+
     cmpAccess: function(fascicle, access) {
-        
+
         _hide(this.btnRecycle, this.btnRestore, this.btnDelete);
-        
+
         if (fascicle == '99999999-9999-9999-9999-999999999999') {
             _show(this.btnRestore, this.btnDelete);
         } else {
             _show(this.btnRecycle);
         }
-        
+
         _disable(this.btnUpdate, this.btnCapture, this.btnTransfer, this.btnMove, this.btnBriefcase, this.btnCopy,
                     this.btnDuplicate, this.btnRecycle, this.btnRestore, this.btnDelete);
-        
+
         if (access["documents.update"]    == true) this.btnUpdate.enable();
         if (access["documents.capture"]   == true) this.btnCapture.enable();
         if (access["documents.transfer"]  == true) this.btnTransfer.enable();
