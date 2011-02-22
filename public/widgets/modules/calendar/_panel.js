@@ -5,9 +5,11 @@ Inprint.edition.calendar.Panel = Ext.extend(Ext.Panel, {
 
         this.panels = {};
 
-        this.panels.tree = new Inprint.edition.calendar.Tree();
-        this.panels.grid = new Inprint.edition.calendar.Grid();
-        this.panels.help = new Inprint.edition.calendar.HelpPanel();
+        this.panels.tree    = new Inprint.edition.calendar.Tree();
+        this.panels.archive = new Inprint.edition.calendar.TreeArchive();
+
+        this.panels.grid    = new Inprint.edition.calendar.Grid();
+        this.panels.help    = new Inprint.panels.Help({ hid: this.xtype });
 
         Ext.apply(this, {
 
@@ -20,22 +22,31 @@ Inprint.edition.calendar.Panel = Ext.extend(Ext.Panel, {
 
             items: [
                 {
-                    title: _("Fascicles"),
+                    region:"west",
+                    layout:'accordion',
+                    width: 200,
+                    minSize: 200,
+                    maxSize: 600,
+                    defaults: {
+                        //bodyStyle: 'padding:15px',
+                        //margins: "3 0 3 3"
+                    },
+                    layoutConfig: {
+                        animate: true
+                    },
+                    items: [
+                        this.panels.tree,
+                        this.panels.archive
+                    ]
+                },
+
+                {
                     region: "center",
                     layout:"fit",
                     margins: "3 0 3 0",
                     items: this.panels.grid
                 },
-                {
-                    title: _("Editions"),
-                    region:"west",
-                    margins: "3 0 3 3",
-                    width: 200,
-                    minSize: 200,
-                    maxSize: 600,
-                    layout:"fit",
-                    items: this.panels.tree
-                },
+
                 {
                     region:"east",
                     margins: "3 3 3 0",

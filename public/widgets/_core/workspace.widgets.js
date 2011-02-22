@@ -2,7 +2,7 @@
  * Inprint Content 4.5
  * Copyright(c) 2001-2010, Softing, LLC.
  * licensing@softing.ru
- * 
+ *
  * http://softing.ru/license
  */
 
@@ -12,7 +12,7 @@ Inprint.About = function(conf){
                 '<div>'+ "" +'</div><br>'+
                 '<div>'+ "" +'</div>'+
                 '<div>'+ "" +'</div>';
-    
+
     var win = new Ext.Window({
         width: 360,
         height: 200,
@@ -28,29 +28,29 @@ Inprint.About = function(conf){
             }
         }]
     });
-    
+
     win.show();
 };
 
 Inprint.Help = Ext.extend(Ext.Panel, {
-   
+
     initComponent:function() {
-        
+
         Ext.apply(this, {
             title: _("Help center")
         });
-        
+
         Inprint.Help.superclass.initComponent.apply(this, arguments);
     },
-    
+
     onRender:function() {
         Inprint.Help.superclass.onRender.apply(this, arguments);
     },
-    
+
     cmpReload:function() {
         //this.items.first().setSrc();
     }
-    
+
 });
 
 Inprint.Logout = function(btn) {
@@ -74,6 +74,6 @@ Inprint.registry.register("core-about", {
     icon: "information",
     text: _("About"),
     handler: function() {
-        Inprint.About()
+        Inprint.About();
     }
 });

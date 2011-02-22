@@ -82,7 +82,7 @@ Inprint.factory.StoreFields = {
         [ "id", "fascicle", "page", "place", "place_title", "title", "description", "amount", "area", "x", "y", "w", "h", Inprint.factory.createDateField("created"), Inprint.factory.createDateField("updated") ],
 
     "/fascicle/composer/modules/":
-        [ "id", "fascicle", "page", , "place", "place_title", "title", "description", "amount", "area", "x", "y", "w", "h", Inprint.factory.createDateField("created"), Inprint.factory.createDateField("updated") ],
+        [ "id", "fascicle", "page", "place", "place_title", "title", "description", "amount", "area", "x", "y", "w", "h", Inprint.factory.createDateField("created"), Inprint.factory.createDateField("updated") ],
 
     "/fascicle/documents/list/": [
             'id', 'access',    'edition',  'edition_shortcut',    'fascicle',    'fascicle_shortcut',    'headline', 'headline_shortcut',
@@ -92,7 +92,7 @@ Inprint.factory.StoreFields = {
         ],
 
     "/fascicle/modules/list/":
-        [ "id", "fascicle", "page", , "place", "place_title", "title", "description", "amount", "area", "x", "y", "w", "h", Inprint.factory.createDateField("created"), Inprint.factory.createDateField("updated") ],
+        [ "id", "fascicle", "page", "place", "place_title", "title", "description", "amount", "area", "x", "y", "w", "h", Inprint.factory.createDateField("created"), Inprint.factory.createDateField("updated") ],
 
     "/fascicle/requests/list/": [
             "id", "serialnum", "edition", "fascicle", "advertiser", "advertiser_shortcut",
@@ -132,13 +132,13 @@ Inprint.factory.StoreFields = {
 
 };
 
-Inprint.factory.Store = new function() {
+Inprint.factory.Store = function() {
 
     var defaults = Inprint.factory.StoreDefaults;
     var source = Inprint.factory.StoreFields;
     var items = {};
 
-    var combos = new Array(
+    var combos = [
 
         "/advertising/combo/managers/",
         "/advertising/combo/advertisers/",
@@ -180,15 +180,15 @@ Inprint.factory.Store = new function() {
 
         "/options/combos/capture-destination/"
 
-    );
+    ];
 
     for ( var i = 0; i < combos.length; i++ ) {
         source[ combos[i] ] = [ 'id', 'icon', 'color', 'spacer', 'bold', 'nlevel', 'title', 'shortcut', 'description' ];
     }
 
-    for (var i in source) {
-        items[i] = {
-            url: _url(i), fields: source[i]
+    for (var j in source) {
+        items[j] = {
+            url: _url(j), fields: source[j]
         };
     }
 
@@ -262,4 +262,4 @@ Inprint.factory.Store = new function() {
 
     };
 
-}
+} ();

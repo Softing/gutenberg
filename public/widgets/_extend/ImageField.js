@@ -3,8 +3,9 @@ Ext.form.ImageField = Ext.extend(Ext.form.Field, {
     autoCreate: {tag: 'img'},
 
     setValue: function(new_value) {
-        if (new_value)
+        if (new_value) {
             this.el.dom.src = new_value;
+        }
     },
 
     initValue : function() {
@@ -28,17 +29,18 @@ Ext.form.TitleField = Ext.extend(Ext.form.Field, {
     },
 
     setValue: function(new_value) {
-        if (new_value)
+        if (new_value) {
             this.el.dom.innerHTML = '<b>'+ new_value +'</b>';
+        }
     },
 
     initValue : function() {
         this.setValue(this.value);
     },
-    
+
     //markInvalid: function() {},
     //clearInvalid: function() {},
-    
+
     onDestroy: function(){
         Ext.form.TitleField.superclass.onDestroy.call(this);
     }

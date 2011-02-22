@@ -2,26 +2,26 @@
  * Inprint Content 4.5
  * Copyright(c) 2001-2010, Softing, LLC.
  * licensing@softing.ru
- * 
+ *
  * http://softing.ru/license
  */
 
 //Inprint.TaskbarBtn = Ext.extend(Ext.Button, {
 Inprint.TaskbarBtn = Ext.extend(Ext.Toolbar.SplitButton, {
-    
+
     panel: false,
     icon:  '',
     text:  '',
     initComponent : function(){
-        
+
         this.tooltip = this.text;
-        
-        if ( this.description ){
-            this.text =  this.text +' <'+ this.description +'>'
+
+        if ( this.description ) {
+            this.text =  this.text +' <'+ this.description +'>';
         }
-        
+
         this.text = Ext.util.Format.ellipsis(this.text || 'Unnamed window', 60);
-        
+
         Ext.apply(this, {
             panel:        this.panel,
             tooltip:      this.tooltip,
@@ -38,9 +38,9 @@ Inprint.TaskbarBtn = Ext.extend(Ext.Toolbar.SplitButton, {
                 }]
             }
         });
-        
+
         Inprint.TaskbarBtn.superclass.initComponent.call(this);
-        
+
         this.on("click", function(btn) {
             if (btn.pressed) {
                 Inprint.ObjectResolver.show(btn.panel);
@@ -53,24 +53,26 @@ Inprint.TaskbarBtn = Ext.extend(Ext.Toolbar.SplitButton, {
 });
 
 Inprint.TaskButton = function(cmp, el) {
-    
+
     this.cmp = cmp;
-    
-    if (! cmp.rawTitle)
+
+    if (! cmp.rawTitle) {
         cmp.rawTitle = 'Unnamed window';
-    
+    }
+
     var text = Ext.util.Format.ellipsis(cmp.rawTitle, 12);
     var tooltip = false;
-    
-    if (cmp.rawTitle.length > text.length)
+
+    if (cmp.rawTitle.length > text.length) {
         tooltip = cmp.rawTitle;
-    
+    }
+
     Ext.apply(this, {
         icon: cmp.icon,
         text: text,
         tooltip: tooltip
     });
-    
+
     Inprint.TaskButton.superclass.constructor.call(this, {
         renderTo: el,
         handler : function() {

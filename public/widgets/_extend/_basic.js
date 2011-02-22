@@ -32,7 +32,7 @@ Ext.Ajax.extraParams = {
 Ext.Ajax.on('beforerequest', function(conn, options) {
     options.extraParams = {
         ajax:true
-    }
+    };
 }, this);
 
 Ext.Ajax.on('requestcomplete', function(conn, response, options) {
@@ -84,4 +84,4 @@ Array.prototype.contains = function(obj) {
     }
   }
   return false;
-}
+};

@@ -11,12 +11,12 @@ Inprint.factory.GridChoser = Ext.extend(Ext.grid.GridPanel, {
     storeId: null,
     params: {},
     urls: { load: null, fill: null, save: null },
-    
+
     initComponent: function() {
 
         this.components = {};
 
-        this.store = Inprint.factory.Store.json(this.storeId),
+        this.store = Inprint.factory.Store.json(this.storeId);
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
 
         Ext.apply(this, {
@@ -81,7 +81,7 @@ Inprint.factory.GridChoser = Ext.extend(Ext.grid.GridPanel, {
                         sm.selectRow(i, true);
                     }
                 }
-                
+
             }
         });
     },

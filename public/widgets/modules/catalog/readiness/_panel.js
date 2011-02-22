@@ -5,7 +5,7 @@ Inprint.catalog.readiness.Panel = Ext.extend(Ext.Panel, {
         this.panels = {};
 
         this.panels.grid = new Inprint.catalog.readiness.Grid();
-        this.panels.help = new Inprint.catalog.readiness.HelpPanel();
+        this.panels.help = new Inprint.panels.Help({ hid: this.xtype });
 
         Ext.apply(this, {
             layout: "border",
@@ -38,7 +38,7 @@ Inprint.catalog.readiness.Panel = Ext.extend(Ext.Panel, {
 
     onRender: function() {
         Inprint.catalog.readiness.Panel.superclass.onRender.apply(this, arguments);
-        
+
         Inprint.catalog.readiness.Access(this, this.panels);
         Inprint.catalog.readiness.Interaction(this, this.panels);
     },

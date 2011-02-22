@@ -30,18 +30,18 @@ Ext.grid.GridPanel.prototype.getValues = function(field) {
 
 Ext.grid.GridPanel.prototype.cmpClear = function() {
     this.getStore().removeAll();
-}
+};
 
 Ext.grid.GridPanel.prototype.cmpLoad = function(params, clear) {
     if (clear) {
         this.cacheParams = params;
         this.getStore().reload({ params: this.cacheParams });
     } else {
-        Ext.apply (this.cacheParams, params);
+        Ext.apply(this.cacheParams, params);
         this.getStore().reload({ params: this.cacheParams });
     }
-}
+};
 
 Ext.grid.GridPanel.prototype.cmpReload = function() {
     this.getStore().reload();
-}
+};

@@ -9,7 +9,7 @@
 Inprint.Workspace = function() {
 
     // Activate state sore
-    
+
     var items = [];
 
     var Portal  = new Inprint.Portal();
@@ -24,8 +24,6 @@ Inprint.Workspace = function() {
         bodyStyle: 'background:none;',
         items: Portal
     });
-
-    //items.push( Portal.id );
 
     var Viewport = new Ext.Viewport({
         layout: 'fit',
@@ -56,6 +54,6 @@ Inprint.Workspace = function() {
             return Taskbar;
         }
 
-    }
+    };
 
 };

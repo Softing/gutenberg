@@ -35,7 +35,7 @@ Inprint.ObjectResolver = function() {
 
             var panelId = item.aid || Ext.id();
 
-            if (Inprint.registry[item.aid].modal == false) {
+            if (Inprint.registry[item.aid].modal === false) {
                 panelId = Ext.id();
             }
 
@@ -89,9 +89,9 @@ Inprint.ObjectResolver = function() {
             });
 
             config.tools = tools;
-            var xobject = Inprint.registry[item.aid]["xobject"];
+            var xobject = Inprint.registry[item.aid].xobject;
             if (xobject && typeof(xobject) == "function") {
-                config.items = { xtype: item.aid, oid: item.oid };
+                config.items = { xtype: config.aid, oid: config.oid };
             } else {
                 config.items = new Ext.Panel({
                     html:"<h1>" + _("Not implemented") + "</h1>"
@@ -193,12 +193,13 @@ Inprint.ObjectResolver = function() {
                 }
             }
 
-            if (objectStore.length == 0) {
+            if (objectStore.length === 0) {
                 Inprint.layout.getPanel().layout.setActiveItem(0);
             }
 
             Inprint.layout.getPanel().remove(panel);
             Inprint.layout.getPanel().doLayout();
         }
-    }
+    };
+
 }();

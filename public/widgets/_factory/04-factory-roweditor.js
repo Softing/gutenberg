@@ -20,8 +20,9 @@ Inprint.factory.RowEditor = function(settings) {
     });
 
     editor.on("canceledit", function(roweditor, forced) {
-        if (!roweditor.record.data.id)
-            roweditor.grid.getStore().remove(roweditor.record)
+        if (!roweditor.record.data.id) {
+            roweditor.grid.getStore().remove(roweditor.record);
+        }
     });
 
     editor.on("afteredit", function(roweditor, obj, record, number) {
@@ -38,4 +39,4 @@ Inprint.factory.RowEditor = function(settings) {
 
     return editor;
 
-}
+};

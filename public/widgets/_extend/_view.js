@@ -5,8 +5,8 @@ Ext.DataView.prototype.cmpLoad = function(params) {
     } else {
         this.getStore().reload({ params: this.params});
     }
-}
+};
 
 Ext.DataView.prototype.cmpReload = function() {
     this.getStore().reload();
-}
+};

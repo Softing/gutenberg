@@ -8,75 +8,6 @@
 
 // Global functions
 
-function _fmtDate(str, format, inputFormat) {
-
-    var dt = Date.parseDate(str, "Y-m-d h:i:s");
-    if (dt) {
-        return dt.dateFormat(format || 'M j, Y');
-    }
-    return '';
-
-};
-
-// Helpers
-function _show() {
-    Ext.each(arguments, function(c) {
-        if (c && c.show) c.show();
-    });
-}
-function _hide() {
-    Ext.each(arguments, function(c) {
-        if (c && c.hide) c.hide();
-    });
-}
-
-function _enable() {
-    Ext.each(arguments, function(c) {
-        if (c && c.enable) c.enable();
-    });
-}
-function _disable() {
-    Ext.each(arguments, function(c) {
-        if (c && c.disable) c.disable();
-    });
-}
-
-/* Access functions */
-function _a(terms, binding, accessfunction) {
-    Ext.Ajax.request({
-        url: _url("/access/"),
-        params: {
-            term: terms,
-            binding: binding
-        },
-        scope: this,
-        success: function(result) {
-            var data = Ext.util.JSON.decode(result.responseText);
-            accessfunction(data.result);
-        }
-    });
-}
-
-function _accessCheck(terms, binding, accessfunction){
-    _a(terms, binding, accessfunction);
-}
-
-function _arrayAccessCheck(records, fields){
-    var result = {};
-    for (var r=0; r<records.length;r++) {
-        var access = records[r].get("access");
-        for (var f=0; f<fields.length;f++) {
-            var field = fields[f];
-            if (access[field] && result[field] != 'disabled') {
-                result[field] = 'enabled';
-            } else {
-                result[field] = 'disabled';
-            }
-        }
-    }
-    return result;
-}
-
 /* Icons functions */
 
 function _ico24(icon) {
@@ -99,11 +30,11 @@ var NULLID = "00000000-0000-0000-0000-000000000000";
 
 _nullId = function(uuid) {
     return "00000000-0000-0000-0000-000000000000";
-}
+};
 
 _idIsNull = function(uuid) {
     return uuid == "00000000-0000-0000-0000-000000000000";
-}
+};
 
 _get_values = function(myfield, myarray) {
     var data = [];
@@ -115,10 +46,20 @@ _get_values = function(myfield, myarray) {
 
 // Inverse colors
 
+function DecToHex(number) {
+    var hexbase="0123456789ABCDEF";
+    return hexbase.charAt((number>> 4)& 0xf)+ hexbase.charAt(number& 0xf);
+}
+
+function giveHex(s) {
+    s=s.toUpperCase();
+    return parseInt(s,16);
+}
+
 function inverse(input) {
     if(input.length < 6 || input.length > 6){
-    window.alert('You Must Enter a six digit color code')
-    return false;
+        window.alert('You Must Enter a six digit color code');
+        return false;
     }
     hex1 = input.slice(0,2);
     hexb1 = input.slice(2,4);
@@ -136,17 +77,84 @@ function inverse(input) {
     return newColor;
 }
 
-function DecToHex(number) {
-    var hexbase="0123456789ABCDEF";
-    return hexbase.charAt((number>> 4)& 0xf)+ hexbase.charAt(number& 0xf);
+// Ext specifed
+
+function _fmtDate(str, format, inputFormat) {
+
+    var dt = Date.parseDate(str, "Y-m-d h:i:s");
+    if (dt) {
+        return dt.dateFormat(format || 'M j, Y');
+    }
+    return '';
+
 }
 
-function giveHex(s){
-    s=s.toUpperCase();
-    return parseInt(s,16);
+// Helpers
+function _show() {
+    Ext.each(arguments, function(c) {
+        if (c && c.show) {
+            c.show();
+        }
+    });
+}
+function _hide() {
+    Ext.each(arguments, function(c) {
+        if (c && c.hide) {
+            c.hide();
+        }
+    });
 }
 
+function _enable() {
+    Ext.each(arguments, function(c) {
+        if (c && c.enable) {
+            c.enable();
+        }
+    });
+}
+function _disable() {
+    Ext.each(arguments, function(c) {
+        if (c && c.disable) {
+            c.disable();
+        }
+    });
+}
 
+/* Access functions */
+function _a(terms, binding, accessfunction) {
+    Ext.Ajax.request({
+        url: _url("/access/"),
+        params: {
+            term: terms,
+            binding: binding
+        },
+        scope: this,
+        success: function(result) {
+            var data = Ext.util.JSON.decode(result.responseText);
+            accessfunction(data.result);
+        }
+    });
+}
+
+function _accessCheck(terms, binding, accessfunction) {
+    _a(terms, binding, accessfunction);
+}
+
+function _arrayAccessCheck(records, fields) {
+    var result = {};
+    for (var r=0; r<records.length;r++) {
+        var access = records[r].get("access");
+        for (var f=0; f<fields.length;f++) {
+            var field = fields[f];
+            if (access[field] && result[field] != 'disabled') {
+                result[field] = 'enabled';
+            } else {
+                result[field] = 'disabled';
+            }
+        }
+    }
+    return result;
+}
 
 // Executor
 
@@ -159,10 +167,10 @@ Ext.onReady(function() {
     Ext.QuickTips.init();
 
     // Enable history
-    Ext.History.init();
-    Ext.History.on('change', function(token) {
-        if(token) {}
-    }, this);
+    //Ext.History.init();
+    //Ext.History.on('change', function(token) {
+    //    if(token) { }
+    //}, this);
 
     // Enable State Manager
 
@@ -192,7 +200,9 @@ Ext.onReady(function() {
                 Inprint.session = Ext.util.JSON.decode( response.responseText );
                 if (Inprint.session && Inprint.session.member && Inprint.session.member.id ){
                     Inprint.checkSettings();
-                    if (defer) Inprint.updateSession.defer( 90000, this, [ true, true ]);
+                    if (defer) {
+                        Inprint.updateSession.defer( 90000, this, [ true, true ]);
+                    }
                 } else {
                     Ext.MessageBox.alert(
                     _("Your session is closed"),
@@ -204,8 +214,13 @@ Ext.onReady(function() {
     };
 
     Inprint.checkInProgress = false;
-    Inprint.checkSettings = function(){
-        if (Inprint.checkInProgress) return;
+
+    Inprint.checkSettings = function() {
+
+        if (Inprint.checkInProgress) {
+            return;
+        }
+
         if (
             !Inprint.session.member.title ||
             !Inprint.session.member.shortcut ||
@@ -225,6 +240,7 @@ Ext.onReady(function() {
                 setupWindow.show();
             }
         }
+
     };
 
     Inprint.updateSession(true, true);

@@ -1,4 +1,4 @@
-Inprint.factory.Combo = new function() {
+Inprint.factory.Combo = function() {
 
     var defaults = {
         xtype: "combo",
@@ -241,8 +241,9 @@ Inprint.factory.Combo = new function() {
             Ext.apply(combo, defaults);
 
             // Add combo item
-            if (combos[url])
+            if (combos[url]) {
                 Ext.apply(combo, combos[url]);
+            }
 
             // Add store
             if (!config) {
@@ -315,8 +316,9 @@ Inprint.factory.Combo = new function() {
             });
 
             // Add custom config
-            if (combos[url] && config)
+            if (combos[url] && config) {
                 Ext.apply(combo, config);
+            }
 
             return combo;
 
@@ -332,4 +334,4 @@ Inprint.factory.Combo = new function() {
         }
     };
 
-}
+} ();

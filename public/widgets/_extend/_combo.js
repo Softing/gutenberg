@@ -1,13 +1,13 @@
 // Extend Comboboxes
 
 Ext.form.ComboBox.prototype.setValue = function(v, t){
-    
+
     if (t || t === "") {
         this.displayText = t;
     }
-    
+
     var text = this.displayText || v;
-    
+
     if(this.valueField){
         var r = this.findRecord(this.valueField, v);
         if(r){
@@ -20,9 +20,9 @@ Ext.form.ComboBox.prototype.setValue = function(v, t){
     if(this.hiddenField){
         this.hiddenField.value = Ext.value(v, '');
     }
-    
+
     Ext.form.ComboBox.superclass.setValue.call(this, text);
-    
+
     this.value = v;
     return this;
 };
@@ -58,8 +58,13 @@ Inprint.ext.Combobox = Ext.extend(Ext.form.ComboBox, {
     initComponent: function(){
 
         // Add default values
-        if ( ! this.valueField )   this.valueField   = 'id';
-        if ( ! this.displayField ) this.displayField = 'title';
+        if ( ! this.valueField ) {
+            this.valueField   = 'id';
+        }
+
+        if ( ! this.displayField ) {
+            this.displayField = 'title';
+        }
 
         Ext.apply(this, {
             trigger1Class: "x-form-clear-trigger",
@@ -80,8 +85,9 @@ Inprint.ext.Combobox = Ext.extend(Ext.form.ComboBox, {
         //}, this);
 
         this.onViewClick = Ext.form.ComboBox.prototype.onViewClick.createSequence(function(combo) {
-            if ( this.clearable )
+            if ( this.clearable ) {
                 this.getTrigger(0).show();
+            }
         }, this);
 
         this.addEvents({"select": true});

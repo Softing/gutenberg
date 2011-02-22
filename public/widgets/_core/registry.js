@@ -7,13 +7,14 @@
  */
 
 Inprint.registry = function() {
-    
+
     var registr = {
 
         "register": function(id, item) {
             this[id] = item;
-            if (item['xobject'])
-                Ext.reg(id, item['xobject']);
+            if (item.xobject) {
+                Ext.reg(id, item.xobject);
+            }
         },
 
         "core": {
@@ -24,7 +25,7 @@ Inprint.registry = function() {
                 Inprint.layout.getPanel().layout.setActiveItem(0);
             }
         },
-        
+
         "documents": {
             text: _("Documents"),
             icon: "document-word"
@@ -37,7 +38,7 @@ Inprint.registry = function() {
             text:  _("Composition"),
             icon: "newspapers"
         },
-        
+
         "fascicle": {
             text: _("Unknown fascicle"),
             icon: "blue-folder-open-document-text"
@@ -46,7 +47,7 @@ Inprint.registry = function() {
             text: _("Fascicles"),
             icon: "blue-folders-stack"
         },
-        
+
         "settings": {
             text: _("Settings"),
             icon: "switch"
@@ -64,6 +65,6 @@ Inprint.registry = function() {
             }
         }
     };
-    
+
     return registr;
 }();

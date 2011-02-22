@@ -7,7 +7,7 @@ Inprint.catalog.editions.Panel = Ext.extend(Ext.Panel, {
 
         this.panels.tree = new Inprint.catalog.editions.Tree();
         this.panels.grid = new Inprint.catalog.editions.Grid();
-        this.panels.help = new Inprint.catalog.editions.HelpPanel();
+        this.panels.help = new Inprint.panels.Help({ hid: this.xtype });
 
         Ext.apply(this, {
 

@@ -3,8 +3,8 @@ Inprint.catalog.roles.Panel = Ext.extend(Ext.Panel, {
     initComponent: function() {
 
         this.panels = {};
-        this.panels.grid    = new Inprint.catalog.roles.Grid();
-        this.panels.help    = new Inprint.catalog.roles.HelpPanel({ oid: "Inprint.catalog.roles" });
+        this.panels.grid = new Inprint.catalog.roles.Grid();
+        this.panels.help = new Inprint.panels.Help({ hid: this.xtype });
 
         Ext.apply(this, {
             layout: "border",
@@ -31,7 +31,7 @@ Inprint.catalog.roles.Panel = Ext.extend(Ext.Panel, {
         });
 
         Inprint.catalog.roles.Panel.superclass.initComponent.apply(this, arguments);
-        
+
     },
 
     onRender: function() {

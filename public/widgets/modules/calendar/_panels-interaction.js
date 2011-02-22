@@ -1,12 +1,13 @@
 Inprint.edition.calendar.Interaction = function(parent, panels) {
 
-    var tree = panels.tree;
-    var grid = panels.grid;
-    var help = panels.help;
+    var tree    = panels.tree;
+    var archive = panels.archive;
+    var grid    = panels.grid;
+    var help    = panels.help;
 
     var managed = false;
 
-    // Tree
+    // Open issues Tree
 
     tree.getSelectionModel().on("selectionchange", function(sm, node) {
         if (node && node.id) {
@@ -26,11 +27,42 @@ Inprint.edition.calendar.Interaction = function(parent, panels) {
                     _disable(grid.btnCreate);
                 }
 
-                grid.getLoader().baseParams = {
+                grid.cmpLoad({
+                    showArchive: false,
                     edition: grid.currentEdition
-                };
+                });
 
-                grid.getRootNode().reload();
+            });
+
+        } else {
+            grid.disable();
+        }
+    });
+
+    // Archive issues Tree
+
+    archive.getSelectionModel().on("selectionchange", function(sm, node) {
+        if (node && node.id) {
+
+            grid.enable();
+            grid.currentEdition = node.id;
+
+            _disable(grid.btnCreate, grid.btnUpdate, grid.btnDelete);
+
+            _a(["editions.calendar.manage"], grid.currentEdition, function(access) {
+
+                if (access["editions.calendar.manage"] == true) {
+                    managed = true;
+                    _enable(grid.btnCreate);
+                } else {
+                    managed = false;
+                    _disable(grid.btnCreate);
+                }
+
+                grid.cmpLoad({
+                    showArchive: true,
+                    edition: grid.currentEdition
+                });
 
             });
 

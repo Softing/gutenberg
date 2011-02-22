@@ -9,7 +9,8 @@ Inprint.catalog.organization.Panel = Ext.extend(Ext.Panel, {
         this.panels.grid = new Inprint.catalog.organization.Grid({
             title: _("Members")
         });
-        this.panels.help = new Inprint.catalog.organization.HelpPanel();
+
+        this.panels.help = new Inprint.panels.Help({ hid: this.xtype });
 
         Ext.apply(this, {
 

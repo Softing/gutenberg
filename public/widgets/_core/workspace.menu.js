@@ -22,10 +22,13 @@ Inprint.Menu = Ext.extend(Ext.Toolbar,{
         var task = {
             run: function() {
                 var clock = Ext.fly("menu-clock");
-                if (clock) clock.update(new Date().format('g:i:s A'));
+                if (clock) {
+                    clock.update(new Date().format('g:i:s A'));
+                }
             },
             interval: 1000 //1 second
-        }
+        };
+
         var runner = new Ext.util.TaskRunner();
         runner.start(task);
     },
@@ -63,7 +66,7 @@ Inprint.Menu = Ext.extend(Ext.Toolbar,{
         if ( Inprint.registry[item.id] ) {
 
             var btn = {};
-            
+
             btn.aid     = item.id;
             btn.oid     = item.oid;
             btn.icon    = Inprint.registry[btn.aid].icon;
