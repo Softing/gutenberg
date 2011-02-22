@@ -1,40 +1,40 @@
 Inprint.cmp.Composer = Ext.extend(Ext.Window, {
 
     initComponent: function() {
-        
+
         this.panels = {};
-        
+
         this.selLength = this.selection.length;
-        
-        this.panels["modules"] = new Inprint.cmp.composer.Modules({
+
+        this.panels.modules = new Inprint.cmp.composer.Modules({
             parent: this
         });
-        
-        this.panels["templates"] = new Inprint.cmp.composer.Templates({
+
+        this.panels.templates = new Inprint.cmp.composer.Templates({
             parent: this
         });
-        
-        this.panels["flash"]   = new Inprint.cmp.composer.Flash({
+
+        this.panels.flash   = new Inprint.cmp.composer.Flash({
             parent: this
         });
-        
+
         Ext.apply(this, {
-            
+
             border:false,
-            
+
             modal:true,
             layout: "border",
             closeAction: "hide",
             title: _("Разметка полос"),
-            
+
             width: (this.selLength*300) + 400,
             height:450,
-            
+
             defaults: {
                 collapsible: false,
                 split: true
             },
-            
+
             items: [
                 {
                     border:false,
@@ -45,11 +45,11 @@ Inprint.cmp.Composer = Ext.extend(Ext.Window, {
                         split: true
                     },
                     items: [
-                        this.panels["modules"],
-                        this.panels["templates"]
+                        this.panels.modules,
+                        this.panels.templates
                     ]
                 },
-                this.panels["flash"]
+                this.panels.flash
             ],
             buttons: [
                 {
@@ -65,20 +65,20 @@ Inprint.cmp.Composer = Ext.extend(Ext.Window, {
                     }
                 }
             ]
-            
+
         });
-        
+
         Inprint.cmp.Composer.superclass.initComponent.apply(this, arguments);
-        
+
     },
-    
+
     onRender: function() {
         Inprint.cmp.Composer.superclass.onRender.apply(this, arguments);
         Inprint.cmp.composer.Interaction(this, this.panels);
     },
-    
+
     cmpSave: function() {
-        this.panels["flash"].cmpSave();
+        this.panels.flash.cmpSave();
     }
 
 });

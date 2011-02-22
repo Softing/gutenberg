@@ -8,7 +8,7 @@ Inprint.catalog.indexes.Panel = Ext.extend(Ext.Panel, {
         this.headline = null;
         
         this.panels = {};
-        this.panels["editions"]  = new Inprint.catalog.indexes.TreeEditions({
+        this.panels.editions  = new Inprint.catalog.indexes.TreeEditions({
             parent: this
         });
         this.panels["headlines"] = new Inprint.catalog.indexes.TreeHeadlines({
@@ -33,7 +33,7 @@ Inprint.catalog.indexes.Panel = Ext.extend(Ext.Panel, {
                     width: 130,
                     collapsible: false,
                     split: true,
-                    items: this.panels["editions"]
+                    items: this.panels.editions
                 },
                 {
                     flex:2,

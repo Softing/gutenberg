@@ -1,7 +1,7 @@
 Inprint.fascicle.templates.Interaction = function(parent, panels) {
     
     var pages   = panels["pages"];
-    var modules = panels["modules"];
+    var modules = panels.modules;
     
     //Grids
     
@@ -11,7 +11,7 @@ Inprint.fascicle.templates.Interaction = function(parent, panels) {
         
         _disable(modules.btnCreate, pages.btnUpdate, pages.btnDelete);
         
-        if (sm.getCount() == 0) {
+        if (sm.getCount() === 0) {
             modules.disable();
         }
         

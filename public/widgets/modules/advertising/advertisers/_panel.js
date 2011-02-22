@@ -5,8 +5,8 @@ Inprint.advert.advertisers.Main = Ext.extend(Ext.Panel, {
         this.currentEdition = null;
 
         this.panels = {};
-        this.panels["tree"]  = new Inprint.advert.advertisers.Tree({ parent: this });
-        this.panels["grid"]  = new Inprint.advert.advertisers.Grid({ parent: this });
+        this.panels.tree  = new Inprint.advert.advertisers.Tree({ parent: this });
+        this.panels.grid  = new Inprint.advert.advertisers.Grid({ parent: this });
 
         Ext.apply(this, {
             layout: "border",
@@ -22,12 +22,12 @@ Inprint.advert.advertisers.Main = Ext.extend(Ext.Panel, {
                     maxSize: 300,
                     layout:"fit",
                     collapseMode: 'mini',
-                    items: this.panels["tree"]
+                    items: this.panels.tree
                 },
                 {   region: "center",
                     margins: "3 3 3 0",
                     layout:"fit",
-                    items: this.panels["grid"]
+                    items: this.panels.grid
                 }
             ]
         });

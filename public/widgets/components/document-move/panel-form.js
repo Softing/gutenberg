@@ -19,9 +19,9 @@ Inprint.cmp.MoveDocument.Form = Ext.extend(Ext.FormPanel, {
                         allowBlank:false
                     },
                     items: [
-                        
+
                         {
-                            columnWidth:.125,
+                            columnWidth: .125,
                             xtype: "treecombo",
                             hiddenName: "edition",
                             fieldLabel: _("Edition"),
@@ -45,7 +45,9 @@ Inprint.cmp.MoveDocument.Form = Ext.extend(Ext.FormPanel, {
                                 render: function(field) {
                                     var id = Inprint.session.options["default.edition"];
                                     var title = Inprint.session.options["default.edition.name"] || _("Unknown edition");
-                                    if (id && title) field.setValue(id, title);
+                                    if (id && title) {
+                                        field.setValue(id, title);
+                                    }
                                     this.getForm().findField("fascicle").enable();
                                 },
                                 select: function(field) {
@@ -54,23 +56,23 @@ Inprint.cmp.MoveDocument.Form = Ext.extend(Ext.FormPanel, {
                                 }
                             }
                         },
-                        
+
                         xc.getConfig("/documents/combos/fascicles/", {
                             disabled: true,
                             baseParams: { term: 'editions.documents.assign' },
                             listeners: {
                                 scope: this,
                                 render: function(combo) {
-                                    
+
                                     this.getForm().findField("edition").on("select", function() {
                                         combo.enable();
                                         combo.reset();
                                     }, this);
-                                    
+
                                 },
                                 beforequery: function(qe) {
                                     delete qe.combo.lastQuery;
-                                    qe.combo.getStore().baseParams["flt_edition"]  = this.getForm().findField("edition").getValue();
+                                    qe.combo.getStore().baseParams.flt_edition  = this.getForm().findField("edition").getValue();
                                 }
                             }
                         })
@@ -99,20 +101,20 @@ Inprint.cmp.MoveDocument.Form = Ext.extend(Ext.FormPanel, {
                                 scope: this,
                                 change: function(group, radio) {
                                     var value = radio.getGroupValue();
-                                    
+
                                     var edition  = this.getForm().findField("edition").getValue();
                                     var fascicle = this.getForm().findField("fascicle").getValue();
-                                    
+
                                     if (value == "yes") {
-                                        
+
                                         if (edition && fascicle) {
                                             this.getForm().findField("headline").enable();
                                         }
-                                        
+
                                         this.getForm().findField("headline").reset();
                                         this.getForm().findField("rubric").reset();
                                     }
-                                    
+
                                     if (value == "no") {
                                         this.getForm().findField("headline").reset();
                                         this.getForm().findField("rubric").reset();
@@ -130,14 +132,14 @@ Inprint.cmp.MoveDocument.Form = Ext.extend(Ext.FormPanel, {
                                 render: function(combo) {
                                     this.getForm().findField("fascicle").on("select", function() {
                                         combo.reset();
-                                        combo.getStore().baseParams["flt_edition"] = this.getForm().findField("edition").getValue();
-                                        combo.getStore().baseParams["flt_fascicle"] = this.getForm().findField("fascicle").getValue();
+                                        combo.getStore().baseParams.flt_edition = this.getForm().findField("edition").getValue();
+                                        combo.getStore().baseParams.flt_fascicle = this.getForm().findField("fascicle").getValue();
                                     }, this);
                                 },
                                 beforequery: function(qe) {
                                     delete qe.combo.lastQuery;
-                                    qe.combo.getStore().baseParams["flt_edition"] = this.getForm().findField("edition").getValue();
-                                    qe.combo.getStore().baseParams["flt_fascicle"] = this.getForm().findField("fascicle").getValue();
+                                    qe.combo.getStore().baseParams.flt_edition = this.getForm().findField("edition").getValue();
+                                    qe.combo.getStore().baseParams.flt_fascicle = this.getForm().findField("fascicle").getValue();
                                 }
                             }
                         }),
@@ -154,16 +156,16 @@ Inprint.cmp.MoveDocument.Form = Ext.extend(Ext.FormPanel, {
                                 },
                                 beforequery: function(qe) {
                                     delete qe.combo.lastQuery;
-                                    qe.combo.getStore().baseParams["flt_edition"] = this.getForm().findField("edition").getValue();
-                                    qe.combo.getStore().baseParams["flt_fascicle"] = this.getForm().findField("fascicle").getValue();
-                                    qe.combo.getStore().baseParams["flt_headline"] = this.getForm().findField("headline").getValue();
-                                    
+                                    qe.combo.getStore().baseParams.flt_edition = this.getForm().findField("edition").getValue();
+                                    qe.combo.getStore().baseParams.flt_fascicle = this.getForm().findField("fascicle").getValue();
+                                    qe.combo.getStore().baseParams.flt_headline = this.getForm().findField("headline").getValue();
+
                                 }
                             }
                         })
 
                     ]
-                },
+                }
 
             ]
         });

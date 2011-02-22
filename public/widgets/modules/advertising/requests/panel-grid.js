@@ -408,14 +408,14 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
         
         form.findField("edition").setValue( this.parent.currentEdition );
         
-        //form.findField("manager").getStore().baseParams["edition"] = this.parent.currentEdition;
+        //form.findField("manager").getStore().baseParams.edition = this.parent.currentEdition;
         //form.findField("manager").getStore().baseParams["fascicle"] = this.parent.currentFascicle;
         //form.findField("manager").setValue(Inprint.session.member.id, Inprint.session.member.shortcut);
         
-        form.findField("advertiser").getStore().baseParams["edition"] = this.parent.currentEdition;
+        form.findField("advertiser").getStore().baseParams.edition = this.parent.currentEdition;
         form.findField("advertiser").getStore().baseParams["fascicle"] = this.parent.currentFascicle;
         
-        form.findField("fascicle").getStore().baseParams["edition"] = this.parent.currentEdition;
+        form.findField("fascicle").getStore().baseParams.edition = this.parent.currentEdition;
         if (this.parent.currentFascicle) {
             form.findField("fascicle").loadValue( this.parent.currentFascicle );
             form.findField("place").enable();

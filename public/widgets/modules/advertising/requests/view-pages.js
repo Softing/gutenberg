@@ -23,7 +23,7 @@ Inprint.advert.requests.View = Ext.extend(Ext.DataView, {
                         var pageclass  = "";
                         var alertclass = "";
                         
-                        if(page.num && page.num % 2 == 0) {
+                        if(page.num && page.num % 2 === 0) {
                             pageclass = "inprint-plan-page-left";
                             if (prevPage && prevPage.num != page.num-1) {
                                 alertclass = "inprint-plan-page-alert-left";

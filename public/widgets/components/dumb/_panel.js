@@ -38,8 +38,9 @@ Inprint.cmp.DumbWindow = Ext.extend(Ext.Window, {
         });
 
         this.formPanel.on("actioncomplete", function (form, action) {
-            if (action.type == "submit")
+            if (action.type == "submit") {
                 this.hide();
+            }
         });
 
         Inprint.cmp.DumbWindow.superclass.initComponent.apply(this, arguments);

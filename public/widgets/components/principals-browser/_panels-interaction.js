@@ -12,4 +12,4 @@ Inprint.cmp.PrincipalsBrowser.Interaction = function(panels) {
     });
 
 
-}
+};

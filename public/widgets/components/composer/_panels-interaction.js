@@ -1,8 +1,8 @@
 Inprint.cmp.composer.Interaction = function(parent, panels) {
 
-    var modules   = panels["modules"];
-    var templates = panels["templates"];
-    var flash     = panels["flash"];
+    var modules   = panels.modules;
+    var templates = panels.templates;
+    var flash     = panels.flash;
 
     modules.getSelectionModel().on("selectionchange", function(sm, node) {
         if (node) {
@@ -31,7 +31,8 @@ Inprint.cmp.composer.Interaction = function(parent, panels) {
     }, modules);
 
     modules.on("afterrender", function() {
-        new Ext.dd.DropTarget(modules.getEl(), {
+
+        Ext.dd.DropTarget(modules.getEl(), {
             ddGroup    : 'principals-selector',
             notifyDrop : function(ddSource, e, data){
                 var ids = [];
@@ -57,4 +58,4 @@ Inprint.cmp.composer.Interaction = function(parent, panels) {
 
     }, this);
 
-}
+};

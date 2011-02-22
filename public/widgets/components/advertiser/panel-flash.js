@@ -10,7 +10,7 @@ Inprint.cmp.adverta.Flash = Ext.extend(Ext.Panel, {
         this.urls = {
             "init":   _url("/fascicle/composer/initialize/"),
             "save":   _url("/fascicle/composer/save/")
-        }
+        };
 
         var selection = this.parent.selection;
         var selLength = this.parent.selLength;
@@ -28,7 +28,7 @@ Inprint.cmp.adverta.Flash = Ext.extend(Ext.Panel, {
             this.pages.push(array[0]);
         }
 
-        var selLength = selection.length;
+        selLength = selection.length;
 
         var flashWidth = 300 * selLength;
 
@@ -85,7 +85,7 @@ Inprint.cmp.adverta.Flash = Ext.extend(Ext.Panel, {
     cmpInit: function() {
         this.body.mask(_("Loading..."));
         Ext.Ajax.request({
-            url: this.urls["init"],
+            url: this.urls.init,
             scope:this,
             callback : function() {
                 this.body.unmask();
@@ -123,7 +123,8 @@ Inprint.cmp.adverta.Flash = Ext.extend(Ext.Panel, {
             } else {
                 init.defer(10, this);
             }
-        }
+        };
+
         init.defer(100, this);
 
     },
@@ -158,7 +159,7 @@ Inprint.cmp.adverta.Flash = Ext.extend(Ext.Panel, {
         }
 
         Ext.Ajax.request({
-            url: this.urls["save"],
+            url: this.urls.save,
             scope:this,
             success: function ( result, request ) {
                 var responce = Ext.util.JSON.decode(result.responseText);

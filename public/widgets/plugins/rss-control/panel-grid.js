@@ -115,7 +115,7 @@ Inprint.plugins.rss.control.Grid = Ext.extend(Ext.grid.GridPanel, {
         });
         Ext.Ajax.request({
             scope:this,
-            url: this.urls["save"],
+            url: this.urls.save,
             params: {
                 rubrics: data,
                 feed: this.feed

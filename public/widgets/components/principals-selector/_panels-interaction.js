@@ -45,4 +45,4 @@ Inprint.cmp.PrincipalsSelector.Interaction = function(panels) {
         });
     });
 
-}
+};

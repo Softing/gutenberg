@@ -4,11 +4,11 @@ Inprint.cmp.Uploader = Ext.extend(Ext.Window, {
 
         this.panels = {};
 
-        this.panels["flash"] = new Inprint.cmp.uploader.Flash({
+        this.panels.flash = new Inprint.cmp.uploader.Flash({
             config: this.config
         });
 
-        this.panels["html"]  = new Inprint.cmp.uploader.Html({
+        this.panels.html = new Inprint.cmp.uploader.Html({
             config: this.config
         });
 
@@ -23,8 +23,8 @@ Inprint.cmp.Uploader = Ext.extend(Ext.Window, {
                 activeTab: 0,
                 border: false,
                 items: [
-                    this.panels["flash"],
-                    this.panels["html"]
+                    this.panels.flash,
+                    this.panels.html
                 ]
             }
         });
@@ -35,8 +35,8 @@ Inprint.cmp.Uploader = Ext.extend(Ext.Window, {
         Inprint.cmp.Uploader.superclass.onRender.apply(this, arguments);
         Inprint.cmp.uploader.Interaction(this, this.panels);
 
-        this.relayEvents(this.panels["flash"], ['fileUploaded']);
-        this.relayEvents(this.panels["html"],  ['fileUploaded']);
+        this.relayEvents(this.panels.flash, ['fileUploaded']);
+        this.relayEvents(this.panels.html,  ['fileUploaded']);
 
     }
 

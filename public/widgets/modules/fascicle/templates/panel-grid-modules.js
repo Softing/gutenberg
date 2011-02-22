@@ -18,7 +18,7 @@ Inprint.fascicle.templates.Modules = Ext.extend(Ext.grid.GridPanel, {
             "delete": _url("/fascicle/templates/modules/delete/")
         }
 
-        this.store = Inprint.factory.Store.json(this.urls["list"]);
+        this.store = Inprint.factory.Store.json(this.urls.list);
 
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
 
@@ -357,7 +357,7 @@ Inprint.fascicle.templates.Modules = Ext.extend(Ext.grid.GridPanel, {
     //        "delete": _url("/fascicle/templates/modules/delete/")
     //    }
     //
-    //    this.store = Inprint.factory.Store.json(this.urls["list"]);
+    //    this.store = Inprint.factory.Store.json(this.urls.list);
     //
     //    this.selectionModel = new Ext.grid.CheckboxSelectionModel();
     //

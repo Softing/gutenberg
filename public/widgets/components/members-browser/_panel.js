@@ -62,4 +62,4 @@ Inprint.membersBrowser.Window = function(config) {
 
     mywindow.show();
 
-}
+};

@@ -5,7 +5,7 @@ Inprint.cmp.memberRules.Grid = Ext.extend(Ext.grid.GridPanel, {
         this.store = Inprint.factory.Store.json("/catalog/members/rules/", {
             autoLoad: true
         });
-        
+
         this.columns = [
             {
                 id:"shortcut",
@@ -13,14 +13,18 @@ Inprint.cmp.memberRules.Grid = Ext.extend(Ext.grid.GridPanel, {
                 sortable: true,
                 dataIndex: "area",
                 renderer: function(value, p, record) {
-                    if (value == "domain")
+                    if (value == "domain") {
                         return '<img src="'+ _ico("building") +'">';
-                    if (value == "edition")
+                    }
+                    if (value == "edition") {
                         return '<img src="'+ _ico("book") +'">';
-                    if (value == "group")
+                    }
+                    if (value == "group") {
                         return '<img src="'+ _ico("folder") +'">';
-                    if (value == "member")
+                    }
+                    if (value == "member") {
                         return '<img src="'+ _ico("user-business") +'">';
+                    }
                     return '';
                 }
             },
@@ -42,7 +46,7 @@ Inprint.cmp.memberRules.Grid = Ext.extend(Ext.grid.GridPanel, {
                 }
             }
         ];
-        
+
         Ext.apply(this, {
             border:false,
             stripeRows: true,

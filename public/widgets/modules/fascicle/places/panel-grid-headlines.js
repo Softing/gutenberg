@@ -9,7 +9,7 @@ Inprint.fascicle.places.Headlines = Ext.extend(Ext.grid.GridPanel, {
             "save": _url("/fascicle/templates/index/save/")
         }
 
-        this.store = Inprint.factory.Store.json(this.urls["list"]);
+        this.store = Inprint.factory.Store.json(this.urls.list);
 
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
 
@@ -78,7 +78,7 @@ Inprint.fascicle.places.Headlines = Ext.extend(Ext.grid.GridPanel, {
             function(btn) {
                 if (btn == "yes") {
                     Ext.Ajax.request({
-                        url: this.urls["save"],
+                        url: this.urls.save,
                         scope:this,
                         success: this.cmpReload,
                         params: {

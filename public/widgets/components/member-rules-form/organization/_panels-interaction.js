@@ -11,4 +11,4 @@ Inprint.cmp.memberRulesForm.Organization.Interaction = function(parent, panels) 
         }
     });
 
-}
+};

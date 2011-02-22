@@ -4,11 +4,11 @@ Inprint.cmp.adverta.Modules = Ext.extend(Ext.Panel, {
 
         this.panels = {};
 
-        this.panels["modules"] = new Inprint.cmp.adverta.GridModules({
+        this.panels.modules = new Inprint.cmp.adverta.GridModules({
             parent: this.parent
         });
 
-        this.panels["templates"] = new Inprint.cmp.adverta.GridTemplates({
+        this.panels.templates = new Inprint.cmp.adverta.GridTemplates({
             parent: this.parent
         });
 
@@ -22,8 +22,8 @@ Inprint.cmp.adverta.Modules = Ext.extend(Ext.Panel, {
                 split: true
             },
             items: [
-                this.panels["modules"],
-                this.panels["templates"]
+                this.panels.modules,
+                this.panels.templates
             ]
         });
 

@@ -50,7 +50,7 @@ Inprint.cmp.MoveDocument = Ext.extend(Ext.Window, {
     setId: function(data) {
         this.form.getForm().baseParams = {
             id: data
-        }
+        };
     }
 
 });

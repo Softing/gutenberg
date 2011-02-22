@@ -28,4 +28,4 @@ Inprint.cmp.ExcahngeBrowser.Interaction = function(parent, panels) {
         }
     }, parent);
 
-}
+};

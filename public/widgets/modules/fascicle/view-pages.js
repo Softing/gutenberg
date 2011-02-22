@@ -26,7 +26,7 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
                         var pageclass  = "";
                         var alertclass = "";
                         
-                        if(page.num && page.num % 2 == 0) {
+                        if(page.num && page.num % 2 === 0) {
                             pageclass = "inprint-plan-page-left";
                             if (prevPage && prevPage.num != page.num-1) {
                                 alertclass = "inprint-plan-page-alert-left";
@@ -182,7 +182,7 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
         
         //this.getStore().on("load", function(){
         //    if (this.scrollTop && this.scrollHeight) {
-        //        this.body.dom.scrollTop = this.scrollTop + (this.scrollTop == 0 ? 0 : this.body.dom.scrollHeight - this.scrollHeight);
+        //        this.body.dom.scrollTop = this.scrollTop + (this.scrollTop === 0 ? 0 : this.body.dom.scrollHeight - this.scrollHeight);
         //    }
         //}, this);
         

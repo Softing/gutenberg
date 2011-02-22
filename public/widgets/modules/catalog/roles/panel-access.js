@@ -2,8 +2,8 @@ Inprint.catalog.roles.RestrictionsPanel = Ext.extend(Ext.grid.EditorGridPanel, {
 
     initComponent: function() {
 
-        this.uid;
-        this.record;
+        this.uid = null;
+        this.record = null;
 
         this.components = {};
 

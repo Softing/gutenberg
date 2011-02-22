@@ -12,7 +12,7 @@ Inprint.catalog.readiness.Grid = Ext.extend(Ext.grid.GridPanel, {
             "delete": _url("/catalog/readiness/delete/")
         };
 
-        this.store = Inprint.factory.Store.json(this.urls["list"],{
+        this.store = Inprint.factory.Store.json(this.urls.list,{
             autoLoad:true
         });
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();

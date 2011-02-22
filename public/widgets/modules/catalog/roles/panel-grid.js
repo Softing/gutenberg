@@ -12,7 +12,7 @@ Inprint.catalog.roles.Grid = Ext.extend(Ext.grid.GridPanel, {
             "delete": _url("/catalog/roles/delete/")
         }
 
-        this.store = Inprint.factory.Store.json(this.urls["list"], {
+        this.store = Inprint.factory.Store.json(this.urls.list, {
             autoLoad:true
         });
         

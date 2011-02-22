@@ -3,7 +3,7 @@ Inprint.cmp.membersList.Window = Ext.extend(Ext.Window, {
     initComponent: function() {
 
         this.panels = {};
-        this.panels.grid = new Inprint.cmp.membersList.Grid()
+        this.panels.grid = new Inprint.cmp.membersList.Grid();
 
         Ext.apply(this, {
             title: _("Employeers list"),
@@ -42,14 +42,15 @@ Inprint.cmp.membersList.Window = Ext.extend(Ext.Window, {
 
     cmpLoad: function(node) {
 
-        if (!node)
+        if (!node) {
             node = '00000000-0000-0000-0000-000000000000';
+        }
 
         this.panels.grid.getStore().load({
             params: {
                 node:node
             }
-        })
+        });
     }
 
 });

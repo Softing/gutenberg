@@ -10,4 +10,4 @@ Inprint.cmp.memberRulesForm.Editions.Interaction = function(parent, panels) {
             grid.cmpFill(parent.memberId, node.id);
         }
     });
-}
+};

@@ -99,14 +99,14 @@ Inprint.cmp.UpdateDocument.Form = Ext.extend(Ext.FormPanel, {
                     listeners: {
                         scope: this,
                         render: function(field) {
-                            //var id = Inprint.session.member["id"];
-                            //var title = Inprint.session.member["title"] || _("Unknown employee");
+                            //var id = Inprint.session.member.id;
+                            //var title = Inprint.session.member.title || _("Unknown employee");
                             //if (id && title) field.setValue(id, title);
                         },
                         beforequery: function(qe) {
                             delete qe.combo.lastQuery;
-                            qe.combo.getStore().baseParams["term"] = "catalog.documents.assign:*";
-                            qe.combo.getStore().baseParams["workgroup"] = this.getForm().findField("maingroup").getValue();
+                            qe.combo.getStore().baseParams.term = "catalog.documents.assign:*";
+                            qe.combo.getStore().baseParams.workgroup = this.getForm().findField("maingroup").getValue();
                         }
                     }
                 }),
@@ -124,8 +124,8 @@ Inprint.cmp.UpdateDocument.Form = Ext.extend(Ext.FormPanel, {
                         scope: this,
                         beforequery: function(qe) {
                             delete qe.combo.lastQuery;
-                            qe.combo.getStore().baseParams["flt_edition"]  = this.edition;
-                            qe.combo.getStore().baseParams["flt_fascicle"] = this.fascicle;
+                            qe.combo.getStore().baseParams.flt_edition  = this.edition;
+                            qe.combo.getStore().baseParams.flt_fascicle = this.fascicle;
                         }
                     }
                 }),
@@ -143,9 +143,9 @@ Inprint.cmp.UpdateDocument.Form = Ext.extend(Ext.FormPanel, {
                         },
                         beforequery: function(qe) {
                             delete qe.combo.lastQuery;
-                            qe.combo.getStore().baseParams["flt_edition"]  = this.edition;
-                            qe.combo.getStore().baseParams["flt_fascicle"] = this.fascicle;
-                            qe.combo.getStore().baseParams["flt_headline"] = this.getForm().findField("headline").getValue();
+                            qe.combo.getStore().baseParams.flt_edition  = this.edition;
+                            qe.combo.getStore().baseParams.flt_fascicle = this.fascicle;
+                            qe.combo.getStore().baseParams.flt_headline = this.getForm().findField("headline").getValue();
                         }
                     }
                 })

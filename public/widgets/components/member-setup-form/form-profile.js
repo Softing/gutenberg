@@ -128,24 +128,17 @@ Inprint.cmp.memberSetupWindow.Form = Ext.extend(Ext.FormPanel, {
     },
 
     onRender: function() {
-        
+
         Inprint.cmp.memberSetupWindow.Form.superclass.onRender.apply(this, arguments);
-        
+
         var form = this.getForm();
-        
+
         if (Inprint.session.member) {
             form.findField("title").setValue(Inprint.session.member.title);
             form.findField("shortcut").setValue(Inprint.session.member.shortcut);
             form.findField("position").setValue(Inprint.session.member.position);
         }
-        
-        if (Inprint.session.options) {
-            //if (Inprint.session.options["default.edition"])
-            //    this.getForm().findField("edition").loadValue(Inprint.session.options["transfer.capture.destination"]);
-            //if (Inprint.session.options["default.workgroup"])
-            //    this.getForm().findField("edition").loadValue(Inprint.session.options["transfer.capture.destination"]);
-        }
-        
+
     }
 
 });

@@ -21,7 +21,7 @@ Inprint.plugins.rss.Interaction = function(parent, panels) {
         if (sm.getCount() > 1) {
             profile.getEl().mask("Please, select document");
         }
-        if (sm.getCount() == 0) {
+        if (sm.getCount() === 0) {
             profile.getEl().mask("Please, select document");
         }
     });

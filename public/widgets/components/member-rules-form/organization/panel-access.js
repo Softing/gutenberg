@@ -2,8 +2,8 @@ Inprint.cmp.memberRulesForm.Organization.Restrictions = Ext.extend(Ext.grid.Edit
 
     initComponent: function() {
 
-        this.uid;
-        this.record;
+        this.uid = null;
+        this.record = null;
 
         this.components = {};
 
@@ -50,7 +50,7 @@ Inprint.cmp.memberRulesForm.Organization.Restrictions = Ext.extend(Ext.grid.Edit
                 header: _("Limit"),
                 dataIndex: 'limit',
                 renderer: function(value, metadata, record, row, col, store) {
-                    if (value == undefined || value == "") {
+                    if (value === undefined || value === "") {
                         return _("Employee");
                     }
                     return value;
@@ -127,8 +127,9 @@ Inprint.cmp.memberRulesForm.Organization.Restrictions = Ext.extend(Ext.grid.Edit
                     var record = store.getById(i);
                     if (record) {
                         record.set("icon", result.data[i].icon);
-                        if (result.data[i].type == "obtained")
+                        if (result.data[i].type == "obtained") {
                             this.getSelectionModel().selectRecords([ record ], true);
+                        }
                         if (mode == 'member') {
                             record.set("limit", _("Employee"));
                             record.set("selection", "member");
@@ -161,7 +162,7 @@ Inprint.cmp.memberRulesForm.Organization.Restrictions = Ext.extend(Ext.grid.Edit
                 binding: this.nodeId
             },
             success: function() {
-                this.cmpReload;
+                this.cmpReload();
                 new Ext.ux.Notification({
                     iconCls: 'event',
                     title: _("System event"),

@@ -1,8 +1,8 @@
 Inprint.advert.modules.Interaction = function(parent, panels) {
 
-    var tree    = panels["editions"];
+    var tree    = panels.editions;
     var pages   = panels["pages"];
-    var modules = panels["modules"];
+    var modules = panels.modules;
 
     // Tree
     tree.getSelectionModel().on("selectionchange", function(sm, node) {
@@ -20,7 +20,7 @@ Inprint.advert.modules.Interaction = function(parent, panels) {
         
         _disable(modules.btnCreate, pages.btnUpdate, pages.btnDelete);
         
-        if (sm.getCount() == 0) {
+        if (sm.getCount() === 0) {
             modules.disable();
         }
         

@@ -2,8 +2,8 @@ Inprint.cmp.memberRulesForm.Domain.Restrictions = Ext.extend(Ext.grid.EditorGrid
 
     initComponent: function() {
 
-        this.uid;
-        this.record;
+        this.uid = null;
+        this.record = null;
 
         this.components = {};
 
@@ -66,7 +66,7 @@ Inprint.cmp.memberRulesForm.Domain.Restrictions = Ext.extend(Ext.grid.EditorGrid
     cmpFill: function(member) {
 
         this.memberId = member;
-        
+
         this.getSelectionModel().clearSelections();
         this.getStore().rejectChanges();
 
@@ -110,7 +110,7 @@ Inprint.cmp.memberRulesForm.Domain.Restrictions = Ext.extend(Ext.grid.EditorGrid
                 binding: '00000000-0000-0000-0000-000000000000'
             },
             success: function() {
-                this.cmpReload;
+                this.cmpReload();
                 new Ext.ux.Notification({
                     iconCls: 'event',
                     title: _("System event"),
@@ -119,5 +119,5 @@ Inprint.cmp.memberRulesForm.Domain.Restrictions = Ext.extend(Ext.grid.EditorGrid
             }
         });
     }
-    
+
 });

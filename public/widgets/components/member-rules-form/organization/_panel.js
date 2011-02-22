@@ -3,8 +3,8 @@ Inprint.cmp.memberRulesForm.Organization = Ext.extend(Ext.Panel, {
     initComponent: function() {
 
         this.panels = {};
-        this.panels["tree"] = new Inprint.cmp.memberRulesForm.Organization.Tree();
-        this.panels["grid"] = new Inprint.cmp.memberRulesForm.Organization.Restrictions();
+        this.panels.tree = new Inprint.cmp.memberRulesForm.Organization.Tree();
+        this.panels.grid = new Inprint.cmp.memberRulesForm.Organization.Restrictions();
 
         Ext.apply(this, {
             border:false,
@@ -20,7 +20,7 @@ Inprint.cmp.memberRulesForm.Organization = Ext.extend(Ext.Panel, {
                     layout:"fit",
                     border:false,
                     margins: "3 3 3 0",
-                    items: this.panels["grid"]
+                    items: this.panels.grid
                 },
                 {
                     region:"west",
@@ -28,7 +28,7 @@ Inprint.cmp.memberRulesForm.Organization = Ext.extend(Ext.Panel, {
                     border:false,
                     margins: "3 0 3 3",
                     width: 200,
-                    items: this.panels["tree"]
+                    items: this.panels.tree
                 }
             ]
         });
@@ -41,11 +41,11 @@ Inprint.cmp.memberRulesForm.Organization = Ext.extend(Ext.Panel, {
     },
     
     cmpReload: function() {
-        this.panels["grid"].cmpReload();
+        this.panels.grid.cmpReload();
     },
     
     cmpSave: function() {
-        this.panels["grid"].cmpSave();
+        this.panels.grid.cmpSave();
     }
 
 });

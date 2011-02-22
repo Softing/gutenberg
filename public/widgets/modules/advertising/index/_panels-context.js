@@ -1,6 +1,6 @@
 Inprint.advert.index.Context = function(parent, panels) {
 
-    var tree = panels["editions"];
+    var tree = panels.editions;
 
     tree.on("contextmenu", function(node) {
         

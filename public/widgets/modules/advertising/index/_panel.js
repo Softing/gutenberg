@@ -5,10 +5,10 @@ Inprint.advert.index.Main = Ext.extend(Ext.Panel, {
         this.edition = null;
         this.panels = {};
         
-        this.panels["editions"]  = new Inprint.advert.index.Editions({
+        this.panels.editions  = new Inprint.advert.index.Editions({
             parent: this
         });
-        this.panels["modules"]   = new Inprint.advert.index.Modules({
+        this.panels.modules   = new Inprint.advert.index.Modules({
             parent: this
         });
         this.panels["headlines"] = new Inprint.advert.index.Headlines({
@@ -26,7 +26,7 @@ Inprint.advert.index.Main = Ext.extend(Ext.Panel, {
                     split: true,
                     layout:"fit",
                     margins: "3 0 3 3",
-                    items: this.panels["editions"]
+                    items: this.panels.editions
                 },
                 {
                     border:false,
@@ -38,7 +38,7 @@ Inprint.advert.index.Main = Ext.extend(Ext.Panel, {
                             region: "center",
                             margins: "3 3 0 0",
                             layout:"fit",
-                            items: this.panels["modules"]
+                            items: this.panels.modules
                         },
                         {
                             title: _("Headlines"),
@@ -66,7 +66,7 @@ Inprint.advert.index.Main = Ext.extend(Ext.Panel, {
     },
     
     cmpReload: function() {
-        this.panels["modules"].cmpReload();
+        this.panels.modules.cmpReload();
         this.panels["headlines"].cmpReload();
     }
 

@@ -3,8 +3,8 @@ Inprint.cmp.PrincipalsBrowser = Ext.extend(Ext.Window, {
     initComponent: function() {
 
         this.panels = {};
-        this.panels.grid = new Inprint.cmp.PrincipalsBrowser.Grid()
-        this.panels.tree = new Inprint.cmp.PrincipalsBrowser.Tree()
+        this.panels.grid = new Inprint.cmp.PrincipalsBrowser.Grid();
+        this.panels.tree = new Inprint.cmp.PrincipalsBrowser.Tree();
 
         Ext.apply(this, {
             title: _("Principals list"),

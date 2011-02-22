@@ -7,4 +7,4 @@ Inprint.membersBrowser.Interaction = function(panels) {
         view.cmpLoad({ node: node.id });
     });
 
-}
+};

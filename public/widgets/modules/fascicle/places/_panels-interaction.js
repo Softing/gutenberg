@@ -1,7 +1,7 @@
 Inprint.fascicle.places.Interaction = function(parent, panels) {
 
     var places = panels["places"];
-    var modules   = panels["modules"];
+    var modules   = panels.modules;
     var headlines = panels["headlines"];
 
     // Tree

@@ -2,8 +2,8 @@ Inprint.cmp.memberRulesForm.Editions.Restrictions = Ext.extend(Ext.grid.EditorGr
 
     initComponent: function() {
 
-        this.uid;
-        this.record;
+        this.uid = null;
+        this.record = null;
 
         this.components = {};
 
@@ -91,8 +91,9 @@ Inprint.cmp.memberRulesForm.Editions.Restrictions = Ext.extend(Ext.grid.EditorGr
                     var record = store.getById(i);
                     if (record) {
                         record.set("icon", result.data[i].icon);
-                        if (result.data[i].type == "obtained")
+                        if (result.data[i].type == "obtained") {
                             this.getSelectionModel().selectRecords([ record ], true);
+                        }
                     }
                 }
                 store.commitChanges();
@@ -115,7 +116,7 @@ Inprint.cmp.memberRulesForm.Editions.Restrictions = Ext.extend(Ext.grid.EditorGr
                 binding: this.nodeId
             },
             success: function() {
-                this.cmpReload;
+                this.cmpReload();
                 new Ext.ux.Notification({
                     iconCls: 'event',
                     title: _("System event"),
@@ -124,5 +125,5 @@ Inprint.cmp.memberRulesForm.Editions.Restrictions = Ext.extend(Ext.grid.EditorGr
             }
         });
     }
-    
+
 });

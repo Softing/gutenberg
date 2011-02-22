@@ -96,7 +96,9 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                         render: function(field) {
                                             var id = Inprint.session.options["default.edition"];
                                             var title = Inprint.session.options["default.edition.name"] || _("Unknown edition");
-                                            if (id && title) field.setValue(id, title);
+                                            if (id && title) {
+                                                field.setValue(id, title);
+                                            }
                                         },
                                         select: function(field) {
                                             this.getForm().findField("fascicle").getTree().getRootNode().reload();
@@ -132,7 +134,9 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                         render: function(field) {
                                             var id = Inprint.session.options["default.workgroup"];
                                             var title = Inprint.session.options["default.workgroup.name"] || _("Unknown department");
-                                            if (id && title) field.setValue(id, title);
+                                            if (id && title) {
+                                                field.setValue(id, title);
+                                            }
                                         }
                                     }
                                 },
@@ -142,15 +146,17 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                     listeners: {
                                         scope: this,
                                         render: function(field) {
-                                            var id = Inprint.session.member["id"];
-                                            var title = Inprint.session.member["title"] || _("Unknown employee");
-                                            if (id && title) field.setValue(id, title);
+                                            var id = Inprint.session.member.id;
+                                            var title = Inprint.session.member.title || _("Unknown employee");
+                                            if (id && title) {
+                                                field.setValue(id, title);
+                                            }
                                         },
                                         beforequery: function(qe) {
                                             delete qe.combo.lastQuery;
-                                            qe.combo.getStore().baseParams["term"] = "catalog.documents.create:*";
-                                            qe.combo.getStore().baseParams["edition"] = this.getForm().findField("edition").getValue();
-                                            qe.combo.getStore().baseParams["workgroup"] = this.getForm().findField("workgroup").getValue();
+                                            qe.combo.getStore().baseParams.term = "catalog.documents.create:*";
+                                            qe.combo.getStore().baseParams.edition = this.getForm().findField("edition").getValue();
+                                            qe.combo.getStore().baseParams.workgroup = this.getForm().findField("workgroup").getValue();
                                         }
                                     }
                                 })
@@ -201,7 +207,9 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                         render: function(field) {
                                             var id = '00000000-0000-0000-0000-000000000000';
                                             var title = _("Briefcase");
-                                            if (id && title) field.setValue(id, title);
+                                            if (id && title) {
+                                                field.setValue(id, title);
+                                            }
                                         }
                                     }
                                 },
@@ -222,8 +230,8 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                         },
                                         beforequery: function(qe) {
                                             delete qe.combo.lastQuery;
-                                            qe.combo.getStore().baseParams["flt_edition"]  = this.getForm().findField("edition").getValue();
-                                            qe.combo.getStore().baseParams["flt_fascicle"] = this.getForm().findField("fascicle").getValue();
+                                            qe.combo.getStore().baseParams.flt_edition  = this.getForm().findField("edition").getValue();
+                                            qe.combo.getStore().baseParams.flt_fascicle = this.getForm().findField("fascicle").getValue();
                                         }
                                     }
                                 }),
@@ -244,8 +252,8 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                             this.getForm().findField("headline").on("select", function() {
                                                 combo.enable();
                                                 combo.reset();
-                                                combo.getStore().baseParams["flt_fascicle"] = this.getForm().findField("fascicle").getValue();
-                                                combo.getStore().baseParams["flt_headline"] = this.getForm().findField("headline").getValue();
+                                                combo.getStore().baseParams.flt_fascicle = this.getForm().findField("fascicle").getValue();
+                                                combo.getStore().baseParams.flt_headline = this.getForm().findField("headline").getValue();
                                             }, this);
                                         },
                                         beforequery: function(qe) {

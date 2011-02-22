@@ -9,7 +9,7 @@ Inprint.cmp.adverta.GridModules = Ext.extend(Ext.ux.tree.TreeGrid, {
             "list":        "/fascicle/composer/modules/",
             "create": _url("/fascicle/modules/create/"),
             "delete": _url("/fascicle/modules/delete/")
-        }
+        };
 
         this.columns = [
             {
@@ -33,7 +33,7 @@ Inprint.cmp.adverta.GridModules = Ext.extend(Ext.ux.tree.TreeGrid, {
         ];
 
         this.loader  = new Ext.tree.TreeLoader({
-            dataUrl: this.urls["list"],
+            dataUrl: this.urls.list,
             baseParams: {
                 page: this.parent.selection
             }
@@ -78,7 +78,7 @@ Inprint.cmp.adverta.GridModules = Ext.extend(Ext.ux.tree.TreeGrid, {
                         scope:this,
                         success: function() {
                             this.cmpReload();
-                            this.parent.panels["flash"].cmpInit();
+                            this.parent.panels.flash.cmpInit();
                         },
                         params: {
                             id: this.cmpGetSelectedNode().attributes.module

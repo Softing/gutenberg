@@ -17,7 +17,7 @@ Inprint.fascicle.adverta.Modules = Ext.extend(Ext.grid.GridPanel, {
             "delete": _url("/advertising/modules/delete/")
         }
 
-        this.store = Inprint.factory.Store.json(this.urls["list"]);
+        this.store = Inprint.factory.Store.json(this.urls.list);
         
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
         

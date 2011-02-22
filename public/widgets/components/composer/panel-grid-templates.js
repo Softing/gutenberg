@@ -4,7 +4,7 @@ Inprint.cmp.composer.Templates = Ext.extend(Ext.grid.GridPanel, {
 
         this.urls = {
             "list": "/fascicle/composer/templates/"
-        }
+        };
 
         var selection = this.parent.selection;
         var selLength = this.parent.selLength;
@@ -15,7 +15,7 @@ Inprint.cmp.composer.Templates = Ext.extend(Ext.grid.GridPanel, {
             pages.push(array[0]);
         }
 
-        this.store = Inprint.factory.Store.json(this.urls["list"], {
+        this.store = Inprint.factory.Store.json(this.urls.list, {
             autoLoad:true,
             baseParams: {
                 page: pages

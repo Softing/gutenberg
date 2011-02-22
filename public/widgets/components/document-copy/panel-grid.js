@@ -2,7 +2,7 @@ Inprint.cmp.CopyDocument.Grid = Ext.extend(Ext.grid.EditorGridPanel, {
 
     initComponent: function() {
 
-        this.currentRecord;
+        this.currentRecord = null;
 
         var xc = Inprint.factory.Combo;
 
@@ -48,8 +48,8 @@ Inprint.cmp.CopyDocument.Grid = Ext.extend(Ext.grid.EditorGridPanel, {
                             },
                             beforequery: function(qe) {
                                 delete qe.combo.lastQuery;
-                                qe.combo.getStore().baseParams["flt_edition"] = this.currentRecord.get("edition");
-                                qe.combo.getStore().baseParams["flt_fascicle"] = this.currentRecord.get("id");
+                                qe.combo.getStore().baseParams.flt_edition = this.currentRecord.get("edition");
+                                qe.combo.getStore().baseParams.flt_fascicle = this.currentRecord.get("id");
                             }
                         }
                     })
@@ -75,9 +75,9 @@ Inprint.cmp.CopyDocument.Grid = Ext.extend(Ext.grid.EditorGridPanel, {
                             },
                             beforequery: function(qe) {
                                 delete qe.combo.lastQuery;
-                                qe.combo.getStore().baseParams["flt_edition"] =  this.currentRecord.get("edition");
-                                qe.combo.getStore().baseParams["flt_fascicle"] = this.currentRecord.get("id");
-                                qe.combo.getStore().baseParams["flt_headline"] = this.currentRecord.get("headline");
+                                qe.combo.getStore().baseParams.flt_edition =  this.currentRecord.get("edition");
+                                qe.combo.getStore().baseParams.flt_fascicle = this.currentRecord.get("id");
+                                qe.combo.getStore().baseParams.flt_headline = this.currentRecord.get("headline");
                             }
                         }
                     })

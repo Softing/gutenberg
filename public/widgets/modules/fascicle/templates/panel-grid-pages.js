@@ -13,7 +13,7 @@ Inprint.fascicle.templates.Pages = Ext.extend(Ext.grid.GridPanel, {
             "delete": _url("/fascicle/templates/pages/delete/")
         }
 
-        this.store = Inprint.factory.Store.json(this.urls["list"], {
+        this.store = Inprint.factory.Store.json(this.urls.list, {
             autoLoad:true,
             baseParams: {
                 fascicle: this.parent.fascicle

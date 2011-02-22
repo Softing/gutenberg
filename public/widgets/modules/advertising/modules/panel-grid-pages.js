@@ -13,7 +13,7 @@ Inprint.advert.modules.Pages = Ext.extend(Ext.grid.GridPanel, {
             "delete": _url("/advertising/pages/delete/")
         }
 
-        this.store = Inprint.factory.Store.json(this.urls["list"]);
+        this.store = Inprint.factory.Store.json(this.urls.list);
 
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
 

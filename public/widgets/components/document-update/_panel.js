@@ -96,7 +96,7 @@ Inprint.cmp.UpdateDocument = Ext.extend(Ext.Window, {
             form.findField("rubric").enable();
             if (json.data.rubric && json.data.rubric_shortcut) {
                 form.findField("rubric").setValue(json.data.rubric, json.data.rubric_shortcut);
-                form.findField("rubric").getStore().baseParams["flt_headline"] = json.data.headline;
+                form.findField("rubric").getStore().baseParams.flt_headline = json.data.headline;
             }
         }
 

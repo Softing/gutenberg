@@ -1,14 +1,14 @@
 Inprint.cmp.Adverta.Interaction = function(parent, panels) {
 
-    var request   = panels["request"];
-    var templates = panels["templates"];
-    var modules   = panels["modules"];
-    var flash     = panels["flash"];
+    var request   = panels.request;
+    var templates = panels.templates;
+    var modules   = panels.modules;
+    var flash     = panels.flash;
 
     if (modules) {
 
-        var gridModules   = modules.panels["modules"];
-        var gridTemplates = modules.panels["templates"];
+        var gridModules   = modules.panels.modules;
+        var gridTemplates = modules.panels.templates;
 
         gridModules.getSelectionModel().on("selectionchange", function(sm, node) {
             if (node) {
@@ -37,7 +37,8 @@ Inprint.cmp.Adverta.Interaction = function(parent, panels) {
         }, gridModules);
 
         gridModules.on("afterrender", function() {
-            new Ext.dd.DropTarget(modules.getEl(), {
+
+            Ext.dd.DropTarget(modules.getEl(), {
                 ddGroup    : 'principals-selector',
                 notifyDrop : function(ddSource, e, data){
                     var ids = [];
@@ -63,58 +64,6 @@ Inprint.cmp.Adverta.Interaction = function(parent, panels) {
 
         }, gridModules);
 
-        //modules.on("rowcontextmenu", function(grid, rindex, e) {
-        //    e.stopEvent();
-        //    var items = [];
-        //    items.push({
-        //        icon: _ico("minus-button"),
-        //        cls: "x-btn-text-icon",
-        //        text: _("Remove"),
-        //        ref: "../btnRemove",
-        //        scope:this,
-        //        handler: this.cmpDelete
-        //    });
-        //    var coords = e.getXY();
-        //    new Ext.menu.Menu({ items : items }).showAt([coords[0], coords[1]]);
-        //}, modules);
-        //
-        //modules.on("afterrender", function(panel) {
-        //
-        //    var selection = panel.parent.selection;
-        //    var fascicle  = panel.parent.fascicle;
-        //
-        //    new Ext.dd.DropTarget(modules.getView().scroller.dom, {
-        //
-        //        ddGroup    : 'principals-selector',
-        //        notifyDrop : function(ddSource, e, data){
-        //
-        //            var ids = [];
-        //
-        //            Ext.each(ddSource.dragData.selections, function(r) {
-        //                ids.push(r.data.id);
-        //            });
-        //
-        //            Ext.Ajax.request({
-        //                url: _url("/fascicle/modules/create/"),
-        //                scope: panel.parent,
-        //                success: function() {
-        //                    this.panels["flash"].cmpInit();
-        //                    this.panels["modules"].panels["modules"].cmpReload();
-        //                },
-        //                params: {
-        //                    fascicle: fascicle,
-        //                    page: selection,
-        //                    module: ids
-        //                }
-        //            });
-        //
-        //            return true;
-        //        }
-        //
-        //    });
-        //
-        //}, this);
-
     }
 
     request.getForm().on("actioncomplete", function(form, action){
@@ -124,4 +73,4 @@ Inprint.cmp.Adverta.Interaction = function(parent, panels) {
             }
         }, parent);
 
-}
+};

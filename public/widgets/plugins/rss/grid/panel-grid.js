@@ -19,7 +19,7 @@ Inprint.plugins.rss.Grid = Ext.extend(Ext.grid.GridPanel, {
                 autoLoad:true,
                 remoteSort: true,
                 totalProperty: 'total',
-                url: this.urls["list"],
+                url: this.urls.list,
                 baseParams: { flt_rssonly: false },
                 fields: fields
             })

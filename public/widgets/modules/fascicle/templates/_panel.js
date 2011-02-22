@@ -9,7 +9,7 @@ Inprint.fascicle.templates.Main = Ext.extend(Ext.Panel, {
             parent: this
         });
         
-        this.panels["modules"]   = new Inprint.fascicle.templates.Modules({
+        this.panels.modules   = new Inprint.fascicle.templates.Modules({
             parent: this
         });
 
@@ -32,7 +32,7 @@ Inprint.fascicle.templates.Main = Ext.extend(Ext.Panel, {
                     split: true,
                     layout:"fit",
                     margins: "0 3 3 0",
-                    items: this.panels["modules"]
+                    items: this.panels.modules
                 }
             ]
         });
@@ -48,7 +48,7 @@ Inprint.fascicle.templates.Main = Ext.extend(Ext.Panel, {
     
     cmpReload: function() {
         this.panels["pages"].cmpReload();
-        this.panels["modules"].cmpReload();
+        this.panels.modules.cmpReload();
     }
 
 });
