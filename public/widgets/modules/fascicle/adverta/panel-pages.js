@@ -1,9 +1,9 @@
 Inprint.fascicle.adverta.Pages = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
-        
+
         this.components = {};
-        
+
         this.urls = {
             "read":   _url("/fascicle/pages/read/"),
             "create": _url("/fascicle/pages/create/"),
@@ -15,19 +15,19 @@ Inprint.fascicle.adverta.Pages = Ext.extend(Ext.Panel, {
             "clean":  _url("/fascicle/pages/clean/"),
             "resize": _url("/fascicle/pages/resize/")
         };
-        
+
         this.view = new Inprint.fascicle.plan.View({
             parent: this.parent,
             fascicle: this.oid
         });
-        
+
         Ext.apply(this, {
             border:false,
             layout: "fit",
             autoScroll:true,
             items: this.view
         });
-        
+
         Inprint.fascicle.adverta.Pages.superclass.initComponent.apply(this, arguments);
 
     },
@@ -35,11 +35,11 @@ Inprint.fascicle.adverta.Pages = Ext.extend(Ext.Panel, {
     onRender: function() {
         Inprint.fascicle.adverta.Pages.superclass.onRender.apply(this, arguments);
     },
-    
+
     getView: function() {
         return this.view;
     },
-    
+
     getIdByNum: function(num) {
         var id = null;
         var nodes = this.view.getNodes();
@@ -50,11 +50,11 @@ Inprint.fascicle.adverta.Pages = Ext.extend(Ext.Panel, {
         });
         return id;
     },
-    
+
     getStore: function() {
         return this.view.getStore();
     },
-    
+
     cmpGetSelected: function () {
         var result = [];
         var records = this.view.getSelectedNodes();
@@ -65,11 +65,11 @@ Inprint.fascicle.adverta.Pages = Ext.extend(Ext.Panel, {
     },
 
     cmpPageCreate: function() {
-        
-        var wndw = this.components["create"];
-        
+
+        var wndw = this.components.create;
+
         if (!wndw) {
-            
+
             wndw = new Ext.Window({
                 title: 'Добавление полос',
                 width: 300,
@@ -131,27 +131,27 @@ Inprint.fascicle.adverta.Pages = Ext.extend(Ext.Panel, {
                     ]
                 },
                 buttons: [
-                    _BTN_WNDW_ADD, 
+                    _BTN_WNDW_ADD,
                     _BTN_WNDW_CANCEL
                 ]
             });
-            
-            this.components["create"] = wndw;
+
+            this.components.create = wndw;
         }
-        
+
         var form = wndw.findByType("form")[0].getForm();
         form.reset();
         wndw.show();
-        
+
     },
 
     // Редактировать
     cmpPageUpdate: function() {
-        
-        var wndw = this.components["update"];
-        
+
+        var wndw = this.components.update;
+
         if (!wndw) {
-            
+
             wndw = new Ext.Window({
                 title: 'Редактировать полосы',
                 width: 300,
@@ -192,56 +192,56 @@ Inprint.fascicle.adverta.Pages = Ext.extend(Ext.Panel, {
                     ]
                 },
                 buttons: [
-                    _BTN_WNDW_OK, 
+                    _BTN_WNDW_OK,
                     _BTN_WNDW_CANCEL
                 ]
             });
-            
-            this.components["update"] = wndw;
+
+            this.components.update = wndw;
         }
-        
+
         wndw.show();
-        
+
         var form = wndw.findByType("form")[0].getForm();
         form.reset();
         form.baseParams.page = this.cmpGetSelected();
         wndw.show();
     },
-    
+
     cmpPageCompose: function() {
-        
+
         var selection = this.cmpGetSelected();
-        
+
         if (selection.length > 2) {
             return;
         }
-        
+
         if (selection.length <= 0) {
             return;
         }
-        
+
         var wndw = new Inprint.cmp.Composer({
             fascicle: this.parent.fascicle,
             selection: selection
         });
-        
+
         wndw.on("actioncomplete", function() {
             this.parent.cmpReload();
         }, this);
-        
+
         wndw.show();
     },
-    
+
     //Переместить
     cmpPageMove: function(inc, text) {
-        
+
         if ( inc == 'cancel') {
             return;
         }
-        
+
         if ( inc == 'ok') {
             Ext.Ajax.request({
-                url: this.urls["move"],
+                url: this.urls.move,
                 params: {
                     fascicle: this.oid,
                     after: text,
@@ -249,29 +249,29 @@ Inprint.fascicle.adverta.Pages = Ext.extend(Ext.Panel, {
                 },
                 scope: this,
                 success: function() {
-                    this.parent.cmpReload()
+                    this.parent.cmpReload();
                 }
             });
             return;
         }
-        
+
         Ext.MessageBox.prompt(
             'Перемещение полос',
             'Укажите номер полосы, после которой будут размещены выбранные полосы',
             this.cmpPageMove, this
         );
-        
+
     },
-    
+
     cmpPageMoveLeft: function(inc, text) {
-        
+
         if ( inc == 'cancel') {
             return;
         }
-        
+
         if ( inc == 'ok') {
             Ext.Ajax.request({
-                url: this.urls["left"],
+                url: this.urls.left,
                 params: {
                     fascicle: this.oid,
                     amount: text,
@@ -279,29 +279,29 @@ Inprint.fascicle.adverta.Pages = Ext.extend(Ext.Panel, {
                 },
                 scope: this,
                 success: function() {
-                    this.parent.cmpReload()
+                    this.parent.cmpReload();
                 }
             });
             return;
         }
-        
+
         Ext.MessageBox.prompt(
             'Cмещение влево',
             'На сколько полос сместить?',
             this.cmpPageMoveLeft, this
         );
-        
+
     },
-    
+
     cmpPageMoveRight: function(inc, text) {
-        
+
         if ( inc == 'cancel') {
             return;
         }
-        
+
         if ( inc == 'ok') {
             Ext.Ajax.request({
-                url: this.urls["right"],
+                url: this.urls.right,
                 params: {
                     fascicle: this.oid,
                     amount: text,
@@ -309,28 +309,28 @@ Inprint.fascicle.adverta.Pages = Ext.extend(Ext.Panel, {
                 },
                 scope: this,
                 success: function() {
-                    this.parent.cmpReload()
+                    this.parent.cmpReload();
                 }
             });
             return;
         }
-        
+
         Ext.MessageBox.prompt(
             'Cмещение вправо',
             'На сколько полос сместить?',
             this.cmpPageMoveRight, this
         );
-        
+
     },
-    
+
     // Стереть
     cmpPageClean: function() {
-    
-        var wndw = this.components["clean"];
-    
+
+        var wndw = this.components.clean;
+
         if (!wndw) {
-            
-            var wndw = new Ext.Window({
+
+            wndw = new Ext.Window({
                 title: 'Удаление содержимого полосы',
                 width:250,
                 height:140,
@@ -341,7 +341,7 @@ Inprint.fascicle.adverta.Pages = Ext.extend(Ext.Panel, {
                 items: {
                     xtype: "form",
                     border: false,
-                    url: this.urls["clean"],
+                    url: this.urls.clean,
                     baseParams: {
                         fascicle: this.oid
                     },
@@ -378,14 +378,14 @@ Inprint.fascicle.adverta.Pages = Ext.extend(Ext.Panel, {
                     ]
                 },
                 buttons: [
-                    _BTN_WNDW_OK, 
+                    _BTN_WNDW_OK,
                     _BTN_WNDW_CANCEL
                 ]
             });
-            
-            this.components["clean"] = wndw;
+
+            this.components.clean = wndw;
         }
-        
+
         var form = wndw.findByType("form")[0].getForm();
         form.reset();
         form.baseParams.page = this.cmpGetSelected();
@@ -394,11 +394,11 @@ Inprint.fascicle.adverta.Pages = Ext.extend(Ext.Panel, {
 
     // разверстать
     cmpPageResize: function() {
-        
-        var wndw = this.components["resize"];
-        
+
+        var wndw = this.components.resize;
+
         if (!wndw) {
-            
+
             wndw = new Ext.Window({
                 title: 'Разверстка полос',
                 width:320,
@@ -410,7 +410,7 @@ Inprint.fascicle.adverta.Pages = Ext.extend(Ext.Panel, {
                 items: {
                     xtype: "form",
                     border: false,
-                    url: this.urls["resize"],
+                    url: this.urls.resize,
                     baseParams: {
                         fascicle: this.oid
                     },
@@ -458,24 +458,26 @@ Inprint.fascicle.adverta.Pages = Ext.extend(Ext.Panel, {
                     ]
                 },
                 buttons: [
-                    _BTN_WNDW_OK, 
+                    _BTN_WNDW_OK,
                     _BTN_WNDW_CANCEL
                 ]
             });
 
-            this.components["resize"] = wndw;
+            this.components.resize = wndw;
         }
-        
+
         var form = wndw.findByType("form")[0].getForm();
         form.reset();
         form.baseParams.page = this.cmpGetSelected();
         wndw.show();
-        
+
     },
-    
+
     //Удалить
     cmpPageDelete: function(inc) {
-        if ( inc == 'no') return;
+        if ( inc == 'no') {
+            return;
+        }
         if ( inc == 'yes') {
             Ext.Ajax.request({
                 url: this.urls["delete"],
@@ -485,7 +487,7 @@ Inprint.fascicle.adverta.Pages = Ext.extend(Ext.Panel, {
                 },
                 scope: this,
                 success: function() {
-                    this.parent.cmpReload()
+                    this.parent.cmpReload();
                 }
             });
         } else {
@@ -496,5 +498,5 @@ Inprint.fascicle.adverta.Pages = Ext.extend(Ext.Panel, {
             );
         }
     }
-    
+
 });

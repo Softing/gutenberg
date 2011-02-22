@@ -7,7 +7,7 @@ Inprint.advert.index.Modules = Ext.extend(Ext.grid.GridPanel, {
         this.urls = {
             "list":      "/advertising/index/modules/",
             "save": _url("/advertising/index/save/")
-        }
+        };
 
         this.store = Inprint.factory.Store.json(this.urls.list);
 

@@ -1,11 +1,11 @@
 Inprint.fascicle.indexes.Interaction = function(parent, panels) {
 
-    
+
     var headlines = panels.headlines;
     var rubrics   = panels.rubrics;
 
     // Tree
-    
+
     headlines.getSelectionModel().on("selectionchange", function(sm, node) {
         if (node) {
             parent.headline = node.id;
@@ -14,7 +14,7 @@ Inprint.fascicle.indexes.Interaction = function(parent, panels) {
             rubrics.btnCreate.enable();
         }
     });
-    
+
     rubrics.getSelectionModel().on("selectionchange", function(sm) {
         _disable(rubrics.btnDelete, rubrics.btnUpdate);
         if (parent.access.manage) {
@@ -26,5 +26,5 @@ Inprint.fascicle.indexes.Interaction = function(parent, panels) {
             }
         }
     });
-    
-}
+
+};

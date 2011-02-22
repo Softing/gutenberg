@@ -11,7 +11,7 @@ Inprint.advert.modules.Pages = Ext.extend(Ext.grid.GridPanel, {
             "read":   _url("/advertising/pages/read/"),
             "update": _url("/advertising/pages/update/"),
             "delete": _url("/advertising/pages/delete/")
-        }
+        };
 
         this.store = Inprint.factory.Store.json(this.urls.list);
 
@@ -382,7 +382,7 @@ Inprint.advert.modules.Pages = Ext.extend(Ext.grid.GridPanel, {
                         load.defer(100, this);
                     }
                     if (action.type == "submit") {
-                        form.window.hide()
+                        form.window.hide();
                         this.cmpReload();
                     }
                 }

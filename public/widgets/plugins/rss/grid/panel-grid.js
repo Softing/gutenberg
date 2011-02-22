@@ -9,7 +9,7 @@ Inprint.plugins.rss.Grid = Ext.extend(Ext.grid.GridPanel, {
 
         this.urls = {
             "list": _url("/plugin/rss/list/")
-        }
+        };
 
         var fields = Inprint.factory.StoreFields["/documents/list/"];
         fields.push("rss_id", "rss_published");
@@ -95,7 +95,7 @@ Inprint.plugins.rss.Grid = Ext.extend(Ext.grid.GridPanel, {
                 enableToggle: true,
                 scope:this,
                 toggleHandler: function(btn, tgle) {
-                    this.store.baseParams["flt_rssonly"] = tgle;
+                    this.store.baseParams.flt_rssonly = tgle;
                     this.store.reload();
                 }
             }

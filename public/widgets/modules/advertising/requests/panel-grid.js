@@ -8,10 +8,10 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
             "read":   _url("/advertising/requests/read/"),
             "update": _url("/advertising/requests/update/"),
             "delete": _url("/advertising/requests/delete/")
-        }
+        };
 
         this.store = Inprint.factory.Store.json("/advertising/requests/list/");
-        
+
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
 
         Ext.apply(this, {
@@ -147,7 +147,7 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
     onRender: function() {
         Inprint.advert.requests.Grid.superclass.onRender.apply(this, arguments);
     },
-    
+
     cmpCreate: function() {
 
         var xc = Inprint.factory.Combo;
@@ -185,12 +185,12 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
                         emptyText: _("Description"),
                         tooltip: 'Описание заявки'
                     },
-                    
+
                     {
                         xtype: "titlefield",
                         value: "Заявка"
                     },
-                    
+
                     //xc.getConfig("/advertising/combo/managers/", {
                     //    hideLabel:true,
                     //    editable:true,
@@ -204,7 +204,7 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
                     //        }
                     //    }
                     //}),
-                    
+
                     xc.getConfig("/advertising/combo/advertisers/", {
                         hideLabel:true,
                         editable:true,
@@ -219,12 +219,12 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
                             }
                         }
                     }),
-                    
+
                     {
                         xtype: "titlefield",
                         value: "Расположение"
                     },
-                    
+
                     xc.getConfig("/advertising/combo/fascicles/", {
                         hideLabel:true,
                         allowBlank:true,
@@ -254,7 +254,7 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
                             },
                             beforequery: function(qe) {
                                 var form = qe.combo.ownerCt.getForm();
-                                qe.combo.getStore().baseParams.fascicle = 
+                                qe.combo.getStore().baseParams.fascicle =
                                     form.findField("fascicle").getValue();
                                 delete qe.combo.lastQuery;
                             }
@@ -268,18 +268,18 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
                             scope: this,
                             beforequery: function(qe) {
                                 var form = qe.combo.ownerCt.getForm();
-                                qe.combo.getStore().baseParams.place = 
+                                qe.combo.getStore().baseParams.place =
                                     form.findField("place").getValue();
                                 delete qe.combo.lastQuery;
                             }
                         }
                     }),
-                    
+
                     {
                         xtype: "titlefield",
                         value: "Свойства"
                     },
-                    
+
                     {
                         xtype: "combo",
                         hiddenName: "status",
@@ -342,7 +342,7 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
                                 [ "no", _("Not approved") ]
                             ]
                         },
-                        
+
                         valueField: "id",
                         displayField:'text',
                         typeAhead: true,
@@ -405,16 +405,12 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
 
         var form = win.findByType("form")[0].getForm();
         form.reset();
-        
+
         form.findField("edition").setValue( this.parent.currentEdition );
-        
-        //form.findField("manager").getStore().baseParams.edition = this.parent.currentEdition;
-        //form.findField("manager").getStore().baseParams.fascicle = this.parent.currentFascicle;
-        //form.findField("manager").setValue(Inprint.session.member.id, Inprint.session.member.shortcut);
-        
+
         form.findField("advertiser").getStore().baseParams.edition = this.parent.currentEdition;
         form.findField("advertiser").getStore().baseParams.fascicle = this.parent.currentFascicle;
-        
+
         form.findField("fascicle").getStore().baseParams.edition = this.parent.currentEdition;
         if (this.parent.currentFascicle) {
             form.findField("fascicle").loadValue( this.parent.currentFascicle );
@@ -466,12 +462,12 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
                         fieldLabel: _("Description"),
                         emptyText: _("Description")
                     },
-                    
+
                     {
                         xtype: "titlefield",
                         value: "Заявка"
                     },
-                    
+
                     xc.getConfig("/advertising/combo/managers/", {
                         hideLabel:true,
                         editable:true,
@@ -485,7 +481,7 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
                             }
                         }
                     }),
-                    
+
                     xc.getConfig("/advertising/combo/advertisers/", {
                         hideLabel:true,
                         editable:true,
@@ -499,12 +495,12 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
                             }
                         }
                     }),
-                    
+
                     {
                         xtype: "titlefield",
                         value: "Расположение"
                     },
-                    
+
                     xc.getConfig("/advertising/combo/fascicles/", {
                         hideLabel:true,
                         allowBlank:true,
@@ -533,7 +529,7 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
                             },
                             beforequery: function(qe) {
                                 var form = qe.combo.ownerCt.getForm();
-                                qe.combo.getStore().baseParams.fascicle = 
+                                qe.combo.getStore().baseParams.fascicle =
                                     form.findField("fascicle").getValue();
                                 delete qe.combo.lastQuery;
                             }
@@ -547,18 +543,18 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
                             scope: this,
                             beforequery: function(qe) {
                                 var form = qe.combo.ownerCt.getForm();
-                                qe.combo.getStore().baseParams.place = 
+                                qe.combo.getStore().baseParams.place =
                                     form.findField("place").getValue();
                                 delete qe.combo.lastQuery;
                             }
                         }
                     }),
-                    
+
                     {
                         xtype: "titlefield",
                         value: "Свойства"
                     },
-                    
+
                     {
                         xtype: "combo",
                         hiddenName: "status",
@@ -583,7 +579,7 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
                         triggerAction: 'all',
                         selectOnFocus:true
                     },
-                    
+
                     {
                         xtype: "combo",
                         hiddenName: "payment",
@@ -622,7 +618,7 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
                                 [ "no", _("Not approved") ]
                             ]
                         },
-                        
+
                         valueField: "id",
                         displayField:'text',
                         typeAhead: true,
@@ -697,24 +693,24 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
             success: function(form, action) {
                 win.body.unmask();
                 var data = action.result.data;
-                
+
                 form.findField("id").setValue(data.id);
-                
+
                 form.findField("manager").setValue(data.manager, data.manager_shortcut);
                 form.findField("advertiser").setValue(data.advertiser, data.advertiser_shortcut);
-                
+
                 form.findField("fascicle").setValue(data.fascicle, data.fascicle_shortcut);
                 form.findField("place").setValue(data.place, data.place_shortcut);
                 form.findField("module").setValue(data.module, data.module_shortcut);
-                
+
                 form.findField("status").setValue(data.status);
                 form.findField("payment").setValue(data.payment);
                 form.findField("readiness").setValue(data.readiness);
-                
+
                 if(data.fascicle_shortcut) {
                     form.findField("place").enable();
                 }
-                
+
             },
             failure: function(form, action) {
                 Ext.Msg.alert("Load failed", action.result.errorMessage);
@@ -723,7 +719,7 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
 
         win.show(this);
     },
-    
+
     cmpDelete: function() {
         Ext.MessageBox.confirm(
             _("Warning"),

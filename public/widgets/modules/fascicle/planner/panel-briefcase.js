@@ -1,15 +1,14 @@
 Inprint.fascicle.planner.Briefcase = Ext.extend(Ext.grid.GridPanel, {
 
     initComponent: function() {
-        
+
         var columns = new Inprint.documents.GridColumns();
-        
+
         this.urls = {
             "list":       "/documents/list/"
-        }
+        };
 
         this.store = Inprint.factory.Store.group(this.urls.list, {
-            remoteSort: true,
             groupField:'headline_shortcut',
             remoteGroup:false,
             remoteSort:false,
@@ -20,7 +19,7 @@ Inprint.fascicle.planner.Briefcase = Ext.extend(Ext.grid.GridPanel, {
         });
 
         this.sm = new Ext.grid.CheckboxSelectionModel();
-        
+
         this.columns = [
             this.sm,
             columns.title,
@@ -34,13 +33,13 @@ Inprint.fascicle.planner.Briefcase = Ext.extend(Ext.grid.GridPanel, {
             columns.images,
             columns.size
         ];
-        
+
         this.view = new Ext.grid.GroupingView({
             forceFit:true,
             groupTextTpl: '{text} ({[values.rs.length]} {[values.rs.length > 1 ? "Items" : "Item"]})'
 
         });
-        
+
         Ext.apply(this, {
             border:false,
             stripeRows: true,
@@ -50,7 +49,7 @@ Inprint.fascicle.planner.Briefcase = Ext.extend(Ext.grid.GridPanel, {
             tbar: this.tbar,
             columns: this.columns
         });
-        
+
         Inprint.fascicle.planner.Briefcase.superclass.initComponent.apply(this, arguments);
 
     },

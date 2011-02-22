@@ -16,13 +16,10 @@ Inprint.plugins.rss.control.Grid = Ext.extend(Ext.grid.GridPanel, {
             {name: 'title'},
             {name: 'description'},
             {name: 'level'}
-            //{name: '_id', type: 'int'},
-            //{name: '_parent', type: 'auto'},
-            //{name: '_is_leaf', type: 'bool'}
         ]);
 
         var store = new Ext.data.Store({
-            url: this.urls["load"],
+            url: this.urls.load,
             autoLoad:true,
             reader: new Ext.data.JsonReader({
                 id: 'id',
@@ -48,7 +45,6 @@ Inprint.plugins.rss.control.Grid = Ext.extend(Ext.grid.GridPanel, {
         Ext.apply(this, {
             border:false,
             store: store,
-            //master_column_id : 'title',
             columns: [
                 this.selModel,
                 {id:'title',header: _("Title"), width: 160, sortable: true, dataIndex: 'title',
@@ -86,7 +82,7 @@ Inprint.plugins.rss.control.Grid = Ext.extend(Ext.grid.GridPanel, {
         this.body.mask(_("Loading"));
 
         Ext.Ajax.request({
-            url: this.urls["fill"],
+            url: this.urls.fill,
             scope:this,
             params: {
                 feed: this.feed
@@ -121,8 +117,8 @@ Inprint.plugins.rss.control.Grid = Ext.extend(Ext.grid.GridPanel, {
                 feed: this.feed
             },
             success: function() {
-                this.cmpReload;
-                new Ext.ux.Notification({
+                this.cmpReload();
+                Ext.ux.Notification({
                     iconCls: 'event',
                     title: _("System event"),
                     html: _("Changes have been saved")

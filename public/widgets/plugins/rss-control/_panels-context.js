@@ -56,4 +56,4 @@ Inprint.plugins.rss.control.Context = function(parent, panels) {
 
     }, tree);
 
-}
+};

@@ -1,17 +1,17 @@
 Inprint.fascicle.places.Context = function(parent, panels) {
 
-    var tree = panels["places"];
+    var tree = panels.places;
 
     tree.on("contextmenu", function(node) {
-        
+
         this.selection = node;
 
         var nodeid = node.attributes.id;
         var nodetype = node.attributes.type;
-        
+
         var disabled = false;
         var items = [];
-        
+
         if (nodetype == 'fascicle') {
             items.push({
                 icon: _ico("zone--plus"),
@@ -43,7 +43,7 @@ Inprint.fascicle.places.Context = function(parent, panels) {
                 handler: function() { this.cmpDelete(node); }
             });
         }
-        
+
         items.push('-', {
             icon: _ico("arrow-circle-double"),
             cls: "x-btn-text-icon",
@@ -56,4 +56,4 @@ Inprint.fascicle.places.Context = function(parent, panels) {
 
     }, tree);
 
-}
+};

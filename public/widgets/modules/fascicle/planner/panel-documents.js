@@ -1,10 +1,10 @@
 Inprint.fascicle.planner.Documents = Ext.extend(Ext.grid.EditorGridPanel, {
 
     initComponent: function() {
-        
+
         var actions = new Inprint.documents.GridActions();
         var columns = new Inprint.documents.GridColumns();
-        
+
         this.urls = {
             "list":       "/fascicle/documents/list/",
             "briefcase":  "/documents/briefcase/",
@@ -13,10 +13,9 @@ Inprint.fascicle.planner.Documents = Ext.extend(Ext.grid.EditorGridPanel, {
             "recycle":    "/documents/recycle/",
             "restore":    "/documents/restore/",
             "delete":     "/documents/delete/"
-        }
+        };
 
         this.store = Inprint.factory.Store.group(this.urls.list, {
-            remoteSort: true,
             groupField:'headline_shortcut',
             remoteGroup:false,
             remoteSort:false,
@@ -27,7 +26,7 @@ Inprint.fascicle.planner.Documents = Ext.extend(Ext.grid.EditorGridPanel, {
         });
 
         this.sm = new Ext.grid.CheckboxSelectionModel();
-        
+
         this.columns = [
             this.sm,
             columns.viewed,
@@ -48,7 +47,7 @@ Inprint.fascicle.planner.Documents = Ext.extend(Ext.grid.EditorGridPanel, {
             columns.images,
             columns.size
         ];
-        
+
         this.tbar = [
             {
                 ref: "../btnCreate",
@@ -141,13 +140,13 @@ Inprint.fascicle.planner.Documents = Ext.extend(Ext.grid.EditorGridPanel, {
                 cls: 'x-btn-text-icon',
                 scope:this
             }
-        ]
-        
+        ];
+
         this.view = new Ext.grid.GroupingView({
             forceFit:true,
             groupTextTpl: '{text} ({[values.rs.length]} {[values.rs.length > 1 ? "Items" : "Item"]})'
         });
-        
+
         Ext.apply(this, {
             border:false,
             stripeRows: true,
@@ -157,7 +156,7 @@ Inprint.fascicle.planner.Documents = Ext.extend(Ext.grid.EditorGridPanel, {
             tbar: this.tbar,
             columns: this.columns
         });
-        
+
         Inprint.fascicle.planner.Documents.superclass.initComponent.apply(this, arguments);
 
     },
@@ -165,11 +164,11 @@ Inprint.fascicle.planner.Documents = Ext.extend(Ext.grid.EditorGridPanel, {
     onRender: function() {
         Inprint.fascicle.planner.Documents.superclass.onRender.apply(this, arguments);
     },
-    
+
     cmpShowBriefcase: function() {
-        
+
         //if (!this.dlgShowBriefcase) {
-            
+
             this.dlgShowBriefcase = new Ext.Window({
                 title: 'Просмотр портфеля материалов',
                 width: 900, height: 600,
@@ -200,8 +199,8 @@ Inprint.fascicle.planner.Documents = Ext.extend(Ext.grid.EditorGridPanel, {
             ]
             });
         //}
-        
+
         this.dlgShowBriefcase.show();
-        
+
     }
 });

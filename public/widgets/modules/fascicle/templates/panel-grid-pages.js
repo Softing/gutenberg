@@ -11,7 +11,7 @@ Inprint.fascicle.templates.Pages = Ext.extend(Ext.grid.GridPanel, {
             "read":   _url("/fascicle/templates/pages/read/"),
             "update": _url("/fascicle/templates/pages/update/"),
             "delete": _url("/fascicle/templates/pages/delete/")
-        }
+        };
 
         this.store = Inprint.factory.Store.json(this.urls.list, {
             autoLoad:true,
@@ -150,7 +150,7 @@ Inprint.fascicle.templates.Pages = Ext.extend(Ext.grid.GridPanel, {
                     },
                     actioncomplete: function (form, action) {
                         if (action.type == "submit") {
-                            this.components["create-window"].hide()
+                            this.components["create-window"].hide();
                             this.cmpReload();
                         }
                     }
@@ -309,7 +309,7 @@ Inprint.fascicle.templates.Pages = Ext.extend(Ext.grid.GridPanel, {
 
                         }
                         if (action.type == "submit") {
-                            this.components["update-window"].hide()
+                            this.components["update-window"].hide();
                             this.cmpReload();
                         }
                     }

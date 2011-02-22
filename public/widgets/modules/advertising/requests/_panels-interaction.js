@@ -23,4 +23,4 @@ Inprint.advert.requests.Interaction = function(parent, panels) {
         }
     }, parent);
 
-}
+};

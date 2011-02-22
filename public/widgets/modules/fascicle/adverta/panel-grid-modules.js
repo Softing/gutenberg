@@ -1,35 +1,28 @@
 Inprint.fascicle.adverta.Modules = Ext.extend(Ext.grid.GridPanel, {
 
     initComponent: function() {
-        
+
         this.pageId = null;
         this.pageW  = null;
         this.pageH  = null;
-        
+
         this.params = {};
         this.components = {};
-        
+
         this.urls = {
             "list":        "/advertising/modules/list/",
             "create": _url("/advertising/modules/create/"),
             "read":   _url("/advertising/modules/read/"),
             "update": _url("/advertising/modules/update/"),
             "delete": _url("/advertising/modules/delete/")
-        }
+        };
 
         this.store = Inprint.factory.Store.json(this.urls.list);
-        
+
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
-        
+
         this.columns = [
             this.selectionModel,
-            //{
-            //    id:"title",
-            //    header: _("Title"),
-            //    width: 150,
-            //    sortable: true,
-            //    dataIndex: "title"
-            //},
             {
                 id:"shortcut",
                 header: _("Shortcut"),
@@ -43,44 +36,8 @@ Inprint.fascicle.adverta.Modules = Ext.extend(Ext.grid.GridPanel, {
                 sortable: true,
                 dataIndex: "description"
             }
-            //{
-            //    id:"amount",
-            //    header: _("Amount"),
-            //    sortable: true,
-            //    dataIndex: "amount"
-            //},
-            //{
-            //    id:"area",
-            //    header: _("Area"),
-            //    sortable: true,
-            //    dataIndex: "area"
-            //},
-            //{
-            //    id:"x",
-            //    header: _("X"),
-            //    sortable: true,
-            //    dataIndex: "x"
-            //},
-            //{
-            //    id:"y",
-            //    header: _("Y"),
-            //    sortable: true,
-            //    dataIndex: "y"
-            //},
-            //{
-            //    id:"w",
-            //    header: _("W"),
-            //    sortable: true,
-            //    dataIndex: "w"
-            //},
-            //{
-            //    id:"h",
-            //    header: _("H"),
-            //    sortable: true,
-            //    dataIndex: "h"
-            //}
         ];
-        
+
         this.tbar = [
             {
                 disabled:false,
@@ -111,7 +68,7 @@ Inprint.fascicle.adverta.Modules = Ext.extend(Ext.grid.GridPanel, {
                 handler: this.cmpDelete
             }
         ];
-        
+
         Ext.apply(this, {
             border:false,
             stripeRows: true,
@@ -127,8 +84,8 @@ Inprint.fascicle.adverta.Modules = Ext.extend(Ext.grid.GridPanel, {
     onRender: function() {
         Inprint.fascicle.adverta.Modules.superclass.onRender.apply(this, arguments);
     },
-    
-    
+
+
     cmpCreate: function() {
         var win = this.components["create-window"];
 
@@ -148,24 +105,24 @@ Inprint.fascicle.adverta.Modules = Ext.extend(Ext.grid.GridPanel, {
                 },
                 baseParams: {},
                 items: [
-                    
+
                     _FLD_HDN_EDITION,
                     _FLD_HDN_PAGE,
-                    
+
                     {
                         xtype: "titlefield",
                         value: _("Basic options")
                     },
-                    
+
                     _FLD_SHORTCUT,
                     _FLD_TITLE,
                     _FLD_DESCRIPTION,
-                    
+
                     {
                         xtype: "titlefield",
                         value: _("More options")
                     },
-                    
+
                     {
                         xtype: "numberfield",
                         allowBlank:false,
@@ -187,14 +144,14 @@ Inprint.fascicle.adverta.Modules = Ext.extend(Ext.grid.GridPanel, {
                     },
                     actioncomplete: function (form, action) {
                         if (action.type == "submit") {
-                            this.components["create-window"].hide()
+                            this.components["create-window"].hide();
                             this.cmpReload();
                         }
                     }
                 },
                 keys: [ _KEY_ENTER_SUBMIT ]
             };
-            
+
             var flash =  {
                 xtype: "flash",
                 swfWidth:380,
@@ -214,7 +171,7 @@ Inprint.fascicle.adverta.Modules = Ext.extend(Ext.grid.GridPanel, {
                         alert(2);
                     },
                     afterrender: function(panel) {
-                        
+
                         var init = function () {
                             if (panel.swf.init) {
                                 panel.swf.init(panel.getSwfId(), "letter", 0, 0);
@@ -222,13 +179,13 @@ Inprint.fascicle.adverta.Modules = Ext.extend(Ext.grid.GridPanel, {
                                 init.defer(10, this);
                             }
                         };
-                        
+
                         init.defer(10, this);
-                        
+
                     }
                 }
             };
-            
+
             win = new Ext.Window({
                 width:700,
                 height:500,
@@ -265,12 +222,12 @@ Inprint.fascicle.adverta.Modules = Ext.extend(Ext.grid.GridPanel, {
                 },
                 buttons: [ _BTN_WNDW_ADD, _BTN_WNDW_CLOSE ]
             });
-            
+
         }
-        
+
         win.show(this);
         this.components["create-window"] = win;
-        
+
         if (this.pageW && this.pageH) {
             var configure = function () {
                 if (win.flash.setGrid) {
@@ -280,17 +237,17 @@ Inprint.fascicle.adverta.Modules = Ext.extend(Ext.grid.GridPanel, {
                 } else {
                     configure.defer(10, this);
                 }
-            }
+            };
             configure.defer(10, this);
         }
-        
+
         var form = win.form.getForm();
-        
+
         form.reset();
-        
+
         form.findField("edition").setValue(this.parent.edition);
         form.findField("page").setValue(this.pageId);
-        
+
     },
 
     cmpUpdate: function() {
@@ -312,21 +269,21 @@ Inprint.fascicle.adverta.Modules = Ext.extend(Ext.grid.GridPanel, {
                 },
                 items: [
                     _FLD_HDN_ID,
-                    
+
                     {
                         xtype: "titlefield",
                         value: _("Basic options")
                     },
-                    
+
                     _FLD_SHORTCUT,
                     _FLD_TITLE,
                     _FLD_DESCRIPTION,
-                    
+
                     {
                         xtype: "titlefield",
                         value: _("More options")
                     },
-                    
+
                     {
                         xtype: "numberfield",
                         allowBlank:false,
@@ -350,9 +307,9 @@ Inprint.fascicle.adverta.Modules = Ext.extend(Ext.grid.GridPanel, {
                     },
                     actioncomplete: function (form, action) {
                         if (action.type == "load") {
-                            
+
                             var swf = this.components["update-window"].findByType("flash")[0].swf;
-                            
+
                             var load = function () {
                                 if (swf.setBlocks) {
                                     var record = action.result.data;
@@ -363,12 +320,12 @@ Inprint.fascicle.adverta.Modules = Ext.extend(Ext.grid.GridPanel, {
                                     load.defer(10, this);
                                 }
                             };
-                            
+
                             load.defer(10, this);
-                            
+
                         }
                         if (action.type == "submit") {
-                            this.components["update-window"].hide()
+                            this.components["update-window"].hide();
                             this.cmpReload();
                         }
                     }
@@ -395,7 +352,7 @@ Inprint.fascicle.adverta.Modules = Ext.extend(Ext.grid.GridPanel, {
                         alert(2);
                     },
                     afterrender: function(panel) {
-                        
+
                         var init = function () {
                             if (panel.swf.init) {
                                 panel.swf.init(panel.getSwfId(), "letter", 0, 0);
@@ -403,13 +360,13 @@ Inprint.fascicle.adverta.Modules = Ext.extend(Ext.grid.GridPanel, {
                                 init.defer(10, this);
                             }
                         };
-                        
+
                         init.defer(10, this);
-                        
+
                     }
                 }
             };
-            
+
             win = new Ext.Window({
                 width:700,
                 height:500,
@@ -446,7 +403,7 @@ Inprint.fascicle.adverta.Modules = Ext.extend(Ext.grid.GridPanel, {
                 },
                 buttons: [ _BTN_WNDW_SAVE, _BTN_WNDW_CLOSE ]
             });
-            
+
         }
 
         win.show(this);
@@ -461,13 +418,13 @@ Inprint.fascicle.adverta.Modules = Ext.extend(Ext.grid.GridPanel, {
                 } else {
                     configure.defer(10, this);
                 }
-            }
+            };
             configure.defer(10, this);
         }
 
         var form = win.form.getForm();
         form.reset();
-        
+
         form.load({
             url: this.urls.read,
             scope:this,
@@ -475,9 +432,9 @@ Inprint.fascicle.adverta.Modules = Ext.extend(Ext.grid.GridPanel, {
                 id: this.getValue("id")
             }
         });
-        
+
     },
-    
+
     cmpDelete: function() {
         Ext.MessageBox.confirm(
             _("Warning"),

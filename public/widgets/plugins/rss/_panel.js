@@ -1,6 +1,7 @@
 Inprint.plugins.rss.Panel = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
+
         this.panels = {
             grid: new Inprint.plugins.rss.Grid({
                 parent:this,
@@ -10,7 +11,8 @@ Inprint.plugins.rss.Panel = Ext.extend(Ext.Panel, {
                 parent:this,
                 oid: this.oid
             })
-        }
+        };
+
         Ext.apply(this, {
             border:true,
             layout: "border",
@@ -21,16 +23,17 @@ Inprint.plugins.rss.Panel = Ext.extend(Ext.Panel, {
             items: [
                 {   region: "center",
                     layout:"fit",
-                    items: this.panels["grid"]
+                    items: this.panels.grid
                 },
                 {   region: "south",
                     layout:"fit",
                     split:true,
                     height:354,
-                    items: this.panels["profile"]
+                    items: this.panels.profile
                 }
             ]
         });
+
         Inprint.plugins.rss.Panel.superclass.initComponent.apply(this, arguments);
     },
 
@@ -41,7 +44,7 @@ Inprint.plugins.rss.Panel = Ext.extend(Ext.Panel, {
     },
 
     cmpReload: function() {
-        this.panels["grid"].cmpReload();
+        this.panels.grid.cmpReload();
     }
 
 });

@@ -8,7 +8,9 @@ Inprint.plugins.rss.Access = function(parent, panels) {
         var access = _arrayAccessCheck(records, ['rss']);
 
         _disable(grid.btnPublish, grid.btnUnpublish);
-        if (access["rss"] == 'enabled') _enable(grid.btnPublish, grid.btnUnpublish);
+        if (access.rss == 'enabled') {
+            _enable(grid.btnPublish, grid.btnUnpublish);
+        }
 
     });
 

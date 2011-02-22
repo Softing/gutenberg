@@ -1,22 +1,22 @@
 Inprint.fascicle.places.Main = Ext.extend(Ext.Panel, {
-    
+
     initComponent: function() {
-        
+
         this.fascicle = this.oid;
         this.panels = {};
-        
-        this.panels["places"]   = new Inprint.fascicle.places.Places({
+
+        this.panels.places   = new Inprint.fascicle.places.Places({
             parent: this, fascicle: this.oid
         });
-        
+
         this.panels.modules   = new Inprint.fascicle.places.Modules({
             parent: this, fascicle: this.oid
         });
-        
+
         this.panels.headlines = new Inprint.fascicle.places.Headlines({
             parent: this, fascicle: this.oid
         });
-        
+
         Ext.apply(this, {
             layout: "border",
             items: [
@@ -28,7 +28,7 @@ Inprint.fascicle.places.Main = Ext.extend(Ext.Panel, {
                     split: true,
                     layout:"fit",
                     margins: "3 0 3 3",
-                    items: this.panels["places"]
+                    items: this.panels.places
                 },
                 {
                     border:false,
@@ -66,7 +66,7 @@ Inprint.fascicle.places.Main = Ext.extend(Ext.Panel, {
         Inprint.fascicle.places.Context(this, this.panels);
         Inprint.fascicle.places.Interaction(this, this.panels);
     },
-    
+
     cmpReload: function() {
         this.panels.modules.cmpReload();
         this.panels.headlines.cmpReload();

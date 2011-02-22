@@ -1,14 +1,14 @@
 Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
-        
-        this.manager;
-        this.version;
-        
+
+        this.manager = null;
+        this.version = null;
+
         this.access = {};
-        
+
         this.fascicle = this.oid;
-        
+
         this.panels = {
             pages: new Inprint.fascicle.planner.Pages({
                 parent: this,
@@ -26,8 +26,8 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                 parent: this,
                 oid: this.oid
             })
-        }
-        
+        };
+
         this.tbar = [
             {
                 ref: "../btnPageCreate",
@@ -148,22 +148,22 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                 text: 'Печать А4',
                 icon: _ico("printer"),
                 cls: 'x-btn-text-icon',
-                scope:this, 
+                scope:this,
                 handler: function() {
-                    
+
                 }
             },
             {
                 text: 'Печать А3',
                 icon: _ico("printer"),
                 cls: 'x-btn-text-icon',
-                scope:this, 
+                scope:this,
                 handler: function() {
-                    
+
                 }
             }
         ];
-        
+
         Ext.apply(this, {
             layout: "border",
             autoScroll:true,
@@ -196,8 +196,8 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                             activeItem: 0,
                             collapseMode: 'mini',
                             items: [
-                                this.panels["documents"],
-                                this.panels["requests"]
+                                this.panels.documents,
+                                this.panels.requests
                             ],
                             stateId: 'fasicles.planner.documents'
                         }
@@ -211,30 +211,30 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                     maxSize: 800,
                     layout:"fit",
                     collapseMode: 'mini',
-                    items: this.panels["summary"],
+                    items: this.panels.summary,
                     stateId: 'fasicles.planner.summary'
                 }
             ]
         });
-        
+
         Inprint.fascicle.planner.Panel.superclass.initComponent.apply(this, arguments);
 
     },
 
     onRender: function() {
         Inprint.fascicle.planner.Panel.superclass.onRender.apply(this, arguments);
-        
+
         Inprint.fascicle.planner.Context(this, this.panels);
         Inprint.fascicle.planner.Interaction(this, this.panels);
-        
+
         this.cmpInitSession();
-        
+
     },
-    
+
     cmpInitSession: function () {
-        
+
         this.body.mask("Обновление данных...");
-        
+
         Ext.Ajax.request({
             url: _url("/fascicle/seance/"),
             scope: this,
@@ -245,37 +245,37 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                 this.body.unmask();
             },
             success: function(response) {
-                
-                var rsp = Ext.util.JSON.decode(response.responseText)
-                
+
+                var rsp = Ext.util.JSON.decode(response.responseText);
+
                 this.version = rsp.fascicle.version;
                 this.manager = rsp.fascicle.manager;
-                
+
                 var shortcut = rsp.fascicle.shortcut;
                 var description = "";
-                
+
                 if (rsp.fascicle.manager) {
                     description += '&nbsp;[<b>Работает '+ rsp.fascicle.manager_shortcut +'</b>]';
                 }
-                
+
                 description += '&nbsp;[Полос&nbsp;'+ rsp.fascicle.pc +'='+ rsp.fascicle.dc +'+'+ rsp.fascicle.ac;
                 description += '&nbsp;|&nbsp;'+ rsp.fascicle.dav +'%/'+ rsp.fascicle.aav +'%]';
-                
+
                 var title = Inprint.ObjectResolver.makeTitle(this.parent.oid, this.parent.aid, this.parent.icon, shortcut, description);
-                this.parent.setTitle(title)
-                
+                this.parent.setTitle(title);
+
                 this.panels.pages.getStore().loadData({ data: rsp.pages });
-                this.panels["documents"].getStore().loadData({ data: rsp.documents });
-                this.panels["requests"].getStore().loadData({ data: rsp.requests });
-                this.panels["summary"].getStore().loadData({ data: rsp.summary });
-                
+                this.panels.documents.getStore().loadData({ data: rsp.documents });
+                this.panels.requests.getStore().loadData({ data: rsp.requests });
+                this.panels.summary.getStore().loadData({ data: rsp.summary });
+
                 Inprint.fascicle.planner.Access(this, this.panels, rsp.fascicle.access);
-                
+
                 this.cmpCheckSession.defer( 50000, this);
             }
         });
     },
-    
+
     cmpReload: function() {
         this.cmpInitSession();
     },
@@ -289,9 +289,9 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
             },
             success: function(response) {
                 var rsp = Ext.util.JSON.decode(response.responseText);
-                
+
                 Inprint.fascicle.planner.Access(this, this.panels, rsp.fascicle.access);
-                
+
                 if (this.manager && this.manager != rsp.fascicle.manager) {
                     Ext.MessageBox.alert(_("Error"), _("Another employee %1 captured this issue!", [1]));
                 } else {
@@ -309,9 +309,9 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
             params: {
                 fascicle: this.oid
             },
-            callback: function() { this.body.unmask() },
+            callback: function() { this.body.unmask(); },
             success: function(response) {
-                var rsp = Ext.util.JSON.decode(response.responseText)
+                var rsp = Ext.util.JSON.decode(response.responseText);
                 if (!rsp.success && rsp.errors[0]) {
                     Ext.MessageBox.alert(_("Error"), _(rsp.errors[0].msg));
                 }
@@ -321,18 +321,18 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
     },
 
     beginEdit: function() {
-        
+
         this.body.mask("Открываем выпуск...");
-        
+
         Ext.Ajax.request({
             url: _url("/fascicle/open/"),
             scope: this,
             params: {
                 fascicle: this.oid
             },
-            callback: function() { this.body.unmask() },
+            callback: function() { this.body.unmask(); },
             success: function(response) {
-                var rsp = Ext.util.JSON.decode(response.responseText)
+                var rsp = Ext.util.JSON.decode(response.responseText);
                 if (!rsp.success && rsp.errors[0]) {
                     Ext.MessageBox.alert(_("Error"), _(rsp.errors[0].msg));
                 }
@@ -342,18 +342,18 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
     },
 
     endEdit: function() {
-        
+
         this.body.mask("Закрываем выпуск...");
-        
+
         Ext.Ajax.request({
             url: _url("/fascicle/close/"),
             scope: this,
             params: {
                 fascicle: this.oid
             },
-            callback: function() { this.body.unmask() },
+            callback: function() { this.body.unmask(); },
             success: function(response) {
-                var rsp = Ext.util.JSON.decode(response.responseText)
+                var rsp = Ext.util.JSON.decode(response.responseText);
                 if (!rsp.success && rsp.errors[0]) {
                     Ext.MessageBox.alert(_("Error"), _(rsp.errors[0].msg));
                 }
@@ -363,11 +363,11 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
     },
 
     cmpSave: function() {
-        
+
         var pages     = this.panels.pages;
-        var documents = this.panels["documents"];
-        var modules   = this.panels["summary"];
-        
+        var documents = this.panels.documents;
+        var modules   = this.panels.summary;
+
         // get documents changes
         var data1 = [];
         var records1 = documents.getStore().getModifiedRecords();
@@ -378,7 +378,7 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                 data1.push(document +'::'+ pages);
             }, this);
         }
-        
+
         // get modules changes
         var data2 = [];
         var records2 = modules.getStore().getModifiedRecords();
@@ -389,9 +389,9 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                 data2.push(place +'::'+ pages);
             }, this);
         }
-        
+
         this.body.mask("Сохранение данных");
-        
+
         var o = {
             url: _url("/fascicle/save/"),
             params:{
@@ -405,9 +405,9 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                 this.cmpReload();
             }
         };
-        
+
         Ext.Ajax.request(o);
-        
+
     },
 
     cmpOnClose: function(inc) {
@@ -419,7 +419,7 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
             Inprint.layout.remove(this);
             return true;
         }
-        
+
         if (this.sessionIsActive) {
             var mbx = Ext.MessageBox.confirm(
                 'Подтверждение',
@@ -428,7 +428,7 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
             );
             return false;
         }
-        
+
         return true;
     }
 

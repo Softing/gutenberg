@@ -1,19 +1,19 @@
 Inprint.fascicle.adverta.Requests = Ext.extend(Ext.grid.GridPanel, {
-    
+
     initComponent: function() {
-        
+
         this.components = {};
         this.urls = {
             "create": _url("/fascicle/requests/create/"),
             "read":   _url("/fascicle/requests/read/"),
             "update": _url("/fascicle/requests/update/"),
             "delete": _url("/fascicle/requests/delete/")
-        }
-        
+        };
+
         this.store = Inprint.factory.Store.json("/fascicle/requests/list/");
-        
+
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
-        
+
         this.columns = [
             this.selectionModel,
             {
@@ -44,7 +44,7 @@ Inprint.fascicle.adverta.Requests = Ext.extend(Ext.grid.GridPanel, {
                 sortable: true,
                 dataIndex: "shortcut"
             },
-            
+
             {
                 id:"position",
                 header: _("Place"),
@@ -94,7 +94,7 @@ Inprint.fascicle.adverta.Requests = Ext.extend(Ext.grid.GridPanel, {
                 sortable: true,
                 dataIndex: "readiness"
             },
-            
+
             {
                 id:"modified",
                 header: _("Modified"),
@@ -104,9 +104,9 @@ Inprint.fascicle.adverta.Requests = Ext.extend(Ext.grid.GridPanel, {
                 format: "Y-m-d H:i",
                 dataIndex: "updated"
             }
-            
+
         ];
-        
+
         this.tbar = [
             {
                 icon: _ico("plus-button"),
@@ -136,7 +136,7 @@ Inprint.fascicle.adverta.Requests = Ext.extend(Ext.grid.GridPanel, {
                 handler: this.cmpDelete
             }
         ];
-        
+
         Ext.apply(this, {
             border: false,
             stripeRows: true,
@@ -144,43 +144,43 @@ Inprint.fascicle.adverta.Requests = Ext.extend(Ext.grid.GridPanel, {
             sm: this.selectionModel,
             autoExpandColumn: "title"
         });
-        
+
         Inprint.fascicle.adverta.Requests.superclass.initComponent.apply(this, arguments);
-        
+
     },
 
     onRender: function() {
         Inprint.fascicle.adverta.Requests.superclass.onRender.apply(this, arguments);
     },
-    
+
     cmpCreate: function() {
-        
+
         var pages = this.parent.panels.pages;
-        
+
         var selection = pages.cmpGetSelected();
-        
+
         if (selection.length > 2) {
             return;
         }
-        
+
         var wndw = new Inprint.cmp.Adverta({
             fascicle: this.parent.fascicle,
             selection: selection
         });
-        
+
         wndw.on("actioncomplete", function() {
             this.parent.cmpReload();
         }, this);
-        
+
         wndw.show();
     },
-    
+
     cmpUpdate: function() {
         alert("update");
     },
-    
+
     cmpDelete: function() {
         alert("delete");
     }
-    
+
 });

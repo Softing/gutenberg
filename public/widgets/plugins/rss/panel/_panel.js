@@ -6,7 +6,7 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
 
         this.urls = {
             "read":   _url("/plugin/rss/read/")
-        }
+        };
 
         this.panels = {
             "form": new Inprint.plugins.rss.profile.Form({
@@ -15,7 +15,7 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
             "grid": new Inprint.plugins.rss.profile.Grid({
                 parent: this
             })
-        }
+        };
 
         this.tbar = [
             {
@@ -56,7 +56,7 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
 
         this.items = [
             this.panels.form,
-            this.panels["grid"]
+            this.panels.grid
         ];
 
         Ext.apply(this, {
@@ -70,7 +70,7 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
     onRender: function() {
         Inprint.plugins.rss.Profile.superclass.onRender.apply(this, arguments);
 
-        this.grid = this.panels["grid"];
+        this.grid = this.panels.grid;
         this.form = this.panels.form.getForm();
 
         this.panels.form.on("actioncomplete", function (form, action) {
@@ -120,15 +120,15 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
     cmpAccess: function(access) {
         _disable(this.btnSave, this.btnUpload);
 
-        if (access && access["rss"] === true) {
+        if (access && access.rss === true) {
             this.btnSave.enable();
         }
 
-        if (access && access["rss"] === true && access["upload"] === true) {
+        if (access && access.rss === true && access.upload === true) {
             this.btnUpload.enable();
         }
 
-        if (access && access["rss"] === true) {
+        if (access && access.rss === true) {
             this.getEl().unmask();
         } else {
             this.getEl().mask(_("Access denide"));
@@ -182,7 +182,7 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
 
         UploadPanel.on("fileupload", function(uploader, success, result){
             if(success){
-                this.panels["grid"].cmpReload();
+                this.panels.grid.cmpReload();
             }
         }, this);
 

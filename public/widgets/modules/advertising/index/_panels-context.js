@@ -3,15 +3,15 @@ Inprint.advert.index.Context = function(parent, panels) {
     var tree = panels.editions;
 
     tree.on("contextmenu", function(node) {
-        
+
         this.selection = node;
 
         var nodeid = node.attributes.id;
         var nodetype = node.attributes.type;
-        
+
         var disabled = false;
         var items = [];
-        
+
         if (nodetype == 'edition') {
             items.push({
                 icon: _ico("zone--plus"),
@@ -43,7 +43,7 @@ Inprint.advert.index.Context = function(parent, panels) {
                 handler: function() { this.cmpDelete(node); }
             });
         }
-        
+
         items.push('-', {
             icon: _ico("arrow-circle-double"),
             cls: "x-btn-text-icon",
@@ -56,4 +56,4 @@ Inprint.advert.index.Context = function(parent, panels) {
 
     }, tree);
 
-}
+};

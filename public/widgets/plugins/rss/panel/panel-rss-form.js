@@ -4,7 +4,7 @@ Inprint.plugins.rss.profile.Form = Ext.extend(Ext.FormPanel, {
 
         this.urls = {
             "update": _url("/plugin/rss/update/")
-        }
+        };
 
         Ext.apply(this, {
             xtype: "form",

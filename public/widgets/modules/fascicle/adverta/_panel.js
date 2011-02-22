@@ -1,14 +1,14 @@
 Inprint.fascicle.adverta.Panel = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
-        
-        this.manager;
-        this.version;
-        
+
+        this.manager = null;
+        this.version = null;
+
         this.access = {};
-        
+
         this.fascicle = this.oid;
-        
+
         this.panels = {
             pages: new Inprint.fascicle.adverta.Pages({
                 parent: this,
@@ -22,8 +22,8 @@ Inprint.fascicle.adverta.Panel = Ext.extend(Ext.Panel, {
                 parent: this,
                 oid: this.oid
             })
-        }
-        
+        };
+
         this.tbar = [
             '->',
             {
@@ -72,22 +72,22 @@ Inprint.fascicle.adverta.Panel = Ext.extend(Ext.Panel, {
                 text: 'Печать А4',
                 icon: _ico("printer"),
                 cls: 'x-btn-text-icon',
-                scope:this, 
+                scope:this,
                 handler: function() {
-                    
+
                 }
             },
             {
                 text: 'Печать А3',
                 icon: _ico("printer"),
                 cls: 'x-btn-text-icon',
-                scope:this, 
+                scope:this,
                 handler: function() {
-                    
+
                 }
             }
         ];
-        
+
         Ext.apply(this, {
             layout: "border",
             autoScroll:true,
@@ -118,7 +118,7 @@ Inprint.fascicle.adverta.Panel = Ext.extend(Ext.Panel, {
                             maxSize: 800,
                             layout:"fit",
                             collapseMode: 'mini',
-                            items: this.panels["requests"],
+                            items: this.panels.requests,
                             stateId: 'fasicles.planner.adverta'
                         }
                     ]
@@ -131,26 +131,26 @@ Inprint.fascicle.adverta.Panel = Ext.extend(Ext.Panel, {
                     maxSize: 800,
                     layout:"fit",
                     collapseMode: 'mini',
-                    items: this.panels["summary"],
+                    items: this.panels.summary,
                     stateId: 'fasicles.planner.summary'
                 }
             ]
         });
-        
+
         Inprint.fascicle.adverta.Panel.superclass.initComponent.apply(this, arguments);
 
     },
 
     onRender: function() {
         Inprint.fascicle.adverta.Panel.superclass.onRender.apply(this, arguments);
-        
+
         Inprint.fascicle.adverta.Context(this, this.panels);
         Inprint.fascicle.adverta.Interaction(this, this.panels);
-        
+
         this.cmpInitSession();
-        
+
     },
-    
+
     cmpInitSession: function () {
         this.body.mask("Обновление данных...");
         Ext.Ajax.request({
@@ -163,36 +163,36 @@ Inprint.fascicle.adverta.Panel = Ext.extend(Ext.Panel, {
                 this.body.unmask();
             },
             success: function(response) {
-                
-                var rsp = Ext.util.JSON.decode(response.responseText)
-                
+
+                var rsp = Ext.util.JSON.decode(response.responseText);
+
                 this.version = rsp.fascicle.version;
                 this.manager = rsp.fascicle.manager;
-                
+
                 var shortcut = rsp.fascicle.shortcut;
                 var description = "";
-                
+
                 if (rsp.fascicle.manager) {
                     description += '&nbsp;[<b>Работает '+ rsp.fascicle.manager_shortcut +'</b>]';
                 }
-                
+
                 description += '&nbsp;[Полос&nbsp;'+ rsp.fascicle.pc +'='+ rsp.fascicle.dc +'+'+ rsp.fascicle.ac;
                 description += '&nbsp;|&nbsp;'+ rsp.fascicle.dav +'%/'+ rsp.fascicle.aav +'%]';
-                
+
                 var title = Inprint.ObjectResolver.makeTitle(this.parent.oid, this.parent.aid, this.parent.icon, shortcut, description);
-                this.parent.setTitle(title)
-                
+                this.parent.setTitle(title);
+
                 this.panels.pages.getStore().loadData({ data: rsp.pages });
-                this.panels["requests"].getStore().loadData({ data: rsp.requests });
-                this.panels["summary"].getStore().loadData({ data: rsp.summary });
-                
+                this.panels.requests.getStore().loadData({ data: rsp.requests });
+                this.panels.summary.getStore().loadData({ data: rsp.summary });
+
                 Inprint.fascicle.adverta.Access(this, this.panels, rsp.fascicle.access);
-                
+
                 this.cmpCheckSession.defer( 50000, this);
             }
         });
     },
-    
+
     cmpReload: function() {
         this.cmpInitSession();
     },
@@ -206,9 +206,9 @@ Inprint.fascicle.adverta.Panel = Ext.extend(Ext.Panel, {
             },
             success: function(response) {
                 var rsp = Ext.util.JSON.decode(response.responseText);
-                
+
                 Inprint.fascicle.adverta.Access(this, this.panels, rsp.fascicle.access);
-                
+
                 if (this.manager && this.manager != rsp.fascicle.manager) {
                     Ext.MessageBox.alert(_("Error"), _("Another employee %1 captured this issue!", [1]));
                 } else {
@@ -226,9 +226,9 @@ Inprint.fascicle.adverta.Panel = Ext.extend(Ext.Panel, {
             params: {
                 fascicle: this.oid
             },
-            callback: function() { this.body.unmask() },
+            callback: function() { this.body.unmask(); },
             success: function(response) {
-                var rsp = Ext.util.JSON.decode(response.responseText)
+                var rsp = Ext.util.JSON.decode(response.responseText);
                 if (!rsp.success && rsp.errors[0]) {
                     Ext.MessageBox.alert(_("Error"), _(rsp.errors[0].msg));
                 }
@@ -238,18 +238,18 @@ Inprint.fascicle.adverta.Panel = Ext.extend(Ext.Panel, {
     },
 
     beginEdit: function() {
-        
+
         this.body.mask("Открываем выпуск...");
-        
+
         Ext.Ajax.request({
             url: _url("/fascicle/open/"),
             scope: this,
             params: {
                 fascicle: this.oid
             },
-            callback: function() { this.body.unmask() },
+            callback: function() { this.body.unmask(); },
             success: function(response) {
-                var rsp = Ext.util.JSON.decode(response.responseText)
+                var rsp = Ext.util.JSON.decode(response.responseText);
                 if (!rsp.success && rsp.errors[0]) {
                     Ext.MessageBox.alert(_("Error"), _(rsp.errors[0].msg));
                 }
@@ -259,18 +259,18 @@ Inprint.fascicle.adverta.Panel = Ext.extend(Ext.Panel, {
     },
 
     endEdit: function() {
-        
+
         this.body.mask("Закрываем выпуск...");
-        
+
         Ext.Ajax.request({
             url: _url("/fascicle/close/"),
             scope: this,
             params: {
                 fascicle: this.oid
             },
-            callback: function() { this.body.unmask() },
+            callback: function() { this.body.unmask(); },
             success: function(response) {
-                var rsp = Ext.util.JSON.decode(response.responseText)
+                var rsp = Ext.util.JSON.decode(response.responseText);
                 if (!rsp.success && rsp.errors[0]) {
                     Ext.MessageBox.alert(_("Error"), _(rsp.errors[0].msg));
                 }
@@ -280,14 +280,14 @@ Inprint.fascicle.adverta.Panel = Ext.extend(Ext.Panel, {
     },
 
     cmpSave: function() {
-        
+
         var pages = this.panels.pages;
-        var requests = this.panels["requests"];
-        
+        var requests = this.panels.requests;
+
         var data = [];
-        
+
         // get requests changes
-        
+
         var records = requests.getStore().getModifiedRecords();
         if(records.length) {
             Ext.each(records, function(r, i) {
@@ -296,9 +296,9 @@ Inprint.fascicle.adverta.Panel = Ext.extend(Ext.Panel, {
                 data.push(document +'::'+ pages);
             }, this);
         }
-        
+
         this.body.mask("Сохранение данных");
-        
+
         var o = {
             url: _url("/fascicle/save/"),
             params:{
@@ -311,9 +311,9 @@ Inprint.fascicle.adverta.Panel = Ext.extend(Ext.Panel, {
                 this.cmpReload();
             }
         };
-        
+
         Ext.Ajax.request(o);
-        
+
     },
 
     cmpOnClose: function(inc) {
@@ -325,7 +325,7 @@ Inprint.fascicle.adverta.Panel = Ext.extend(Ext.Panel, {
             Inprint.layout.remove(this);
             return true;
         }
-        
+
         if (this.sessionIsActive) {
             var mbx = Ext.MessageBox.confirm(
                 'Подтверждение',
@@ -334,7 +334,7 @@ Inprint.fascicle.adverta.Panel = Ext.extend(Ext.Panel, {
             );
             return false;
         }
-        
+
         return true;
     }
 

@@ -7,7 +7,7 @@ Inprint.fascicle.places.Modules = Ext.extend(Ext.grid.GridPanel, {
         this.urls = {
             "list":      "/fascicle/templates/index/modules/",
             "save": _url("/fascicle/templates/index/save/")
-        }
+        };
 
         this.store = Inprint.factory.Store.json(this.urls.list);
 

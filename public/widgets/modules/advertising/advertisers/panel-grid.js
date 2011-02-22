@@ -9,12 +9,12 @@ Inprint.advert.advertisers.Grid = Ext.extend(Ext.grid.GridPanel, {
             "read":   _url("/advertising/advertisers/read/"),
             "update": _url("/advertising/advertisers/update/"),
             "delete": _url("/advertising/advertisers/delete/")
-        }
+        };
 
         this.store = Inprint.factory.Store.json("/advertising/advertisers/list/", {
             totalProperty: 'total'
         });
-        
+
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
 
         this.columns = [
@@ -153,7 +153,7 @@ Inprint.advert.advertisers.Grid = Ext.extend(Ext.grid.GridPanel, {
     onRender: function() {
         Inprint.advert.advertisers.Grid.superclass.onRender.apply(this, arguments);
     },
-    
+
     cmpCreate: function() {
 
         var win = this.components["create-window"];
@@ -177,7 +177,7 @@ Inprint.advert.advertisers.Grid = Ext.extend(Ext.grid.GridPanel, {
                             _FLD_HDN_EDITION,
                             {
                                 border:false,
-                                columnWidth:.5,
+                                columnWidth: .5,
                                 layout: 'form',
                                 items: [
                                     {
@@ -271,8 +271,9 @@ Inprint.advert.advertisers.Grid = Ext.extend(Ext.grid.GridPanel, {
             });
 
             form.on("actioncomplete", function (form, action) {
-                if (action.type == "submit")
+                if (action.type == "submit") {
                     win.hide();
+                }
                 this.cmpReload();
             }, this);
 
@@ -281,9 +282,9 @@ Inprint.advert.advertisers.Grid = Ext.extend(Ext.grid.GridPanel, {
 
         var form = win.items.first().getForm();
         form.reset();
-        
+
         form.findField("edition").setValue(this.parent.currentEdition);
-        
+
         win.show();
 
     },
@@ -429,7 +430,7 @@ Inprint.advert.advertisers.Grid = Ext.extend(Ext.grid.GridPanel, {
 
         win.show(this);
     },
-    
+
     cmpDelete: function() {
         Ext.MessageBox.confirm(
             _("Warning"),

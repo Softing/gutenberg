@@ -1,10 +1,10 @@
 Inprint.fascicle.adverta.Summary = Ext.extend(Ext.grid.EditorGridPanel, {
 
     initComponent: function() {
-        
+
         this.urls = {
             "list":       "/fascicle/summary/"
-        }
+        };
 
         this.store = Inprint.factory.Store.group(this.urls.list, {
             groupField:'place_shortcut',
@@ -16,7 +16,7 @@ Inprint.fascicle.adverta.Summary = Ext.extend(Ext.grid.EditorGridPanel, {
         });
 
         this.sm = new Ext.grid.CheckboxSelectionModel();
-        
+
         this.colModel = new Ext.grid.ColumnModel({
             defaults: {
                 sortable: false,
@@ -59,15 +59,15 @@ Inprint.fascicle.adverta.Summary = Ext.extend(Ext.grid.EditorGridPanel, {
                     width: 20,
                     header: _('FR'),
                     dataIndex: 'free'
-                }  
+                }
             ]
         });
-        
+
         this.view = new Ext.grid.GroupingView({
             hideGroupedColumn: true,
             groupTextTpl: '{text}'
         });
-        
+
         Ext.apply(this, {
             border:false,
             stripeRows: true,
@@ -77,7 +77,7 @@ Inprint.fascicle.adverta.Summary = Ext.extend(Ext.grid.EditorGridPanel, {
             tbar: this.tbar,
             columns: this.columns
         });
-        
+
         Inprint.fascicle.planner.Summary.superclass.initComponent.apply(this, arguments);
 
     },

@@ -15,7 +15,7 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
             "read":   _url("/advertising/modules/read/"),
             "update": _url("/advertising/modules/update/"),
             "delete": _url("/advertising/modules/delete/")
-        }
+        };
 
         this.store = Inprint.factory.Store.json(this.urls.list);
 
@@ -147,7 +147,7 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
                 } else {
                     configure.defer(10, this);
                 }
-            }
+            };
             configure.defer(10, this);
         }
 
@@ -291,7 +291,7 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
                         load.defer(10, this);
                     }
                     if (action.type == "submit") {
-                        form.window.hide()
+                        form.window.hide();
                         this.cmpReload();
                     }
                 }

@@ -66,7 +66,7 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
 
     cmpPageCreate: function() {
 
-        var wndw = this.components["create"];
+        var wndw = this.components.create;
 
         if (!wndw) {
 
@@ -139,7 +139,7 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
                 ]
             });
 
-            this.components["create"] = wndw;
+            this.components.create = wndw;
         }
 
         var form = wndw.findByType("form")[0].getForm();
@@ -151,7 +151,7 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
     // Редактировать
     cmpPageUpdate: function() {
 
-        var wndw = this.components["update"];
+        var wndw = this.components.update;
 
         if (!wndw) {
 
@@ -200,7 +200,7 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
                 ]
             });
 
-            this.components["update"] = wndw;
+            this.components.update = wndw;
         }
 
         wndw.show();
@@ -244,7 +244,7 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
 
         if ( inc == 'ok') {
             Ext.Ajax.request({
-                url: this.urls["move"],
+                url: this.urls.move,
                 params: {
                     fascicle: this.oid,
                     after: text,
@@ -252,7 +252,7 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
                 },
                 scope: this,
                 success: function() {
-                    this.parent.cmpReload()
+                    this.parent.cmpReload();
                 }
             });
             return;
@@ -274,7 +274,7 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
 
         if ( inc == 'ok') {
             Ext.Ajax.request({
-                url: this.urls["left"],
+                url: this.urls.left,
                 params: {
                     fascicle: this.oid,
                     amount: text,
@@ -282,7 +282,7 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
                 },
                 scope: this,
                 success: function() {
-                    this.parent.cmpReload()
+                    this.parent.cmpReload();
                 }
             });
             return;
@@ -304,7 +304,7 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
 
         if ( inc == 'ok') {
             Ext.Ajax.request({
-                url: this.urls["right"],
+                url: this.urls.right,
                 params: {
                     fascicle: this.oid,
                     amount: text,
@@ -312,7 +312,7 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
                 },
                 scope: this,
                 success: function() {
-                    this.parent.cmpReload()
+                    this.parent.cmpReload();
                 }
             });
             return;
@@ -329,11 +329,11 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
     // Стереть
     cmpPageClean: function() {
 
-        var wndw = this.components["clean"];
+        var wndw = this.components.clean;
 
         if (!wndw) {
 
-            var wndw = new Ext.Window({
+            wndw = new Ext.Window({
                 title: 'Удаление содержимого полосы',
                 width:250,
                 height:140,
@@ -344,7 +344,7 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
                 items: {
                     xtype: "form",
                     border: false,
-                    url: this.urls["clean"],
+                    url: this.urls.clean,
                     baseParams: {
                         fascicle: this.oid
                     },
@@ -386,7 +386,7 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
                 ]
             });
 
-            this.components["clean"] = wndw;
+            this.components.clean = wndw;
         }
 
         var form = wndw.findByType("form")[0].getForm();
@@ -397,7 +397,9 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
 
     //Удалить
     cmpPageDelete: function(inc) {
-        if ( inc == 'no') return;
+        if ( inc == 'no') {
+            return;
+        }
         if ( inc == 'yes') {
             Ext.Ajax.request({
                 url: this.urls["delete"],
@@ -407,7 +409,7 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
                 },
                 scope: this,
                 success: function() {
-                    this.parent.cmpReload()
+                    this.parent.cmpReload();
                 }
             });
         } else {

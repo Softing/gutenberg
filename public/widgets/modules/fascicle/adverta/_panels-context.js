@@ -1,24 +1,24 @@
 Inprint.fascicle.adverta.Context = function(parent, panels) {
 
     var view     = panels.pages.getView();
-    var requests = panels["requests"];
-    
+    var requests = panels.requests;
+
     view.on("contextmenu", function( view, index, node, e) {
-        
+
         e.stopEvent();
-        
+
         view.select(node, true);
-        
+
         var selection = panels.pages.cmpGetSelected();
         var selLength = selection.length;
-        
+
         var items = [];
         var disabled = true;
-        
+
         if (parent.access.manage) {
             disabled = false;
         }
-        
+
         items.push(
             {
                 ref: "../btnPageCreate",
@@ -28,7 +28,7 @@ Inprint.fascicle.adverta.Context = function(parent, panels) {
                 icon: _ico("plus-button"),
                 cls: 'x-btn-text-icon',
                 scope: panels.pages,
-                handler: panels["requests"].cmpCreate
+                handler: panels.requests.cmpCreate
             },
             "-",
             {
@@ -41,9 +41,9 @@ Inprint.fascicle.adverta.Context = function(parent, panels) {
                 handler: panels.pages.cmpPageCompose
             }
         );
-    
+
         new Ext.menu.Menu({ items : items }).showAt( e.getXY() );
-    
+
     }, view);
 
-}
+};

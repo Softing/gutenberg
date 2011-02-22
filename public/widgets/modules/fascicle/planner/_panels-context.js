@@ -1,34 +1,32 @@
 Inprint.fascicle.planner.Context = function(parent, panels) {
 
     var view  = panels.pages.getView();
-    
+
     view.on("contextmenu", function( view, index, node, e) {
-        
+
         e.stopEvent();
-        
-        //view.select(node, false);
-        
+
         var selection = panels.pages.cmpGetSelected();
         var selLength = selection.length;
-        
+
         var disabled = true;
         var disabled1 = true;
         var disabled2 = true;
         var items = [];
-        
+
         if (parent.access.manage) {
-            
+
             if (selLength == 1) {
                 disabled1 = false;
             }
-            
+
             if (selLength > 0 && selLength < 3) {
                 disabled2 = false;
             }
-            
+
             disabled = false;
         }
-        
+
         items.push(
             {
                 ref: "../btnPageCreate",
@@ -123,7 +121,7 @@ Inprint.fascicle.planner.Context = function(parent, panels) {
                 handler: panels.pages.cmpPageDelete
             }
         );
-        
+
         items.push('-', {
             icon: _ico("arrow-circle-double"),
             cls: "x-btn-text-icon",
@@ -131,9 +129,9 @@ Inprint.fascicle.planner.Context = function(parent, panels) {
             scope: this,
             handler: this.cmpReload
         });
-        
+
         new Ext.menu.Menu({ items : items }).showAt( e.getXY() );
 
     }, view);
 
-}
+};

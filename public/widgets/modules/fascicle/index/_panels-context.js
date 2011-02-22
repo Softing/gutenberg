@@ -60,4 +60,4 @@ Inprint.fascicle.indexes.Context = function(parent, panels) {
 
     }, headlines);
 
-}
+};

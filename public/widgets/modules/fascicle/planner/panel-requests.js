@@ -10,7 +10,7 @@ Inprint.fascicle.planner.Requests = Ext.extend(Ext.grid.GridPanel, {
             "update": _url("/fascicle/requests/update/"),
             "delete": _url("/fascicle/requests/delete/"),
             "move":   _url("/fascicle/requests/move/")
-        }
+        };
 
         this.store = Inprint.factory.Store.json("/fascicle/requests/list/");
 
@@ -245,11 +245,12 @@ Inprint.fascicle.planner.Requests = Ext.extend(Ext.grid.GridPanel, {
     },
 
     cmpMove: function(inc) {
-        var wndw = this.components["move"];
+
+        var wndw = this.components.move;
 
         if (!wndw) {
 
-            var wndw = new Ext.Window({
+            wndw = new Ext.Window({
                 title: 'Перемещение заявки',
                 width:250,
                 height:140,
@@ -260,7 +261,7 @@ Inprint.fascicle.planner.Requests = Ext.extend(Ext.grid.GridPanel, {
                 items: {
                     xtype: "form",
                     border: false,
-                    url: this.urls["move"],
+                    url: this.urls.move,
                     labelWidth: 60,
                     defaultType: 'checkbox',
                     defaults: { anchor: '100%', hideLabel:true },
@@ -299,7 +300,7 @@ Inprint.fascicle.planner.Requests = Ext.extend(Ext.grid.GridPanel, {
                 ]
             });
 
-            this.components["move"] = wndw;
+            this.components.move = wndw;
         }
 
         var form = wndw.findByType("form")[0].getForm();
@@ -308,7 +309,7 @@ Inprint.fascicle.planner.Requests = Ext.extend(Ext.grid.GridPanel, {
             fascicle: this.oid,
             request: this.getValue("id"),
             page: this.parent.panels.pages.cmpGetSelected()
-        }
+        };
         wndw.show();
     },
 
@@ -318,7 +319,7 @@ Inprint.fascicle.planner.Requests = Ext.extend(Ext.grid.GridPanel, {
 
         if (!wndw) {
 
-            var wndw = new Ext.Window({
+            wndw = new Ext.Window({
                 title: 'Удаление заявки',
                 width:250,
                 height:140,
@@ -376,7 +377,7 @@ Inprint.fascicle.planner.Requests = Ext.extend(Ext.grid.GridPanel, {
         form.baseParams = {
             fascicle: this.oid,
             request:  this.getValues("id")
-        }
+        };
         wndw.show();
     }
 

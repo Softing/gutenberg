@@ -13,7 +13,7 @@ Inprint.fascicle.indexes.TreeHeadlines = Ext.extend(Ext.tree.TreePanel, {
         };
 
         var treeLoader = new Ext.tree.TreeLoader({
-            dataUrl: this.urls["tree"],
+            dataUrl: this.urls.tree,
             baseParams: {
                 fascicle: this.parent.fascicle
             }
@@ -33,12 +33,6 @@ Inprint.fascicle.indexes.TreeHeadlines = Ext.extend(Ext.tree.TreePanel, {
                 text: _("Fascicle"),
                 type: "fascicle"
             }
-            //rootVisible: false,
-            //root: {
-            //    id:'00000000-0000-0000-0000-000000000000',
-            //    nodeType: 'async',
-            //    draggable: false
-            //}
         });
 
         Inprint.fascicle.indexes.TreeHeadlines.superclass.initComponent.apply(this, arguments);
