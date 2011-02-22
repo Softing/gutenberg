@@ -27,7 +27,7 @@ Inprint.plugins.rss.control.Interaction = function(parent, panels) {
     //
     //        _a(["editions.calendar.manage"], grid.currentEdition, function(access) {
     //
-    //            if (access["editions.calendar.manage"] == true) {
+    //            if (access["editions.calendar.manage"] === true) {
     //                managed = true;
     //                _enable(grid.btnCreate);
     //            } else {

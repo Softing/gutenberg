@@ -1,7 +1,7 @@
 Inprint.advert.modules.Interaction = function(parent, panels) {
 
     var tree    = panels.editions;
-    var pages   = panels["pages"];
+    var pages   = panels.pages;
     var modules = panels.modules;
 
     // Tree

@@ -25,7 +25,7 @@ Inprint.system.settings.Panel = Ext.extend(Ext.Panel, {
             },
             success: function(responce) {
 
-                var data = Ext.decode(responce.responseText)
+                var data = Ext.decode(responce.responseText);
 
                 var tpl = new Ext.XTemplate(
                         '<tpl for=".">',

@@ -12,7 +12,7 @@ Inprint.edition.calendar.Controls = function (params) {
             var wndw = cache["create-window"];
 
             if (!wndw) {
-                var form = this.hlpCreateForm("create", "fascicle", urls["create"]);
+                var form = this.hlpCreateForm("create", "fascicle", urls.create);
                 wndw = this.hlpCreateWindow(_("Release addition"), [ _BTN_WNDW_ADD, _BTN_WNDW_CLOSE ], form);
                 cache["create-window"] = wndw;
             }
@@ -29,7 +29,7 @@ Inprint.edition.calendar.Controls = function (params) {
             var wndw = cache["update-window"];
 
             if (!wndw) {
-                var form = this.hlpCreateForm("update", "fascicle", urls["update"]);
+                var form = this.hlpCreateForm("update", "fascicle", urls.update);
                 wndw = this.hlpCreateWindow(_("Release addition"), [ _BTN_WNDW_SAVE, _BTN_WNDW_CLOSE ], form);
                 cache["update-window"] = wndw;
             }
@@ -38,7 +38,7 @@ Inprint.edition.calendar.Controls = function (params) {
             form.reset();
 
             form.load({
-                url: urls["read"],
+                url: urls.read,
                 scope:this,
                 params: {
                     id: this.cmpGetSelectedNode().id
@@ -90,7 +90,7 @@ Inprint.edition.calendar.Controls = function (params) {
             var wndw = cache["create-attachment-window"];
 
             if (!wndw) {
-                var form = this.hlpCreateForm("create", "attachment", urls["create"]);
+                var form = this.hlpCreateForm("create", "attachment", urls.create);
                 wndw = this.hlpCreateWindow(_("Release addition"), [ _BTN_WNDW_ADD, _BTN_WNDW_CLOSE ], form);
                 cache["create-attachment-window"] = wndw;
             }
@@ -245,7 +245,7 @@ Inprint.edition.calendar.Controls = function (params) {
                         }
                     }
                 }
-            }
+            };
         },
 
         "hlpCreateWindow": function(title, btns, form) {
@@ -266,6 +266,6 @@ Inprint.edition.calendar.Controls = function (params) {
                 }
             });
         }
-    }
+    };
 
 };

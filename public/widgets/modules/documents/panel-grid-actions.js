@@ -149,5 +149,6 @@ Inprint.documents.GridActions = function() {
                     }
                 }, this).setIcon(Ext.MessageBox.WARNING);
         }
-    }
+    };
+    
 };

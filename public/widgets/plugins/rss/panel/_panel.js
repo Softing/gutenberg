@@ -8,7 +8,7 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
             "read":   _url("/plugin/rss/read/")
         }
 
-        this.children = {
+        this.panels = {
             "form": new Inprint.plugins.rss.profile.Form({
                 parent: this
             }),
@@ -55,8 +55,8 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
         };
 
         this.items = [
-            this.children["form"],
-            this.children["grid"]
+            this.panels.form,
+            this.panels["grid"]
         ];
 
         Ext.apply(this, {
@@ -70,10 +70,10 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
     onRender: function() {
         Inprint.plugins.rss.Profile.superclass.onRender.apply(this, arguments);
 
-        this.grid = this.children["grid"];
-        this.form = this.children["form"].getForm();
+        this.grid = this.panels["grid"];
+        this.form = this.panels.form.getForm();
 
-        this.children["form"].on("actioncomplete", function (form, action) {
+        this.panels.form.on("actioncomplete", function (form, action) {
             if (action.type == "submit") {
                 this.btnUpload.enable();
                 this.grid.getStore().reload();
@@ -101,7 +101,7 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
         this.getEl().mask(_("Loading") + "...");
 
         this.form.load({
-            url: this.urls["read"],
+            url: this.urls.read,
             scope:this,
             params: {
                 document: this.oid
@@ -120,15 +120,15 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
     cmpAccess: function(access) {
         _disable(this.btnSave, this.btnUpload);
 
-        if (access && access["rss"] == true) {
+        if (access && access["rss"] === true) {
             this.btnSave.enable();
         }
 
-        if (access && access["rss"] == true && access["upload"] == true) {
+        if (access && access["rss"] === true && access["upload"] === true) {
             this.btnUpload.enable();
         }
 
-        if (access && access["rss"] == true) {
+        if (access && access["rss"] === true) {
             this.getEl().unmask();
         } else {
             this.getEl().mask(_("Access denide"));
@@ -182,7 +182,7 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
 
         UploadPanel.on("fileupload", function(uploader, success, result){
             if(success){
-                this.children["grid"].cmpReload();
+                this.panels["grid"].cmpReload();
             }
         }, this);
 

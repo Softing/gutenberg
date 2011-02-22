@@ -1,15 +1,15 @@
 Inprint.catalog.indexes.Context = function(parent, panels) {
 
-    var headlines = panels["headlines"];
+    var headlines = panels.headlines;
 
     headlines.on("contextmenu", function(node) {
-        
+
         this.selection = node;
 
         var disabled = true;
         var items = [];
 
-        if (parent.access["manage"]) {
+        if (parent.access.manage) {
             disabled = false;
         }
 
@@ -45,7 +45,7 @@ Inprint.catalog.indexes.Context = function(parent, panels) {
                 handler: function() { this.cmpDelete(node); }
             });
         }
-        
+
         items.push('-', {
             icon: _ico("arrow-circle-double"),
             cls: "x-btn-text-icon",
@@ -58,4 +58,4 @@ Inprint.catalog.indexes.Context = function(parent, panels) {
 
     }, headlines);
 
-}
+};

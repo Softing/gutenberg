@@ -160,7 +160,7 @@ Inprint.advert.advertisers.Grid = Ext.extend(Ext.grid.GridPanel, {
         if (!win) {
 
             var form = new Ext.FormPanel({
-                url: this.urls["create"],
+                url: this.urls.create,
                 frame:false,
                 border:false,
                 labelWidth: 75,
@@ -296,7 +296,7 @@ Inprint.advert.advertisers.Grid = Ext.extend(Ext.grid.GridPanel, {
             var form = new Ext.FormPanel({
                 border:false,
                 labelWidth: 75,
-                url: this.urls["update"],
+                url: this.urls.update,
                 bodyStyle: "padding:5px 5px",
                 defaults: {
                     anchor: "100%",

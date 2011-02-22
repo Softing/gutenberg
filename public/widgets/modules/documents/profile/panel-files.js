@@ -9,7 +9,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
 
         this.config = {
             document: this.oid
-        }
+        };
 
         this.urls = {
             "create":       _url("/documents/files/create/"),
@@ -20,7 +20,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
             "publish":      _url("/documents/files/publish/"),
             "unpublish":    _url("/documents/files/unpublish/"),
             "description":  _url("/documents/files/description/")
-        }
+        };
 
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
 
@@ -232,7 +232,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
 
                 }
 
-                if (this.access["files.delete"]  == true) {
+                if (this.access["files.delete"]  === true) {
                     rowCtxMenuItems.push("-");
                     rowCtxMenuItems.push({
                         icon: _ico("document-shred"),
@@ -277,9 +277,12 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
     cmpAccess: function(access) {
         this.access = access;
         _disable(this.btnCreate, this.btnUpload, this.btnDelete);
-        if (access["files.add"]     == true) this.btnCreate.enable();
-        if (access["files.add"]     == true) this.btnUpload.enable();
-        //if (access["files.delete"]  == true) this.btnDelete.enable();
+        if (access["files.add"]     === true) {
+            this.btnCreate.enable();
+        }
+        if (access["files.add"]     === true) {
+            this.btnUpload.enable();
+        }
     },
 
     cmpCreate: function() {
@@ -361,7 +364,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
     // Publish and unpublish file
     cmpPublish: function() {
         Ext.Ajax.request({
-            url: this.urls["publish"],
+            url: this.urls.publish,
             scope:this,
             success: this.cmpReload,
             params: { document: this.config.document, file: this.getValues("id") }
@@ -371,7 +374,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
         var document = this.getStore().baseParams.document;
         var file = this.getValues("id");
         Ext.Ajax.request({
-            url: this.urls["unpublish"],
+            url: this.urls.unpublish,
             scope:this,
             success: this.cmpReload,
             params: { document: this.config.document, file: this.getValues("id") }
@@ -386,7 +389,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
             function(btn, text) {
                 if (btn == "ok") {
                     Ext.Ajax.request({
-                        url: this.urls["rename"],
+                        url: this.urls.rename,
                         success: this.cmpReload,
                         scope:this,
                         params: { document: this.config.document, file: this.getValues("id"), filename: text }
@@ -409,7 +412,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
             fn: function(btn, text) {
                 if (btn == "ok") {
                     Ext.Ajax.request({
-                        url: this.urls["description"],
+                        url: this.urls.description,
                         scope:this,
                         success: this.cmpReload,
                         params: { document: this.config.document, file: this.getValues("id"), description: text }

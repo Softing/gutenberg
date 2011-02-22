@@ -14,4 +14,4 @@ Inprint.catalog.roles.Access = function(parent, panels) {
             });
         }
     });
-}
+};

@@ -158,7 +158,7 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
             var form = new Ext.FormPanel({
                 border:false,
                 labelWidth: 75,
-                url: this.urls["create"],
+                url: this.urls.create,
                 bodyStyle: "padding:5px 5px",
                 plugins: new Ext.ux.DataTip(),
                 defaults: {
@@ -254,7 +254,7 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
                             },
                             beforequery: function(qe) {
                                 var form = qe.combo.ownerCt.getForm();
-                                qe.combo.getStore().baseParams["fascicle"] = 
+                                qe.combo.getStore().baseParams.fascicle = 
                                     form.findField("fascicle").getValue();
                                 delete qe.combo.lastQuery;
                             }
@@ -268,7 +268,7 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
                             scope: this,
                             beforequery: function(qe) {
                                 var form = qe.combo.ownerCt.getForm();
-                                qe.combo.getStore().baseParams["place"] = 
+                                qe.combo.getStore().baseParams.place = 
                                     form.findField("place").getValue();
                                 delete qe.combo.lastQuery;
                             }
@@ -409,11 +409,11 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
         form.findField("edition").setValue( this.parent.currentEdition );
         
         //form.findField("manager").getStore().baseParams.edition = this.parent.currentEdition;
-        //form.findField("manager").getStore().baseParams["fascicle"] = this.parent.currentFascicle;
+        //form.findField("manager").getStore().baseParams.fascicle = this.parent.currentFascicle;
         //form.findField("manager").setValue(Inprint.session.member.id, Inprint.session.member.shortcut);
         
         form.findField("advertiser").getStore().baseParams.edition = this.parent.currentEdition;
-        form.findField("advertiser").getStore().baseParams["fascicle"] = this.parent.currentFascicle;
+        form.findField("advertiser").getStore().baseParams.fascicle = this.parent.currentFascicle;
         
         form.findField("fascicle").getStore().baseParams.edition = this.parent.currentEdition;
         if (this.parent.currentFascicle) {
@@ -434,7 +434,7 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
             var form = new Ext.FormPanel({
                 border:false,
                 labelWidth: 75,
-                url: this.urls["update"],
+                url: this.urls.update,
                 bodyStyle: "padding:5px 5px",
                 defaults: {
                     anchor: "100%",
@@ -533,7 +533,7 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
                             },
                             beforequery: function(qe) {
                                 var form = qe.combo.ownerCt.getForm();
-                                qe.combo.getStore().baseParams["fascicle"] = 
+                                qe.combo.getStore().baseParams.fascicle = 
                                     form.findField("fascicle").getValue();
                                 delete qe.combo.lastQuery;
                             }
@@ -547,7 +547,7 @@ Inprint.advert.requests.Grid = Ext.extend(Ext.grid.GridPanel, {
                             scope: this,
                             beforequery: function(qe) {
                                 var form = qe.combo.ownerCt.getForm();
-                                qe.combo.getStore().baseParams["place"] = 
+                                qe.combo.getStore().baseParams.place = 
                                     form.findField("place").getValue();
                                 delete qe.combo.lastQuery;
                             }

@@ -5,10 +5,10 @@ Inprint.edition.calendar.Access = function(parent, panels) {
 
     _a(["editions.calendar.manage"], null, function(terms) {
     //    if(terms["domain.editions.manage"]) {
-    //        parent.access["editions"] = true;
+    //        parent.access.editions = true;
     //    }
     //    if(terms["domain.exchange.manage"]) {
-    //        parent.access["exchange"] = true;
+    //        parent.access.exchange = true;
     //        grid.btnCreateStage.enable();
     //        grid.getSelectionModel().on("selectionchange", function(sm) {
     //            if (sm.getCount()) {
@@ -27,4 +27,4 @@ Inprint.edition.calendar.Access = function(parent, panels) {
     //    }
     });
 
-}
+};

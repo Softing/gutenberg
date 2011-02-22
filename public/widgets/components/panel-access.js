@@ -50,7 +50,7 @@
 //                    width: 50,
 //                    dataIndex: 'limit',
 //                    renderer: function(value, metadata, record, row, col, store) {
-//                        if (value == undefined || value == "") {
+//                        if (value === undefined || value == "") {
 //                            return _("Employee");
 //                        }
 //                        return value;

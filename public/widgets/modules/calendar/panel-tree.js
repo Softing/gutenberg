@@ -27,7 +27,7 @@ Inprint.edition.calendar.Tree = Ext.extend(Ext.tree.TreePanel, {
         Inprint.edition.calendar.Tree.superclass.initComponent.apply(this, arguments);
 
         this.on("beforeappend", function(tree, parent, node) {
-            if (node.attributes.icon == undefined) {
+            if (node.attributes.icon === undefined) {
                 node.attributes.icon = 'folder-open';
             }
             node.attributes.icon = _ico(node.attributes.icon);

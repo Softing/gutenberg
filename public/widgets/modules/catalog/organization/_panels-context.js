@@ -9,7 +9,7 @@ Inprint.catalog.organization.Context = function(parent, panels) {
         var disabled = true;
         var items = [];
 
-        if (parent.access["departments"]) {
+        if (parent.access.departments) {
             disabled = false;
         }
 
@@ -56,4 +56,4 @@ Inprint.catalog.organization.Context = function(parent, panels) {
 
     }, tree);
 
-}
+};

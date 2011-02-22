@@ -182,7 +182,7 @@ Inprint.fascicle.planner.Requests = Ext.extend(Ext.grid.GridPanel, {
 
     cmpCreate: function() {
 
-        var pages = this.parent.panels["pages"];
+        var pages = this.parent.panels.pages;
 
         var selection = pages.cmpGetSelected();
 
@@ -205,7 +205,7 @@ Inprint.fascicle.planner.Requests = Ext.extend(Ext.grid.GridPanel, {
 
     cmpUpdateProxy: function () {
         Ext.Ajax.request({
-            url: this.urls["read"],
+            url: this.urls.read,
             params: {
                 fascicle: this.oid,
                 request: this.getValue("id")
@@ -307,7 +307,7 @@ Inprint.fascicle.planner.Requests = Ext.extend(Ext.grid.GridPanel, {
         form.baseParams = {
             fascicle: this.oid,
             request: this.getValue("id"),
-            page: this.parent.panels["pages"].cmpGetSelected()
+            page: this.parent.panels.pages.cmpGetSelected()
         }
         wndw.show();
     },

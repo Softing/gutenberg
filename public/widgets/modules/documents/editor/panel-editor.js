@@ -23,7 +23,6 @@ Inprint.documents.editor.FormPanel = Ext.extend( Ext.form.FormPanel,
                         text : '<b>Сохранить текст</b>',
                         cls : 'x-btn-text-icon',
                         icon: _ico("disk-black"),
-                        scope:this,
                         handler : function() {
                             this.getForm().submit();
                         }
@@ -37,14 +36,14 @@ Inprint.documents.editor.FormPanel = Ext.extend( Ext.form.FormPanel,
         Inprint.documents.editor.FormPanel.superclass.initComponent.apply(this, arguments);
 
         this.on('beforeaction', function() {
-            this.body.mask('Идет сохранение текста...');
+            this.body.mask(_("Saving text") + '...');
             this.btnSave.disable();
         }, this);
 
         this.on('actionfailed', function() {
             this.body.unmask();
             this.btnSave.enable();
-            Ext.MessageBox.alert('Ошибка!', 'Не удалось сохранить текст!');
+            Ext.MessageBox.alert(_("Error"), _("Unable to save text"));
         }, this);
 
     },
@@ -67,12 +66,6 @@ Inprint.documents.editor.FormPanel = Ext.extend( Ext.form.FormPanel,
 
             this.parent.cmpReload();
 
-            //new Ext.ux.ToastWindow({
-            //    title: 'Все в порядке!',
-            //    html: 'Ваш текст успешно сохранен',
-            //    iconCls: 'toast-success'
-            //}).show(document);
-
         }, this);
 
         this.editor.on('sync', function( editor, html ) {
@@ -82,7 +75,7 @@ Inprint.documents.editor.FormPanel = Ext.extend( Ext.form.FormPanel,
 
         this.editor.on('initialize', function() {
 
-            this.body.mask('Идет загрузка текста');
+            this.body.mask(_("Loading text"));
 
             Ext.Ajax.request({
                 url : '/documents/text/get/',

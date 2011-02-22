@@ -5,15 +5,15 @@ Inprint.documents.Profile = Ext.extend(Ext.Panel, {
         this.document = this.oid;
 
         this.panels = {};
-        this.panels["profile"]  = new Inprint.documents.Profile.View({
+        this.panels.profile  = new Inprint.documents.Profile.View({
             oid: this.oid,
             parent: this
         });
-        this.panels["files"]    = new Inprint.documents.Profile.Files({
+        this.panels.files    = new Inprint.documents.Profile.Files({
             oid: this.oid,
             parent: this
         });
-        this.panels["comments"] = new Inprint.documents.Profile.Comments({
+        this.panels.comments = new Inprint.documents.Profile.Comments({
             oid: this.oid,
             parent: this
         });
@@ -30,7 +30,7 @@ Inprint.documents.Profile = Ext.extend(Ext.Panel, {
                     layout:"fit",
                     split:true,
                     height:220,
-                    items: this.panels["profile"]
+                    items: this.panels.profile
                 },
                 {   region: "center",
                     layout:"fit",
@@ -39,7 +39,7 @@ Inprint.documents.Profile = Ext.extend(Ext.Panel, {
                         border: false,
                         xtype: "tabpanel",
                         items:[
-                            this.panels["files"]
+                            this.panels.files
                         ]
                     }
                 },
@@ -47,7 +47,7 @@ Inprint.documents.Profile = Ext.extend(Ext.Panel, {
                     layout:"fit",
                     split:true,
                     width:400,
-                    items: this.panels["comments"]
+                    items: this.panels.comments
                 }
             ]
         });
@@ -78,14 +78,14 @@ Inprint.documents.Profile = Ext.extend(Ext.Panel, {
                 var response = Ext.util.JSON.decode(result.responseText);
                 if (response.data) {
                     this.document = response.data.id;
-                    this.panels["profile"].cmpFill(response.data);
-                    this.panels["files"].cmpFill(response.data);
-                    this.panels["comments"].cmpFill(response.data);
+                    this.panels.profile.cmpFill(response.data);
+                    this.panels.files.cmpFill(response.data);
+                    this.panels.comments.cmpFill(response.data);
                 }
             }
         });
 
-        this.panels["files"].cmpReload();
+        this.panels.files.cmpReload();
 
     }
 

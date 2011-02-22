@@ -40,8 +40,8 @@ Inprint.catalog.editions.ChangeStagePanel = function () {
         modal:true,
         items: form
     });
-    
+
     win.relayEvents(form, ["actioncomplete"]);
 
     return win;
-}
+};

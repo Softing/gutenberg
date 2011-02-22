@@ -9,7 +9,7 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
 
         this.urls = {
             "list":       "/documents/list/"
-        }
+        };
 
         this.store = Inprint.factory.Store.json(this.urls.list, {
             remoteSort: true,

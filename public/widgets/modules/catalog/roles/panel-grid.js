@@ -10,12 +10,12 @@ Inprint.catalog.roles.Grid = Ext.extend(Ext.grid.GridPanel, {
             "read":   _url("/catalog/roles/read/"),
             "update": _url("/catalog/roles/update/"),
             "delete": _url("/catalog/roles/delete/")
-        }
+        };
 
         this.store = Inprint.factory.Store.json(this.urls.list, {
             autoLoad:true
         });
-        
+
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
 
         // Toolbar
@@ -121,15 +121,15 @@ Inprint.catalog.roles.Grid = Ext.extend(Ext.grid.GridPanel, {
         win.items.first().cmpSetId(this.getValue("id"));
         win.items.first().cmpFill();
     },
-    
-    
+
+
     cmpCreate: function() {
 
         var win = this.components["create-window"];
         if (!win) {
 
             var form = new Ext.FormPanel({
-                url: this.urls["create"],
+                url: this.urls.create,
                 frame:false,
                 border:false,
                 labelWidth: 75,
@@ -156,8 +156,9 @@ Inprint.catalog.roles.Grid = Ext.extend(Ext.grid.GridPanel, {
             });
 
             form.on("actioncomplete", function (form, action) {
-                if (action.type == "submit")
+                if (action.type == "submit") {
                     win.hide();
+                }
                 this.getStore().load();
             }, this);
 
@@ -179,7 +180,7 @@ Inprint.catalog.roles.Grid = Ext.extend(Ext.grid.GridPanel, {
             var form = new Ext.FormPanel({
                 border:false,
                 labelWidth: 75,
-                url: this.urls["update"],
+                url: this.urls.update,
                 bodyStyle: "padding:5px 5px",
                 defaults: {
                     anchor: "100%",
@@ -204,8 +205,9 @@ Inprint.catalog.roles.Grid = Ext.extend(Ext.grid.GridPanel, {
             });
 
             form.on("actioncomplete", function (form, action) {
-                if (action.type == "submit")
+                if (action.type == "submit") {
                     win.hide();
+                }
                 this.getStore().load();
             }, this);
 
@@ -228,7 +230,7 @@ Inprint.catalog.roles.Grid = Ext.extend(Ext.grid.GridPanel, {
 
         win.show(this);
     },
-    
+
     cmpDelete: function() {
         Ext.MessageBox.confirm(
             _("Warning"),

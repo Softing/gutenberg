@@ -20,7 +20,9 @@ Inprint.employee.logs.Panel = Ext.extend(Ext.grid.GridPanel, {
                     width: 160,
                     dataIndex: 'initiator_shortcut',
                     renderer: function(value) {
-                        if (value == null) return _("Not defined");
+                        if (value === null) {
+                            return _("Not defined");
+                        }
                         return value;
                     }
                 },

@@ -1,6 +1,6 @@
 Inprint.fascicle.templates.Interaction = function(parent, panels) {
     
-    var pages   = panels["pages"];
+    var pages   = panels.pages;
     var modules = panels.modules;
     
     //Grids

@@ -16,13 +16,13 @@ Inprint.panels.Help = Ext.extend(Ext.Panel, {
 
         Inprint.panels.Help.superclass.onRender.apply(this, arguments);
 
-        if ( this.hid ) {
-            //this.load({
-            //    method: 'get',
-            //    url: "/help/" + this.hid + "/index.html",
-            //    text: _("Loading...")
-            //});
-        }
+        //if ( this.hid ) {
+        //    this.load({
+        //        method: 'get',
+        //        url: "/help/" + this.hid + "/index.html",
+        //        text: _("Loading...")
+        //    });
+        //}
 
     }
 });

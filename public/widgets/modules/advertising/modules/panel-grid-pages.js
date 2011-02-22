@@ -102,7 +102,7 @@ Inprint.advert.modules.Pages = Ext.extend(Ext.grid.GridPanel, {
         if (!wndw) {
 
             var flash =  this.cmpCreateFlash();
-            var form = this.cmpCreateForm("create", this.urls["create"]);
+            var form = this.cmpCreateForm("create", this.urls.create);
             wndw = this.cmpCreateWindow(_("Creating a new Page"), [ _BTN_WNDW_ADD, _BTN_WNDW_CLOSE ], form, flash);
             this.components["create-window"] = wndw;
 
@@ -112,7 +112,7 @@ Inprint.advert.modules.Pages = Ext.extend(Ext.grid.GridPanel, {
             //    frame:false,
             //    border:false,
             //    labelWidth: 75,
-            //    url: this.urls["create"],
+            //    url: this.urls.create,
             //    bodyStyle: "padding:5px 5px",
             //    defaults: {
             //        anchor: "100%",
@@ -242,7 +242,7 @@ Inprint.advert.modules.Pages = Ext.extend(Ext.grid.GridPanel, {
         var wndw = this.components["update-window"];
         if (!wndw) {
             var flash =  this.cmpCreateFlash();
-            var form = this.cmpCreateForm("update", this.urls["update"]);
+            var form = this.cmpCreateForm("update", this.urls.update);
             wndw = this.cmpCreateWindow(_("Creating a new Module"), [ _BTN_WNDW_SAVE, _BTN_WNDW_CLOSE ], form, flash);
             this.components["update-window"] = wndw;
         }
@@ -429,6 +429,6 @@ Inprint.advert.modules.Pages = Ext.extend(Ext.grid.GridPanel, {
             },
             buttons: btns
         });
-    },
+    }
 
 });

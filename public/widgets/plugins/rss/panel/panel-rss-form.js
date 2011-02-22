@@ -8,7 +8,7 @@ Inprint.plugins.rss.profile.Form = Ext.extend(Ext.FormPanel, {
 
         Ext.apply(this, {
             xtype: "form",
-            url: this.urls["update"],
+            url: this.urls.update,
             width: 600,
             border:false,
             labelWidth: 100,
@@ -56,7 +56,7 @@ Inprint.plugins.rss.profile.Form = Ext.extend(Ext.FormPanel, {
 
     onRender: function() {
         Inprint.plugins.rss.profile.Form.superclass.onRender.apply(this, arguments);
-        this.getForm().url = this.urls["update"];
+        this.getForm().url = this.urls.update;
     }
 
 });

@@ -23,4 +23,4 @@ Inprint.catalog.editions.Interaction = function(parent, panels) {
     grid.btnRemoveStage.on("click", grid.actions.removeStage.createDelegate(this));
     grid.btnManagePrincipals.on("click", grid.actions.managePrincipals.createDelegate(this));
 
-}
+};

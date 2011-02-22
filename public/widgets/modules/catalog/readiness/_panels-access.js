@@ -14,4 +14,4 @@ Inprint.catalog.readiness.Access = function(parent, panels) {
             });
         }
     });
-}
+};

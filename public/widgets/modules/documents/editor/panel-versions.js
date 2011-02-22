@@ -2,15 +2,15 @@ Inprint.documents.editor.Versions = Ext.extend( Ext.Panel, {
 
     initComponent: function() {
 
-        this.children = {};
+        this.panels = {};
 
-        this.children["browser"] = new Inprint.documents.editor.versions.Browser({
+        this.panels.browser = new Inprint.documents.editor.versions.Browser({
               parent:this,
               url: this.url,
               oid: this.oid
         });
 
-        this.children["viewer"] = new Inprint.documents.editor.versions.Viewer({
+        this.panels.viewer = new Inprint.documents.editor.versions.Viewer({
               parent: this,
               oid: this.oid
         });
@@ -47,8 +47,8 @@ Inprint.documents.editor.Versions = Ext.extend( Ext.Panel, {
             ],
 
             items: [
-               this.children["browser"],
-               this.children["viewer"]
+               this.panels.browser,
+               this.panels.viewer
             ]
 
         });
@@ -63,10 +63,7 @@ Inprint.documents.editor.Versions = Ext.extend( Ext.Panel, {
         this.btnView.disable();
         this.layout.setActiveItem(1);
 
-        this.children["viewer"].load({
-
-            //scripts: false,
-            //nocache: true,
+        this.panels.viewer.load({
 
             text: _("Loading") + "...",
             timeout: 30,
@@ -74,7 +71,7 @@ Inprint.documents.editor.Versions = Ext.extend( Ext.Panel, {
             mode: "iframe",
 
             url: this.url + "/read/",
-            params: { version: this.children["browser"].config.selection }
+            params: { version: this.panels.browser.config.selection }
 
         });
 
@@ -86,7 +83,7 @@ Inprint.documents.editor.Versions = Ext.extend( Ext.Panel, {
     },
 
     cmpReload: function () {
-        if (this.children["browser"].cmpReload) { this.children["browser"].cmpReload(); }
+        if (this.panels.browser.cmpReload) { this.panels.browser.cmpReload(); }
     }
 
 });

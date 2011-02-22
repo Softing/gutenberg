@@ -81,7 +81,7 @@ Inprint.fascicle.adverta.Pages = Ext.extend(Ext.Panel, {
                 items: {
                     xtype: "form",
                     border: false,
-                    url: this.urls["create"],
+                    url: this.urls.create,
                     baseParams: {
                         fascicle: this.oid
                     },
@@ -163,7 +163,7 @@ Inprint.fascicle.adverta.Pages = Ext.extend(Ext.Panel, {
                 items: {
                     xtype: "form",
                     border: false,
-                    url: this.urls["update"],
+                    url: this.urls.update,
                     baseParams: {
                         fascicle: this.oid
                     },

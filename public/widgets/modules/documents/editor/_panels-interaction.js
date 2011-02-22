@@ -1,7 +1,7 @@
 Inprint.documents.Editor.Interaction = function(parent, panels) {
 
     //parent.buttons[0].on("click", function(){
-    //    
+    //
     //    //Ext.Ajax.request({
     //    //    scope:this,
     //    //    url: _url("/documents/copy/"),
@@ -14,7 +14,7 @@ Inprint.documents.Editor.Interaction = function(parent, panels) {
     //    //        this.fireEvent("actioncomplete", this);
     //    //    }
     //    //});
-    //    
+    //
     //}, parent)
 
-}
+};

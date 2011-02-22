@@ -6,7 +6,7 @@ Inprint.flash.Proxy = {
         if(fp){
             fp.onFlashEvent(e);
         }else{
-            arguments.callee.defer(10, this, [id, e]);
+            arguments.call.defer(10, this, [id, e]);
         }
     },
 
@@ -18,8 +18,8 @@ Inprint.flash.Proxy = {
                 form.baseParams = {};
             }
 
-            form.baseParams["w"] = w;
-            form.baseParams["h"] = h;
+            form.baseParams.w = w;
+            form.baseParams.h = h;
 
         } else {
             alert("Can't find form object!");
@@ -38,28 +38,28 @@ Inprint.flash.Proxy = {
 
             if (hash){
                 if(hash.x) {
-                    form.baseParams["x"] = hash.x;
+                    form.baseParams.x = hash.x;
                 } else {
-                    alert ("Can't find x!");
+                    alert("Can't find x!");
                 }
                 if(hash.y) {
-                    form.baseParams["y"] = hash.y;
+                    form.baseParams.y = hash.y;
                 } else {
-                    alert ("Can't find y!");
+                    alert("Can't find y!");
                 }
                 if(hash.w) {
-                    form.baseParams["w"] = hash.w;
+                    form.baseParams.w = hash.w;
                 } else {
-                    alert ("Can't find w!");
+                    alert("Can't find w!");
                 }
-                if(hash.h) {
-                    form.baseParams["h"] = hash.h;
+                if(hash.h){
+                    form.baseParams.h = hash.h;
                 } else {
-                    alert ("Can't find h!");
+                    alert("Can't find h!");
                 }
 
             } else {
-                alert ("Can't find hash!");
+                alert("Can't find hash!");
             }
 
         } else {

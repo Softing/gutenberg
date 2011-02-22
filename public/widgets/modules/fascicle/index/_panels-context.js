@@ -1,6 +1,6 @@
 Inprint.fascicle.indexes.Context = function(parent, panels) {
 
-    var headlines = panels["headlines"];
+    var headlines = panels.headlines;
 
     headlines.on("contextmenu", function(node) {
 
@@ -11,7 +11,7 @@ Inprint.fascicle.indexes.Context = function(parent, panels) {
         var disabled = true;
         var items = [];
 
-        if (parent.access["manage"]) {
+        if (parent.access.manage) {
             disabled = false;
         }
 

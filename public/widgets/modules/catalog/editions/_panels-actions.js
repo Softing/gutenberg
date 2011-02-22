@@ -57,7 +57,7 @@ Inprint.catalog.editions.Actions = function(parent, panels) {
             }
         });
 
-        
+
     };
 
     grid.actions.removeStage = function() {
@@ -121,4 +121,4 @@ Inprint.catalog.editions.Actions = function(parent, panels) {
         win.show();
     };
 
-}
+};

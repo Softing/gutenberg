@@ -1,6 +1,6 @@
 Inprint.fascicle.planner.Context = function(parent, panels) {
 
-    var view  = panels["pages"].getView();
+    var view  = panels.pages.getView();
     
     view.on("contextmenu", function( view, index, node, e) {
         
@@ -8,7 +8,7 @@ Inprint.fascicle.planner.Context = function(parent, panels) {
         
         //view.select(node, false);
         
-        var selection = panels["pages"].cmpGetSelected();
+        var selection = panels.pages.cmpGetSelected();
         var selLength = selection.length;
         
         var disabled = true;
@@ -16,7 +16,7 @@ Inprint.fascicle.planner.Context = function(parent, panels) {
         var disabled2 = true;
         var items = [];
         
-        if (parent.access["manage"]) {
+        if (parent.access.manage) {
             
             if (selLength == 1) {
                 disabled1 = false;
@@ -37,8 +37,8 @@ Inprint.fascicle.planner.Context = function(parent, panels) {
                 tooltip: 'Добавить новые полосы в этот выпуск',
                 icon: _ico("plus-button"),
                 cls: 'x-btn-text-icon',
-                scope: panels["pages"],
-                handler: panels["pages"].cmpPageCreate
+                scope: panels.pages,
+                handler: panels.pages.cmpPageCreate
             },
             {
                 ref: "../btnPageUpdate",
@@ -46,8 +46,8 @@ Inprint.fascicle.planner.Context = function(parent, panels) {
                 text:'Редактировать',
                 icon: _ico("pencil"),
                 cls: 'x-btn-text-icon',
-                scope: panels["pages"],
-                handler: panels["pages"].cmpPageUpdate
+                scope: panels.pages,
+                handler: panels.pages.cmpPageUpdate
             },
             "-",
             {
@@ -56,8 +56,8 @@ Inprint.fascicle.planner.Context = function(parent, panels) {
                 text:'Разметить',
                 icon: _ico("wand"),
                 cls: 'x-btn-text-icon',
-                scope: panels["pages"],
-                handler: panels["pages"].cmpPageCompose
+                scope: panels.pages,
+                handler: panels.pages.cmpPageCompose
             },
             "-",
             {
@@ -67,8 +67,8 @@ Inprint.fascicle.planner.Context = function(parent, panels) {
                 tooltip: 'Перенести отмеченные полосы',
                 icon: _ico("arrow-stop-180"),
                 cls: 'x-btn-text-icon',
-                scope:panels["pages"],
-                handler: panels["pages"].cmpPageMoveLeft
+                scope:panels.pages,
+                handler: panels.pages.cmpPageMoveLeft
             },
             {
                 ref: "../btnPageMoveRight",
@@ -77,8 +77,8 @@ Inprint.fascicle.planner.Context = function(parent, panels) {
                 tooltip: 'Перенести отмеченные полосы',
                 icon: _ico("arrow-stop"),
                 cls: 'x-btn-text-icon',
-                scope:panels["pages"],
-                handler: panels["pages"].cmpPageMoveRight
+                scope:panels.pages,
+                handler: panels.pages.cmpPageMoveRight
             },
             {
                 ref: "../btnPageMove",
@@ -87,8 +87,8 @@ Inprint.fascicle.planner.Context = function(parent, panels) {
                 tooltip: 'Перенести отмеченные полосы',
                 icon: _ico("navigation-000-button"),
                 cls: 'x-btn-text-icon',
-                scope:panels["pages"],
-                handler: panels["pages"].cmpPageMove
+                scope:panels.pages,
+                handler: panels.pages.cmpPageMove
             },
             "-",
             {
@@ -98,8 +98,8 @@ Inprint.fascicle.planner.Context = function(parent, panels) {
                 tooltip: 'Очистить содержимое полос',
                 icon: _ico("eraser"),
                 cls: 'x-btn-text-icon',
-                scope:panels["pages"],
-                handler: panels["pages"].cmpPageClean
+                scope:panels.pages,
+                handler: panels.pages.cmpPageClean
             },
             //{
             //    ref: "../btnPageResize",
@@ -108,8 +108,8 @@ Inprint.fascicle.planner.Context = function(parent, panels) {
             //    tooltip: 'Добавить новые полосы скопировав содержимое',
             //    icon: _ico("arrow-resize-045"),
             //    cls: 'x-btn-text-icon',
-            //    scope:panels["pages"],
-            //    handler: panels["pages"].cmpPageResize
+            //    scope:panels.pages,
+            //    handler: panels.pages.cmpPageResize
             //},
             "-",
             {
@@ -119,8 +119,8 @@ Inprint.fascicle.planner.Context = function(parent, panels) {
                 tooltip: 'Удалить полосы',
                 icon: _ico("minus-button"),
                 cls: 'x-btn-text-icon',
-                scope:panels["pages"],
-                handler: panels["pages"].cmpPageDelete
+                scope:panels.pages,
+                handler: panels.pages.cmpPageDelete
             }
         );
         

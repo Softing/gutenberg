@@ -111,7 +111,7 @@ Inprint.catalog.readiness.Grid = Ext.extend(Ext.grid.GridPanel, {
         if (!win) {
 
             var form = new Ext.FormPanel({
-                url: this.urls["create"],
+                url: this.urls.create,
                 frame:false,
                 border:false,
                 labelWidth: 75,
@@ -125,7 +125,7 @@ Inprint.catalog.readiness.Grid = Ext.extend(Ext.grid.GridPanel, {
                     _FLD_SHORTCUT,
                     _FLD_DESCRIPTION,
                     _FLD_COLOR,
-                    _FLD_PERCENT,
+                    _FLD_PERCENT
                 ],
                 keys: [ _KEY_ENTER_SUBMIT ],
                 buttons: [ _BTN_SAVE,_BTN_CLOSE ]
@@ -140,8 +140,9 @@ Inprint.catalog.readiness.Grid = Ext.extend(Ext.grid.GridPanel, {
             });
 
             form.on("actioncomplete", function (form, action) {
-                if (action.type == "submit")
+                if (action.type == "submit") {
                     win.hide();
+                }
                 this.getStore().load();
             }, this);
 
@@ -161,7 +162,7 @@ Inprint.catalog.readiness.Grid = Ext.extend(Ext.grid.GridPanel, {
         if (!win) {
 
             var form = new Ext.FormPanel({
-                url: this.urls["update"],
+                url: this.urls.update,
                 frame:false,
                 border:false,
                 labelWidth: 75,
@@ -176,7 +177,7 @@ Inprint.catalog.readiness.Grid = Ext.extend(Ext.grid.GridPanel, {
                     _FLD_SHORTCUT,
                     _FLD_DESCRIPTION,
                     _FLD_COLOR,
-                    _FLD_PERCENT,
+                    _FLD_PERCENT
                 ],
                 keys: [ _KEY_ENTER_SUBMIT ],
                 buttons: [ _BTN_SAVE,_BTN_CLOSE ]
@@ -191,8 +192,9 @@ Inprint.catalog.readiness.Grid = Ext.extend(Ext.grid.GridPanel, {
             });
 
             form.on("actioncomplete", function (form, action) {
-                if (action.type == "submit")
+                if (action.type == "submit") {
                     win.hide();
+                }
                 this.getStore().load();
             }, this);
 
@@ -203,7 +205,7 @@ Inprint.catalog.readiness.Grid = Ext.extend(Ext.grid.GridPanel, {
         form.reset();
 
         form.load({
-            url: this.urls["read"],
+            url: this.urls.read,
             scope:this,
             params: {
                 id: this.getValue("id")

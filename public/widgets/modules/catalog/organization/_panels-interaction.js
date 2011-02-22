@@ -1,5 +1,5 @@
 Inprint.catalog.organization.Interaction = function(parent, panels) {
-    
+
     var tree = panels.tree;
     var grid = panels.grid;
     var help = panels.help;
@@ -73,7 +73,7 @@ Inprint.catalog.organization.Interaction = function(parent, panels) {
         }
         win.show();
         win.cmpFill(grid.getValue("id"));
-    },
+    };
 
     grid.btnUpdateProfile.handler = function() {
         var win = grid.components["update-profile-window"];
@@ -86,20 +86,21 @@ Inprint.catalog.organization.Interaction = function(parent, panels) {
         }
         win.show();
         win.cmpFill(grid.getValue("id"));
-    },
+    };
 
     grid.btnManageRules.handler = function() {
         var win = new Inprint.cmp.memberRulesForm.Window({
             memberId: grid.getValue("id")
         });
         win.show();
-    }
+    };
 
     // Grid
-    
+
     grid.getStore().on("load", function(store) {
-        if (tree.cmpCurrentNode())
+        if (tree.cmpCurrentNode()) {
             grid.setTitle(_("Employees") +' - '+ tree.cmpCurrentNode().text +' ('+ store.getCount() +')');
+        }
     });
-    
-}
+
+};

@@ -2,21 +2,21 @@ Inprint.documents.Editor = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
 
-        this.children = {};
+        this.panels = {};
 
-        this.children["form"]     = new Inprint.documents.editor.FormPanel({
+        this.panels.form     = new Inprint.documents.editor.FormPanel({
             parent:this,
             oid: this.oid
         });
 
-        this.children["versions"] = new Inprint.documents.editor.Versions({
+        this.panels.versions = new Inprint.documents.editor.Versions({
             title: _("Hot save"),
             url: _url("/documents/hotsave"),
             parent:this,
             oid: this.oid
         });
 
-        this.children["hotsaves"] = new Inprint.documents.editor.Versions({
+        this.panels.hotsaves = new Inprint.documents.editor.Versions({
             title: _("Versions"),
             url: _url("/documents/versions"),
             parent:this,
@@ -28,8 +28,8 @@ Inprint.documents.Editor = Ext.extend(Ext.Panel, {
             border:false,
             defaults: { autoScroll: true, border:false },
             items: [
-                this.children["versions"],
-                this.children["hotsaves"]
+                this.panels.versions,
+                this.panels.hotsaves
             ],
             listeners: {
                 "tabchange": function(tabpanel, panel) {
@@ -49,7 +49,7 @@ Inprint.documents.Editor = Ext.extend(Ext.Panel, {
                 {
                     region: "center",
                     layout:"fit",
-                    items: this.children["form"]
+                    items: this.panels.form
                 },
                 {   region: "east",
                     layout:"fit",
@@ -66,12 +66,12 @@ Inprint.documents.Editor = Ext.extend(Ext.Panel, {
 
     onRender: function() {
         Inprint.documents.Editor.superclass.onRender.apply(this, arguments);
-        Inprint.documents.Editor.Interaction(this, this.children);
+        Inprint.documents.Editor.Interaction(this, this.panels);
     },
 
     cmpReload: function() {
-        if (this.children["versions"].cmpReload) { this.children["versions"].cmpReload(); }
-        if (this.children["hotsaves"].cmpReload) { this.children["hotsaves"].cmpReload(); }
+        if (this.panels.versions.cmpReload) { this.panels.versions.cmpReload(); }
+        if (this.panels.hotsaves.cmpReload) { this.panels.hotsaves.cmpReload(); }
     }
 
 });

@@ -140,7 +140,7 @@
 //                frame:false,
 //                border:false,
 //                labelWidth: 75,
-//                url: this.urls["create"],
+//                url: this.urls.create,
 //                bodyStyle: "padding:5px 5px",
 //                defaults: {
 //                    anchor: "100%",
@@ -303,7 +303,7 @@
 //                frame:false,
 //                border:false,
 //                labelWidth: 75,
-//                url: this.urls["update"],
+//                url: this.urls.update,
 //                bodyStyle: "padding:5px 5px",
 //                baseParams: {},
 //                defaults: {

@@ -4,15 +4,15 @@ Inprint.advert.modules.Main = Ext.extend(Ext.Panel, {
 
         this.edition = null;
         this.panels = {};
-        
+
         this.panels.editions  = new Inprint.advert.modules.Editions({
             parent: this
         });
-        
-        this.panels["pages"]     = new Inprint.advert.modules.Pages({
+
+        this.panels.pages     = new Inprint.advert.modules.Pages({
             parent: this
         });
-        
+
         this.panels.modules   = new Inprint.advert.modules.Modules({
             parent: this
         });
@@ -40,7 +40,7 @@ Inprint.advert.modules.Main = Ext.extend(Ext.Panel, {
                             region: "center",
                             margins: "3 3 0 0",
                             layout:"fit",
-                            items: this.panels["pages"]
+                            items: this.panels.pages
                         },
                         {
                             title: _("Modules"),
@@ -52,7 +52,7 @@ Inprint.advert.modules.Main = Ext.extend(Ext.Panel, {
                             layout:"fit",
                             margins: "0 3 3 0",
                             items: this.panels.modules
-                        },
+                        }
                     ]
                 }
             ]
@@ -66,9 +66,9 @@ Inprint.advert.modules.Main = Ext.extend(Ext.Panel, {
         Inprint.advert.modules.Context(this, this.panels);
         Inprint.advert.modules.Interaction(this, this.panels);
     },
-    
+
     cmpReload: function() {
-        this.panels["pages"].cmpReload();
+        this.panels.pages.cmpReload();
         this.panels.modules.cmpReload();
     }
 

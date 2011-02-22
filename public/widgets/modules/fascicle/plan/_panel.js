@@ -36,7 +36,7 @@ Inprint.fascicle.plan.Panel = Ext.extend(Ext.Panel, {
         Ext.apply(this, {
             layout: 'fit',
             autoScroll:true,
-            items: this.panels["pages"]
+            items: this.panels.pages
         });
         
         Inprint.fascicle.plan.Panel.superclass.initComponent.apply(this, arguments);
@@ -81,7 +81,7 @@ Inprint.fascicle.plan.Panel = Ext.extend(Ext.Panel, {
                 var title = Inprint.ObjectResolver.makeTitle(this.parent.oid, this.parent.aid, this.parent.icon, shortcut, description);
                 this.parent.setTitle(title)
                 
-                this.panels["pages"].getStore().loadData({ data: rsp.pages });
+                this.panels.pages.getStore().loadData({ data: rsp.pages });
                 
                 //this.panels["documents"].getStore().loadData({ data: rsp.documents });
                 //this.panels["summary"].getStore().loadData({ data: rsp.summary });

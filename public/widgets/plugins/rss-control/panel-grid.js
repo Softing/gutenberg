@@ -15,7 +15,7 @@ Inprint.plugins.rss.control.Grid = Ext.extend(Ext.grid.GridPanel, {
             {name: 'id'},
             {name: 'title'},
             {name: 'description'},
-            {name: 'level'},
+            {name: 'level'}
             //{name: '_id', type: 'int'},
             //{name: '_parent', type: 'auto'},
             //{name: '_is_leaf', type: 'bool'}
@@ -63,7 +63,7 @@ Inprint.plugins.rss.control.Grid = Ext.extend(Ext.grid.GridPanel, {
 
                         return "<div style=\"background: url("+ ico +") "+ (padding-22) +"px 1px no-repeat;padding-left:" + padding + "px;\">"+ v +"</div>";
                     }},
-                {id:'description',header: _("Description"), width: 160, sortable: true, dataIndex: 'description'},
+                {id:'description',header: _("Description"), width: 160, sortable: true, dataIndex: 'description'}
             ],
             stripeRows: true,
             autoExpandColumn: 'description'

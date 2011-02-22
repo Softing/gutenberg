@@ -2,7 +2,7 @@ Inprint.fascicle.planner.Access = function(parent, panels, access) {
     
     parent.access = access;
     
-    var pages     = panels["pages"];
+    var pages     = panels.pages;
     var documents = panels["documents"];
     var requests  = panels["requests"];
     

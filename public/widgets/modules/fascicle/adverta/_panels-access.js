@@ -2,7 +2,7 @@ Inprint.fascicle.adverta.Access = function(parent, panels, access) {
     
     parent.access = access;
     
-    var pages = panels["pages"];
+    var pages = panels.pages;
     var requests = panels["requests"];
     
     //Seance
@@ -47,28 +47,28 @@ Inprint.fascicle.adverta.Access = function(parent, panels, access) {
     //    if (access.manage) {
     //        
     //        if (sm.getCount() == 1) {
-    //            if (doc_access["update"]    == 'enabled') documents.btnUpdate.enable();
-    //            if (doc_access["capture"]   == 'enabled') documents.btnCapture.enable();
-    //            if (doc_access["transfer"]  == 'enabled') documents.btnTransfer.enable();
-    //            if (doc_access["briefcase"] == 'enabled') documents.btnBriefcase.enable();
-    //            if (doc_access["move"]      == 'enabled') documents.btnMove.enable();
-    //            //if (access["move"]      == 'enabled') documents.btnCopy.enable();
-    //            //if (access["move"]      == 'enabled') documents.btnDuplicate.enable();
-    //            //if (access["recover"]   == 'enabled') documents.btnRestore.enable();
+    //            if (doc_access.update    == 'enabled') documents.btnUpdate.enable();
+    //            if (doc_access.capture   == 'enabled') documents.btnCapture.enable();
+    //            if (doc_access.transfer  == 'enabled') documents.btnTransfer.enable();
+    //            if (doc_access.briefcase == 'enabled') documents.btnBriefcase.enable();
+    //            if (doc_access.move      == 'enabled') documents.btnMove.enable();
+    //            //if (access.move      == 'enabled') documents.btnCopy.enable();
+    //            //if (access.move      == 'enabled') documents.btnDuplicate.enable();
+    //            //if (access.recover   == 'enabled') documents.btnRestore.enable();
     //            if (doc_access["delete"]    == 'enabled') documents.btnRecycle.enable();
     //            //if (access["delete"]    == 'enabled') documents.btnDelete.enable();
     //        }
     //        
     //        if (sm.getCount() > 0 ) {
-    //            //if (access["update"]    == 'enabled') documents.btnCapture.enable();
-    //            //if (access["transfer"]  == 'enabled') documents.btnTransfer.enable();
-    //            if (doc_access["capture"]   == 'enabled') documents.btnCapture.enable();
-    //            if (doc_access["transfer"]  == 'enabled') documents.btnTransfer.enable();
-    //            if (doc_access["briefcase"] == 'enabled') documents.btnBriefcase.enable();
-    //            if (doc_access["move"]      == 'enabled') documents.btnMove.enable();
-    //            //if (access["move"]      == 'enabled') documents.btnCopy.enable();
-    //            //if (access["move"]      == 'enabled') documents.btnDuplicate.enable();
-    //            //if (access["recover"]   == 'enabled') documents.btnRestore.enable();
+    //            //if (access.update    == 'enabled') documents.btnCapture.enable();
+    //            //if (access.transfer  == 'enabled') documents.btnTransfer.enable();
+    //            if (doc_access.capture   == 'enabled') documents.btnCapture.enable();
+    //            if (doc_access.transfer  == 'enabled') documents.btnTransfer.enable();
+    //            if (doc_access.briefcase == 'enabled') documents.btnBriefcase.enable();
+    //            if (doc_access.move      == 'enabled') documents.btnMove.enable();
+    //            //if (access.move      == 'enabled') documents.btnCopy.enable();
+    //            //if (access.move      == 'enabled') documents.btnDuplicate.enable();
+    //            //if (access.recover   == 'enabled') documents.btnRestore.enable();
     //            if (doc_access["delete"]    == 'enabled') documents.btnRecycle.enable();
     //            //if (access["delete"]    == 'enabled') documents.btnDelete.enable();
     //        }

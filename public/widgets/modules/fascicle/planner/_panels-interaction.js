@@ -2,7 +2,7 @@ Inprint.fascicle.planner.Interaction = function(parent, panels) {
 
     var access = parent.access;
 
-    var pages       = panels["pages"];
+    var pages       = panels.pages;
     var documents   = panels["documents"];
     var requests    = panels["requests"];
     var summary     = panels["summary"];
@@ -59,19 +59,19 @@ Inprint.fascicle.planner.Interaction = function(parent, panels) {
         if (this.access.manage) {
             
             if (sm.getCount() == 1) {
-                if (doc_access["update"]    == 'enabled') documents.btnUpdate.enable();
-                if (doc_access["capture"]   == 'enabled') documents.btnCapture.enable();
-                if (doc_access["transfer"]  == 'enabled') documents.btnTransfer.enable();
-                if (doc_access["briefcase"] == 'enabled') documents.btnBriefcase.enable();
-                if (doc_access["move"]      == 'enabled') documents.btnMove.enable();
+                if (doc_access.update    == 'enabled') documents.btnUpdate.enable();
+                if (doc_access.capture   == 'enabled') documents.btnCapture.enable();
+                if (doc_access.transfer  == 'enabled') documents.btnTransfer.enable();
+                if (doc_access.briefcase == 'enabled') documents.btnBriefcase.enable();
+                if (doc_access.move      == 'enabled') documents.btnMove.enable();
                 if (doc_access["delete"]    == 'enabled') documents.btnRecycle.enable();
             }
             
             if (sm.getCount() > 0 ) {
-                if (doc_access["capture"]   == 'enabled') documents.btnCapture.enable();
-                if (doc_access["transfer"]  == 'enabled') documents.btnTransfer.enable();
-                if (doc_access["briefcase"] == 'enabled') documents.btnBriefcase.enable();
-                if (doc_access["move"]      == 'enabled') documents.btnMove.enable();
+                if (doc_access.capture   == 'enabled') documents.btnCapture.enable();
+                if (doc_access.transfer  == 'enabled') documents.btnTransfer.enable();
+                if (doc_access.briefcase == 'enabled') documents.btnBriefcase.enable();
+                if (doc_access.move      == 'enabled') documents.btnMove.enable();
                 if (doc_access["delete"]    == 'enabled') documents.btnRecycle.enable();
             }
         }
@@ -81,7 +81,7 @@ Inprint.fascicle.planner.Interaction = function(parent, panels) {
     // Advert table
     requests.getSelectionModel().on("selectionchange", function(sm) {
         
-        var pages    = this.panels["pages"];
+        var pages    = this.panels.pages;
         var requests = this.panels["requests"];
         
         var selectedPages = pages.cmpGetSelected();

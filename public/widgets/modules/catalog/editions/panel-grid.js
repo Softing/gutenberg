@@ -14,7 +14,7 @@ Inprint.catalog.editions.Grid = Ext.extend(Ext.grid.GridPanel, {
                 dataIndex: "readiness_color",
                 header : '<img src="' + _ico("color") + '">',
                 renderer: function(val) {
-                    return "<div style=\"background:#" + val + ";padding:2px 3px;font-size:10px;-webkit-border-radius:2px;-moz-border-radius:3px;\">&nbsp;</div>"
+                    return "<div style=\"background:#" + val + ";padding:2px 3px;font-size:10px;-webkit-border-radius:2px;-moz-border-radius:3px;\">&nbsp;</div>";
                 }
             },
             {   id:"weight",
@@ -58,7 +58,7 @@ Inprint.catalog.editions.Grid = Ext.extend(Ext.grid.GridPanel, {
                 }
             }
         ];
-        
+
         this.tbar = [
             {
                 xtype: 'buttongroup',

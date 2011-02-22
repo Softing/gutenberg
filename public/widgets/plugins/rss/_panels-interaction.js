@@ -8,7 +8,7 @@ Inprint.plugins.rss.Interaction = function(parent, panels) {
         setTimeout(function() { el.mask("Please, select document"); }, 10);
     }, profile);
 
-    profile.children["form"].on("actioncomplete", function (form, action) {
+    profile.panels.form.on("actioncomplete", function (form, action) {
         if (action.type == "submit") {
             this.getStore().reload();
         }

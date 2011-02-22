@@ -10,10 +10,9 @@ Inprint.documents.GridColumns = function() {
             width : 26,
             sortable : true,
             renderer : function(value, p, record) {
-                //if (record.data.islooked)
-                //    return '<img title="Материал был просмотрен текущим владельцем" src="'+ _ico("eye") +'">';
-                if (!record.data.islooked)
+                if (!record.data.islooked) {
                     return '<img title="Материал был просмотрен текущим владельцем" src="'+ _ico("flag") +'">';
+                }
                 return '';
             }
         },
@@ -201,10 +200,12 @@ Inprint.documents.GridColumns = function() {
             width:40,
             sortable: true,
             renderer : function(value, p, record) {
-                if (record.data.rsize)
+                if (record.data.rsize) {
                     return record.data.rsize;
-                if (record.data.psize)
+                }
+                if (record.data.psize) {
                     return String.format('<span style="color:silver">{0}</span>', record.data.psize);
+                }
                 return '';
             }
         },
@@ -249,5 +250,6 @@ Inprint.documents.GridColumns = function() {
             xtype: 'datecolumn', format: 'M d H:i'
         }
 
-    }
+    };
+
 };

@@ -30,7 +30,7 @@ Inprint.plugins.rss.control.Tree = Ext.extend(Ext.tree.TreePanel, {
         Inprint.plugins.rss.control.Tree.superclass.initComponent.apply(this, arguments);
 
         this.on("beforeappend", function(tree, parent, node) {
-            if (node.attributes.icon == undefined) {
+            if (node.attributes.icon === undefined) {
                 node.attributes.icon = 'folder-open';
             }
             node.attributes.icon = _ico(node.attributes.icon);
@@ -60,7 +60,7 @@ Inprint.plugins.rss.control.Tree = Ext.extend(Ext.tree.TreePanel, {
 
             var form = new Ext.FormPanel({
 
-                url: this.urls["create"],
+                url: this.urls.create,
 
                 frame:false,
                 border:false,
@@ -111,7 +111,7 @@ Inprint.plugins.rss.control.Tree = Ext.extend(Ext.tree.TreePanel, {
         if (!win) {
 
             var form = new Ext.FormPanel({
-                url: this.urls["update"],
+                url: this.urls.update,
                 frame:false,
                 border:false,
                 labelWidth: 75,
@@ -158,7 +158,7 @@ Inprint.plugins.rss.control.Tree = Ext.extend(Ext.tree.TreePanel, {
         form.reset();
 
         form.load({
-            url: this.urls["read"],
+            url: this.urls.read,
             scope:this,
             params: {
                 id: node.id

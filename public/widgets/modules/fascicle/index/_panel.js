@@ -9,10 +9,10 @@ Inprint.fascicle.indexes.Panel = Ext.extend(Ext.Panel, {
         
         this.panels = {};
 
-        this.panels["headlines"] = new Inprint.fascicle.indexes.TreeHeadlines({
+        this.panels.headlines = new Inprint.fascicle.indexes.TreeHeadlines({
             parent: this
         });
-        this.panels["rubrics"]   = new Inprint.fascicle.indexes.Rubrics({
+        this.panels.rubrics   = new Inprint.fascicle.indexes.Rubrics({
             parent: this
         });
 
@@ -30,13 +30,13 @@ Inprint.fascicle.indexes.Panel = Ext.extend(Ext.Panel, {
                     width: 200,
                     minSize: 100,
                     maxSize: 600,
-                    items: this.panels["headlines"]
+                    items: this.panels.headlines
                 },
                 {
                     region: "center",
                     layout:"fit",
                     margins: "3 0 3 0",
-                    items: this.panels["rubrics"]
+                    items: this.panels.rubrics
                 }
             ]
         });

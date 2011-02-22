@@ -66,7 +66,7 @@ Inprint.advert.index.Editions = Ext.extend(Ext.tree.TreePanel, {
                     border:false,
                     xtype: "form",
                     labelWidth: 75,
-                    url: this.urls["create"],
+                    url: this.urls.create,
                     bodyStyle: "padding:10px",
                     defaults: {
                         anchor: "100%",

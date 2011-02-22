@@ -109,7 +109,7 @@ Inprint.fascicle.adverta.Panel = Ext.extend(Ext.Panel, {
                         {
                             region: "center",
                             layout: "fit",
-                            items: this.panels["pages"]
+                            items: this.panels.pages
                         },
                         {
                             region:"south",
@@ -182,7 +182,7 @@ Inprint.fascicle.adverta.Panel = Ext.extend(Ext.Panel, {
                 var title = Inprint.ObjectResolver.makeTitle(this.parent.oid, this.parent.aid, this.parent.icon, shortcut, description);
                 this.parent.setTitle(title)
                 
-                this.panels["pages"].getStore().loadData({ data: rsp.pages });
+                this.panels.pages.getStore().loadData({ data: rsp.pages });
                 this.panels["requests"].getStore().loadData({ data: rsp.requests });
                 this.panels["summary"].getStore().loadData({ data: rsp.summary });
                 
@@ -281,7 +281,7 @@ Inprint.fascicle.adverta.Panel = Ext.extend(Ext.Panel, {
 
     cmpSave: function() {
         
-        var pages = this.panels["pages"];
+        var pages = this.panels.pages;
         var requests = this.panels["requests"];
         
         var data = [];

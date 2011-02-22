@@ -55,7 +55,7 @@ Inprint.edition.calendar.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
                         cls: 'x-btn-text-icon',
                         ref: "../../btnCreate",
                         scope: this.Components,
-                        handler: this.Components["create"]
+                        handler: this.Components.create
                     },
                     {
                         id: 'update',
@@ -65,7 +65,7 @@ Inprint.edition.calendar.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
                         cls: 'x-btn-text-icon',
                         ref: "../../btnUpdate",
                         scope: this.Components,
-                        handler: this.Components["update"]
+                        handler: this.Components.update
                     },
                     {
                         id: 'delete',
@@ -92,7 +92,7 @@ Inprint.edition.calendar.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
                         cls: 'x-btn-text-icon',
                         ref: "../../btnAttachmentCreate",
                         scope: this.Components,
-                        handler: this.Components["create"]
+                        handler: this.Components.create
                     },
                     {
                         id: 'updateAttachment',
@@ -102,7 +102,7 @@ Inprint.edition.calendar.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
                         cls: 'x-btn-text-icon',
                         ref: "../../btnAttachmentUpdate",
                         scope: this.Components,
-                        handler: this.Components["update"]
+                        handler: this.Components.update
                     },
                     {
                         id: 'deleteAttachment',

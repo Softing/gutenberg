@@ -4,9 +4,6 @@ Inprint.system.logs.Panel = Ext.extend(Ext.grid.GridPanel, {
 
         this.store = Inprint.factory.Store.json("/system/logservice/");
 
-        //        this.filterEdition = Inprint.factory.Combo.create("editions");
-        //        this.filterEmployee = Inprint.factory.Combo.create("members");
-
         Ext.apply(this, {
             stripeRows: true,
             autoExpandColumn: 'message',
@@ -16,7 +13,9 @@ Inprint.system.logs.Panel = Ext.extend(Ext.grid.GridPanel, {
                     width: 160,
                     dataIndex: 'edition',
                     renderer: function(value) {
-                        if (value == null) return _("Not defined");
+                        if (value === null) {
+                            return _("Not defined");
+                        }
                         return value;
                     }
                 },
@@ -25,7 +24,9 @@ Inprint.system.logs.Panel = Ext.extend(Ext.grid.GridPanel, {
                     width: 160,
                     dataIndex: 'initiator',
                     renderer: function(value) {
-                        if (value == null) return _("Not defined");
+                        if (value === null) {
+                            return _("Not defined");
+                        }
                         return value;
                     }
                 },

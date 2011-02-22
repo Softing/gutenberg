@@ -36,8 +36,8 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                 tooltip: 'Добавить новые полосы в этот выпуск',
                 icon: _ico("plus-button"),
                 cls: 'x-btn-text-icon',
-                scope: this.panels["pages"],
-                handler: this.panels["pages"].cmpPageCreate
+                scope: this.panels.pages,
+                handler: this.panels.pages.cmpPageCreate
             },
             {
                 ref: "../btnPageUpdate",
@@ -45,8 +45,8 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                 text:'Редактировать',
                 icon: _ico("pencil"),
                 cls: 'x-btn-text-icon',
-                scope: this.panels["pages"],
-                handler: this.panels["pages"].cmpPageUpdate
+                scope: this.panels.pages,
+                handler: this.panels.pages.cmpPageUpdate
             },
             "-",
             {
@@ -56,8 +56,8 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                 tooltip: 'Перенести отмеченные полосы',
                 icon: _ico("arrow-stop-180"),
                 cls: 'x-btn-text-icon',
-                scope:this.panels["pages"],
-                handler: this.panels["pages"].cmpPageMoveLeft
+                scope:this.panels.pages,
+                handler: this.panels.pages.cmpPageMoveLeft
             },
             {
                 ref: "../btnPageMoveRight",
@@ -66,8 +66,8 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                 tooltip: 'Перенести отмеченные полосы',
                 icon: _ico("arrow-stop"),
                 cls: 'x-btn-text-icon',
-                scope:this.panels["pages"],
-                handler: this.panels["pages"].cmpPageMoveRight
+                scope:this.panels.pages,
+                handler: this.panels.pages.cmpPageMoveRight
             },
             {
                 ref: "../btnPageMove",
@@ -76,8 +76,8 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                 tooltip: 'Перенести отмеченные полосы',
                 icon: _ico("navigation-000-button"),
                 cls: 'x-btn-text-icon',
-                scope:this.panels["pages"],
-                handler: this.panels["pages"].cmpPageMove
+                scope:this.panels.pages,
+                handler: this.panels.pages.cmpPageMove
             },
             "-",
             {
@@ -87,8 +87,8 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                 tooltip: 'Очистить содержимое полос',
                 icon: _ico("eraser"),
                 cls: 'x-btn-text-icon',
-                scope:this.panels["pages"],
-                handler: this.panels["pages"].cmpPageClean
+                scope:this.panels.pages,
+                handler: this.panels.pages.cmpPageClean
             },
             "-",
             {
@@ -98,8 +98,8 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                 tooltip: 'Удалить полосы',
                 icon: _ico("minus-button"),
                 cls: 'x-btn-text-icon',
-                scope:this.panels["pages"],
-                handler: this.panels["pages"].cmpPageDelete
+                scope:this.panels.pages,
+                handler: this.panels.pages.cmpPageDelete
             },
             '->',
             {
@@ -185,7 +185,7 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                         {
                             region: "center",
                             layout: "fit",
-                            items: this.panels["pages"]
+                            items: this.panels.pages
                         },
                         {
                             region:"south",
@@ -264,7 +264,7 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                 var title = Inprint.ObjectResolver.makeTitle(this.parent.oid, this.parent.aid, this.parent.icon, shortcut, description);
                 this.parent.setTitle(title)
                 
-                this.panels["pages"].getStore().loadData({ data: rsp.pages });
+                this.panels.pages.getStore().loadData({ data: rsp.pages });
                 this.panels["documents"].getStore().loadData({ data: rsp.documents });
                 this.panels["requests"].getStore().loadData({ data: rsp.requests });
                 this.panels["summary"].getStore().loadData({ data: rsp.summary });
@@ -364,7 +364,7 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
 
     cmpSave: function() {
         
-        var pages     = this.panels["pages"];
+        var pages     = this.panels.pages;
         var documents = this.panels["documents"];
         var modules   = this.panels["summary"];
         

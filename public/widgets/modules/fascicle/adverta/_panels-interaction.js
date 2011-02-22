@@ -1,6 +1,6 @@
 Inprint.fascicle.adverta.Interaction = function(parent, panels) {
 
-    var pages = panels["pages"];
+    var pages = panels.pages;
     
     // View 
     //pages.view.on("selectionchange", function(view, data) {

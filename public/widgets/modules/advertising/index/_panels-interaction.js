@@ -2,7 +2,7 @@ Inprint.advert.index.Interaction = function(parent, panels) {
 
     var editions  = panels.editions;
     var modules   = panels.modules;
-    var headlines = panels["headlines"];
+    var headlines = panels.headlines;
 
     // Tree
     editions.getSelectionModel().on("selectionchange", function(sm, node) {

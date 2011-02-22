@@ -9,7 +9,7 @@ Inprint.catalog.editions.Context = function(parent, panels) {
         var disabled = true;
         var items = [];
 
-        if (parent.access["editions"]) {
+        if (parent.access.editions) {
             disabled = false;
         }
 
@@ -56,4 +56,4 @@ Inprint.catalog.editions.Context = function(parent, panels) {
 
     }, tree);
 
-}
+};

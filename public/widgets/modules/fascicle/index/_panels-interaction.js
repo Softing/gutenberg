@@ -17,7 +17,7 @@ Inprint.fascicle.indexes.Interaction = function(parent, panels) {
     
     rubrics.getSelectionModel().on("selectionchange", function(sm) {
         _disable(rubrics.btnDelete, rubrics.btnUpdate);
-        if (parent.access["manage"]) {
+        if (parent.access.manage) {
             if (sm.getCount() == 1) {
                _enable(rubrics.btnUpdate);
             }

@@ -134,15 +134,15 @@ Inprint.documents.Profile.View = Ext.extend(Ext.Panel, {
         '<table width="99%" align="center">',
         '<tr style="background:#f5f5f5;">',
             '<th>Название</th>',
-            '<th width="70">Издание</th>',
-            '<th width="70">Выпуск</td>',
-            '<th width="90">Раздел</th>',
-            '<th width="90">Рубрика</th>',
-            '<th width="50">Объем</th>',
-            '<th width="80">Отдел</td>',
-            '<th width="100">Редактор</th>',
-            '<th width="130">Автор</th>',
-            '<th width="100">Дата&nbsp;сдачи</th>',
+            '<th width="70">'+ _("Edition") +'</th>',
+            '<th width="70">'+ _("Issue") +'</td>',
+            '<th width="90">'+ _("Category") +'</th>',
+            '<th width="90">'+ _("Rubric") +'</th>',
+            '<th width="50">'+ _("Value") +'</th>',
+            '<th width="80">'+ _("Group") +'</td>',
+            '<th width="100">'+ _("Editor") +'</th>',
+            '<th width="130">'+ _("Author") +'</th>',
+            '<th width="100">'+ _("Date") +'</th>',
         '</tr>',
         '<tr>',
             '<td>{title}</td>',
@@ -172,9 +172,9 @@ Inprint.documents.Profile.View = Ext.extend(Ext.Panel, {
         '<tpl if="fascicles">',
             '<table width="99%" align="center">',
             '<tr style="background:#f5f5f5;">',
-                '<th width="70">Издание</th>',
-                '<th width="70">Выпуск</td>',
-                '<th width="90">Раздел</th>',
+                '<th width="70">'+ _("Edition") +'</th>',
+                '<th width="70">'+ _("Issue") +'</td>',
+                '<th width="90">'+ _("Category") +'</th>',
                 '<th>Рубрика</th>',
             '</tr>',
             '<tpl for="fascicles">',
@@ -240,16 +240,36 @@ Inprint.documents.Profile.View = Ext.extend(Ext.Panel, {
         _disable(this.btnUpdate, this.btnCapture, this.btnTransfer, this.btnMove, this.btnBriefcase, this.btnCopy,
                     this.btnDuplicate, this.btnRecycle, this.btnRestore, this.btnDelete);
 
-        if (access["documents.update"]    == true) this.btnUpdate.enable();
-        if (access["documents.capture"]   == true) this.btnCapture.enable();
-        if (access["documents.transfer"]  == true) this.btnTransfer.enable();
-        if (access["documents.briefcase"] == true) this.btnBriefcase.enable();
-        if (access["documents.move"]      == true) this.btnMove.enable();
-        if (access["documents.move"]      == true) this.btnCopy.enable();
-        if (access["documents.move"]      == true) this.btnDuplicate.enable();
-        if (access["documents.recover"]   == true) this.btnRestore.enable();
-        if (access["documents.delete"]    == true) this.btnRecycle.enable();
-        if (access["documents.delete"]    == true) this.btnDelete.enable();
+        if (access["documents.update"]    === true) {
+            this.btnUpdate.enable();
+        }
+        if (access["documents.capture"]   === true) {
+            this.btnCapture.enable();
+        }
+        if (access["documents.transfer"]  === true) {
+            this.btnTransfer.enable();
+        }
+        if (access["documents.briefcase"] === true) {
+            this.btnBriefcase.enable();
+        }
+        if (access["documents.move"]      === true) {
+            this.btnMove.enable();
+        }
+        if (access["documents.move"]      === true) {
+            this.btnCopy.enable();
+        }
+        if (access["documents.move"]      === true) {
+            this.btnDuplicate.enable();
+        }
+        if (access["documents.recover"]   === true) {
+            this.btnRestore.enable();
+        }
+        if (access["documents.delete"]    === true) {
+            this.btnRecycle.enable();
+        }
+        if (access["documents.delete"]    === true) {
+            this.btnDelete.enable();
+        }
     }
 
 });

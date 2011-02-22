@@ -13,7 +13,7 @@ Inprint.fascicle.places.Main = Ext.extend(Ext.Panel, {
             parent: this, fascicle: this.oid
         });
         
-        this.panels["headlines"] = new Inprint.fascicle.places.Headlines({
+        this.panels.headlines = new Inprint.fascicle.places.Headlines({
             parent: this, fascicle: this.oid
         });
         
@@ -51,7 +51,7 @@ Inprint.fascicle.places.Main = Ext.extend(Ext.Panel, {
                             split: true,
                             layout:"fit",
                             margins: "0 3 3 0",
-                            items: this.panels["headlines"]
+                            items: this.panels.headlines
                         }
                     ]
                 }
@@ -69,7 +69,7 @@ Inprint.fascicle.places.Main = Ext.extend(Ext.Panel, {
     
     cmpReload: function() {
         this.panels.modules.cmpReload();
-        this.panels["headlines"].cmpReload();
+        this.panels.headlines.cmpReload();
     }
 
 });

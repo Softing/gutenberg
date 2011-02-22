@@ -64,7 +64,7 @@ Inprint.documents.editor.versions.Browser = Ext.extend( Ext.list.ListView, {
                 this.config.selection = record.get("id");
             }
 
-            else if (selection.length != 0){
+            else if (selection.length !== 0){
                 this.parent.btnView.disable();
             }
 

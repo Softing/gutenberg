@@ -155,7 +155,7 @@ Inprint.fascicle.adverta.Requests = Ext.extend(Ext.grid.GridPanel, {
     
     cmpCreate: function() {
         
-        var pages = this.parent.panels["pages"];
+        var pages = this.parent.panels.pages;
         
         var selection = pages.cmpGetSelected();
         

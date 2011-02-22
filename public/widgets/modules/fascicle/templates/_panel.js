@@ -5,7 +5,7 @@ Inprint.fascicle.templates.Main = Ext.extend(Ext.Panel, {
         this.fascicle = this.oid;
         this.panels = {};
         
-        this.panels["pages"]     = new Inprint.fascicle.templates.Pages({
+        this.panels.pages     = new Inprint.fascicle.templates.Pages({
             parent: this
         });
         
@@ -21,7 +21,7 @@ Inprint.fascicle.templates.Main = Ext.extend(Ext.Panel, {
                     region: "center",
                     margins: "3 3 0 0",
                     layout:"fit",
-                    items: this.panels["pages"]
+                    items: this.panels.pages
                 },
                 {
                     title: _("Modules"),
@@ -47,7 +47,7 @@ Inprint.fascicle.templates.Main = Ext.extend(Ext.Panel, {
     },
     
     cmpReload: function() {
-        this.panels["pages"].cmpReload();
+        this.panels.pages.cmpReload();
         this.panels.modules.cmpReload();
     }
 

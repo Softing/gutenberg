@@ -1,1 +1,1 @@
-Ext.namespace("Inprint.portal.events");
+//Ext.namespace("Inprint.portal.events");

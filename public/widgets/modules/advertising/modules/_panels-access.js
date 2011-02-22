@@ -5,10 +5,10 @@ Inprint.advert.modules.Access = function(parent, panels) {
     //
     //_a(["domain.editions.manage", "domain.exchange.manage"], null, function(terms) {
     //    if(terms["domain.editions.manage"]) {
-    //        parent.access["editions"] = true;
+    //        parent.access.editions = true;
     //    }
     //    if(terms["domain.exchange.manage"]) {
-    //        parent.access["exchange"] = true;
+    //        parent.access.exchange = true;
     //        grid.btnCreateStage.enable();
     //        grid.getSelectionModel().on("selectionchange", function(sm) {
     //            if (sm.getCount()) {

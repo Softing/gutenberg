@@ -30,7 +30,7 @@ Inprint.catalog.editions.Tree = Ext.extend(Ext.tree.TreePanel, {
 
         this.on("beforeappend", function(tree, parent, node) {
 
-            if (node.attributes.icon == undefined) {
+            if (node.attributes.icon === undefined) {
                 node.attributes.icon = 'blue-folders';
             }
 
