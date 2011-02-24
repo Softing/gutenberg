@@ -81,12 +81,13 @@ sub index
             t1.id, t1.shortcut, t2.id as edition, t2.shortcut as edition_shortcut
         FROM fascicles t1, editions t2
         WHERE
+
             t1.edition = t2.id
             AND t1.edition = ANY (?)
             AND t1.enabled = true
-            AND t1.edition=t1.parent
-            AND t1.deadline >= now()
-        ORDER BY t1.deadline, t2.shortcut, t1.shortcut
+            AND t1.archived = false
+
+        ORDER BY t1.dateout, t2.shortcut, t1.shortcut
     ", [ $accessLayoutEditions ])->Hashes;
 
     my $composition  = {

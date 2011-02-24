@@ -1,4 +1,4 @@
-Inprint.edition.calendar.Interaction = function(parent, panels) {
+Inprint.calendar.Interaction = function(parent, panels) {
 
     var tree    = panels.tree;
     var archive = panels.archive;

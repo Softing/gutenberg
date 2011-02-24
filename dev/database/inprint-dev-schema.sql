@@ -30,6 +30,8 @@ SET search_path = public, pg_catalog;
 -- Name: lquery; Type: SHELL TYPE; Schema: public; Owner: inprint
 --
 
+CREATE LANGUAGE plpgsql;
+
 CREATE TYPE lquery;
 
 
@@ -2936,19 +2938,21 @@ CREATE TABLE fascicles (
     title character varying NOT NULL,
     shortcut character varying NOT NULL,
     description character varying,
-    
+
+    circulation integer NOT NULL DEFAULT 0,
+
+    pnum character varying,
     anum character varying,
-    ynum character varying,
     
     manager uuid,
     
     enabled boolean NOT NULL DEFAULT false,
     archived boolean NOT NULL DEFAULT false,
     
-    flagmat integer DEFAULT 0 NOT NULL,
+    flagdoc integer DEFAULT 0 NOT NULL,
     flagadv integer DEFAULT 0 NOT NULL,
     
-    datemat timestamp(6) with time zone NOT NULL,
+    datedoc timestamp(6) with time zone NOT NULL,
     dateadv timestamp(6) with time zone NOT NULL,
     
     dateprint timestamp(6) with time zone NOT NULL,

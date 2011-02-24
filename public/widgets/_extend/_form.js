@@ -1,4 +1,3 @@
-
 /* Fields */
 
 _FLD_HDN_ID = {
@@ -130,25 +129,37 @@ _FLD_WEIGHT = {
 
 var _BTN_WNDW_ADD = {
     text: _("Add"),  handler: function() {
-        this.findParentByType("window").findByType("form")[0].getForm().submit({
-            submitEmptyText: false
-        });
+        var wndw = this.findParentByType("window");
+        if (!wndw) { alert('Window not found'); return; }
+        var panel = wndw.items.first();
+        if (!panel) { alert('Panel not found'); return; }
+        var form = panel.getForm();
+        if (!form) { alert('Form not found'); return; }
+        form.submit({ submitEmptyText: false });
     }
 };
 
 var _BTN_WNDW_SAVE = {
     text: _("Save"), handler: function() {
-        this.findParentByType("window").findByType("form")[0].getForm().submit({
-            submitEmptyText: false
-        });
+        var wndw = this.findParentByType("window");
+        if (!wndw) { alert('Window not found'); return; }
+        var panel = wndw.items.first();
+        if (!panel) { alert('Panel not found'); return; }
+        var form = panel.getForm();
+        if (!form) { alert('Form not found'); return; }
+        form.submit({ submitEmptyText: false });
     }
 };
 
 var _BTN_WNDW_OK = {
     text: _("Ok"),   handler: function()  {
-        this.findParentByType("window").findByType("form")[0].getForm().submit({
-            submitEmptyText: false
-        });
+        var wndw = this.findParentByType("window");
+        if (!wndw) { alert('Window not found'); return; }
+        var panel = wndw.items.first();
+        if (!panel) { alert('Panel not found'); return; }
+        var form = panel.getForm();
+        if (!form) { alert('Form not found'); return; }
+        form.submit({ submitEmptyText: false });
     }
 };
 

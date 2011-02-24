@@ -1,4 +1,4 @@
-Inprint.edition.calendar.Access = function(parent, panels) {
+Inprint.calendar.Access = function(parent, panels) {
 
     var tree = panels.tree;
     var grid = panels.grid;

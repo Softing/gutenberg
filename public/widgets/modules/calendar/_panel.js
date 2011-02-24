@@ -1,14 +1,14 @@
-Inprint.edition.calendar.Panel = Ext.extend(Ext.Panel, {
+Inprint.calendar.Panel = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
 
 
         this.panels = {};
 
-        this.panels.tree    = new Inprint.edition.calendar.Tree();
-        this.panels.archive = new Inprint.edition.calendar.TreeArchive();
+        this.panels.tree    = new Inprint.calendar.Tree();
+        this.panels.archive = new Inprint.calendar.TreeArchive();
 
-        this.panels.grid    = new Inprint.edition.calendar.Grid();
+        this.panels.grid    = new Inprint.calendar.Grid();
         this.panels.help    = new Inprint.panels.Help({ hid: this.xtype });
 
         Ext.apply(this, {
@@ -60,14 +60,14 @@ Inprint.edition.calendar.Panel = Ext.extend(Ext.Panel, {
             ]
         });
 
-        Inprint.edition.calendar.Panel.superclass.initComponent.apply(this, arguments);
+        Inprint.calendar.Panel.superclass.initComponent.apply(this, arguments);
 
     },
 
     onRender: function() {
-        Inprint.edition.calendar.Panel.superclass.onRender.apply(this, arguments);
+        Inprint.calendar.Panel.superclass.onRender.apply(this, arguments);
 
-        Inprint.edition.calendar.Interaction(this, this.panels);
+        Inprint.calendar.Interaction(this, this.panels);
 
     },
 
@@ -84,5 +84,5 @@ Inprint.edition.calendar.Panel = Ext.extend(Ext.Panel, {
 Inprint.registry.register("composition-calendar", {
     icon: "calendar-day",
     text:  _("Calendar"),
-    xobject: Inprint.edition.calendar.Panel
+    xobject: Inprint.calendar.Panel
 });

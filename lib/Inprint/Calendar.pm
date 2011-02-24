@@ -97,18 +97,26 @@ sub list {
     my $edition  = $c->sql->Q("SELECT * FROM editions WHERE id=?", [ $i_edition ])->Hash;
     my $editions = $c->access->GetChildrens("editions.documents.work");
 
-    #    EXTRACT( DAY FROM t1.enddate-t1.begindate) as totaldays,
-    #    EXTRACT( DAY FROM now()-t1.begindate) as passeddays
-
     # Common sql
     my $sql = "
         SELECT
-            t1.id,
+            t1.id, t1.parent, t1.manager, t1.variation,
             t2.id as edition, t2.shortcut as edition_shortcut,
-            t1.parent, t1.title, t1.shortcut, t1.description, t1.manager, t1.variation,
-            to_char(t1.deadline, 'YYYY-MM-DD HH24:MI:SS') as deadline,
-            to_char(t1.advert_deadline, 'YYYY-MM-DD HH24:MI:SS') as advert_deadline,
-            t1.created, t1.updated
+            t1.title, t1.shortcut, t1.description,
+
+            t1.anum, t1.ynum,
+
+            t1.enabled, t1.archived,
+            t1.flagmat, t1.flagadv,
+
+            to_char(t1.datemat, 'YYYY-MM-DD HH24:MI:SS')   as datemat,
+            to_char(t1.dateadv, 'YYYY-MM-DD HH24:MI:SS')   as dateadv,
+            to_char(t1.dateprint, 'YYYY-MM-DD HH24:MI:SS') as dateprint,
+            to_char(t1.dateout, 'YYYY-MM-DD HH24:MI:SS')   as dateout,
+
+            to_char(t1.created, 'YYYY-MM-DD HH24:MI:SS') as created,
+            to_char(t1.updated, 'YYYY-MM-DD HH24:MI:SS') as updated
+
         FROM fascicles t1, editions t2 WHERE t2.id=t1.edition
     ";
 
@@ -116,16 +124,10 @@ sub list {
     my $sql_parent = $sql . " AND edition=? AND t1.edition=t1.parent ";
     push @params, $edition->{id};
 
-    # Archive
-    if ($i_archive eq 'true') {
-        $sql_parent .= " AND t1.deadline < now() ";
-    }
+    $sql_parent .= " AND t1.archived = true "  if ($i_archive eq 'true');
+    $sql_parent .= " AND t1.archived = false " if ($i_archive ne 'true');
 
-    if ($i_archive ne 'true') {
-        $sql_parent .= " AND t1.deadline >= now() ";
-    }
-
-    $sql_parent .= " ORDER BY t1.deadline DESC ";
+    $sql_parent .= " ORDER BY t1.dateout DESC ";
 
     my $result = $c->sql->Q($sql_parent, \@params)->Hashes;
 
@@ -134,15 +136,15 @@ sub list {
         $node->{leaf} = $c->json->true;
         $node->{icon} = "/icons/blue-folder-open.png";
 
-        my $sql_childrens = $sql . " AND t1.parent=? ORDER BY t1.deadline DESC ";
-        $node->{children} = $c->sql->Q($sql_childrens, [ $node->{id} ])->Hashes;
-
-        foreach my $subnode (@{ $node->{children} }) {
-            $node->{leaf} = $c->json->false;
-            $subnode->{icon} = "/icons/blueprint.png";
-            $subnode->{leaf} = $c->json->true;
-            $subnode->{shortcut} = $subnode->{edition_shortcut} ."/". $subnode->{shortcut};
-        }
+        #my $sql_childrens = $sql . " AND t1.parent=? ORDER BY t1.deadline DESC ";
+        #$node->{children} = $c->sql->Q($sql_childrens, [ $node->{id} ])->Hashes;
+        #
+        #foreach my $subnode (@{ $node->{children} }) {
+        #    $node->{leaf} = $c->json->false;
+        #    $subnode->{icon} = "/icons/blueprint.png";
+        #    $subnode->{leaf} = $c->json->true;
+        #    $subnode->{shortcut} = $subnode->{edition_shortcut} ."/". $subnode->{shortcut};
+        #}
 
         $node->{shortcut} = $node->{edition_shortcut} ."/". $node->{shortcut};
 

@@ -80,10 +80,6 @@ Inprint.ext.Combobox = Ext.extend(Ext.form.ComboBox, {
             ]
         };
 
-        //this.reset = Ext.form.Field.prototype.reset.createSequence(function() {
-        //    this.getTrigger(0).hide();
-        //}, this);
-
         this.onViewClick = Ext.form.ComboBox.prototype.onViewClick.createSequence(function(combo) {
             if ( this.clearable ) {
                 this.getTrigger(0).show();
@@ -94,12 +90,6 @@ Inprint.ext.Combobox = Ext.extend(Ext.form.ComboBox, {
         this.addEvents({"clear": true});
 
         Inprint.ext.Combobox.superclass.initComponent.call(this);
-
-        //if ( this.nocache ){
-        //    this.on("beforequery", function(qe) {
-        //        delete qe.combo.lastQuery;
-        //    });
-        //}
 
     },
 

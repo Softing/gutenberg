@@ -1,1 +1,2 @@
-Ext.namespace("Inprint.edition.calendar");
+Ext.namespace("Inprint.calendar");
+Ext.namespace("Inprint.calendar.forms");

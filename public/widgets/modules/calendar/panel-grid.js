@@ -1,4 +1,4 @@
-Inprint.edition.calendar.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
+Inprint.calendar.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
 
     initComponent: function() {
 
@@ -12,7 +12,10 @@ Inprint.edition.calendar.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
             'disable': _url('/calendar/disable/')
         };
 
-        this.Components = new Inprint.edition.calendar.Controls({ scope: this, url: this.url });
+        this.Components = new Inprint.calendar.Controls({
+            scope: this,
+            url: this.url
+        });
 
         Ext.apply(this, {
 
@@ -45,6 +48,7 @@ Inprint.edition.calendar.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
             {
                 xtype: 'buttongroup',
                 title: _("Issues"),
+                columns: 3,
                 defaults: { scale: 'small' },
                 items: [
                     {
@@ -54,9 +58,20 @@ Inprint.edition.calendar.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
                         icon: _ico("plus-button"),
                         cls: 'x-btn-text-icon',
                         ref: "../../btnCreate",
-                        scope: this.Components,
-                        handler: this.Components.create
+                        scope: this,
+                        handler: function() {
+
+                            var form = new Inprint.calendar.forms.Create({
+                                url: this.url.create
+                            });
+
+                            var wndw = this.cmpCreateWindow(
+                                form, _("Adding issue"), [ _BTN_WNDW_ADD, _BTN_WNDW_CLOSE ]
+                            ).show();
+
+                        }
                     },
+
                     {
                         id: 'update',
                         text: _("Edit"),
@@ -67,6 +82,7 @@ Inprint.edition.calendar.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
                         scope: this.Components,
                         handler: this.Components.update
                     },
+
                     {
                         id: 'delete',
                         text: _("Delete"),
@@ -77,6 +93,7 @@ Inprint.edition.calendar.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
                         scope: this.Components,
                         handler: this.Components["delete"]
                     }
+
                 ]
             },
             {
@@ -118,11 +135,11 @@ Inprint.edition.calendar.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
             }
         ];
 
-        Inprint.edition.calendar.Grid.superclass.initComponent.apply(this, arguments);
+        Inprint.calendar.Grid.superclass.initComponent.apply(this, arguments);
     },
 
     onRender: function() {
-        Inprint.edition.calendar.Grid.superclass.onRender.apply(this, arguments);
+        Inprint.calendar.Grid.superclass.onRender.apply(this, arguments);
 
         this.on("contextmenu", function(node) {
 
@@ -208,14 +225,17 @@ Inprint.edition.calendar.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
         this.getRootNode().reload();
     },
 
-    cmpUpdate: {},
-
-    cmpCreateAttachment: {},
-
-    cmpDelete: {},
-
-    cmpCreateForm: {},
-
-    cmpCreateWindow: {}
+    cmpCreateWindow: function(form, title, btns) {
+        return new Ext.Window({
+            modal:true,
+            layout: "fit",
+            closeAction: "hide",
+            width:800,
+            height:380,
+            title: title,
+            items: form,
+            buttons: btns
+        });
+    }
 
 });

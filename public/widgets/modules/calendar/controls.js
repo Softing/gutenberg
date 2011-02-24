@@ -1,4 +1,4 @@
-Inprint.edition.calendar.Controls = function (params) {
+Inprint.calendar.Controls = function (params) {
 
     var urls  = params.url;
     var cache = {};

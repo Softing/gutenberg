@@ -31,9 +31,9 @@ Inprint.factory.Combo = function() {
             emptyText: _("Select") + "..."
         },
         "/calendar/combos/sources/": {
-            hiddenName: "copyfrom",
+            hiddenName: "source",
             icon: "building",
-            fieldLabel: _("Copy from"),
+            fieldLabel: _("Source"),
             emptyText: _("Select") + "..."
         },
         "/calendar/combos/parents/": {
