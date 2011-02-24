@@ -3,7 +3,9 @@
 use strict;
 use File::Find;
 
-my $path ="../../public/widgets/components";
+my ($subpath) = @ARGV;
+
+my $path ="../../public/widgets/";
 
 my @jsfiles;
 

@@ -9,6 +9,8 @@ SET check_function_bodies = false;
 SET client_min_messages = warning;
 SET escape_string_warning = off;
 
+BEGIN;
+
 --
 -- Name: plugins; Type: SCHEMA; Schema: -; Owner: inprint
 --
@@ -21,11 +23,6 @@ ALTER SCHEMA plugins OWNER TO inprint;
 --
 -- Name: plpgsql; Type: PROCEDURAL LANGUAGE; Schema: -; Owner: inprint
 --
-
-CREATE PROCEDURAL LANGUAGE plpgsql;
-
-
-ALTER PROCEDURAL LANGUAGE plpgsql OWNER TO inprint;
 
 SET search_path = public, pg_catalog;
 
@@ -2931,16 +2928,34 @@ CREATE TABLE fascicles (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
     edition uuid NOT NULL,
     parent uuid NOT NULL,
+    
+    fastype character varying NOT NULL DEFAULT 'issue',
+    
+    variation uuid NOT NULL DEFAULT uuid_generate_v4(),
+    
     title character varying NOT NULL,
     shortcut character varying NOT NULL,
     description character varying,
+    
+    anum character varying,
+    ynum character varying,
+    
     manager uuid,
-    variation uuid NOT NULL,
-    deadline timestamp(6) with time zone,
-    advert_deadline timestamp(6) with time zone,
+    
+    enabled boolean NOT NULL DEFAULT false,
+    archived boolean NOT NULL DEFAULT false,
+    
+    flagmat integer DEFAULT 0 NOT NULL,
+    flagadv integer DEFAULT 0 NOT NULL,
+    
+    datemat timestamp(6) with time zone NOT NULL,
+    dateadv timestamp(6) with time zone NOT NULL,
+    
+    dateprint timestamp(6) with time zone NOT NULL,
+    dateout timestamp(6) with time zone NOT NULL,
+    
     created timestamp(6) with time zone DEFAULT now() NOT NULL,
-    updated timestamp(6) with time zone DEFAULT now() NOT NULL,
-    enabled boolean DEFAULT false NOT NULL
+    updated timestamp(6) with time zone DEFAULT now() NOT NULL
 );
 
 
@@ -4624,3 +4639,4 @@ GRANT ALL ON SCHEMA public TO PUBLIC;
 -- PostgreSQL database dump complete
 --
 
+COMMIT;
