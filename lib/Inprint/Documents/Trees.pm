@@ -182,7 +182,7 @@ sub fascicles {
                 t1.enabled=true
                 AND t1.id <> '00000000-0000-0000-0000-000000000000'
                 AND t1.id <> '99999999-9999-9999-9999-999999999999'
-                AND t1.deadline >= now()
+                AND t1.enabled = true
                 AND t2.id = t1.edition
         ";
 

@@ -207,10 +207,12 @@ sub convert {
     my $fileContent;
     open my $INPUT, "<", $filepath || die "Can't open <$filepath> : $!";
     binmode $INPUT;
-    while (read($INPUT, my $buf, 60*57)) {
-        $fileContent .= encode_base64($buf);
+    while ( &read($INPUT, my $buf, 60*57)) {
+        $fileContent .= $buf;
     }
     close $INPUT;
+
+    $fileContent = encode_base64($fileContent);
 
     $ooRequest->content( $fileContent );
 

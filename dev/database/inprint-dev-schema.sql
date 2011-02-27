@@ -30,10 +30,28 @@ SET search_path = public, pg_catalog;
 -- Name: lquery; Type: SHELL TYPE; Schema: public; Owner: inprint
 --
 
+-- CREATE LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION make_plpgsql()
+RETURNS VOID
+LANGUAGE SQL
+AS $$
 CREATE LANGUAGE plpgsql;
+$$;
+
+SELECT
+    CASE
+    WHEN EXISTS(
+        SELECT 1
+        FROM pg_catalog.pg_language
+        WHERE lanname='plpgsql'
+    )
+    THEN NULL
+    ELSE make_plpgsql() END;
+
+DROP FUNCTION make_plpgsql();
 
 CREATE TYPE lquery;
-
 
 --
 -- Name: lquery_in(cstring); Type: FUNCTION; Schema: public; Owner: inprint
@@ -432,7 +450,7 @@ CREATE FUNCTION access_delete_after_trigger() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 DECLARE
-    arg_type varchar; 
+    arg_type varchar;
 BEGIN
     arg_type := TG_ARGV[0];
 
@@ -455,7 +473,7 @@ CREATE FUNCTION access_insert_after_trigger() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 DECLARE
-    arg_type varchar; 
+    arg_type varchar;
 BEGIN
 
     arg_type := TG_ARGV[0];
@@ -463,11 +481,11 @@ BEGIN
     --RAISE EXCEPTION '%', arg_type;
 
     EXECUTE ' DELETE FROM cache_access WHERE type=''' ||arg_type|| ''' AND binding=''' ||NEW.id|| '''; ';
-    
-    IF arg_type = 'editions' THEN 
+
+    IF arg_type = 'editions' THEN
         EXECUTE '
             INSERT INTO cache_access
-                SELECT ''editions'' AS type, t1.path, t1.id AS binding, t2.id AS member, ARRAY( 
+                SELECT ''editions'' AS type, t1.path, t1.id AS binding, t2.id AS member, ARRAY(
                     SELECT DISTINCT (((a2.section::text || ''.''::text) || a2.subsection::text) || ''.''::text) || a2.term::text AS term
                     FROM map_member_to_rule a1, rules a2
                     WHERE a2.id = a1.term AND a2.section = ''' ||arg_type|| ''' AND a1.member = t2.id AND (a1.binding IN ( SELECT id FROM editions WHERE path @> t1.path))
@@ -476,10 +494,10 @@ BEGIN
                 WHERE t1.id = ''' ||NEW.id|| ''' ORDER BY t1.path;';
     END IF;
 
-    IF arg_type = 'catalog' THEN 
+    IF arg_type = 'catalog' THEN
         EXECUTE '
             INSERT INTO cache_access
-                SELECT ''catalog'' AS type, t1.path, t1.id AS binding, t2.id AS member, ARRAY( 
+                SELECT ''catalog'' AS type, t1.path, t1.id AS binding, t2.id AS member, ARRAY(
                     SELECT DISTINCT a2.section::text || ''.''::text || a2.subsection::text || ''.''::text || a2.term::text || '':''::text || a1.area AS term
                     FROM map_member_to_rule a1, rules a2
                     WHERE a2.id = a1.term AND a2.section = ''catalog'' AND a1.member = t2.id AND (a1.binding IN ( SELECT id FROM catalog WHERE path @> t1.path))
@@ -489,7 +507,7 @@ BEGIN
     END IF;
 
     EXECUTE ' DELETE FROM cache_access WHERE array_dims(terms) is null ';
-    
+
     RETURN NEW;
 END;
 $$;
@@ -508,22 +526,22 @@ DECLARE
     arg_type varchar;
 		arecords RECORD;
 BEGIN
-	
+
 	arg_type := TG_ARGV[0];
 
 	EXECUTE ' DELETE FROM cache_access WHERE type=''' ||arg_type|| ''' AND binding=''' ||NEW.id|| '''; ';
 
 	-- CREATE RULES FOR NEW POSITION
 
-    IF arg_type = 'editions' THEN 
-			
-			FOR arecords IN 
-				SELECT 
-					'editions' AS type, 
-					t1.path, 
-					t1.id AS binding, 
-					t2.id AS member, 
-					ARRAY( 
+    IF arg_type = 'editions' THEN
+
+			FOR arecords IN
+				SELECT
+					'editions' AS type,
+					t1.path,
+					t1.id AS binding,
+					t2.id AS member,
+					ARRAY(
 							SELECT DISTINCT (((a2.section::text || '.'::text) || a2.subsection::text) || '.'::text) || a2.term::text AS term
               FROM map_member_to_rule a1, rules a2
               WHERE a2.id = a1.term AND a2.section = 'editions' AND a1.member = t2.id AND (a1.binding IN ( SELECT id FROM editions WHERE path @> t1.path))
@@ -537,21 +555,21 @@ BEGIN
 
     END IF;
 
-    IF arg_type = 'catalog' THEN 
+    IF arg_type = 'catalog' THEN
 
-			FOR arecords IN 
-				SELECT 
-					'catalog' AS type, 
-					t1.path, 
-					t1.id AS binding, 
-					t2.id AS member, 
-					ARRAY( 
+			FOR arecords IN
+				SELECT
+					'catalog' AS type,
+					t1.path,
+					t1.id AS binding,
+					t2.id AS member,
+					ARRAY(
 							SELECT DISTINCT a2.section::text || '.'::text || a2.subsection::text || '.'::text || a2.term::text || ':'::text || a1.area AS term
 							FROM map_member_to_rule a1, rules a2
 							WHERE a2.id = a1.term AND a2.section = 'catalog' AND a1.member = t2.id AND (a1.binding IN ( SELECT id FROM catalog WHERE path @> t1.path))
 					) AS terms
-				FROM catalog t1, members t2 
-				WHERE t1.path ~ ( NEW.path::text || '.*')::lquery ORDER BY t1.path 
+				FROM catalog t1, members t2
+				WHERE t1.path ~ ( NEW.path::text || '.*')::lquery ORDER BY t1.path
 			LOOP
 						DELETE FROM cache_access WHERE type='catalog' AND path=arecords.path AND binding=arecords.binding AND member=arecords.member;
 						INSERT INTO cache_access (type, path, binding, member, terms) VALUES ('catalog', arecords.path, arecords.binding, arecords.member, arecords.terms);
@@ -562,19 +580,19 @@ BEGIN
     EXECUTE ' DELETE FROM cache_access WHERE array_dims(terms) is null ';
 
     EXECUTE '
-        UPDATE cache_visibility t1 
+        UPDATE cache_visibility t1
             SET parents = ARRAY(
                     SELECT t2.id FROM ' ||arg_type|| ' t2 WHERE (
                         ARRAY(
-                            SELECT t3.id FROM ' ||arg_type|| ' t3 WHERE 
-                                t3.path ~ ((t2.path::text || ''.*''::text)::lquery)) 
-                                && 
+                            SELECT t3.id FROM ' ||arg_type|| ' t3 WHERE
+                                t3.path ~ ((t2.path::text || ''.*''::text)::lquery))
+                                &&
                                 ARRAY(select t4.binding from map_member_to_rule t4 WHERE member=t1.member AND term=t1.termid )
                     )
-                ) 
+                )
             WHERE ''' ||NEW.id|| ''' = ANY(t1.parents)
     ';
-    
+
     return NEW;
 END;
 $$;
@@ -601,12 +619,12 @@ CREATE FUNCTION fascicles_map_documents_delete_after_trigger() RETURNS trigger
     LANGUAGE plpgsql
     AS $_$
 DECLARE
-    arg_seqnums integer[]; 
+    arg_seqnums integer[];
 BEGIN
 
     EXECUTE 'SELECT ARRAY(
                 SELECT t2.seqnum
-                FROM fascicles_map_documents t1, fascicles_pages t2 
+                FROM fascicles_map_documents t1, fascicles_pages t2
                 WHERE t2.id = t1.page AND t1.fascicle = $1 AND t1.entity = $2
                 ORDER BY t2.seqnum
             );'
@@ -619,7 +637,7 @@ BEGIN
 
     EXECUTE 'UPDATE documents SET firstpage=$1 WHERE id=$2'
         USING arg_seqnums[1], OLD.entity;
-    
+
     return OLD;
 END;
 $_$;
@@ -635,12 +653,12 @@ CREATE FUNCTION fascicles_map_documents_update_after_trigger() RETURNS trigger
     LANGUAGE plpgsql
     AS $_$
 DECLARE
-    arg_seqnums integer[]; 
+    arg_seqnums integer[];
 BEGIN
 
     EXECUTE 'SELECT ARRAY(
                 SELECT t2.seqnum
-                FROM fascicles_map_documents t1, fascicles_pages t2 
+                FROM fascicles_map_documents t1, fascicles_pages t2
                 WHERE t2.id = t1.page AND t1.fascicle = $1 AND t1.entity = $2
                 ORDER BY t2.seqnum
             );'
@@ -653,7 +671,7 @@ BEGIN
 
     EXECUTE 'UPDATE documents SET firstpage=$1 WHERE id=$2'
         USING arg_seqnums[1], NEW.entity;
-    
+
     return NEW;
 END;
 $_$;
@@ -669,12 +687,12 @@ CREATE FUNCTION fascicles_map_modules_delete_after_trigger() RETURNS trigger
     LANGUAGE plpgsql
     AS $_$
 DECLARE
-    arg_seqnums integer[]; 
+    arg_seqnums integer[];
 BEGIN
 
     EXECUTE 'SELECT ARRAY(
                 SELECT t2.seqnum
-                FROM fascicles_map_modules t1, fascicles_pages t2 
+                FROM fascicles_map_modules t1, fascicles_pages t2
                 WHERE t2.id = t1.page AND t1.fascicle = $1 AND t1.module = $2
                 ORDER BY t2.seqnum
             );'
@@ -685,7 +703,7 @@ BEGIN
 
     EXECUTE 'UPDATE fascicles_requests SET firstpage=$1 WHERE module=$2'
         USING arg_seqnums[1], OLD.module;
-    
+
     return OLD;
 END;
 $_$;
@@ -701,23 +719,23 @@ CREATE FUNCTION fascicles_map_modules_update_after_trigger() RETURNS trigger
     LANGUAGE plpgsql
     AS $_$
 DECLARE
-    arg_seqnums integer[]; 
+    arg_seqnums integer[];
 BEGIN
 
     EXECUTE 'SELECT ARRAY(
                 SELECT t2.seqnum
-                FROM fascicles_map_modules t1, fascicles_pages t2 
+                FROM fascicles_map_modules t1, fascicles_pages t2
                 WHERE t2.id = t1.page AND t1.fascicle = $1 AND t1.module = $2
                 ORDER BY t2.seqnum
             );'
         INTO arg_seqnums USING NEW.fascicle, NEW.module;
-        
+
     EXECUTE 'UPDATE fascicles_requests SET pages=array_to_string($1, '','') WHERE module=$2'
         USING arg_seqnums, NEW.module;
 
     EXECUTE 'UPDATE fascicles_requests SET firstpage=$1 WHERE module=$2'
         USING arg_seqnums[1], NEW.module;
-    
+
     return NEW;
 END;
 $_$;
@@ -1162,16 +1180,16 @@ BEGIN
             INTO arg_term_name USING OLD.term;
     END IF;
 
-    
 
-    IF OLD.section = 'editions' THEN    
-    
+
+    IF OLD.section = 'editions' THEN
+
         EXECUTE 'DELETE FROM cache_access WHERE type=''' ||OLD.section|| ''' AND member=''' ||OLD.member|| ''' AND path ~ (''' || arg_path::text || '.*'')::lquery ';
         EXECUTE 'DELETE FROM cache_visibility WHERE type=''' ||OLD.section|| ''' AND member=''' ||OLD.member|| ''' AND term LIKE ''' ||arg_term_name|| ''' ';
-        
+
         EXECUTE '
             INSERT INTO cache_access
-                SELECT ''' ||OLD.section|| ''' AS type, t1.path, t1.id AS binding, t2.id AS member, ARRAY( 
+                SELECT ''' ||OLD.section|| ''' AS type, t1.path, t1.id AS binding, t2.id AS member, ARRAY(
                     SELECT DISTINCT a2.section::text || ''.''::text || a2.subsection::text || ''.''::text || a2.term::text AS term
                     FROM map_member_to_rule a1, rules a2
                     WHERE a2.id = a1.term AND a2.section = ''' ||OLD.section|| ''' AND a1.member = t2.id AND (a1.binding IN ( SELECT id FROM ' ||OLD.section|| ' WHERE path @> t1.path))
@@ -1179,31 +1197,31 @@ BEGIN
                 FROM ' ||OLD.section|| ' t1, members t2
                 WHERE t2.id=''' ||OLD.member|| ''' AND t1.path ~ (''' || arg_path::text || '.*'')::lquery ORDER BY t1.path;
         ';
-        
+
         EXECUTE '
             INSERT INTO cache_visibility
                 SELECT ''' ||OLD.section|| ''' AS type, ''' ||OLD.member|| ''' as member, ''' ||arg_term_name|| ''' AS term, ''' ||OLD.term|| ''' as termid,
-                ARRAY( 
-                    SELECT id FROM ' ||OLD.section|| ' WHERE 
+                ARRAY(
+                    SELECT id FROM ' ||OLD.section|| ' WHERE
                         path @> ARRAY( SELECT path from map_member_to_rule t1, ' ||OLD.section|| ' t2 WHERE t2.id = t1.binding AND t1.member=''' ||OLD.member|| ''' AND t1.term = ''' ||OLD.term|| ''')
                 ) as parents,
-                ARRAY( 
-                    SELECT id FROM ' ||OLD.section|| ' WHERE 
+                ARRAY(
+                    SELECT id FROM ' ||OLD.section|| ' WHERE
                         path <@ ARRAY( SELECT path from map_member_to_rule t1, ' ||OLD.section|| ' t2 WHERE t2.id = t1.binding AND t1.member=''' ||OLD.member|| ''' AND t1.term = ''' ||OLD.term|| ''')
                 ) as childrens
         ';
-        
+
     END IF;
 
     IF OLD.section = 'catalog' THEN
-        
+
         EXECUTE 'DELETE FROM cache_access WHERE type=''' ||OLD.section|| ''' AND member=''' ||OLD.member|| ''' AND path ~ (''' || arg_path::text || '.*'')::lquery ';
         EXECUTE 'DELETE FROM cache_visibility WHERE type=''' ||OLD.section|| ''' AND member=''' ||OLD.member|| ''' AND term LIKE ''' ||arg_term_name|| ':' ||OLD.area|| ''' ';
-        
+
         /*
         EXECUTE '
             INSERT INTO cache_access
-                SELECT ''' ||OLD.section|| ''' AS type, t1.path, t1.id AS binding, t2.id AS member, ARRAY( 
+                SELECT ''' ||OLD.section|| ''' AS type, t1.path, t1.id AS binding, t2.id AS member, ARRAY(
                     SELECT DISTINCT a2.section::text || ''.''::text || a2.subsection::text || ''.''::text || a2.term::text || '':''::text || a1.area AS term
                     FROM map_member_to_rule a1, rules a2
                     WHERE a2.id = a1.term AND a2.section = ''' ||OLD.section|| ''' AND a1.member = ''' ||OLD.member|| ''' AND (a1.binding IN ( SELECT id FROM ' ||OLD.section|| ' WHERE path @> t1.path))
@@ -1211,21 +1229,21 @@ BEGIN
                 FROM ' ||OLD.section|| ' t1, members t2
                 WHERE t2.id=''' ||OLD.member|| ''' AND t1.path ~ (''' || arg_path::text || '.*'')::lquery ORDER BY t1.path;
         ';
-        
+
         EXECUTE '
             INSERT INTO cache_visibility
                 SELECT ''' ||OLD.section|| ''' AS type, ''' ||OLD.member|| ''' as member, ''' ||arg_term_name|| '''||'':''||''' ||OLD.area|| ''' AS term, ''' ||OLD.term|| ''' as termid,
-                ARRAY( 
-                    SELECT id FROM ' ||OLD.section|| ' WHERE 
-                        path @> ARRAY( 
-                            SELECT path from map_member_to_rule t1, ' ||OLD.section|| ' t2 
+                ARRAY(
+                    SELECT id FROM ' ||OLD.section|| ' WHERE
+                        path @> ARRAY(
+                            SELECT path from map_member_to_rule t1, ' ||OLD.section|| ' t2
                             WHERE t2.id = t1.binding AND t1.member=''' ||OLD.member|| ''' AND t1.term = ''' ||OLD.term|| ''' AND t1.area = ''' ||OLD.area|| '''
                         )
                 ) as parents,
-                ARRAY( 
-                    SELECT id FROM ' ||OLD.section|| ' WHERE 
-                        path <@ ARRAY( 
-                            SELECT path from map_member_to_rule t1, ' ||OLD.section|| ' t2 
+                ARRAY(
+                    SELECT id FROM ' ||OLD.section|| ' WHERE
+                        path <@ ARRAY(
+                            SELECT path from map_member_to_rule t1, ' ||OLD.section|| ' t2
                             WHERE t2.id = t1.binding AND t1.member=''' ||OLD.member|| ''' AND t1.term = ''' ||OLD.term|| ''' AND t1.area = ''' ||OLD.area|| '''
                         )
                 ) as childrens
@@ -1233,7 +1251,7 @@ BEGIN
         */
     END IF;
 
-    RETURN OLD;    
+    RETURN OLD;
 END;
 $_$;
 
@@ -1259,15 +1277,15 @@ BEGIN
         EXECUTE '
             INSERT INTO cache_access("type", path, binding, member, terms)
             VALUES (
-                ''domain'', ''00000000000000000000000000000000''::ltree, ''00000000-0000-0000-0000-000000000000'', ''' ||NEW.member|| ''', 
-                ARRAY( 
+                ''domain'', ''00000000000000000000000000000000''::ltree, ''00000000-0000-0000-0000-000000000000'', ''' ||NEW.member|| ''',
+                ARRAY(
                     SELECT DISTINCT (((a2.section::text || ''.''::text) || a2.subsection::text) || ''.''::text) || a2.term::text AS term
                     FROM map_member_to_rule a1, rules a2
                     WHERE a2.id = a1.term AND a2.section = ''domain'' AND a1.member = ''' ||NEW.member|| '''
                 )
            );
         ';
-    
+
     END IF;
 
     IF NEW.section = 'editions' OR NEW.section = 'catalog' THEN
@@ -1282,10 +1300,10 @@ BEGIN
 
         EXECUTE 'DELETE FROM cache_access WHERE type=''' ||NEW.section|| ''' AND member=''' ||NEW.member|| ''' AND path ~ (''' || arg_path::text || '.*'')::lquery; ';
         EXECUTE 'DELETE FROM cache_visibility WHERE type=''' ||NEW.section|| ''' AND member=''' ||NEW.member|| ''' AND term LIKE ''' ||arg_term_name|| '''; ';
-    
+
         EXECUTE '
             INSERT INTO cache_access
-                SELECT ''' ||NEW.section|| ''' AS type, t1.path, t1.id AS binding, t2.id AS member, ARRAY( 
+                SELECT ''' ||NEW.section|| ''' AS type, t1.path, t1.id AS binding, t2.id AS member, ARRAY(
                     SELECT DISTINCT a2.section::text || ''.''::text || a2.subsection::text || ''.''::text || a2.term::text AS term
                     FROM map_member_to_rule a1, rules a2
                     WHERE a2.id = a1.term AND a2.section = ''' ||NEW.section|| ''' AND a1.member = t2.id AND (a1.binding IN ( SELECT id FROM ' ||NEW.section|| ' WHERE path @> t1.path))
@@ -1293,19 +1311,19 @@ BEGIN
                 FROM ' ||NEW.section|| ' t1, members t2
                 WHERE t2.id=''' ||NEW.member|| ''' AND t1.path ~ (''' || arg_path::text || '.*'')::lquery ORDER BY t1.path;
         ';
-        
+
         EXECUTE '
             INSERT INTO cache_visibility
                 SELECT ''' ||NEW.section|| ''' AS type, ''' ||NEW.member|| ''' as member, ''' ||arg_term_name|| ''' AS term, ''' ||NEW.term|| ''' as termid,
-                ARRAY( 
-                    SELECT id FROM ' ||NEW.section|| ' WHERE 
+                ARRAY(
+                    SELECT id FROM ' ||NEW.section|| ' WHERE
                         path @> ARRAY( SELECT path from map_member_to_rule t1, ' ||NEW.section|| ' t2 WHERE t2.id = t1.binding AND t1.member=''' ||NEW.member|| ''' AND t1.term = ''' ||NEW.term|| ''')
                 ) as parents,
-                ARRAY( 
-                    SELECT id FROM ' ||NEW.section|| ' WHERE 
+                ARRAY(
+                    SELECT id FROM ' ||NEW.section|| ' WHERE
                         path <@ ARRAY( SELECT path from map_member_to_rule t1, ' ||NEW.section|| ' t2 WHERE t2.id = t1.binding AND t1.member=''' ||NEW.member|| ''' AND t1.term = ''' ||NEW.term|| ''')
                 ) as childrens
-                
+
         ';
     END IF;
 
@@ -1313,10 +1331,10 @@ BEGIN
 
         EXECUTE 'DELETE FROM cache_access WHERE type=''' ||NEW.section|| ''' AND member=''' ||NEW.member|| ''' AND path ~ (''' || arg_path::text || '.*'')::lquery; ';
         EXECUTE 'DELETE FROM cache_visibility WHERE type=''' ||NEW.section|| ''' AND member=''' ||NEW.member|| ''' AND term LIKE ''' ||arg_term_name|| ':' ||NEW.area|| ''' ';
-    
+
         EXECUTE '
             INSERT INTO cache_access
-                SELECT ''' ||NEW.section|| ''' AS type, t1.path, t1.id AS binding, t2.id AS member, ARRAY( 
+                SELECT ''' ||NEW.section|| ''' AS type, t1.path, t1.id AS binding, t2.id AS member, ARRAY(
                     SELECT DISTINCT a2.section::text || ''.''::text || a2.subsection::text || ''.''::text || a2.term::text || '':''::text || a1.area AS term
                     FROM map_member_to_rule a1, rules a2
                     WHERE a2.id = a1.term AND a2.section = ''' ||NEW.section|| ''' AND a1.member = ''' ||NEW.member|| ''' AND (a1.binding IN ( SELECT id FROM ' ||NEW.section|| ' WHERE path @> t1.path))
@@ -1324,30 +1342,30 @@ BEGIN
                 FROM ' ||NEW.section|| ' t1, members t2
                 WHERE t2.id=''' ||NEW.member|| ''' AND t1.path ~ (''' || arg_path::text || '.*'')::lquery ORDER BY t1.path;
         ';
-        
+
         EXECUTE '
             INSERT INTO cache_visibility
                 SELECT ''' ||NEW.section|| ''' AS type, ''' ||NEW.member|| ''' as member, ''' ||arg_term_name|| '''||'':''||''' ||NEW.area|| ''' AS term, ''' ||NEW.term|| ''' as termid,
-                ARRAY( 
-                    SELECT id FROM ' ||NEW.section|| ' WHERE 
-                        path @> ARRAY( 
-                            SELECT path from map_member_to_rule t1, ' ||NEW.section|| ' t2 
+                ARRAY(
+                    SELECT id FROM ' ||NEW.section|| ' WHERE
+                        path @> ARRAY(
+                            SELECT path from map_member_to_rule t1, ' ||NEW.section|| ' t2
                             WHERE t2.id = t1.binding AND t1.member=''' ||NEW.member|| ''' AND t1.term = ''' ||NEW.term|| ''' AND t1.area = ''' ||NEW.area|| '''
                         )
                 ) as parents,
-                ARRAY( 
-                    SELECT id FROM ' ||NEW.section|| ' WHERE 
-                        path <@ ARRAY( 
-                            SELECT path from map_member_to_rule t1, ' ||NEW.section|| ' t2 
+                ARRAY(
+                    SELECT id FROM ' ||NEW.section|| ' WHERE
+                        path <@ ARRAY(
+                            SELECT path from map_member_to_rule t1, ' ||NEW.section|| ' t2
                             WHERE t2.id = t1.binding AND t1.member=''' ||NEW.member|| ''' AND t1.term = ''' ||NEW.term|| ''' AND t1.area = ''' ||NEW.area|| '''
                         )
                 ) as childrens
         ';
-        
+
     END IF;
-    
+
     RETURN NEW;
-    
+
 END;
 $_$;
 
@@ -1407,7 +1425,7 @@ CREATE FUNCTION tree_delete_after_trigger() RETURNS trigger
     AS $$
 BEGIN
     EXECUTE ' DELETE FROM ' || TG_TABLE_NAME || ' WHERE path ~ (''' || OLD.path::text || '.*{1}'')::lquery; ';
-    RETURN OLD; 
+    RETURN OLD;
 END;
 $$;
 
@@ -1427,7 +1445,7 @@ DECLARE
 BEGIN
 
 	new_id := replace(NEW.id::text, '-',  '');
-        
+
 	IF NEW.path IS NOT NULL THEN
 	-- передан, какой-то материализованный путь
 	-- обрезаем в материализованном пути id вставляемого узла, если он есть
@@ -1435,15 +1453,15 @@ BEGIN
 		THEN subpath(NEW.path, 0, -1)
 		ELSE NEW.path
 	END;
-	
+
 	-- проверяем существование родителя
         EXECUTE 'SELECT mp.path FROM ' || TG_TABLE_NAME || ' AS mp WHERE mp.path = $1 OR replace(mp.id::text, ''-'',  '''') = $2'
 	INTO new_path USING new_path, new_path::text;
-	
+
 	-- родителя не нашли
         IF new_path IS NULL OR new_path = '' THEN
             NEW.path := new_id;
-	
+
 	-- родителя нашли
         ELSE
             NEW.path := new_path || new_id;
@@ -1466,7 +1484,7 @@ CREATE FUNCTION tree_update_after_trigger() RETURNS trigger
     LANGUAGE plpgsql
     AS $_$
 DECLARE
-	tid     ltree;  
+	tid     ltree;
 	new_id	ltree;
 BEGIN
 
@@ -1476,9 +1494,9 @@ BEGIN
 	NEW.id := OLD.id;
 
 	-- Приводим NULL значение материализованного пути к ID
-	NEW.path := CASE WHEN NEW.path IS NULL 
+	NEW.path := CASE WHEN NEW.path IS NULL
 		THEN new_id::text
-		ELSE NEW.path::text 
+		ELSE NEW.path::text
 	END;
 
 	-- Есть ли у нас изменения материализованного пути
@@ -1486,7 +1504,7 @@ BEGIN
 
 		-- Проверяем что новое значение материализованного пути
 		-- лежит не пределах подчинения и что на его конце ID
-		IF NEW.path ~ ('*.' || new_id::text || '.*{1,}')::lquery 
+		IF NEW.path ~ ('*.' || new_id::text || '.*{1,}')::lquery
 		   OR NEW.path ~ ('*.!' || new_id::text)::lquery
 		THEN
 			RAISE EXCEPTION 'Bad path! id = %', new_id;
@@ -1494,7 +1512,7 @@ BEGIN
 
 		-- Если уровень больше 1 то стоит проверить родителя
 		IF nlevel(NEW.path) > 1 THEN
-			EXECUTE 'SELECT replace(m.id::text, ''-'',  '''') FROM ' ||TG_TABLE_NAME|| ' AS m 
+			EXECUTE 'SELECT replace(m.id::text, ''-'',  '''') FROM ' ||TG_TABLE_NAME|| ' AS m
 				WHERE m.path = subpath($1, 0, nlevel($2) - 1)'
 			INTO tid USING NEW.path, NEW.path;
 			IF tid IS NULL THEN
@@ -2374,7 +2392,7 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: l18n; Type: TABLE; Schema: plugins; Owner: inprint; Tablespace: 
+-- Name: l18n; Type: TABLE; Schema: plugins; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE l18n (
@@ -2389,7 +2407,7 @@ CREATE TABLE l18n (
 ALTER TABLE plugins.l18n OWNER TO inprint;
 
 --
--- Name: menu; Type: TABLE; Schema: plugins; Owner: inprint; Tablespace: 
+-- Name: menu; Type: TABLE; Schema: plugins; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE menu (
@@ -2405,7 +2423,7 @@ CREATE TABLE menu (
 ALTER TABLE plugins.menu OWNER TO inprint;
 
 --
--- Name: routes; Type: TABLE; Schema: plugins; Owner: inprint; Tablespace: 
+-- Name: routes; Type: TABLE; Schema: plugins; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE routes (
@@ -2423,7 +2441,7 @@ CREATE TABLE routes (
 ALTER TABLE plugins.routes OWNER TO inprint;
 
 --
--- Name: rules; Type: TABLE; Schema: plugins; Owner: inprint; Tablespace: 
+-- Name: rules; Type: TABLE; Schema: plugins; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE rules (
@@ -2445,7 +2463,7 @@ ALTER TABLE plugins.rules OWNER TO inprint;
 SET search_path = public, pg_catalog;
 
 --
--- Name: ad_advertisers; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: ad_advertisers; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE ad_advertisers (
@@ -2493,7 +2511,7 @@ ALTER SEQUENCE ad_advertisers_serialnum_seq OWNED BY ad_advertisers.serialnum;
 
 
 --
--- Name: ad_index; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: ad_index; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE ad_index (
@@ -2510,7 +2528,7 @@ CREATE TABLE ad_index (
 ALTER TABLE public.ad_index OWNER TO inprint;
 
 --
--- Name: ad_modules; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: ad_modules; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE ad_modules (
@@ -2533,7 +2551,7 @@ CREATE TABLE ad_modules (
 ALTER TABLE public.ad_modules OWNER TO inprint;
 
 --
--- Name: ad_pages; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: ad_pages; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE ad_pages (
@@ -2552,7 +2570,7 @@ CREATE TABLE ad_pages (
 ALTER TABLE public.ad_pages OWNER TO inprint;
 
 --
--- Name: ad_places; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: ad_places; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE ad_places (
@@ -2568,7 +2586,7 @@ CREATE TABLE ad_places (
 ALTER TABLE public.ad_places OWNER TO inprint;
 
 --
--- Name: ad_requests; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: ad_requests; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE ad_requests (
@@ -2615,7 +2633,7 @@ ALTER SEQUENCE ad_requests_serialnum_seq OWNED BY ad_requests.serialnum;
 
 
 --
--- Name: branches; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: branches; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE branches (
@@ -2633,7 +2651,7 @@ CREATE TABLE branches (
 ALTER TABLE public.branches OWNER TO inprint;
 
 --
--- Name: cache_access; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: cache_access; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE cache_access (
@@ -2648,7 +2666,7 @@ CREATE TABLE cache_access (
 ALTER TABLE public.cache_access OWNER TO inprint;
 
 --
--- Name: cache_files; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: cache_files; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE cache_files (
@@ -2673,7 +2691,7 @@ CREATE TABLE cache_files (
 ALTER TABLE public.cache_files OWNER TO inprint;
 
 --
--- Name: cache_hotsave; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: cache_hotsave; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE cache_hotsave (
@@ -2694,7 +2712,7 @@ CREATE TABLE cache_hotsave (
 ALTER TABLE public.cache_hotsave OWNER TO inprint;
 
 --
--- Name: catalog; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: catalog; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE catalog (
@@ -2713,7 +2731,7 @@ CREATE TABLE catalog (
 ALTER TABLE public.catalog OWNER TO inprint;
 
 --
--- Name: editions; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: editions; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE editions (
@@ -2730,7 +2748,7 @@ CREATE TABLE editions (
 ALTER TABLE public.editions OWNER TO inprint;
 
 --
--- Name: map_member_to_rule; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: map_member_to_rule; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE map_member_to_rule (
@@ -2746,7 +2764,7 @@ CREATE TABLE map_member_to_rule (
 ALTER TABLE public.map_member_to_rule OWNER TO inprint;
 
 --
--- Name: members; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: members; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE members (
@@ -2761,7 +2779,7 @@ CREATE TABLE members (
 ALTER TABLE public.members OWNER TO inprint;
 
 --
--- Name: rules; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: rules; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE rules (
@@ -2789,7 +2807,7 @@ CREATE VIEW cache_rules AS
 ALTER TABLE public.cache_rules OWNER TO inprint;
 
 --
--- Name: cache_versions; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: cache_versions; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE cache_versions (
@@ -2810,7 +2828,7 @@ CREATE TABLE cache_versions (
 ALTER TABLE public.cache_versions OWNER TO inprint;
 
 --
--- Name: cache_visibility; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: cache_visibility; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE cache_visibility (
@@ -2826,7 +2844,7 @@ CREATE TABLE cache_visibility (
 ALTER TABLE public.cache_visibility OWNER TO inprint;
 
 --
--- Name: comments; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: comments; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE comments (
@@ -2847,7 +2865,7 @@ CREATE TABLE comments (
 ALTER TABLE public.comments OWNER TO inprint;
 
 --
--- Name: documents; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: documents; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE documents (
@@ -2907,7 +2925,7 @@ CREATE TABLE documents (
 ALTER TABLE public.documents OWNER TO inprint;
 
 --
--- Name: editions_options; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: editions_options; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE editions_options (
@@ -2923,18 +2941,18 @@ CREATE TABLE editions_options (
 ALTER TABLE public.editions_options OWNER TO inprint;
 
 --
--- Name: fascicles; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: fascicles; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE fascicles (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
     edition uuid NOT NULL,
     parent uuid NOT NULL,
-    
+
     fastype character varying NOT NULL DEFAULT 'issue',
-    
+
     variation uuid NOT NULL DEFAULT uuid_generate_v4(),
-    
+
     title character varying NOT NULL,
     shortcut character varying NOT NULL,
     description character varying,
@@ -2943,21 +2961,21 @@ CREATE TABLE fascicles (
 
     pnum character varying,
     anum character varying,
-    
+
     manager uuid,
-    
+
     enabled boolean NOT NULL DEFAULT false,
     archived boolean NOT NULL DEFAULT false,
-    
-    flagdoc integer DEFAULT 0 NOT NULL,
-    flagadv integer DEFAULT 0 NOT NULL,
+
+    flagdoc varchar DEFAULT 'bydate' NOT NULL,
+    flagadv varchar DEFAULT 'bydate' NOT NULL,
     
     datedoc timestamp(6) with time zone NOT NULL,
     dateadv timestamp(6) with time zone NOT NULL,
-    
+
     dateprint timestamp(6) with time zone NOT NULL,
     dateout timestamp(6) with time zone NOT NULL,
-    
+
     created timestamp(6) with time zone DEFAULT now() NOT NULL,
     updated timestamp(6) with time zone DEFAULT now() NOT NULL
 );
@@ -2966,7 +2984,7 @@ CREATE TABLE fascicles (
 ALTER TABLE public.fascicles OWNER TO inprint;
 
 --
--- Name: fascicles_indx_headlines; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: fascicles_indx_headlines; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE fascicles_indx_headlines (
@@ -2985,7 +3003,7 @@ CREATE TABLE fascicles_indx_headlines (
 ALTER TABLE public.fascicles_indx_headlines OWNER TO inprint;
 
 --
--- Name: fascicles_indx_rubrics; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: fascicles_indx_rubrics; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE fascicles_indx_rubrics (
@@ -3005,7 +3023,7 @@ CREATE TABLE fascicles_indx_rubrics (
 ALTER TABLE public.fascicles_indx_rubrics OWNER TO inprint;
 
 --
--- Name: fascicles_map_documents; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: fascicles_map_documents; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE fascicles_map_documents (
@@ -3022,7 +3040,7 @@ CREATE TABLE fascicles_map_documents (
 ALTER TABLE public.fascicles_map_documents OWNER TO inprint;
 
 --
--- Name: fascicles_map_modules; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: fascicles_map_modules; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE fascicles_map_modules (
@@ -3042,7 +3060,7 @@ CREATE TABLE fascicles_map_modules (
 ALTER TABLE public.fascicles_map_modules OWNER TO inprint;
 
 --
--- Name: fascicles_map_requests; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: fascicles_map_requests; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE fascicles_map_requests (
@@ -3059,7 +3077,7 @@ CREATE TABLE fascicles_map_requests (
 ALTER TABLE public.fascicles_map_requests OWNER TO inprint;
 
 --
--- Name: fascicles_modules; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: fascicles_modules; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE fascicles_modules (
@@ -3082,7 +3100,7 @@ CREATE TABLE fascicles_modules (
 ALTER TABLE public.fascicles_modules OWNER TO inprint;
 
 --
--- Name: fascicles_options; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: fascicles_options; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE fascicles_options (
@@ -3099,7 +3117,7 @@ CREATE TABLE fascicles_options (
 ALTER TABLE public.fascicles_options OWNER TO inprint;
 
 --
--- Name: fascicles_pages; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: fascicles_pages; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE fascicles_pages (
@@ -3119,7 +3137,7 @@ CREATE TABLE fascicles_pages (
 ALTER TABLE public.fascicles_pages OWNER TO inprint;
 
 --
--- Name: fascicles_requests; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: fascicles_requests; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE fascicles_requests (
@@ -3179,7 +3197,7 @@ ALTER SEQUENCE fascicles_requests_serialnum_seq OWNED BY fascicles_requests.seri
 
 
 --
--- Name: fascicles_tmpl_index; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: fascicles_tmpl_index; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE fascicles_tmpl_index (
@@ -3197,7 +3215,7 @@ CREATE TABLE fascicles_tmpl_index (
 ALTER TABLE public.fascicles_tmpl_index OWNER TO inprint;
 
 --
--- Name: fascicles_tmpl_modules; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: fascicles_tmpl_modules; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE fascicles_tmpl_modules (
@@ -3221,7 +3239,7 @@ CREATE TABLE fascicles_tmpl_modules (
 ALTER TABLE public.fascicles_tmpl_modules OWNER TO inprint;
 
 --
--- Name: fascicles_tmpl_pages; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: fascicles_tmpl_pages; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE fascicles_tmpl_pages (
@@ -3241,7 +3259,7 @@ CREATE TABLE fascicles_tmpl_pages (
 ALTER TABLE public.fascicles_tmpl_pages OWNER TO inprint;
 
 --
--- Name: fascicles_tmpl_places; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: fascicles_tmpl_places; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE fascicles_tmpl_places (
@@ -3258,7 +3276,7 @@ CREATE TABLE fascicles_tmpl_places (
 ALTER TABLE public.fascicles_tmpl_places OWNER TO inprint;
 
 --
--- Name: history; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: history; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE history (
@@ -3286,7 +3304,7 @@ CREATE TABLE history (
 ALTER TABLE public.history OWNER TO inprint;
 
 --
--- Name: indx_headlines; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: indx_headlines; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE indx_headlines (
@@ -3304,7 +3322,7 @@ CREATE TABLE indx_headlines (
 ALTER TABLE public.indx_headlines OWNER TO inprint;
 
 --
--- Name: indx_rubrics; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: indx_rubrics; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE indx_rubrics (
@@ -3323,7 +3341,7 @@ CREATE TABLE indx_rubrics (
 ALTER TABLE public.indx_rubrics OWNER TO inprint;
 
 --
--- Name: indx_tags; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: indx_tags; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE indx_tags (
@@ -3338,7 +3356,7 @@ CREATE TABLE indx_tags (
 ALTER TABLE public.indx_tags OWNER TO inprint;
 
 --
--- Name: logs; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: logs; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE logs (
@@ -3359,7 +3377,7 @@ CREATE TABLE logs (
 ALTER TABLE public.logs OWNER TO inprint;
 
 --
--- Name: map_member_to_catalog; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: map_member_to_catalog; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE map_member_to_catalog (
@@ -3372,7 +3390,7 @@ CREATE TABLE map_member_to_catalog (
 ALTER TABLE public.map_member_to_catalog OWNER TO inprint;
 
 --
--- Name: map_principals_to_stages; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: map_principals_to_stages; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE map_principals_to_stages (
@@ -3386,7 +3404,7 @@ CREATE TABLE map_principals_to_stages (
 ALTER TABLE public.map_principals_to_stages OWNER TO inprint;
 
 --
--- Name: map_role_to_rule; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: map_role_to_rule; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE map_role_to_rule (
@@ -3399,7 +3417,7 @@ CREATE TABLE map_role_to_rule (
 ALTER TABLE public.map_role_to_rule OWNER TO inprint;
 
 --
--- Name: migration; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: migration; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE migration (
@@ -3413,7 +3431,7 @@ CREATE TABLE migration (
 ALTER TABLE public.migration OWNER TO inprint;
 
 --
--- Name: options; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: options; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE options (
@@ -3427,7 +3445,7 @@ CREATE TABLE options (
 ALTER TABLE public.options OWNER TO inprint;
 
 --
--- Name: profiles; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: profiles; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE profiles (
@@ -3452,7 +3470,7 @@ CREATE TABLE profiles (
 ALTER TABLE public.profiles OWNER TO inprint;
 
 --
--- Name: readiness; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: readiness; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE readiness (
@@ -3470,7 +3488,7 @@ CREATE TABLE readiness (
 ALTER TABLE public.readiness OWNER TO inprint;
 
 --
--- Name: roles; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: roles; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE roles (
@@ -3486,7 +3504,7 @@ CREATE TABLE roles (
 ALTER TABLE public.roles OWNER TO inprint;
 
 --
--- Name: rss; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: rss; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE rss (
@@ -3505,7 +3523,7 @@ CREATE TABLE rss (
 ALTER TABLE public.rss OWNER TO inprint;
 
 --
--- Name: rss_feeds; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: rss_feeds; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE rss_feeds (
@@ -3522,7 +3540,7 @@ CREATE TABLE rss_feeds (
 ALTER TABLE public.rss_feeds OWNER TO inprint;
 
 --
--- Name: rss_feeds_mapping; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: rss_feeds_mapping; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE rss_feeds_mapping (
@@ -3536,7 +3554,7 @@ CREATE TABLE rss_feeds_mapping (
 ALTER TABLE public.rss_feeds_mapping OWNER TO inprint;
 
 --
--- Name: rss_feeds_options; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: rss_feeds_options; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE rss_feeds_options (
@@ -3550,7 +3568,7 @@ CREATE TABLE rss_feeds_options (
 ALTER TABLE public.rss_feeds_options OWNER TO inprint;
 
 --
--- Name: sessions; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: sessions; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE sessions (
@@ -3565,7 +3583,7 @@ CREATE TABLE sessions (
 ALTER TABLE public.sessions OWNER TO inprint;
 
 --
--- Name: stages; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: stages; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE stages (
@@ -3584,7 +3602,7 @@ CREATE TABLE stages (
 ALTER TABLE public.stages OWNER TO inprint;
 
 --
--- Name: state; Type: TABLE; Schema: public; Owner: inprint; Tablespace: 
+-- Name: state; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE state (
@@ -3673,7 +3691,7 @@ ALTER TABLE fascicles_requests ALTER COLUMN serialnum SET DEFAULT nextval('fasci
 SET search_path = plugins, pg_catalog;
 
 --
--- Name: l18n_l18n_original_key; Type: CONSTRAINT; Schema: plugins; Owner: inprint; Tablespace: 
+-- Name: l18n_l18n_original_key; Type: CONSTRAINT; Schema: plugins; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY l18n
@@ -3681,7 +3699,7 @@ ALTER TABLE ONLY l18n
 
 
 --
--- Name: l18n_pkey; Type: CONSTRAINT; Schema: plugins; Owner: inprint; Tablespace: 
+-- Name: l18n_pkey; Type: CONSTRAINT; Schema: plugins; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY l18n
@@ -3689,7 +3707,7 @@ ALTER TABLE ONLY l18n
 
 
 --
--- Name: menu_pkey; Type: CONSTRAINT; Schema: plugins; Owner: inprint; Tablespace: 
+-- Name: menu_pkey; Type: CONSTRAINT; Schema: plugins; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY menu
@@ -3697,7 +3715,7 @@ ALTER TABLE ONLY menu
 
 
 --
--- Name: menu_plugin_key; Type: CONSTRAINT; Schema: plugins; Owner: inprint; Tablespace: 
+-- Name: menu_plugin_key; Type: CONSTRAINT; Schema: plugins; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY menu
@@ -3705,7 +3723,7 @@ ALTER TABLE ONLY menu
 
 
 --
--- Name: routes_pkey; Type: CONSTRAINT; Schema: plugins; Owner: inprint; Tablespace: 
+-- Name: routes_pkey; Type: CONSTRAINT; Schema: plugins; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY routes
@@ -3713,7 +3731,7 @@ ALTER TABLE ONLY routes
 
 
 --
--- Name: routes_plugin_key; Type: CONSTRAINT; Schema: plugins; Owner: inprint; Tablespace: 
+-- Name: routes_plugin_key; Type: CONSTRAINT; Schema: plugins; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY routes
@@ -3721,7 +3739,7 @@ ALTER TABLE ONLY routes
 
 
 --
--- Name: rules_pkey; Type: CONSTRAINT; Schema: plugins; Owner: inprint; Tablespace: 
+-- Name: rules_pkey; Type: CONSTRAINT; Schema: plugins; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY rules
@@ -3729,7 +3747,7 @@ ALTER TABLE ONLY rules
 
 
 --
--- Name: rules_plugin_key; Type: CONSTRAINT; Schema: plugins; Owner: inprint; Tablespace: 
+-- Name: rules_plugin_key; Type: CONSTRAINT; Schema: plugins; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY rules
@@ -3739,7 +3757,7 @@ ALTER TABLE ONLY rules
 SET search_path = public, pg_catalog;
 
 --
--- Name: ad_advertisers_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: ad_advertisers_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY ad_advertisers
@@ -3747,7 +3765,7 @@ ALTER TABLE ONLY ad_advertisers
 
 
 --
--- Name: ad_index_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: ad_index_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY ad_index
@@ -3755,7 +3773,7 @@ ALTER TABLE ONLY ad_index
 
 
 --
--- Name: ad_modules_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: ad_modules_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY ad_modules
@@ -3763,7 +3781,7 @@ ALTER TABLE ONLY ad_modules
 
 
 --
--- Name: ad_pages_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: ad_pages_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY ad_pages
@@ -3771,7 +3789,7 @@ ALTER TABLE ONLY ad_pages
 
 
 --
--- Name: ad_places_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: ad_places_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY ad_places
@@ -3779,7 +3797,7 @@ ALTER TABLE ONLY ad_places
 
 
 --
--- Name: ad_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: ad_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY ad_requests
@@ -3787,7 +3805,7 @@ ALTER TABLE ONLY ad_requests
 
 
 --
--- Name: cache_access_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: cache_access_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY cache_access
@@ -3795,7 +3813,7 @@ ALTER TABLE ONLY cache_access
 
 
 --
--- Name: cache_files_entity_key; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: cache_files_entity_key; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY cache_files
@@ -3803,7 +3821,7 @@ ALTER TABLE ONLY cache_files
 
 
 --
--- Name: cache_files_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: cache_files_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY cache_files
@@ -3811,7 +3829,7 @@ ALTER TABLE ONLY cache_files
 
 
 --
--- Name: cache_hotsave_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: cache_hotsave_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY cache_hotsave
@@ -3819,7 +3837,7 @@ ALTER TABLE ONLY cache_hotsave
 
 
 --
--- Name: cache_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: cache_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY cache_versions
@@ -3827,7 +3845,7 @@ ALTER TABLE ONLY cache_versions
 
 
 --
--- Name: cache_visibility_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: cache_visibility_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY cache_visibility
@@ -3835,7 +3853,7 @@ ALTER TABLE ONLY cache_visibility
 
 
 --
--- Name: catalog_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: catalog_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY catalog
@@ -3843,7 +3861,7 @@ ALTER TABLE ONLY catalog
 
 
 --
--- Name: chains_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: chains_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY branches
@@ -3851,7 +3869,7 @@ ALTER TABLE ONLY branches
 
 
 --
--- Name: comments_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: comments_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY comments
@@ -3859,7 +3877,7 @@ ALTER TABLE ONLY comments
 
 
 --
--- Name: documents_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: documents_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY documents
@@ -3867,7 +3885,7 @@ ALTER TABLE ONLY documents
 
 
 --
--- Name: editions_options_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: editions_options_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY editions_options
@@ -3875,7 +3893,7 @@ ALTER TABLE ONLY editions_options
 
 
 --
--- Name: editions_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: editions_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY editions
@@ -3883,7 +3901,7 @@ ALTER TABLE ONLY editions
 
 
 --
--- Name: fascicles_indx_headlines_edition_key; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: fascicles_indx_headlines_edition_key; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY fascicles_indx_headlines
@@ -3891,7 +3909,7 @@ ALTER TABLE ONLY fascicles_indx_headlines
 
 
 --
--- Name: fascicles_indx_headlines_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: fascicles_indx_headlines_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY fascicles_indx_headlines
@@ -3899,7 +3917,7 @@ ALTER TABLE ONLY fascicles_indx_headlines
 
 
 --
--- Name: fascicles_indx_rubrics_edition_key; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: fascicles_indx_rubrics_edition_key; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY fascicles_indx_rubrics
@@ -3907,7 +3925,7 @@ ALTER TABLE ONLY fascicles_indx_rubrics
 
 
 --
--- Name: fascicles_indx_rubrics_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: fascicles_indx_rubrics_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY fascicles_indx_rubrics
@@ -3915,7 +3933,7 @@ ALTER TABLE ONLY fascicles_indx_rubrics
 
 
 --
--- Name: fascicles_map_documents_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: fascicles_map_documents_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY fascicles_map_documents
@@ -3923,7 +3941,7 @@ ALTER TABLE ONLY fascicles_map_documents
 
 
 --
--- Name: fascicles_map_modules_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: fascicles_map_modules_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY fascicles_map_modules
@@ -3931,7 +3949,7 @@ ALTER TABLE ONLY fascicles_map_modules
 
 
 --
--- Name: fascicles_map_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: fascicles_map_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY fascicles_map_requests
@@ -3939,7 +3957,7 @@ ALTER TABLE ONLY fascicles_map_requests
 
 
 --
--- Name: fascicles_modules_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: fascicles_modules_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY fascicles_modules
@@ -3947,7 +3965,7 @@ ALTER TABLE ONLY fascicles_modules
 
 
 --
--- Name: fascicles_options_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: fascicles_options_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY fascicles_options
@@ -3955,7 +3973,7 @@ ALTER TABLE ONLY fascicles_options
 
 
 --
--- Name: fascicles_pages_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: fascicles_pages_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY fascicles_pages
@@ -3963,7 +3981,7 @@ ALTER TABLE ONLY fascicles_pages
 
 
 --
--- Name: fascicles_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: fascicles_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY fascicles
@@ -3971,7 +3989,7 @@ ALTER TABLE ONLY fascicles
 
 
 --
--- Name: fascicles_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: fascicles_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY fascicles_requests
@@ -3979,7 +3997,7 @@ ALTER TABLE ONLY fascicles_requests
 
 
 --
--- Name: fascicles_tmpl_index_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: fascicles_tmpl_index_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY fascicles_tmpl_index
@@ -3987,7 +4005,7 @@ ALTER TABLE ONLY fascicles_tmpl_index
 
 
 --
--- Name: fascicles_tmpl_modules_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: fascicles_tmpl_modules_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY fascicles_tmpl_modules
@@ -3995,7 +4013,7 @@ ALTER TABLE ONLY fascicles_tmpl_modules
 
 
 --
--- Name: fascicles_tmpl_pages_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: fascicles_tmpl_pages_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY fascicles_tmpl_pages
@@ -4003,7 +4021,7 @@ ALTER TABLE ONLY fascicles_tmpl_pages
 
 
 --
--- Name: fascicles_tmpl_places_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: fascicles_tmpl_places_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY fascicles_tmpl_places
@@ -4011,7 +4029,7 @@ ALTER TABLE ONLY fascicles_tmpl_places
 
 
 --
--- Name: history_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: history_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY history
@@ -4019,7 +4037,7 @@ ALTER TABLE ONLY history
 
 
 --
--- Name: indx_headlines_edition_key; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: indx_headlines_edition_key; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY indx_headlines
@@ -4027,7 +4045,7 @@ ALTER TABLE ONLY indx_headlines
 
 
 --
--- Name: indx_headlines_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: indx_headlines_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY indx_headlines
@@ -4035,7 +4053,7 @@ ALTER TABLE ONLY indx_headlines
 
 
 --
--- Name: indx_rubrics_edition_key; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: indx_rubrics_edition_key; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY indx_rubrics
@@ -4043,7 +4061,7 @@ ALTER TABLE ONLY indx_rubrics
 
 
 --
--- Name: indx_rubrics_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: indx_rubrics_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY indx_rubrics
@@ -4051,7 +4069,7 @@ ALTER TABLE ONLY indx_rubrics
 
 
 --
--- Name: indx_tags_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: indx_tags_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY indx_tags
@@ -4059,7 +4077,7 @@ ALTER TABLE ONLY indx_tags
 
 
 --
--- Name: logs_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: logs_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY logs
@@ -4067,7 +4085,7 @@ ALTER TABLE ONLY logs
 
 
 --
--- Name: map_member_to_catalog_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: map_member_to_catalog_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY map_member_to_catalog
@@ -4075,7 +4093,7 @@ ALTER TABLE ONLY map_member_to_catalog
 
 
 --
--- Name: map_member_to_rule_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: map_member_to_rule_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY map_member_to_rule
@@ -4083,7 +4101,7 @@ ALTER TABLE ONLY map_member_to_rule
 
 
 --
--- Name: map_principals_to_stages_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: map_principals_to_stages_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY map_principals_to_stages
@@ -4091,7 +4109,7 @@ ALTER TABLE ONLY map_principals_to_stages
 
 
 --
--- Name: map_role_to_rule_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: map_role_to_rule_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY map_role_to_rule
@@ -4099,7 +4117,7 @@ ALTER TABLE ONLY map_role_to_rule
 
 
 --
--- Name: member_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: member_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY members
@@ -4107,7 +4125,7 @@ ALTER TABLE ONLY members
 
 
 --
--- Name: member_profiles_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: member_profiles_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY profiles
@@ -4115,7 +4133,7 @@ ALTER TABLE ONLY profiles
 
 
 --
--- Name: member_session_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: member_session_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY sessions
@@ -4123,7 +4141,7 @@ ALTER TABLE ONLY sessions
 
 
 --
--- Name: migration_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: migration_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY migration
@@ -4131,7 +4149,7 @@ ALTER TABLE ONLY migration
 
 
 --
--- Name: options_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: options_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY options
@@ -4139,7 +4157,7 @@ ALTER TABLE ONLY options
 
 
 --
--- Name: roles_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: roles_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY roles
@@ -4147,7 +4165,7 @@ ALTER TABLE ONLY roles
 
 
 --
--- Name: rss_feeds_mapping_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: rss_feeds_mapping_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY rss_feeds_mapping
@@ -4155,7 +4173,7 @@ ALTER TABLE ONLY rss_feeds_mapping
 
 
 --
--- Name: rss_feeds_options_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: rss_feeds_options_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY rss_feeds_options
@@ -4163,7 +4181,7 @@ ALTER TABLE ONLY rss_feeds_options
 
 
 --
--- Name: rss_feeds_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: rss_feeds_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY rss_feeds
@@ -4171,7 +4189,7 @@ ALTER TABLE ONLY rss_feeds
 
 
 --
--- Name: rss_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: rss_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY rss
@@ -4179,7 +4197,7 @@ ALTER TABLE ONLY rss
 
 
 --
--- Name: rules_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: rules_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY rules
@@ -4187,7 +4205,7 @@ ALTER TABLE ONLY rules
 
 
 --
--- Name: stages_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: stages_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY stages
@@ -4195,7 +4213,7 @@ ALTER TABLE ONLY stages
 
 
 --
--- Name: state_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: state_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY state
@@ -4203,7 +4221,7 @@ ALTER TABLE ONLY state
 
 
 --
--- Name: statuses_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace: 
+-- Name: statuses_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY readiness
@@ -4211,7 +4229,7 @@ ALTER TABLE ONLY readiness
 
 
 --
--- Name: fki_; Type: INDEX; Schema: public; Owner: inprint; Tablespace: 
+-- Name: fki_; Type: INDEX; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE INDEX fki_ ON fascicles_pages USING btree (origin);

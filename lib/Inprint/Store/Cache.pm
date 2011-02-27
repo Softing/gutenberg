@@ -27,10 +27,16 @@ sub makeRecord {
     my $mimetype = extractMimeType($c, $extension);
 
     my $cacheRecord = $c->sql->Q("
-            SELECT * FROM cache_files WHERE file_path=? AND file_name=?
+                SELECT * FROM cache_files WHERE file_path=? AND file_name=?
             ", [ $filepath, $filename ])->Hash;
 
-    unless ($cacheRecord->{id}) {
+    if ($cacheRecord->{id}) {
+        unless ($cacheRecord->{file_exists}) {
+            $c->sql->Do("
+                    UPDATE cache_files SET file_exists=true WHERE file_path=? AND file_name=?
+                ", [ $filepath, $filename ])->Hash;
+        }
+    } else {
 
         $c->sql->Do("
                 INSERT INTO cache_files (
@@ -98,9 +104,9 @@ sub getRecordsByPath {
 
     $sql .= " ORDER BY file_published DESC, file_extension, file_name";
 
-    my $record = $c->sql->Q($sql, \@params)->Hashes;
+    my $records = $c->sql->Q($sql, \@params)->Hashes;
 
-    return $record;
+    return $records;
 }
 
 sub deleteRecordById {

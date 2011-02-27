@@ -39,6 +39,7 @@ sub index
     if ($accessViewDocuments) {
         if ($accessCreateDocuments) {
             push @{ $DocumentsSection->{menu} }, { id => "documents-create" };
+            push @{ $DocumentsSection->{menu} }, '-';
         }
         push @{ $DocumentsSection->{menu} }, { id => "documents-todo" };
         push @{ $DocumentsSection->{menu} }, '-';
@@ -147,9 +148,8 @@ sub index
                 t1.edition = t2.id
                 AND t1.edition = ANY (?)
                 AND t1.enabled = true
-                AND t1.deadline >= now()
                 AND t1.parent = ?
-            ORDER BY t1.deadline, t2.shortcut, t1.shortcut
+            ORDER BY t1.dateout, t2.shortcut, t1.shortcut
         ", [ $accessLayoutEditions, $fascicle->{id} ])->Hashes;
 
         foreach my $children (@$childrens) {

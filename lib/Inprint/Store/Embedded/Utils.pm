@@ -32,7 +32,23 @@ sub makePath {
     return $path;
 }
 
-sub encode {
+sub doEncode{
+    my $c = shift;
+    my $path = shift;
+
+    if ($^O eq "MSWin32") {
+        $path = Encode::encode("cp1251", $path);
+    }
+
+    if ($^O eq "linux") {
+        #$path = Encode::encode("utf8", $path);
+    }
+
+    return $path;
+}
+
+
+sub doDecode {
     my $c = shift;
     my $path = shift;
 
@@ -113,8 +129,8 @@ sub getRelativePath {
 
     $path = substr $path, length($basepath), length($path)-length($basepath);
 
-    $path =~ s/\\/\//;
-    $path =~ s/\/$//;
+    $path =~ s/\\/\//g;
+    $path =~ s/\/$//g;
 
     return $path;
 }

@@ -103,7 +103,7 @@ sub fascicles {
                 FROM fascicles t1, editions t2
                 WHERE
                     t1.edition = t2.id
-                    AND t1.deadline >= now()
+                    AND t1.enabled = true
                     AND t1.id <> '99999999-9999-9999-9999-999999999999'
                     AND t1.id <> '00000000-0000-0000-0000-000000000000'
         ";
@@ -118,7 +118,7 @@ sub fascicles {
         $sql .= " AND t1.edition = ANY(?) ";
         push @params, $editions;
 
-        $result = $c->sql->Q(" $sql ORDER BY t1.deadline DESC, t2.shortcut, t1.title ", \@params)->Hashes;
+        $result = $c->sql->Q(" $sql ORDER BY t1.dateout DESC, t2.shortcut, t1.title ", \@params)->Hashes;
 
         if ($c->access->Check($i_term, $i_edition)) {
             unshift @$result, {

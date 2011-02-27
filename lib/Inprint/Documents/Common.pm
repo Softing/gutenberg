@@ -23,10 +23,10 @@ sub fascicles {
             t1.id,
             t2.id as edition, t2.shortcut as edition_shortcut,
             t1.parent, t1.title, t1.shortcut, t1.description, t1.manager, t1.variation,
-            to_char(t1.deadline, 'YYYY-MM-DD HH24:MI:SS') as deadline,
-            to_char(t1.advert_deadline, 'YYYY-MM-DD HH24:MI:SS') as advert_deadline,
+            to_char(t1.datedoc, 'YYYY-MM-DD HH24:MI:SS') as datedoc,
+            to_char(t1.dateadv, 'YYYY-MM-DD HH24:MI:SS') as dateadv,
             t1.created, t1.updated
-        FROM fascicles t1, editions t2 WHERE t2.id=t1.edition AND t1.deadline >= now()
+        FROM fascicles t1, editions t2 WHERE t2.id=t1.edition AND t1.enabled = true
     ";
 
     my $editions = $c->access->GetChildrens("editions.documents.work");
@@ -39,7 +39,7 @@ sub fascicles {
     }
 
 
-    $sql .= " ORDER BY t1.deadline DESC ";
+    $sql .= " ORDER BY t1.dateout DESC ";
 
     my $result = $c->sql->Q($sql, \@params)->Hashes;
 

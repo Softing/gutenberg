@@ -45,8 +45,8 @@ sub updateCache {
         # Get file extension
         my $extension = Inprint::Store::Embedded::Utils::getExtension($c, $filename);
 
-        my $filepath = Inprint::Store::Embedded::Utils::makePath($c, $path,$filename);
-        my $filepath_encoded = Inprint::Store::Embedded::Utils::encode($c, $filepath);
+        my $filepath = Inprint::Store::Embedded::Utils::makePath($c, $path, $filename);
+        my $filepath_encoded = Inprint::Store::Embedded::Utils::doDecode($c, $filepath);
 
         # Create Cache record
         my $digest   = Inprint::Store::Embedded::Metadata::getDigest($c, $filepath);
@@ -55,8 +55,7 @@ sub updateCache {
         my $updated  = Inprint::Store::Embedded::Metadata::getFileModifyDate($c, $filepath);
 
         my $cacheRecord = Inprint::Store::Cache::makeRecord( $c,
-                $filepath_encoded,
-                $digest, $filesize, $created, $updated
+                $filepath_encoded, $digest, $filesize, $created, $updated
             );
 
         ## Create File record
@@ -77,8 +76,8 @@ sub updateCache {
     }
     closedir DIR;
 
-    # Clear cache
-    my $folderpath = Inprint::Store::Embedded::Utils::encode($c, $path);
+    ## Clear cache
+    my $folderpath = Inprint::Store::Embedded::Utils::doDecode($c, $path);
     Inprint::Store::Cache::cleanup($c, $folderpath);
 
     return \@files;
@@ -101,24 +100,27 @@ sub fileUpload {
 
     $filename =~ s/\s+/_/g;
 
-    my $filepath = Inprint::Store::Embedded::Utils::makePath($c, $path,$filename);
-    my $filepath_encoded = Inprint::Store::Embedded::Utils::encode($c, $filepath);
-
+    my $filepath = Inprint::Store::Embedded::Utils::makePath($c, $path, $filename);
+    my $filepath_encoded = Inprint::Store::Embedded::Utils::doEncode($c, $filepath);
     $filepath_encoded = Inprint::Store::Embedded::Utils::normalizeFilename($c, $filepath_encoded);
 
     $upload->move_to($filepath_encoded);
 
-    my $digest   = Inprint::Store::Embedded::Metadata::getDigest($c, $filepath);
-    my $filesize = Inprint::Store::Embedded::Metadata::getFileSize($c, $filepath);
-    my $created  = Inprint::Store::Embedded::Metadata::getFileCreateDate($c, $filepath);
-    my $updated  = Inprint::Store::Embedded::Metadata::getFileModifyDate($c, $filepath);
+    die "Can't find path <$filepath_encoded>" unless -e $filepath_encoded;
+    die "Can't read path <$filepath_encoded>" unless -r $filepath_encoded;
+
+    my $digest   = Inprint::Store::Embedded::Metadata::getDigest($c, $filepath_encoded);
+    my $filesize = Inprint::Store::Embedded::Metadata::getFileSize($c, $filepath_encoded);
+    my $created  = Inprint::Store::Embedded::Metadata::getFileCreateDate($c, $filepath_encoded);
+    my $updated  = Inprint::Store::Embedded::Metadata::getFileModifyDate($c, $filepath_encoded);
 
     my $cacheRecord = Inprint::Store::Cache::makeRecord( $c,
-            $filepath_encoded,
+            $filepath,
             $digest, $filesize, $created, $updated
         );
 
     return $cacheRecord;
+
 }
 
 sub fileCreate {
@@ -129,7 +131,7 @@ sub fileCreate {
     $filename =~ s/\s+/_/g;
 
     my $filepath = Inprint::Store::Embedded::Utils::makePath($c, $folder, "$filename.rtf");
-    my $filepath_encoded = Inprint::Store::Embedded::Utils::encode($c, $filepath);
+    my $filepath_encoded = Inprint::Store::Embedded::Utils::doDecode($c, $filepath);
 
     $filepath_encoded = Inprint::Store::Embedded::Utils::normalizeFilename($c, $filepath_encoded);
 
@@ -166,7 +168,7 @@ sub fileRead {
     return unless $rootpath;
 
     my $filepath = Inprint::Store::Embedded::Utils::makePath($c, $rootpath, $cacheRecord->{file_path}, $cacheRecord->{file_name});
-    my $filepath_encoded = Inprint::Store::Embedded::Utils::encode($c, $filepath);
+    my $filepath_encoded = Inprint::Store::Embedded::Utils::doEncode($c, $filepath);
 
     die "Can't find file <$filepath_encoded>" unless -e $filepath_encoded;
     die "Can't read file <$filepath_encoded>" unless -r $filepath_encoded;
@@ -188,7 +190,7 @@ sub fileSave {
     return unless $rootpath;
 
     my $filepath = Inprint::Store::Embedded::Utils::makePath($c, $rootpath, $cacheRecord->{file_path}, $cacheRecord->{file_name});
-    my $filepath_encoded = Inprint::Store::Embedded::Utils::encode($c, $filepath);
+    my $filepath_encoded = Inprint::Store::Embedded::Utils::doEncode($c, $filepath);
 
     die "Can't find file <$filepath_encoded>" unless -e $filepath_encoded;
     die "Can't read file <$filepath_encoded>" unless -r $filepath_encoded;
@@ -232,7 +234,7 @@ sub fileDelete {
     return unless $rootpath;
 
     my $filepath = Inprint::Store::Embedded::Utils::makePath($c, $rootpath, $cacheRecord->{file_path}, $cacheRecord->{file_name});
-    my $filepath_encoded = Inprint::Store::Embedded::Utils::encode($c, $filepath);
+    my $filepath_encoded = Inprint::Store::Embedded::Utils::doEncode($c, $filepath);
 
     Inprint::Store::Cache::deleteRecordById($c, $fid);
     unlink $filepath_encoded;

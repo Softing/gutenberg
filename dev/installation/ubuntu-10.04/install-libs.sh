@@ -8,15 +8,15 @@ apt-get -y install libossp-uuid-perl
 apt-get -y install libfile-copy-recursive-perl
 apt-get -y install libwww-perl
 apt-get -y install libhtml-scrubber-perl
-apt-get -y install perlmagick
 apt-get -y install libgd-gd2-perl
 apt-get -y install libgd-text-perl
-apt-get -y install sun-java6-jre
-apt-get -y install imagemagick
 apt-get -y install ghostscript
+apt-get -y install imagemagick
+apt-get -y install perlmagick
 apt-get -y install postgresql
 apt-get -y install postgresql-contrib
 apt-get -y install apache2
+apt-get -y install sun-java6-jre
 
 a2enmod rewrite
 a2enmod expires
@@ -27,4 +27,5 @@ a2enmod expires
 perl -MCPAN -e 'install DBIx::Connector' 
 perl -MCPAN -e 'install IO::Epoll'
 perl -MCPAN -e 'install File::Util'
+perl -MCPAN -e 'install Convert::Cyrillic'
 perl -MCPAN -e 'install Mojolicious'

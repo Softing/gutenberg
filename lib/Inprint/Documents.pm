@@ -218,12 +218,12 @@ sub list {
         push @holders, $current_member;
         push @params, \@holders;
 
-        $sql_filters .= " AND fsc.deadline >= now() ";
+        $sql_filters .= " AND fsc.enabled = true ";
         $sql_filters .= " AND dcm.fascicle <> '99999999-9999-9999-9999-999999999999' ";
     }
 
     if ($mode eq "all") {
-        $sql_filters .= " AND fsc.deadline >= now() ";
+        $sql_filters .= " AND fsc.enabled = true ";
         $sql_filters .= " AND dcm.fascicle <> '99999999-9999-9999-9999-999999999999' ";
         if ($fascicle && $fascicle ne "all" && $fascicle ne '00000000-0000-0000-0000-000000000000') {
             $sql_filters .= " AND dcm.fascicle <> '00000000-0000-0000-0000-000000000000' ";
@@ -231,7 +231,7 @@ sub list {
     }
 
     if ($mode eq "archive") {
-        $sql_filters .= " AND fsc.deadline < now() ";
+        $sql_filters .= " AND fsc.enabled  <> true ";
         $sql_filters .= " AND dcm.fascicle <> '99999999-9999-9999-9999-999999999999' ";
         $sql_filters .= " AND dcm.fascicle <> '00000000-0000-0000-0000-000000000000' ";
     }
