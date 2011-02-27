@@ -173,7 +173,7 @@ sub fileRead {
     die "Can't find file <$filepath_encoded>" unless -e $filepath_encoded;
     die "Can't read file <$filepath_encoded>" unless -r $filepath_encoded;
 
-    my $text = Inprint::Store::Embedded::Editor::read($c, "html", $filepath_encoded);
+    my $text = Inprint::Store::Embedded::Editor::readFile($c, "html", $filepath_encoded);
 
     return $text ;
 }
@@ -195,7 +195,7 @@ sub fileSave {
     die "Can't find file <$filepath_encoded>" unless -e $filepath_encoded;
     die "Can't read file <$filepath_encoded>" unless -r $filepath_encoded;
 
-    my $returnText = Inprint::Store::Embedded::Editor::write($c, $cacheRecord->{file_extension}, $filepath_encoded, $text);
+    my $returnText = Inprint::Store::Embedded::Editor::writeFile($c, $cacheRecord->{file_extension}, $filepath_encoded, $text);
 
     return $returnText;
 }

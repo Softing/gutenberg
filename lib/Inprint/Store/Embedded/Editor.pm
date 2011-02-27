@@ -18,7 +18,7 @@ use HTML::Scrubber;
 
 use Inprint::Store::Embedded::Utils;
 
-sub read {
+sub readFile {
     my ($c, $filetype, $filepath) = @_;
 
     my $result;
@@ -56,7 +56,7 @@ sub read {
     return $result;
 }
 
-sub write {
+sub writeFile {
 
     my ($c, $filetype, $filepath, $text) = @_;
 
@@ -207,7 +207,7 @@ sub convert {
     my $fileContent;
     open my $INPUT, "<", $filepath || die "Can't open <$filepath> : $!";
     binmode $INPUT;
-    while ( &read($INPUT, my $buf, 60*57)) {
+    while ( read($INPUT, my $buf, 60*57)) {
         $fileContent .= $buf;
     }
     close $INPUT;
