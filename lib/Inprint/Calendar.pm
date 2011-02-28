@@ -160,9 +160,12 @@ sub create {
 
     my $id        = $c->uuid();
     my $variation = $c->uuid();
+
     my $enabled   = 1;
     my $archived  = 0;
-    my $fastype   = "issue";
+
+    my $i_type          = $c->param("type");
+    my $i_parent        = $c->param("parent");
 
     my $i_edition       = $c->param("edition");
 
@@ -208,6 +211,20 @@ sub create {
         }
     }
 
+    # Checks
+
+    unless ($i_type ~~ ["issue", "attachment", "template"]) {
+        push @errors, {
+            id => "type", msg => "Can't find type"
+        }
+    }
+
+    if ($i_type eq "attachment") {
+        Inprint::Check::uuid($c, \@errors, "parent", $i_parent);
+    }
+
+    $i_parent = $i_edition unless ($i_parent);
+
     Inprint::Check::uuid($c, \@errors, "edition", $i_edition);
 
     Inprint::Check::text($c, \@errors, "shortcut",    $i_shortcut);
@@ -234,7 +251,7 @@ sub create {
 
         # Create new Fascicle
         Inprint::Models::Fascicle::create( $c,
-            $id, $i_edition, $i_edition, $fastype, $variation,
+            $id, $i_edition, $i_parent, $i_type, $variation,
             $i_shortcut, $i_description,
             $i_circulation, $i_pnum, $i_anum, undef, $enabled, $archived,
             $i_flagdoc, $i_flagadv,
@@ -244,12 +261,12 @@ sub create {
     #    if ($i_copyfrom && $i_copyfrom eq "00000000-0000-0000-0000-000000000000") {
     #        Inprint::Models::Fascicle::importFromDefaults($c, $id);
     #    }
-    #
+
     #    # Import from Fascicle
     #    if ($i_copyfrom && $i_copyfrom ne "00000000-0000-0000-0000-000000000000") {
     #        Inprint::Models::Fascicle::importFromFascicle($c, $id, $i_copyfrom);
     #    }
-    #
+
         $c->sql->et;
     }
 
