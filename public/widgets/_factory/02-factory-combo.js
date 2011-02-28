@@ -37,10 +37,10 @@ Inprint.factory.Combo = function() {
             emptyText: _("Select") + "..."
         },
         "/calendar/combos/parents/": {
-            hiddenName: "copypages",
+            hiddenName: "parent",
             icon: "building",
-            fieldLabel: _("Copy pages"),
-            emptyText: _("Select") + "..."
+            fieldLabel: _("Issue"),
+            emptyText: _("Select issue") + "..."
         },
 
         // Catalog

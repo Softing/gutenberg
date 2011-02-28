@@ -1,9 +1,11 @@
 Inprint.calendar.Interaction = function(parent, panels) {
 
-    var tree    = panels.tree;
-    var archive = panels.archive;
-    var grid    = panels.grid;
-    var help    = panels.help;
+    var tree      = panels.tree;
+    var archive   = panels.archive;
+    var templates = panels.templates;
+
+    var grid      = panels.grid;
+    var help      = panels.help;
 
     var managed = false;
 
@@ -28,7 +30,6 @@ Inprint.calendar.Interaction = function(parent, panels) {
                 }
 
                 grid.cmpLoad({
-                    showArchive: false,
                     edition: grid.currentEdition
                 });
 
@@ -61,6 +62,38 @@ Inprint.calendar.Interaction = function(parent, panels) {
 
                 grid.cmpLoad({
                     showArchive: true,
+                    edition: grid.currentEdition
+                });
+
+            });
+
+        } else {
+            grid.disable();
+        }
+    });
+
+    // Templates
+
+    templates.getSelectionModel().on("selectionchange", function(sm, node) {
+        if (node && node.id) {
+
+            grid.enable();
+            grid.currentEdition = node.id;
+
+            _disable(grid.btnCreate, grid.btnUpdate, grid.btnDelete);
+
+            _a(["editions.templates.manage"], grid.currentEdition, function(access) {
+
+                if (access["editions.templates.manage"] === true) {
+                    managed = true;
+                    _enable(grid.btnCreate);
+                } else {
+                    managed = false;
+                    _disable(grid.btnCreate);
+                }
+
+                grid.cmpLoad({
+                    showTemplates: true,
                     edition: grid.currentEdition
                 });
 

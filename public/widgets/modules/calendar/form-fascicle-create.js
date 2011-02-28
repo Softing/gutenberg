@@ -26,6 +26,62 @@ Inprint.calendar.forms.Create = Ext.extend( Ext.form.FormPanel,
 
                             {
                                 xtype: "titlefield",
+                                value: _("Type")
+                            },
+
+                            {
+                                xtype: "combo",
+                                name: "type",
+                                fieldLabel: _("Type"),
+                                store: new Ext.data.ArrayStore({
+                                    fields: ['id', 'shortcut'],
+                                    data : [
+                                        ['issue', _("Issue")],
+                                        ['attachment', _("Attachment")],
+                                        ['template', _("Template")],
+                                    ]
+                                }),
+                                displayField:'shortcut',
+                                editable: false,
+                                typeAhead: true,
+                                mode: 'local',
+                                forceSelection: true,
+                                triggerAction: 'all',
+                                emptyText: _("Select a type") + "...",
+                                selectOnFocus:true,
+                                listeners: {
+                                    scope:this,
+                                    render: function (combo) {
+                                        combo.setValue("issue", _("Issue"));
+                                    },
+                                    select: function (combo, record, indx) {
+                                        var parent = this.getForm().findField("parent");
+                                        parent.reset();
+                                        if (record.get("id") == "attachment") {
+                                            parent.enable();
+                                        } else {
+                                            parent.disable();
+                                        }
+                                    }
+                                }
+                            },
+
+                            Inprint.factory.Combo.create(
+                                "/calendar/combos/parents/",
+                                {
+                                    name: "parent",
+                                    disabled: true,
+                                    listeners: {
+                                        scope: this,
+                                        beforequery: function(qe) {
+                                            delete qe.combo.lastQuery;
+                                        }
+                                    }
+                                }
+                            ),
+
+                            {
+                                xtype: "titlefield",
                                 value: _("Numbering")
                             },
 

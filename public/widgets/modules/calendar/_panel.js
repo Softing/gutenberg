@@ -5,11 +5,12 @@ Inprint.calendar.Panel = Ext.extend(Ext.Panel, {
 
         this.panels = {};
 
-        this.panels.tree    = new Inprint.calendar.Tree();
-        this.panels.archive = new Inprint.calendar.TreeArchive();
+        this.panels.tree      = new Inprint.calendar.Tree();
+        this.panels.archive   = new Inprint.calendar.TreeArchive();
+        this.panels.templates = new Inprint.calendar.TreeTemplates();
 
-        this.panels.grid    = new Inprint.calendar.Grid();
-        this.panels.help    = new Inprint.panels.Help({ hid: this.xtype });
+        this.panels.grid      = new Inprint.calendar.Grid();
+        this.panels.help      = new Inprint.panels.Help({ hid: this.xtype });
 
         Ext.apply(this, {
 
@@ -32,7 +33,8 @@ Inprint.calendar.Panel = Ext.extend(Ext.Panel, {
                     },
                     items: [
                         this.panels.tree,
-                        this.panels.archive
+                        this.panels.archive,
+                        this.panels.templates
                     ]
                 },
 

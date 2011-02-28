@@ -17,122 +17,6 @@ Inprint.calendar.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
             url: this.url
         });
 
-        Ext.apply(this, {
-
-            border:false,
-
-            columns: [
-                {
-                    header: _("Shortcut"),
-                    dataIndex: 'shortcut',
-                    width: 140
-                },
-                {
-                    header: _("Description"),
-                    dataIndex: 'description',
-                    width: 200
-                },
-
-                {
-                    header: _("Circulation"),
-                    dataIndex: 'circulation',
-                    width: 80
-                },
-
-                {
-                    header: "",
-                    dataIndex: 'flagdoc',
-                    width: 60,
-                    tpl: new Ext.XTemplate('{flagdoc:this.formatFlag}', {
-                        formatFlag: function(flag) {
-                            var string = _("Not set");
-                            switch (flag) {
-                                case "bydate":
-                                    string = _("By date");
-                                    break;
-                                case "enabled":
-                                    string = _("Enabled");
-                                    break;
-                                case "disabled":
-                                    string = _("Disabled");
-                                    break;
-                            };
-                            return string;
-                        }
-                    })
-                },
-
-                {
-                    header: _("Documents"),
-                    dataIndex: 'datedoc',
-                    width: 90,
-                    tpl: new Ext.XTemplate('{datedoc:this.formatDate}', {
-                        formatDate: function(date) {
-                            return _fmtDate(date, 'M j, H:i');
-                        }
-                    })
-                },
-
-                {
-                    header: "",
-                    dataIndex: 'flagadv',
-                    width: 60,
-                    tpl: new Ext.XTemplate('{flagadv:this.formatFlag}', {
-                        formatFlag: function(flag) {
-                            var string = _("Not set");
-                            switch (flag) {
-                                case "bydate":
-                                    string = _("By date");
-                                    break;
-                                case "enabled":
-                                    string = _("Enabled");
-                                    break;
-                                case "disabled":
-                                    string = _("Disabled");
-                                    break;
-                            };
-                            return string;
-                        }
-                    })
-                },
-
-                {
-                    header: _("Advertisement"),
-                    dataIndex: 'dateadv',
-                    width: 90,
-                    tpl: new Ext.XTemplate('{dateadv:this.formatDate}', {
-                        formatDate: function(date) {
-                            return _fmtDate(date, 'M j, H:i');
-                        }
-                    })
-                },
-                {
-                    header: _("Print date"),
-                    dataIndex: 'dateprint',
-                    width: 90,
-                    tpl: new Ext.XTemplate('{dateprint:this.formatDate}', {
-                        formatDate: function(date) {
-                            return _fmtDate(date, 'M j, H:i');
-                        }
-                    })
-                },
-                {
-                    header: _("Out date"),
-                    dataIndex: 'dateout',
-                    width: 90,
-                    tpl: new Ext.XTemplate('{dateout:this.formatDate}', {
-                        formatDate: function(date) {
-                            return _fmtDate(date, 'M j, H:i');
-                        }
-                    })
-                }
-
-            ],
-
-            dataUrl: _url('/calendar/list/')
-
-        });
-
         this.tbar = [
             {
                 xtype: 'buttongroup',
@@ -226,7 +110,7 @@ Inprint.calendar.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
             },
             {
                 xtype: 'buttongroup',
-                title: _("Attachments"),
+                title: _("Management"),
                 defaults: { scale: 'small' },
                 items: [
                     {
@@ -238,30 +122,123 @@ Inprint.calendar.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
                         ref: "../../btnAttachmentCreate",
                         scope: this.Components,
                         handler: this.Components.create
-                    },
-                    {
-                        id: 'updateAttachment',
-                        text: _("Edit"),
-                        disabled: true,
-                        icon: _ico("pencil"),
-                        cls: 'x-btn-text-icon',
-                        ref: "../../btnAttachmentUpdate",
-                        scope: this.Components,
-                        handler: this.Components.update
-                    },
-                    {
-                        id: 'deleteAttachment',
-                        text: _("Delete"),
-                        disabled: true,
-                        icon: _ico("minus-button"),
-                        cls: 'x-btn-text-icon',
-                        ref: "../../btnAttachmentDelete",
-                        scope: this.Components,
-                        handler: this.Components["delete"]
                     }
                 ]
             }
         ];
+
+        this.columns = [
+            {
+                header: _("Shortcut"),
+                dataIndex: 'shortcut',
+                width: 140
+            },
+            {
+                header: _("Description"),
+                dataIndex: 'description',
+                width: 200
+            },
+
+            {
+                header: _("Circulation"),
+                dataIndex: 'circulation',
+                width: 80
+            },
+
+            {
+                header: "",
+                dataIndex: 'flagdoc',
+                width: 60,
+                tpl: new Ext.XTemplate('{flagdoc:this.formatFlag}', {
+                    formatFlag: function(flag) {
+                        var string = _("Not set");
+                        switch (flag) {
+                            case "bydate":
+                                string = _("By date");
+                                break;
+                            case "enabled":
+                                string = _("Enabled");
+                                break;
+                            case "disabled":
+                                string = _("Disabled");
+                                break;
+                        };
+                        return string;
+                    }
+                })
+            },
+
+            {
+                header: _("Documents"),
+                dataIndex: 'datedoc',
+                width: 90,
+                tpl: new Ext.XTemplate('{datedoc:this.formatDate}', {
+                    formatDate: function(date) {
+                        return _fmtDate(date, 'M j, H:i');
+                    }
+                })
+            },
+
+            {
+                header: "",
+                dataIndex: 'flagadv',
+                width: 60,
+                tpl: new Ext.XTemplate('{flagadv:this.formatFlag}', {
+                    formatFlag: function(flag) {
+                        var string = _("Not set");
+                        switch (flag) {
+                            case "bydate":
+                                string = _("By date");
+                                break;
+                            case "enabled":
+                                string = _("Enabled");
+                                break;
+                            case "disabled":
+                                string = _("Disabled");
+                                break;
+                        };
+                        return string;
+                    }
+                })
+            },
+
+            {
+                header: _("Advertisement"),
+                dataIndex: 'dateadv',
+                width: 90,
+                tpl: new Ext.XTemplate('{dateadv:this.formatDate}', {
+                    formatDate: function(date) {
+                        return _fmtDate(date, 'M j, H:i');
+                    }
+                })
+            },
+            {
+                header: _("Print date"),
+                dataIndex: 'dateprint',
+                width: 90,
+                tpl: new Ext.XTemplate('{dateprint:this.formatDate}', {
+                    formatDate: function(date) {
+                        return _fmtDate(date, 'M j, H:i');
+                    }
+                })
+            },
+            {
+                header: _("Out date"),
+                dataIndex: 'dateout',
+                width: 90,
+                tpl: new Ext.XTemplate('{dateout:this.formatDate}', {
+                    formatDate: function(date) {
+                        return _fmtDate(date, 'M j, H:i');
+                    }
+                })
+            }
+
+        ];
+
+        Ext.apply(this, {
+            border:false,
+            dataUrl: _url('/calendar/list/')
+        });
 
         Inprint.calendar.Grid.superclass.initComponent.apply(this, arguments);
     },
@@ -285,11 +262,11 @@ Inprint.calendar.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
 
     cmpCreateWindow: function(form, title, btns) {
         return new Ext.Window({
-            modal:true,
+            modal: true,
             layout: "fit",
             closeAction: "hide",
-            width:800,
-            height:380,
+            width: 800,
+            height: 420,
             title: title,
             items: form,
             buttons: btns
