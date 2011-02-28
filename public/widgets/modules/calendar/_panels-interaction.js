@@ -30,6 +30,8 @@ Inprint.calendar.Interaction = function(parent, panels) {
                 }
 
                 grid.cmpLoad({
+                    archive: "false",
+                    fastype: "issue",
                     edition: grid.currentEdition
                 });
 
@@ -61,7 +63,8 @@ Inprint.calendar.Interaction = function(parent, panels) {
                 }
 
                 grid.cmpLoad({
-                    showArchive: true,
+                    archive: true,
+                    fastype: "issue",
                     edition: grid.currentEdition
                 });
 
@@ -93,7 +96,8 @@ Inprint.calendar.Interaction = function(parent, panels) {
                 }
 
                 grid.cmpLoad({
-                    showTemplates: true,
+                    archive: "false",
+                    fastype: "template",
                     edition: grid.currentEdition
                 });
 

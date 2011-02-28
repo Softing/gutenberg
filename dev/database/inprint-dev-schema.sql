@@ -2946,17 +2946,18 @@ ALTER TABLE public.editions_options OWNER TO inprint;
 
 CREATE TABLE fascicles (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    
     edition uuid NOT NULL,
     parent uuid NOT NULL,
 
-    fastype character varying NOT NULL DEFAULT 'issue',
+    fastype character varying DEFAULT 'issue',
 
     variation uuid NOT NULL DEFAULT uuid_generate_v4(),
 
     shortcut character varying NOT NULL,
     description character varying,
 
-    circulation integer NOT NULL DEFAULT 0,
+    circulation integer DEFAULT 0,
 
     pnum character varying,
     anum character varying,
@@ -2966,14 +2967,14 @@ CREATE TABLE fascicles (
     enabled boolean NOT NULL DEFAULT false,
     archived boolean NOT NULL DEFAULT false,
 
-    flagdoc varchar DEFAULT 'bydate' NOT NULL,
-    flagadv varchar DEFAULT 'bydate' NOT NULL,
+    flagdoc varchar DEFAULT 'bydate',
+    flagadv varchar DEFAULT 'bydate',
     
-    datedoc timestamp(6) with time zone NOT NULL,
-    dateadv timestamp(6) with time zone NOT NULL,
+    datedoc timestamp(6) with time zone,
+    dateadv timestamp(6) with time zone,
 
-    dateprint timestamp(6) with time zone NOT NULL,
-    dateout timestamp(6) with time zone NOT NULL,
+    dateprint timestamp(6) with time zone,
+    dateout timestamp(6) with time zone,
 
     created timestamp(6) with time zone DEFAULT now() NOT NULL,
     updated timestamp(6) with time zone DEFAULT now() NOT NULL

@@ -31,7 +31,7 @@ Inprint.calendar.forms.Create = Ext.extend( Ext.form.FormPanel,
 
                             {
                                 xtype: "combo",
-                                name: "type",
+                                hiddenName: "type",
                                 allowBlank:false,
                                 fieldLabel: _("Type"),
                                 store: new Ext.data.ArrayStore({
@@ -42,7 +42,8 @@ Inprint.calendar.forms.Create = Ext.extend( Ext.form.FormPanel,
                                         ['template', _("Template")],
                                     ]
                                 }),
-                                displayField:'shortcut',
+                                valueField: "id",
+                                displayField: "shortcut",
                                 editable: false,
                                 typeAhead: true,
                                 mode: 'local',
@@ -52,11 +53,6 @@ Inprint.calendar.forms.Create = Ext.extend( Ext.form.FormPanel,
                                 selectOnFocus:true,
                                 listeners: {
                                     scope:this,
-                                    render: function (combo) {
-                                        combo.store.on("load", function() {
-                                            combo.select(0);
-                                        });
-                                    },
                                     select: function (combo, record, indx) {
 
                                         var parent = this.getForm().findField("parent");
@@ -64,6 +60,9 @@ Inprint.calendar.forms.Create = Ext.extend( Ext.form.FormPanel,
                                         parent.disable();
 
                                         if (record.get("id") == "issue") {
+
+                                            this.getForm().findField("shortcut").allowBlank = true;
+
                                             this.getForm().findField("pnum").enable();
                                             this.getForm().findField("anum").enable();
 
@@ -85,11 +84,14 @@ Inprint.calendar.forms.Create = Ext.extend( Ext.form.FormPanel,
 
                                             this.getForm().findField("parent").enable();
 
+                                            this.getForm().findField("shortcut").disable();
+                                            this.getForm().findField("description").disable();
+
                                             this.getForm().findField("pnum").disable();
                                             this.getForm().findField("anum").disable();
 
-                                            this.getForm().findField("circulation").disable();
-                                            this.getForm().findField("template").disable();
+                                            this.getForm().findField("circulation").enable();
+                                            this.getForm().findField("template").enable();
 
                                             this.getForm().findField("dateprint").disable();
                                             this.getForm().findField("dateout").disable();
@@ -102,6 +104,9 @@ Inprint.calendar.forms.Create = Ext.extend( Ext.form.FormPanel,
                                         }
 
                                         if (record.get("id") == "template") {
+
+                                            this.getForm().findField("shortcut").allowBlank = false;
+
                                             this.getForm().findField("pnum").disable();
                                             this.getForm().findField("anum").disable();
 
@@ -187,9 +192,9 @@ Inprint.calendar.forms.Create = Ext.extend( Ext.form.FormPanel,
                                     fieldLabel: _("Template"),
                                     name: "source",
                                     listeners: {
-                                        render: function(combo) {
-                                            combo.setValue("00000000-0000-0000-0000-000000000000", _("Defaults"));
-                                        },
+                                        //render: function(combo) {
+                                        //    combo.setValue("00000000-0000-0000-0000-000000000000", _("Defaults"));
+                                        //},
                                         beforequery: function(qe) {
                                             delete qe.combo.lastQuery;
                                         }

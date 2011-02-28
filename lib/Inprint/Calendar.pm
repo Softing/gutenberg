@@ -10,6 +10,8 @@ use warnings;
 
 use Inprint::Utils::Documents;
 use Inprint::Models::Fascicle;
+use Inprint::Models::Fascicle::Template;
+use Inprint::Models::Fascicle::Attachment;
 
 use Inprint::Check;
 
@@ -92,7 +94,8 @@ sub list {
     my @params;
 
     my $i_edition = $c->param("edition") || undef;
-    my $i_archive = $c->param("showArchive") || "false";
+    my $i_fastype = $c->param("fastype") || "issue";
+    my $i_archive = $c->param("archive") || "false";
 
     my $edition  = $c->sql->Q("SELECT * FROM editions WHERE id=?", [ $i_edition ])->Hash;
     my $editions = $c->access->GetChildrens("editions.documents.work");
@@ -122,11 +125,15 @@ sub list {
     ";
 
     # Parent query
-    my $sql_parent = $sql . " AND edition=? AND t1.fastype = 'issue' ";
+    my $sql_parent = $sql . " AND edition=? AND t1.fastype <> 'system' ";
     push @params, $edition->{id};
 
-    $sql_parent .= " AND t1.archived = true "  if ($i_archive eq 'true');
-    $sql_parent .= " AND t1.archived = false " if ($i_archive ne 'true');
+    $sql_parent .= " AND t1.archived = true "      if ($i_archive eq "true");
+
+    $sql_parent .= " AND ( t1.fastype = 'issue' "    if ($i_fastype eq "issue");
+    $sql_parent .= " OR t1.fastype = 'attachment' ) "    if ($i_fastype eq "issue");
+
+    $sql_parent .= " AND t1.fastype = 'template' " if ($i_fastype eq "template");
 
     $sql_parent .= " ORDER BY t1.dateout DESC ";
 
@@ -137,15 +144,15 @@ sub list {
         $node->{leaf} = $c->json->true;
         $node->{icon} = "/icons/blue-folder-open.png";
 
-        #my $sql_childrens = $sql . " AND t1.parent=? ORDER BY t1.deadline DESC ";
-        #$node->{children} = $c->sql->Q($sql_childrens, [ $node->{id} ])->Hashes;
-        #
-        #foreach my $subnode (@{ $node->{children} }) {
-        #    $node->{leaf} = $c->json->false;
-        #    $subnode->{icon} = "/icons/blueprint.png";
-        #    $subnode->{leaf} = $c->json->true;
-        #    $subnode->{shortcut} = $subnode->{edition_shortcut} ."/". $subnode->{shortcut};
-        #}
+        my $sql_childrens = $sql . " AND t1.parent=? ORDER BY t1.dateout DESC ";
+        $node->{children} = $c->sql->Q($sql_childrens, [ $node->{id} ])->Hashes;
+
+        foreach my $subnode (@{ $node->{children} }) {
+            $node->{leaf} = $c->json->false;
+            $subnode->{icon} = "/icons/blueprint.png";
+            $subnode->{leaf} = $c->json->true;
+            $subnode->{shortcut} = $subnode->{edition_shortcut} ."/". $subnode->{shortcut};
+        }
 
         #$node->{shortcut} = $node->{edition_shortcut} ."/". $node->{shortcut};
 
@@ -155,6 +162,27 @@ sub list {
 }
 
 sub create {
+
+    my $c = shift;
+    my $i_type = $c->param("type");
+
+    if ($i_type eq "issue") {
+        createIssue($c);
+    }
+
+    if ($i_type eq "attachment") {
+        createAttachment($c);
+    }
+
+    if ($i_type eq "template") {
+
+        createTemplate($c);
+    }
+
+    return $c;
+}
+
+sub createIssue {
 
     my $c = shift;
 
@@ -266,6 +294,104 @@ sub create {
     #    if ($i_copyfrom && $i_copyfrom ne "00000000-0000-0000-0000-000000000000") {
     #        Inprint::Models::Fascicle::importFromFascicle($c, $id, $i_copyfrom);
     #    }
+
+        $c->sql->et;
+    }
+
+    $success = $c->json->true unless (@errors);
+    $c->render_json( { success => $success, errors => \@errors } );
+}
+
+sub createAttachment {
+
+    my $c = shift;
+
+    my $id        = $c->uuid();
+    my $variation = $c->uuid();
+
+    my $enabled   = 1;
+    my $archived  = 0;
+
+    my $i_type          = $c->param("type");
+    my $i_parent        = $c->param("parent");
+
+    my $i_edition       = $c->param("edition");
+
+    my $i_template      = $c->param("template");
+    my $i_circulation   = $c->param("circulation") || 0;
+
+    my @errors;
+    my $success = $c->json->false;
+
+    # Checks
+
+    Inprint::Check::uuid($c, \@errors, "parent", $i_parent);
+    Inprint::Check::uuid($c, \@errors, "edition", $i_edition);
+
+    Inprint::Check::int($c, \@errors, "circulation", $i_circulation, 1);
+    Inprint::Check::uuid($c, \@errors, "tempalte", $i_template, 1);
+
+    my $edition = Inprint::Check::edition($c, \@errors, $i_edition);
+    my $parent  = Inprint::Check::fascicle($c, \@errors, $i_parent);
+
+    unless (@errors) {
+
+        $c->sql->bt;
+
+        # Create new Fascicle
+        Inprint::Models::Fascicle::create( $c,
+            $id, $edition->{id}, $parent->{id},
+            $i_type, $variation,
+            $parent->{shortcut}, $parent->{description},
+            $i_circulation, $parent->{pnum}, $parent->{anum}, undef, $enabled, $archived,
+            $parent->{flagdoc}, $parent->{flagadv},
+            $parent->{datedoc}, $parent->{dateadv}, $parent->{dateprint}, $parent->{dateout}
+        );
+
+        $c->sql->et;
+
+    }
+
+    $success = $c->json->true unless (@errors);
+    $c->render_json( { success => $success, errors => \@errors } );
+}
+
+sub createTemplate {
+
+    my $c = shift;
+
+    my $id        = $c->uuid();
+    my $variation = $c->uuid();
+
+    my $enabled   = 1;
+    my $archived  = 0;
+
+    my $i_type          = $c->param("type");
+
+    my $i_edition       = $c->param("edition");
+
+    my $i_shortcut      = $c->param("shortcut");
+    my $i_description   = $c->param("description");
+
+    my @errors;
+    my $success = $c->json->false;
+
+    # Checks
+
+    Inprint::Check::uuid($c, \@errors, "edition", $i_edition);
+
+    Inprint::Check::text($c, \@errors, "shortcut",    $i_shortcut);
+    Inprint::Check::text($c, \@errors, "description", $i_description, 1);
+
+        my $edition = Inprint::Check::edition($c, \@errors, $i_edition);
+
+    unless (@errors) {
+
+        $c->sql->bt;
+
+        # Create new Fascicle
+        Inprint::Models::Fascicle::Template::create(
+            $c, $id, $i_edition, "template", $i_shortcut, $i_description);
 
         $c->sql->et;
     }

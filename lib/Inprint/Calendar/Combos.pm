@@ -47,6 +47,7 @@ sub parents {
         WHERE
             ( t1.id <> '00000000-0000-0000-0000-000000000000' AND t1.id <> '99999999-9999-9999-9999-999999999999')
             AND t1.edition = t1.parent
+            AND t1.fastype = 'issue'
             AND t2.id = t1.edition
     ";
 
@@ -77,7 +78,7 @@ sub sources {
         WHERE
             ( t1.id <> '00000000-0000-0000-0000-000000000000' AND t1.id <> '99999999-9999-9999-9999-999999999999')
             AND t2.id = t1.edition
-            AND t1.deadline >= now()
+            AND t1.fastype = 'template'
     ";
 
     my $access = $c->access->GetBindings("editions.calendar.manage");
@@ -89,13 +90,13 @@ sub sources {
         ORDER BY t2.shortcut, t1.shortcut
     ", \@data)->Hashes;
 
-    unshift @$result, {
-        id=> "00000000-0000-0000-0000-000000000000",
-        icon => "marker",
-        title=> $c->l("Defaults"),
-        shortcut=> $c->l("Get defaults"),
-        description=> $c->l("Copy from defaults"),
-    };
+    #unshift @$result, {
+    #    id=> "00000000-0000-0000-0000-000000000000",
+    #    icon => "marker",
+    #    title=> $c->l("Defaults"),
+    #    shortcut=> $c->l("Get defaults"),
+    #    description=> $c->l("Copy from defaults"),
+    #};
 
     $success = $c->json->true unless (@errors);
     $c->render_json( { data => $result } );
