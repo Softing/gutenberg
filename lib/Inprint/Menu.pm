@@ -85,6 +85,7 @@ sub index
 
             t1.edition = t2.id
             AND t1.edition = ANY (?)
+            AND t1.fastype = 'issue'
             AND t1.enabled = true
             AND t1.archived = false
 
