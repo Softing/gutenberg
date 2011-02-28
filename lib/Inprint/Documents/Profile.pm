@@ -10,6 +10,8 @@ use warnings;
 
 use base 'Inprint::BaseController';
 
+use Inprint::Store::Embedded;
+
 sub read {
 
     my $c = shift;
