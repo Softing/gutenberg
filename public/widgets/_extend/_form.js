@@ -127,40 +127,43 @@ _FLD_WEIGHT = {
 
 /* Buttons for Window */
 
-var _BTN_WNDW_ADD = {
-    text: _("Add"),  handler: function() {
-        var wndw = this.findParentByType("window");
-        if (!wndw) { alert('Window not found'); return; }
-        var panel = wndw.items.first();
-        if (!panel) { alert('Panel not found'); return; }
-        var form = panel.getForm();
-        if (!form) { alert('Form not found'); return; }
-        form.submit({ submitEmptyText: false });
+var _BTN_FINDER = function () {
+    var wndw = this.findParentByType("window");
+    if (!wndw) {
+        alert('Window not found');
+        return;
     }
+
+    var panel = wndw.findByType("form")[0];
+
+    if (!panel || !panel.getForm) {
+        panel = wndw.items.first();
+    }
+
+    if (!panel || !panel.getForm) {
+        alert('FormPanel not found');
+        return;
+    }
+
+    var form = panel.getForm();
+    if (!form) {
+        alert('Form not found');
+        return;
+    }
+
+    form.submit({ submitEmptyText: false });
+}
+
+var _BTN_WNDW_ADD = {
+    text: _("Add"),  handler: _BTN_FINDER
 };
 
 var _BTN_WNDW_SAVE = {
-    text: _("Save"), handler: function() {
-        var wndw = this.findParentByType("window");
-        if (!wndw) { alert('Window not found'); return; }
-        var panel = wndw.items.first();
-        if (!panel) { alert('Panel not found'); return; }
-        var form = panel.getForm();
-        if (!form) { alert('Form not found'); return; }
-        form.submit({ submitEmptyText: false });
-    }
+    text: _("Save"), handler: _BTN_FINDER
 };
 
 var _BTN_WNDW_OK = {
-    text: _("Ok"),   handler: function()  {
-        var wndw = this.findParentByType("window");
-        if (!wndw) { alert('Window not found'); return; }
-        var panel = wndw.items.first();
-        if (!panel) { alert('Panel not found'); return; }
-        var form = panel.getForm();
-        if (!form) { alert('Form not found'); return; }
-        form.submit({ submitEmptyText: false });
-    }
+    text: _("Ok"),   handler: _BTN_FINDER
 };
 
 var _BTN_WNDW_CLOSE = {

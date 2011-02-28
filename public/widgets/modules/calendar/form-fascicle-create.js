@@ -52,7 +52,7 @@ Inprint.calendar.forms.Create = Ext.extend( Ext.form.FormPanel,
                                 listeners: {
                                     scope:this,
                                     render: function (combo) {
-                                        combo.setValue("issue", _("Issue"));
+                                        //combo.setValue("issue", _("Issue"));
                                     },
                                     select: function (combo, record, indx) {
                                         var parent = this.getForm().findField("parent");
