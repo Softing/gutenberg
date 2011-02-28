@@ -7,104 +7,166 @@ Inprint.calendar.forms.Update = Ext.extend( Ext.form.FormPanel,
         this.items = [
 
             _FLD_HDN_ID,
-            _FLD_HDN_EDITION,
-            _FLD_HDN_PARENT,
 
             {
-                xtype: "titlefield",
-                value: _("Basic parameters")
-            },
-
-            Inprint.factory.Combo.create(
-            "/calendar/combos/editions/",
-            {
-                name: "copyfrom",
-                listeners: {
-                    beforequery: function(qe) {
-                        delete qe.combo.lastQuery;
-                    }
-                }
-            }),
-
-            _FLD_SHORTCUT,
-            _FLD_TITLE,
-            _FLD_DESCRIPTION,
-
-            {
-                xtype: "titlefield",
-                value: _("Deadline")
-            },
-
-            {
-                xtype:"checkbox",
-                fieldLabel: _("State"),
-                boxLabel: _("Enabled"),
-                checked: true,
-                name: "enabled"
-            },
-
-            {
-                xtype: "xdatefield",
-                name: "deadline",
-                format: "F j, Y",
-                submitFormat: "Y-m-d",
-                allowBlank:false,
-                fieldLabel: _("Issue"),
-                listeners: {
-                    scope:this,
-                    change: function(field, value, old)
+                border:false,
+                layout:'column',
+                defaults:{
+                    bodyStyle:'padding:10px'
+                },
+                items:[
                     {
-                        var v = field.getValue();
-
-                        var f1 = field.ownerCt.getForm().findField('title');
-                        if (f1.getValue().length === 0) {
-                            f1.setValue(v.dateFormat('j-M-y'));
-                        }
-
-                        var f2 = field.ownerCt.getForm().findField('shortcut');
-                        if (f2.getValue().length === 0) {
-                            f2.setValue(v.dateFormat('j-M-y'));
-                        }
-                    }
-                }
-            },
-            {
-                xtype: 'xdatefield',
-                name: 'advertisement',
-                format:'F j, Y',
-                submitFormat:'Y-m-d',
-                allowBlank:false,
-                fieldLabel: _("Advertisement")
-            },
-
-            {
-                xtype: "titlefield",
-                value: _("Copy parameters")
-            },
-
-            Inprint.factory.Combo.create(
-                "/calendar/combos/sources/",
-                {
-                    name: "copyfrom",
-                    listeners: {
-                        render: function(combo) {
-                            combo.setValue("00000000-0000-0000-0000-000000000000", _("Defaults"));
+                        border:false,
+                        columnWidth:.5,
+                        layout: 'form',
+                        defaults:{
+                            anchor:'100%'
                         },
-                        beforequery: function(qe) {
-                            delete qe.combo.lastQuery;
-                        }
+                        items: [
+
+                            {
+                                xtype: "titlefield",
+                                value: _("Numbering")
+                            },
+
+                            {
+                                xtype: "textfield",
+                                name: "pnum",
+                                fieldLabel: _("Prevailing")
+                            },
+                            {
+                                xtype: "textfield",
+                                name: "anum",
+                                fieldLabel: _("Annual")
+                            },
+
+                            {
+                                xtype: "titlefield",
+                                value: _("Basic parameters")
+                            },
+
+                            {
+                                xtype: "textfield",
+                                name: "shortcut",
+                                fieldLabel: _("Shortcut")
+                            },
+                            {
+                                xtype: "textfield",
+                                name: "description",
+                                fieldLabel: _("Description")
+                            },
+
+                            {
+                                xtype: "titlefield",
+                                value: _("Additional parameters")
+                            },
+
+                            {
+                                xtype: "numberfield",
+                                name: "circulation",
+                                fieldLabel: _("Circulation"),
+                                value: 0
+                            },
+
+                            Inprint.factory.Combo.create(
+                                "/calendar/combos/sources/", {
+                                    fieldLabel: _("Template"),
+                                    name: "layoutsource",
+                                    listeners: {
+                                        render: function(combo) {
+                                            combo.setValue("00000000-0000-0000-0000-000000000000", _("Defaults"));
+                                        },
+                                        beforequery: function(qe) {
+                                            delete qe.combo.lastQuery;
+                                        }
+                                    }
+                            })
+
+                        ]
+                    },
+                    {
+                        border:false,
+                        columnWidth:.5,
+                        layout: 'form',
+                        defaults:{
+                            anchor:'100%'
+                        },
+                        items: [
+
+                            {
+                                xtype: "titlefield",
+                                value: _("Dates")
+                            },
+
+                            {
+                                xtype: 'xdatefield',
+                                name: 'dateout',
+                                format:'F j, Y',
+                                submitFormat:'Y-m-d',
+                                fieldLabel: _("Publication")
+                            },
+                            {
+                                xtype: 'xdatefield',
+                                name: 'dateprint',
+                                format:'F j, Y',
+                                submitFormat:'Y-m-d',
+                                fieldLabel: _("Printing")
+                            },
+
+                            {
+                                xtype: "titlefield",
+                                value: _("Deadline")
+                            },
+
+                            {
+                                labelWidth: 20,
+                                xtype: "xdatefield",
+                                name: "datedoc",
+                                format: "F j, Y",
+                                submitFormat: "Y-m-d",
+                                allowBlank:false,
+                                fieldLabel: _("Documents")
+                            },
+                            {
+                                xtype: 'xdatefield',
+                                name: 'dateadv',
+                                format:'F j, Y',
+                                submitFormat:'Y-m-d',
+                                allowBlank:false,
+                                fieldLabel: _("Advertisement")
+                            },
+
+                            {
+                                xtype: "radiogroup",
+                                fieldLabel: _("Documents"),
+                                items: [
+                                    { boxLabel: _("By date"),  name: "flagdoc", inputValue: "bydate", checked: true },
+                                    { boxLabel: _("Enabled"),  name: "flagdoc", inputValue: "enabled" },
+                                    { boxLabel: _("Disabled"), name: "flagdoc", inputValue: "disabled" },
+                                ]
+                            },
+
+                            {
+                                xtype: "radiogroup",
+                                fieldLabel: _("Advertisement"),
+                                items: [
+                                    { boxLabel: _("By date"),  name: "flagadv", inputValue: "bydate", checked: true },
+                                    { boxLabel: _("Enabled"),  name: "flagadv", inputValue: "enabled" },
+                                    { boxLabel: _("Disabled"), name: "flagadv", inputValue: "disabled" },
+                                ]
+                            }
+
+                        ]
                     }
-                })
+
+                ]
+            }
         ];
 
         Ext.apply(this,  {
             xtype: "form",
             border:false,
-            labelWidth: 100,
-            bodyStyle: "padding:5px",
-            defaults: {
-                anchor: "100%"
-            }
+            labelWidth: 90
         });
 
         Inprint.calendar.forms.Update.superclass.initComponent.apply(this, arguments);
@@ -114,12 +176,6 @@ Inprint.calendar.forms.Update = Ext.extend( Ext.form.FormPanel,
     onRender: function() {
 
         Inprint.calendar.forms.Update.superclass.onRender.apply(this, arguments);
-
-        this.on('actioncomplete', function(form, action) {
-            if (action.type == "submit") {
-
-            }
-        }, this);
 
     }
 

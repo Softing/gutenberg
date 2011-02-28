@@ -177,8 +177,38 @@ Inprint.calendar.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
                         icon: _ico("pencil"),
                         cls: 'x-btn-text-icon',
                         ref: "../../btnUpdate",
-                        scope: this.Components,
-                        handler: this.Components.update
+                        scope: this,
+                        handler: function() {
+
+                            var form = new Inprint.calendar.forms.Create({
+                                parent: this,
+                                url: this.url.create
+                            });
+
+                            form.getForm().findField("edition").setValue(this.currentEdition);
+
+                            form.load({
+                                url: this.url.read,
+                                scope:this,
+                                params: {
+                                    id: this.cmpGetSelectedNode().id
+                                },
+                                failure: function(form, action) {
+                                    Ext.Msg.alert("Load failed", action.result.errorMessage);
+                                }
+                            });
+
+                            var wndw = this.cmpCreateWindow(
+                                form, _("Adding issue"), [ _BTN_WNDW_ADD, _BTN_WNDW_CLOSE ]
+                            ).show();
+
+                            form.on('actioncomplete', function(form, action) {
+                                if (action.type == "submit") {
+                                    wndw.close();
+                                    this.cmpReload();
+                                }
+                            }, this);
+                        }
                     },
 
                     {
