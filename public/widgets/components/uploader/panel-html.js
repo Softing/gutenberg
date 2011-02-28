@@ -26,67 +26,61 @@ Inprint.cmp.uploader.Html = Ext.extend(Ext.FormPanel, {
                     xtype: "fileuploadfield",
                     emptyText: _("Select an file"),
                     fieldLabel: _("File") + " 1",
-                    name: "file1",
-                    buttonText: _("Select"),
-                    buttonCfg: {
-                        width: 100
-                    }
-                },
-                {
-                    xtype: "fileuploadfield",
-                    emptyText: _("Select an file"),
-                    fieldLabel: _("File") + " 2",
-                    name: "file2",
-                    buttonText: _("Select"),
-                    buttonCfg: {
-                        width: 100
-                    }
-                },
-                {
-                    xtype: "fileuploadfield",
-                    emptyText: _("Select an file"),
-                    fieldLabel: _("File") + " 3",
-                    name: "file3",
-                    buttonText: _("Select"),
-                    buttonCfg: {
-                        width: 100
-                    }
-                },
-                {
-                    xtype: "fileuploadfield",
-                    emptyText: _("Select an file"),
-                    fieldLabel: _("File") + " 4",
-                    name: "file4",
-                    buttonText: _("Select"),
-                    buttonCfg: {
-                        width: 100
-                    }
-                },
-                {
-                    xtype: "fileuploadfield",
-                    emptyText: _("Select an file"),
-                    fieldLabel: _("File") + " 5",
-                    name: "file5",
+                    name: "file",
                     buttonText: _("Select"),
                     buttonCfg: {
                         width: 100
                     }
                 }
+                //{
+                //    xtype: "fileuploadfield",
+                //    emptyText: _("Select an file"),
+                //    fieldLabel: _("File") + " 2",
+                //    name: "file",
+                //    buttonText: _("Select"),
+                //    buttonCfg: {
+                //        width: 100
+                //    }
+                //},
+                //{
+                //    xtype: "fileuploadfield",
+                //    emptyText: _("Select an file"),
+                //    fieldLabel: _("File") + " 3",
+                //    name: "file3",
+                //    buttonText: _("Select"),
+                //    buttonCfg: {
+                //        width: 100
+                //    }
+                //},
+                //{
+                //    xtype: "fileuploadfield",
+                //    emptyText: _("Select an file"),
+                //    fieldLabel: _("File") + " 4",
+                //    name: "file4",
+                //    buttonText: _("Select"),
+                //    buttonCfg: {
+                //        width: 100
+                //    }
+                //},
+                //{
+                //    xtype: "fileuploadfield",
+                //    emptyText: _("Select an file"),
+                //    fieldLabel: _("File") + " 5",
+                //    name: "file5",
+                //    buttonText: _("Select"),
+                //    buttonCfg: {
+                //        width: 100
+                //    }
+                //}
             ],
-            listeners: {
-                actioncomplete: function() {
-                    this.fireEvent('fileUploaded', this);
-                },
-                actionfailed: function() {
-
-                }
-            },
             buttons: [
                 {
                     text: _("Save"),
                     scope:this,
                     handler: function(){
-                        this.getForm().submit();
+                        this.getForm().submit({
+                            submitEmptyText: false
+                        });
                     }
                 },{
                     text: _("Reset"),

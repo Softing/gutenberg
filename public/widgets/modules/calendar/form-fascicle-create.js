@@ -45,8 +45,16 @@ Inprint.calendar.forms.Create = Ext.extend( Ext.form.FormPanel,
                                 value: _("Basic parameters")
                             },
 
-                            _FLD_SHORTCUT,
-                            _FLD_DESCRIPTION,
+                            {
+                                xtype: "textfield",
+                                name: "shortcut",
+                                fieldLabel: _("Shortcut")
+                            },
+                            {
+                                xtype: "textfield",
+                                name: "description",
+                                fieldLabel: _("Description")
+                            },
 
                             {
                                 xtype: "titlefield",
@@ -168,12 +176,6 @@ Inprint.calendar.forms.Create = Ext.extend( Ext.form.FormPanel,
     onRender: function() {
 
         Inprint.calendar.forms.Create.superclass.onRender.apply(this, arguments);
-
-        this.on('actioncomplete', function(form, action) {
-            if (action.type == "submit") {
-
-            }
-        }, this);
 
     }
 

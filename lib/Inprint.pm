@@ -25,7 +25,7 @@ sub startup {
 
     my $self = shift;
 
-    $self->log->level('debug');
+    $self->log->level('error');
     $self->secret('passw0rd');
 
     $self->sessions->cookie_name("inprint");

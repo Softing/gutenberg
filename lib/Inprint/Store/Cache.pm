@@ -30,14 +30,8 @@ sub makeRecord {
                 SELECT * FROM cache_files WHERE file_path=? AND file_name=?
             ", [ $filepath, $filename ])->Hash;
 
-    if ($cacheRecord->{id}) {
-        unless ($cacheRecord->{file_exists}) {
-            $c->sql->Do("
-                    UPDATE cache_files SET file_exists=true WHERE file_path=? AND file_name=?
-                ", [ $filepath, $filename ])->Hash;
-        }
-    } else {
-
+    unless ($cacheRecord->{id}) {
+        
         $c->sql->Do("
                 INSERT INTO cache_files (
                     id, file_path, file_name, file_extension, file_mime,
@@ -83,7 +77,8 @@ sub getRecordsByPath {
         SELECT
             id, file_name as name, file_mime as mime,
             file_description as description, file_extension as extension,
-            file_size as size, file_published as published,
+            file_size as size, file_length as length,
+            file_published as published,
             created as created, updated as updated
         FROM cache_files
         WHERE file_exists = true AND file_path=? ";

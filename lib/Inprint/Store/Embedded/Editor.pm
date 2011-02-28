@@ -181,6 +181,78 @@ sub createHotSave {
     return $hotSaveFilePath;
 }
 
+sub getMetadata {
+
+    my ($c, $filepath) = @_;
+
+    my ($basename, $basepath, $extension) = fileparse($filepath, qr/(\.[^.]+){1}?/);
+    $extension =~ s/^.//g;
+
+    my $metadata = {};
+
+    if ($extension ~~ ["doc", "docx", "odt", "rtf", "txt"]) {
+
+        my $ooHost    = $c->config->get("openoffice.host");
+        my $ooPort    = $c->config->get("openoffice.port");
+        my $ooTimeout = $c->config->get("openoffice.timeout");
+
+        die "Cant read configuration <openoffice.host>" unless $ooHost;
+        die "Cant read configuration <openoffice.port>" unless $ooPort;
+        die "Cant read configuration <openoffice.timeout>" unless $ooTimeout;
+
+        my $ooUrl = "http://$ooHost:$ooPort/api/query/";
+
+        my $ooUagent = LWP::UserAgent->new();
+        $ooUagent->timeout( $ooTimeout );
+
+        my $ooRequest = HTTP::Request->new();
+        $ooRequest->method("POST");
+        $ooRequest->uri( $ooUrl );
+
+        $ooRequest->header("InputFormat", $extension);
+        $ooRequest->header("Content-type", "application/octet-stream");
+
+        my $fileContent;
+        open my $INPUT, "<", $filepath || die "Can't open <$filepath> : $!";
+        binmode $INPUT;
+        while ( read($INPUT, my $buf, 60*57)) {
+            $fileContent .= $buf;
+        }
+        close $INPUT;
+
+        $fileContent = encode_base64($fileContent);
+
+        $ooRequest->content( $fileContent );
+
+        my $responseBody;
+        my $ParagraphCount = 0;
+        my $CharacterCount = 0;
+        my $WordCount = 0;
+
+        my $ooResponse = $ooUagent->request($ooRequest);
+        if ($ooResponse->is_success()) {
+
+            $ParagraphCount = $ooResponse->header("Softing-Meta-WordCount");
+            $CharacterCount = $ooResponse->header("Softing-Meta-CharacterCount");
+            $WordCount = $ooResponse->header("Softing-Meta-WordCount");
+
+        } else {
+            die $ooResponse->as_string;
+        }
+
+        $metadata = {
+            responseBody => $responseBody,
+            ParagraphCount => $ParagraphCount,
+            CharacterCount => $CharacterCount,
+            WordCount => $WordCount
+        };
+
+    }
+
+    return $metadata;
+}
+
+
 sub convert {
 
     my ($c, $filepath, $input, $output) = @_;
@@ -195,6 +267,7 @@ sub convert {
 
     my $ooUrl = "http://$ooHost:$ooPort/api/converter2/";
     my $ooUagent = LWP::UserAgent->new();
+    $ooUagent->timeout( $ooTimeout );
 
     my $ooRequest = HTTP::Request->new();
     $ooRequest->method("POST");

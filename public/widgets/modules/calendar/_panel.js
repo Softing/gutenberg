@@ -27,10 +27,6 @@ Inprint.calendar.Panel = Ext.extend(Ext.Panel, {
                     width: 200,
                     minSize: 200,
                     maxSize: 600,
-                    defaults: {
-                        //bodyStyle: 'padding:15px',
-                        //margins: "3 0 3 3"
-                    },
                     layoutConfig: {
                         animate: true
                     },
@@ -67,6 +63,8 @@ Inprint.calendar.Panel = Ext.extend(Ext.Panel, {
     onRender: function() {
         Inprint.calendar.Panel.superclass.onRender.apply(this, arguments);
 
+        Inprint.calendar.Access(this, this.panels);
+        Inprint.calendar.Context(this, this.panels);
         Inprint.calendar.Interaction(this, this.panels);
 
     },

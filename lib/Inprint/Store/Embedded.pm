@@ -58,6 +58,21 @@ sub updateCache {
                 $filepath_encoded, $digest, $filesize, $created, $updated
             );
 
+        unless ($cacheRecord->{file_exists}) {
+            $c->sql->Do("
+                    UPDATE cache_files SET file_exists=true WHERE id=?
+                ", [ $cacheRecord->{id} ]);
+        }
+
+        # Update length
+        my $metadata = Inprint::Store::Embedded::Editor::getMetadata($c, $filepath);
+
+        if ($metadata->{CharacterCount} > 0) {
+            $c->sql->Do("
+                    UPDATE cache_files SET file_length=? WHERE id=?
+                ", [ $metadata->{CharacterCount}, $cacheRecord->{id} ]);
+        }
+
         ## Create File record
         my $filehash = {
             id          => $cacheRecord->{id},
@@ -87,7 +102,7 @@ sub updateCache {
 
 sub fileUpload {
     my $c = shift;
-    my $path = shift;
+    my $folder = shift;
     my $upload = shift;
 
     return unless $upload;
@@ -96,11 +111,11 @@ sub fileUpload {
 
     return unless $filename;
 
-    Inprint::Store::Embedded::Utils::checkFolder($c, $path);
+    Inprint::Store::Embedded::Utils::checkFolder($c, $folder);
 
     $filename =~ s/\s+/_/g;
 
-    my $filepath = Inprint::Store::Embedded::Utils::makePath($c, $path, $filename);
+    my $filepath = Inprint::Store::Embedded::Utils::makePath($c, $folder, $filename);
     my $filepath_encoded = Inprint::Store::Embedded::Utils::doEncode($c, $filepath);
     $filepath_encoded = Inprint::Store::Embedded::Utils::normalizeFilename($c, $filepath_encoded);
 
@@ -113,6 +128,13 @@ sub fileUpload {
     my $filesize = Inprint::Store::Embedded::Metadata::getFileSize($c, $filepath_encoded);
     my $created  = Inprint::Store::Embedded::Metadata::getFileCreateDate($c, $filepath_encoded);
     my $updated  = Inprint::Store::Embedded::Metadata::getFileModifyDate($c, $filepath_encoded);
+
+    ## Save original
+    my $fileorigin = Inprint::Store::Embedded::Utils::makePath($c, $folder, ".origins", $filename);
+    my $fileorigin_encoded = Inprint::Store::Embedded::Utils::doEncode($c, $fileorigin);
+    $fileorigin_encoded = Inprint::Store::Embedded::Utils::normalizeFilename($c, $fileorigin_encoded);
+
+    copy $filepath_encoded, $fileorigin_encoded;
 
     my $cacheRecord = Inprint::Store::Cache::makeRecord( $c,
             $filepath,
@@ -132,7 +154,6 @@ sub fileCreate {
 
     my $filepath = Inprint::Store::Embedded::Utils::makePath($c, $folder, "$filename.rtf");
     my $filepath_encoded = Inprint::Store::Embedded::Utils::doDecode($c, $filepath);
-
     $filepath_encoded = Inprint::Store::Embedded::Utils::normalizeFilename($c, $filepath_encoded);
 
     my $templateFile = Inprint::Store::Embedded::Utils::makePath($c, $c->config->get("store.path"), "templates", "template.rtf");
@@ -149,6 +170,7 @@ sub fileCreate {
     my $created  = Inprint::Store::Embedded::Metadata::getFileCreateDate($c, $filepath);
     my $updated  = Inprint::Store::Embedded::Metadata::getFileModifyDate($c, $filepath);
 
+    # Create cache record
     my $cacheRecord = Inprint::Store::Cache::makeRecord( $c,
             $filepath_encoded,
             $digest, $filesize, $created, $updated

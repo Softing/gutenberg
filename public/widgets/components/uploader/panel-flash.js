@@ -29,15 +29,7 @@ Inprint.cmp.uploader.Flash = Ext.extend(AwesomeUploader, {
 
         Ext.apply(this, {
             title: _("Flash mode"),
-            border:false,
-            listeners:{
-                scope:this,
-                fileupload:function(uploader, success, result){
-                    if(success){
-                        this.fireEvent('fileUploaded', this);
-                    }
-                }
-            }
+            border:false
         });
 
         Inprint.cmp.uploader.Flash.superclass.initComponent.apply(this, arguments);

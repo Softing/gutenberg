@@ -117,7 +117,8 @@ sub uploadHtml {
     }
 
     $success = $c->json->true unless (@errors);
-    $c->render_json({ success => $success, errors => \@errors });
+    #$c->render_json({ success => $success, errors => \@errors });
+    $c->render( text => '{ success: true }', format => 'html' );
 }
 
 sub publish {

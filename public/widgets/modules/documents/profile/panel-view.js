@@ -138,25 +138,25 @@ Inprint.documents.Profile.View = Ext.extend(Ext.Panel, {
             '<th width="70">'+ _("Issue") +'</td>',
             '<th width="90">'+ _("Category") +'</th>',
             '<th width="90">'+ _("Rubric") +'</th>',
-            '<th width="50">'+ _("Value") +'</th>',
+            '<th width="50">'+ _("Length") +'</th>',
             '<th width="80">'+ _("Group") +'</td>',
             '<th width="100">'+ _("Editor") +'</th>',
             '<th width="130">'+ _("Author") +'</th>',
-            '<th width="100">'+ _("Date") +'</th>',
+            '<th width="90">'+ _("Date") +'</th>',
         '</tr>',
         '<tr>',
-            '<td>{title}</td>',
-            '<td>{edition_shortcut}</td>',
-            '<td>{fascicle_shortcut}</td>',
-            '<td>{headline_shortcut}</td>',
-            '<td>{rubric_shortcut}</td>',
+            '<td>{[ this.fmtString( values.title ) ]}</td>',
+            '<td>{[ this.fmtString( values.edition_shortcut ) ]}</td>',
+            '<td>{[ this.fmtString( values.fascicle_shortcut ) ]}</td>',
+            '<td>{[ this.fmtString( values.headline_shortcut ) ]}</td>',
+            '<td>{[ this.fmtString( values.rubric_shortcut ) ]}</td>',
             '<td><nobr>',
                 '<tpl if="rsize">{rsize}</tpl>',
                 '<tpl if="!rsize">{psize}</tpl>',
             '</nobr></td>',
-            '<td><nobr>{workgroup_shortcut}</nobr></td>',
-            '<td><nobr>{manager_shortcut}</nobr></td>',
-            '<td><nobr>{author}</nobr></td>',
+            '<td><nobr>{[ this.fmtString( values.workgroup_shortcut ) ]}</nobr></td>',
+            '<td><nobr>{[ this.fmtString( values.manager_shortcut ) ]}</nobr></td>',
+            '<td><nobr>{[ this.fmtString( values.author ) ]}</nobr></td>',
             '<td><nobr>',
                 '<tpl if="fdate">{[ this.fmtDate( values.fdate ) ]}</tpl>',
                 '<tpl if="!fdate">{[ this.fmtDate( values.pdate ) ]}</tpl>',
@@ -164,7 +164,8 @@ Inprint.documents.Profile.View = Ext.extend(Ext.Panel, {
         '</tr>',
         '</table>',
         {
-            fmtDate : function(date) { return _fmtDate(date, 'M j, H:i'); }
+            fmtDate : function(date) { return _fmtDate(date, 'M j, H:i'); },
+            fmtString : function(string) { if (!string) { string = ''; } return string; }
         }
     ),
 
@@ -179,16 +180,17 @@ Inprint.documents.Profile.View = Ext.extend(Ext.Panel, {
             '</tr>',
             '<tpl for="fascicles">',
                 '<tr>',
-                    '<td>{edition_shortcut}</td>',
-                    '<td>{fascicle_shortcut}</td>',
-                    '<td>{headline_shortcut}</td>',
-                    '<td>{rubric_shortcut}</td>',
+                    '<td>{[ this.fmtString( values.edition_shortcut ) ]}</td>',
+                    '<td>{[ this.fmtString( values.fascicle_shortcut ) ]}</td>',
+                    '<td>{[ this.fmtString( values.headline_shortcut ) ]}</td>',
+                    '<td>{[ this.fmtString( values.rubric_shortcut ) ]}</td>',
                 '</tr>',
             '</tpl>',
             '</table>',
         '</tpl>',
         {
-            fmtDate : function(date) { return _fmtDate(date, 'M j, H:i'); }
+            fmtDate : function(date) { return _fmtDate(date, 'M j, H:i'); },
+            fmtString : function(string) { if (!string) { string = ''; } return string; }
         }
     ),
 
@@ -208,7 +210,8 @@ Inprint.documents.Profile.View = Ext.extend(Ext.Panel, {
             '</table>',
         '</tpl>',
         {
-            fmtDate : function(date) { return _fmtDate(date, 'M j, H:i'); }
+            fmtDate : function(date) { return _fmtDate(date, 'M j, H:i'); },
+            fmtString : function(string) { if (!string) { string = ''; } return string; }
         }
     ),
 

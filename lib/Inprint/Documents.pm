@@ -338,13 +338,13 @@ sub list {
 
         # Update images count
         my @images = ("jpg", "jpeg", "png", "gif", "bmp", "tiff" );
-        my $imgCount = $c->sql->Q(" SELECT count(*) FROM cache_files WHERE file_path=? AND file_extension=ANY(?) ", [ $relativePath, \@images ])->Value;
-        $c->sql->Do("UPDATE documents SET images=? WHERE filepath=? ", [ $imgCount, $relativePath ]);
+        my $imgCount = $c->sql->Q(" SELECT count(*) FROM cache_files WHERE file_path=? AND file_exists = true AND file_extension=ANY(?) ", [ $relativePath, \@images ])->Value;
+        $c->sql->Do("UPDATE documents SET images=? WHERE filepath=? ", [ $imgCount || 0, $relativePath ]);
 
         # Update rsize count
         my @documents = ("doc", "docx", "odt", "rtf", "txt" );
-        my $lengthCount = $c->sql->Q(" SELECT sum(file_length) FROM cache_files WHERE file_path=? AND file_extension=ANY(?) ", [ $relativePath, \@documents ])->Value;
-        $c->sql->Do("UPDATE documents SET rsize=? WHERE filepath=? ", [ $lengthCount, $relativePath ]);
+        my $lengthCount = $c->sql->Q(" SELECT sum(file_length) FROM cache_files WHERE file_path=? AND file_exists = true AND file_extension=ANY(?) ", [ $relativePath, \@documents ])->Value;
+        $c->sql->Do("UPDATE documents SET rsize=? WHERE filepath=? ", [ $lengthCount || 0, $relativePath ]);
 
         # Get document pages
         $document->{pages} = Inprint::Utils::CollapsePagesToString($document->{pages});

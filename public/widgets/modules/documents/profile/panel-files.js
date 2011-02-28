@@ -29,7 +29,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
             autoLoad:true,
             url: _url("/documents/files/list/"),
             baseParams: { document: this.config.document },
-            fields: [ "id", "name", "description", "mime", "extension", "published",  "size", "created", "updated" ]
+            fields: [ "id", "name", "description", "mime", "extension", "published",  "size", "length", "created", "updated" ]
         });
 
         // Column model
@@ -62,6 +62,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
             { id:'name', header: _("File"),dataIndex:'name', width:250},
             { id: 'description', header: _("Description"),dataIndex:'description', width:150},
             { id: 'size', header: _("Size"), dataIndex:'size', width:100, renderer:Ext.util.Format.fileSize},
+            { id: 'size', header: _("Length"), dataIndex:'length', width:100},
             { id: 'created', header: _("Created"), dataIndex:'created', width:120 },
             { id: 'updated', header: _("Updated") ,dataIndex:'updated', width:120 }
         ];
@@ -322,7 +323,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
         form.on("actioncomplete", function (form, action) {
             if (action.type == "submit") {
                 win.hide();
-                this.getStore().load();
+                this.cmpReload();
             }
         }, this);
 

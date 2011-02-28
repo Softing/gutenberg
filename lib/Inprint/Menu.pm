@@ -233,7 +233,7 @@ sub index
     if ($accessViewSettings) {
         push @{ $SettingsSection->{menu} }, { id => "settings-organization" };
         push @{ $SettingsSection->{menu} }, { id => "settings-editions" };
-        push @{ $SettingsSection->{menu} }, { id => "settings-roles" };
+        #push @{ $SettingsSection->{menu} }, { id => "settings-roles" };
         push @{ $SettingsSection->{menu} }, { id => "settings-readiness" };
         push @{ $SettingsSection->{menu} }, { id => "settings-index" };
     }

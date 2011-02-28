@@ -100,18 +100,19 @@ sub list {
     # Common sql
     my $sql = "
         SELECT
-            t1.id, t1.parent, t1.manager, t1.variation,
+
+            t1.id,
             t2.id as edition, t2.shortcut as edition_shortcut,
-            t1.title, t1.shortcut, t1.description,
-
-            t1.anum, t1.ynum,
-
+            t1.parent, t1.fastype, t1.variation,
+            t1.shortcut, t1.description,
+            t1.circulation, t1.pnum, t1.anum,
+            t1.manager,
             t1.enabled, t1.archived,
-            t1.flagmat, t1.flagadv,
+            t1.flagdoc, t1.flagadv,
 
-            to_char(t1.datemat, 'YYYY-MM-DD HH24:MI:SS')   as datemat,
+            to_char(t1.datedoc, 'YYYY-MM-DD HH24:MI:SS')   as datedoc,
             to_char(t1.dateadv, 'YYYY-MM-DD HH24:MI:SS')   as dateadv,
-            to_char(t1.dateprint, 'YYYY-MM-DD HH24:MI:SS') as dateprint,
+            to_char(t1.dateprint, 'YYYY-MM-DD HH24:MI:SS')   as dateprint,
             to_char(t1.dateout, 'YYYY-MM-DD HH24:MI:SS')   as dateout,
 
             to_char(t1.created, 'YYYY-MM-DD HH24:MI:SS') as created,
@@ -121,7 +122,7 @@ sub list {
     ";
 
     # Parent query
-    my $sql_parent = $sql . " AND edition=? AND t1.edition=t1.parent ";
+    my $sql_parent = $sql . " AND edition=? AND t1.fastype = 'issue' ";
     push @params, $edition->{id};
 
     $sql_parent .= " AND t1.archived = true "  if ($i_archive eq 'true');
@@ -146,7 +147,7 @@ sub list {
         #    $subnode->{shortcut} = $subnode->{edition_shortcut} ."/". $subnode->{shortcut};
         #}
 
-        $node->{shortcut} = $node->{edition_shortcut} ."/". $node->{shortcut};
+        #$node->{shortcut} = $node->{edition_shortcut} ."/". $node->{shortcut};
 
     }
 
@@ -157,85 +158,98 @@ sub create {
 
     my $c = shift;
 
-    my $id      = $c->uuid();
-    my $version = $c->uuid();
+    my $id        = $c->uuid();
+    my $variation = $c->uuid();
+    my $enabled   = 1;
+    my $archived  = 0;
+    my $fastype   = "issue";
 
     my $i_edition       = $c->param("edition");
-    my $i_parent        = $c->param("parent");
 
-    my $i_enabled       = $c->param("enabled");
-
-    my $i_title         = $c->param("title");
     my $i_shortcut      = $c->param("shortcut");
     my $i_description   = $c->param("description");
 
-    my $i_deadline      = $c->param("deadline");
-    my $i_advertisement = $c->param("advertisement");
+    my $i_circulation   = $c->param("circulation") || 0;
 
-    my $i_copyfrom      = $c->param("copyfrom");
+    my $i_dateadv       = $c->param("dateadv");
+    my $i_datedoc       = $c->param("datedoc");
+    my $i_dateout       = $c->param("dateout");
+    my $i_dateprint     = $c->param("dateprint");
 
-    my $enabled = 0;
-    if ($i_enabled eq "on") {
-        $enabled = 1;
-    }
+    my $i_flagadv       = $c->param("flagadv") || 'bydate';
+    my $i_flagdoc       = $c->param("flagdoc") || 'bydate';
+
+    my $i_anum          = $c->param("anum") || 0;
+    my $i_pnum          = $c->param("pnum") || 0;
 
     my @errors;
     my $success = $c->json->false;
 
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_edition));
+    $i_dateadv   = undef if $i_dateadv eq 'undefined';
+    $i_datedoc   = undef if $i_datedoc eq 'undefined';
+    $i_dateout   = undef if $i_dateout eq 'undefined';
+    $i_dateprint = undef if $i_dateprint eq 'undefined';
 
-    push @errors, { id => "title", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_title));
+    $i_dateout   = $i_datedoc unless $i_dateout;
+    $i_dateprint = $i_datedoc unless $i_dateprint;
 
-    if ($i_shortcut) {
-        push @errors, { id => "shortcut", msg => "Incorrectly filled field"}
-            unless ($c->is_text($i_shortcut));
+    unless ($i_shortcut) {
+        if ($i_anum) {
+            $i_shortcut = $i_anum;
+        }
+        elsif ($i_pnum) {
+            $i_shortcut = $i_pnum;
+        }
+        elsif ($i_dateprint) {
+            $i_shortcut = $i_dateprint;
+        }
+        elsif ($i_dateout) {
+            $i_shortcut = $i_dateout;
+        }
     }
 
-    if ($i_description) {
-        push @errors, { id => "description", msg => "Incorrectly filled field"}
-            unless ($c->is_text($i_description));
-    }
+    Inprint::Check::uuid($c, \@errors, "edition", $i_edition);
 
-    if ($i_copyfrom) {
-        push @errors, { id => "copypages", msg => "Incorrectly filled field"}
-            unless ($c->is_uuid($i_copyfrom));
-    }
+    Inprint::Check::text($c, \@errors, "shortcut",    $i_shortcut);
+    Inprint::Check::text($c, \@errors, "description", $i_description, 1);
 
-    unless ($i_parent) {
-        $i_parent = $i_edition;
-    }
+    Inprint::Check::int($c, \@errors, "circulation", $i_circulation, 1);
 
-    #TODO: add date checks
+    Inprint::Check::date($c, \@errors, "dateadv",   $i_dateadv, 1);
+    Inprint::Check::date($c, \@errors, "datedoc",   $i_datedoc, 1);
+    Inprint::Check::date($c, \@errors, "dateout",   $i_dateout, 1);
+    Inprint::Check::date($c, \@errors, "dateprint", $i_dateprint, 1);
 
-    my $edition;
-    unless (@errors) {
-        $edition = $c->sql->Q("
-            SELECT * FROM editions WHERE id=? ",
-            [ $i_edition ])->Hash;
-        push @errors, { id => "edition", msg => "Incorrectly filled field"}
-            unless ($edition->{id});
-    }
+    Inprint::Check::flag($c, \@errors, "flagdoc", $i_flagdoc, 1);
+    Inprint::Check::flag($c, \@errors, "flagadv", $i_flagadv, 1);
+
+    Inprint::Check::int($c, \@errors, "anum", $i_anum, 1);
+    Inprint::Check::int($c, \@errors, "pnum", $i_pnum, 1);
+
+    my $edition = Inprint::Check::edition($c, \@errors, $i_edition);
 
     unless (@errors) {
 
         $c->sql->bt;
 
         # Create new Fascicle
-        Inprint::Models::Fascicle::create( $c, $id, $i_edition, $i_parent, $enabled, $i_title,
-            $i_shortcut, $i_description, $version, $i_deadline, $i_advertisement );
+        Inprint::Models::Fascicle::create( $c,
+            $id, $i_edition, $i_edition, $fastype, $variation,
+            $i_shortcut, $i_description,
+            $i_circulation, $i_pnum, $i_anum, undef, $enabled, $archived,
+            $i_flagdoc, $i_flagadv,
+            $i_datedoc, $i_dateadv, $i_dateprint, $i_dateout);
 
-        # Import from Defaults
-        if ($i_copyfrom && $i_copyfrom eq "00000000-0000-0000-0000-000000000000") {
-            Inprint::Models::Fascicle::importFromDefaults($c, $id);
-        }
-
-        # Import from Fascicle
-        if ($i_copyfrom && $i_copyfrom ne "00000000-0000-0000-0000-000000000000") {
-            Inprint::Models::Fascicle::importFromFascicle($c, $id, $i_copyfrom);
-        }
-
+    #    # Import from Defaults
+    #    if ($i_copyfrom && $i_copyfrom eq "00000000-0000-0000-0000-000000000000") {
+    #        Inprint::Models::Fascicle::importFromDefaults($c, $id);
+    #    }
+    #
+    #    # Import from Fascicle
+    #    if ($i_copyfrom && $i_copyfrom ne "00000000-0000-0000-0000-000000000000") {
+    #        Inprint::Models::Fascicle::importFromFascicle($c, $id, $i_copyfrom);
+    #    }
+    #
         $c->sql->et;
     }
 

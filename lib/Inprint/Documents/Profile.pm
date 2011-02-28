@@ -80,6 +80,20 @@ sub read {
 
     }
 
+    unless (@errors) {
+        my $relativePath = Inprint::Store::Embedded::getRelativePath($c, "documents", $document->{created}, $document->{id}, 1);
+
+        # Update images count
+        my @images = ("jpg", "jpeg", "png", "gif", "bmp", "tiff" );
+        my $imgCount = $c->sql->Q(" SELECT count(*) FROM cache_files WHERE file_path=? AND file_exists = true AND file_extension=ANY(?) ", [ $relativePath, \@images ])->Value;
+        $c->sql->Do("UPDATE documents SET images=? WHERE filepath=? ", [ $imgCount || 0, $relativePath ]);
+
+        # Update rsize count
+        my @documents = ("doc", "docx", "odt", "rtf", "txt" );
+        my $lengthCount = $c->sql->Q(" SELECT sum(file_length) FROM cache_files WHERE file_path=? AND file_exists = true AND file_extension=ANY(?) ", [ $relativePath, \@documents ])->Value;
+        $c->sql->Do("UPDATE documents SET rsize=? WHERE filepath=? ", [ $lengthCount || 0, $relativePath ]);
+    }
+
     # Get history
     unless (@errors) {
         $document->{history} = $c->sql->Q("

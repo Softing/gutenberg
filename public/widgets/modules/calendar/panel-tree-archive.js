@@ -40,9 +40,6 @@ Inprint.calendar.TreeArchive = Ext.extend(Ext.tree.TreePanel, {
 
     onRender: function() {
         Inprint.calendar.TreeArchive.superclass.onRender.apply(this, arguments);
-        this.getRootNode().on("expand", function(node) {
-            node.firstChild.select();
-        });
         this.getLoader().baseParams = { term: "editions.calendar.view" };
         this.getLoader().on("beforeload", function() { this.body.mask(_("Loading")); }, this);
         this.getLoader().on("load", function() { this.body.unmask(); }, this);

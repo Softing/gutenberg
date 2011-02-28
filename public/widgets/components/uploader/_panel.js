@@ -32,7 +32,9 @@ Inprint.cmp.Uploader = Ext.extend(Ext.Window, {
     },
 
     onRender: function() {
+
         Inprint.cmp.Uploader.superclass.onRender.apply(this, arguments);
+
         Inprint.cmp.uploader.Interaction(this, this.panels);
 
         this.relayEvents(this.panels.flash, ['fileUploaded']);

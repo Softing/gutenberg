@@ -25,17 +25,106 @@ Inprint.calendar.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
                 {
                     header: _("Shortcut"),
                     dataIndex: 'shortcut',
-                    width: 240
-                },
-                {
-                    header: _("Title"),
-                    dataIndex: 'title',
-                    width: 240
+                    width: 140
                 },
                 {
                     header: _("Description"),
                     dataIndex: 'description',
-                    width: 240
+                    width: 200
+                },
+
+                {
+                    header: _("Circulation"),
+                    dataIndex: 'circulation',
+                    width: 80
+                },
+
+                {
+                    header: "",
+                    dataIndex: 'flagdoc',
+                    width: 60,
+                    tpl: new Ext.XTemplate('{flagdoc:this.formatFlag}', {
+                        formatFlag: function(flag) {
+                            var string = _("Not set");
+                            switch (flag) {
+                                case "bydate":
+                                    string = _("By date");
+                                    break;
+                                case "enabled":
+                                    string = _("Enabled");
+                                    break;
+                                case "disabled":
+                                    string = _("Disabled");
+                                    break;
+                            };
+                            return string;
+                        }
+                    })
+                },
+
+                {
+                    header: _("Documents"),
+                    dataIndex: 'datedoc',
+                    width: 90,
+                    tpl: new Ext.XTemplate('{datedoc:this.formatDate}', {
+                        formatDate: function(date) {
+                            return _fmtDate(date, 'M j, H:i');
+                        }
+                    })
+                },
+
+                {
+                    header: "",
+                    dataIndex: 'flagadv',
+                    width: 60,
+                    tpl: new Ext.XTemplate('{flagadv:this.formatFlag}', {
+                        formatFlag: function(flag) {
+                            var string = _("Not set");
+                            switch (flag) {
+                                case "bydate":
+                                    string = _("By date");
+                                    break;
+                                case "enabled":
+                                    string = _("Enabled");
+                                    break;
+                                case "disabled":
+                                    string = _("Disabled");
+                                    break;
+                            };
+                            return string;
+                        }
+                    })
+                },
+
+                {
+                    header: _("Advertisement"),
+                    dataIndex: 'dateadv',
+                    width: 90,
+                    tpl: new Ext.XTemplate('{dateadv:this.formatDate}', {
+                        formatDate: function(date) {
+                            return _fmtDate(date, 'M j, H:i');
+                        }
+                    })
+                },
+                {
+                    header: _("Print date"),
+                    dataIndex: 'dateprint',
+                    width: 90,
+                    tpl: new Ext.XTemplate('{dateprint:this.formatDate}', {
+                        formatDate: function(date) {
+                            return _fmtDate(date, 'M j, H:i');
+                        }
+                    })
+                },
+                {
+                    header: _("Out date"),
+                    dataIndex: 'dateout',
+                    width: 90,
+                    tpl: new Ext.XTemplate('{dateout:this.formatDate}', {
+                        formatDate: function(date) {
+                            return _fmtDate(date, 'M j, H:i');
+                        }
+                    })
                 }
 
             ],
@@ -62,13 +151,22 @@ Inprint.calendar.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
                         handler: function() {
 
                             var form = new Inprint.calendar.forms.Create({
+                                parent: this,
                                 url: this.url.create
                             });
+
+                            form.getForm().findField("edition").setValue(this.currentEdition);
 
                             var wndw = this.cmpCreateWindow(
                                 form, _("Adding issue"), [ _BTN_WNDW_ADD, _BTN_WNDW_CLOSE ]
                             ).show();
 
+                            form.on('actioncomplete', function(form, action) {
+                                if (action.type == "submit") {
+                                    wndw.close();
+                                    this.cmpReload();
+                                }
+                            }, this);
                         }
                     },
 
@@ -140,76 +238,6 @@ Inprint.calendar.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
 
     onRender: function() {
         Inprint.calendar.Grid.superclass.onRender.apply(this, arguments);
-
-        this.on("contextmenu", function(node) {
-
-            var items = [];
-
-            node.select();
-
-            var edition = node.attributes.edition;
-            var parent  = node.attributes.parent;
-
-            if (edition == parent) {
-                items.push({
-                    icon: _ico("blueprint--plus"),
-                    cls: 'x-btn-text-icon',
-                    text    : _('Create attachment'),
-                    scope:this,
-                    handler : function() {
-                        this.cmpCreateAttachment(node);
-                    }
-                });
-            }
-
-            if (edition != parent) {
-                items.push({
-                    icon: _ico("blueprint--pencil"),
-                    cls: 'x-btn-text-icon',
-                    text    : _('Edit attachment'),
-                    scope:this,
-                    handler : this.cmpUpdate
-                });
-                items.push({
-                    icon: _ico("blueprint--minus"),
-                    cls: 'x-btn-text-icon',
-                    text    : _('Delete attachment'),
-                    scope:this,
-                    handler: this.cmpDelete
-                });
-            }
-
-            items.push("-");
-
-            items.push({
-                icon: _ico("table"),
-                cls: 'x-btn-text-icon',
-                text    : _('View plan'),
-                handler : function() {
-                    Inprint.ObjectResolver.resolve({ aid:'fascicle-plan', oid: node.id, text: node.text });
-                }
-            });
-
-            items.push({
-                icon: _ico("clock"),
-                cls: 'x-btn-text-icon',
-                text    : _('View composer'),
-                handler : function() {
-                    Inprint.ObjectResolver.resolve({ aid:'fascicle-planner', oid: node.id, text: node.text });
-                }
-            });
-
-            items.push('-', {
-                icon: _ico("arrow-circle-double"),
-                cls: "x-btn-text-icon",
-                text: _("Reload"),
-                scope: this,
-                handler: this.cmpReload
-            });
-
-            new Ext.menu.Menu({ items : items }).show(node.ui.getAnchor());
-        }, this);
-
     },
 
     cmpGetSelectedNode: function() {

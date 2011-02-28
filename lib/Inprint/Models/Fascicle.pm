@@ -6,14 +6,21 @@ use warnings;
 sub create {
     my $c = shift;
 
-    my ($id, $edition, $parent, $enabled, $title, $shortcut,
-        $description, $version, $deadline, $ad_deadline ) = @_;
+    my ($id, $edition, $parent, $fastype, $variation,
+        $shortcut, $description,
+        $circulation, $pnum, $anum, $manager, $enabled, $archived, $flagdoc,
+        $flagadv, $datedoc, $dateadv, $dateprint, $dateout) = @_;
 
     $c->sql->Do("
-        INSERT INTO fascicles (
-            id, edition, parent, enabled, title, shortcut, description, variation, deadline, advert_deadline, created, updated)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
-    ", [ $id, $edition, $parent, $enabled, $title, $shortcut, $description, $version, $deadline, $ad_deadline ]);
+        INSERT INTO fascicles(
+            id, edition, parent, fastype, variation, shortcut, description,
+            circulation, pnum, anum, manager, enabled, archived, flagdoc,
+            flagadv, datedoc, dateadv, dateprint, dateout, created, updated)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
+
+    ", [ $id, $edition, $parent, $fastype, $variation, $shortcut, $description,
+        $circulation, $pnum, $anum, $manager, $enabled, $archived, $flagdoc,
+        $flagadv, $datedoc, $dateadv, $dateprint, $dateout ]);
 
     return $c;
 }
@@ -24,12 +31,22 @@ sub read {
 
     my $result = $c->sql->Q("
         SELECT
-            id, edition, parent, enabled, title, shortcut, description, manager, variation,
-            to_char(deadline, 'YYYY-MM-DD HH24:MI:SS') as deadline,
-            to_char(advert_deadline, 'YYYY-MM-DD HH24:MI:SS') as advert_deadline,
-            created, updated
+            id, edition, parent, fastype, variation,
+            shortcut, description,
+            circulation, pnum, anum,
+            manager,
+            enabled, archived,
+            flagdoc, flagadv,
+
+            to_char(datedoc, 'YYYY-MM-DD HH24:MI:SS')   as datedoc,
+            to_char(dateadv, 'YYYY-MM-DD HH24:MI:SS')   as dateadv,
+            to_char(dateprint, 'YYYY-MM-DD HH24:MI:SS')   as dateprint,
+            to_char(dateout, 'YYYY-MM-DD HH24:MI:SS')   as dateout,
+
+            to_char(created, 'YYYY-MM-DD HH24:MI:SS') as created,
+            to_char(updated, 'YYYY-MM-DD HH24:MI:SS') as updated
         FROM fascicles
-        WHERE id=? ORDER BY shortcut
+        WHERE id=?
     ", [ $id ])->Hash;
 
     return $result;

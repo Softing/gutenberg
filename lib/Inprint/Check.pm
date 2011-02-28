@@ -21,7 +21,13 @@ sub exists {
 }
 
 sub uuid {
-    my ($c, $errors, $field, $value) = @_;
+    my ($c, $errors, $field, $value, $ifexists) = @_;
+
+    if ($ifexists) {
+        return 1 unless $value;
+        return 1 if $value eq 'undefined';
+    }
+
     unless (length($value) > 0 && $value =~ m/^[a-z|0-9]{8}(-[a-z|0-9]{4}){3}-[a-z|0-9]{12}+$/) {
         push @$errors, { id => $field, msg => "Incorrectly filled field"};
         return 0;
@@ -30,7 +36,13 @@ sub uuid {
 }
 
 sub date {
-    my ($c, $errors, $field, $value) = @_;
+    my ($c, $errors, $field, $value, $ifexists) = @_;
+
+    if ($ifexists) {
+        return 1 unless $value;
+        return 1 if $value eq 'undefined';
+    }
+
     unless (length($value) > 0 && $value =~ m/^[0-9]{4}-[0-9]{2}-[0-9]{2}+$/) {
         push @$errors, { id => $field, msg => "Incorrectly filled field"};
         return 0;
@@ -39,7 +51,13 @@ sub date {
 }
 
 sub int {
-    my ($c, $errors, $field, $value) = @_;
+    my ($c, $errors, $field, $value, $ifexists) = @_;
+
+    if ($ifexists) {
+        return 1 unless $value;
+        return 1 if $value eq 'undefined';
+    }
+
     unless (length($value) > 0 && $value =~ m/^\-?[\d]+$/) {
         push @$errors, { id => $field, msg => "Incorrectly filled field"};
         return 0;
@@ -48,25 +66,62 @@ sub int {
 }
 
 sub float {
-    my ($c, $errors, $field, $value) = @_;
+    my ($c, $errors, $field, $value, $ifexists) = @_;
+
+    if ($ifexists) {
+        return 1 unless $value;
+        return 1 if $value eq 'undefined';
+    }
+
     unless (length($value) > 0 && $value =~ m/^(\d{1,7}|(\d{1,7})?\.\d{0,2}|(\d{0,7})?(\.\d{0,7})?[Ee]((\+?0*[1-7])|-0*\d{1,2}))$/) {
         push @$errors, { id => $field, msg => "Incorrectly filled field"};
         return 0;
     }
+
+    return 1;
+}
+
+sub flag {
+    my ($c, $errors, $field, $value, $ifexists) = @_;
+
+    if ($ifexists) {
+        return 1 unless $value;
+        return 1 if $value eq 'undefined';
+    }
+
+    unless (length($value) > 0 && $value =~ m/^[a-z|0-9]+$/) {
+        push @$errors, { id => $field, msg => "Incorrectly filled field"};
+        return 0;
+    }
+
     return 1;
 }
 
 sub text {
-    my ($c, $errors, $field, $value) = @_;
+    my ($c, $errors, $field, $value, $ifexists) = @_;
+
+    if ($ifexists) {
+        return 1 unless $value;
+        return 1 if $value eq 'undefined';
+    }
+
+    unless (length($value) > 0) {
     #unless (length($value) > 0 && $value =~ m/^[\w|\d|\s|:|\\|\/|"|'|#|\-|.|,|?]+$/) {
-    #    push @$errors, { id => $field, msg => "Incorrectly filled field"};
-    #    return 0;
-    #}
+        push @$errors, { id => $field, msg => "Incorrectly filled field"};
+        return 0;
+    }
+
     return 1;
 }
 
 sub path{
-    my ($c, $errors, $field, $value) = @_;
+    my ($c, $errors, $field, $value, $ifexists) = @_;
+
+    if ($ifexists) {
+        return 1 unless $value;
+        return 1 if $value eq 'undefined';
+    }
+
     unless (length($value) > 0 && $value =~ m/^[\w|\d|\.|-]+$/) {
         push @$errors, { id => $field, msg => "Incorrectly filled field"};
         return 0;
@@ -75,7 +130,13 @@ sub path{
 }
 
 sub rule {
-    my ($c, $errors, $field, $value) = @_;
+    my ($c, $errors, $field, $value, $ifexists) = @_;
+
+    if ($ifexists) {
+        return 1 unless $value;
+        return 1 if $value eq 'undefined';
+    }
+
     unless (length($value) > 0 && $value =~ m/^[a-z|:|*|-|\.]+$/) {
         push @$errors, { id => $field, msg => "Incorrectly filled field"};
         return 0;
