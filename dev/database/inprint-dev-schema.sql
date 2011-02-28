@@ -2953,7 +2953,6 @@ CREATE TABLE fascicles (
 
     variation uuid NOT NULL DEFAULT uuid_generate_v4(),
 
-    title character varying NOT NULL,
     shortcut character varying NOT NULL,
     description character varying,
 
