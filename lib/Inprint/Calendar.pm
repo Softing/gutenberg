@@ -285,12 +285,12 @@ sub createIssue {
             $i_flagdoc, $i_flagadv,
             $i_datedoc, $i_dateadv, $i_dateprint, $i_dateout);
 
-    #    # Import from Defaults
+    # Import from Defaults
     #    if ($i_copyfrom && $i_copyfrom eq "00000000-0000-0000-0000-000000000000") {
-    #        Inprint::Models::Fascicle::importFromDefaults($c, $id);
+            Inprint::Models::Fascicle::importFromDefaults($c, $id);
     #    }
 
-    #    # Import from Fascicle
+    # Import from Fascicle
     #    if ($i_copyfrom && $i_copyfrom ne "00000000-0000-0000-0000-000000000000") {
     #        Inprint::Models::Fascicle::importFromFascicle($c, $id, $i_copyfrom);
     #    }
@@ -347,6 +347,8 @@ sub createAttachment {
             $parent->{flagdoc}, $parent->{flagadv},
             $parent->{datedoc}, $parent->{dateadv}, $parent->{dateprint}, $parent->{dateout}
         );
+
+        Inprint::Models::Fascicle::importFromDefaults($c, $id);
 
         $c->sql->et;
 
