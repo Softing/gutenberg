@@ -151,7 +151,7 @@ sub list {
             $node->{leaf} = $c->json->false;
             $subnode->{icon} = "/icons/blueprint.png";
             $subnode->{leaf} = $c->json->true;
-            $subnode->{shortcut} = $subnode->{edition_shortcut} ."/". $subnode->{shortcut};
+            $subnode->{shortcut} = $subnode->{edition_shortcut};
         }
 
         #$node->{shortcut} = $node->{edition_shortcut} ."/". $node->{shortcut};
