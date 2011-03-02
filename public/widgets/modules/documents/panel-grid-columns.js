@@ -42,16 +42,19 @@ Inprint.documents.GridColumns = function() {
 
                 var links = record.get("links");
                 var linksResult = [];
-                for (var f=0; f<links.length;f++) {
 
-                    var file  = String.format(
-                        "<a style=\"color:{2}\" href=\"/?aid=document-editor&oid={0}&text={1}\" "+
-                            "onClick=\"Inprint.ObjectResolver.resolve({aid:'document-editor',oid:'{0}',text:'{1}'});"+
-                            "return false;\"><nobr>{1}</nobr></a>",
-                        links[f].id, links[f].name, "gray"
-                    );
+                if (links) {
+                    for (var f=0; f<links.length;f++) {
 
-                    linksResult.push(file);
+                        var file  = String.format(
+                            "<a style=\"color:{2}\" href=\"/?aid=document-editor&oid={0}&text={1}\" "+
+                                "onClick=\"Inprint.ObjectResolver.resolve({aid:'document-editor',oid:'{0}',text:'{1}'});"+
+                                "return false;\"><nobr>{1}</nobr></a>",
+                            links[f].id, links[f].name, "gray"
+                        );
+
+                        linksResult.push(file);
+                    }
                 }
 
                 var result = "<div style=\"font-size:12px;font-weight:bold;\">"+ header +"</div>"+
