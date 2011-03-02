@@ -102,8 +102,8 @@ Inprint.calendar.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
                         icon: _ico("minus-button"),
                         cls: 'x-btn-text-icon',
                         ref: "../../btnDelete",
-                        scope: this.Components,
-                        handler: this.Components["delete"]
+                        scope: this,
+                        handler: this.cmpDelete
                     }
 
                 ]
@@ -258,6 +258,27 @@ Inprint.calendar.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
 
     cmpReload: function() {
         this.getRootNode().reload();
+    },
+
+    cmpDelete: function(btn) {
+        if (btn != 'yes' && btn != 'no') {
+            Ext.MessageBox.confirm(
+                _("Warning"),
+                _("You really want to do it?"),
+                this.cmpDelete, this);
+            return;
+        }
+        if (btn == 'yes') {
+            Ext.Ajax.request({
+                url: this.url["delete"],
+                params: {
+                    id: this.cmpGetSelectedNode().id
+                },
+                scope: this,
+                success: this.cmpReload,
+                failure: this.failure
+            });
+        }
     },
 
     cmpCreateWindow: function(form, title, btns) {

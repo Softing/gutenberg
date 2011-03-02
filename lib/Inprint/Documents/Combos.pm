@@ -99,7 +99,7 @@ sub fascicles {
 
         my @params;
         my $sql = "
-                SELECT t1.id, t2.shortcut ||'/'|| t1.title as title, t1.description
+                SELECT t1.id, t2.shortcut ||'/'|| t1.shortcut as title, t1.description
                 FROM fascicles t1, editions t2
                 WHERE
                     t1.edition = t2.id
@@ -118,7 +118,7 @@ sub fascicles {
         $sql .= " AND t1.edition = ANY(?) ";
         push @params, $editions;
 
-        $result = $c->sql->Q(" $sql ORDER BY t1.dateout DESC, t2.shortcut, t1.title ", \@params)->Hashes;
+        $result = $c->sql->Q(" $sql ORDER BY t1.dateout DESC, t2.shortcut, t1.shortcut ", \@params)->Hashes;
 
         if ($c->access->Check($i_term, $i_edition)) {
             unshift @$result, {
