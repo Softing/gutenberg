@@ -46,8 +46,8 @@ Inprint.cmp.adverta.GridTemplates = Ext.extend(Ext.grid.GridPanel, {
 
             title: _("Templates"),
 
-            enableDragDrop: true,
-            ddGroup: 'principals-selector',
+            enableDrag: true,
+            ddGroup: 'TreeDD',
 
             height:200,
             layout:"fit",

@@ -41,13 +41,37 @@ Inprint.cmp.composer.Modules = Ext.extend(Ext.ux.tree.TreeGrid, {
 
         Ext.apply(this, {
 
+            layout:"fit",
+            region: "center",
             title: _("Modules"),
 
-            enableDragDrop: true,
-            ddGroup: 'principals-selector',
+            enableSort : false,
 
-            layout:"fit",
-            region: "center"
+            enableDrop: true,
+            ddGroup: 'TreeDD',
+
+            dropConfig: {
+                dropAllowed : true,
+                notifyDrop : function (source, e, data) {
+
+                    var templates = [];
+                    Ext.each(source.dragData.selections, function(r) {
+                        templates.push(r.data.id);
+                    });
+
+                    this.tree.fireEvent("templateDroped", templates);
+
+                    this.cancelExpand();
+
+                    return true;
+                },
+
+                onContainerOver: function(source, e, data) {
+                    return "x-tree-drop-ok-append";
+                }
+
+            }
+
 
         });
 

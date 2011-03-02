@@ -179,6 +179,8 @@ sub modules {
 
         $result = $c->sql->Q(" $sql ", \@params)->Hashes;
 
+        #die $result;
+
         foreach my $node (@{ $result }) {
 
             $node->{id} = $c->uuid;

@@ -30,32 +30,22 @@ Inprint.cmp.composer.Interaction = function(parent, panels) {
         new Ext.menu.Menu({ items : items }).show(node.ui.getAnchor());
     }, modules);
 
-    modules.on("afterrender", function() {
+    modules.on("templateDroped", function(templates) {
 
-        Ext.dd.DropTarget(modules.getEl(), {
-            ddGroup    : 'principals-selector',
-            notifyDrop : function(ddSource, e, data){
-                var ids = [];
-                Ext.each(ddSource.dragData.selections, function(r) {
-                    ids.push(r.data.id);
-                });
-                Ext.Ajax.request({
-                    url: _url("/fascicle/modules/create/"),
-                    scope:this,
-                    success: function() {
-                        flash.cmpInit();
-                        modules.cmpReload();
-                    },
-                    params: {
-                        fascicle: parent.fascicle,
-                        page: parent.selection,
-                        module: ids
-                    }
-                });
-                return true;
+        Ext.Ajax.request({
+            url: _url("/fascicle/modules/create/"),
+            scope:this,
+            params: {
+                fascicle: parent.fascicle,
+                page: parent.selection,
+                module: templates
+            },
+            success: function() {
+                flash.cmpInit();
+                modules.cmpReload();
             }
         });
 
-    }, this);
+    }, modules);
 
 };
