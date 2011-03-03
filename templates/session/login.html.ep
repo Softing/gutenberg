@@ -10,7 +10,7 @@
     <title>Inprint Content 5.0</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
     <meta HTTP-EQUIV="Pragma" CONTENT="no-cache"></meta>
-    <link type="text/css" rel="stylesheet" href="/login-page.css">
+    <link type="text/css" rel="stylesheet" href="/styles/login-page.css">
     <link type="text/css" rel="stylesheet" href="/ext-3.3.1/resources/css/ext-all.css">
     <link type="text/css" rel="stylesheet" href="/ext-3.3.1/resources/css/xtheme-gray.css">
 
@@ -22,11 +22,11 @@
     <script type="text/javascript" src="/locale/"></script>
 
     <!-- Login page -->
-    <script type="text/javascript" src="/login-page.js"></script>
+    <script type="text/javascript" src="/scripts/login-page.js"></script>
 
 </head>
 <body>
-    <script type="text/javascript" src="/wallpaper.js"></script>
+    <script type="text/javascript" src="/scripts/wallpaper.js"></script>
     <div class="footer">inprint.content 5.0.0</div>
 </body>
 </html>

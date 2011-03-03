@@ -33,7 +33,10 @@ Inprint.Menu = Ext.extend(Ext.Toolbar,{
         runner.start(task);
     },
 
-    CmpQuery: function(){
+    CmpQuery: function() {
+        if (this.items) {
+            this.items.each(this.remove, this);
+        }
         Ext.Ajax.request({
             url: _url("/menu/"),
             scope: this,
@@ -45,7 +48,6 @@ Inprint.Menu = Ext.extend(Ext.Toolbar,{
     },
 
     CmpLoad: function(result) {
-
         // Обрабатываем все пункты меню
         Ext.each(result, function(item) {
             if (item == '->') {

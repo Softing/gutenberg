@@ -86,7 +86,7 @@ sub login
                 $c->events->Create("system", undef, "login", "The user with login %1 has entered the wrong password", [ $i_login ]);
 
                 $json->{success} = 'false';
-                push @{ $json->{errors} }, { msg => 'Wrong password' }
+                push @{ $json->{errors} }, { msg => "Wrong password" }
             }
 
         }

@@ -9,6 +9,8 @@ use utf8;
 use strict;
 use warnings;
 
+use Inprint::Check;
+
 use base 'Inprint::BaseController';
 
 sub read {
@@ -18,8 +20,7 @@ sub read {
     my @errors;
     my $success = $c->json->false;
 
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_request));
+    Inprint::Check::uuid($c, \@errors, "id", $i_request);
 
     my $result = [];
 
@@ -60,8 +61,7 @@ sub list {
     my @errors;
     my $success = $c->json->false;
 
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_id));
+    Inprint::Check::uuid($c, \@errors, "id", $i_id);
 
     my @data;
     my $sql = "
@@ -130,47 +130,23 @@ sub create {
     my @errors;
     my $success = $c->json->false;
 
-    unless ($i_payment) {
-        $i_payment = "no";
-    }
+    $i_payment   = "no" unless ($i_payment);
+    $i_readiness = "no" unless ($i_readiness);
 
-    unless ($i_readiness) {
-        $i_readiness = "no";
-    }
-
-    push @errors, { id => "shortcut", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_shortcut));
-
-    push @errors, { id => "description", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_description));
+    Inprint::Check::text($c, \@errors, "shortcut", $i_shortcut);
+    Inprint::Check::text($c, \@errors, "description", $i_description);
 
     unless ($i_module) {
         unless ($i_template) {
-            push @errors, { id => "module-or-template", msg => "Incorrectly filled field"}
+            push @errors, { id => "module",   msg => "Incorrectly filled field"};
         }
     }
 
-    if (length $i_module > 0) {
-        push @errors, { id => "module", msg => "Incorrectly filled field"}
-            unless ($c->is_uuid($i_module));
-    }
+    Inprint::Check::uuid($c, \@errors, "module", $i_module) if (length $i_module > 0);
+    Inprint::Check::uuid($c, \@errors, "template", $i_template) if (length $i_template > 0);
 
-    if (length $i_template > 0) {
-        push @errors, { id => "template", msg => "Incorrectly filled field"}
-            unless ($c->is_uuid($i_template));
-    }
-
-    my $fascicle; unless(@errors) {
-        $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
-        push @errors, { id => "fascicle", msg => "Can't find object"}
-            unless ($fascicle->{id});
-    }
-
-    my $advertiser; unless(@errors) {
-        $advertiser = $c->sql->Q(" SELECT * FROM ad_advertisers WHERE id=? ", [ $i_advertiser ])->Hash;
-        push @errors, { id => "advertiser", msg => "Can't find object"}
-            unless ($advertiser->{id});
-    }
+    my $fascicle   = Inprint::Check::fascicle($c, \@errors, $i_fascicle);
+    my $advertiser = Inprint::Check::advertiser($c, \@errors, $i_advertiser);
 
     #push @errors, { id => "access", msg => "Not enough permissions"}
     #    unless ($c->access->Check("domain.roles.manage"));
@@ -341,17 +317,11 @@ sub update {
     my @errors;
     my $success = $c->json->false;
 
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_id));
-
-    push @errors, { id => "shortcut", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_shortcut));
-
-    push @errors, { id => "description", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_description));
-
-    push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.roles.manage"));
+    Inprint::Check::uuid($c, \@errors, "id", $i_id);
+    Inprint::Check::text($c, \@errors, "shortcut", $i_shortcut);
+    Inprint::Check::text($c, \@errors, "description", $i_description);
+    
+    Inprint::Check::access($c, \@errors, "domain.roles.manage");
 
     unless (@errors) {
         $c->sql->Do("

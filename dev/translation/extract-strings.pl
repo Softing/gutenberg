@@ -16,14 +16,19 @@ my @result;
 my @words;
 my @jsfiles;
 
-my $path = "../../public/widgets";
+find({ wanted => sub {
+    my $filename = $File::Find::name;
+    if ( (/\.js$/) ) {
+        push @jsfiles, $filename;
+    }
+}}, "../../public/scripts");
 
 find({ wanted => sub {
     my $filename = $File::Find::name;
     if ( (/\.js$/) ) {
         push @jsfiles, $filename;
     }
-}}, $path);
+}}, "../../public/widgets");
 
 @jsfiles = sort { $a cmp $b } @jsfiles;
 

@@ -217,6 +217,14 @@ sub edition {
     return $item;
 }
 
+sub advertiser {
+    my ($c, $errors, $id) = @_;
+    undef my $item;
+    $item = $c->sql->Q(" SELECT * FROM ad_advertisers WHERE id=? ", [ $id ])->Hash unless (@$errors);
+    push @$errors, { id => "advertiser", msg => "Can't find object"} unless ($item->{id});
+    return $item;
+}
+
 sub fascicle {
     my ($c, $errors, $id) = @_;
     undef my $item;

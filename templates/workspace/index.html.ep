@@ -31,7 +31,7 @@
 
 </head>
 <body>
-    <script type="text/javascript" src="/wallpaper.js"></script>
+    <script type="text/javascript" src="/scripts/wallpaper.js"></script>
     <!-- Loading mask element -->
     <div id="loading-mask" style=""></div>
     <div id="loading">

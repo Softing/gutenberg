@@ -245,8 +245,7 @@ Ext.onReady(function() {
 
     Inprint.updateSession(true, true);
 
-    // Enable registry and layout
-    //Inprint.registry = new Inprint.Registry();
+    // Enable layout
     Inprint.layout   = new Inprint.Workspace();
 
     // Resolve url
@@ -262,9 +261,7 @@ Ext.onReady(function() {
     }
 
     // Remove loading mask
-    //setTimeout(function(){
-        Ext.get('loading').remove();
-        Ext.get('loading-mask').fadeOut({remove:true});
-    //}, 0);
+    Ext.get('loading').remove();
+    Ext.get('loading-mask').fadeOut({remove:true});
 
 });

@@ -48,9 +48,10 @@ Inprint.calendar.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
                             form.on('actioncomplete', function(form, action) {
                                 if (action.type == "submit") {
                                     wndw.close();
-                                    this.cmpReload();
+                                    this.cmpReloadWithMenu();
                                 }
                             }, this);
+
                         }
                     },
 
@@ -116,12 +117,14 @@ Inprint.calendar.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
                     {
                         id: 'createAttachment',
                         text: _("Create"),
-                        disabled: true,
+                        disabled: false,
                         icon: _ico("plus-button"),
                         cls: 'x-btn-text-icon',
                         ref: "../../btnAttachmentCreate",
-                        scope: this.Components,
-                        handler: this.Components.create
+                        scope: this,
+                        handler: function() {
+
+                        }
                     }
                 ]
             }
@@ -260,6 +263,11 @@ Inprint.calendar.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
         this.getRootNode().reload();
     },
 
+    cmpReloadWithMenu: function() {
+        this.getRootNode().reload();
+        Inprint.layout.getMenu().CmpQuery();
+    },
+
     cmpDelete: function(btn) {
         if (btn != 'yes' && btn != 'no') {
             Ext.MessageBox.confirm(
@@ -275,7 +283,7 @@ Inprint.calendar.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
                     id: this.cmpGetSelectedNode().id
                 },
                 scope: this,
-                success: this.cmpReload,
+                success: this.cmpReloadWithMenu,
                 failure: this.failure
             });
         }
