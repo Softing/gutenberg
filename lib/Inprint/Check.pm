@@ -241,5 +241,15 @@ sub principal {
     return $item;
 }
 
+# Render error
+
+sub checkErrors {
+    my ($c, $errors) = @_;
+    if (@{ $errors }) {
+        $c->render_json({ success => $c->json->false, errors => \@$errors });
+        return;
+    }
+    return $c;
+}
 
 1;

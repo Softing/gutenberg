@@ -108,7 +108,8 @@ sub templates {
                 SELECT
                     t1.id, t1.origin, t1.fascicle, t1.page, t1.title, t1.description,
                     t1.amount, round(t1.area::numeric, 2) as area, t1.x, t1.y, t1.w, t1.h,
-                    t3.title as place_title,
+                    t2.id as mapping,
+                    t3.id as place, t3.title as place_title,
                     t1.created, t1.updated
                 FROM fascicles_tmpl_modules t1, fascicles_tmpl_index t2, fascicles_tmpl_places t3
                 WHERE

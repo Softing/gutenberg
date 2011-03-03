@@ -30,7 +30,7 @@ Inprint.cmp.composer.Interaction = function(parent, panels) {
         new Ext.menu.Menu({ items : items }).show(node.ui.getAnchor());
     }, modules);
 
-    modules.on("templateDroped", function(templates) {
+    modules.on("templateDroped", function(mapping) {
 
         Ext.Ajax.request({
             url: _url("/fascicle/modules/create/"),
@@ -38,7 +38,7 @@ Inprint.cmp.composer.Interaction = function(parent, panels) {
             params: {
                 fascicle: parent.fascicle,
                 page: parent.selection,
-                module: templates
+                mapping: mapping
             },
             success: function() {
                 flash.cmpInit();

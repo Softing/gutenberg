@@ -79,10 +79,10 @@ Inprint.factory.StoreFields = {
     // Fascicles
 
     "/fascicle/composer/templates/":
-        [ "id", "fascicle", "page", "place", "place_title", "title", "description", "amount", "area", "x", "y", "w", "h", Inprint.factory.createDateField("created"), Inprint.factory.createDateField("updated") ],
+        [ "id", "fascicle", "page", "mapping", "place", "place_title", "title", "description", "amount", "area", "x", "y", "w", "h", Inprint.factory.createDateField("created"), Inprint.factory.createDateField("updated") ],
 
     "/fascicle/composer/modules/":
-        [ "id", "fascicle", "page", "place", "place_title", "title", "description", "amount", "area", "x", "y", "w", "h", Inprint.factory.createDateField("created"), Inprint.factory.createDateField("updated") ],
+        [ "id", "fascicle", "page", "mapping", "place", "place_title", "title", "description", "amount", "area", "x", "y", "w", "h", Inprint.factory.createDateField("created"), Inprint.factory.createDateField("updated") ],
 
     "/fascicle/documents/list/": [
             'id', 'access',    'edition',  'edition_shortcut',    'fascicle',    'fascicle_shortcut',    'headline', 'headline_shortcut',

@@ -9,6 +9,8 @@ use utf8;
 use strict;
 use warnings;
 
+use Inprint::Check;
+
 use base 'Inprint::BaseController';
 
 sub read {
@@ -123,7 +125,7 @@ sub create {
     my $id = $c->uuid();
 
     my $i_fascicle    = $c->param("fascicle");
-    my @i_modules     = $c->param("module");
+    my @i_mapping     = $c->param("mapping");
     my @i_pages       = $c->param("page");
 
     my @errors;
@@ -132,64 +134,52 @@ sub create {
     #push @errors, { id => "access", msg => "Not enough permissions"}
     #    unless ($c->access->Check("domain.roles.manage"));
 
-    my $fascicle; unless (@errors) {
-        $fascicle  = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
-        push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
-            unless ($fascicle);
+    my $fascicle   = Inprint::Check::fascicle($c, \@errors, $i_fascicle);
+
+    Inprint::Check::checkErrors($c, \@errors);
+
+    # Find modules by mapping;
+    my @modules;
+    foreach my $map (@i_mapping) {
+        my $module = $c->sql->Q("
+            SELECT
+                t2.place as place,
+                t1.id, t1.origin, t1.fascicle, t1.page, t1.title, t1.description, t1.amount, t1.area, t1.x, t1.y, t1.w, t1.h, t1.created, t1.updated
+            FROM fascicles_tmpl_modules t1, fascicles_tmpl_index t2
+            WHERE t1.id=t2.entity AND t2.id=?
+        ", [ $map ])->Hash;
+        next unless $module->{id};
+        push @modules, $module;
     }
+
+    push @errors, { id => "page", msg => "Modules not equal $#i_mapping"}
+        unless ($#modules == $#i_mapping);
+
+    Inprint::Check::checkErrors($c, \@errors);
+
+    # Find pages
+    my @pages;
+    foreach my $code (@i_pages) {
+
+        my ($page_id, $seqnum) = split '::', $code;
+
+        my $page = $c->sql->Q("
+            SELECT id, edition, fascicle, origin, headline, seqnum, w, h, created, updated
+            FROM fascicles_pages WHERE id=? AND seqnum=?
+        ", [ $page_id, $seqnum ])->Hash;
+
+        next unless $page->{id};
+        push @pages, $page;
+    }
+
+    push @errors, { id => "page", msg => "Pages not equal $#i_pages"}
+        unless ($#pages == $#i_pages);
+
+    Inprint::Check::checkErrors($c, \@errors);
 
     unless (@errors) {
 
-        foreach my $module_id (@i_modules) {
-
-            next unless $c->is_uuid($module_id);
-
-            my $module = $c->sql->Q("
-                    SELECT id, origin, fascicle, page, title, description, amount, area, x, y, w, h, created, updated
-                    FROM fascicles_tmpl_modules WHERE id=?
-                ", [ $module_id ])->Hash;
-
-            next unless $module->{id};
-
-            my @pages;
-
-            my $place;
-
-            foreach my $code (@i_pages) {
-
-                my ($page_id, $seqnum) = split '::', $code;
-
-                my $page = $c->sql->Q("
-                    SELECT id, edition, fascicle, origin, headline, seqnum, w, h, created, updated
-                    FROM fascicles_pages WHERE id=? AND seqnum=?
-                ", [ $page_id, $seqnum ])->Hash;
-
-                next unless $page->{id};
-
-                my $page_place = $c->sql->Q("
-                    SELECT
-                        t1.id, t1.origin, t1.fascicle, t1.title,
-                        t1.description, t1.created, t1.updated
-                    FROM fascicles_tmpl_places t1, fascicles_tmpl_index t2
-                    WHERE t1.fascicle=? AND t2.place=t1.id AND t2.entity=?
-
-                ", [ $page->{fascicle}, $page->{headline} ])->Hash;
-
-                next unless $page_place->{id};
-
-                unless ( $place->{id} ) {
-                    $place = $page_place;
-                }
-
-                push @errors, { id => "page", msg => "Pages not equal 1"}
-                    unless ( $place->{id} eq $page_place->{id} );
-
-                push @pages, $page;
-
-            }
-
-            push @errors, { id => "page", msg => "Pages not equal 2"}
-                unless ($#pages == $#i_pages);
+        foreach my $module (@modules) {
 
             unless (@errors) {
 
