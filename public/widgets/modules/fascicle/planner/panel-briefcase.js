@@ -11,7 +11,7 @@ Inprint.fascicle.planner.Briefcase = Ext.extend(Ext.grid.GridPanel, {
         this.store = Inprint.factory.Store.group(this.urls.list, {
             groupField:'headline_shortcut',
             remoteGroup:false,
-            remoteSort:false,
+            remoteSort:true,
             autoLoad:true,
             baseParams: {
                 gridmode: "briefcase"

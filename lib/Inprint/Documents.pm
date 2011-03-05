@@ -138,6 +138,8 @@ sub list {
 
     my $current_member = $c->QuerySessionGet("member.id");
 
+    #die $dir;
+
     # Query headers
     my $sql_query = "
         SELECT
@@ -299,12 +301,18 @@ sub list {
 
     # Setup soting
     if ($dir && $sort) {
-        if ( $dir ~~ ["ASC", "DESC"] ) {
-            if ( $sort ~~ [
-                    "title", "maingroup_shortcut", "fascicle_shortcut",
-                    "headline_shortcut", "created", "updated", "uploaded", "moved",
-                    "rubric_shortcut", "pages", "manager_shortcut", "progress",
-                    "holder_shortcut", "images", "rsize" ] ) {
+
+        my @sortModes = ("ASC", "DESC");
+        my @sortColumns= ("title", "maingroup_shortcut", "fascicle_shortcut",
+            "headline_shortcut", "created", "updated", "uploaded", "moved",
+            "rubric_shortcut", "pages", "manager_shortcut", "progress",
+            "holder_shortcut", "images", "rsize");
+
+        if ( $dir ~~ @sortModes ) {
+            if ( $sort ~~ @sortColumns ) {
+
+                $sort = "firstpage" if ($sort eq "pages");
+
                 $sql_query .= " ORDER BY dcm.$sort $dir ";
             }
         }
