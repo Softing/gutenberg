@@ -151,7 +151,8 @@ sub update {
     unless (@errors) {
 
         $c->sql->Do(" UPDATE editions SET title=?, shortcut=?, description=?, path=replace(?, '-',  '')::ltree WHERE id=? ",
-            [ $i_title, $i_shortcut, $i_description, $parent->{shortcut} . ".$i_id", $i_id ]);
+            [ $i_title, $i_shortcut, $i_description, $parent->{path} . ".$i_id", $i_id ]);
+
         $c->sql->Do(" UPDATE documents SET edition_shortcut=? WHERE edition=? ",
             [ $i_shortcut, $i_id ]);
 
