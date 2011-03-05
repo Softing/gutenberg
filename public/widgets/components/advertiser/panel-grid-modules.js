@@ -54,12 +54,12 @@ Inprint.cmp.adverta.GridModules = Ext.extend(Ext.ux.tree.TreeGrid, {
                 dropAllowed : true,
                 notifyDrop : function (source, e, data) {
 
-                    var templates = [];
+                    var mapping = [];
                     Ext.each(source.dragData.selections, function(r) {
-                        templates.push(r.data.id);
+                        mapping.push(r.data.mapping);
                     });
 
-                    this.tree.fireEvent("templateDroped", templates);
+                    this.tree.fireEvent("templateDroped", mapping);
 
                     this.cancelExpand();
 

@@ -143,8 +143,10 @@ sub create {
     foreach my $map (@i_mapping) {
         my $module = $c->sql->Q("
             SELECT
+                t1.id,
                 t2.place as place,
-                t1.id, t1.origin, t1.fascicle, t1.page, t1.title, t1.description, t1.amount, t1.area, t1.x, t1.y, t1.w, t1.h, t1.created, t1.updated
+                t1.origin, t1.fascicle, t1.page, t1.title, t1.description,
+                t1.amount, t1.area, t1.x, t1.y, t1.w, t1.h, t1.created, t1.updated
             FROM fascicles_tmpl_modules t1, fascicles_tmpl_index t2
             WHERE t1.id=t2.entity AND t2.id=?
         ", [ $map ])->Hash;
@@ -177,36 +179,33 @@ sub create {
 
     Inprint::Check::checkErrors($c, \@errors);
 
-    unless (@errors) {
+    foreach my $module (@modules) {
 
-        foreach my $module (@modules) {
+        unless (@errors) {
 
-            unless (@errors) {
+            my $module_id = $c->uuid;
 
-                my $module_id = $c->uuid;
+            $c->sql->Do("
+                INSERT INTO fascicles_modules(id, edition, fascicle, place, origin, title, description, amount, area, w, h,  created, updated)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
+            ", [
+                $module_id, $fascicle->{edition}, $fascicle->{id},
+                $module->{place},
+                $module->{id}, $module->{title}, $module->{description},
+                $module->{amount}, $module->{area},
+                $module->{w}, $module->{h}
+            ]);
 
+            foreach my $page (@pages) {
                 $c->sql->Do("
-                    INSERT INTO fascicles_modules(id, edition, fascicle, place, origin, title, description, amount, area, w, h,  created, updated)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
+                    INSERT INTO fascicles_map_modules(edition, fascicle, module, page, placed, x, y, created, updated)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, now(), now());
                 ", [
-                    $module_id, $fascicle->{edition}, $fascicle->{id},
-                    $place->{id},
-                    $module->{id}, $module->{title}, $module->{description},
-                    $module->{amount}, $module->{area},
-                    $module->{w}, $module->{h}
+                    $fascicle->{edition}, $fascicle->{id}, $module_id, $page->{id}, 0, "1/1", "1/1"
                 ]);
-
-                foreach my $page (@pages) {
-                    $c->sql->Do("
-                        INSERT INTO fascicles_map_modules(edition, fascicle, module, page, placed, x, y, created, updated)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, now(), now());
-                    ", [
-                        $fascicle->{edition}, $fascicle->{id}, $module_id, $page->{id}, 0, "1/1", "1/1"
-                    ]);
-                }
             }
-
         }
+
     }
 
     $success = $c->json->true unless (@errors);
