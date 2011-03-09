@@ -187,25 +187,36 @@ sub list {
     my $sql_filters = " ";
 
     # Set Restrictions
+    #my $editions = $c->access->GetChildrens("editions.documents.work");
+    #my $departments = $c->access->GetChildrens("catalog.documents.view:*");
+
+    # Set view restrictions
+
+    my $editions = $c->access->GetBindings("editions.documents.work");
+    my $departments = $c->access->GetBindings("catalog.documents.view:*");
 
     $sql_filters .= " AND ( ";
 
-    my $editions = $c->access->GetChildrens("editions.documents.work");
-    my $departments = $c->access->GetChildrens("catalog.documents.view:*");
-
     $sql_filters .= " ( ";
     $sql_filters .= "    dcm.edition = ANY(?) ";
-    $sql_filters .= "    AND dcm.workgroup = ANY(?) ";
+    $sql_filters .= "    AND ";
+    $sql_filters .= "    dcm.workgroup = ANY(?) ";
     $sql_filters .= " ) ";
     push @params, $editions;
     push @params, $departments;
 
-    $sql_filters .= " OR dcm.manager=? ";
-    push @params, $current_member;
-
-    $sql_filters .= " OR dcm.holder=? ";
-    push @params, $current_member;
     $sql_filters .= " ) ";
+
+    # Set holder restrictions
+#    if ($mode eq "todo") {
+#        $sql_filters .= " AND ( ";
+#        $sql_filters .= "   dcm.manager=? ";
+#        $sql_filters .= "   OR ";
+#        $sql_filters .= "   dcm.holder=? ";
+#        $sql_filters .= " ) ";
+#        push @params, $current_member;
+#        push @params, $current_member;
+#    }
 
     # Set Filters
 
