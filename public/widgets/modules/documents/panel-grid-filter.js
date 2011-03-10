@@ -89,24 +89,24 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                 }
             }),
             xc.getConfig("/documents/filters/rubrics/", {
-                disabled: true,
+                disabled: false,
                 columnWidth:.125,
                 cacheQuery: false,
                 listeners: {
                     scope: this,
                     render: function(combo) {
-                        this.getForm().findField("edition").on("select", function() {
-                            combo.disable();
-                            combo.reset();
-                        }, this);
-                        this.getForm().findField("fascicle").on("select", function() {
-                            combo.disable();
-                            combo.reset();
-                        }, this);
-                        this.getForm().findField("headline").on("select", function() {
-                            combo.enable();
-                            combo.reset();
-                        }, this);
+                        //this.getForm().findField("edition").on("select", function() {
+                        //    combo.disable();
+                        //    combo.reset();
+                        //}, this);
+                        //this.getForm().findField("fascicle").on("select", function() {
+                        //    combo.disable();
+                        //    combo.reset();
+                        //}, this);
+                        //this.getForm().findField("headline").on("select", function() {
+                        //    combo.enable();
+                        //    combo.reset();
+                        //}, this);
                     },
                     beforequery: function(qe) {
                         qe.combo.getStore().baseParams = this.getFilterParams();
