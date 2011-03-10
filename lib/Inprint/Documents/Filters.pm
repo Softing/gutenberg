@@ -83,9 +83,9 @@ sub headlines {
 
     my @params;
     my $sql = "
-        SELECT DISTINCT t1.headline_shortcut as id, t1.headline_shortcut as title
-        FROM documents t1
-        WHERE t1.edition=ANY(?) AND t1.headline_shortcut is not null
+        SELECT DISTINCT dcm.headline_shortcut as id, dcm.headline_shortcut as title
+        FROM documents dcm, fascicles fsc
+        WHERE fsc.id = dcm.fascicle AND dcm.edition=ANY(?) AND dcm.headline_shortcut is not null
     ";
 
     my $editions = $c->access->GetChildrens("editions.documents.work");
@@ -93,12 +93,12 @@ sub headlines {
 
     if ($cgi_edition && $cgi_edition ne "all") {
         my $editions = $c->sql->Q(" SELECT id FROM editions WHERE path <@ ( SELECT path FROM editions WHERE id=?)", [ $cgi_edition ])->Values;
-        $sql .= " AND t1.edition = ANY(?) ";
+        $sql .= " AND dcm.edition = ANY(?) ";
         push @params, $editions;
     }
 
     if ($cgi_fascicle &&  $cgi_fascicle ne "all") {
-        $sql .= " AND t1.fascicle = ? ";
+        $sql .= " AND dcm.fascicle = ? ";
         push @params, $cgi_fascicle;
     }
 
@@ -106,7 +106,7 @@ sub headlines {
     $sql .= " $sql_filter->{sql} ";
     @params = (@params, @{ $sql_filter->{params} });
 
-    $sql .= " ORDER BY t1.headline_shortcut ";
+    $sql .= " ORDER BY dcm.headline_shortcut ";
 
     my $result = $c->sql->Q($sql, \@params)->Hashes;
 
@@ -131,9 +131,9 @@ sub rubrics {
 
     my @params;
     my $sql = "
-        SELECT DISTINCT t1.rubric_shortcut as id, t1.rubric_shortcut as title
-        FROM documents t1
-        WHERE t1.edition=ANY(?) AND t1.rubric_shortcut is not null
+        SELECT DISTINCT dcm.rubric_shortcut as id, dcm.rubric_shortcut as title
+        FROM documents dcm, fascicles fsc
+        WHERE fsc.id = dcm.fascicle AND dcm.edition=ANY(?) AND dcm.rubric_shortcut is not null
     ";
 
     my $editions = $c->access->GetChildrens("editions.documents.work");
@@ -141,17 +141,17 @@ sub rubrics {
 
     if ($cgi_edition &&  $cgi_edition ne "all") {
         my $editions = $c->sql->Q(" SELECT id FROM editions WHERE path <@ ( SELECT path FROM editions WHERE id=?)", [ $cgi_edition ])->Values;
-        $sql .= " AND t1.edition = ANY(?) ";
+        $sql .= " AND dcm.edition = ANY(?) ";
         push @params, $editions;
     }
 
     if ($cgi_fascicle &&  $cgi_fascicle ne "all") {
-        $sql .= " AND t1.fascicle = ? ";
+        $sql .= " AND dcm.fascicle = ? ";
         push @params, $cgi_fascicle;
     }
 
     if ($cgi_headline &&  $cgi_headline ne "all") {
-        $sql .= " AND t1.headline_shortcut = ? ";
+        $sql .= " AND dcm.headline_shortcut = ? ";
         push @params, $cgi_headline;
     }
 
@@ -159,7 +159,7 @@ sub rubrics {
     $sql .= " $sql_filter->{sql} ";
     @params = (@params, @{ $sql_filter->{params} });
 
-    $sql .= " ORDER BY t1.rubric_shortcut ";
+    $sql .= " ORDER BY dcm.rubric_shortcut ";
 
     my $result = $c->sql->Q($sql, \@params)->Hashes;
 
@@ -182,11 +182,12 @@ sub managers {
     my @params;
     my $sql = "
         SELECT DISTINCT
-            t1.manager as id,
+            dcm.manager as id,
             t2.shortcut as title,
             t2.description as description,
             CASE WHEN t2.type='group' THEN 'folders' ELSE 'user' END as icon
-        FROM documents t1, view_principals t2 WHERE t2.id = t1.manager
+        FROM documents dcm, fascicles fsc, view_principals t2
+        WHERE fsc.id = dcm.fascicle AND t2.id = dcm.manager
     ";
 
     my $sql_filter = $c->createSqlFilter();
@@ -216,11 +217,12 @@ sub holders {
     my @params;
     my $sql = "
         SELECT DISTINCT
-            t1.holder as id,
+            dcm.holder as id,
             t2.shortcut as title,
             t2.description as description,
             CASE WHEN t2.type='group' THEN 'folders' ELSE 'user' END as icon
-        FROM documents t1, view_principals t2 WHERE t2.id = t1.holder
+        FROM documents dcm, fascicles fsc, view_principals t2
+        WHERE fsc.id = dcm.fascicle AND t2.id = dcm.holder
     ";
 
     my $sql_filter = $c->createSqlFilter();
@@ -248,8 +250,8 @@ sub progress {
 
     my @params;
     my $sql = "
-        SELECT DISTINCT t1.readiness as id, t1.progress || '% - ' || t1.readiness_shortcut as title, t1.color, t1.progress
-        FROM documents t1 WHERE 1=1 ";
+        SELECT DISTINCT dcm.readiness as id, dcm.progress || '% - ' || dcm.readiness_shortcut as title, dcm.color, dcm.progress
+        FROM documents dcm, fascicles fsc WHERE fsc.id = dcm.fascicle ";
 
     my $sql_filter = $c->createSqlFilter();
     $sql .= " $sql_filter->{sql} ";
@@ -296,9 +298,9 @@ sub createSqlFilter {
     $sql_filters .= " AND ( ";
 
     $sql_filters .= " ( ";
-    $sql_filters .= "    t1.edition = ANY(?) ";
+    $sql_filters .= "    dcm.edition = ANY(?) ";
     $sql_filters .= "    AND ";
-    $sql_filters .= "    t1.workgroup = ANY(?) ";
+    $sql_filters .= "    dcm.workgroup = ANY(?) ";
     $sql_filters .= " ) ";
     push @params, $editions;
     push @params, $departments;
@@ -310,7 +312,7 @@ sub createSqlFilter {
     if ($mode eq "todo") {
         # get documents fpor departments
         my @holders;
-        $sql_filters .= " AND t1.holder = ANY(?) ";
+        $sql_filters .= " AND dcm.holder = ANY(?) ";
         my $departments = $c->sql->Q(" SELECT catalog FROM map_member_to_catalog WHERE member=? ", [ $current_member ])->Values;
         foreach (@$departments) {
             push @holders, $_;
@@ -319,50 +321,50 @@ sub createSqlFilter {
         push @params, \@holders;
 
         $sql_filters .= " AND fsc.enabled = true ";
-        $sql_filters .= " AND t1.fascicle <> '99999999-9999-9999-9999-999999999999' ";
+        $sql_filters .= " AND dcm.fascicle <> '99999999-9999-9999-9999-999999999999' ";
     }
 
     if ($mode eq "all") {
         $sql_filters .= " AND fsc.enabled = true ";
-        $sql_filters .= " AND t1.fascicle <> '99999999-9999-9999-9999-999999999999' ";
+        $sql_filters .= " AND dcm.fascicle <> '99999999-9999-9999-9999-999999999999' ";
         if ($fascicle && $fascicle ne "all" && $fascicle ne '00000000-0000-0000-0000-000000000000') {
-            $sql_filters .= " AND t1.fascicle <> '00000000-0000-0000-0000-000000000000' ";
+            $sql_filters .= " AND dcm.fascicle <> '00000000-0000-0000-0000-000000000000' ";
         }
     }
 
     if ($mode eq "archive") {
         $sql_filters .= " AND fsc.enabled  <> true ";
-        $sql_filters .= " AND t1.fascicle <> '99999999-9999-9999-9999-999999999999' ";
-        $sql_filters .= " AND t1.fascicle <> '00000000-0000-0000-0000-000000000000' ";
+        $sql_filters .= " AND dcm.fascicle <> '99999999-9999-9999-9999-999999999999' ";
+        $sql_filters .= " AND dcm.fascicle <> '00000000-0000-0000-0000-000000000000' ";
     }
 
     if ($mode eq "briefcase") {
-        $sql_filters .= " AND t1.fascicle = '00000000-0000-0000-0000-000000000000' ";
+        $sql_filters .= " AND dcm.fascicle = '00000000-0000-0000-0000-000000000000' ";
     }
 
     if ($mode eq "recycle") {
-        $sql_filters .= " AND t1.fascicle = '99999999-9999-9999-9999-999999999999' ";
+        $sql_filters .= " AND dcm.fascicle = '99999999-9999-9999-9999-999999999999' ";
     }
 
     # Set Filters
 
     if ($title) {
-        $sql_filters .= " AND t1.title LIKE ? ";
+        $sql_filters .= " AND dcm.title LIKE ? ";
         push @params, "%$title%";
     }
 
     if ($edition && $edition ne "all") {
-        $sql_filters .= " AND ? = ANY(t1.ineditions) ";
+        $sql_filters .= " AND ? = ANY(dcm.ineditions) ";
         push @params, $edition;
     }
 
     if ($group && $group ne "all") {
-        $sql_filters .= " AND ? = ANY(t1.inworkgroups) ";
+        $sql_filters .= " AND ? = ANY(dcm.inworkgroups) ";
         push @params, $group;
     }
 
     if ($fascicle && $fascicle ne "all") {
-        $sql_filters .= " AND t1.fascicle = ? ";
+        $sql_filters .= " AND dcm.fascicle = ? ";
         push @params, $fascicle;
     }
 
