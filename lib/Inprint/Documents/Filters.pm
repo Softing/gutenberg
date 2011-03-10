@@ -275,7 +275,7 @@ sub createSqlFilter {
     my $c       = shift;
     my $filters = shift;
 
-    my $sql;
+    my $sql_filters;
     my @params;
 
     my $mode     = $c->param("gridmode")     || "all";
@@ -289,83 +289,84 @@ sub createSqlFilter {
 
     my $current_member = $c->QuerySessionGet("member.id");
 
-    $sql .= " AND ( ";
-    my $editions = $c->access->GetChildrens("editions.documents.work");
-    my $departments = $c->access->GetChildrens("catalog.documents.view:*");
+    # Set view restrictions
+    my $editions = $c->access->GetBindings("editions.documents.work");
+    my $departments = $c->access->GetBindings("catalog.documents.view:*");
 
-    $sql .= " ( ";
-    $sql .= "    t1.edition = ANY(?) ";
-    $sql .= "    AND t1.workgroup = ANY(?) ";
-    $sql .= " ) ";
+    $sql_filters .= " AND ( ";
+
+    $sql_filters .= " ( ";
+    $sql_filters .= "    dcm.edition = ANY(?) ";
+    $sql_filters .= "    AND ";
+    $sql_filters .= "    dcm.workgroup = ANY(?) ";
+    $sql_filters .= " ) ";
     push @params, $editions;
     push @params, $departments;
-    $sql .= " OR manager=? ";
-    push @params, $current_member;
-    $sql .= " ) ";
+
+    $sql_filters .= " ) ";
+
+    # Set Filters
 
     if ($mode eq "todo") {
+        # get documents fpor departments
         my @holders;
-        $sql .= " AND t1.holder = ANY(?) ";
-
-        my $departments = $c->sql->Q(" SELECT catalog FROM map_member_to_catalog WHERE member =? ", [ $current_member ])->Values;
-
+        $sql_filters .= " AND dcm.holder = ANY(?) ";
+        my $departments = $c->sql->Q(" SELECT catalog FROM map_member_to_catalog WHERE member=? ", [ $current_member ])->Values;
         foreach (@$departments) {
             push @holders, $_;
         }
-
         push @holders, $current_member;
         push @params, \@holders;
 
-        $sql .= " AND t1.isopen = true ";
-        $sql .= " AND t1.fascicle <> '99999999-9999-9999-9999-999999999999' ";
+        $sql_filters .= " AND fsc.enabled = true ";
+        $sql_filters .= " AND dcm.fascicle <> '99999999-9999-9999-9999-999999999999' ";
     }
 
     if ($mode eq "all") {
-        $sql .= " AND t1.isopen is true ";
-        $sql .= " AND t1.fascicle <> '99999999-9999-9999-9999-999999999999' ";
+        $sql_filters .= " AND fsc.enabled = true ";
+        $sql_filters .= " AND dcm.fascicle <> '99999999-9999-9999-9999-999999999999' ";
         if ($fascicle && $fascicle ne "all" && $fascicle ne '00000000-0000-0000-0000-000000000000') {
-            $sql .= " AND fascicle <> '00000000-0000-0000-0000-000000000000' ";
+            $sql_filters .= " AND dcm.fascicle <> '00000000-0000-0000-0000-000000000000' ";
         }
     }
 
     if ($mode eq "archive") {
-        $sql .= " AND t1.isopen = false ";
-        $sql .= " AND t1.fascicle <> '99999999-9999-9999-9999-999999999999' ";
-        $sql .= " AND t1.fascicle <> '00000000-0000-0000-0000-000000000000' ";
+        $sql_filters .= " AND fsc.enabled  <> true ";
+        $sql_filters .= " AND dcm.fascicle <> '99999999-9999-9999-9999-999999999999' ";
+        $sql_filters .= " AND dcm.fascicle <> '00000000-0000-0000-0000-000000000000' ";
     }
 
     if ($mode eq "briefcase") {
-        $sql .= " AND t1.fascicle = '00000000-0000-0000-0000-000000000000' ";
+        $sql_filters .= " AND dcm.fascicle = '00000000-0000-0000-0000-000000000000' ";
     }
 
     if ($mode eq "recycle") {
-        $sql .= " AND t1.fascicle = '99999999-9999-9999-9999-999999999999' ";
+        $sql_filters .= " AND dcm.fascicle = '99999999-9999-9999-9999-999999999999' ";
     }
 
-
-    # Filters
+    # Set Filters
 
     if ($title) {
-        $sql .= " AND t1.title LIKE ? ";
+        $sql_filters .= " AND dcm.title LIKE ? ";
         push @params, "%$title%";
     }
 
     if ($edition && $edition ne "all") {
-        $sql .= " AND ? = ANY(t1.ineditions) ";
+        $sql_filters .= " AND ? = ANY(dcm.ineditions) ";
         push @params, $edition;
     }
 
     if ($group && $group ne "all") {
-        $sql .= " AND ? = ANY(t1.inworkgroups) ";
+        $sql_filters .= " AND ? = ANY(dcm.inworkgroups) ";
         push @params, $group;
     }
 
     if ($fascicle && $fascicle ne "all") {
-        $sql .= " AND t1.fascicle = ? ";
+        $sql_filters .= " AND dcm.fascicle = ? ";
         push @params, $fascicle;
     }
 
-    return { sql => $sql, params => \@params };
+    return { sql => $sql_filters, params => \@params };
 }
 
 1;

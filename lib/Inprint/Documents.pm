@@ -186,12 +186,7 @@ sub list {
 
     my $sql_filters = " ";
 
-    # Set Restrictions
-    #my $editions = $c->access->GetChildrens("editions.documents.work");
-    #my $departments = $c->access->GetChildrens("catalog.documents.view:*");
-
     # Set view restrictions
-
     my $editions = $c->access->GetBindings("editions.documents.work");
     my $departments = $c->access->GetBindings("catalog.documents.view:*");
 
@@ -206,17 +201,6 @@ sub list {
     push @params, $departments;
 
     $sql_filters .= " ) ";
-
-    # Set holder restrictions
-#    if ($mode eq "todo") {
-#        $sql_filters .= " AND ( ";
-#        $sql_filters .= "   dcm.manager=? ";
-#        $sql_filters .= "   OR ";
-#        $sql_filters .= "   dcm.holder=? ";
-#        $sql_filters .= " ) ";
-#        push @params, $current_member;
-#        push @params, $current_member;
-#    }
 
     # Set Filters
 
