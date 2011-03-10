@@ -94,20 +94,6 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                 cacheQuery: false,
                 listeners: {
                     scope: this,
-                    render: function(combo) {
-                        //this.getForm().findField("edition").on("select", function() {
-                        //    combo.disable();
-                        //    combo.reset();
-                        //}, this);
-                        //this.getForm().findField("fascicle").on("select", function() {
-                        //    combo.disable();
-                        //    combo.reset();
-                        //}, this);
-                        //this.getForm().findField("headline").on("select", function() {
-                        //    combo.enable();
-                        //    combo.reset();
-                        //}, this);
-                    },
                     beforequery: function(qe) {
                         qe.combo.getStore().baseParams = this.getFilterParams();
                         delete qe.combo.lastQuery;
