@@ -9,6 +9,7 @@ use strict;
 use warnings;
 
 use Inprint::Models::Headline;
+use Inprint::Check;
 
 use base 'Inprint::BaseController';
 
@@ -108,17 +109,10 @@ sub create {
     my @errors;
     my $success = $c->json->false;
 
-    push @errors, { id => "edition", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_edition));
-
-    push @errors, { id => "title", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_title));
-
-    push @errors, { id => "description", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_description));
-
-    push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.index.manage"));
+    Inprint::Check::uuid($c, \@errors, "edition", $i_edition);
+    Inprint::Check::text($c, \@errors, "title", $i_title);
+    Inprint::Check::text($c, \@errors, "description", $i_description);
+    Inprint::Check::access($c, \@errors, "domain.index.manage");
 
     my $edition = $c->sql->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
     push @errors, { id => "edition", msg => "Incorrectly filled field"}
@@ -143,17 +137,10 @@ sub update {
     my @errors;
     my $success = $c->json->false;
 
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_id));
-
-    push @errors, { id => "title", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_title));
-
-    push @errors, { id => "description", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_description));
-
-    push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.index.manage"));
+    Inprint::Check::uuid($c, \@errors, "id", $i_id);
+    Inprint::Check::text($c, \@errors, "title", $i_title);
+    Inprint::Check::text($c, \@errors, "description", $i_description);
+    Inprint::Check::access($c, \@errors, "domain.index.manage");
 
     my $headline = Inprint::Models::Headline::read($c, $i_id);
     push @errors, { id => "id", msg => "Incorrectly filled field"}

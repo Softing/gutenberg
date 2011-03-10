@@ -59,8 +59,8 @@ sub update {
     my $tag = Inprint::Models::Tag::getByTitle($c, $title, $description);
 
     if ($tag->{id}) {
-        $c->sql->Do(" UPDATE fascicles_indx_rubrics SET title=?, description=? WHERE id=? ",
-            [ $tag->{title}, $tag->{description} || "", $id ]);
+        $c->sql->Do(" UPDATE fascicles_indx_rubrics SET id=?, title=?, description=? WHERE id=? ",
+            [ $tag->{id}, $tag->{title}, $tag->{description} || "", $id ]);
         if ($bydefault eq "on") {
             $c->sql->Do("
                 UPDATE fascicles_indx_rubrics SET bydefault=false WHERE fascicle=? AND headline=?;

@@ -96,8 +96,8 @@ sub update {
 
     # Do query
 
-    $c->sql->Do(" UPDATE indx_rubrics SET title=?, description=? WHERE id=? ",
-        [ $tag->{title}, $tag->{description} || "", $rubric->{id} ]);
+    $c->sql->Do(" UPDATE indx_rubrics SET tag=?, title=?, description=? WHERE id=? ",
+        [ $tag->{id}, $tag->{title}, $tag->{description} || "", $rubric->{id} ]);
 
     if ($bydefault eq "on") {
         $c->sql->Do("

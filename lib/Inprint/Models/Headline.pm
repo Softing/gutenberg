@@ -74,8 +74,8 @@ sub update {
 
     # Do query
 
-    $c->sql->Do(" UPDATE indx_headlines SET title=?, description=? WHERE id=? ",
-        [ $tag->{title}, $tag->{description} || "", $id ]);
+    $c->sql->Do(" UPDATE indx_headlines SET tag=?, title=?, description=? WHERE id=? ",
+        [ $tag->{id}, $tag->{title}, $tag->{description} || "", $id ]);
 
     if ($bydefault eq "on") {
         $c->sql->Do("
