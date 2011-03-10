@@ -296,9 +296,9 @@ sub createSqlFilter {
     $sql_filters .= " AND ( ";
 
     $sql_filters .= " ( ";
-    $sql_filters .= "    dcm.edition = ANY(?) ";
+    $sql_filters .= "    t1.edition = ANY(?) ";
     $sql_filters .= "    AND ";
-    $sql_filters .= "    dcm.workgroup = ANY(?) ";
+    $sql_filters .= "    t1.workgroup = ANY(?) ";
     $sql_filters .= " ) ";
     push @params, $editions;
     push @params, $departments;
@@ -310,7 +310,7 @@ sub createSqlFilter {
     if ($mode eq "todo") {
         # get documents fpor departments
         my @holders;
-        $sql_filters .= " AND dcm.holder = ANY(?) ";
+        $sql_filters .= " AND t1.holder = ANY(?) ";
         my $departments = $c->sql->Q(" SELECT catalog FROM map_member_to_catalog WHERE member=? ", [ $current_member ])->Values;
         foreach (@$departments) {
             push @holders, $_;
@@ -319,50 +319,50 @@ sub createSqlFilter {
         push @params, \@holders;
 
         $sql_filters .= " AND fsc.enabled = true ";
-        $sql_filters .= " AND dcm.fascicle <> '99999999-9999-9999-9999-999999999999' ";
+        $sql_filters .= " AND t1.fascicle <> '99999999-9999-9999-9999-999999999999' ";
     }
 
     if ($mode eq "all") {
         $sql_filters .= " AND fsc.enabled = true ";
-        $sql_filters .= " AND dcm.fascicle <> '99999999-9999-9999-9999-999999999999' ";
+        $sql_filters .= " AND t1.fascicle <> '99999999-9999-9999-9999-999999999999' ";
         if ($fascicle && $fascicle ne "all" && $fascicle ne '00000000-0000-0000-0000-000000000000') {
-            $sql_filters .= " AND dcm.fascicle <> '00000000-0000-0000-0000-000000000000' ";
+            $sql_filters .= " AND t1.fascicle <> '00000000-0000-0000-0000-000000000000' ";
         }
     }
 
     if ($mode eq "archive") {
         $sql_filters .= " AND fsc.enabled  <> true ";
-        $sql_filters .= " AND dcm.fascicle <> '99999999-9999-9999-9999-999999999999' ";
-        $sql_filters .= " AND dcm.fascicle <> '00000000-0000-0000-0000-000000000000' ";
+        $sql_filters .= " AND t1.fascicle <> '99999999-9999-9999-9999-999999999999' ";
+        $sql_filters .= " AND t1.fascicle <> '00000000-0000-0000-0000-000000000000' ";
     }
 
     if ($mode eq "briefcase") {
-        $sql_filters .= " AND dcm.fascicle = '00000000-0000-0000-0000-000000000000' ";
+        $sql_filters .= " AND t1.fascicle = '00000000-0000-0000-0000-000000000000' ";
     }
 
     if ($mode eq "recycle") {
-        $sql_filters .= " AND dcm.fascicle = '99999999-9999-9999-9999-999999999999' ";
+        $sql_filters .= " AND t1.fascicle = '99999999-9999-9999-9999-999999999999' ";
     }
 
     # Set Filters
 
     if ($title) {
-        $sql_filters .= " AND dcm.title LIKE ? ";
+        $sql_filters .= " AND t1.title LIKE ? ";
         push @params, "%$title%";
     }
 
     if ($edition && $edition ne "all") {
-        $sql_filters .= " AND ? = ANY(dcm.ineditions) ";
+        $sql_filters .= " AND ? = ANY(t1.ineditions) ";
         push @params, $edition;
     }
 
     if ($group && $group ne "all") {
-        $sql_filters .= " AND ? = ANY(dcm.inworkgroups) ";
+        $sql_filters .= " AND ? = ANY(t1.inworkgroups) ";
         push @params, $group;
     }
 
     if ($fascicle && $fascicle ne "all") {
-        $sql_filters .= " AND dcm.fascicle = ? ";
+        $sql_filters .= " AND t1.fascicle = ? ";
         push @params, $fascicle;
     }
 
