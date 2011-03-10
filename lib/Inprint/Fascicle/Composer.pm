@@ -106,14 +106,15 @@ sub templates {
 
             push @queries, "
                 SELECT
-                    t1.id, t1.origin, t1.fascicle, t1.page, t1.title, t1.description,
+                    t2.id as id,
+                    t1.origin, t1.fascicle, t1.page, t1.title, t1.description,
                     t1.amount, round(t1.area::numeric, 2) as area, t1.x, t1.y, t1.w, t1.h,
-                    t2.id as mapping,
                     t3.id as place, t3.title as place_title,
                     t1.created, t1.updated
                 FROM fascicles_tmpl_modules t1, fascicles_tmpl_index t2, fascicles_tmpl_places t3
                 WHERE
-                    t1.page=? AND t1.amount=?
+                    t1.page=?
+                    AND t1.amount=?
                     AND t2.entity = t1.id AND t2.place = t3.id
                 ";
             push @params, $tmpl_id;
@@ -179,8 +180,6 @@ sub modules {
     unless (@errors) {
 
         $result = $c->sql->Q(" $sql ", \@params)->Hashes;
-
-        #die $result;
 
         foreach my $node (@{ $result }) {
 

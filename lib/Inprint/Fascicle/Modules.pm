@@ -125,8 +125,8 @@ sub create {
     my $id = $c->uuid();
 
     my $i_fascicle    = $c->param("fascicle");
-    my @i_mapping     = $c->param("mapping");
-    my @i_pages       = $c->param("page");
+    my @i_mapping     = $c->param("templates");
+    my @i_pages       = $c->param("pages");
 
     my @errors;
     my $success = $c->json->false;

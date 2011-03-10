@@ -37,8 +37,8 @@ Inprint.cmp.composer.Interaction = function(parent, panels) {
             scope:this,
             params: {
                 fascicle: parent.fascicle,
-                page: parent.selection,
-                mapping: mapping
+                pages: parent.selection,
+                templates: mapping
             },
             success: function() {
                 flash.cmpInit();

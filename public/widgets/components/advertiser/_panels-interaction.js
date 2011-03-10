@@ -43,8 +43,8 @@ Inprint.cmp.Adverta.Interaction = function(parent, panels) {
                 scope:this,
                 params: {
                     fascicle: parent.fascicle,
-                    page: parent.selection,
-                    module: templates
+                    pages: parent.selection,
+                    templates: templates
                 },
                 success: function() {
                     flash.cmpInit();
@@ -53,34 +53,6 @@ Inprint.cmp.Adverta.Interaction = function(parent, panels) {
             });
 
         }, gridModules);
-
-        //gridModules.on("afterrender", function() {
-        //
-        //    Ext.dd.DropTarget(modules.getEl(), {
-        //        ddGroup    : 'principals-selector',
-        //        notifyDrop : function(ddSource, e, data){
-        //            var ids = [];
-        //            Ext.each(ddSource.dragData.selections, function(r) {
-        //                ids.push(r.data.id);
-        //            });
-        //            Ext.Ajax.request({
-        //                url: _url("/fascicle/modules/create/"),
-        //                scope:this,
-        //                success: function() {
-        //                    flash.cmpInit();
-        //                    gridModules.cmpReload();
-        //                },
-        //                params: {
-        //                    fascicle: parent.fascicle,
-        //                    page: parent.selection,
-        //                    module: ids
-        //                }
-        //            });
-        //            return true;
-        //        }
-        //    });
-        //
-        //}, gridModules);
 
     }
 

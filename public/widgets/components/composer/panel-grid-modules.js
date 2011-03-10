@@ -56,7 +56,7 @@ Inprint.cmp.composer.Modules = Ext.extend(Ext.ux.tree.TreeGrid, {
 
                     var mapping = [];
                     Ext.each(source.dragData.selections, function(r) {
-                        mapping.push(r.data.mapping);
+                        mapping.push(r.data.id);
                     });
 
                     this.tree.fireEvent("templateDroped", mapping);
