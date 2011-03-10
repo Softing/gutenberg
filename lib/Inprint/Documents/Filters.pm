@@ -85,11 +85,8 @@ sub headlines {
     my $sql = "
         SELECT DISTINCT dcm.headline_shortcut as id, dcm.headline_shortcut as title
         FROM documents dcm, fascicles fsc
-        WHERE fsc.id = dcm.fascicle AND dcm.edition=ANY(?) AND dcm.headline_shortcut is not null
+        WHERE fsc.id = dcm.fascicle AND dcm.headline_shortcut is not null
     ";
-
-    my $editions = $c->access->GetChildrens("editions.documents.work");
-    push @params, $editions;
 
     if ($cgi_edition && $cgi_edition ne "all") {
         my $editions = $c->sql->Q(" SELECT id FROM editions WHERE path <@ ( SELECT path FROM editions WHERE id=?)", [ $cgi_edition ])->Values;
@@ -133,11 +130,8 @@ sub rubrics {
     my $sql = "
         SELECT DISTINCT dcm.rubric_shortcut as id, dcm.rubric_shortcut as title
         FROM documents dcm, fascicles fsc
-        WHERE fsc.id = dcm.fascicle AND dcm.edition=ANY(?) AND dcm.rubric_shortcut is not null
+        WHERE fsc.id = dcm.fascicle AND dcm.rubric_shortcut is not null
     ";
-
-    my $editions = $c->access->GetChildrens("editions.documents.work");
-    push @params, $editions;
 
     if ($cgi_edition &&  $cgi_edition ne "all") {
         my $editions = $c->sql->Q(" SELECT id FROM editions WHERE path <@ ( SELECT path FROM editions WHERE id=?)", [ $cgi_edition ])->Values;
