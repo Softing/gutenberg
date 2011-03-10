@@ -11,7 +11,8 @@ use warnings;
 
 use Encode;
 use File::Basename;
-use HTTP::Request::Common qw(POST);
+use MIME::Base64;
+use HTTP::Request;
 use LWP::UserAgent;
 use Image::Magick;
 use Digest::file qw(digest_file_hex);
@@ -287,17 +288,6 @@ sub _generatePreviewFile {
 
     if (lc($filextenOriginal) ~~ ['doc', 'docx', 'txt', 'rtf', 'odt', 'xls', 'xlsx', 'odp', 'ods' ]) {
 
-        my $ooHost = $c->config->get("openoffice.host");
-        my $ooPort = $c->config->get("openoffice.port");
-        my $ooTimeout = $c->config->get("openoffice.timeout");
-
-        die "Cant read configuration <openoffice.host>" unless $ooHost;
-        die "Cant read configuration <openoffice.port>" unless $ooPort;
-        die "Cant read configuration <openoffice.timeout>" unless $ooTimeout;
-
-        my $ooUrl = "http://$ooHost:$ooPort/api/converter/";
-        my $ooUagent = LWP::UserAgent->new();
-
         my $pdfPath = "$folderEncoded/.thumbnails/$filenameEncoded.pdf";
 
         if ($^O eq "MSWin32") {
@@ -309,24 +299,11 @@ sub _generatePreviewFile {
             $pdfPath =~ s/\/+/\//g;
         }
 
-        # Create pdf
-        my $ooRequest = POST(
-            $ooUrl, Content_Type => 'form-data',
-            Content => [ outputFormat => "pdf", inputDocument =>  [ $filepathEncoded ] ]
-        );
-
-        my $ooResponse = $ooUagent->request($ooRequest);
-        if ($ooResponse->is_success()) {
-
-            open FILE, "> $pdfPath" or die "Can't open <$pdfPath> : $!";
-            binmode FILE;
-                print FILE $ooResponse->content;
-            close FILE;
-
-        } else {
-            die $ooResponse->as_string;
-        }
-
+        my $response = __convert($c, $filepathEncoded, $extension, "pdf");
+        open my $FILE, ">", $pdfPath || die "Can't open <$pdfPath> : $!";
+        binmode $FILE;
+            print $FILE $response->{responseBody};
+        close $FILE;
 
         # Crete thumbnail
 
@@ -356,6 +333,68 @@ sub _generatePreviewFile {
         }
     }
 
+}
+
+sub __convert {
+
+    my ($c, $filepath, $input, $output) = @_;
+
+    my $ooHost = $c->config->get("openoffice.host");
+    my $ooPort = $c->config->get("openoffice.port");
+    my $ooTimeout = $c->config->get("openoffice.timeout");
+
+    die "Cant read configuration <openoffice.host>" unless $ooHost;
+    die "Cant read configuration <openoffice.port>" unless $ooPort;
+    die "Cant read configuration <openoffice.timeout>" unless $ooTimeout;
+
+    my $ooUrl = "http://$ooHost:$ooPort/api/converter/";
+    my $ooUagent = LWP::UserAgent->new();
+    $ooUagent->timeout( $ooTimeout );
+
+    my $ooRequest = HTTP::Request->new();
+    $ooRequest->method("POST");
+    $ooRequest->uri( $ooUrl );
+
+    $ooRequest->header("InputFormat", $input);
+    $ooRequest->header("OutputFormat", $output);
+    $ooRequest->header("Content-type", "application/octet-stream");
+
+    my $fileContent;
+    open my $INPUT, "<", $filepath || die "Can't open <$filepath> : $!";
+    binmode $INPUT;
+    while ( read($INPUT, my $buf, 60*57)) {
+        $fileContent .= $buf;
+    }
+    close $INPUT;
+
+    $fileContent = encode_base64($fileContent);
+
+    $ooRequest->content( $fileContent );
+
+    my $responseBody;
+    my $ParagraphCount = 0;
+    my $CharacterCount = 0;
+    my $WordCount = 0;
+
+    my $ooResponse = $ooUagent->request($ooRequest);
+    if ($ooResponse->is_success()) {
+
+        $ParagraphCount = $ooResponse->header("Softing-Meta-WordCount");
+        $CharacterCount = $ooResponse->header("Softing-Meta-CharacterCount");
+        $WordCount = $ooResponse->header("Softing-Meta-WordCount");
+
+        $responseBody = MIME::Base64::decode($ooResponse->content);
+
+    } else {
+        die $ooResponse->as_string;
+    }
+
+    return {
+        responseBody => $responseBody,
+        ParagraphCount => $ParagraphCount,
+        CharacterCount => $CharacterCount,
+        WordCount => $WordCount
+    }
 }
 
 1;

@@ -265,7 +265,7 @@ sub convert {
     die "Cant read configuration <openoffice.port>" unless $ooPort;
     die "Cant read configuration <openoffice.timeout>" unless $ooTimeout;
 
-    my $ooUrl = "http://$ooHost:$ooPort/api/converter2/";
+    my $ooUrl = "http://$ooHost:$ooPort/api/converter/";
     my $ooUagent = LWP::UserAgent->new();
     $ooUagent->timeout( $ooTimeout );
 
