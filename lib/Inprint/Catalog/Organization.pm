@@ -149,6 +149,8 @@ sub update {
         unless (@errors) {
             $c->sql->Do(" UPDATE catalog SET title=?, shortcut=?, description=?, path=replace(?, '-',  '')::ltree WHERE id=? ",
                 [ $i_title, $i_shortcut, $i_description, $parent->{path} . ".$i_id", $i_id ]);
+            $c->sql->Do(" UPDATE documents SET inworkgroups=?, workgroup=?, workgroup_shortcut=? WHERE workgroup=? ",
+                [ [$i_id], $i_id, $i_shortcut, $i_id ]);
         }
     }
 
@@ -166,11 +168,16 @@ sub delete {
     Inprint::Check::uuid($c, \@errors, "id", $i_id);
     Inprint::Check::access($c, \@errors, "domain.departments.manage");
 
+    my $null = "00000000-0000-0000-0000-000000000000";
+
     push @errors, { id => "id", msg => "Incorrectly filled field"}
-        if ($i_id eq "00000000-0000-0000-0000-000000000000");
+        if ($i_id eq $null);
 
     unless (@errors) {
-        $c->sql->Do(" DELETE FROM catalog WHERE id =? ", [ $i_id ]);
+        $c->sql->Do(" DELETE FROM catalog WHERE id =? ",
+            [ $i_id ]);
+        $c->sql->Do(" UPDATE documents SET inworkgroups=?, workgroup=?, workgroup_shortcut=? WHERE workgroup=? ",
+            [ [$null], $null, $c->l("Editorial house"), $i_id ]);
     }
 
     $success = $c->json->true unless (@errors);
