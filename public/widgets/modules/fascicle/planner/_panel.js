@@ -271,7 +271,7 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
 
                 Inprint.fascicle.planner.Access(this, this.panels, rsp.fascicle.access);
 
-                this.cmpCheckSession.defer( 50000, this);
+                this.cmpCheckSession.defer( 3000, this);
             }
         });
     },
@@ -295,7 +295,7 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                 if (this.manager && this.manager != rsp.fascicle.manager) {
                     Ext.MessageBox.alert(_("Error"), _("Another employee %1 captured this issue!", [1]));
                 } else {
-                    this.cmpCheckSession.defer( 50000, this);
+                    this.cmpCheckSession.defer( 3000, this);
                 }
             }
         });

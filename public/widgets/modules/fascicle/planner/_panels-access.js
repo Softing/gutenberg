@@ -12,14 +12,6 @@ Inprint.fascicle.planner.Access = function(parent, panels, access) {
     _disable(parent.btnCaptureSession, parent.btnBeginSession,
         parent.btnEndSession, parent.btnSave);
 
-    _disable(requests.btnCreate, requests.btnUpdate, requests.btnMove,
-        requests.btnDelete);
-
-    _disable(documents.btnUpdate, documents.btnCapture, documents.btnTransfer,
-        documents.btnMove, documents.btnBriefcase, documents.btnCopy,
-        documents.btnDuplicate, documents.btnRecycle, documents.btnRestore,
-        documents.btnDelete);
-
     if (access.open) {
         parent.btnBeginSession.show();
         parent.btnBeginSession.enable();
@@ -46,6 +38,16 @@ Inprint.fascicle.planner.Access = function(parent, panels, access) {
         documents.btnCreate.enable();
         documents.btnFromBriefcase.enable();
         requests.btnCreate.enable();
+    } else {
+
+        _disable(documents.btnUpdate, documents.btnCapture, documents.btnTransfer,
+        documents.btnMove, documents.btnBriefcase, documents.btnCopy,
+        documents.btnDuplicate, documents.btnRecycle, documents.btnRestore,
+        documents.btnDelete);
+
+        _disable(requests.btnCreate, requests.btnUpdate, requests.btnMove,
+        requests.btnDelete);
+
     }
 
 };
