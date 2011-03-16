@@ -227,11 +227,11 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
         Inprint.fascicle.planner.Context(this, this.panels);
         Inprint.fascicle.planner.Interaction(this, this.panels);
 
-        this.cmpInitSession();
+        this.cmpInitSession(true);
 
     },
 
-    cmpInitSession: function () {
+    cmpInitSession: function (check) {
 
         this.body.mask("Обновление данных...");
 
@@ -271,13 +271,15 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
 
                 Inprint.fascicle.planner.Access(this, this.panels, rsp.fascicle.access);
 
-                this.cmpCheckSession.defer( 3000, this);
+                if(check) {
+                    this.cmpCheckSession.defer( 3000, this);
+                }
             }
         });
     },
 
     cmpReload: function() {
-        this.cmpInitSession();
+        this.cmpInitSession(false);
     },
 
     cmpCheckSession: function () {

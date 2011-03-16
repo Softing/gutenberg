@@ -272,16 +272,16 @@ sub update {
     my $i_description = $c->param("description");
 
     my $i_advertiser  = $c->param("advertiser") || undef;
-    my $i_manager     = $c->param("manager") || undef;
+    my $i_manager     = $c->param("manager")    || undef;
 
-    my $i_fascicle    = $c->param("fascicle") || undef;
-    my $i_place       = $c->param("place") || undef;
-    my $i_module      = $c->param("module") || undef;
+    my $i_fascicle    = $c->param("fascicle")   || undef;
+    my $i_module      = $c->param("module")     || undef;
 
-    my $i_status       = $c->param("status") || undef;
-    my $i_squib        = $c->param("squib") || undef;
-    my $i_payment      = $c->param("payment") || undef;
-    my $i_approved    = $c->param("approved") || undef;
+    my $i_status      = $c->param("status")     || undef;
+    my $i_squib       = $c->param("squib")      || undef;
+
+    my $i_payment     = $c->param("payment")   eq "on" ? "yes" : "no";
+    my $i_approved    = $c->param("approved")  eq "on" ? "yes" : "no";
 
     my @errors;
     my $success = $c->json->false;
@@ -292,22 +292,22 @@ sub update {
 
     Inprint::Check::access($c, \@errors, "domain.roles.manage");
 
+    #my $module = $c->sql->Q(" SELECT * FROM fascile_modules WHERE id=? ", [ $i_module ])->Hash;
+    #my $place  = $c->sql->Q(" SELECT * FROM fascile_tmpl_places WHERE id=? ", [ $module->{place} ])->Hash;
+
     unless (@errors) {
         $c->sql->Do("
             UPDATE fascicles_requests SET
+                advertiser=?,
+                status=?, squib=?, payment=?, readiness=?,
                 shortcut=?, description=?,
-                advertiser=?, manager=?,
-                fascicle=?, place=?, module=?,
-                status=?, squib=?, payment=?, readiness=?, updated=now()
+                updated=now()
             WHERE id=?;
 
         ", [
-            $i_shortcut, $i_description,
-
-            $i_advertiser, $i_manager,
-            $i_fascicle, $i_place, $i_module,
+            $i_advertiser,
             $i_status, $i_squib, $i_payment, $i_approved,
-
+            $i_shortcut, $i_description,
             $i_id
         ]);
     }
