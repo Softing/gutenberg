@@ -12,7 +12,12 @@ Inprint.fascicle.planner.Requests = Ext.extend(Ext.grid.GridPanel, {
             "move":   _url("/fascicle/requests/move/")
         };
 
-        this.store = Inprint.factory.Store.json("/fascicle/requests/list/");
+        this.store = Inprint.factory.Store.json("/fascicle/requests/list/", {
+            remoteSort:true,
+            baseParams: {
+                flt_fascicle: this.oid
+            }
+        });
 
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
 

@@ -314,7 +314,7 @@ sub search {
     }
 
     # Select rows with pagination
-    if ($limit > 0 && $start >= 0) {
+    if ($paginate eq "yes" && $limit > 0 && $start >= 0) {
         $sql_query .= " LIMIT ? OFFSET ? ";
         push @params, $limit;
         push @params, $start;

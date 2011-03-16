@@ -156,7 +156,6 @@ Inprint.fascicle.planner.Documents = Ext.extend(Ext.grid.EditorGridPanel, {
             border:false,
             stripeRows: true,
             columnLines: true,
-            autoExpandColumn: "title",
             sm: this.sm,
             tbar: this.tbar,
             columns: this.columns

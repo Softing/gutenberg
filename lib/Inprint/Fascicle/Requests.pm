@@ -10,6 +10,7 @@ use strict;
 use warnings;
 
 use Inprint::Check;
+use Inprint::Models::Fascicle::Request;
 
 use base 'Inprint::BaseController';
 
@@ -53,55 +54,23 @@ sub read {
 sub list {
     my $c = shift;
 
-    my $i_id    = $c->param("id");
-    my $i_type  = $c->param("type");
-
-    my $result = [];
-
+    my $result;
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "id", $i_id);
+    my $filter = {
+        flt_fascicle => $c->param("flt_fascicle")
+    };
 
-    my @data;
-    my $sql = "
-        SELECT
-            t1.id, t1.serialnum, t1.title, t1.shortcut, t1.status, t1.payment, t1.readiness, t1.created, t1.updated,
-            edition.id as edition, edition.shortcut as edition_shortcut,
-            fascicle.id as fascicle, fascicle.shortcut as fascicle_shortcut,
-            advertiser.id as advertiser, advertiser.shortcut as advertiser_shortcut,
-            place.id as place, place.shortcut as place_shortcut,
-            manager.id as manager, manager.shortcut as manager_shortcut,
-            hole.x, hole.y, hole.h, hole.w,
-            page.seqnum
+    my $sorting = {
+        dir => $c->param("dir"),
+        column => $c->param("sort")
+    };
 
-        FROM ad_requests AS t1
-
-            LEFT JOIN ad_places             AS place        ON place.id = t1.place
-            LEFT JOIN profiles              AS manager      ON manager.id = t1.manager
-            LEFT JOIN fascicles_map_holes   AS hole         ON hole.entity = t1.id
-            LEFT JOIN ad_modules            AS module       ON module.id = hole.module
-            LEFT JOIN fascicles_pages       AS page         ON page.id = hole.page
-
-        , editions AS edition, fascicles AS fascicle, ad_advertisers AS advertiser
-
-        WHERE edition.id = t1.edition AND fascicle.id = t1.fascicle AND fascicle.is_enabled=true AND advertiser.id = t1.advertiser
-            AND 1=1
-    ";
-
-    if ($i_type eq "edition") {
-        $sql .= " AND edition.id = ? ";
-        push @data, $i_id;
-    }
-
-    if ($i_type eq "fascicle") {
-        $sql .= " AND fascicle.id = ? AND fascicle.is_enabled=true";
-        push @data, $i_id;
-    }
+    Inprint::Check::uuid($c, \@errors, "id", $filter->{flt_fascicle});
 
     unless (@errors) {
-        $result = $c->sql->Q(" $sql ", \@data)->Hashes;
-        $c->render_json( { data => $result } );
+        $result = Inprint::Models::Fascicle::Request::search($c, $filter, $sorting);
     }
 
     $success = $c->json->true unless (@errors);
@@ -320,7 +289,7 @@ sub update {
     Inprint::Check::uuid($c, \@errors, "id", $i_id);
     Inprint::Check::text($c, \@errors, "shortcut", $i_shortcut);
     Inprint::Check::text($c, \@errors, "description", $i_description);
-    
+
     Inprint::Check::access($c, \@errors, "domain.roles.manage");
 
     unless (@errors) {

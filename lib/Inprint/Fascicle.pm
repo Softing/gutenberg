@@ -11,6 +11,7 @@ use warnings;
 use Inprint::Utils::Pages;
 
 use Inprint::Models::Documents;
+use Inprint::Models::Fascicle::Request;
 
 use base 'Inprint::BaseController';
 
@@ -520,26 +521,11 @@ sub getRequests {
 
     return unless $fascicle;
 
-    my @params;
+    my $filter = {
+        flt_fascicle => $fascicle
+    };
 
-    # Query headers
-    my $sql_query = "
-        SELECT
-            t1.id, t1.serialnum, t1.edition, t1.fascicle, t1.advertiser, t1.advertiser_shortcut,
-            t1.place, t1.place_shortcut, t1.manager, t1.manager_shortcut,
-            t1.origin, t1.origin_shortcut, t1.origin_area,
-            t1.origin_x, t1.origin_y, t1.origin_w, t1.origin_h,
-            t2.id as module, t2.title as module_title, pages, firstpage,
-            t1.amount, t1.shortcut, t1.description, t1.status, t1.payment, t1.readiness,
-            to_char(t1.created, 'YYYY-MM-DD HH24:MI:SS') as created,
-            to_char(t1.updated, 'YYYY-MM-DD HH24:MI:SS') as updated
-        FROM fascicles_requests t1 LEFT JOIN fascicles_modules t2 ON t1.module = t2.id
-        WHERE t1.fascicle=?
-    ";
-
-    push @params, $fascicle;
-
-    my $result = $c->sql->Q($sql_query, \@params)->Hashes;
+    my $result = Inprint::Models::Fascicle::Request::search($c, $filter);
 
     return $result;
 }
