@@ -174,6 +174,11 @@ sub draw_module {
         $fontheight = 5;
     }
 
+    if ($^O eq "darwin") {
+        $font = '/System/Library/Fonts/Menlo.ttc';
+        $fontsize = 8;
+    }
+
     if ($^O eq "linux") {
         $font = '/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf';
         $fontsize = 8;
