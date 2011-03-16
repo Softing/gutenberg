@@ -24,6 +24,11 @@ sub makePath {
         $path =~ s/\\+/\\/g;
     }
 
+    if ($^O eq "darwin") {
+        $path =~ s/\\/\//g;
+        $path =~ s/\/+/\//g;
+    }
+
     if ($^O eq "linux") {
         $path =~ s/\\/\//g;
         $path =~ s/\/+/\//g;
@@ -40,6 +45,10 @@ sub doEncode{
         $path = Encode::encode("cp1251", $path);
     }
 
+    if ($^O eq "darwin") {
+        $path = Encode::encode("utf8", $path);
+    }
+
     if ($^O eq "linux") {
         #$path = Encode::encode("utf8", $path);
     }
@@ -54,6 +63,10 @@ sub doDecode {
 
     if ($^O eq "MSWin32") {
         $path = Encode::decode("cp1251", $path);
+    }
+
+    if ($^O eq "darwin") {
+        $path = Encode::decode("utf8", $path);
     }
 
     if ($^O eq "linux") {
