@@ -86,35 +86,35 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                 ref: "../btnUpload",
                 scope:this,
                 handler: this.cmpUpload
-            },
-            "->",
-            {
-                icon: _ico("arrow-270-medium"),
-                cls: "x-btn-text-icon",
-                text: _("Download zip"),
-                scope:this,
-                handler: function() {
-                    window.location = "/documents/"+ this.oid +"/zip/all/?rnd="+ Math.random();
-                }
-            },
-            {
-                icon: _ico("arrow-270-medium"),
-                cls: "x-btn-text-icon",
-                text: _("Download documents"),
-                scope:this,
-                handler: function() {
-                    window.location = "/documents/"+ this.oid +"/zip/txt/?rnd="+ Math.random();
-                }
-            },
-            {
-                icon: _ico("arrow-270-medium"),
-                cls: "x-btn-text-icon",
-                text: _("Download images"),
-                scope:this,
-                handler: function() {
-                    window.location = "/documents/"+ this.oid +"/zip/img/?rnd="+ Math.random();
-                }
             }
+            //"->",
+            //{
+            //    icon: _ico("arrow-270-medium"),
+            //    cls: "x-btn-text-icon",
+            //    text: _("Download zip"),
+            //    scope:this,
+            //    handler: function() {
+            //        window.location = "/documents/"+ this.oid +"/zip/all/?rnd="+ Math.random();
+            //    }
+            //},
+            //{
+            //    icon: _ico("arrow-270-medium"),
+            //    cls: "x-btn-text-icon",
+            //    text: _("Download documents"),
+            //    scope:this,
+            //    handler: function() {
+            //        window.location = "/documents/"+ this.oid +"/zip/txt/?rnd="+ Math.random();
+            //    }
+            //},
+            //{
+            //    icon: _ico("arrow-270-medium"),
+            //    cls: "x-btn-text-icon",
+            //    text: _("Download images"),
+            //    scope:this,
+            //    handler: function() {
+            //        window.location = "/documents/"+ this.oid +"/zip/img/?rnd="+ Math.random();
+            //    }
+            //}
         ];
 
         Ext.apply(this, {
@@ -134,20 +134,18 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
         Inprint.documents.Profile.Files.superclass.onRender.apply(this, arguments);
 
         this.on("rowdblclick", function(thisGrid, rowIndex, evtObj) {
-
             evtObj.stopEvent();
-
             var record = thisGrid.getStore().getAt(rowIndex);
-
             if(record.get("name").match(/^.+\.(doc|docx|odt|rtf|txt)$/i)) {
-                Inprint.ObjectResolver.resolve({
-                    aid: "document-editor",
-                    oid:  record.get("id"),
-                    text: record.get("filename"),
-                    description: _("Text editing")
-                });
+                if (this.access["files.work"]  === true) {
+                    Inprint.ObjectResolver.resolve({
+                        aid: "document-editor",
+                        oid:  record.get("id"),
+                        text: record.get("filename"),
+                        description: _("Text editing")
+                    });
+                }
             }
-
         }, this);
 
         this.on("rowcontextmenu", function(thisGrid, rowIndex, evtObj) {
@@ -161,25 +159,25 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
 
             if ( selCount > 0 ) {
 
-                if ( selCount == 1 ) {
-
-                    if(record.get("name").match(/^.+\.(doc|docx|odt|rtf|txt)$/i)) {
-                        rowCtxMenuItems.push({
-                            icon: _ico("pencil"),
-                            cls: "x-btn-text-icon",
-                            text: _("Edit Text"),
-                            scope:this,
-                            handler : function() {
-                                Inprint.ObjectResolver.resolve({
-                                    aid: "document-editor",
-                                    oid:  record.get("id"),
-                                    text: record.get("filename"),
-                                    description: _("Text editing")
-                                });
-                            }
-                        });
+                if (this.access["files.work"]  === true) {
+                    if ( selCount == 1 ) {
+                        if(record.get("name").match(/^.+\.(doc|docx|odt|rtf|txt)$/i)) {
+                            rowCtxMenuItems.push({
+                                icon: _ico("pencil"),
+                                cls: "x-btn-text-icon",
+                                text: _("Edit Text"),
+                                scope:this,
+                                handler : function() {
+                                    Inprint.ObjectResolver.resolve({
+                                        aid: "document-editor",
+                                        oid:  record.get("id"),
+                                        text: record.get("filename"),
+                                        description: _("Text editing")
+                                    });
+                                }
+                            });
+                        }
                     }
-
                 }
 
                 rowCtxMenuItems.push({
@@ -195,41 +193,49 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                         window.location = "/files/download/?" + items.join("&");
                     }
                 });
-                rowCtxMenuItems.push("-");
 
-                rowCtxMenuItems.push({
-                    icon: _ico("light-bulb"),
-                    cls: "x-btn-text-icon",
-                    text: _("Publish"),
-                    scope:this,
-                    handler: this.cmpPublish
-                });
 
-                rowCtxMenuItems.push({
-                    icon: _ico("light-bulb-off"),
-                    cls: "x-btn-text-icon",
-                    text: _("Unpublish"),
-                    scope:this,
-                    handler: this.cmpUnpublish
-                });
+                if (this.access["files.work"]  === true) {
 
-                rowCtxMenuItems.push("-");
+                    rowCtxMenuItems.push("-");
 
-                if ( selCount == 1 ) {
-                    //rowCtxMenuItems.push({
-                    //    icon: _ico("edit-drop-cap"),
-                    //    cls: "x-btn-text-icon",
-                    //    text: _("Rename file"),
-                    //    scope:this,
-                    //    handler : this.cmpRenameFile
-                    //});
                     rowCtxMenuItems.push({
-                        icon: _ico("edit-column"),
+                        icon: _ico("light-bulb"),
                         cls: "x-btn-text-icon",
-                        text: _("Change description"),
+                        text: _("Publish"),
                         scope:this,
-                        handler : this.cmpChangeDescription
+                        handler: this.cmpPublish
                     });
+
+                    rowCtxMenuItems.push({
+                        icon: _ico("light-bulb-off"),
+                        cls: "x-btn-text-icon",
+                        text: _("Unpublish"),
+                        scope:this,
+                        handler: this.cmpUnpublish
+                    });
+
+                    rowCtxMenuItems.push("-");
+
+                    if ( selCount == 1 ) {
+
+                        //rowCtxMenuItems.push({
+                        //    icon: _ico("edit-drop-cap"),
+                        //    cls: "x-btn-text-icon",
+                        //    text: _("Rename file"),
+                        //    scope:this,
+                        //    handler : this.cmpRenameFile
+                        //});
+
+                        rowCtxMenuItems.push({
+                            icon: _ico("edit-column"),
+                            cls: "x-btn-text-icon",
+                            text: _("Change description"),
+                            scope:this,
+                            handler : this.cmpChangeDescription
+                        });
+
+                    }
 
                 }
 
@@ -277,13 +283,16 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
 
     cmpAccess: function(access) {
         this.access = access;
+
         _disable(this.btnCreate, this.btnUpload, this.btnDelete);
+
         if (access["files.add"]     === true) {
             this.btnCreate.enable();
-        }
-        if (access["files.add"]     === true) {
             this.btnUpload.enable();
         }
+
+
+
     },
 
     cmpCreate: function() {
@@ -371,6 +380,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
             params: { document: this.config.document, file: this.getValues("id") }
         });
     },
+
     cmpUnpublish: function() {
         var document = this.getStore().baseParams.document;
         var file = this.getValues("id");

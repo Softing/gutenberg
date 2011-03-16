@@ -54,7 +54,6 @@ sub read {
             FROM documents dcm WHERE dcm.id=?
         ", [ $i_id ])->Hash;
 
-
         $document->{access} = {};
         my $current_member = $c->QuerySessionGet("member.id");
 
@@ -62,22 +61,39 @@ sub read {
             $c->sql->Do("UPDATE documents SET islooked=true WHERE id=?", $document->{id});
         }
 
+        # Get document rules
         my @rules = qw(
-           documents.update documents.capture documents.move documents.transfer
-           documents.briefcase documents.delete documents.recover
-           documents.discuss files.add files.delete files.work
+           documents.update
+           documents.capture
+           documents.move
+           documents.transfer
+           documents.briefcase
+           documents.delete
+           documents.recover
+           documents.discuss
+           files.add
+           files.delete
+           files.work
         );
+
         foreach (@rules) {
+
             if ($document->{holder} eq $current_member) {
                 if ($c->access->Check(["catalog.$_:*"], $document->{workgroup})) {
                     $document->{access}->{$_} = $c->json->true;
+                } else {
+                    $document->{access}->{$_} = $c->json->false;
                 }
             }
+
             if ($document->{holder} ne $current_member) {
                 if ($c->access->Check("catalog.$_:group", $document->{workgroup})) {
                     $document->{access}->{$_} = $c->json->true;
+                } else {
+                    $document->{access}->{$_} = $c->json->false;
                 }
             }
+
         }
 
     }

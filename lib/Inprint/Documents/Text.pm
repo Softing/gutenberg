@@ -9,6 +9,7 @@ use strict;
 use warnings;
 
 use Inprint::Check;
+use Inprint::Documents::Access;
 use Inprint::Store::Embedded;
 
 use base 'Inprint::BaseController';
@@ -34,10 +35,18 @@ sub set {
     my $i_oid  = $c->param("oid");
     my $i_text = $c->param("text");
 
+    my $html;
     my @errors;
     my $success = $c->json->false;
 
-    my $html = Inprint::Store::Embedded::fileSave($c, $i_oid, $i_text);
+    my $access = Inprint::Documents::Access::get($c, $i_oid);
+
+    push @errors, { id => "access", msg => "Denide by [files.work]"}
+        unless ($access->{"files.work"});
+
+    unless (@errors) {
+        $html = Inprint::Store::Embedded::fileSave($c, $i_oid, $i_text);
+    }
 
     $success = $c->json->true unless (@errors);
     $c->render_json( { success => $success, errors => \@errors, data => $html } );

@@ -813,6 +813,7 @@ sub update {
             } else {
                 $c->sql->Do(" UPDATE documents SET rubric=null, rubric_shortcut=null WHERE id=? ", [ $document->{id} ]);
             }
+
         }
 
     }
