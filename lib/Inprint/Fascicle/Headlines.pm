@@ -8,6 +8,7 @@ package Inprint::Fascicle::Headlines;
 use strict;
 use warnings;
 
+use Inprint::Check;
 use Inprint::Models::Fascicle::Headline;
 
 use base 'Inprint::BaseController';
@@ -19,8 +20,7 @@ sub read {
     my @errors;
     my $success = $c->json->false;
 
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_id));
+    Inprint::Check::uuid($c, \@errors, "id", $i_id);
 
     my $result = [];
 
@@ -41,12 +41,9 @@ sub tree {
     my @errors;
     my $success = $c->json->false;
 
-    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_fascicle));
+    Inprint::Check::uuid($c, \@errors, "fascicle", $i_fascicle);
 
-    my $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
-    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
-        unless ($fascicle->{id});
+    my $fascicle = Inprint::Check::fascicle($c, \@errors, $i_fascicle);
 
     my @result;
     unless (@errors) {
@@ -93,21 +90,13 @@ sub create {
     my @errors;
     my $success = $c->json->false;
 
-    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_fascicle));
+    Inprint::Check::uuid($c, \@errors, "fascicle", $i_fascicle);
+    Inprint::Check::text($c, \@errors, "title", $i_title);
+    Inprint::Check::text($c, \@errors, "description", $i_description, 1);
 
-    push @errors, { id => "title", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_title));
+    my $fascicle = Inprint::Check::fascicle($c, \@errors, $i_fascicle);
 
-    push @errors, { id => "description", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_description));
-
-    my $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
-    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
-        unless ($fascicle->{id});
-
-    push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("editions.index.manage", $fascicle->{edition}));
+    Inprint::Check::access($c, \@errors, "editions.index.manage", $fascicle->{edition});
 
     unless (@errors) {
         Inprint::Models::Fascicle::Headline::create($c, $id, $fascicle->{edition}, $fascicle->{id}, $i_bydefault, $i_title, $i_description);
@@ -128,27 +117,24 @@ sub update {
     my @errors;
     my $success = $c->json->false;
 
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_id));
+    Inprint::Check::uuid($c, \@errors, "id", $i_id);
+    Inprint::Check::text($c, \@errors, "title", $i_title);
+    Inprint::Check::text($c, \@errors, "description", $i_description, 1);
 
-    push @errors, { id => "title", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_title));
+    my $item = Inprint::Models::Fascicle::Headline::read($c, $i_id);
 
-    push @errors, { id => "description", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_description));
-
-    push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.editions.manage"));
-
-    my $headline = Inprint::Models::Fascicle::Headline::read($c, $i_id);
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($headline->{id});
-
-    push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("editions.index.manage", $headline->{edition}));
+    Inprint::Check::object($c, \@errors, "headline", $item);
+    Inprint::Check::access($c, \@errors, "editions.index.manage", $item->{edition});
 
     unless (@errors) {
-        Inprint::Models::Fascicle::Headline::update($c, $i_id, $headline->{edition}, $headline->{fascicle}, $i_bydefault, $i_title, $i_description);
+
+        # Update headlines in fascicle
+        Inprint::Models::Fascicle::Headline::update($c, $item->{id}, $item->{edition}, $item->{fascicle}, $i_bydefault, $i_title, $i_description);
+
+        # Update documents in fascicle
+        $c->sql->Do("UPDATE documents SET headline_shortcut=? WHERE fascicle=? AND headline=?",
+            [ $i_title, $item->{fascicle}, $item->{id} ]);
+
     }
 
     $success = $c->json->true unless (@errors);
@@ -156,24 +142,34 @@ sub update {
 }
 
 sub delete {
+
     my $c = shift;
+
     my $i_id = $c->param("id");
 
     my @errors;
     my $success = $c->json->false;
 
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_id));
+    Inprint::Check::uuid($c, \@errors, "id", $i_id);
 
-    my $headline = Inprint::Models::Fascicle::Headline::read($c, $i_id);
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($headline->{id});
+    my $item = Inprint::Models::Fascicle::Headline::read($c, $i_id);
 
-    push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("editions.index.manage", $headline->{edition}));
+    Inprint::Check::object($c, \@errors, "headline", $item);
+    Inprint::Check::access($c, \@errors, "editions.index.manage", $item->{edition});
 
     unless (@errors) {
+
+        # Delete headline
         Inprint::Models::Fascicle::Headline::delete($c, $i_id);
+
+        # Update documents
+        $ñ->sql->Do("
+                UPDATE documents SET
+                    headline ='00000000-0000-0000-0000-000000000000', headline_shortcut = '--'
+                    rubric   ='00000000-0000-0000-0000-000000000000', rubric_shortcut   = '--'
+                WHERE fascicle=? AND headline=?
+            ", [ $item->{fascicle}, $item->{id} ]);
+
     }
 
     $success = $c->json->true unless (@errors);

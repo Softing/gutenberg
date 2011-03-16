@@ -141,6 +141,17 @@ sub rule {
         push @$errors, { id => $field, msg => "Incorrectly filled field"};
         return 0;
     }
+
+    return 1;
+}
+
+sub object {
+    my ($c, $errors, $field, $object) = @_;
+    unless ($object && $object->{id}) {
+        push @$errors, { id => $field, msg => "Can't find object"};
+        return 0;
+    }
+
     return 1;
 }
 

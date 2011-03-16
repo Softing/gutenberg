@@ -61,7 +61,7 @@ sub update {
 
     if ($tag->{id}) {
 
-        $c->sql->Do(" UPDATE fascicles_indx_headlines SET id=?, title=?, description=? WHERE id=? ",
+        $c->sql->Do(" UPDATE fascicles_indx_headlines SET tag=?, title=?, description=? WHERE id=? ",
             [ $tag->{id}, $tag->{title}, $tag->{description} || "", $id ]);
 
         if ($bydefault eq "on") {
@@ -82,14 +82,14 @@ sub delete {
     my $c  = shift;
     my $id = shift;
 
+    # Delete rubrics
     $c->sql->Do("
-        DELETE FROM fascicles_indx_rubrics WHERE headline=? ",
-        [ $id ]);
+        DELETE FROM fascicles_indx_rubrics WHERE headline=? ", [ $id ]);
 
+    # Delete headline
     $c->sql->Do("
         DELETE FROM fascicles_indx_headlines WHERE id=?
-            AND id <> '00000000-0000-0000-0000-000000000000' ",
-        [ $id ]);
+            AND id <> '00000000-0000-0000-0000-000000000000' ", [ $id ]);
 
     return $c;
 }
