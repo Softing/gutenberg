@@ -49,11 +49,8 @@ sub read {
 
 # Get documents list
 sub list {
-
     my ($c, $params) = @_;
-
     my $searchResult = Inprint::Models::Documents::search($c, $params);
-
     $c->render_json( { "data" => $searchResult->{result}, "total" => $searchResult->{total} } );
 }
 
@@ -345,10 +342,22 @@ sub create {
 
         $c->sql->bt;
 
+        # Crete document
         $c->sql->Do(" INSERT INTO documents (" . ( join ",", @fields ) .") VALUES (". ( join ",", @placeholders ) .") ", \@data);
 
+        # Get new document
         my $document = $c->sql->Q(" SELECT * FROM documents WHERE id=? ", [ $id ])->Hash;
+        my $principal = Inprint::Check::principal($c, \@errors, $c->QuerySessionGet("member.id"));
 
+        # Create document comment
+        if ($i_comment) {
+            Inprint::Models::Documents::say($c,
+                $document->{id}, $document->{stage}, $document->{stage_shortcut}, $document->{color},
+                $principal->{id}, $principal->{shortcut}, $i_comment
+            );
+        }
+
+        # Create history
         $c->sql->Do("
             INSERT INTO history(
                 entity, operation,
@@ -1036,35 +1045,17 @@ sub say {
     my @errors;
     my $success = $c->json->false;
 
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_id));
+    Inprint::Check::uuid($c, \@errors, "id", $i_id);
+    Inprint::Check::text($c, \@errors, "text", $i_text);
 
-    push @errors, { id => "text", msg => "Incorrectly filled field"}
-        unless ($i_text);
-
-    my $document;
-    unless (@errors) {
-        $document = $c->sql->Q(" SELECT * FROM documents WHERE id=? ", [ $i_id ])->Hash;
-        push @errors, { id => "document", msg => "Can't find document object"}
-                unless ($document->{id});
-    }
-
-    my $current_user = $c->QuerySessionGet("member.id");
-    my $member;
-    unless (@errors) {
-        $member    = $c->sql->Q(" SELECT id, shortcut FROM profiles WHERE id=? ", [ $current_user ])->Hash;
-        push @errors, { id => "document", msg => "Can't find document object"}
-            unless ($member->{id});
-    }
+    my $document  = Inprint::Check::document($c, \@errors, $i_id);
+    my $principal = Inprint::Check::principal($c, \@errors, $c->QuerySessionGet("member.id"));
 
     unless (@errors) {
-
-        $c->sql->Do("
-                INSERT INTO comments(
-                    path, entity, member, member_shortcut, stage, stage_shortcut, stage_color, fulltext, created, updated)
-                VALUES (null, ?, ?, ?, ?, ?, ?, ?, now(), now() ) ", [
-                $document->{id}, $member->{id}, $member->{shortcut}, $document->{stage}, $document->{stage_shortcut}, $document->{color}, $i_text
-            ]);
+        Inprint::Models::Documents::say($c,
+            $document->{id}, $document->{stage}, $document->{stage_shortcut}, $document->{color},
+            $principal->{id}, $principal->{shortcut}, $i_text
+        );
     }
 
     $success = $c->json->true unless (@errors);

@@ -378,4 +378,19 @@ sub search {
     return { "result" => $result, "total" => $total };
 }
 
+
+sub say {
+
+    my ($c, $id, $stage, $stage_shortcut, $color, $member, $member_shortcut, $text) = @_;
+
+    $c->sql->Do("
+            INSERT INTO comments(
+                path, entity, member, member_shortcut, stage, stage_shortcut, stage_color, fulltext, created, updated)
+            VALUES (null, ?, ?, ?, ?, ?, ?, ?, now(), now() ) ", [
+            $id, $member, $member_shortcut, $stage, $stage_shortcut, $color, $text
+        ]);
+
+    return;
+}
+
 1;
