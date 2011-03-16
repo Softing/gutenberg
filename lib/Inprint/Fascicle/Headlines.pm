@@ -121,19 +121,22 @@ sub update {
     Inprint::Check::text($c, \@errors, "title", $i_title);
     Inprint::Check::text($c, \@errors, "description", $i_description, 1);
 
-    my $item = Inprint::Models::Fascicle::Headline::read($c, $i_id);
+    my $oldItem = Inprint::Models::Fascicle::Headline::read($c, $i_id);
 
-    Inprint::Check::object($c, \@errors, "headline", $item);
-    Inprint::Check::access($c, \@errors, "editions.index.manage", $item->{edition});
+    Inprint::Check::object($c, \@errors, "headline", $oldItem);
+    Inprint::Check::access($c, \@errors, "editions.index.manage", $oldItem->{edition});
 
     unless (@errors) {
 
         # Update headlines in fascicle
-        Inprint::Models::Fascicle::Headline::update($c, $item->{id}, $item->{edition}, $item->{fascicle}, $i_bydefault, $i_title, $i_description);
+        Inprint::Models::Fascicle::Headline::update($c, $oldItem->{id}, $oldItem->{edition}, $oldItem->{fascicle}, $i_bydefault, $i_title, $i_description);
+
+        # Re-read headline
+        my $newItem = Inprint::Models::Fascicle::Headline::read($c, $i_id);
 
         # Update documents in fascicle
-        $c->sql->Do("UPDATE documents SET headline_shortcut=? WHERE fascicle=? AND headline=?",
-            [ $i_title, $item->{fascicle}, $item->{id} ]);
+        $c->sql->Do("UPDATE documents SET headline=?, headline_shortcut=? WHERE fascicle=? AND headline=?",
+            [ $newItem->{tag}, $newItem->{title}, $oldItem->{fascicle}, $oldItem->{tag} ]);
 
     }
 
@@ -165,7 +168,7 @@ sub delete {
         # Update documents
         $ñ->sql->Do("
                 UPDATE documents SET
-                    headline ='00000000-0000-0000-0000-000000000000', headline_shortcut = '--'
+                    headline ='00000000-0000-0000-0000-000000000000', headline_shortcut = '--',
                     rubric   ='00000000-0000-0000-0000-000000000000', rubric_shortcut   = '--'
                 WHERE fascicle=? AND headline=?
             ", [ $item->{fascicle}, $item->{id} ]);

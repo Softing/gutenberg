@@ -108,24 +108,27 @@ sub update {
     push @errors, { id => "title", msg => "Incorrectly filled field"}
         unless ($c->is_text($i_title));
 
-    my $item = Inprint::Models::Fascicle::Rubric::read($c, $i_id);
+    my $oldItem = Inprint::Models::Fascicle::Rubric::read($c, $i_id);
     push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($item->{id});
+        unless ($oldItem->{id});
 
     push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("editions.index.manage", $item->{edition}));
+        unless ($c->access->Check("editions.index.manage", $oldItem->{edition}));
 
     unless (@errors) {
 
         # Update rubric
         Inprint::Models::Fascicle::Rubric::update($c,
-            $item->{id}, $item->{edition}, $item->{fascicle}, $item->{headline},
+            $oldItem->{id}, $oldItem->{edition}, $oldItem->{fascicle}, $oldItem->{headline},
             $i_bydefault, $i_title, $i_description);
+
+        # Re-read rubric
+        my $newItem = Inprint::Models::Fascicle::Rubric::read($c, $i_id);
 
         # Update documents in fascicle
         $c->sql->Do("
-            UPDATE documents SET rubric_shortcut=? WHERE fascicle=? AND rubric=?",
-            [ $i_title, $item->{fascicle}, $item->{id} ]);
+            UPDATE documents SET rubric=?, rubric_shortcut=? WHERE fascicle=? AND rubric=?",
+            [ $newItem->{tag}, $newItem->{title}, $oldItem->{fascicle}, $oldItem->{tag} ]);
 
     }
 
@@ -158,7 +161,6 @@ sub delete {
         # Update documents
         $c->sql->Do("
                 UPDATE documents SET
-                    headline ='00000000-0000-0000-0000-000000000000', headline_shortcut = '--'
                     rubric   ='00000000-0000-0000-0000-000000000000', rubric_shortcut   = '--'
                 WHERE fascicle=? AND headline=?
             ", [ $item->{fascicle}, $item->{id} ]);
