@@ -15,7 +15,9 @@ use base 'Inprint::BaseController';
 
 sub list {
     my $c = shift;
-    Inprint::Documents::list($c);
+    Inprint::Documents::list($c, {
+        baseSort => 'headline_shortcut'
+    });
 }
 
 1;

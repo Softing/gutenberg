@@ -110,7 +110,7 @@ sub read {
 # Get documents list
 sub list {
 
-    my $c = shift;
+    my ($c, $params) = @_;
 
     my @params;
 
@@ -306,10 +306,23 @@ sub list {
         if ( $dir ~~ @sortModes ) {
             if ( $sort ~~ @sortColumns ) {
 
-                $sort = "firstpage" if ($sort eq "pages");
+                if ($sort eq "pages") {
+                    $sort = "firstpage";
+                }
 
-                $sql_query .= " ORDER BY dcm.$sort $dir ";
+                $sql_query .= " ORDER BY ";
+
+                if( $params->{baseSort} ) {
+                    $sql_query .=  "dcm." . $params->{baseSort} .", " ;
+                }
+
+                $sql_query .=  " dcm.$sort $dir ";
             }
+        }
+
+    } else {
+        if( $params->{baseSort} ) {
+            $sql_query .=  " ORDER BY dcm." . $params->{baseSort};
         }
     }
 

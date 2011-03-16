@@ -17,7 +17,7 @@ Inprint.fascicle.planner.Documents = Ext.extend(Ext.grid.EditorGridPanel, {
 
         this.store = Inprint.factory.Store.group(this.urls.list, {
             groupField:'headline_shortcut',
-            remoteGroup:false,
+            remoteGroup:true,
             remoteSort:true,
             baseParams: {
                 gridmode: "all",
