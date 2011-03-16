@@ -85,11 +85,27 @@ Inprint.factory.StoreFields = {
         [ "id", "fascicle", "page", "mapping", "place", "place_title", "title", "description", "amount", "area", "x", "y", "w", "h", Inprint.factory.createDateField("created"), Inprint.factory.createDateField("updated") ],
 
     "/fascicle/documents/list/": [
-            'id', 'access',    'edition',  'edition_shortcut',    'fascicle',    'fascicle_shortcut',    'headline', 'headline_shortcut',
-            'rubric', 'rubric_shortcut',    'copygroup',    'holder','creator','manager','holder_shortcut','creator_shortcut','manager_shortcut',
-            'workgroup','workgroup_shortcut','ingroups',    'islooked','isopen',    'branch','branch_shortcut','stage','stage_shortcut','color','progress',
-            'title','author','pages',    'pdate','psize','rdate','rsize',    'images','files',    'created','updated'
-        ],
+        'id', 'access',
+
+        'edition',  'edition_shortcut',
+        'fascicle', 'fascicle_shortcut',
+        'headline', 'headline_shortcut',
+        'rubric', 'rubric_shortcut',
+        'copygroup',
+
+        'holder','creator','manager','holder_shortcut','creator_shortcut','manager_shortcut',
+        'maingroup','maingroup_shortcut',
+        'workgroup','workgroup_shortcut','ingroups',
+        'islooked','isopen',
+        'branch','branch_shortcut','stage','stage_shortcut','color','progress',
+        'title','author','pages',
+        'pdate','psize','rdate','rsize',
+        'images','files', 'links',
+        Inprint.factory.createDateField("created"),
+        Inprint.factory.createDateField("updated"),
+        Inprint.factory.createDateField("uploaded"),
+        Inprint.factory.createDateField("moved")
+    ],
 
     "/fascicle/modules/list/":
         [ "id", "fascicle", "page", "place", "place_title", "title", "description", "amount", "area", "x", "y", "w", "h", Inprint.factory.createDateField("created"), Inprint.factory.createDateField("updated") ],

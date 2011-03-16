@@ -8,16 +8,18 @@ package Inprint::Fascicle::Documents;
 use strict;
 use warnings;
 
-#use Inprint::Utils;
-use Inprint::Documents;
+use Inprint::Models::Documents;
 
 use base 'Inprint::BaseController';
 
 sub list {
     my $c = shift;
-    Inprint::Documents::list($c, {
+
+    my $searchResult = Inprint::Models::Documents::search($c, {
         baseSort => 'headline_shortcut'
     });
+
+    $c->render_json( { "data" => $searchResult->{result}, "total" => $searchResult->{total} } );
 }
 
 1;

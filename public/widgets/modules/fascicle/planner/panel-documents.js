@@ -31,9 +31,15 @@ Inprint.fascicle.planner.Documents = Ext.extend(Ext.grid.EditorGridPanel, {
             this.sm,
             columns.viewed,
             columns.title,
-            columns.edition,
+            Ext.apply(columns.edition, {
+                hidden:true
+            }),
+            columns.maingroup,
+            columns.manager,
             columns.workgroup,
-            columns.fascicle,
+            Ext.apply(columns.fascicle, {
+                hidden:true
+            }),
             columns.headline,
             columns.rubric,
             Ext.apply(columns.pages, {
@@ -41,7 +47,6 @@ Inprint.fascicle.planner.Documents = Ext.extend(Ext.grid.EditorGridPanel, {
                     allowBlank: true
                 })
             }),
-            columns.manager,
             columns.progress,
             columns.holder,
             columns.images,

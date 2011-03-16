@@ -66,26 +66,27 @@ Inprint.documents.GridColumns = function() {
 
         edition: {
             id:"edition",
-            dataIndex: "edition_shortcut",
-            header: _("Edition"),
             width: 80,
-            sortable: true
+            sortable: true,
+            header: _("Edition"),
+            dataIndex: "edition_shortcut"
         },
 
         maingroup: {
             id:"maingroup",
-            dataIndex: "maingroup_shortcut",
-            header: _("Linked"),
             width: 80,
-            sortable: true
+            sortable: true,
+            header: _("Department"),
+            dataIndex: "maingroup_shortcut"
         },
 
         workgroup: {
             id:"workgroup",
-            dataIndex: "workgroup_shortcut",
-            header: _("Department"),
             width: 80,
-            sortable: true
+            hidden: true,
+            sortable: true,
+            header: _("Where"),
+            dataIndex: "workgroup_shortcut"
         },
 
         fascicle: {
@@ -123,20 +124,6 @@ Inprint.documents.GridColumns = function() {
             sortable: true
         },
 
-        manager:{
-            id:"manager",
-            dataIndex: "manager_shortcut",
-            header: _("Manager"),
-            width: 100,
-            sortable: true,
-            renderer : function(v, p, record) {
-                if (record.data.workgroup == record.data.manager) {
-                    v = '<b>' +v+ '</b>';
-                }
-                return v;
-            }
-        },
-
         progress: {
             id:"progress",
             dataIndex: "progress",
@@ -171,6 +158,20 @@ Inprint.documents.GridColumns = function() {
                             '<div class="x-progress-bar{0}" style="width:{1}%;background:{4}!important;color:{5} !important;">&nbsp;</div>'+
                     '</div>',
                     style, v, text, bgcolor.rgb(), fgcolor.rgb(), txtcolor);
+            }
+        },
+
+        manager:{
+            id:"manager",
+            dataIndex: "manager_shortcut",
+            header: _("Manager"),
+            width: 100,
+            sortable: true,
+            renderer : function(v, p, record) {
+                if (record.data.workgroup == record.data.manager) {
+                    v = '<b>' +v+ '</b>';
+                }
+                return v;
             }
         },
 
