@@ -39,12 +39,13 @@ sub index {
     $jsonString = "
         var inprintLocalization = $jsonString;
         function _(arg, vals) {
+            var string = inprintLocalization[arg] || arg;
             if (vals) {
                 for (var i=0; i<vals.length;i++) {
-                    arg = arg.replace('%'+ (i+1), vals[i]);
+                    string = string.replace('%'+ (i+1), vals[i]);
                 }
             }
-            return inprintLocalization[arg] || arg;
+            return string;
         }
     ";
 
