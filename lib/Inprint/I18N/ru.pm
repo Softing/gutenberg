@@ -10,398 +10,1209 @@ use base 'Inprint::I18N';
 use utf8;
 
 our %Lexicon = (
-    ""                            => "",
-    "#"                           => "",
-    "About"                       => "О программе",
-    "About this software"         => "Об этой программе",
-    "Access"                      => "Доступ",
-    "Access denide"               => "",
-    "Access rights management"    => "",
-    "Account removal"             => "",
-    "Action"                      => "",
-    "Active"                      => "Активно",
-    "Active request"              => "Активная заявка",
-    "Add"                         => "Добавить",
-    "Add a comment"               => "Добавить комментарий",
-    "Adding a new category"       => "",
-    "Adding a new edition"        => "",
-    "Adding a new headline"       => "",
-    "Adding an advertiser"        => "",
-    "Adding issue"                => "Добавление выпуска",
-    "Adding of the new document"  => "",
-    "Additional parameters"       => "Дополнительные параметры",
-    "Address"                     => "Адрес",
-    "Advertisement"               => "Реклама",
-    "Advertiser"                  => "Рекламодатель",
-    "Advertisers"                 => "Рекламодатели",
-    "Advertising"                 => "Реклама",
-    "Advertising requests"        => "",
-    "Advertizing modules"         => "Рекламные модули",
-    "Advertizing positions"       => "Рекламные позиции",
-    "Advertizing requests"        => "Рекламные заявки",
-    "Alias"                       => "",
-    "All"                         => "Все",
-    "All departments"             => "Все отделы",
-    "All editions"                => "Все издания",
-    "All fascicles"               => "Все выпуски",
-    "Amount"                      => "Количество",
-    "Annual"                      => "Годовой",
-    "Apply to enclosed"           => "",
-    "Appointment"                 => "Назначение",
-    "Approved"                    => "Утверждено",
-    "Archive"                     => "Архив",
-    "Archive issues"              => "",
-    "Archive of requests"         => "Архив заявок",
-    "Are you want to logout?"     => "",
-    "Area"                        => "Площадь",
-    "Assignment"                  => "Назначение",
-    "Attachment"                  => "Вложение",
-    "Author"                      => "Автор",
-    "BIK"                         => "БИК",
-    "Bank"                        => "Банк",
-    "Banking details"             => "",
-    "Basic options"               => "Основные параметры",
-    "Basic parameters"            => "Основные параметры",
-    "Binding"                     => "",
-    "Briefcase"                   => "Портфель",
-    "Briefcase index"             => "Рубрикатор портфеля",
-    "By date"                     => "По дате",
-    "By default"                  => "По умолчанию",
-    "Calendar"                    => "Календарь",
-    "Cancel"                      => "Отменить",
-    "Capture"                     => "Захват",
-    "Card"                        => "Карточка",
-    "Catalog"                     => "Каталог",
-    "Catalog item creation"       => "",
-    "Category"                    => "",
-    "Change"                      => "Изменить",
-    "Change description"          => "Изменить описание",
-    "Change stage"                => "",
-    "Change the file description" => "",
-    "Change the file name"        => "",
-    "Changes have been saved"     => "",
-    "Circulation"                 => "Тираж",
-    "Close"                       => "Закрыть",
-    "Close this panel"            => "Закрыть эту панель",
-    "Color"                       => "Цвет",
-    "Comment"                     => "Комментарий",
-    "Comments"                    => "Комментарии",
-    "Communication error"         => "Комментарий",
-    "Company news"                => "Новости компании",
-    "Composition"                 => "",
-    "Contact"                     => "Контакт",
-    "Copy"                        => "Копировать",
-    "Copy documents"              => "Копировать материалы",
-    "Copy parameters"             => "",
-    "Create"                      => "Создать",
-    "Create a new document"       => "Создать новый материал",
-    "Create a new file" + " [RTF]"=> "",
-    "Create attachment"           => "",
-    "Create document"             => "Создать материал",
-    "Create request"              => "",
-    "Create role"                 => "",
-    "Create stage"                => "",
-    "Created"                     => "Создан",
-    "Creating a new Module"       => "",
-    "Creating a new Page"         => "",
-    "Creating a new module"       => "",
-    "Date"                        => "Дата",
-    "Dates"                       => "Даты",
-    "Deadline"                    => "Дедлайн",
-    "Default destination"         => "Назначение по умолчанию",
-    "Default feed"                => "",
-    "Defaults"                    => "По умолчанию",
-    "Delete"                      => "Удалить",
-    "Delete attachment"           => "",
-    "Delete file"                 => "Удалить файл",
-    "Delete the file?"            => "",
-    "Deleting a category"         => "",
-    "Delivery date"               => "Дата отправки",
-    "Department"                  => "Отдел",
-    "Departments"                 => "Отделы",
-    "Description"                 => "Описание",
-    "Disabled"                    => "Выключено",
-    "Displaying documents {0} - {1} of {2}"=> "",
-    "Document capture"            => "",
-    "Document description"        => "Описание материала ",
-    "Document profile"            => "Профиль материала",
-    "Document restoration"        => "",
-    "Documents"                   => "Материалы",
-    "Domain"                      => "Домен",
-    "Download documents"          => "Скачать материал",
-    "Download file"               => "Скачать файл",
-    "Download files"              => "Скачать файлы",
-    "Download images"             => "Скачать иллюстрации",
-    "Download zip"                => "Скачать 7zip",
-    "Dumb window"                 => "Пустое окно",
-    "Duplicate"                   => "Дублировать",
-    "Edit"                        => "Редактировать",
-    "Edit Document Properties"    => "",
-    "Edit Text"                   => "",
-    "Edit attachment"             => "",
-    "Edit category"               => "",
-    "Edit headline"               => "",
-    "Edit profile"                => "Редактировать профиль",
-    "Edit request"                => "",
-    "Editing of the Module"       => "",
-    "Edition"                     => "Издание",
-    "Edition addition"            => "",
-    "Edition removal"             => "",
-    "Editions"                    => "Издания",
-    "Editor"                      => "",
-    "Employee"                    => "Сотрудник",
-    "Employee information"        => "Информация о сотруднике",
-    "Employee profile"            => "Профиль сотрудника",
-    "Employee settings"           => "Настройки сотрудника",
-    "Employee setup"              => "",
-    "Employeers list"             => "",
-    "Employees"                   => "Сотрудники",
-    "Employees browser"           => "",
-    "Empoyee"                     => "",
-    "Empoyees online"             => "",
-    "Enabled"                     => "Включено",
-    "Enter"                       => "Войти",
-    "Enter a new description for file"=> "",
-    "Enter a new filename"        => "",
-    "Error"                       => "",
-    "Error communicating with server"=> "",
-    "Event"                       => "Событие",
-    "Event type"                  => "",
-    "Exchange"                    => "Обмен",
-    "FR"                          => "",
-    "Fascic;e"                    => "",
-    "Fascicle"                    => "Выпуск",
-    "Fascicle index"              => "Рубрикатор выпуска",
-    "Fascicle plan"               => "План выпуска",
-    "Fascicles"                   => "Выпуски",
-    "Feeds"                       => "",
-    "File"                        => "",
-    "File name"                   => "Имя файла",
-    "Files"                       => "Файлы",
-    "Filter"                      => "Фильтр",
-    "Find"                        => "Поиск",
-    "Flash mode"                  => "",
-    "General information"         => "",
-    "Go back"                     => "",
-    "Group"                       => "Группа",
-    "Group by"                    => "",
-    "Group removal"               => "",
-    "Group rules"                 => "",
-    "H"                           => "",
-    "HL"                          => "",
-    "Headline"                    => "Раздел",
-    "Headlines"                   => "Разделы",
-    "Help"                        => "Справка",
-    "Help center"                 => "Справочный центр",
-    "Holder"                      => "Владелец",
-    "Hot save"                    => "",
-    "Html mode"                   => "",
-    "ID"                          => "",
-    "INN"                         => "ИНН",
-    "Index"                       => "Рубрикатор",
-    "Indexation"                  => "Рубрицирование",
-    "Inprint"                     => "Инпринт",
-    "Irreversible removal"        => "",
-    "Irrevocable action!"         => "",
-    "Issue"                       => "Выпуск",
-    "Issues"                      => "Выпуски",
-    "Items"                       => "",
-    "KPP"                         => "КПП",
-    "KS"                          => "КС",
-    "Label"                       => "",
-    "Last Modified"               => "",
-    "Length"                      => "",
-    "Limit"                       => "Ограничение",
-    "Limitation..."               => "",
-    "Linked"                      => "Привязка",
-    "Loading"                     => "Загрузка",
-    "Loading text"                => "",
-    "Loading..."                  => "",
-    "Login"                       => "Логин",
-    "Logout"                      => "Выход",
-    "Logs"                        => "Логи",
-    "Management"                  => "",
-    "Manager"                     => "Редактор",
-    "Members"                     => "Участники",
-    "Membership"                  => "Членство",
-    "Microsoft Excel (xls)"       => "",
-    "Microsoft Word (doc)"        => "",
-    "Modification of the file"    => "",
-    "Modification of the file description"=> "",
-    "Modified"                    => "",
-    "Module"                      => "Модуль",
-    "Module size"                 => "",
-    "Modules"                     => "Модули",
-    "More options"                => "",
-    "Move"                        => "Переместить",
-    "Move document"               => "Переместить материал",
-    "Moved"                       => "",
-    "Moving to the briefcase"     => "",
-    "Moving to the recycle bin"   => "",
-    "My alerts"                   => "Мои события",
-    "Name"                        => "Имя",
-    "No"                          => "Нет",
-    "No chains to display"        => "",
-    "No documents to display"     => "Материалы не найдены",
-    "No versions to display"      => "",
-    "Not approved"                => "Не утверждено",
-    "Not defined"                 => "",
-    "Not implemented"             => "",
-    "Not set"                     => "",
-    "Numbering"                   => "Нумерация",
-    "Ok"                          => "",
-    "Open issues"                 => "",
-    "OpenOffice.org (ods)"        => "",
-    "OpenOffice.org (odt)"        => "",
-    "Organization"                => "Организация",
-    "Out date"                    => "",
-    "Page"                        => "Полоса",
-    "Pages"                       => "Полосы",
-    "Paid"                        => "Оплачено",
-    "Parameters"                  => "Параметры",
-    "Parent"                      => "Родитель",
-    "Password"                    => "Пароль",
-    "Path to image"               => "",
-    "Payment"                     => "Оплата",
-    "Percent"                     => "",
-    "Phones"                      => "",
-    "Photo"                       => "Фото",
-    "Place"                       => "Позиция",
-    "Planning"                    => "Планирование",
-    "Please enter your text"      => "Пожалуйста, введите текст",
-    "Please wait..."              => "",
-    "Position"                    => "Должность",
-    "Possible"                    => "Возможно",
-    "Possible request"            => "Возможна заявка",
-    "Prevailing"                  => "Сквозной",
-    "Preview"                     => "",
-    "Principals list"             => "",
-    "Print date"                  => "",
-    "Printing"                    => "Печать",
-    "Probably someone has entered in Inprint with your login on other computer. <br/> push F5 what to pass to authorization page"=> "",
-    "Profile"                     => "Профиль",
-    "Profile of the employee"     => "",
-    "Progress"                    => "Готовность",
-    "Properties"                  => "Свойства",
-    "Publication"                 => "Публикация",
-    "Publish"                     => "Опубликовать",
-    "Publishing House"            => "Издательский дом",
-    "RQ"                          => "",
-    "RS"                          => "РС",
-    "RSS feeds"                   => "",
-    "Readiness"                   => "Готовность",
-    "Record date"                 => "",
-    "Recycle"                     => "Корзина",
-    "Recycle Bin"                 => "Корзина",
-    "Recycle bin"                 => "",
-    "Refresh this panel"          => "",
-    "Release addition"            => "",
-    "Reload"                      => "Обновить",
-    "Remove"                      => "Удалить",
-    "Remove selected files?"      => "",
-    "Rename file"                 => "Переименовать файл",
-    "Renaming a file"             => "",
-    "Request"                     => "Заявка",
-    "Reservation"                 => "Резерв",
-    "Reset"                       => "",
-    "Restore"                     => "Восстановить",
-    "Review of access rights"     => "",
-    "Rich Text Format (rtf)"      => "",
-    "Rights"                      => "Правила",
-    "Role"                        => "Роль",
-    "Roles"                       => "Роли",
-    "Root node"                   => "",
-    "Rubric"                      => "Рубрика",
-    "Rubrication"                 => "",
-    "Rule"                        => "Правило",
-    "Rules"                       => "Правила",
-    "Save"                        => "Сохранить",
-    "Save recursive"              => "",
-    "Saving"                      => "",
-    "Saving text"                 => "",
-    "Select"                      => "Выбрать",
-    "Select a file extension"     => "",
-    "Select a paid status..."     => "Выбрать статус платежа",
-    "Select a request status..."  => "Выбрать статус заявки",
-    "Select a type"               => "",
-    "Select a willingness..."     => "Выбрать статус готовности",
-    "Select an file"              => "",
-    "Select employees"            => "Выбрать сотрудников",
-    "Select issue"                => "",
-    "Select..."                   => "",
-    "Serial"                      => "",
-    "Settings"                    => "Настройки",
-    "Shortcut"                    => "Ярлык",
-    "Show only with RSS"          => "",
-    "Simple Text (txt)"           => "",
-    "Size"                        => "Размер",
-    "Software error"              => "",
-    "Squib"                       => "Подверстка",
-    "Stage"                       => "Ступень",
-    "Stages"                      => "Ступени",
-    "State"                       => "Состояние",
-    "Status"                      => "",
-    "Suitable data is not found"  => "Подходящие данные не найдены",
-    "System Information"          => "",
-    "System event"                => "",
-    "System information"          => "Системная информация",
-    "System profile"              => "Системный профиль",
-    "Table format"                => "",
-    "Tabular text (txt)"          => "",
-    "Template"                    => "Шаблон",
-    "Templates"                   => "Шаблоны",
-    "Templates of pages"          => "Шаблоны полос",
-    "Termination of membership"   => "",
-    "Text editing"                => "",
-    "Text editor"                 => "",
-    "Text format"                 => "",
-    "The rights"                  => "",
-    "This change can not be undone!"=> "",
-    "Titl"                        => "",
-    "Title"                       => "Название",
-    "Todo"                        => "В работе",
-    "Transfer"                    => "Передача",
-    "Transfer browser"            => "",
-    "Type"                        => "",
-    "URL"                         => "",
-    "Unable to save text"         => "",
-    "Unknown department"          => "",
-    "Unknown edition"             => "",
-    "Unknown employee"            => "",
-    "Unknown fascicle"            => "",
-    "Unnamed window"              => "",
-    "Unpublish"                   => "Снять с публикации",
-    "Update"                      => "Обновить",
-    "Update role"                 => "",
-    "Updated"                     => "Обновлен",
-    "Upload"                      => "Загрузить",
-    "Upload document"             => "",
-    "Upload files"                => "Загрузить файлы",
-    "Uploaded"                    => "",
-    "Use by default"              => "",
-    "User Information"            => "",
-    "Versions"                    => "",
-    "View"                        => "Посмотреть",
-    "View composer"               => "",
-    "View plan"                   => "",
-    "W"                           => "",
-    "Warning"                     => "",
-    "Weight"                      => "",
-    "Without conversion"          => "",
-    "Workgroup"                   => "",
-    "X"                           => "",
-    "Y"                           => "",
-    "Yes"                         => "Да",
-    "You can't cancel this action!"=> "",
-    "You really want to do it?"   => "",
-    "You really want to do this?" => "",
-    "You really want to remove the selected accounts?"=> "",
-    "You really want to stop membership in group for the selected accounts?"=> "",
-    "You really wish to do this?" => "",
-    "Your session is closed"      => "",
-    "Добавление рекламной заявки" => "",
-    "Разметка полос"              => "",
-    "Редактирование заявки"       => "",
+    "#"
+ => "",
+
+    "About"
+ => "",
+
+    "About this software"
+ => "",
+
+    "Access"
+ => "",
+
+    "Access denide"
+ => "",
+
+    "Access rights management"
+ => "",
+
+    "Account removal"
+ => "",
+
+    "Action"
+ => "",
+
+    "Active"
+ => "",
+
+    "Active request"
+ => "",
+
+    "Add"
+ => "",
+
+    "Add a comment"
+ => "",
+
+    "Add to the department"
+ => "",
+
+    "Adding a new category"
+ => "",
+
+    "Adding a new edition"
+ => "",
+
+    "Adding a new headline"
+ => "",
+
+    "Adding an advertiser"
+ => "",
+
+    "Adding issue"
+ => "",
+
+    "Adding of the new document"
+ => "",
+
+    "Additional parameters"
+ => "",
+
+    "Address"
+ => "",
+
+    "Advertisement"
+ => "",
+
+    "Advertiser"
+ => "",
+
+    "Advertisers"
+ => "",
+
+    "Advertising"
+ => "",
+
+    "Advertising requests"
+ => "",
+
+    "Advertizing modules"
+ => "",
+
+    "Advertizing positions"
+ => "",
+
+    "Advertizing requests"
+ => "",
+
+    "Alias"
+ => "",
+
+    "All"
+ => "",
+
+    "All available"
+ => "",
+
+    "All departments"
+ => "",
+
+    "All editions"
+ => "",
+
+    "All fascicles"
+ => "",
+
+    "Amount"
+ => "",
+
+    "Annual"
+ => "",
+
+    "Apply to enclosed"
+ => "",
+
+    "Appointment"
+ => "",
+
+    "Approved"
+ => "",
+
+    "Archive"
+ => "",
+
+    "Archive issues"
+ => "",
+
+    "Archive of requests"
+ => "",
+
+    "Are you want to logout?"
+ => "",
+
+    "Area"
+ => "",
+
+    "Assignment"
+ => "",
+
+    "Attachment"
+ => "",
+
+    "Author"
+ => "",
+
+    "BIK"
+ => "",
+
+    "Bank"
+ => "",
+
+    "Banking details"
+ => "",
+
+    "Basic options"
+ => "",
+
+    "Basic parameters"
+ => "",
+
+    "Binding"
+ => "",
+
+    "Briefcase"
+ => "",
+
+    "Briefcase for reserved documents"
+ => "",
+
+    "Briefcase index"
+ => "",
+
+    "By date"
+ => "",
+
+    "By default"
+ => "",
+
+    "Calendar"
+ => "",
+
+    "Cancel"
+ => "",
+
+    "Capture"
+ => "",
+
+    "Card"
+ => "",
+
+    "Catalog"
+ => "",
+
+    "Catalog item creation"
+ => "",
+
+    "Category"
+ => "",
+
+    "Change"
+ => "",
+
+    "Change description"
+ => "",
+
+    "Change stage"
+ => "",
+
+    "Change the file description"
+ => "",
+
+    "Change the file name"
+ => "",
+
+    "Changes have been saved"
+ => "",
+
+    "Circulation"
+ => "",
+
+    "Close"
+ => "",
+
+    "Close this panel"
+ => "",
+
+    "Color"
+ => "",
+
+    "Comment"
+ => "",
+
+    "Comments"
+ => "",
+
+    "Communication error"
+ => "",
+
+    "Company news"
+ => "",
+
+    "Composition"
+ => "",
+
+    "Contact"
+ => "",
+
+    "Copy"
+ => "",
+
+    "Copy documents"
+ => "",
+
+    "Copy from defaults"
+ => "",
+
+    "Copy parameters"
+ => "",
+
+    "Create"
+ => "",
+
+    "Create a new document"
+ => "",
+
+    "Create a new file" + " [RTF]"
+ => "",
+
+    "Create attachment"
+ => "",
+
+    "Create document"
+ => "",
+
+    "Create request"
+ => "",
+
+    "Create role"
+ => "",
+
+    "Create stage"
+ => "",
+
+    "Created"
+ => "",
+
+    "Creating a new Module"
+ => "",
+
+    "Creating a new Page"
+ => "",
+
+    "Creating a new module"
+ => "",
+
+    "Date"
+ => "",
+
+    "Dates"
+ => "",
+
+    "Deadline"
+ => "",
+
+    "Default destination"
+ => "",
+
+    "Default feed"
+ => "",
+
+    "Defaults"
+ => "",
+
+    "Delete"
+ => "",
+
+    "Delete attachment"
+ => "",
+
+    "Delete file"
+ => "",
+
+    "Delete the file?"
+ => "",
+
+    "Deleting a category"
+ => "",
+
+    "Delivery date"
+ => "",
+
+    "Department"
+ => "",
+
+    "Departments"
+ => "",
+
+    "Description"
+ => "",
+
+    "Disabled"
+ => "",
+
+    "Displaying documents {0} - {1} of {2}"
+ => "",
+
+    "Document capture"
+ => "",
+
+    "Document description"
+ => "",
+
+    "Document profile"
+ => "",
+
+    "Document restoration"
+ => "",
+
+    "Documents"
+ => "",
+
+    "Domain"
+ => "",
+
+    "Download documents"
+ => "",
+
+    "Download file"
+ => "",
+
+    "Download files"
+ => "",
+
+    "Download images"
+ => "",
+
+    "Download zip"
+ => "",
+
+    "Dumb window"
+ => "",
+
+    "Duplicate"
+ => "",
+
+    "Edit"
+ => "",
+
+    "Edit Document Properties"
+ => "",
+
+    "Edit Text"
+ => "",
+
+    "Edit attachment"
+ => "",
+
+    "Edit category"
+ => "",
+
+    "Edit headline"
+ => "",
+
+    "Edit profile"
+ => "",
+
+    "Edit request"
+ => "",
+
+    "Editing of the Module"
+ => "",
+
+    "Edition"
+ => "",
+
+    "Edition addition"
+ => "",
+
+    "Edition removal"
+ => "",
+
+    "Editions"
+ => "",
+
+    "Editor"
+ => "",
+
+    "Editorial house"
+ => "",
+
+    "Employee"
+ => "",
+
+    "Employee information"
+ => "",
+
+    "Employee profile"
+ => "",
+
+    "Employee settings"
+ => "",
+
+    "Employee setup"
+ => "",
+
+    "Employeers list"
+ => "",
+
+    "Employees"
+ => "",
+
+    "Employees browser"
+ => "",
+
+    "Empoyee"
+ => "",
+
+    "Empoyees online"
+ => "",
+
+    "Enabled"
+ => "",
+
+    "Enter"
+ => "",
+
+    "Enter a new description for file"
+ => "",
+
+    "Enter a new filename"
+ => "",
+
+    "Error"
+ => "",
+
+    "Error communicating with server"
+ => "",
+
+    "Event"
+ => "",
+
+    "Event type"
+ => "",
+
+    "Exchange"
+ => "",
+
+    "FR"
+ => "",
+
+    "Fascic;e"
+ => "",
+
+    "Fascicle"
+ => "",
+
+    "Fascicle index"
+ => "",
+
+    "Fascicle plan"
+ => "",
+
+    "Fascicles"
+ => "",
+
+    "Feeds"
+ => "",
+
+    "File"
+ => "",
+
+    "File name"
+ => "",
+
+    "Files"
+ => "",
+
+    "Filter"
+ => "",
+
+    "Find"
+ => "",
+
+    "Flash mode"
+ => "",
+
+    "General information"
+ => "",
+
+    "Get defaults"
+ => "",
+
+    "Go back"
+ => "",
+
+    "Group"
+ => "",
+
+    "Group by"
+ => "",
+
+    "Group removal"
+ => "",
+
+    "Group rules"
+ => "",
+
+    "H"
+ => "",
+
+    "HL"
+ => "",
+
+    "Headline"
+ => "",
+
+    "Headlines"
+ => "",
+
+    "Help"
+ => "",
+
+    "Help center"
+ => "",
+
+    "Holder"
+ => "",
+
+    "Hot save"
+ => "",
+
+    "Html mode"
+ => "",
+
+    "ID"
+ => "",
+
+    "INN"
+ => "",
+
+    "Index"
+ => "",
+
+    "Indexation"
+ => "",
+
+    "Inprint"
+ => "",
+
+    "Irreversible removal"
+ => "",
+
+    "Irrevocable action!"
+ => "",
+
+    "Issue"
+ => "",
+
+    "Issues"
+ => "",
+
+    "Items"
+ => "",
+
+    "KPP"
+ => "",
+
+    "KS"
+ => "",
+
+    "Label"
+ => "",
+
+    "Last Modified"
+ => "",
+
+    "Length"
+ => "",
+
+    "Limit"
+ => "",
+
+    "Limitation..."
+ => "",
+
+    "Loading"
+ => "",
+
+    "Loading text"
+ => "",
+
+    "Loading..."
+ => "",
+
+    "Login"
+ => "",
+
+    "Logout"
+ => "",
+
+    "Logs"
+ => "",
+
+    "Management"
+ => "",
+
+    "Manager"
+ => "",
+
+    "Members"
+ => "",
+
+    "Membership"
+ => "",
+
+    "Microsoft Excel (xls)"
+ => "",
+
+    "Microsoft Word (doc)"
+ => "",
+
+    "Modification of the file"
+ => "",
+
+    "Modification of the file description"
+ => "",
+
+    "Modified"
+ => "",
+
+    "Module"
+ => "",
+
+    "Module size"
+ => "",
+
+    "Modules"
+ => "",
+
+    "More options"
+ => "",
+
+    "Move"
+ => "",
+
+    "Move document"
+ => "",
+
+    "Moved"
+ => "",
+
+    "Moving to the briefcase"
+ => "",
+
+    "Moving to the recycle bin"
+ => "",
+
+    "My alerts"
+ => "",
+
+    "Name"
+ => "",
+
+    "No"
+ => "",
+
+    "No chains to display"
+ => "",
+
+    "No documents to display"
+ => "",
+
+    "No versions to display"
+ => "",
+
+    "Not approved"
+ => "",
+
+    "Not defined"
+ => "",
+
+    "Not implemented"
+ => "",
+
+    "Not set"
+ => "",
+
+    "Numbering"
+ => "",
+
+    "Ok"
+ => "",
+
+    "Open issues"
+ => "",
+
+    "OpenOffice.org (ods)"
+ => "",
+
+    "OpenOffice.org (odt)"
+ => "",
+
+    "Organization"
+ => "",
+
+    "Out date"
+ => "",
+
+    "Page"
+ => "",
+
+    "Pages"
+ => "",
+
+    "Paid"
+ => "",
+
+    "Parameters"
+ => "",
+
+    "Parent"
+ => "",
+
+    "Password"
+ => "",
+
+    "Path to image"
+ => "",
+
+    "Payment"
+ => "",
+
+    "Percent"
+ => "",
+
+    "Phones"
+ => "",
+
+    "Photo"
+ => "",
+
+    "Place"
+ => "",
+
+    "Planning"
+ => "",
+
+    "Please enter your text"
+ => "",
+
+    "Please wait..."
+ => "",
+
+    "Position"
+ => "",
+
+    "Possible"
+ => "",
+
+    "Possible request"
+ => "",
+
+    "Prevailing"
+ => "",
+
+    "Preview"
+ => "",
+
+    "Principals list"
+ => "",
+
+    "Print date"
+ => "",
+
+    "Printing"
+ => "",
+
+    "Probably someone has entered in Inprint with your login on other computer. <br/> push F5 what to pass to authorization page"
+ => "",
+
+    "Profile"
+ => "",
+
+    "Profile of the employee"
+ => "",
+
+    "Progress"
+ => "",
+
+    "Properties"
+ => "",
+
+    "Publication"
+ => "",
+
+    "Publish"
+ => "",
+
+    "Publishing House"
+ => "",
+
+    "RQ"
+ => "",
+
+    "RS"
+ => "",
+
+    "RSS feeds"
+ => "",
+
+    "Readiness"
+ => "",
+
+    "Record date"
+ => "",
+
+    "Recycle"
+ => "",
+
+    "Recycle Bin"
+ => "",
+
+    "Recycle bin"
+ => "",
+
+    "Refresh this panel"
+ => "",
+
+    "Release addition"
+ => "",
+
+    "Reload"
+ => "",
+
+    "Remove"
+ => "",
+
+    "Remove selected files?"
+ => "",
+
+    "Rename file"
+ => "",
+
+    "Renaming a file"
+ => "",
+
+    "Request"
+ => "",
+
+    "Reservation"
+ => "",
+
+    "Reset"
+ => "",
+
+    "Restore"
+ => "",
+
+    "Review of access rights"
+ => "",
+
+    "Rich Text Format (rtf)"
+ => "",
+
+    "Rights"
+ => "",
+
+    "Role"
+ => "",
+
+    "Roles"
+ => "",
+
+    "Root node"
+ => "",
+
+    "Rubric"
+ => "",
+
+    "Rubrication"
+ => "",
+
+    "Rule"
+ => "",
+
+    "Rules"
+ => "",
+
+    "Save"
+ => "",
+
+    "Save recursive"
+ => "",
+
+    "Saving"
+ => "",
+
+    "Saving text"
+ => "",
+
+    "Select"
+ => "",
+
+    "Select a file extension"
+ => "",
+
+    "Select a paid status..."
+ => "",
+
+    "Select a request status..."
+ => "",
+
+    "Select a type"
+ => "",
+
+    "Select a willingness..."
+ => "",
+
+    "Select an file"
+ => "",
+
+    "Select employees"
+ => "",
+
+    "Select issue"
+ => "",
+
+    "Select..."
+ => "",
+
+    "Serial"
+ => "",
+
+    "Settings"
+ => "",
+
+    "Shortcut"
+ => "",
+
+    "Show only with RSS"
+ => "",
+
+    "Simple Text (txt)"
+ => "",
+
+    "Size"
+ => "",
+
+    "Software error"
+ => "",
+
+    "Squib"
+ => "",
+
+    "Stage"
+ => "",
+
+    "Stages"
+ => "",
+
+    "State"
+ => "",
+
+    "Status"
+ => "",
+
+    "Suitable data is not found"
+ => "",
+
+    "System Information"
+ => "",
+
+    "System event"
+ => "",
+
+    "System information"
+ => "",
+
+    "System profile"
+ => "",
+
+    "Table format"
+ => "",
+
+    "Tabular text (txt)"
+ => "",
+
+    "Template"
+ => "",
+
+    "Templates"
+ => "",
+
+    "Templates of pages"
+ => "",
+
+    "Termination of membership"
+ => "",
+
+    "Text editing"
+ => "",
+
+    "Text editor"
+ => "",
+
+    "Text format"
+ => "",
+
+    "The empoyee not found"
+ => "",
+
+    "The login is not specified"
+ => "",
+
+    "The password is not specified"
+ => "",
+
+    "The rights"
+ => "",
+
+    "This change can not be undone!"
+ => "",
+
+    "Titl"
+ => "",
+
+    "Title"
+ => "",
+
+    "Todo"
+ => "",
+
+    "Transfer"
+ => "",
+
+    "Transfer browser"
+ => "",
+
+    "Type"
+ => "",
+
+    "URL"
+ => "",
+
+    "Unable to save text"
+ => "",
+
+    "Unknown department"
+ => "",
+
+    "Unknown edition"
+ => "",
+
+    "Unknown employee"
+ => "",
+
+    "Unknown fascicle"
+ => "",
+
+    "Unnamed window"
+ => "",
+
+    "Unpublish"
+ => "",
+
+    "Update"
+ => "",
+
+    "Update role"
+ => "",
+
+    "Updated"
+ => "",
+
+    "Upload"
+ => "",
+
+    "Upload document"
+ => "",
+
+    "Upload files"
+ => "",
+
+    "Uploaded"
+ => "",
+
+    "Use by default"
+ => "",
+
+    "User Information"
+ => "",
+
+    "Versions"
+ => "",
+
+    "View"
+ => "",
+
+    "View composer"
+ => "",
+
+    "View plan"
+ => "",
+
+    "W"
+ => "",
+
+    "Warning"
+ => "",
+
+    "Weight"
+ => "",
+
+    "Where"
+ => "",
+
+    "Without conversion"
+ => "",
+
+    "Workgroup"
+ => "",
+
+    "Wrong password"
+ => "Пароль не подошел",
+
+    "X"
+ => "",
+
+    "Y"
+ => "",
+
+    "Yes"
+ => "",
+
+    "You can't cancel this action!"
+ => "",
+
+    "You really want to do it?"
+ => "",
+
+    "You really want to do this?"
+ => "",
+
+    "You really want to remove the selected accounts?"
+ => "",
+
+    "You really want to stop membership in group for the selected accounts?"
+ => "",
+
+    "You really wish to do this?"
+ => "",
+
+    "Your session is closed"
+ => "",
+
+    "Добавление рекламной заявки"
+ => "",
+
+    "Разметка полос"
+ => "",
+
+    "Редактирование заявки"
+ => "",
+
 );
 
 sub get {

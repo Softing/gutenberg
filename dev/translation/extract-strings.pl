@@ -10,10 +10,11 @@ use File::Find;
 
 binmode DATA, ":utf8";
 
+my @words;
 my @langs = ("en", "ru");
 
-my @result;
-my @words;
+# Process JS files
+
 my @jsfiles;
 
 find({ wanted => sub {
@@ -47,17 +48,39 @@ foreach my $path (@jsfiles) {
     close($file);
 }
 
+# Process PM files
 
-my %seen = ();
-foreach my $item (@words) {
-    push(@result, $item) unless $seen{$item}++;
+my @pmfiles;
+
+find({ wanted => sub {
+    my $filename = $File::Find::name;
+    if ( (/\.pm$/) ) {
+        push @pmfiles, $filename;
+    }
+}}, "../../lib/Inprint");
+
+foreach my $path (@pmfiles) {
+    open(my $file, "<:utf8", $path) or die("Could not open $path");
+    while (<$file>) {
+        while (/->l\("(.*?)"\)/g) {
+            my $string = $1;
+            push @words, $string;
+        }
+        while (/->l\('(.*?)'\)/g) {
+            my $string = $1;
+            push @words, $string;
+        }
+    }
+    close($file);
 }
 
-@result = sort {$a cmp $b} @result;
-
+# Fill pm files
 foreach my $lang (@langs) {
 
+    my @result = @words;
     my $translation = {};
+
+    # Add strings to @words from pm file
 
     if (-r $FindBin::Bin ."/../../lib/Inprint/I18N/$lang.pm") {
         open (my $source, "<:utf8", $FindBin::Bin ."/../../lib/Inprint/I18N/$lang.pm");
@@ -69,6 +92,7 @@ foreach my $lang (@langs) {
                 $string =~ s/\s+/ /g;
                 $string =~ s/\s+=\>\s+/=>/g;
                 $string =~ m/"(.*?)"=\>"(.*?)"/;
+                push @result, $1;
                 $translation->{$1} = $2;
             }
         }
@@ -76,6 +100,10 @@ foreach my $lang (@langs) {
         close ($source);
     }
 
+    # Sort @words
+    @result = sort {$a cmp $b} @result;
+
+    # Save @words to pm file
     open (my $file, ">:utf8", "$FindBin::Bin/translations/$lang.pm");
 
     say $file "package Inprint::I18N::$lang;";
@@ -91,10 +119,20 @@ foreach my $lang (@langs) {
     say $file "";
     say $file "our \%Lexicon = (";
 
+    my $tab = "    ";
+    my %seen = ();
     foreach my $item (@result) {
-        my $param = sprintf('%-30s', '"'.$item.'"');
+
+        next if $seen{$item}++;
+        next unless $item;
+
+        my $param = sprintf('%-60s', '"'.$item.'"');
         my $value = $translation->{$item};
-        say $file "    $param=> \"$value\",";
+
+        if ($item ~~ @words) {
+            say $file "    $param\n => \"$value\",\n";
+        }
+
     }
 
     say $file ");";
@@ -114,8 +152,8 @@ foreach my $lang (@langs) {
     close($file);
 
     if (-e $FindBin::Bin ."/../../lib/Inprint/I18N/$lang.pm") {
-        #move($FindBin::Bin ."/../../lib/Inprint/I18N/$lang.pm", $FindBin::Bin ."/../../lib/Inprint/I18N/$lang.pm.old");
-        #move($FindBin::Bin ."/translations/$lang.pm", $FindBin::Bin ."/../../lib/Inprint/I18N/$lang.pm");
+    #    move($FindBin::Bin ."/../../lib/Inprint/I18N/$lang.pm", $FindBin::Bin ."/../../lib/Inprint/I18N/$lang.pm.old");
+        move($FindBin::Bin ."/translations/$lang.pm", $FindBin::Bin ."/../../lib/Inprint/I18N/$lang.pm");
     }
 
 }

@@ -27,12 +27,12 @@ sub login
 
         unless ($i_login ) {
            $json->{success} = 'false';
-           push @{ $json->{errors} }, { msg => 'The login is not specified' }
+           push @{ $json->{errors} }, { msg => $c->l("The login is not specified") }
         }
 
         unless ( $i_password ) {
            $json->{success} = 'false';
-           push @{ $json->{errors} }, { msg => 'The password is not specified' }
+           push @{ $json->{errors} }, { msg => $c->l("The password is not specified") }
         }
 
         # пытаемся найти сотрудника с таким логином
@@ -40,7 +40,7 @@ sub login
            my $exist = $c->sql->Q(" SELECT count(*) FROM members WHERE login=?", [ $i_login ])->Value;
            if ( $exist != 1 ){
               $json->{success} = 'false';
-              push @{ $json->{errors} }, { msg => 'The empoyee not found' }
+              push @{ $json->{errors} }, { msg => $c->l("The empoyee not found") }
            }
         }
 
@@ -86,7 +86,7 @@ sub login
                 $c->events->Create("system", undef, "login", "The user with login %1 has entered the wrong password", [ $i_login ]);
 
                 $json->{success} = 'false';
-                push @{ $json->{errors} }, { msg => "Wrong password" }
+                push @{ $json->{errors} }, { msg => $c->l("Wrong password") }
             }
 
         }
