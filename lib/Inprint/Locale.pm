@@ -41,7 +41,7 @@ sub index {
         function _(arg, vals) {
             if (vals) {
                 for (var i=0; i<vals.length;i++) {
-                    arg.replace('%'+i, vals[i]);
+                    arg.replace('%'+i+1, vals[i]);
                 }
             }
             return inprintLocalization[arg] || arg;
