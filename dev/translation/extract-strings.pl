@@ -136,7 +136,7 @@ foreach my $lang (@langs) {
     say $file "";
     say $file "use utf8;";
     say $file "";
-    say $file "our \%Lexicon = (";
+    say $file "our \%Lexicon = (\n";
 
     my $tab = "    ";
     my %seen = ();

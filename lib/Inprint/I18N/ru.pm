@@ -10,6 +10,7 @@ use base 'Inprint::I18N';
 use utf8;
 
 our %Lexicon = (
+
     "#"
  => "",
 
@@ -1172,7 +1173,7 @@ our %Lexicon = (
  => "",
 
     "Wrong password"
- => "",
+ => "Пароль не подошел",
 
     "X"
  => "",
