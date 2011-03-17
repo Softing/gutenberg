@@ -36,11 +36,11 @@ find({ wanted => sub {
 foreach my $path (@jsfiles) {
     open(my $file, "<:utf8", $path) or die("Could not open $path");
     while (<$file>) {
-        while (/_\("(.*?)"\)/g) {
+        while (/_\("(.*?)"/g) {
             my $string = $1;
             push @words, $string;
         }
-        while (/_\('(.*?)'\)/g) {
+        while (/_\('(.*?)'/g) {
             my $string = $1;
             push @words, $string;
         }
@@ -62,11 +62,11 @@ find({ wanted => sub {
 foreach my $path (@pmfiles) {
     open(my $file, "<:utf8", $path) or die("Could not open $path");
     while (<$file>) {
-        while (/->l\("(.*?)"\)/g) {
+        while (/->l\("(.*?)"/g) {
             my $string = $1;
             push @words, $string;
         }
-        while (/->l\('(.*?)'\)/g) {
+        while (/->l\('(.*?)'/g) {
             my $string = $1;
             push @words, $string;
         }

@@ -122,6 +122,9 @@ our %Lexicon = (
     "Annual"
  => "Годовой",
 
+    "Another employee %1 captured this issue!"
+ => "",
+
     "Apply to enclosed"
  => "",
 
@@ -275,7 +278,7 @@ our %Lexicon = (
     "Create a new document"
  => "Создать новый материал",
 
-    "Create a new file" + " [RTF]"
+    "Create a new file"
  => "",
 
     "Create attachment"
