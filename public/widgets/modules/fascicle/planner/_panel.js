@@ -295,7 +295,7 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                 Inprint.fascicle.planner.Access(this, this.panels, rsp.fascicle.access);
 
                 if (this.manager && this.manager != rsp.fascicle.manager) {
-                    Ext.MessageBox.alert(_("Error"), _("Another employee %1 captured this issue!", ["user"]));
+                    Ext.MessageBox.alert(_("Error"), _("Another employee %1 captured this issue!", [ rsp.fascicle.manager_shortcut ]));
                 } else {
                     this.cmpCheckSession.defer( 3000, this);
                 }
