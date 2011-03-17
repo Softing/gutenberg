@@ -145,7 +145,7 @@ foreach my $lang (@langs) {
         next if $seen{$item}++;
         next unless $item;
 
-        my $param = sprintf('%-60s', '"'.$item.'"');
+        my $param = '"' .$item. '"';
         my $value = $translation->{$item};
 
         if ($item ~~ @words) {
