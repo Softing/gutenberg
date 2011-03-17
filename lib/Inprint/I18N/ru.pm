@@ -123,7 +123,7 @@ our %Lexicon = (
  => "Годовой",
 
     "Another employee %1 captured this issue!"
- => "",
+ => "Сотрудник %1 захватил этот выпуск!",
 
     "Apply to enclosed"
  => "",
