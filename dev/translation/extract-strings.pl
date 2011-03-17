@@ -85,8 +85,15 @@ foreach my $lang (@langs) {
     if (-r $FindBin::Bin ."/../../lib/Inprint/I18N/$lang.pm") {
         open (my $source, "<:utf8", $FindBin::Bin ."/../../lib/Inprint/I18N/$lang.pm");
 
+        my $param;
         foreach my $string (<$source>) {
-            if ($string =~ m/=\>/) {
+
+            chomp($string);
+            $string =~ s/\t+/ /g;
+            $string =~ s/\s+/ /g;
+            $string =~ s/\s+=\>\s+/=>/g;
+
+           if ($string =~ m/"(.*?)"=\>"(.*?)"/) {
                 chomp($string);
                 $string =~ s/\t+/ /g;
                 $string =~ s/\s+/ /g;
@@ -95,6 +102,18 @@ foreach my $lang (@langs) {
                 push @result, $1;
                 $translation->{$1} = $2;
             }
+
+            elsif ($string =~ m/=\>/) {
+                $string =~ m/"(.*?)"/;
+                push @result, $param;
+                $translation->{$param} = $1;
+                $param = "";
+            }
+
+            elsif ($string =~ m/"(.*?)"/) {
+                $param = $1;
+            }
+
         }
 
         close ($source);
@@ -151,9 +170,9 @@ foreach my $lang (@langs) {
 
     close($file);
 
-    if (-e $FindBin::Bin ."/../../lib/Inprint/I18N/$lang.pm") {
+    #if (-e $FindBin::Bin ."/../../lib/Inprint/I18N/$lang.pm") {
     #    move($FindBin::Bin ."/../../lib/Inprint/I18N/$lang.pm", $FindBin::Bin ."/../../lib/Inprint/I18N/$lang.pm.old");
-        move($FindBin::Bin ."/translations/$lang.pm", $FindBin::Bin ."/../../lib/Inprint/I18N/$lang.pm");
-    }
+    #    move($FindBin::Bin ."/translations/$lang.pm", $FindBin::Bin ."/../../lib/Inprint/I18N/$lang.pm");
+    #}
 
 }
