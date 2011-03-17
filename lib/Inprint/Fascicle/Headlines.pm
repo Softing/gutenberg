@@ -166,12 +166,12 @@ sub delete {
         Inprint::Models::Fascicle::Headline::delete($c, $i_id);
 
         # Update documents
-        $ñ->sql->Do("
+        $c->sql->Do("
                 UPDATE documents SET
                     headline ='00000000-0000-0000-0000-000000000000', headline_shortcut = '--',
                     rubric   ='00000000-0000-0000-0000-000000000000', rubric_shortcut   = '--'
                 WHERE fascicle=? AND headline=?
-            ", [ $item->{fascicle}, $item->{id} ]);
+            ", [ $item->{fascicle}, $item->{tag} ]);
 
     }
 

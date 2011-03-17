@@ -162,8 +162,8 @@ sub delete {
         $c->sql->Do("
                 UPDATE documents SET
                     rubric   ='00000000-0000-0000-0000-000000000000', rubric_shortcut   = '--'
-                WHERE fascicle=? AND headline=?
-            ", [ $item->{fascicle}, $item->{id} ]);
+                WHERE fascicle=? AND rubric=?
+            ", [ $item->{fascicle}, $item->{tag} ]);
 
     }
 

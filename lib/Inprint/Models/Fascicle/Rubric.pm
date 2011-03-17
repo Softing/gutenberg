@@ -35,7 +35,7 @@ sub read {
     my $id = shift;
 
     my $result = $c->sql->Q("
-        SELECT id, edition, headline, tag, title, description, created, updated
+        SELECT id, edition, fascicle, headline, tag, title, description, created, updated
         FROM fascicles_indx_rubrics WHERE id=? ",
         [ $id ])->Hash;
 
