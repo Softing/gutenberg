@@ -137,7 +137,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
             evtObj.stopEvent();
             var record = thisGrid.getStore().getAt(rowIndex);
             if(record.get("name").match(/^.+\.(doc|docx|odt|rtf|txt)$/i)) {
-                if (this.access["files.work"]  === true) {
+                if (this.access["fedit"]  === true) {
                     Inprint.ObjectResolver.resolve({
                         aid: "document-editor",
                         oid:  record.get("id"),
@@ -159,7 +159,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
 
             if ( selCount > 0 ) {
 
-                if (this.access["files.work"]  === true) {
+                if (this.access["fedit"]  === true) {
                     if ( selCount == 1 ) {
                         if(record.get("name").match(/^.+\.(doc|docx|odt|rtf|txt)$/i)) {
                             rowCtxMenuItems.push({
@@ -195,7 +195,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                 });
 
 
-                if (this.access["files.work"]  === true) {
+                if (this.access["fedit"]  === true) {
 
                     rowCtxMenuItems.push("-");
 
@@ -239,7 +239,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
 
                 }
 
-                if (this.access["files.delete"]  === true) {
+                if (this.access["fdelete"]  === true) {
                     rowCtxMenuItems.push("-");
                     rowCtxMenuItems.push({
                         icon: _ico("document-shred"),
@@ -283,16 +283,11 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
 
     cmpAccess: function(access) {
         this.access = access;
-
         _disable(this.btnCreate, this.btnUpload, this.btnDelete);
-
-        if (access["files.add"]     === true) {
+        if (access["fadd"]     === true) {
             this.btnCreate.enable();
             this.btnUpload.enable();
         }
-
-
-
     },
 
     cmpCreate: function() {

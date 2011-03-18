@@ -240,39 +240,17 @@ Inprint.documents.Profile.View = Ext.extend(Ext.Panel, {
             _show(this.btnRecycle);
         }
 
-        _disable(this.btnUpdate, this.btnCapture, this.btnTransfer, this.btnMove, this.btnBriefcase, this.btnCopy,
-                    this.btnDuplicate, this.btnRecycle, this.btnRestore, this.btnDelete);
+        access.update    === true ? this.btnUpdate.enable()     : this.btnUpdate.disable();
+        access.capture   === true ? this.btnCapture.enable()    : this.btnCapture.disable();
+        access.transfer  === true ? this.btnTransfer.enable()   : this.btnTransfer.disable();
+        access.briefcase === true ? this.btnBriefcase.enable()  : this.btnBriefcase.disable();
+        access.move      === true ? this.btnMove.enable()       : this.btnMove.disable();
+        access.move      === true ? this.btnCopy.enable()       : this.btnCopy.disable();
+        access.move      === true ? this.btnDuplicate.enable()  : this.btnDuplicate.disable();
+        access.recover   === true ? this.btnRestore.enable()    : this.btnRestore.disable();
+        access["delete"] === true ? this.btnRecycle.enable()    : this.btnRecycle.disable();
+        access["delete"] === true ? this.btnDelete.enable()     : this.btnDelete.disable();
 
-        if (access["documents.update"]    === true) {
-            this.btnUpdate.enable();
-        }
-        if (access["documents.capture"]   === true) {
-            this.btnCapture.enable();
-        }
-        if (access["documents.transfer"]  === true) {
-            this.btnTransfer.enable();
-        }
-        if (access["documents.briefcase"] === true) {
-            this.btnBriefcase.enable();
-        }
-        if (access["documents.move"]      === true) {
-            this.btnMove.enable();
-        }
-        if (access["documents.move"]      === true) {
-            this.btnCopy.enable();
-        }
-        if (access["documents.move"]      === true) {
-            this.btnDuplicate.enable();
-        }
-        if (access["documents.recover"]   === true) {
-            this.btnRestore.enable();
-        }
-        if (access["documents.delete"]    === true) {
-            this.btnRecycle.enable();
-        }
-        if (access["documents.delete"]    === true) {
-            this.btnDelete.enable();
-        }
     }
 
 });

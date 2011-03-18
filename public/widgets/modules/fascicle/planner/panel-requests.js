@@ -143,6 +143,16 @@ Inprint.fascicle.planner.Requests = Ext.extend(Ext.grid.GridPanel, {
             },
             '-',
             {
+                ref: "../btnChangeModule",
+                disabled:true,
+                text:'Изменить модуль',
+                icon: _ico("navigation-000-button"),
+                cls: 'x-btn-text-icon',
+                scope:this,
+                handler: this.cmpMove
+            },
+            '-',
+            {
                 icon: _ico("minus-button"),
                 cls: "x-btn-text-icon",
                 text: _("Remove"),

@@ -62,24 +62,12 @@ sub read {
         }
 
         # Get document rules
-        my @rules = qw(
-           documents.update
-           documents.capture
-           documents.move
-           documents.transfer
-           documents.briefcase
-           documents.delete
-           documents.recover
-           documents.discuss
-           files.add
-           files.delete
-           files.work
-        );
+        my @rules = qw( update capture move transfer briefcase delete recover discuss fadd fedit fdelete );
 
         foreach (@rules) {
 
             if ($document->{holder} eq $current_member) {
-                if ($c->access->Check(["catalog.$_:*"], $document->{workgroup})) {
+                if ($c->access->Check(["catalog.documents.$_:*"], $document->{workgroup})) {
                     $document->{access}->{$_} = $c->json->true;
                 } else {
                     $document->{access}->{$_} = $c->json->false;
@@ -87,7 +75,7 @@ sub read {
             }
 
             if ($document->{holder} ne $current_member) {
-                if ($c->access->Check("catalog.$_:group", $document->{workgroup})) {
+                if ($c->access->Check("catalog.documents.$_:group", $document->{workgroup})) {
                     $document->{access}->{$_} = $c->json->true;
                 } else {
                     $document->{access}->{$_} = $c->json->false;
