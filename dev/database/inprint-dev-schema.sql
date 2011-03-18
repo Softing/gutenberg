@@ -478,8 +478,6 @@ BEGIN
 
     arg_type := TG_ARGV[0];
 
-    --RAISE EXCEPTION '%', arg_type;
-
     EXECUTE ' DELETE FROM cache_access WHERE type=''' ||arg_type|| ''' AND binding=''' ||NEW.id|| '''; ';
 
     IF arg_type = 'editions' THEN
@@ -524,56 +522,50 @@ CREATE FUNCTION access_update_after_trigger() RETURNS trigger
     AS $$
 DECLARE
     arg_type varchar;
-		arecords RECORD;
+    arecords RECORD;
 BEGIN
 
-	arg_type := TG_ARGV[0];
+    arg_type := TG_ARGV[0];
 
-	EXECUTE ' DELETE FROM cache_access WHERE type=''' ||arg_type|| ''' AND binding=''' ||NEW.id|| '''; ';
+    EXECUTE ' DELETE FROM cache_access WHERE type=''' ||arg_type|| ''' AND binding=''' ||NEW.id|| '''; ';
 
-	-- CREATE RULES FOR NEW POSITION
+    -- CREATE RULES FOR NEW POSITION
 
     IF arg_type = 'editions' THEN
 
-			FOR arecords IN
-				SELECT
-					'editions' AS type,
-					t1.path,
-					t1.id AS binding,
-					t2.id AS member,
-					ARRAY(
-							SELECT DISTINCT (((a2.section::text || '.'::text) || a2.subsection::text) || '.'::text) || a2.term::text AS term
-              FROM map_member_to_rule a1, rules a2
-              WHERE a2.id = a1.term AND a2.section = 'editions' AND a1.member = t2.id AND (a1.binding IN ( SELECT id FROM editions WHERE path @> t1.path))
-					) AS terms
-					FROM editions t1, members t2
-					WHERE t1.path ~ (NEW.path::text || '.*')::lquery ORDER BY t1.path
-			LOOP
-						DELETE FROM cache_access WHERE type='editions' AND path=arecords.path AND binding=arecords.binding AND member=arecords.member;
-						INSERT INTO cache_access (type, path, binding, member, terms) VALUES ('editions', arecords.path, arecords.binding, arecords.member, arecords.terms);
-			END LOOP;
+        FOR arecords IN
+            SELECT
+                'editions' AS type, t1.path, t1.id AS binding, t2.id AS member,
+                ARRAY(
+                    SELECT DISTINCT (((a2.section::text || '.'::text) || a2.subsection::text) || '.'::text) || a2.term::text AS term
+                    FROM map_member_to_rule a1, rules a2
+                    WHERE a2.id = a1.term AND a2.section = 'editions' AND a1.member = t2.id AND (a1.binding IN ( SELECT id FROM editions WHERE path @> t1.path))
+                ) AS terms
+            FROM editions t1, members t2
+            WHERE t1.path ~ (NEW.path::text || '.*')::lquery ORDER BY t1.path
+        LOOP
+            DELETE FROM cache_access WHERE type='editions' AND path=arecords.path AND binding=arecords.binding AND member=arecords.member;
+            INSERT INTO cache_access (type, path, binding, member, terms) VALUES ('editions', arecords.path, arecords.binding, arecords.member, arecords.terms);
+        END LOOP;
 
     END IF;
 
     IF arg_type = 'catalog' THEN
 
-			FOR arecords IN
-				SELECT
-					'catalog' AS type,
-					t1.path,
-					t1.id AS binding,
-					t2.id AS member,
-					ARRAY(
-							SELECT DISTINCT a2.section::text || '.'::text || a2.subsection::text || '.'::text || a2.term::text || ':'::text || a1.area AS term
-							FROM map_member_to_rule a1, rules a2
-							WHERE a2.id = a1.term AND a2.section = 'catalog' AND a1.member = t2.id AND (a1.binding IN ( SELECT id FROM catalog WHERE path @> t1.path))
-					) AS terms
-				FROM catalog t1, members t2
-				WHERE t1.path ~ ( NEW.path::text || '.*')::lquery ORDER BY t1.path
-			LOOP
-						DELETE FROM cache_access WHERE type='catalog' AND path=arecords.path AND binding=arecords.binding AND member=arecords.member;
-						INSERT INTO cache_access (type, path, binding, member, terms) VALUES ('catalog', arecords.path, arecords.binding, arecords.member, arecords.terms);
-			END LOOP;
+        FOR arecords IN
+            SELECT
+                'catalog' AS type, t1.path, t1.id AS binding, t2.id AS member,
+                ARRAY(
+                    SELECT DISTINCT a2.section::text || '.'::text || a2.subsection::text || '.'::text || a2.term::text || ':'::text || a1.area AS term
+                    FROM map_member_to_rule a1, rules a2
+                    WHERE a2.id = a1.term AND a2.section = 'catalog' AND a1.member = t2.id AND (a1.binding IN ( SELECT id FROM catalog WHERE path @> t1.path))
+                ) AS terms
+            FROM catalog t1, members t2
+            WHERE t1.path ~ ( NEW.path::text || '.*')::lquery ORDER BY t1.path
+        LOOP
+            DELETE FROM cache_access WHERE type='catalog' AND path=arecords.path AND binding=arecords.binding AND member=arecords.member;
+            INSERT INTO cache_access (type, path, binding, member, terms) VALUES ('catalog', arecords.path, arecords.binding, arecords.member, arecords.terms);
+        END LOOP;
 
     END IF;
 
@@ -630,8 +622,6 @@ BEGIN
             );'
         INTO arg_seqnums USING OLD.fascicle, OLD.entity;
 
-    --RAISE EXCEPTION '%', arg_seqnums;
-
     EXECUTE 'UPDATE documents SET pages=array_to_string($1, '','') WHERE id=$2'
         USING arg_seqnums, OLD.entity;
 
@@ -663,8 +653,6 @@ BEGIN
                 ORDER BY t2.seqnum
             );'
         INTO arg_seqnums USING NEW.fascicle, NEW.entity;
-
-    --RAISE EXCEPTION '%', arg_seqnums;
 
     EXECUTE 'UPDATE documents SET pages=array_to_string($1, '','') WHERE id=$2'
         USING arg_seqnums, NEW.entity;
@@ -1180,75 +1168,18 @@ BEGIN
             INTO arg_term_name USING OLD.term;
     END IF;
 
-
-
     IF OLD.section = 'editions' THEN
-
-        EXECUTE 'DELETE FROM cache_access WHERE type=''' ||OLD.section|| ''' AND member=''' ||OLD.member|| ''' AND path ~ (''' || arg_path::text || '.*'')::lquery ';
-        EXECUTE 'DELETE FROM cache_visibility WHERE type=''' ||OLD.section|| ''' AND member=''' ||OLD.member|| ''' AND term LIKE ''' ||arg_term_name|| ''' ';
-
-        EXECUTE '
-            INSERT INTO cache_access
-                SELECT ''' ||OLD.section|| ''' AS type, t1.path, t1.id AS binding, t2.id AS member, ARRAY(
-                    SELECT DISTINCT a2.section::text || ''.''::text || a2.subsection::text || ''.''::text || a2.term::text AS term
-                    FROM map_member_to_rule a1, rules a2
-                    WHERE a2.id = a1.term AND a2.section = ''' ||OLD.section|| ''' AND a1.member = t2.id AND (a1.binding IN ( SELECT id FROM ' ||OLD.section|| ' WHERE path @> t1.path))
-                ) AS terms
-                FROM ' ||OLD.section|| ' t1, members t2
-                WHERE t2.id=''' ||OLD.member|| ''' AND t1.path ~ (''' || arg_path::text || '.*'')::lquery ORDER BY t1.path;
-        ';
-
-        EXECUTE '
-            INSERT INTO cache_visibility
-                SELECT ''' ||OLD.section|| ''' AS type, ''' ||OLD.member|| ''' as member, ''' ||arg_term_name|| ''' AS term, ''' ||OLD.term|| ''' as termid,
-                ARRAY(
-                    SELECT id FROM ' ||OLD.section|| ' WHERE
-                        path @> ARRAY( SELECT path from map_member_to_rule t1, ' ||OLD.section|| ' t2 WHERE t2.id = t1.binding AND t1.member=''' ||OLD.member|| ''' AND t1.term = ''' ||OLD.term|| ''')
-                ) as parents,
-                ARRAY(
-                    SELECT id FROM ' ||OLD.section|| ' WHERE
-                        path <@ ARRAY( SELECT path from map_member_to_rule t1, ' ||OLD.section|| ' t2 WHERE t2.id = t1.binding AND t1.member=''' ||OLD.member|| ''' AND t1.term = ''' ||OLD.term|| ''')
-                ) as childrens
-        ';
-
+        IF arg_path IS NOT null AND arg_term_name IS NOT NULL THEN
+            EXECUTE 'DELETE FROM cache_access WHERE type=''' ||OLD.section|| ''' AND member=''' ||OLD.member|| ''' AND path ~ (''' || arg_path::text || '.*'')::lquery ';
+            EXECUTE 'DELETE FROM cache_visibility WHERE type=''' ||OLD.section|| ''' AND member=''' ||OLD.member|| ''' AND term LIKE ''' ||arg_term_name|| ''' ';
+        END IF;
     END IF;
 
     IF OLD.section = 'catalog' THEN
-
-        EXECUTE 'DELETE FROM cache_access WHERE type=''' ||OLD.section|| ''' AND member=''' ||OLD.member|| ''' AND path ~ (''' || arg_path::text || '.*'')::lquery ';
-        EXECUTE 'DELETE FROM cache_visibility WHERE type=''' ||OLD.section|| ''' AND member=''' ||OLD.member|| ''' AND term LIKE ''' ||arg_term_name|| ':' ||OLD.area|| ''' ';
-
-        /*
-        EXECUTE '
-            INSERT INTO cache_access
-                SELECT ''' ||OLD.section|| ''' AS type, t1.path, t1.id AS binding, t2.id AS member, ARRAY(
-                    SELECT DISTINCT a2.section::text || ''.''::text || a2.subsection::text || ''.''::text || a2.term::text || '':''::text || a1.area AS term
-                    FROM map_member_to_rule a1, rules a2
-                    WHERE a2.id = a1.term AND a2.section = ''' ||OLD.section|| ''' AND a1.member = ''' ||OLD.member|| ''' AND (a1.binding IN ( SELECT id FROM ' ||OLD.section|| ' WHERE path @> t1.path))
-                ) AS terms
-                FROM ' ||OLD.section|| ' t1, members t2
-                WHERE t2.id=''' ||OLD.member|| ''' AND t1.path ~ (''' || arg_path::text || '.*'')::lquery ORDER BY t1.path;
-        ';
-
-        EXECUTE '
-            INSERT INTO cache_visibility
-                SELECT ''' ||OLD.section|| ''' AS type, ''' ||OLD.member|| ''' as member, ''' ||arg_term_name|| '''||'':''||''' ||OLD.area|| ''' AS term, ''' ||OLD.term|| ''' as termid,
-                ARRAY(
-                    SELECT id FROM ' ||OLD.section|| ' WHERE
-                        path @> ARRAY(
-                            SELECT path from map_member_to_rule t1, ' ||OLD.section|| ' t2
-                            WHERE t2.id = t1.binding AND t1.member=''' ||OLD.member|| ''' AND t1.term = ''' ||OLD.term|| ''' AND t1.area = ''' ||OLD.area|| '''
-                        )
-                ) as parents,
-                ARRAY(
-                    SELECT id FROM ' ||OLD.section|| ' WHERE
-                        path <@ ARRAY(
-                            SELECT path from map_member_to_rule t1, ' ||OLD.section|| ' t2
-                            WHERE t2.id = t1.binding AND t1.member=''' ||OLD.member|| ''' AND t1.term = ''' ||OLD.term|| ''' AND t1.area = ''' ||OLD.area|| '''
-                        )
-                ) as childrens
-        ';
-        */
+        IF arg_path IS NOT null AND arg_term_name IS NOT NULL THEN
+            EXECUTE 'DELETE FROM cache_access WHERE type=''' ||OLD.section|| ''' AND member=''' ||OLD.member|| ''' AND path ~ (''' || arg_path::text || '.*'')::lquery ';
+            EXECUTE 'DELETE FROM cache_visibility WHERE type=''' ||OLD.section|| ''' AND member=''' ||OLD.member|| ''' AND term LIKE ''' ||arg_term_name|| ':' ||OLD.area|| ''' ';
+        END IF;
     END IF;
 
     RETURN OLD;
@@ -1297,71 +1228,72 @@ BEGIN
     END IF;
 
     IF NEW.section = 'editions' THEN
+        IF arg_path IS NOT null AND arg_term_name IS NOT NULL THEN
+            EXECUTE 'DELETE FROM cache_access WHERE type=''' ||NEW.section|| ''' AND member=''' ||NEW.member|| ''' AND path ~ (''' || arg_path::text || '.*'')::lquery; ';
+            EXECUTE 'DELETE FROM cache_visibility WHERE type=''' ||NEW.section|| ''' AND member=''' ||NEW.member|| ''' AND term LIKE ''' ||arg_term_name|| '''; ';
 
-        EXECUTE 'DELETE FROM cache_access WHERE type=''' ||NEW.section|| ''' AND member=''' ||NEW.member|| ''' AND path ~ (''' || arg_path::text || '.*'')::lquery; ';
-        EXECUTE 'DELETE FROM cache_visibility WHERE type=''' ||NEW.section|| ''' AND member=''' ||NEW.member|| ''' AND term LIKE ''' ||arg_term_name|| '''; ';
+            EXECUTE '
+                INSERT INTO cache_access
+                    SELECT ''' ||NEW.section|| ''' AS type, t1.path, t1.id AS binding, t2.id AS member, ARRAY(
+                        SELECT DISTINCT a2.section::text || ''.''::text || a2.subsection::text || ''.''::text || a2.term::text AS term
+                        FROM map_member_to_rule a1, rules a2
+                        WHERE a2.id = a1.term AND a2.section = ''' ||NEW.section|| ''' AND a1.member = t2.id AND (a1.binding IN ( SELECT id FROM ' ||NEW.section|| ' WHERE path @> t1.path))
+                    ) AS terms
+                    FROM ' ||NEW.section|| ' t1, members t2
+                    WHERE t2.id=''' ||NEW.member|| ''' AND t1.path ~ (''' || arg_path::text || '.*'')::lquery ORDER BY t1.path;
+            ';
 
-        EXECUTE '
-            INSERT INTO cache_access
-                SELECT ''' ||NEW.section|| ''' AS type, t1.path, t1.id AS binding, t2.id AS member, ARRAY(
-                    SELECT DISTINCT a2.section::text || ''.''::text || a2.subsection::text || ''.''::text || a2.term::text AS term
-                    FROM map_member_to_rule a1, rules a2
-                    WHERE a2.id = a1.term AND a2.section = ''' ||NEW.section|| ''' AND a1.member = t2.id AND (a1.binding IN ( SELECT id FROM ' ||NEW.section|| ' WHERE path @> t1.path))
-                ) AS terms
-                FROM ' ||NEW.section|| ' t1, members t2
-                WHERE t2.id=''' ||NEW.member|| ''' AND t1.path ~ (''' || arg_path::text || '.*'')::lquery ORDER BY t1.path;
-        ';
+            EXECUTE '
+                INSERT INTO cache_visibility
+                    SELECT ''' ||NEW.section|| ''' AS type, ''' ||NEW.member|| ''' as member, ''' ||arg_term_name|| ''' AS term, ''' ||NEW.term|| ''' as termid,
+                    ARRAY(
+                        SELECT id FROM ' ||NEW.section|| ' WHERE
+                            path @> ARRAY( SELECT path from map_member_to_rule t1, ' ||NEW.section|| ' t2 WHERE t2.id = t1.binding AND t1.member=''' ||NEW.member|| ''' AND t1.term = ''' ||NEW.term|| ''')
+                    ) as parents,
+                    ARRAY(
+                        SELECT id FROM ' ||NEW.section|| ' WHERE
+                            path <@ ARRAY( SELECT path from map_member_to_rule t1, ' ||NEW.section|| ' t2 WHERE t2.id = t1.binding AND t1.member=''' ||NEW.member|| ''' AND t1.term = ''' ||NEW.term|| ''')
+                    ) as childrens
 
-        EXECUTE '
-            INSERT INTO cache_visibility
-                SELECT ''' ||NEW.section|| ''' AS type, ''' ||NEW.member|| ''' as member, ''' ||arg_term_name|| ''' AS term, ''' ||NEW.term|| ''' as termid,
-                ARRAY(
-                    SELECT id FROM ' ||NEW.section|| ' WHERE
-                        path @> ARRAY( SELECT path from map_member_to_rule t1, ' ||NEW.section|| ' t2 WHERE t2.id = t1.binding AND t1.member=''' ||NEW.member|| ''' AND t1.term = ''' ||NEW.term|| ''')
-                ) as parents,
-                ARRAY(
-                    SELECT id FROM ' ||NEW.section|| ' WHERE
-                        path <@ ARRAY( SELECT path from map_member_to_rule t1, ' ||NEW.section|| ' t2 WHERE t2.id = t1.binding AND t1.member=''' ||NEW.member|| ''' AND t1.term = ''' ||NEW.term|| ''')
-                ) as childrens
-
-        ';
+            ';
+        END IF;
     END IF;
 
     IF NEW.section = 'catalog' THEN
+        IF arg_path IS NOT null AND arg_term_name IS NOT NULL THEN
+            EXECUTE 'DELETE FROM cache_access WHERE type=''' ||NEW.section|| ''' AND member=''' ||NEW.member|| ''' AND path ~ (''' || arg_path::text || '.*'')::lquery; ';
+            EXECUTE 'DELETE FROM cache_visibility WHERE type=''' ||NEW.section|| ''' AND member=''' ||NEW.member|| ''' AND term LIKE ''' ||arg_term_name|| ':' ||NEW.area|| ''' ';
 
-        EXECUTE 'DELETE FROM cache_access WHERE type=''' ||NEW.section|| ''' AND member=''' ||NEW.member|| ''' AND path ~ (''' || arg_path::text || '.*'')::lquery; ';
-        EXECUTE 'DELETE FROM cache_visibility WHERE type=''' ||NEW.section|| ''' AND member=''' ||NEW.member|| ''' AND term LIKE ''' ||arg_term_name|| ':' ||NEW.area|| ''' ';
+            EXECUTE '
+                INSERT INTO cache_access
+                    SELECT ''' ||NEW.section|| ''' AS type, t1.path, t1.id AS binding, t2.id AS member, ARRAY(
+                        SELECT DISTINCT a2.section::text || ''.''::text || a2.subsection::text || ''.''::text || a2.term::text || '':''::text || a1.area AS term
+                        FROM map_member_to_rule a1, rules a2
+                        WHERE a2.id = a1.term AND a2.section = ''' ||NEW.section|| ''' AND a1.member = ''' ||NEW.member|| ''' AND (a1.binding IN ( SELECT id FROM ' ||NEW.section|| ' WHERE path @> t1.path))
+                    ) AS terms
+                    FROM ' ||NEW.section|| ' t1, members t2
+                    WHERE t2.id=''' ||NEW.member|| ''' AND t1.path ~ (''' || arg_path::text || '.*'')::lquery ORDER BY t1.path;
+            ';
 
-        EXECUTE '
-            INSERT INTO cache_access
-                SELECT ''' ||NEW.section|| ''' AS type, t1.path, t1.id AS binding, t2.id AS member, ARRAY(
-                    SELECT DISTINCT a2.section::text || ''.''::text || a2.subsection::text || ''.''::text || a2.term::text || '':''::text || a1.area AS term
-                    FROM map_member_to_rule a1, rules a2
-                    WHERE a2.id = a1.term AND a2.section = ''' ||NEW.section|| ''' AND a1.member = ''' ||NEW.member|| ''' AND (a1.binding IN ( SELECT id FROM ' ||NEW.section|| ' WHERE path @> t1.path))
-                ) AS terms
-                FROM ' ||NEW.section|| ' t1, members t2
-                WHERE t2.id=''' ||NEW.member|| ''' AND t1.path ~ (''' || arg_path::text || '.*'')::lquery ORDER BY t1.path;
-        ';
-
-        EXECUTE '
-            INSERT INTO cache_visibility
-                SELECT ''' ||NEW.section|| ''' AS type, ''' ||NEW.member|| ''' as member, ''' ||arg_term_name|| '''||'':''||''' ||NEW.area|| ''' AS term, ''' ||NEW.term|| ''' as termid,
-                ARRAY(
-                    SELECT id FROM ' ||NEW.section|| ' WHERE
-                        path @> ARRAY(
-                            SELECT path from map_member_to_rule t1, ' ||NEW.section|| ' t2
-                            WHERE t2.id = t1.binding AND t1.member=''' ||NEW.member|| ''' AND t1.term = ''' ||NEW.term|| ''' AND t1.area = ''' ||NEW.area|| '''
-                        )
-                ) as parents,
-                ARRAY(
-                    SELECT id FROM ' ||NEW.section|| ' WHERE
-                        path <@ ARRAY(
-                            SELECT path from map_member_to_rule t1, ' ||NEW.section|| ' t2
-                            WHERE t2.id = t1.binding AND t1.member=''' ||NEW.member|| ''' AND t1.term = ''' ||NEW.term|| ''' AND t1.area = ''' ||NEW.area|| '''
-                        )
-                ) as childrens
-        ';
-
+            EXECUTE '
+                INSERT INTO cache_visibility
+                    SELECT ''' ||NEW.section|| ''' AS type, ''' ||NEW.member|| ''' as member, ''' ||arg_term_name|| '''||'':''||''' ||NEW.area|| ''' AS term, ''' ||NEW.term|| ''' as termid,
+                    ARRAY(
+                        SELECT id FROM ' ||NEW.section|| ' WHERE
+                            path @> ARRAY(
+                                SELECT path from map_member_to_rule t1, ' ||NEW.section|| ' t2
+                                WHERE t2.id = t1.binding AND t1.member=''' ||NEW.member|| ''' AND t1.term = ''' ||NEW.term|| ''' AND t1.area = ''' ||NEW.area|| '''
+                            )
+                    ) as parents,
+                    ARRAY(
+                        SELECT id FROM ' ||NEW.section|| ' WHERE
+                            path <@ ARRAY(
+                                SELECT path from map_member_to_rule t1, ' ||NEW.section|| ' t2
+                                WHERE t2.id = t1.binding AND t1.member=''' ||NEW.member|| ''' AND t1.term = ''' ||NEW.term|| ''' AND t1.area = ''' ||NEW.area|| '''
+                            )
+                    ) as childrens
+            ';
+        END IF;
     END IF;
 
     RETURN NEW;
@@ -2946,7 +2878,7 @@ ALTER TABLE public.editions_options OWNER TO inprint;
 
 CREATE TABLE fascicles (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    
+
     edition uuid NOT NULL,
     parent uuid NOT NULL,
 
@@ -2969,7 +2901,7 @@ CREATE TABLE fascicles (
 
     flagdoc varchar DEFAULT 'bydate',
     flagadv varchar DEFAULT 'bydate',
-    
+
     datedoc timestamp(6) with time zone,
     dateadv timestamp(6) with time zone,
 
