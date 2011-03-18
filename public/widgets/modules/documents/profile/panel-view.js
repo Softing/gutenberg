@@ -154,7 +154,7 @@ Inprint.documents.Profile.View = Ext.extend(Ext.Panel, {
                 '<tpl if="rsize">{rsize}</tpl>',
                 '<tpl if="!rsize">{psize}</tpl>',
             '</nobr></td>',
-            '<td><nobr>{[ this.fmtString( values.workgroup_shortcut ) ]}</nobr></td>',
+            '<td><nobr>{[ this.fmtString( values.maingroup_shortcut ) ]}</nobr></td>',
             '<td><nobr>{[ this.fmtString( values.manager_shortcut ) ]}</nobr></td>',
             '<td><nobr>{[ this.fmtString( values.author ) ]}</nobr></td>',
             '<td><nobr>',
