@@ -66,8 +66,10 @@ Inprint.documents.GridColumns = function() {
                     }
                 }
 
-                var result = "<div style=\"font-size:12px;font-weight:bold;\">"+ header +"</div>"+
-                    "<div style=\"margin-top:6px;\">"+ linksResult.join(",&nbsp; ") + "</div>";
+                var result = "<span style=\"font-size:12px;font-weight:bold;\">"+ header +"</span>";
+                if (linksResult.length > 0 ) {
+                    result += "<span> &nbsp;&mdash;&nbsp; "+ linksResult.join(",&nbsp; ") + "</span>";
+                }
 
                 return result;
             }
