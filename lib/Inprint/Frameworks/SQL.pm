@@ -40,7 +40,9 @@ sub Q {
     my $value = shift;
     my $trace = shift;
 
-    $trace = 1;
+    unless (ref($value) eq "ARRAY") {
+        $value = [ $value ] if $value;
+    }
 
     return new Inprint::Frameworks::SQLQuery($c->{conn}, $query, $value, $trace);
 }
@@ -53,7 +55,7 @@ sub Do {
     my $trace = shift;
 
     unless (ref($value) eq "ARRAY") {
-        $value = [ $value ];
+        $value = [ $value ] if $value;
     }
 
     my $count = $c->{conn}->dbh->do($query, undef, @{$value});
