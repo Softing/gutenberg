@@ -359,7 +359,7 @@ sub search {
         }
 
         $document->{access} = {};
-        my @rules = qw(update capture move transfer briefcase delete recover);
+        my @rules = qw(update capture move transfer briefcase delete recover fupload fedit fdelete);
 
         foreach (@rules) {
             if ($document->{holder} eq $current_member) {
@@ -373,6 +373,7 @@ sub search {
                 }
             }
         }
+
     }
 
     return { "result" => $result, "total" => $total };

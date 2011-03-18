@@ -40,20 +40,29 @@ Inprint.documents.GridColumns = function() {
                     record.data.id, value, color
                 );
 
-                var links = record.get("links");
+                var access = record.get("access");
+
+                var links  = record.get("links");
                 var linksResult = [];
 
                 if (links) {
                     for (var f=0; f<links.length;f++) {
 
-                        var file  = String.format(
-                            "<a style=\"color:{2}\" href=\"/?aid=document-editor&oid={0}&text={1}\" "+
-                                "onClick=\"Inprint.ObjectResolver.resolve({aid:'document-editor',oid:'{0}',text:'{1}'});"+
-                                "return false;\"><nobr>{1}</nobr></a>",
-                            links[f].id, links[f].name, "gray"
-                        );
+                        if (access.fedit) {
+                            linksResult.push(
+                                String.format(
+                                    "<a style=\"color:{2}\" href=\"/?aid=document-editor&oid={0}&text={1}\" "+
+                                        "onClick=\"Inprint.ObjectResolver.resolve({aid:'document-editor',oid:'{0}',text:'{1}'});"+
+                                        "return false;\"><nobr>{1}</nobr></a>",
+                                    links[f].id, links[f].name, "gray"
+                                )
+                            );
+                        } else {
+                            linksResult.push(
+                                String.format("<nobr>{0}</nobr>", links[f].name)
+                            );
+                        }
 
-                        linksResult.push(file);
                     }
                 }
 
