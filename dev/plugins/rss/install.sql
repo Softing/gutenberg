@@ -94,3 +94,4 @@ INSERT INTO plugins.l18n (plugin, l18n_language, l18n_original, l18n_translation
 
 INSERT INTO plugins.l18n (plugin, l18n_language, l18n_original, l18n_translation)
     VALUES ('rss', 'ru', 'Default feed', 'Лента по умолчанию');
+
