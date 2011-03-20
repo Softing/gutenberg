@@ -6,7 +6,10 @@
  * http://softing.ru/license
  */
 
-// Global functions
+// Global functions and variables
+
+var EXTJS_VERSION = "3.3.1";
+var EXTJS_PATH    = "/ext-3.3.1";
 
 /* Icons functions */
 
