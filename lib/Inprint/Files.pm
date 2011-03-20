@@ -46,13 +46,20 @@ sub download {
             $filename  = encode("cp1251", $filename);
         }
 
+        if ($^O eq "darwin") {
+            $filepath =~ s/\\/\//g;
+            $filepath =~ s/\/+/\//g;
+
+            $filepath  = encode("utf8", $filepath);
+            $filename  = encode("utf8", $filename);
+        }
+
         if ($^O eq "linux") {
             $filepath =~ s/\\/\//g;
             $filepath =~ s/\/+/\//g;
 
             $filepath  = encode("utf8", $filepath);
             $filename  = encode("utf8", $filename);
-
         }
 
         $filename =~ s/\s+/_/g;
@@ -169,6 +176,18 @@ sub preview {
         $thumbnailsSrc =~ s/\\+/\\/g;
         $thumbnailsSrc   = Encode::encode("cp1251", $thumbnailsSrc);
     }
+
+    if ($^O eq "darwin") {
+
+        $filepath =~ s/\\/\//g;
+        $filepath =~ s/\/+/\//g;
+        $filepath = Encode::encode("utf8", $filepath);
+
+        $thumbnailsSrc =~ s/\\/\//g;
+        $thumbnailsSrc =~ s/\/+/\//g;
+        $thumbnailsSrc   = Encode::encode("utf8", $thumbnailsSrc);
+    }
+
     if ($^O eq "linux") {
 
         $filepath =~ s/\\/\//g;
@@ -234,6 +253,22 @@ sub _generatePreviewFile {
         $filepathEncoded =~ s/\\+/\\/g;
     }
 
+    if ($^O eq "darwin") {
+
+        $rootpath = Encode::encode("utf8", $rootpath);
+        $folderEncoded   = Encode::encode("utf8", $folderEncoded);
+        $filenameEncoded = Encode::encode("utf8", $filenameEncoded);
+        $filextenEncoded = Encode::encode("utf8", $filextenEncoded);
+
+        $folderEncoded = "$rootpath/$folderEncoded";
+        $folderEncoded =~ s/\//\\/g;
+        $folderEncoded =~ s/\\+/\\/g;
+
+        $filepathEncoded = "$folderEncoded/$filenameEncoded";
+        $filepathEncoded =~ s/\\/\//g;
+        $filepathEncoded =~ s/\/+/\//g;
+    }
+
     if ($^O eq "linux") {
 
         $rootpath = Encode::encode("utf8", $rootpath);
@@ -252,12 +287,21 @@ sub _generatePreviewFile {
 
     my $thumbnailFolder = "$folderEncoded/.thumbnails";
     my $thumbnailFile   = "$folderOriginal/.thumbnails/$filenameOriginal-$size.png";
+
     if ($^O eq "MSWin32") {
         $thumbnailFolder =~ s/\//\\/g;
         $thumbnailFolder =~ s/\\+/\\/g;
         $thumbnailFile  =~ s/\//\\/g;
         $thumbnailFile  =~ s/\\+/\\/g;
     }
+
+    if ($^O eq "darwin") {
+        $thumbnailFolder =~ s/\\/\//g;
+        $thumbnailFolder =~ s/\/+/\//g;
+        $thumbnailFile  =~ s/\\/\//g;
+        $thumbnailFile  =~ s/\/+/\//g;
+    }
+
     if ($^O eq "linux") {
         $thumbnailFolder =~ s/\\/\//g;
         $thumbnailFolder =~ s/\/+/\//g;
@@ -294,6 +338,12 @@ sub _generatePreviewFile {
             $pdfPath =~ s/\//\\/g;
             $pdfPath =~ s/\\+/\\/g;
         }
+
+        if ($^O eq "darwin") {
+            $pdfPath =~ s/\\/\//g;
+            $pdfPath =~ s/\/+/\//g;
+        }
+
         if ($^O eq "linux") {
             $pdfPath =~ s/\\/\//g;
             $pdfPath =~ s/\/+/\//g;
