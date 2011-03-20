@@ -66,14 +66,11 @@ sub feed {
 
     $c->render(status => 404) unless @$index;
 
-    my (@headlines, @rubrics);
+    my @editions, my @headlines, my @rubrics;
     foreach my $item (@$index) {
-        if ($item->{nature} eq "headline") {
-            push @headlines, $item->{tag};
-        }
-        if ($item->{nature} eq "rubric") {
-            push @rubrics, $item->{tag};
-        }
+        push @editions,  $item->{tag} if ($item->{nature} eq "edition");
+        push @headlines, $item->{tag} if ($item->{nature} eq "headline");
+        push @rubrics,   $item->{tag} if ($item->{nature} eq "rubric");
     }
 
     unless ( @headlines ) {
@@ -96,22 +93,30 @@ sub feed {
             t1.id, t1.document, t1.link, t1.title, t1.description, t1.fulltext, t1.published, t1.created,
             to_char(t1.updated, 'Dy, DD Mon YYYY HH:MI:SS +0300') as updated,
             t2.headline, t2, rubric, t2.author
-        FROM rss t1, documents t2 WHERE t2.id=t1.document
+        FROM rss t1, documents t2
+        WHERE t2.id = t1.document
     ";
 
-    $sql .= " AND (";
+    my @filters;
+
+    if (@editions) {
+        push @filters, " t2.edition = ANY(?) ";
+        push @params, \@editions;
+    }
+
     if (@headlines) {
-        $sql .= " t2.headline = ANY(?) ";
+        push @filters, " t2.headline = ANY(?) ";
         push @params, \@headlines;
     }
+
     if (@rubrics) {
-        if (@headlines) {
-            $sql .= " OR "
-        }
-        $sql .= " t2.rubric = ANY(?) ";
+        push @filters, " t2.rubric = ANY(?) ";
         push @params, \@rubrics;
     }
-    $sql .= ")";
+
+    if (@filters) {
+        $sql .= " AND ( ". join(" OR ", @filters) ." ) ";
+    }
 
     my $rss_data = $c->sql->Q($sql, \@params)->Hashes;
 
@@ -123,8 +128,7 @@ sub feed {
             $rss_feed .= "<link>".  $siteurl ."/". $item->{url} ."</link>";
             $rss_feed .= "<guid>".  $siteurl ."/". $item->{url} ."</guid>";
             $rss_feed .= "<description>". $item->{description} ."</description>";
-            $rss_feed .= "<category>Экономика</category>";
-            $rss_feed .= "<pubDate>". $item->{updated} ."</pubDate>";#Sun, 28 Nov 2010 12:50:00 +0300
+            $rss_feed .= "<pubDate>". $item->{updated} ."</pubDate>";
             $rss_feed .= "<author>".  $item->{author} ."</author>";
 
             my $scrubber = HTML::Scrubber->new( allow => [ qw[ p b i u hr br ] ] );
@@ -145,6 +149,7 @@ sub feed {
                     $rss_feed .= "<media:description type=\"plain\">$filedesc</media:description>";
                 }
                 $rss_feed .= "</media:content>";
+
             }
 
         $rss_feed .= "</item>";

@@ -1,15 +1,14 @@
 package Inprint::Plugins::Rss::Control;
 
-# Inprint Content 4.5
-# Copyright(c) 2001-2010, Softing, LLC.
+# Inprint Content 5.0
+# Copyright(c) 2001-2011, Softing, LLC.
 # licensing@softing.ru
 # http://softing.ru/license
 
 use strict;
 use warnings;
 
-use Inprint::Utils::Documents;
-use Inprint::Models::Fascicle;
+use Inprint::Check;
 
 use base 'Inprint::BaseController';
 
@@ -24,8 +23,7 @@ sub tree {
     my @errors;
     my $success = $c->json->false;
 
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_node));
+    Inprint::Check::uuid($c, \@errors, "id", $i_node);
 
     my @result;
 
@@ -59,13 +57,8 @@ sub list {
 
     my $c = shift;
 
-    #my $i_feed = $c->param("feed");
-
     my @errors;
     my $success = $c->json->false;
-
-    #push @errors, { id => "feed", msg => "Incorrectly filled field"}
-    #    unless ($c->is_uuid($i_feed));
 
     my $result;
 
@@ -90,9 +83,6 @@ sub list {
                 title => $edition->{shortcut},
                 description => $edition->{description},
                 level => 1
-                #_id => $edition->{id} . "::edition",
-                #_parent => undef,
-                #_is_leaf => $edition->{leaf} ? $c->json->false : $c->json->true
             };
 
             push @$result, $record;
@@ -118,9 +108,6 @@ sub list {
                     title => $headline->{title},
                     description => $headline->{description},
                     level => 2
-                    #_id => $headline->{tag} . "::headline",
-                    #_parent => $edition->{id} . "::edition",
-                    #_is_leaf => $headline->{leaf}? $c->json->false : $c->json->true
                 };
 
                 push @$result, $record2;
@@ -140,9 +127,6 @@ sub list {
                         title => $rubric->{title},
                         description => $rubric->{description},
                         level => 3
-                        #_id => $rubric->{tag} . "::rubric",
-                        #_parent => $headline->{tag} . "::headline",
-                        #_is_leaf => $c->json->true
                     };
 
                     push @$result, $record3;
@@ -168,14 +152,9 @@ sub create {
     my @errors;
     my $success = $c->json->false;
 
-    push @errors, { id => "url", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_url));
-
-    push @errors, { id => "title", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_title));
-
-    push @errors, { id => "description", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_description));
+    Inprint::Check::url($c, \@errors,  "url", $i_url);
+    Inprint::Check::text($c, \@errors, "title", $i_title);
+    Inprint::Check::text($c, \@errors, "description", $i_description, 1);
 
     #push @errors, { id => "access", msg => "Not enough permissions"}
     #    unless ($c->access->Check("domain.editions.manage"));
@@ -198,8 +177,7 @@ sub read {
     my @errors;
     my $success = $c->json->false;
 
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_id));
+    Inprint::Check::uuid($c, \@errors,  "id", $i_id);
 
     my $result = [];
 
@@ -225,20 +203,13 @@ sub update {
     my @errors;
     my $success = $c->json->false;
 
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_id));
-
-    push @errors, { id => "url", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_url));
+    Inprint::Check::uuid($c, \@errors, "id", $i_id);
+    Inprint::Check::url($c, \@errors,  "url", $i_url);
+    Inprint::Check::text($c, \@errors, "title", $i_title);
+    Inprint::Check::text($c, \@errors, "description", $i_description, 1);
 
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         if ($i_id eq "00000000-0000-0000-0000-000000000000");
-
-    push @errors, { id => "title", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_title));
-
-    push @errors, { id => "description", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_description));
 
     #push @errors, { id => "access", msg => "Not enough permissions"}
     #    unless ($c->access->Check("domain.editions.manage"));
@@ -262,8 +233,7 @@ sub delete {
     my @errors;
     my $success = $c->json->false;
 
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_id));
+    Inprint::Check::uuid($c, \@errors,  "id", $i_id);
 
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         if ($i_id eq "00000000-0000-0000-0000-000000000000");
@@ -287,12 +257,10 @@ sub fill {
     my @errors;
     my $success = $c->json->false;
 
-    push @errors, { id => "feed", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_feed));
+    Inprint::Check::uuid($c, \@errors,  "feed", $i_feed);
 
     ##push @errors, { id => "access", msg => "Not enough permissions"}
     ##    unless ($c->access->Check("domain.editions.manage"));
-    #
 
     my $result = []; unless (@errors) {
         $result = $c->sql->Q("
@@ -314,16 +282,15 @@ sub save {
     my @errors;
     my $success = $c->json->false;
 
-    push @errors, { id => "feed", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_feed));
+    Inprint::Check::uuid($c, \@errors,  "feed", $i_feed);
 
     ##push @errors, { id => "access", msg => "Not enough permissions"}
     ##    unless ($c->access->Check("domain.editions.manage"));
-    #
 
     $c->sql->Do(" DELETE FROM rss_feeds_mapping WHERE feed =? ", [ $i_feed ]);
 
     foreach my $rubric_str (@i_rubrics) {
+
         my ($tag, $nature) = split '::', $rubric_str;
 
         next unless $tag;

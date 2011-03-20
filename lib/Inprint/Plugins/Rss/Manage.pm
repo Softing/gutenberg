@@ -8,6 +8,7 @@ package Inprint::Plugins::Rss::Manage;
 use strict;
 use warnings;
 
+use Inprint::Check;
 use Inprint::Models::Rss;
 
 use base 'Inprint::BaseController';
@@ -21,6 +22,8 @@ sub list {
     my $sort     = $c->param("sort")         || "created";
 
     my $i_filter = $c->param("flt_rssonly");
+
+    my @errors;
 
     # Base query
     my @params;
@@ -75,10 +78,12 @@ sub list {
             rss => $c->json->false,
             upload => $c->json->false,
         };
-        if ($item->{workgroup} && $c->access->Check("catalog.documents.rss:*", $item->{workgroup})) {
-            $item->{access}->{rss} = $c->json->true;
-            if ($item->{id}) {
-                $item->{access}->{upload} = $c->json->true;
+        if ($item->{workgroup}) {
+            if ( Inprint::Check::access($c, \@errors, "catalog.documents.rss:*", $item->{workgroup})) {
+                $item->{access}->{rss} = $c->json->true;
+                if ($item->{id}) {
+                    $item->{access}->{upload} = $c->json->true;
+                }
             }
         }
     }
