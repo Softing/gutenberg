@@ -30,7 +30,9 @@ sub index {
     } else {
         my $hash = $c->stash->{i18n}->{_handle}->getAll;
         while (my ($k,$v) = each %$hash) {
-            $Strings->{$k} = $v;
+            if ( $v or ! $Strings->{$k}) {
+                $Strings->{$k} = $v;
+            }
         }
     }
 
