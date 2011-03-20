@@ -114,6 +114,23 @@ sub text {
     return 1;
 }
 
+sub url {
+    my ($c, $errors, $field, $value, $ifexists) = @_;
+
+    if ($ifexists) {
+        return 1 unless $value;
+        return 1 if $value eq 'undefined';
+    }
+
+    unless (length($value) > 0) {
+    #unless (length($value) > 0 && $value =~ m/^[\w|\d|\s|:|\\|\/|"|'|#|\-|.|,|?]+$/) {
+        push @$errors, { id => $field, msg => "Incorrectly filled field"};
+        return 0;
+    }
+
+    return 1;
+}
+
 sub path{
     my ($c, $errors, $field, $value, $ifexists) = @_;
 
