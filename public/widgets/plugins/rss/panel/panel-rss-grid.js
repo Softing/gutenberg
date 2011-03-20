@@ -7,14 +7,14 @@ Inprint.plugins.rss.profile.Grid = Ext.extend(Ext.grid.GridPanel, {
             root: "data",
             idProperty: "name",
             url: _url('/plugin/rss/files/list/'),
-            fields: [ "name", "description", "cache", "preview", "isdraft", "isapproved",  "size", "created", "updated" ]
+            fields: [ "id", "name", "description", "mime", "published", "size", "length", "created", "updated" ]
         });
 
         this.columns = [
             {
                 id:"approved",
                 width: 32,
-                dataIndex: "isapproved",
+                dataIndex: "published",
                 sortable: false,
                 renderer: function(v) {
                     var image = '';
@@ -26,14 +26,26 @@ Inprint.plugins.rss.profile.Grid = Ext.extend(Ext.grid.GridPanel, {
                 id:"preview",
                 header:_("Preview"),
                 width: 100,
-                dataIndex: "cache",
+                dataIndex: "id",
                 sortable: false,
                 renderer: function(v) {
                     return '<img src="/files/preview/'+ v +'x80" style="border:1px solid silver;"/>';
                 }
             },
-            { id:'name', header: _("File"),dataIndex:'name', width:250},
-            { id: 'description', header: _("Description"),dataIndex:'description', width:150},
+            {
+                id:'title',
+                header: _("File"),
+                dataIndex:'name',
+                width:250,
+                renderer: function(v,p,r) {
+                    var string = '<div><strong>'+v+'</strong></div>';
+                    if (r.get('description')) {
+                        string += '<span>'+ r.get('description') +'</span>';
+                    }
+                    return string;
+                }
+
+            },
             { id: 'size', header: _("Size"), dataIndex:'size', width:100, renderer:Ext.util.Format.fileSize},
             { id: 'created', header: _("Created"), dataIndex:'created', width:120 },
             { id: 'updated', header: _("Updated") ,dataIndex:'updated', width:120 }
@@ -47,7 +59,7 @@ Inprint.plugins.rss.profile.Grid = Ext.extend(Ext.grid.GridPanel, {
             maskDisabled: true,
             loadMask: false,
             bodyStyle: "padding:5px 5px",
-            autoExpandColumn: "description"
+            autoExpandColumn: "title"
         });
 
         // Call parent (required)
@@ -83,13 +95,6 @@ Inprint.plugins.rss.profile.Grid = Ext.extend(Ext.grid.GridPanel, {
             rowCtxMenuItems.push("-");
 
             rowCtxMenuItems.push({
-                icon: _ico("edit-drop-cap"),
-                cls: "x-btn-text-icon",
-                text: _("Rename file"),
-                scope:this,
-                handler : this.cmpRenameFile
-            });
-            rowCtxMenuItems.push({
                 icon: _ico("edit-column"),
                 cls: "x-btn-text-icon",
                 text: _("Change description"),
@@ -118,7 +123,7 @@ Inprint.plugins.rss.profile.Grid = Ext.extend(Ext.grid.GridPanel, {
 
     cmpPublish: function() {
         var document = this.getStore().baseParams.document;
-        var file = this.getValues("cache");
+        var file = this.getValues("id");
         Ext.Ajax.request({
             url: _url("/plugin/rss/files/publish/"),
             scope:this,
@@ -129,7 +134,7 @@ Inprint.plugins.rss.profile.Grid = Ext.extend(Ext.grid.GridPanel, {
 
     cmpUnpublish: function() {
         var document = this.getStore().baseParams.document;
-        var file = this.getValues("cache");
+        var file = this.getValues("id");
         Ext.Ajax.request({
             url: _url("/plugin/rss/files/unpublish/"),
             scope:this,
@@ -140,7 +145,7 @@ Inprint.plugins.rss.profile.Grid = Ext.extend(Ext.grid.GridPanel, {
 
     cmpRenameFile: function() {
         var document = this.getStore().baseParams.document;
-        var file = this.getValues("cache");
+        var file = this.getValues("id");
         Ext.MessageBox.prompt(
             _("Modification of the file"),
             _("Change the file name"),
@@ -158,7 +163,7 @@ Inprint.plugins.rss.profile.Grid = Ext.extend(Ext.grid.GridPanel, {
 
     cmpChangeDescription: function() {
         var document = this.getStore().baseParams.document;
-        var file = this.getValues("cache");
+        var file = this.getValues("id");
         Ext.MessageBox.show({
             width:300,
             scope:this,
@@ -181,7 +186,7 @@ Inprint.plugins.rss.profile.Grid = Ext.extend(Ext.grid.GridPanel, {
 
     cmpDelete: function() {
         var document = this.getStore().baseParams.document;
-        var file = this.getValues("cache");
+        var file = this.getValues("id");
         Ext.MessageBox.confirm(
             _("Delete the file?"),
             _("This change can not be undone!"),

@@ -146,34 +146,20 @@ Inprint.plugins.rss.Grid = Ext.extend(Ext.grid.GridPanel, {
     },
 
     cmpPublish: function() {
-        Ext.MessageBox.confirm(
-            _("Irreversible removal"),
-            _("You can't cancel this action!"),
-            function(btn) {
-                if (btn == "yes") {
-                    Ext.Ajax.request({
-                        url: _url("/plugin/rss/publish/"),
-                        scope:this,
-                        success: this.cmpReload,
-                        params: { id: this.getValues("id") }
-                    });
-                }
-            }, this).setIcon(Ext.MessageBox.WARNING);
+        Ext.Ajax.request({
+            url: _url("/plugin/rss/publish/"),
+            scope:this,
+            success: this.cmpReload,
+            params: { id: this.getValues("id") }
+        });
     },
 
     cmpUnpublish: function() {
-        Ext.MessageBox.confirm(
-            _("Irreversible removal"),
-            _("You can't cancel this action!"),
-            function(btn) {
-                if (btn == "yes") {
-                    Ext.Ajax.request({
-                        url: _url("/plugin/rss/unpublish/"),
-                        scope:this,
-                        success: this.cmpReload,
-                        params: { id: this.getValues("id") }
-                    });
-                }
-            }, this).setIcon(Ext.MessageBox.WARNING);
+        Ext.Ajax.request({
+            url: _url("/plugin/rss/unpublish/"),
+            scope:this,
+            success: this.cmpReload,
+            params: { id: this.getValues("id") }
+        });
     }
 });

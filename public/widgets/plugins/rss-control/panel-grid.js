@@ -50,14 +50,12 @@ Inprint.plugins.rss.control.Grid = Ext.extend(Ext.grid.GridPanel, {
                 {id:'title',header: _("Title"), width: 160, sortable: true, dataIndex: 'title',
                     renderer: function(v, p, r) {
 
-                        if (r.data.level == 1) {
-                            return v;
-                        }
+                        if (r.data.level == 1) return v ;
 
-                        var ico = "/ext-3.3.1/resources/images/default/tree/elbow-end.gif";
-                        var padding = r.data.level*2*10 - r.data.level;
+                        var ico = EXTJS_PATH +"/resources/images/default/tree/elbow-end.gif";
+                        var padding = (r.data.level-1) * 10 - 10;
 
-                        return "<div style=\"background: url("+ ico +") "+ (padding-22) +"px 1px no-repeat;padding-left:" + padding + "px;\">"+ v +"</div>";
+                        return "<div style=\"background: url("+ ico +") "+ (padding-7) +"px -2px no-repeat;padding-left:" + (padding+14) + "px;\">"+ v +"</div>";
                     }},
                 {id:'description',header: _("Description"), width: 160, sortable: true, dataIndex: 'description'}
             ],

@@ -143,47 +143,16 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
 
     cmpUpload: function() {
 
-        var cookies = document.cookie.split(";");
-        var Session;
-
-        Ext.each(cookies, function(cookie) {
-            var nvp = cookie.split("=");
-            if (nvp[0].trim() == 'sid')
-            {
-                Session = nvp[1];
+        var Uploader = new Inprint.cmp.Uploader({
+            config: {
+                document: this.oid,
+                uploadUrl: _url("/plugin/rss/files/upload/")
             }
         });
 
-        var UploadPanel = new AwesomeUploader({
-            border:false,
-            gridWidth:470,
-            gridHeight:120,
-            height:180,
-            extraPostData: {
-                sid: Session,
-                document: this.oid
-            },
-            xhrUploadUrl: _url("/plugin/rss/files/upload/"),
-            flashUploadUrl: _url("/plugin/rss/files/upload/"),
-            standardUploadUrl: _url("/plugin/rss/files/upload/"),
-            awesomeUploaderRoot: _url("/plugins/uploader/")
-        });
-
-        var Uploader = new Ext.Window({
-            title: _('Download files'),
-            modal:true,
-            layout:"fit",
-            width: 500,
-            height: 200,
-            bodyBorder:false,
-            border:false,
-            items: UploadPanel
-        });
-
-        UploadPanel.on("fileupload", function(uploader, success, result){
-            if(success){
-                this.panels.grid.cmpReload();
-            }
+        Uploader.on("fileUploaded", function() {
+            Uploader.hide();
+            this.cmpReload();
         }, this);
 
         Uploader.show();
