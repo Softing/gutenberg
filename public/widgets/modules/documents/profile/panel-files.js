@@ -215,9 +215,9 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                         handler: this.cmpUnpublish
                     });
 
-                    rowCtxMenuItems.push("-");
-
                     if ( selCount == 1 ) {
+
+                        rowCtxMenuItems.push("-");
 
                         //rowCtxMenuItems.push({
                         //    icon: _ico("edit-drop-cap"),
