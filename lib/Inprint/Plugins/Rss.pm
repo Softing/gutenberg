@@ -135,19 +135,23 @@ sub feed {
             my $fulltext = $scrubber->scrub($item->{fulltext});
             $rss_feed .= "<content:encoded><![CDATA[$fulltext]]></content:encoded>";
 
+            #my $folder = Inprint::Store::Embedded::getFolderPath($c, "rss-plugin", $item->{created}, $item->{id}, 1);
+            #my $files = Inprint::Store::Embedded::findFiles($c, $folder, 'published', ['png', 'jpg', 'jpeg', 'gif']);
+
             my $folder = Inprint::Store::Embedded::getFolderPath($c, "rss-plugin", $item->{created}, $item->{id}, 1);
-            my $files = Inprint::Store::Embedded::findFiles($c, $folder, 'published', ['png', 'jpg', 'jpeg', 'gif']);
+            Inprint::Store::Embedded::updateCache($c, $folder);
+            my $files = Inprint::Store::Cache::getRecordsByPath($c, $folder, "all", ['png', 'jpg', 'jpeg', 'gif']);
 
             foreach my $file (@$files) {
 
-                my $fileurl  = "$siteurl/files/download/". $file->{cache} .".". $file->{extension};
+                my $fileurl  = "$siteurl/files/download/". $file->{id} .".". $file->{extension};
                 my $filemime = $file->{mime};
                 my $filedesc = $file->{description};
 
                 $rss_feed .= "<media:content url=\"$fileurl\" type=\"$filemime\" expression=\"full\">";
-                if ($file->{description}) {
-                    $rss_feed .= "<media:description type=\"plain\">$filedesc</media:description>";
-                }
+                #if ($filedesc) {
+                #    $rss_feed .= "<media:description type=\"plain\"><![CDATA[$filedesc]]></media:description>";
+                #}
                 $rss_feed .= "</media:content>";
 
             }
