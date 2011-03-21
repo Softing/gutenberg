@@ -64,7 +64,7 @@ Inprint.documents.Profile.Comments = Ext.extend(Ext.Panel, {
 
     cmpAccess: function(access) {
         _disable(this.btnSay);
-        if (access["documents.discuss"] === true) {
+        if (access["discuss"] === true) {
             this.btnSay.enable();
         }
     },
