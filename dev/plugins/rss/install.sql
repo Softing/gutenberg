@@ -5,6 +5,8 @@ DELETE FROM plugins.routes WHERE plugin='rss';
 DELETE FROM plugins.rules  WHERE plugin='rss';
 DELETE FROM plugins.l18n   WHERE plugin='rss';
 
+DELETE FROM rss_feeds      WHERE id='00000000-0000-0000-0000-000000000000';
+
 -- Insert Menu items
 
 INSERT INTO plugins.menu(plugin, menu_section, menu_id, menu_sortorder, menu_enabled)
@@ -95,3 +97,5 @@ INSERT INTO plugins.l18n (plugin, l18n_language, l18n_original, l18n_translation
 INSERT INTO plugins.l18n (plugin, l18n_language, l18n_original, l18n_translation)
     VALUES ('rss', 'ru', 'Default feed', 'Лента по умолчанию');
 
+INSERT INTO rss_feeds(id, url, title, description, published, created, updated)                                                                                                 
+    VALUES ('00000000-0000-0000-0000-000000000000', 'default', 'По умолчанию', 'По умолчанию', true, now(), now());

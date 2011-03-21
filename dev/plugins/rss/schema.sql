@@ -35,6 +35,3 @@ CREATE TABLE rss_feeds
   updated timestamp(6) with time zone NOT NULL DEFAULT now(),
   CONSTRAINT rss_feeds_pkey PRIMARY KEY (id)
 );
-
-INSERT INTO rss_feeds(id, url, title, description, published, created, updated)
-    VALUES ('00000000-0000-0000-0000-000000000000', 'default', 'По умолчанию', 'По умолчанию', true, now(), now());
