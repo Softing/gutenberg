@@ -101,7 +101,10 @@ sub normalizeFilename {
     my $c = shift;
     my $filepath = shift;
 
-    my ($cname,$cpath,$cextension) = fileparse($filepath, qr/(\.[^.]+){1}?/);
+    my ($cname, $cpath, $cextension) = fileparse($filepath, qr/(\.[^.]+){1}?/);
+
+    $cextension = lc ($cextension);
+    $filepath = makePath($c, $cpath, "$cname$cextension");
 
     if (-e $filepath) {
         for (1..100) {

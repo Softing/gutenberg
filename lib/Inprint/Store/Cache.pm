@@ -31,7 +31,7 @@ sub makeRecord {
             ", [ $filepath, $filename ])->Hash;
 
     unless ($cacheRecord->{id}) {
-        
+
         $c->sql->Do("
                 INSERT INTO cache_files (
                     id, file_path, file_name, file_extension, file_mime,
@@ -85,16 +85,16 @@ sub getRecordsByPath {
 
     push @params, getRelativePath($c, $path);
 
-    if ($status eq 'published') {
-        $sql .= " AND file_published = true ";
-    }
-    if ($status eq 'unpublished') {
-        $sql .= " AND file_published = false ";
-    }
+    $sql .= " AND file_published = true "  if ($status eq 'published');
+    $sql .= " AND file_published = false " if ($status eq 'unpublished');
 
     if ($filter) {
-        $sql .= " AND file_extension = ANY (?) ";
-        push @params, $filter;
+        my @filter;
+        foreach my $item (@$filter) {
+            push @filter, " lower(file_extension) = lower(?) ";
+            push @params, $item;
+        }
+        $sql .= " AND ( ". join(" OR ", @filter) ." ) ";
     }
 
     $sql .= " ORDER BY file_published DESC, file_extension, file_name";
@@ -131,6 +131,11 @@ sub cleanup {
             $filepath =~ s/\//\\/g;
             $filepath =~ s/\\+/\\/g;
             $filepath = encode("cp1251", $filepath);
+        }
+
+        if ($^O eq "darwin") {
+            $filepath =~ s/\\/\//g;
+            $filepath =~ s/\/+/\//g;
         }
 
         if ($^O eq "linux") {

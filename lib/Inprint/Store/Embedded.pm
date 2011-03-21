@@ -117,6 +117,7 @@ sub fileUpload {
 
     my $filepath = Inprint::Store::Embedded::Utils::makePath($c, $folder, $filename);
     my $filepath_encoded = Inprint::Store::Embedded::Utils::doEncode($c, $filepath);
+
     $filepath_encoded = Inprint::Store::Embedded::Utils::normalizeFilename($c, $filepath_encoded);
 
     $upload->move_to($filepath_encoded);
