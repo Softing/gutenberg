@@ -130,7 +130,7 @@ sub feed {
             $rss_feed .= "<link>".  $siteurl ."/". $guid ."</link>";
             $rss_feed .= "<guid>".  $siteurl ."/". $guid ."</guid>";
 
-            $rss_feed .= "<description><![CDATA". $item->{description} ."]]></description>" if $item->{description};
+            $rss_feed .= "<description><![CDATA[". $item->{description} ."]]></description>" if $item->{description};
             $rss_feed .= "<pubDate>". $item->{updated} ."</pubDate>" if $item->{updated};
             $rss_feed .= "<author>".  $item->{author} ."</author>" if $item->{author};
 
