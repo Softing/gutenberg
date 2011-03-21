@@ -80,12 +80,15 @@ sub feed {
     }
 
     my $rss_feed;
+
+    my $feed_url = $siteurl . "/plugin/rss/feeds/". $feed->{url} .".xml";
+
     $rss_feed .= "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
     $rss_feed .= "<rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\" xmlns:media=\"http://search.yahoo.com/mrss/\" xmlns:blogChannel=\"http://backend.userland.com/blogChannelModule\" xmlns:content=\"http://purl.org/rss/1.0/modules/content/\">";
     $rss_feed .= "<channel>";
     $rss_feed .= "<link>$siteurl</link>";
     $rss_feed .= "<title>". $feed->{title} ."</title>";
-    $rss_feed .= "<atom:link href=\"$siteurl\" rel=\"self\" type=\"application/rss+xml\" />";
+    $rss_feed .= "<atom:link href=\"$feed_url\" rel=\"self\" type=\"application/rss+xml\" />";
     $rss_feed .= "<description>". $feed->{description} ."</description>";
 
     my @params; my $sql = "
