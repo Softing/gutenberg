@@ -127,16 +127,14 @@ sub feed {
             $rss_feed .= "<title>". $item->{title} ."</title>";
             $rss_feed .= "<link>".  $siteurl ."/". $item->{url} ."</link>";
             $rss_feed .= "<guid>".  $siteurl ."/". $item->{url} ."</guid>";
-            $rss_feed .= "<description>". $item->{description} ."</description>";
-            $rss_feed .= "<pubDate>". $item->{updated} ."</pubDate>";
-            $rss_feed .= "<author>".  $item->{author} ."</author>";
+
+            $rss_feed .= "<description>". $item->{description} ."</description>" if $item->{description};
+            $rss_feed .= "<pubDate>". $item->{updated} ."</pubDate>" if $item->{updated};
+            $rss_feed .= "<author>".  $item->{author} ."</author>" if $item->{author};
 
             my $scrubber = HTML::Scrubber->new( allow => [ qw[ p b i u hr br ] ] );
             my $fulltext = $scrubber->scrub($item->{fulltext});
             $rss_feed .= "<content:encoded><![CDATA[$fulltext]]></content:encoded>";
-
-            #my $folder = Inprint::Store::Embedded::getFolderPath($c, "rss-plugin", $item->{created}, $item->{id}, 1);
-            #my $files = Inprint::Store::Embedded::findFiles($c, $folder, 'published', ['png', 'jpg', 'jpeg', 'gif']);
 
             my $folder = Inprint::Store::Embedded::getFolderPath($c, "rss-plugin", $item->{created}, $item->{id}, 1);
             Inprint::Store::Embedded::updateCache($c, $folder);
@@ -149,9 +147,9 @@ sub feed {
                 my $filedesc = $file->{description};
 
                 $rss_feed .= "<media:content url=\"$fileurl\" type=\"$filemime\" expression=\"full\">";
-                #if ($filedesc) {
-                #    $rss_feed .= "<media:description type=\"plain\"><![CDATA[$filedesc]]></media:description>";
-                #}
+                if ($filedesc) {
+                    $rss_feed .= "<media:description type=\"plain\"><![CDATA[$filedesc]]></media:description>";
+                }
                 $rss_feed .= "</media:content>";
 
             }
