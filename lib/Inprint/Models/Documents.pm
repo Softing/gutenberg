@@ -178,12 +178,9 @@ sub search {
     my $departments = $c->access->GetBindings("catalog.documents.view:*");
 
     $sql_filters .= " AND ( ";
-
-    $sql_filters .= " ( ";
     $sql_filters .= "    dcm.edition = ANY(?) ";
     $sql_filters .= "    AND ";
     $sql_filters .= "    dcm.workgroup = ANY(?) ";
-    $sql_filters .= " ) ";
     push @params, $editions;
     push @params, $departments;
 

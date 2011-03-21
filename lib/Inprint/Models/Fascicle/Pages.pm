@@ -1,4 +1,4 @@
-package Inprint::Fascicle::Pages;
+package Inprint::Models::Fascicle::Pages;
 
 # Inprint Content 4.5
 # Copyright(c) 2001-2010, Softing, LLC.
@@ -8,193 +8,10 @@ package Inprint::Fascicle::Pages;
 use strict;
 use warnings;
 
-use Inprint::Check;
-
-use Inprint::Fascicle::Utils;
-use Inprint::Models::Fascicle::Page;
-use Inprint::Models::Fascicle::Pages;
-
 use Inprint::Utils::Pages;
+use Inprint::Models::Fascicle::Page;
 
 use base 'Inprint::BaseController';
-
-sub read {
-
-    my $c = shift;
-
-    my @i_pages    = $c->param("page");
-
-    my @data, my @errors;
-
-    unless (@errors) {
-        foreach my $item (@i_pages) {
-            my ($pageid, $seqnum) = split "::", $item;
-            my $page = $c->sql->Q(" SELECT * FROM fascicles_pages WHERE id=? AND seqnum=? ", [ $pageid, $seqnum ])->Hash();
-            push @data, $page;
-        }
-    }
-
-    $c->smart_render(\@errors, \@data);
-}
-
-sub create {
-
-    my $c = shift;
-
-    my $i_fascicle = $c->param("fascicle");
-    my $i_template = $c->param("template");
-    my $i_headline = $c->param("headline");
-    my $i_string   = $c->param("page");
-
-    my $i_copyfrom   = $c->param("copyfrom");
-
-    my @errors;
-
-    Inprint::Check::uuid($c, \@errors, "template", $i_template);
-    Inprint::Check::uuid($c, \@errors, "fascicle", $i_fascicle);
-    my $fascicle = Inprint::Check::fascicle($c, \@errors, $i_fascicle );
-
-    my $template = {};
-    unless (@errors) {
-        if ($i_template eq "00000000-0000-0000-0000-000000000000") {
-            $template = $c->sql->Q("
-                SELECT * FROM fascicles_tmpl_pages
-                WHERE bydefault=true AND fascicle=? ",
-                [ $fascicle->{id} ])->Hash;
-        } else {
-            $template = $c->sql->Q("
-                SELECT * FROM fascicles_tmpl_pages WHERE id = ? ",
-                [ $i_template ])->Hash;
-        }
-    }
-
-    push @errors, { id => "template", msg => "Can't find object"}
-        unless ($template->{id});
-
-    my $headline = {};
-    unless (@errors) {
-        if ($i_headline) {
-            if ($i_template eq "00000000-0000-0000-0000-000000000000") {
-                $headline = $c->sql->Q("
-                    SELECT * FROM fascicles_indx_headlines
-                    WHERE bydefault=true AND fascicle=? ",
-                    [ $fascicle->{id} ])->Hash;
-            } else {
-                $headline = $c->sql->Q("
-                    SELECT * FROM fascicles_indx_headlines WHERE id=? ",
-                    [ $i_headline ])->Hash;
-            }
-        }
-    }
-
-    push @errors, { id => "headline", msg => "Can't find object"}
-        unless ($headline->{id});
-
-    unless (@errors) {
-
-        my $pages = Inprint::Utils::Pages::UncompressString($c, $i_string);
-
-        my $chunks = Inprint::Utils::Pages::GetChunks($c, $pages);
-
-        my $composition = $c->sql->Q("
-            SELECT id, edition, fascicle, headline, seqnum, w, h, created, updated
-            FROM fascicles_pages WHERE fascicle = ?; ",[
-                $i_fascicle
-            ])->Hashes;
-
-        my @inserts;
-
-        foreach my $newpage (@$pages) {
-
-            push @inserts, {
-                edition  => $fascicle->{edition},
-                fascicle => $fascicle->{id},
-                headline => $headline->{id},
-                seqnum   => $newpage
-            };
-
-            my $offset = 0;
-
-            foreach my $oldpage (@$composition) {
-                if ($oldpage->{seqnum} == $newpage) {
-                    $offset = 1;
-                }
-            }
-
-            foreach my $oldpage (@$composition) {
-                if ($oldpage->{seqnum} >= $newpage && $offset == 1) {
-                    $oldpage->{seqnum} ++;
-                    $oldpage->{is_updated} = 1;
-                }
-            }
-
-        }
-
-        $c->sql->bt;
-
-        foreach my $page (@$composition) {
-            if ( $page->{id} && $page->{is_updated} == 1) {
-                $c->sql->Do("
-                    UPDATE fascicles_pages SET seqnum=? WHERE id=?
-                ", [$page->{seqnum}, $page->{id}]);
-            }
-        }
-
-        foreach my $page (@inserts) {
-            my $id = $c->uuid;
-
-            $c->sql->Do("
-                INSERT INTO fascicles_pages(id, edition, fascicle, origin, headline, seqnum, w, h, created, updated)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, now(), now());
-            ", [$id, $page->{edition}, $page->{fascicle}, $template->{id}, $page->{headline}, $page->{seqnum}, $template->{w}, $template->{h} ]);
-        }
-
-        # Update page's cache
-        Inprint::Fascicle::Utils::updateDocumentsPagesCache($c, $fascicle->{id});
-
-        $c->sql->et;
-
-    }
-
-    $c->smart_render(\@errors);
-}
-
-sub update {
-
-    my $c = shift;
-
-    my $i_fascicle = $c->param("fascicle");
-    my $i_headline = $c->param("headline");
-    my @i_pages    = $c->param("page");
-
-    my @errors;
-
-    Inprint::Check::uuid($c, \@errors, "fascicle", $i_fascicle);
-    my $fascicle = Inprint::Check::fascicle($c, \@errors, $i_fascicle );
-
-    push @errors, { id => "fascicle", msg => "Can't find object"}
-        unless ($fascicle->{id});
-
-    my $headline = {};
-    if ($i_headline) {
-        $headline = $c->sql->Q("
-            SELECT * FROM fascicles_indx_headlines WHERE id=? ",
-            [ $i_headline ])->Hash;
-        push @errors, { id => "headline", msg => "Can't find object"}
-            unless ($headline->{id});
-    }
-
-    $c->sql->bt;
-    unless (@errors) {
-        foreach my $item (@i_pages) {
-            my ($page, $seqnum) = split "::", $item;
-            $c->sql->Do(" UPDATE fascicles_pages SET headline=? WHERE id=? AND seqnum=? ", [ $headline->{id}, $page, $seqnum ]);
-        }
-    }
-    $c->sql->et;
-
-    $c->smart_render(\@errors);
-}
 
 sub move {
 
@@ -205,11 +22,13 @@ sub move {
     my @i_pages    = $c->param("page");
 
     my @errors;
+    my $success = $c->json->false;
 
-    Inprint::Check::int($c, \@errors, "after", $i_after);
-    Inprint::Check::uuid($c, \@errors, "fascicle", $i_fascicle);
+    push @errors, { id => "after", msg => "Incorrectly filled field"}
+        unless ($c->is_int($i_after));
 
-    my $fascicle = Inprint::Check::fascicle($c, \@errors, $i_fascicle );
+    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_fascicle));
 
     unless (@errors) {
 
@@ -284,22 +103,20 @@ sub move {
 
         }
 
-        $c->sql->bt;
+        #die $dbg;
 
+        $c->sql->bt;
         foreach my $page (@$composition) {
             if ( $page->{id} && $page->{is_updated} == 1) {
                 $c->sql->Do(" UPDATE fascicles_pages SET seqnum=? WHERE id=? ", [$page->{seqnum}, $page->{id}]);
             }
         }
-
-        # Update page's cache
-        Inprint::Fascicle::Utils::updateDocumentsPagesCache($c, $fascicle->{id});
-
         $c->sql->et;
 
     }
 
-    $c->smart_render(\@errors);
+    $success = $c->json->true unless (@errors);
+    $c->render_json({ success => $success, errors => \@errors });
 }
 
 sub right {
@@ -311,10 +128,13 @@ sub right {
     my $i_page    = $c->param("page");
 
     my @errors;
+    my $success = $c->json->false;
 
-    Inprint::Check::int($c, \@errors, "amount", $i_amount);
-    Inprint::Check::uuid($c, \@errors, "fascicle", $i_fascicle);
-    my $fascicle = Inprint::Check::fascicle($c, \@errors, $i_fascicle );
+    push @errors, { id => "amount", msg => "Incorrectly filled field"}
+        unless ($c->is_int($i_amount));
+
+    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_fascicle));
 
     unless (@errors) {
 
@@ -344,15 +164,13 @@ sub right {
                 $c->sql->Do(" UPDATE fascicles_pages SET seqnum=? WHERE id=? ", [$page->{seqnum}, $page->{id}]);
             }
         }
-
-        # Update page's cache
-        Inprint::Fascicle::Utils::updateDocumentsPagesCache($c, $fascicle->{id});
-
         $c->sql->et;
 
     }
 
-    $c->smart_render(\@errors);
+
+    $success = $c->json->true unless (@errors);
+    $c->render_json({ success => $success, errors => \@errors });
 }
 
 sub left {
@@ -364,11 +182,13 @@ sub left {
     my $i_page    = $c->param("page");
 
     my @errors;
+    my $success = $c->json->false;
 
-    Inprint::Check::int($c, \@errors, "amount", $i_amount);
-    Inprint::Check::uuid($c, \@errors, "fascicle", $i_fascicle);
+    push @errors, { id => "amount", msg => "Incorrectly filled field"}
+        unless ($c->is_int($i_amount));
 
-    my $fascicle = Inprint::Check::fascicle($c, \@errors, $i_fascicle );
+    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_fascicle));
 
     unless (@errors) {
 
@@ -419,14 +239,34 @@ sub left {
                 $c->sql->Do(" UPDATE fascicles_pages SET seqnum=? WHERE id=? ", [$page->{seqnum}, $page->{id}]);
             }
         }
-
-        # Update page's cache
-        Inprint::Fascicle::Utils::updateDocumentsPagesCache($c, $fascicle->{id});
-
         $c->sql->et;
     }
 
-    $c->smart_render(\@errors);
+
+    $success = $c->json->true unless (@errors);
+    $c->render_json({ success => $success, errors => \@errors });
+}
+
+sub resize {
+
+    my $c = shift;
+
+    my $i_fascicle = $c->param("fascicle");
+
+    my @errors;
+    my $success = $c->json->false;
+
+    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_fascicle));
+
+    my $data;
+
+    unless (@errors) {
+
+    }
+
+    $success = $c->json->true unless (@errors);
+    $c->render_json({ success => $success, errors => \@errors, data => [ $data ] });
 }
 
 sub clean {
@@ -436,12 +276,18 @@ sub clean {
     my $i_fascicle  = $c->param("fascicle");
     my $i_documents = $c->param("documents");
     my $i_adverts   = $c->param("adverts");
-    my @i_pages     = $c->param("page");
+    my @i_pages    = $c->param("page");
 
     my @errors;
+    my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "fascicle", $i_fascicle);
-    my $fascicle = Inprint::Check::fascicle($c, \@errors, $i_fascicle );
+    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_fascicle));
+
+    my $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id = ? ", [ $i_fascicle ])->Hash;
+
+    push @errors, { id => "fascicle", msg => "Can't find object"}
+        unless ($fascicle->{id});
 
     unless (@errors) {
         foreach my $item (@i_pages) {
@@ -465,7 +311,8 @@ sub clean {
         }
     }
 
-    $c->smart_render(\@errors);
+    $success = $c->json->true unless (@errors);
+    $c->render_json({ success => $success, errors => \@errors });
 }
 
 sub delete {
@@ -476,13 +323,17 @@ sub delete {
     my @i_pages    = $c->param("page");
 
     my @errors;
-    #my $success = $c->json->false;
+    my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "fascicle", $i_fascicle);
-    my $fascicle = Inprint::Check::fascicle($c, \@errors, $i_fascicle );
+    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_fascicle));
+
+    my $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id = ? ", [ $i_fascicle ])->Hash;
+
+    push @errors, { id => "fascicle", msg => "Can't find object"}
+        unless ($fascicle->{id});
 
     unless (@errors) {
-
         foreach my $item (@i_pages) {
             my ($id, $seqnum) = split "::", $item;
 
@@ -501,13 +352,10 @@ sub delete {
 
             $c->sql->et;
         }
-
-        # Update page's cache
-        Inprint::Fascicle::Utils::updateDocumentsPagesCache($c, $fascicle->{id});
-
     }
 
-    $c->smart_render(\@errors);
+    $success = $c->json->true unless (@errors);
+    $c->render_json({ success => $success, errors => \@errors });
 }
 
 1;

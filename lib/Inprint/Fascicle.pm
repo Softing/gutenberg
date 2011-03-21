@@ -10,6 +10,8 @@ use warnings;
 
 use Inprint::Utils::Pages;
 
+use Inprint::Fascicle::Utils;
+
 use Inprint::Models::Documents;
 use Inprint::Models::Fascicle::Request;
 
@@ -324,7 +326,7 @@ sub save {
                 DELETE FROM fascicles_map_documents WHERE edition =? AND fascicle=? AND entity=?
                 ", [ $fascicle->{edition}, $fascicle->{id}, $document->{id} ]);
 
-            my $seqnums = Inprint::Utils::Pages::UncompressString($c, $seqnumstr);
+            my $seqnums = Inprint::Fascicle::Utils::uncompressString($c, $seqnumstr);
             next unless (@$seqnums);
 
             foreach my $seqnum (@$seqnums) {
@@ -360,6 +362,10 @@ sub save {
             }
 
         }
+
+        # Update documents' pages cache
+        Inprint::Fascicle::Utils::updateDocumentsPagesCache($c, $fascicle->{id});
+
         $c->sql->et;
     }
 
