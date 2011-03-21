@@ -336,10 +336,10 @@ our %Lexicon = (
  => "Удалить файл",
 
     "Delete the file?"
- => "",
+ => "Удалить файл?",
 
     "Deleting a category"
- => "",
+ => "Удалить рубрику?",
 
     "Delivery date"
  => "Дата отправки",
@@ -1074,7 +1074,7 @@ our %Lexicon = (
  => "",
 
     "This change can not be undone!"
- => "",
+ => "Это действие не может быть отменено",
 
     "Titl"
  => "",
