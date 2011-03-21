@@ -40,7 +40,31 @@ sub json {
     return $JSON;
 }
 
-# SQL
+# Renderers helpers
+
+sub smart_render {
+
+    my ($c, $errors, $data) = @_;
+
+    my $success = $c->json->false;
+
+    unless (@$errors) {
+        $success = $c->json->true;
+    }
+
+    my $result = {
+        success => $success,
+        errors  => $errors
+    };
+
+    if ($data) {
+        $result->{data} = $data;
+    }
+
+    $c->render_json($result);
+}
+
+# SQL helpers
 
 sub dbh {
     my $c = shift;
