@@ -228,7 +228,7 @@ our %Lexicon = (
  => "",
 
     "Changes have been saved"
- => "",
+ => "Изменения сохранены",
 
     "Circulation"
  => "Тираж",
@@ -1026,7 +1026,7 @@ our %Lexicon = (
  => "",
 
     "System event"
- => "",
+ => "Новое событие",
 
     "System information"
  => "Системная информация",
