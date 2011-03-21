@@ -139,8 +139,8 @@ sub update {
 
     my $i_document    = $c->param("document") || undef;
     my $i_published   = $c->param("published") || undef;
-    my $i_link        = $c->param("link") || undef;
-    my $i_title       = $c->param("title") || undef;
+    my $i_link        = $c->param("link") || $c->param("document");
+    my $i_title       = $c->param("title") || "Without title";
     my $i_description = $c->param("description") || undef;
     my $i_fulltext    = $c->param("fulltext") || undef;
 
