@@ -85,7 +85,7 @@ sub feed {
     $rss_feed .= "<channel>";
     $rss_feed .= "<link>$siteurl</link>";
     $rss_feed .= "<title>". $feed->{title} ."</title>";
-    $rss_feed .= "<atom:link href=\"$siteurl\" rel=\"self\" type=\"application/rss+xml\" />";
+    $rss_feed .= "<atom:link href=\"$siteurl\" type=\"application/rss+xml\" />";
     $rss_feed .= "<description>". $feed->{description} ."</description>";
 
     my @params; my $sql = "
