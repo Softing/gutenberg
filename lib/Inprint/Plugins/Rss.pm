@@ -122,11 +122,13 @@ sub feed {
 
     foreach my $item (@$rss_data) {
 
+        my $guid = $item->{url} || $item->{id};
+
         $rss_feed .= "<item>";
 
             $rss_feed .= "<title>". $item->{title} ."</title>";
-            $rss_feed .= "<link>".  $siteurl ."/". $item->{url} ."</link>";
-            $rss_feed .= "<guid>".  $siteurl ."/". $item->{url} ."</guid>";
+            $rss_feed .= "<link>".  $siteurl ."/". $guid ."</link>";
+            $rss_feed .= "<guid>".  $siteurl ."/". $guid ."</guid>";
 
             $rss_feed .= "<description>". $item->{description} ."</description>" if $item->{description};
             $rss_feed .= "<pubDate>". $item->{updated} ."</pubDate>" if $item->{updated};
