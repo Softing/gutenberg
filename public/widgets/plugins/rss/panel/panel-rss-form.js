@@ -28,6 +28,7 @@ Inprint.plugins.rss.profile.Form = Ext.extend(Ext.FormPanel, {
                     xtype:"textfield",
                     fieldLabel: _("URL"),
                     emptyText: _("URL"),
+                    allowBlank: true,
                     name: "link"
                 },
                 {

@@ -137,7 +137,9 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
 
     cmpSave: function() {
         this.getEl().mask(_("Saving")+"...");
-        this.form.submit();
+        this.form.submit({
+            submitEmptyText: false
+        });
         this.getEl().unmask();
     },
 
