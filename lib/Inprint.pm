@@ -216,8 +216,8 @@ sub startup {
     $self->createRoutes($sessionBridge, "fascicle/templates/index",         [ "headlines", "modules", "save" ]);
 
     # Files
-    $sessionBridge->route('/files/preview/:id')             ->to('files#preview');
-    $sessionBridge->route('/files/download/:id')            ->to('files#download');
+    $sessionBridge->route('/files/preview/:id')                 ->to('files#preview');
+    $sessionBridge->route('/files/download/:id')                ->to('files#download');
     $sessionBridge->route('/files/download/')                   ->to('files#download');
 
     # Images
@@ -233,15 +233,24 @@ sub startup {
     $sessionBridge->route('/logout/')->to('session#logout');
 
     # Inprint menu
-    $sessionBridge->route('/menu/')                         ->to('menu#index');
+    $sessionBridge->route('/menu/')
+        ->to('menu#index');
 
     # Profile routes
-    $sessionBridge->route('/profile/read/')                 ->to('profile#read');
-    $sessionBridge->route('/profile/update/')               ->to('profile#update');
-    $sessionBridge->route('/profile/image/:id')             ->to('profile#image', id => "00000000-0000-0000-0000-000000000000");
+    $sessionBridge->route('/profile/read/')             ->to('profile#read');
+    $sessionBridge->route('/profile/update/')           ->to('profile#update');
+
+    $sessionBridge->route('/profile/image/:id')
+        ->to('profile#image', id => "00000000-0000-0000-0000-000000000000");
+
+    # Reports
+    $sessionBridge->route('/reports/advertising/fascicle/:fascicle')
+        ->to('reports-advertising-fascicle#index');
 
     # Options routes
-    $sessionBridge->route('/options/update/')               ->to('options#update');
+    $sessionBridge->route('/options/update/')
+        ->to('options#update');
+
     $self->createRoutes($sessionBridge, "options/combos", [ "capture-destination" ]);
 
     # State route
