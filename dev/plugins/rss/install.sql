@@ -40,6 +40,8 @@ INSERT INTO plugins.routes(plugin, route_url, route_controller, route_action, ro
 INSERT INTO plugins.routes(plugin, route_url, route_controller, route_action, route_name, route_enabled, route_authentication)
     VALUES ('rss', '/rss/save/', 'plugins-rss-manage', 'save', null, true, true);
 INSERT INTO plugins.routes(plugin, route_url, route_controller, route_action, route_name, route_enabled, route_authentication)
+    VALUES ('rss', '/rss/filter/', 'plugins-rss-manage', 'filter', null, true, true);
+INSERT INTO plugins.routes(plugin, route_url, route_controller, route_action, route_name, route_enabled, route_authentication)
     VALUES ('rss', '/rss/publish/', 'plugins-rss-manage', 'publish', null, true, true);
 INSERT INTO plugins.routes(plugin, route_url, route_controller, route_action, route_name, route_enabled, route_authentication)
     VALUES ('rss', '/rss/unpublish/', 'plugins-rss-manage', 'unpublish', null, true, true);
