@@ -91,7 +91,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
             {
                 icon: _ico("arrow-transition-090"),
                 cls: "x-btn-text-icon",
-                text: _("As archive"),
+                text: _("Get archive"),
                 scope:this,
                 handler: function() {
                     window.location = "/files/download/?rnd="+ Math.random() +"&document="+ this.oid;
