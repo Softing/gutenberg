@@ -6,7 +6,9 @@
 -- Package: RSS Plugin, RU Locale
 -- Version: 1.0
 
-UPDATE plugins.rules SET rule_sortorder=150, rule_title = 'Может редактировать RSS' WHERE id = 'b98fb3fd-2593-44c8-bcd8-12da48693ef7';
+UPDATE plugins.rules SET rule_sortorder=1000, rule_title = 'Может редактировать RSS' WHERE id = 'b98fb3fd-2593-44c8-bcd8-12da48693ef7';
+
+DELETE FROM plugins.l18n WHERE plugin='rss' AND l18n_language='ru';
 
 INSERT INTO plugins.l18n (plugin, l18n_language, l18n_original, l18n_translation)
     VALUES ('rss', 'ru', 'RSS feeds', 'RSS ленты');
@@ -18,7 +20,16 @@ INSERT INTO plugins.l18n (plugin, l18n_language, l18n_original, l18n_translation
     VALUES ('rss', 'ru', 'Unpublish', 'Снять с публикации');
 
 INSERT INTO plugins.l18n (plugin, l18n_language, l18n_original, l18n_translation)
-    VALUES ('rss', 'ru', 'Show only with RSS', 'Показывать только с RSS');
+    VALUES ('rss', 'ru', 'Show...', 'Показать...');
+
+INSERT INTO plugins.l18n (plugin, l18n_language, l18n_original, l18n_translation)
+    VALUES ('rss', 'ru', 'Show all', 'Показать все');
+    
+INSERT INTO plugins.l18n (plugin, l18n_language, l18n_original, l18n_translation)
+    VALUES ('rss', 'ru', 'Show with RSS', 'Показать с RSS');
+
+INSERT INTO plugins.l18n (plugin, l18n_language, l18n_original, l18n_translation)
+    VALUES ('rss', 'ru', 'Show without RSS', 'Показать без RSS');
 
 INSERT INTO plugins.l18n (plugin, l18n_language, l18n_original, l18n_translation)
     VALUES ('rss', 'ru', 'Feeds', 'Ленты');
