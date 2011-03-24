@@ -117,8 +117,15 @@ sub startup {
     $self->createRoutes($sessionBridge, "catalog/organization",             [ "create", "read", "update", "delete", "tree", "map", "unmap" ]);
     $self->createRoutes($sessionBridge, "catalog/readiness",                [ "create", "read", "update", "delete", "list" ]);
     $self->createRoutes($sessionBridge, "catalog/roles",                    [ "create", "read", "update", "delete", "list", "map", "mapping" ]);
-    $self->createRoutes($sessionBridge, "catalog/rules",                    [ "list", "mapping", "map" ]);
-    $self->createRoutes($sessionBridge, "catalog/members",                  [ "create", "delete", "list", "rules", "setup" ]); #"map", "mapping",
+
+    #$self->createRoutes($sessionBridge, "catalog/rules",                    [ "list", "mapping", "map" ]);
+
+    $sessionBridge->route('/catalog/rules/list/')           ->to('catalog-rules#list');
+    $sessionBridge->route('/catalog/rules/clear/')          ->to('catalog-rules#clear');
+    $sessionBridge->route('/catalog/rules/map/')            ->to('catalog-rules#map');
+    $sessionBridge->route('/catalog/rules/mapping/')        ->to('catalog-rules#mapping');
+
+    $self->createRoutes($sessionBridge, "catalog/members",                  [ "create", "delete", "list", "rules", "setup" ]);
     $self->createRoutes($sessionBridge, "catalog/stages",                   [ "create", "read", "update", "delete", "list", "map-principals", "unmap-principals", "principals-mapping" ]);
     $self->createRoutes($sessionBridge, "catalog/principals",               [ "list" ]);
     $self->createRoutes($sessionBridge, "catalog/indexes",                  [ "editions" ]);
