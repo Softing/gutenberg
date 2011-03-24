@@ -3591,7 +3591,9 @@ ALTER TABLE public.view_members OWNER TO inprint;
 --
 
 CREATE VIEW "public"."view_rules" AS 
-	SELECT rules.id, 'system' AS plugin, rules.term, rules.section, rules.subsection, rules.icon, rules.title, rules.description, rules.sortorder, true AS enabled, (((((rules.section)::text || '.'::text) || (rules.subsection)::text) || '.'::text) || (rules.term)::text) AS term_text FROM rules UNION SELECT rules.id, rules.plugin, rules.rule_term AS term, rules.rule_section AS section, rules.rule_subsection AS subsection, rules.rule_icon AS icon, rules.rule_title AS title, rules.rule_description AS description, rules.rule_sortorder AS sortorder, rules.rule_enabled AS enabled, (((((rules.rule_section)::text || '.'::text) || (rules.rule_subsection)::text) || '.'::text) || (rules.rule_term)::text) AS term_text FROM plugins.rules;
+	SELECT rules.id, 'system' AS plugin, rules.term, rules.section, rules.subsection, rules.icon, rules.title, rules.description, rules.sortorder, true AS enabled, (((((rules.section)::text || '.'::text) || (rules.subsection)::text) || '.'::text) || (rules.term)::text) AS term_text FROM rules 
+	UNION 
+	SELECT rules.id, rules.plugin, rules.rule_term AS term, rules.rule_section AS section, rules.rule_subsection AS subsection, rules.rule_icon AS icon, rules.rule_title AS title, rules.rule_description AS description, rules.rule_sortorder AS sortorder, rules.rule_enabled AS enabled, (((((rules.rule_section)::text || '.'::text) || (rules.rule_subsection)::text) || '.'::text) || (rules.rule_term)::text) AS term_text FROM plugins.rules;
 
 
 ALTER TABLE public.view_rules OWNER TO inprint;
