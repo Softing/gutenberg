@@ -214,6 +214,14 @@ sub preview {
         $c->render_static();
     }
 
+    else {
+        if (-r "$ENV{DOCUMENT_ROOT}/images/st.gif") {
+            $c->tx->res->headers->content_type('image/gif');
+            $c->res->content->asset(Mojo::Asset::File->new(path => "$ENV{DOCUMENT_ROOT}/images/st.gif" ));
+            $c->render_static();
+        }
+    }
+
 
     $c->render_json({  });
 }
