@@ -1,3 +1,11 @@
+-- Inprint Content 5.0 
+-- Copyright(c) 2001-2011, Softing, LLC. 
+-- licensing@softing.ru 
+-- http://softing.ru/license
+
+-- Package: RSS Plugin, Core
+-- Version: 1.0
+
 -- Install Rss Plugin
 
 DELETE FROM plugins.menu   WHERE plugin='rss';
@@ -29,6 +37,8 @@ INSERT INTO plugins.routes(plugin, route_url, route_controller, route_action, ro
     VALUES ('rss', '/rss/read/', 'plugins-rss-manage', 'read', null, true, true);
 INSERT INTO plugins.routes(plugin, route_url, route_controller, route_action, route_name, route_enabled, route_authentication)
     VALUES ('rss', '/rss/update/', 'plugins-rss-manage', 'update', null, true, true);
+INSERT INTO plugins.routes(plugin, route_url, route_controller, route_action, route_name, route_enabled, route_authentication)
+    VALUES ('rss', '/rss/save/', 'plugins-rss-manage', 'save', null, true, true);
 INSERT INTO plugins.routes(plugin, route_url, route_controller, route_action, route_name, route_enabled, route_authentication)
     VALUES ('rss', '/rss/publish/', 'plugins-rss-manage', 'publish', null, true, true);
 INSERT INTO plugins.routes(plugin, route_url, route_controller, route_action, route_name, route_enabled, route_authentication)
@@ -74,28 +84,3 @@ INSERT INTO plugins.routes(plugin, route_url, route_controller, route_action, ro
 
 INSERT INTO plugins.rules(id, plugin, rule_section, rule_subsection, rule_term, rule_sortorder, rule_title, rule_icon, rule_description, rule_enabled)
     VALUES ('b98fb3fd-2593-44c8-bcd8-12da48693ef7', 'rss', 'catalog', 'documents', 'rss', 150, 'Can manage rss', 'key', '', true);
-
--- RU Locale
-
-UPDATE plugins.rules SET rule_sortorder=150, rule_title = 'Может редактировать RSS' WHERE id = 'b98fb3fd-2593-44c8-bcd8-12da48693ef7';
-
-INSERT INTO plugins.l18n (plugin, l18n_language, l18n_original, l18n_translation)
-    VALUES ('rss', 'ru', 'RSS feeds', 'RSS ленты');
-
-INSERT INTO plugins.l18n (plugin, l18n_language, l18n_original, l18n_translation)
-    VALUES ('rss', 'ru', 'Publish', 'Опубликовать');
-
-INSERT INTO plugins.l18n (plugin, l18n_language, l18n_original, l18n_translation)
-    VALUES ('rss', 'ru', 'Unpublish', 'Снять с публикации');
-
-INSERT INTO plugins.l18n (plugin, l18n_language, l18n_original, l18n_translation)
-    VALUES ('rss', 'ru', 'Show only with RSS', 'Показывать только с RSS');
-
-INSERT INTO plugins.l18n (plugin, l18n_language, l18n_original, l18n_translation)
-    VALUES ('rss', 'ru', 'Feeds', 'Ленты');
-
-INSERT INTO plugins.l18n (plugin, l18n_language, l18n_original, l18n_translation)
-    VALUES ('rss', 'ru', 'Default feed', 'Лента по умолчанию');
-
-INSERT INTO rss_feeds(id, url, title, description, published, created, updated)                                                                                                 
-    VALUES ('00000000-0000-0000-0000-000000000000', 'default', 'По умолчанию', 'По умолчанию', true, now(), now());
