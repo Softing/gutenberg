@@ -115,6 +115,8 @@ sub _downloadArchvie {
     my $tmpfname = $c->uuid . ".7z";
     my $tmpfpath = "/tmp/inprint-$tmpfname";
 
+    my @files;
+
     foreach my $file (@$files) {
 
         my $filepath  = $file->{filepath};
@@ -123,14 +125,18 @@ sub _downloadArchvie {
         my $extension = $file->{extension};
 
         if (-e -r $filepath) {
-            if ($^O eq "MSWin32") {
-                system ("LANG=ru_RU.UTF-8 7z a \"$tmpfpath\" \"$filepath\" >/dev/null 2>&1");
-            }
-            if ($^O eq "linux") {
-                system ("LANG=ru_RU.UTF-8 7z a \"$tmpfpath\" \"$filepath\" >/dev/null 2>&1");
-            }
+            push @files, '"'. $filepath .'"';
         }
 
+    }
+    
+    my $fileListString = join " ", @files;
+
+    if ($^O eq "MSWin32") {
+        system ("LANG=ru_RU.UTF-8 7z a -mx0 \"$tmpfpath\" $fileListString >/dev/null 2>&1");
+    }
+    if ($^O eq "linux") {
+        system ("LANG=ru_RU.UTF-8 7z a -mx0 \"$tmpfpath\" $fileListString >/dev/null 2>&1");
     }
 
     $c->tx->res->headers->content_type("application/x-7z-compressed");
@@ -143,7 +149,6 @@ sub _downloadArchvie {
     $c->res->content->headers($headers);
 
     $c->render_static();
-
 }
 
 sub preview {

@@ -41,8 +41,8 @@ sub set {
 
     my $access = Inprint::Documents::Access::get($c, $i_oid);
 
-    push @errors, { id => "access", msg => "Denide by [files.work]"}
-        unless ($access->{"files.work"});
+#    push @errors, { id => "access", msg => "Denide by [files.work]"}
+#        unless ($access->{"files.work"});
 
     unless (@errors) {
         $html = Inprint::Store::Embedded::fileSave($c, $i_oid, $i_text);
