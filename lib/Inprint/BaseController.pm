@@ -126,18 +126,29 @@ sub redirect_to {
 
 sub l {
     my $c = shift;
-    my $text = shift;
+    my $input = shift;
     my @vars = @_;
 
-    $text = $c->stash->{i18n}->{_handle}->get($text) || $text;
+    my $output = $c->stash->{i18n}->{_handle}->get($input);
+
+    if ($input eq $output) {
+        $output = $c->sql->Q("
+            SELECT l18n_translation FROM plugins.l18n
+            WHERE l18n_language=? AND l18n_original=?",
+            [ $c->stash->{i18n}->{_language}, $output ])->Value;
+    }
+
+    unless ($output) {
+        $output = $input;
+    }
 
     for (1 .. $#vars+1) {
         my $placer = "%$_";
         my $value = $vars[$_-1];
-        $text =~ s/$placer/$value/g;
+        $output =~ s/$placer/$value/g;
     }
 
-    return $text;
+    return $output;
 }
 
 # Access
