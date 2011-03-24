@@ -2,25 +2,16 @@ Inprint.cmp.memberRulesForm.Editions.Restrictions = Ext.extend(Ext.grid.EditorGr
 
     initComponent: function() {
 
-        this.uid = null;
-        this.record = null;
-
-        this.components = {};
-
-        this.urls = {
-            "list":    "/catalog/rules/list/",
-            "save":    _url("/catalog/rules/map/"),
-            "fill":    _url("/catalog/rules/mapping/")
-        };
+        var url = "/catalog/rules/list/";
 
         this.sm = new Ext.grid.CheckboxSelectionModel({
             checkOnly:true
         });
 
-        this.store = Inprint.factory.Store.json(this.urls.list, {
+        this.store = Inprint.factory.Store.json(url, {
             autoLoad: false,
             baseParams: {
-                section: 'editions'
+                section: this.cmpGetSection()
             }
         });
 
@@ -63,67 +54,16 @@ Inprint.cmp.memberRulesForm.Editions.Restrictions = Ext.extend(Ext.grid.EditorGr
         this.getStore().load();
     },
 
-    cmpFill: function(member, node) {
-
-        this.memberId = member;
-        this.nodeId = node;
-
-        this.getSelectionModel().clearSelections();
-        this.getStore().rejectChanges();
-
-        this.body.mask(_("Loading"));
-
-        Ext.Ajax.request({
-            url: this.urls.fill,
-            scope:this,
-            params: {
-                binding: node,
-                member: member,
-                section: "editions"
-            },
-            callback: function() {
-                this.body.unmask();
-            },
-            success: function(responce) {
-                var result = Ext.util.JSON.decode(responce.responseText);
-                var store = this.getStore();
-                for (var i in result.data) {
-                    var record = store.getById(i);
-                    if (record) {
-                        record.set("icon", result.data[i].icon);
-                        if (result.data[i].type == "obtained") {
-                            this.getSelectionModel().selectRecords([ record ], true);
-                        }
-                    }
-                }
-                store.commitChanges();
-            }
-        });
+    cmpSetBinding: function(id) {
+        this.nodeId = id;
     },
 
-    cmpSave: function() {
-        var data = [];
-        Ext.each(this.getSelectionModel().getSelections(), function(record) {
-            data.push( record.get("id") + "::edition");
-        });
-        Ext.Ajax.request({
-            scope:this,
-            url: this.urls.save,
-            params: {
-                rules: data,
-                section: "editions",
-                member: this.memberId,
-                binding: this.nodeId
-            },
-            success: function() {
-                this.cmpReload();
-                new Ext.ux.Notification({
-                    iconCls: 'event',
-                    title: _("System event"),
-                    html: _("Changes have been saved")
-                }).show(document);
-            }
-        });
+    cmpGetBinding: function() {
+        return this.nodeId;
+    },
+
+    cmpGetSection: function() {
+        return "editions";
     }
 
 });

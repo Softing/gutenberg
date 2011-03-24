@@ -2,25 +2,16 @@ Inprint.cmp.memberRulesForm.Organization.Restrictions = Ext.extend(Ext.grid.Edit
 
     initComponent: function() {
 
-        this.uid = null;
-        this.record = null;
-
-        this.components = {};
-
-        this.urls = {
-            "list":    "/catalog/rules/list/",
-            "save":    _url("/catalog/rules/map/"),
-            "fill":    _url("/catalog/rules/mapping/")
-        };
+        var url = "/catalog/rules/list/";
 
         this.sm = new Ext.grid.CheckboxSelectionModel({
             checkOnly:true
         });
 
-        this.store = Inprint.factory.Store.json(this.urls.list, {
+        this.store = Inprint.factory.Store.json(url, {
             autoLoad: false,
             baseParams: {
-                section: 'catalog'
+                section: this.cmpGetSection()
             }
         });
 
@@ -49,28 +40,32 @@ Inprint.cmp.memberRulesForm.Organization.Restrictions = Ext.extend(Ext.grid.Edit
                 width: 120,
                 header: _("Limit"),
                 dataIndex: 'limit',
-                renderer: function(value, metadata, record, row, col, store) {
-                    if (value === undefined || value === "") {
-                        return _("Employee");
-                    }
-                    return value;
-                },
                 editor: new Ext.form.ComboBox({
                     lazyRender : true,
                     store: new Ext.data.ArrayStore({
                         fields: ['id', 'name'],
-                        data : [
+                        data: [
                             [ 'member', _("Employee")],
-                            [ 'group', _("Group")]
+                            [ 'group', _("Department")]
                         ]
                     }),
+                    mode: 'local',
                     hiddenName: "id",
                     valueField: "id",
                     displayField:'name',
-                    mode: 'local',
-                    forceSelection: true,
                     editable:false,
-                    emptyText:_("Limitation...")
+                    forceSelection: true,
+                    emptyText:_("Limitation..."),
+                    listeners: {
+                        expand: function(combo) {
+                            var store = combo.getStore();
+                            store.removeAll();
+                            store.loadData([
+                                [ 'member', _("Employee")],
+                                [ 'group', _("Department")]
+                            ]);
+                        }
+                    }
                 })
             }
         ];
@@ -84,92 +79,33 @@ Inprint.cmp.memberRulesForm.Organization.Restrictions = Ext.extend(Ext.grid.Edit
         });
 
         Inprint.cmp.memberRulesForm.Organization.Restrictions.superclass.initComponent.apply(this, arguments);
-
     },
 
     onRender: function() {
+
         Inprint.cmp.memberRulesForm.Organization.Restrictions.superclass.onRender.apply(this, arguments);
+
         this.on("afteredit", function(e) {
             var combo = this.getColumnModel().getCellEditor(e.column, e.row).field;
-            e.record.set(e.field, combo.getRawValue());
+            e.record.set("limit", combo.getRawValue());
             e.record.set("selection", combo.getValue());
             this.getSelectionModel().selectRow(e.row, true);
         });
+
         this.getStore().load();
     },
 
-    cmpFill: function(member, node) {
 
-        this.memberId = member;
-        this.nodeId = node;
-
-        this.getSelectionModel().clearSelections();
-        this.getStore().rejectChanges();
-
-        this.body.mask(_("Loading"));
-
-        Ext.Ajax.request({
-            url: this.urls.fill,
-            scope:this,
-            params: {
-                binding: node,
-                member: member,
-                section: "catalog"
-            },
-            callback: function() {
-                this.body.unmask();
-            },
-            success: function(responce) {
-                var result = Ext.util.JSON.decode(responce.responseText);
-                var store = this.getStore();
-                for (var i in result.data) {
-                    var mode = result.data[i].area;
-                    var record = store.getById(i);
-                    if (record) {
-                        record.set("icon", result.data[i].icon);
-                        if (result.data[i].type == "obtained") {
-                            this.getSelectionModel().selectRecords([ record ], true);
-                        }
-                        if (mode == 'member') {
-                            record.set("limit", _("Employee"));
-                            record.set("selection", "member");
-                        }
-                        if (mode == 'group') {
-                            record.set("limit", _("Group"));
-                            record.set("selection", "group");
-                        }
-                    }
-                }
-                store.commitChanges();
-            }
-        });
+    cmpSetBinding: function(id) {
+        this.nodeId = id;
     },
 
-    cmpSave: function() {
-        var data = [];
-        Ext.each(this.getSelectionModel().getSelections(), function(record) {
-            var id = record.get("id");
-            var mode = record.get("selection") || "member";
-            data.push( id + "::" + mode );
-        });
-        Ext.Ajax.request({
-            url: this.urls.save,
-            scope:this,
-            params: {
-                rules: data,
-                section: "catalog",
-                member: this.memberId,
-                binding: this.nodeId
-            },
-            success: function() {
-                this.cmpReload();
-                new Ext.ux.Notification({
-                    iconCls: 'event',
-                    title: _("System event"),
-                    html: _("Changes have been saved")
-                }).show(document);
-            }
-        });
+    cmpGetBinding: function() {
+        return this.nodeId;
+    },
+
+    cmpGetSection: function() {
+        return "catalog";
     }
 
 });

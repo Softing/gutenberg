@@ -33,19 +33,22 @@ Inprint.cmp.memberRulesForm.Organization = Ext.extend(Ext.Panel, {
             ]
         });
         Inprint.cmp.memberRulesForm.Organization.superclass.initComponent.apply(this, arguments);
-        Inprint.cmp.memberRulesForm.Organization.Interaction(this, this.panels);
     },
 
     onRender: function() {
         Inprint.cmp.memberRulesForm.Organization.superclass.onRender.apply(this, arguments);
     },
-    
+
+    cmpGetTree: function() {
+        return this.panels.tree;
+    },
+
+    cmpGetGrid: function() {
+        return this.panels.grid;
+    },
+
     cmpReload: function() {
         this.panels.grid.cmpReload();
-    },
-    
-    cmpSave: function() {
-        this.panels.grid.cmpSave();
     }
 
 });
