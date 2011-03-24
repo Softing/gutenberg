@@ -98,8 +98,8 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                 }
             },
             {
-                //icon: _ico("arrow-transition-090"),
-                //cls: "x-btn-text-icon",
+                icon: _ico("documents-stack"),
+                cls: "x-btn-text-icon",
                 text: _("Documents"),
                 scope:this,
                 handler: function() {
@@ -107,8 +107,8 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                 }
             },
             {
-                //icon: _ico("arrow-transition-090"),
-                //cls: "x-btn-text-icon",
+                icon: _ico("pictures-stack"),
+                cls: "x-btn-text-icon",
                 text: _("Images"),
                 scope:this,
                 handler: function() {
