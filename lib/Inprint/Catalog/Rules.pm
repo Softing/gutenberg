@@ -44,39 +44,62 @@ sub list {
     $c->render_json( { data => $result } );
 }
 
+sub clear {
+    my $c = shift;
+
+    my $i_member    = $c->param("member");
+    my $i_section   = $c->param("section");
+    my $i_binding   = $c->param("binding");
+
+    # Remove the lower Rules
+    if ($i_section ~~ [ "editions", "catalog" ])
+    {
+        $c->sql->Do("
+            DELETE FROM map_member_to_rule WHERE
+                member=?
+                AND section=?
+                AND binding = ANY (
+                    ARRAY(
+                        SELECT id FROM $i_section WHERE path ~
+                        ('*.' || replace(?, '-', '') || '.*')::lquery
+                    )
+                ) ",
+            [ $i_member, $i_section, $i_binding ]);
+    }
+
+    $c->render_json( { success => $c->json->true } );
+}
+
 sub map {
     my $c = shift;
 
     my $i_member    = $c->param("member");
     my $i_section   = $c->param("section");
-
     my $i_binding   = $c->param("binding");
-    my $i_recursive = $c->param("recursive");
     my @i_rules     = $c->param("rules");
 
-    my $success = $c->json->false;
-
-    if ($i_section ~~ [ "domain", "editions", "catalog" ]) {
+    if ($i_section ~~ [ "domain", "editions", "catalog" ])
+    {
 
         $c->sql->Do("
             DELETE FROM map_member_to_rule
-            WHERE member=? AND section=? AND binding=?
-        ", [ $i_member, $i_section, $i_binding ]);
+                WHERE member=? AND section=? AND binding=? ",
+            [ $i_member, $i_section, $i_binding ]);
 
-        foreach my $string (@i_rules) {
+        foreach my $string (@i_rules)
+        {
             my ($rule, $mode) = split "::", $string;
             if ($rule && $mode) {
                 $c->sql->Do("
                     INSERT INTO map_member_to_rule(member, section, binding, area, term)
-                        VALUES (?, ?, ?, ?, ?);
-                ", [$i_member, $i_section, $i_binding, $mode, $rule]);
+                        VALUES (?, ?, ?, ?, ?) ",
+                    [$i_member, $i_section, $i_binding, $mode, $rule]);
             }
         }
 
-        $success = $c->json->true;
     }
 
-    $c->render_json( { success => $success } );
+    $c->render_json( { success => $c->json->true } );
 }
 
 sub mapping {
@@ -121,7 +144,7 @@ sub mapping {
                 my ($term, $area) = split /:/, $term;
 
                 my $term_obj = $c->sql->Q(
-                    "SELECT * FROM rules WHERE section||'.'||subsection||'.'||term=?", [ $term ])->Hash;
+                    "SELECT * FROM view_rules WHERE term_text = ?", [ $term ])->Hash;
 
                 next if $result->{ $term_obj->{id} };
                 $result->{ $term_obj->{id} } = {
