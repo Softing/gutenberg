@@ -2,6 +2,8 @@ Inprint.plugins.rss.Access = function(parent, panels) {
 
     var grid = panels.grid;
 
+    grid.btnSave.enable();
+
     grid.getSelectionModel().on("selectionchange", function(sm) {
 
         var records = grid.getSelectionModel().getSelections();

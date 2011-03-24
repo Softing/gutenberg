@@ -1,4 +1,4 @@
-Inprint.plugins.rss.Grid = Ext.extend(Ext.grid.GridPanel, {
+Inprint.plugins.rss.Grid = Ext.extend(Ext.grid.EditorGridPanel, {
 
     initComponent: function() {
 
@@ -12,7 +12,7 @@ Inprint.plugins.rss.Grid = Ext.extend(Ext.grid.GridPanel, {
         };
 
         var fields = Inprint.factory.StoreFields["/documents/list/"];
-        fields.push("rss_id", "rss_published");
+        fields.push("rss_id", "rss_published", "rss_sortorder");
 
         this.store = new Ext.data.JsonStore(Ext.apply(
             Inprint.factory.StoreDefaults, {
@@ -30,29 +30,34 @@ Inprint.plugins.rss.Grid = Ext.extend(Ext.grid.GridPanel, {
         this.columns = [
             this.sm,
             {
-                id:"publihed",
                 width: 32,
-                dataIndex: "rss_published",
+                id:"publihed",
                 sortable: false,
+                dataIndex: "rss_published",
                 renderer: function(v) {
                     var image = '';
                     if (v==1) { image = '<img src="'+ _ico("light-bulb") +'"/>'; }
                     return image;
                 }
-
+            },
+            {
+                width: 40,
+                id:"sortorder",
+                sortable: false,
+                dataIndex: "rss_sortorder",
+                editor: new Ext.form.TextField({
+                    allowBlank: true
+                })
             },
             {
                 id:"title",
-                width: 32,
-                header:_("Titl"),
+                header:_("Title"),
                 dataIndex: "title",
                 sortable: false,
                 renderer: function(v) {
                     return '<b>'+ v +'</b>';
                 }
-
             },
-            //columns.title,
             columns.edition,
             columns.workgroup,
             columns.fascicle,
@@ -67,6 +72,16 @@ Inprint.plugins.rss.Grid = Ext.extend(Ext.grid.GridPanel, {
         ];
 
         this.tbar = [
+            {
+                icon: _ico("disk-black"),
+                cls: "x-btn-text-icon",
+                text: _("Save"),
+                ref: "../btnSave",
+                disabled:true,
+                scope:this,
+                handler: this.cmpSave
+            },
+            "-",
             {
                 icon: _ico("light-bulb"),
                 cls: "x-btn-text-icon",
@@ -86,19 +101,28 @@ Inprint.plugins.rss.Grid = Ext.extend(Ext.grid.GridPanel, {
                 handler: this.cmpUnpublish
             },
             "-",
-            {
-                icon: _ico("funnel"),
-                cls: "x-btn-text-icon",
-                text: _("Show only with RSS"),
-                ref: "../btnSwitch",
-                pressed: false,
-                enableToggle: true,
-                scope:this,
-                toggleHandler: function(btn, tgle) {
-                    this.store.baseParams.flt_rssonly = tgle;
-                    this.store.reload();
+            new Ext.form.ComboBox({
+                editable:false,
+                clearable:false,
+                triggerAction: "all",
+                forceSelection: true,
+                valueField: "id",
+                displayField: "title",
+                emptyText: _("Show..."),
+                store: new Ext.data.JsonStore({
+                    autoDestroy: true,
+                    url: _url("/plugin/rss/filter/"),
+                    root: 'data',
+                    fields: [ "id", "title" ]
+                }),
+                listeners: {
+                    scope:this,
+                    select: function (combo, record) {
+                        this.store.baseParams.filter = record.get("id");
+                        this.store.reload();
+                    }
                 }
-            }
+            })
         ];
 
         this.bbar = new Ext.PagingToolbar({
@@ -143,6 +167,35 @@ Inprint.plugins.rss.Grid = Ext.extend(Ext.grid.GridPanel, {
 
     onRender: function() {
         Inprint.plugins.rss.Grid.superclass.onRender.apply(this, arguments);
+    },
+
+    cmpSave: function() {
+
+        // get modules changes
+        var data = [];
+        var records = this.getStore().getModifiedRecords();
+        if(records.length) {
+            Ext.each(records, function(r, i) {
+                var page = r.get("id");
+                var sortorder = r.get("rss_sortorder");
+                data.push(page +'::'+ sortorder);
+            }, this);
+        }
+
+        var o = {
+            url: _url("/plugin/rss/save/"),
+            params:{
+                documents: data
+            },
+            scope:this,
+            success: function () {
+                this.getStore().commitChanges();
+                this.cmpReload();
+            }
+        };
+
+        Ext.Ajax.request(o);
+
     },
 
     cmpPublish: function() {

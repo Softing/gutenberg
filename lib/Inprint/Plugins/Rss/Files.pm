@@ -21,10 +21,10 @@ sub list {
     my @errors;
     my $success = $c->json->false;
 
-    push @errors, { id => "document", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_document));
+    Inprint::Check::uuid($c, \@errors, "document", $i_document);
+    my $document = Inprint::Check::document($c, \@errors, $i_document);
 
-    my $feed = $c->sql->Q(" SELECT * FROM rss WHERE document=? ", [ $i_document ])->Hash;
+    my $feed = $c->sql->Q(" SELECT * FROM plugins_rss.rss WHERE entity=? ", [ $i_document ])->Hash;
 
     #push @errors, { id => "feed", msg => "Can't find object"}
     #    unless ($feed->{id});
@@ -35,7 +35,7 @@ sub list {
         if ($feed->{id}) {
             my $folder = Inprint::Store::Embedded::getFolderPath($c, "rss-plugin", $feed->{created}, $feed->{id}, 1);
             Inprint::Store::Embedded::updateCache($c, $folder);
-            $result = Inprint::Store::Cache::getRecordsByPath($c, $folder, "all", ['png', 'jpg', 'jpeg', 'gif']);
+            $result = Inprint::Store::Cache::getRecordsByPath($c, $folder, "all", ['png', 'jpg', 'jpeg', 'gif', 'wma', 'wmv', 'mpeg', 'mp3']);
         }
 
     }
@@ -56,7 +56,7 @@ sub upload {
     Inprint::Check::uuid($c, \@errors, "document", $i_document);
     my $document = Inprint::Check::document($c, \@errors, $i_document);
 
-    my $feed = $c->sql->Q(" SELECT * FROM rss WHERE document=? ", [ $i_document ])->Hash;
+    my $feed = $c->sql->Q(" SELECT * FROM plugins_rss.rss WHERE entity=? ", [ $i_document ])->Hash;
     push @errors, { id => "feed", msg => "Can't find object"} unless ($feed->{id});
 
     unless (@errors) {

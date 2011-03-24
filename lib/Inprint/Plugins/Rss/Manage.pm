@@ -9,7 +9,6 @@ use strict;
 use warnings;
 
 use Inprint::Check;
-use Inprint::Models::Rss;
 
 use base 'Inprint::BaseController';
 
@@ -21,7 +20,7 @@ sub list {
     my $dir      = $c->param("dir")          || "DESC";
     my $sort     = $c->param("sort")         || "created";
 
-    my $i_filter = $c->param("flt_rssonly");
+    my $i_filter = $c->param("filter");
 
     my @errors;
 
@@ -29,29 +28,82 @@ sub list {
     my @params;
     my $sql_query = "
             SELECT
-                dcm.*, rss.id as rss_id, rss.published as rss_published,
+                dcm.*,
+                rss.id as rss_id, rss.published as rss_published,
+                rss.priority as rss_sortorder,
                 to_char(dcm.pdate, 'YYYY-MM-DD HH24:MI:SS') as pdate,
                 to_char(dcm.fdate, 'YYYY-MM-DD HH24:MI:SS') as fdate,
                 to_char(dcm.ldate, 'YYYY-MM-DD HH24:MI:SS') as ldate,
                 to_char(dcm.created, 'YYYY-MM-DD HH24:MI:SS') as created,
                 to_char(dcm.updated, 'YYYY-MM-DD HH24:MI:SS') as updated
-            FROM documents dcm LEFT JOIN rss ON dcm.id = rss.document
+            FROM documents dcm
+                LEFT JOIN plugins_rss.rss ON dcm.id = rss.entity
             WHERE dcm.fascicle <> '99999999-9999-9999-9999-999999999999'
         ";
 
     # Total query
     my $sql_total = "
         SELECT count(*)
-        FROM documents dcm LEFT JOIN rss ON dcm.id = rss.document
+        FROM documents dcm LEFT JOIN plugins_rss.rss ON dcm.id = rss.entity
         WHERE dcm.fascicle <> '99999999-9999-9999-9999-999999999999'
     ";
 
     # Filters
 
-    if ($i_filter eq "true") {
+    if ($i_filter eq "show-all") {
+    }
+
+    if ($i_filter eq "only-rss") {
         $sql_query .= " AND rss.id is not null AND rss.published=true";
         $sql_total .= " AND rss.id is not null AND rss.published=true";
     }
+
+    if ($i_filter eq "without-rss") {
+        $sql_query .= " AND rss.id is null";
+        $sql_total .= " AND rss.id is null";
+    }
+
+    if ($i_filter =~ m/^[a-z|0-9]{8}(-[a-z|0-9]{4}){3}-[a-z|0-9]{12}+$/) {
+
+        $sql_query .= " AND rss.id is not null AND rss.published=true";
+        $sql_total .= " AND rss.id is not null AND rss.published=true";
+
+        my $index = $c->sql->Q("
+            SELECT tag, nature FROM plugins_rss.rss_feeds_mapping t1 WHERE feed=?
+        ", $i_filter)->Hashes;
+
+        my @editions, my @headlines, my @rubrics;
+        foreach my $item (@$index) {
+            push @editions,  $item->{tag} if ($item->{nature} eq "edition");
+            push @headlines, $item->{tag} if ($item->{nature} eq "headline");
+            push @rubrics,   $item->{tag} if ($item->{nature} eq "rubric");
+        }
+
+        my @filters;
+
+        if (@editions) {
+            push @filters, " dcm.edition = ANY(?) ";
+            push @params, \@editions;
+        }
+
+        if (@headlines) {
+            push @filters, " dcm.headline = ANY(?) ";
+            push @params, \@headlines;
+        }
+
+        if (@rubrics) {
+            push @filters, " dcm.rubric = ANY(?) ";
+            push @params, \@rubrics;
+        }
+
+        if (@filters) {
+            $sql_query .= " AND ( ". join(" OR ", @filters) ." ) ";
+            $sql_total .= " AND ( ". join(" OR ", @filters) ." ) ";
+        }
+    }
+
+    # Get total
+    my $total  = $c->sql->Q($sql_total, \@params)->Value;
 
     # Sorting
     if ($dir && $sort) {
@@ -71,7 +123,7 @@ sub list {
     }
 
     my $result = $c->sql->Q($sql_query, \@params)->Hashes;
-    my $total  = $c->sql->Q($sql_total, [])->Value;
+
 
     foreach my $item (@$result) {
         $item->{access} = {
@@ -92,29 +144,24 @@ sub list {
 }
 
 sub read {
-
     my $c = shift;
+
+    my $result;
+    my @errors;
 
     my $i_document = $c->param("document") || undef;
 
-    my @errors;
-    my $success = $c->json->false;
-
-    push @errors, { id => "document", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_document));
-
-    my $document;
-    unless (@errors) {
-        $document = $c->sql->Q(" SELECT * FROM documents WHERE id=? ", [ $i_document ])->Hash;
-        push @errors, { id => "document", msg => "Can't find object"}
-            unless $document->{id};
-    }
-
-    my $result;
+    Inprint::Check::uuid($c, \@errors, "document", $i_document);
+    my $document = Inprint::Check::document($c, \@errors, $i_document);
 
     unless (@errors) {
 
-        $result = Inprint::Models::Rss::read($c, $document->{id});
+        $result = $c->sql->Q("
+                SELECT id, entity, sitelink, title, description, fulltext,
+                    published, created, updated
+                FROM plugins_rss.rss
+                WHERE entity=? ",
+            [ $document->{id} ])->Hash;
 
         $result->{access} = {
             rss => $c->json->false,
@@ -122,20 +169,19 @@ sub read {
         };
 
         if ($document->{workgroup} && $c->access->Check("catalog.documents.rss:*", $document->{workgroup})) {
-            $result->{access}->{rss} = $c->json->true;
-            if ($result->{id}) {
-                $result->{access}->{upload} = $c->json->true;
-            }
+            $result->{access}->{rss}    = $c->json->true;
+            $result->{access}->{upload} = $c->json->true if ($result->{id});
         }
     }
 
-    $success = $c->json->true unless (@errors);
-    $c->render_json( { success => $success, errors => \@errors, data => $result } );
+    $c->smart_render(\@errors, $result);
 }
 
 sub update {
 
     my $c = shift;
+
+    my @errors;
 
     my $i_document    = $c->param("document") || undef;
     my $i_published   = $c->param("published") || undef;
@@ -144,70 +190,136 @@ sub update {
     my $i_description = $c->param("description") || undef;
     my $i_fulltext    = $c->param("fulltext") || undef;
 
-    my @errors;
-    my $success = $c->json->false;
-
-    push @errors, { id => "document", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_document));
-
-    my $document;
-    unless (@errors) {
-        $document = $c->sql->Q(" SELECT * FROM documents WHERE id=? ", [ $i_document ])->Hash;
-        push @errors, { id => "document", msg => "Can't find object"}
-            unless $document->{id};
-    }
+    Inprint::Check::uuid($c, \@errors, "document", $i_document);
+    my $document = Inprint::Check::document($c, \@errors, $i_document);
 
     unless (@errors) {
-        my $enabled = 0;
-        if ($i_published eq "on") {
-            $enabled = 1;
+
+        my $enabled; $i_published eq "on" ? $enabled = 1 : $enabled = 0;
+
+        # Get record
+        my $record = $c->sql->Q("
+                SELECT id, entity, sitelink, title, description, fulltext,
+                    published, created, updated
+                FROM plugins_rss.rss
+                WHERE entity=? ",
+            [ $document->{id} ])->Hash;
+
+        # Update record
+        if ($record->{id}) {
+            $c->sql->Do("
+                UPDATE plugins_rss.rss
+                    SET sitelink=?, title=?, description=?, fulltext=?,  published=?,
+                        updated=now()
+                    WHERE id=?; ",
+                [ $i_link, $i_title, $i_description, $i_fulltext, $enabled, $record->{id} ]);
         }
-        Inprint::Models::Rss::update($c, $document->{id}, $enabled, $i_link, $i_title, $i_description, $i_fulltext);
-        $success = $c->json->true;
+
+        # Create record
+        unless ($record->{id}) {
+            $c->sql->Do("
+                INSERT
+                    INTO plugins_rss.rss (id, entity, sitelink, title, description, fulltext,
+                        published, created,  updated)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, now(), now()); ",
+                [ $c->uuid, $document->{id}, $i_link, $i_title, $i_description, $i_fulltext, $enabled ]);
+        }
     }
 
-    $success = $c->json->true unless @errors;
-    $c->render_json( { success => $success, errors => \@errors } );
+    $c->smart_render(\@errors);
+}
+
+sub filter {
+    my $c = shift;
+
+    my $data;
+    my @errors;
+
+    unless (@errors) {
+        $data = $c->sql->Q(" SELECT id, title FROM plugins_rss.rss_feeds ORDER BY title ")->Hashes;
+    }
+
+    unshift @$data, {
+        id => "without-rss",
+        title => $c->l("Show without RSS")
+    };
+    unshift @$data, {
+        id => "only-rss",
+        title => $c->l("Show with RSS")
+    };
+    unshift @$data, {
+        id => "show-all",
+        title => $c->l("Show all")
+    };
+
+
+    $c->smart_render(\@errors, \@$data);
+}
+
+sub save {
+    my $c = shift;
+
+    my @errors;
+
+    my @i_documents = $c->param("documents");
+
+    foreach my $item (@i_documents) {
+
+        my ($id, $sortorder) = split "::", $item;
+
+        unless (@errors) {
+            $c->sql->Do(" UPDATE plugins_rss.rss SET priority=? WHERE entity=? ", [ $sortorder, $id ]);
+        }
+    }
+
+    $c->smart_render(\@errors);
 }
 
 sub publish {
     my $c = shift;
 
+    my @errors;
+
     my @i_ids = $c->param("id");
 
-    my @errors;
-    my $success = $c->json->false;
-
     foreach my $id (@i_ids) {
-        my $document = $c->sql->Q(" SELECT * FROM documents WHERE id=? ", [ $id ])->Hash;
+        Inprint::Check::uuid($c, \@errors, "document", $id);
+        my $document = Inprint::Check::document($c, \@errors, $id);
+
         next unless ($document->{workgroup} && $c->access->Check("catalog.documents.rss:*", $document->{workgroup}));
-        my $rss = $c->sql->Q(" SELECT * FROM rss WHERE document=? ", [ $id ])->Hash;
+
+        my $rss = $c->sql->Q(" SELECT * FROM plugins_rss.rss WHERE entity=? ", [ $id ])->Hash;
+
         next unless $rss;
-        $c->sql->Do(" UPDATE rss SET published=true WHERE document=? ", [ $id ]);
+
+        $c->sql->Do(" UPDATE plugins_rss.rss SET published=true WHERE entity=? ", [ $id ]);
     }
 
-    $success = $c->json->true unless @errors;
-    $c->render_json({});
+    $c->smart_render(\@errors);
 }
 
 sub unpublish {
     my $c = shift;
 
+    my @errors;
+
     my @i_ids = $c->param("id");
 
-    my @errors;
-    my $success = $c->json->false;
-
     foreach my $id (@i_ids) {
-        my $document = $c->sql->Q(" SELECT * FROM documents WHERE id=? ", [ $id ])->Hash;
+
+        Inprint::Check::uuid($c, \@errors, "document", $id);
+        my $document = Inprint::Check::document($c, \@errors, $id);
+
         next unless ($document->{workgroup} && $c->access->Check("catalog.documents.rss:*", $document->{workgroup}));
-        my $rss = $c->sql->Q(" SELECT * FROM rss WHERE document=? ", [ $id ])->Hash;
+
+        my $rss = $c->sql->Q(" SELECT * FROM plugins_rss.rss WHERE entity=? ", [ $id ])->Hash;
+
         next unless $rss;
-        $c->sql->Do(" UPDATE rss SET published=false WHERE document=? ", [ $id ]);
+
+        $c->sql->Do(" UPDATE plugins_rss.rss SET published=false WHERE entity=? ", [ $id ]);
     }
 
-    $success = $c->json->true unless @errors;
-    $c->render_json({});
+    $c->smart_render(\@errors);
 }
 
 

@@ -13,29 +13,21 @@ use Inprint::Check;
 use base 'Inprint::BaseController';
 
 sub tree {
-
     my $c = shift;
+
+    my @errors, my @result;
 
     my $i_node = $c->param("node");
     $i_node = '00000000-0000-0000-0000-000000000000' unless ($i_node);
     $i_node = '00000000-0000-0000-0000-000000000000' if ($i_node eq "root-node");
 
-    my @errors;
-    my $success = $c->json->false;
-
     Inprint::Check::uuid($c, \@errors, "id", $i_node);
 
-    my @result;
-
     unless (@errors) {
-        my $sql;
-        my @data;
 
-        $sql .= "
-            SELECT t1.*
-            FROM rss_feeds t1 ";
-
-        my $data = $c->sql->Q("$sql ORDER BY title", \@data)->Hashes;
+        my $data = $c->sql->Q(
+            "SELECT t1.* FROM plugins_rss.rss_feeds t1 ORDER BY title "
+            )->Hashes;
 
         foreach my $item (@$data) {
             my $record = {
@@ -49,12 +41,10 @@ sub tree {
         }
     }
 
-    $success = $c->json->true unless (@errors);
     $c->render_json( \@result );
 }
 
 sub list {
-
     my $c = shift;
 
     my @errors;
@@ -64,17 +54,18 @@ sub list {
 
     unless (@errors) {
 
+        # Find editions
         my $editions = $c->sql->Q("
-                SELECT edtns.*,
+                SELECT editions.*,
                     (
-                        SELECT COUNT(*)
-                        FROM indx_headlines indx
-                        WHERE indx.edition=edtns.id
+                        SELECT COUNT(*) FROM indx_headlines indx
+                        WHERE true
+                            AND indx.edition = editions.id
                             AND indx.id <> '00000000-0000-0000-0000-000000000000'
                     ) as leaf
-                FROM editions edtns
-                ORDER BY edtns.shortcut
-            ", [])->Hashes;
+                FROM editions
+                ORDER BY shortcut
+            ")->Hashes;
 
         foreach my $edition (@$editions) {
 
@@ -87,20 +78,21 @@ sub list {
 
             push @$result, $record;
 
+            # Find headlines
             my $headlines = $c->sql->Q("
-                    SELECT hdlns.*,
+                    SELECT *,
                         (
-                            SELECT COUNT(*)
-                            FROM indx_rubrics indx
-                            WHERE indx.headline=hdlns.id
+                            SELECT COUNT(*) FROM indx_rubrics indx
+                            WHERE true
+                                AND indx.headline = indx_headlines.id
                                 AND indx.id <> '00000000-0000-0000-0000-000000000000'
                         ) as leaf
-                    FROM indx_headlines hdlns
-                    WHERE hdlns.edition=?
-                    ORDER BY hdlns.title
-                ", [ $edition->{id} ])->Hashes;
+                    FROM indx_headlines
+                    WHERE edition=?
+                    ORDER BY title ",
+                $edition->{id})->Hashes;
 
-            # Get Headlines
+            # Find rubrics for eah headline
             foreach my $headline (@$headlines) {
 
                 my $record2 = {
@@ -116,10 +108,9 @@ sub list {
                         SELECT *
                         FROM indx_rubrics
                         WHERE headline=?
-                        ORDER BY title
-                    ", [ $headline->{id} ])->Hashes;
+                        ORDER BY title ",
+                    $headline->{id})->Hashes;
 
-                # Get Rubrics
                 foreach my $rubric (@$rubrics) {
 
                     my $record3 = {
@@ -136,118 +127,102 @@ sub list {
         }
     }
 
-    $success = $c->json->true unless (@errors);
-    $c->render_json( { success => $success, data => $result } );
+    $c->smart_render(\@errors, $result);
 }
 
 sub create {
     my $c = shift;
 
-    my $id            = $c->uuid();
+    my @errors;
 
+    my $id            = $c->uuid();
     my $i_url         = $c->param("url");
     my $i_title       = $c->param("title");
     my $i_description = $c->param("description");
 
-    my @errors;
-    my $success = $c->json->false;
-
     Inprint::Check::url($c, \@errors,  "url", $i_url);
     Inprint::Check::text($c, \@errors, "title", $i_title);
     Inprint::Check::text($c, \@errors, "description", $i_description, 1);
-
-    #push @errors, { id => "access", msg => "Not enough permissions"}
-    #    unless ($c->access->Check("domain.editions.manage"));
+    #Inprint::Check::access($c, \@errors,  "");
 
     unless (@errors) {
         $c->sql->Do("
-            INSERT INTO rss_feeds (id, url, title, description)
+            INSERT INTO plugins_rss.rss_feeds (id, url, title, description)
                 VALUES (?, ?, ?, ?)
         ", [ $id, $i_url, $i_title, $i_description ]);
     }
 
-    $success = $c->json->true unless (@errors);
-    $c->render_json({ success => $success, errors => \@errors });
+    $c->smart_render(\@errors);
 }
 
 sub read {
     my $c = shift;
-    my $i_id = $c->param("id");
 
     my @errors;
-    my $success = $c->json->false;
-
-    Inprint::Check::uuid($c, \@errors,  "id", $i_id);
-
     my $result = [];
+
+    my $i_id = $c->param("id");
+    Inprint::Check::uuid($c, \@errors,  "id", $i_id);
 
     unless (@errors) {
         $result = $c->sql->Q("
-            SELECT t1.*
-            FROM rss_feeds t1 WHERE t1.id = ?
-        ", [ $i_id ])->Hash;
+                SELECT *
+                FROM plugins_rss.rss_feeds
+                WHERE id=? ",
+            [ $i_id ])->Hash;
     }
 
-    $success = $c->json->true unless (@errors);
-    $c->render_json( { success => $success, errors => \@errors, data => $result } );
+    $c->smart_render(\@errors, $result);
 }
 
 sub update {
     my $c = shift;
+
+    my @errors;
 
     my $i_id          = $c->param("id");
     my $i_url         = $c->param("url");
     my $i_title       = $c->param("title");
     my $i_description = $c->param("description");
 
-    my @errors;
-    my $success = $c->json->false;
-
     Inprint::Check::uuid($c, \@errors, "id", $i_id);
-    Inprint::Check::url($c, \@errors,  "url", $i_url);
+    Inprint::Check::url($c,  \@errors, "url", $i_url);
     Inprint::Check::text($c, \@errors, "title", $i_title);
     Inprint::Check::text($c, \@errors, "description", $i_description, 1);
+    #Inprint::Check::access($c, \@errors,  "");
 
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         if ($i_id eq "00000000-0000-0000-0000-000000000000");
-
-    #push @errors, { id => "access", msg => "Not enough permissions"}
-    #    unless ($c->access->Check("domain.editions.manage"));
 
     unless (@errors) {
 
         $c->sql->Do("
-            UPDATE rss_feeds SET url=?, title=?, description=?
-            WHERE id=? ",
+                UPDATE plugins_rss.rss_feeds
+                SET url=?, title=?, description=?
+                WHERE id=? ",
             [ $i_url, $i_title, $i_description, $i_id ]);
     }
 
-    $success = $c->json->true unless (@errors);
-    $c->render_json({ success => $success, errors => \@errors });
+    $c->smart_render(\@errors);
 }
 
 sub delete {
     my $c = shift;
-    my $i_id = $c->param("id");
 
     my @errors;
-    my $success = $c->json->false;
+
+    my $i_id = $c->param("id");
 
     Inprint::Check::uuid($c, \@errors,  "id", $i_id);
-
+    #Inprint::Check::access($c, \@errors,  "");
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         if ($i_id eq "00000000-0000-0000-0000-000000000000");
 
-    #push @errors, { id => "access", msg => "Not enough permissions"}
-    #    unless ($c->access->Check("domain.editions.manage"));
-
     unless (@errors) {
-        $c->sql->Do(" DELETE FROM rss_feeds WHERE id =? ", [ $i_id ]);
+        $c->sql->Do(" DELETE FROM plugins_rss.rss_feeds WHERE id=? ", [ $i_id ]);
     }
 
-    $success = $c->json->true unless (@errors);
-
-    $c->render_json({ success => $success, errors => \@errors });
+    $c->smart_render(\@errors);
 }
 
 sub fill {
@@ -255,56 +230,49 @@ sub fill {
     my $i_feed = $c->param("feed");
 
     my @errors;
-    my $success = $c->json->false;
 
     Inprint::Check::uuid($c, \@errors,  "feed", $i_feed);
-
-    ##push @errors, { id => "access", msg => "Not enough permissions"}
-    ##    unless ($c->access->Check("domain.editions.manage"));
+    #Inprint::Check::access($c, \@errors,  "");
 
     my $result = []; unless (@errors) {
         $result = $c->sql->Q("
-            SELECT tag || '::' || nature FROM rss_feeds_mapping
-            WHERE feed=? ",
-            [ $i_feed ])->Values;
+                SELECT tag || '::' || nature
+                FROM plugins_rss.rss_feeds_mapping
+                WHERE feed=? ",
+            $i_feed)->Values;
     }
 
-    $success = $c->json->true unless (@errors);
-    $c->render_json({ success => $success, errors => \@errors, data => $result });
+    $c->smart_render(\@errors, $result);
 }
 
 
 sub save {
     my $c = shift;
+
+    my @errors;
+
     my $i_feed    = $c->param("feed");
     my @i_rubrics = $c->param("rubrics");
 
-    my @errors;
-    my $success = $c->json->false;
-
     Inprint::Check::uuid($c, \@errors,  "feed", $i_feed);
+    #Inprint::Check::access($c, \@errors,  "");
 
-    ##push @errors, { id => "access", msg => "Not enough permissions"}
-    ##    unless ($c->access->Check("domain.editions.manage"));
-
-    $c->sql->Do(" DELETE FROM rss_feeds_mapping WHERE feed =? ", [ $i_feed ]);
+    $c->sql->Do(" DELETE FROM plugins_rss.rss_feeds_mapping WHERE feed=? ", [ $i_feed ]);
 
     foreach my $rubric_str (@i_rubrics) {
 
         my ($tag, $nature) = split '::', $rubric_str;
 
-        next unless $tag;
-        next unless $nature;
+        next unless $tag || $nature;
 
         $c->sql->Do("
-                INSERT INTO rss_feeds_mapping (feed, nature, tag)
-                VALUES (?,?,?)
+                INSERT INTO plugins_rss.rss_feeds_mapping (feed, nature, tag)
+                VALUES (?, ?, ?)
             ", [ $i_feed, $nature, $tag ]);
 
     }
 
-    $success = $c->json->true unless (@errors);
-    $c->render_json({ success => $success, errors => \@errors });
+    $c->smart_render(\@errors);
 }
 
 1;

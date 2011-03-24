@@ -1,7 +1,7 @@
 package Inprint::Plugins::Rss;
 
-# Inprint Content 4.5
-# Copyright(c) 2001-2010, Softing, LLC.
+# Inprint Content 5.0
+# Copyright(c) 2001-2011, Softing, LLC.
 # licensing@softing.ru
 # http://softing.ru/license
 
@@ -20,7 +20,7 @@ sub feeds {
 
     my $feeds = $c->sql->Q("
         SELECT id, url, title, description, published, created, updated
-        FROM rss_feeds
+        FROM plugins_rss.rss_feeds
         ")->Hashes;
 
     my $html;
@@ -33,9 +33,11 @@ sub feeds {
     $html .= '<body>';
     $html .= '<h1>RSS Feeds</h1>';
     $html .= "<ul>";
+
     foreach (@$feeds) {
         $html .= "<li><a href=\"$$_{url}.xml\">$$_{url}.xml</li>";
     }
+
     $html .= "</ul>";
     $html .= '</body>';
     $html .= '</html>';
@@ -53,14 +55,14 @@ sub feed {
 
     my $feed = $c->sql->Q("
         SELECT id, url, title, description, published, created, updated
-        FROM rss_feeds WHERE url=?
+        FROM plugins_rss.rss_feeds WHERE url=?
         ", [ $i_feed ])->Hash;
 
     $c->render(status => 404) unless $feed->{id};
 
     my $index = $c->sql->Q("
             SELECT tag, nature
-            FROM rss_feeds_mapping t1
+            FROM plugins_rss.rss_feeds_mapping t1
             WHERE feed=?
         ", [ $feed->{id} ])->Hashes;
 
@@ -86,18 +88,18 @@ sub feed {
     $rss_feed .= "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
     $rss_feed .= "<rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\" xmlns:media=\"http://search.yahoo.com/mrss/\" xmlns:blogChannel=\"http://backend.userland.com/blogChannelModule\" xmlns:content=\"http://purl.org/rss/1.0/modules/content/\">";
     $rss_feed .= "<channel>";
-    $rss_feed .= "<link>$siteurl</link>";
+    $rss_feed .= "<link>$feed_url</link>";
     $rss_feed .= "<title>". $feed->{title} ."</title>";
     $rss_feed .= "<atom:link href=\"$feed_url\" rel=\"self\" type=\"application/rss+xml\" />";
     $rss_feed .= "<description>". $feed->{description} ."</description>";
 
     my @params; my $sql = "
         SELECT
-            t1.id, t1.document, t1.link, t1.title, t1.description, t1.fulltext, t1.published, t1.created,
+            t1.id, t1.entity, t1.sitelink, t1.title, t1.description, t1.fulltext, t1.published, t1.created,
             to_char(t1.updated, 'Dy, DD Mon YYYY HH:MI:SS +0300') as updated,
             t2.headline, t2, rubric, t2.author
-        FROM rss t1, documents t2
-        WHERE t2.id = t1.document
+        FROM plugins_rss.rss t1, documents t2
+        WHERE t2.id = t1.entity
     ";
 
     my @filters;
@@ -121,6 +123,8 @@ sub feed {
         $sql .= " AND ( ". join(" OR ", @filters) ." ) ";
     }
 
+    $sql .= " ORDER BY t1.priority DESC ";
+
     my $rss_data = $c->sql->Q($sql, \@params)->Hashes;
 
     foreach my $item (@$rss_data) {
@@ -143,10 +147,10 @@ sub feed {
 
             my $folder = Inprint::Store::Embedded::getFolderPath($c, "rss-plugin", $item->{created}, $item->{id}, 1);
             Inprint::Store::Embedded::updateCache($c, $folder);
-            my $files = Inprint::Store::Cache::getRecordsByPath($c, $folder, "all", ['png', 'jpg', 'jpeg', 'gif']);
+            my $files = Inprint::Store::Cache::getRecordsByPath($c, $folder, "all", [ "png","jpg","jpeg","gif","wmv","wma","mpeg","mp3" ]);
 
             foreach my $file (@$files) {
-
+                $rss_feed .= "\n";
                 my $fileurl  = "$siteurl/files/download/". $file->{id} .".". $file->{extension};
                 my $filemime = $file->{mime};
                 my $filedesc = $file->{description};

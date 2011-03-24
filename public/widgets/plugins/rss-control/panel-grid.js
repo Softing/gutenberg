@@ -103,10 +103,13 @@ Inprint.plugins.rss.control.Grid = Ext.extend(Ext.grid.GridPanel, {
     },
 
     cmpSave: function() {
+
         var data = [];
+
         Ext.each(this.getSelectionModel().getSelections(), function(record) {
             data.push( record.get("id") );
         });
+
         Ext.Ajax.request({
             scope:this,
             url: this.urls.save,
@@ -115,14 +118,11 @@ Inprint.plugins.rss.control.Grid = Ext.extend(Ext.grid.GridPanel, {
                 feed: this.feed
             },
             success: function() {
+                AlertBox.show(" ", _("Changes have been saved"), "success", {timeout: 2});
                 this.cmpReload();
-                Ext.ux.Notification({
-                    iconCls: 'event',
-                    title: _("System event"),
-                    html: _("Changes have been saved")
-                }).show(document);
             }
         });
+
     }
 
 });
