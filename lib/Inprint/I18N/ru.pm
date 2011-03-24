@@ -149,9 +149,6 @@ our %Lexicon = (
     "Area"
  => "Площадь",
 
-    "As archive"
- => "Как архив",
-
     "Assignment"
  => "Назначение",
 
@@ -544,6 +541,9 @@ our %Lexicon = (
 
     "General information"
  => "",
+
+    "Get archive"
+ => "Получить архив",
 
     "Get defaults"
  => "",
