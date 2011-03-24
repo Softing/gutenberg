@@ -22,15 +22,47 @@ use base 'Inprint::BaseController';
 sub download {
 
     my $c = shift;
-    my @files = $c->param("id");
+
+    my @i_files       = $c->param("id");
+    my $i_document    = $c->param("document");
+    my $i_filter      = $c->param("filter");
+
+    my $document;
+    if ($i_document) {
+        $document = $c->sql->Q(" SELECT * FROM documents WHERE id=? ", $i_document)->Hash;
+    }
+
+    my @filter;
+    @filter = ('tiff', 'png', 'gif', 'jpeg', 'jpg') if ($i_filter eq "images");
+    @filter = ('otd', 'pdf', 'doc', 'xls', 'docx', 'xlsx', 'rtf') if ($i_filter eq "documents");
 
     my $rootpath = $c->config->get("store.path");
 
+    my $sql = "
+        SELECT file_path || '/' || file_name as file_path, file_name, file_extension, file_mime
+        FROM cache_files WHERE true
+    ";
+
+    my @params;
+
+    if ($document) {
+        $sql .= " AND file_path LIKE ? ";
+        push @params, "%/" . $document->{id};
+    }
+
+    if (@i_files) {
+        $sql .= " AND id=ANY(?) ";
+        push @params, \@i_files;
+    }
+
+    if (@filter) {
+        $sql .= " AND file_extension=ANY(?) ";
+        push @params, \@filter;
+    }
+
     my @input;
-
-    foreach my $file (@files) {
-
-        my $cacheRecord = $c->sql->Q("SELECT file_path || '/' || file_name as file_path, file_name, file_extension, file_mime FROM cache_files WHERE id=?", [ $file ])->Hash;
+    my $cacheRecords = $c->sql->Q($sql, \@params)->Hashes;
+    foreach my $cacheRecord (@$cacheRecords) {
 
         my $filename  = $cacheRecord->{file_name};
         my $extension = $cacheRecord->{file_extension};
@@ -38,117 +70,83 @@ sub download {
 
         my $filepath = "$rootpath/" . $cacheRecord->{file_path};
 
-        if ($^O eq "MSWin32") {
-            $filepath =~ s/\//\\/g;
-            $filepath =~ s/\\+/\\/g;
+        $filepath  = __adaptPath($c, $filepath);
+        $filename  = __adaptPath($c, $filename);
 
-            $filepath  = encode("cp1251", $filepath);
-            $filename  = encode("cp1251", $filename);
-        }
-
-        if ($^O eq "darwin") {
-            $filepath =~ s/\\/\//g;
-            $filepath =~ s/\/+/\//g;
-
-            $filepath  = encode("utf8", $filepath);
-            $filename  = encode("utf8", $filename);
-        }
-
-        if ($^O eq "linux") {
-            $filepath =~ s/\\/\//g;
-            $filepath =~ s/\/+/\//g;
-
-            $filepath  = encode("utf8", $filepath);
-            $filename  = encode("utf8", $filename);
-        }
+        $filepath  = __encodePath($c, $filepath);
+        $filename  = __encodePath($c, $filename);
 
         $filename =~ s/\s+/_/g;
 
         push @input, {
-
             filepath => $filepath,
             filename => $filename,
             mimetype => $cacheRecord->{file_mime},
             extension => $cacheRecord->{file_extension},
+        }
+    }
 
+    # Download single file
+    if ($#input == 0 ) {
+
+        my $filepath  = $input[0]->{filepath};
+        my $filename  = $input[0]->{filename};
+        my $mimetype  = $input[0]->{mimetype};
+        my $extension = $input[0]->{extension};
+
+        $c->tx->res->headers->content_type($mimetype);
+        $c->res->content->asset(Mojo::Asset::File->new(path => $filepath));
+
+        my $headers = Mojo::Headers->new;
+        $headers->add("Content-Type", "$mimetype;name=$filename");
+        $headers->add("Content-Disposition", "attachment;filename=$filename");
+        $headers->add("Content-Description", $extension);
+        $c->res->content->headers($headers);
+
+        $c->render_static();
+    }
+
+    # Download archive
+    if ($#input > 0 ) {
+
+        my $tmpid = $c->uuid;
+        my $tmpfpath = "/tmp/inprint-$tmpid.7z";
+
+        my $fileListString;
+        foreach my $item (@input) {
+            next unless (-e -r $item->{filepath});
+            $fileListString .= ' "'. $item->{filepath} .'" ';
         }
 
-    }
+        system (" touch /tmp/2222 ");
+        system (" echo 2222 > /tmp/2222 ");
 
-    if ($#files == 0 ) {
-        _downloadFile($c, $input[0]);
-    }
+        if ($^O eq "MSWin32") {
+            system ("LANG=ru_RU.UTF-8 7z a -mx0 \"$tmpfpath\" $fileListString >/dev/null 2>&1");
+        }
+        if ($^O eq "darwin") {
+            system ("LANG=ru_RU.UTF-8 /opt/local/bin/7z a -mx0 \"$tmpfpath\" $fileListString >/dev/null 2>&1");
+        }
+        if ($^O eq "linux") {
+            system "LANG=ru_RU.UTF-8 7z a -mx0 \"$tmpfpath\" $fileListString >/dev/null 2>&1";
+        }
 
-    if ($#files > 0 ) {
-        _downloadArchvie($c, \@input);
+        $c->tx->res->headers->content_type("application/x-7z-compressed");
+        $c->res->content->asset(Mojo::Asset::File->new(path => $tmpfpath));
+
+        my $archname = $tmpid; $archname =~ s/\s+/_/g;
+
+        my $headers = Mojo::Headers->new;
+        $headers->add("Content-Type", "application/x-7z-compressed;name=$archname.7z");
+        $headers->add("Content-Disposition", "attachment;filename=$archname.7z");
+        $headers->add("Content-Description", "7z");
+        $c->res->content->headers($headers);
+
+        $c->render_static();
+
     }
 
     $c->render_json({  });
-
-}
-
-sub _downloadFile {
-    my ($c, $file) = @_;
-
-    my $filepath  = $file->{filepath};
-    my $filename  = $file->{filename};
-    my $mimetype  = $file->{mimetype};
-    my $extension = $file->{extension};
-
-    $c->tx->res->headers->content_type($mimetype);
-    $c->res->content->asset(Mojo::Asset::File->new(path => $filepath));
-
-    my $headers = Mojo::Headers->new;
-    $headers->add("Content-Type", "$mimetype;name=$filename");
-    $headers->add("Content-Disposition", "attachment;filename=$filename");
-    $headers->add("Content-Description", $extension);
-    $c->res->content->headers($headers);
-
-    $c->render_static();
-
-}
-
-sub _downloadArchvie {
-
-    my ($c, $files) = @_;
-
-    my $tmpfname = $c->uuid . ".7z";
-    my $tmpfpath = "/tmp/inprint-$tmpfname";
-
-    my @files;
-
-    foreach my $file (@$files) {
-
-        my $filepath  = $file->{filepath};
-        my $filename  = $file->{filename};
-        my $mimetype  = $file->{mimetype};
-        my $extension = $file->{extension};
-
-        if (-e -r $filepath) {
-            push @files, '"'. $filepath .'"';
-        }
-
-    }
-    
-    my $fileListString = join " ", @files;
-
-    if ($^O eq "MSWin32") {
-        system ("LANG=ru_RU.UTF-8 7z a -mx0 \"$tmpfpath\" $fileListString >/dev/null 2>&1");
-    }
-    if ($^O eq "linux") {
-        system ("LANG=ru_RU.UTF-8 7z a -mx0 \"$tmpfpath\" $fileListString >/dev/null 2>&1");
-    }
-
-    $c->tx->res->headers->content_type("application/x-7z-compressed");
-    $c->res->content->asset(Mojo::Asset::File->new(path => $tmpfpath));
-
-    my $headers = Mojo::Headers->new;
-    $headers->add("Content-Type", "application/x-7z-compressed;name=$tmpfname");
-    $headers->add("Content-Disposition", "attachment;filename=$tmpfname");
-    $headers->add("Content-Description", "7z");
-    $c->res->content->headers($headers);
-
-    $c->render_static();
 }
 
 sub preview {
@@ -171,38 +169,11 @@ sub preview {
     my $filepath = "$rootpath/$folderOriginal/$filenameOriginal";
     my $thumbnailsSrc = "$rootpath/$folderOriginal/.thumbnails/$filenameOriginal-$size.png";
 
-    if ($^O eq "MSWin32") {
+    $filepath       = __adaptPath($c, $filepath);
+    $thumbnailsSrc  = __adaptPath($c, $thumbnailsSrc);
 
-        $filepath =~ s/\//\\/g;
-        $filepath =~ s/\\+/\\/g;
-        $filepath = Encode::encode("cp1251", $filepath);
-
-        $thumbnailsSrc =~ s/\//\\/g;
-        $thumbnailsSrc =~ s/\\+/\\/g;
-        $thumbnailsSrc   = Encode::encode("cp1251", $thumbnailsSrc);
-    }
-
-    if ($^O eq "darwin") {
-
-        $filepath =~ s/\\/\//g;
-        $filepath =~ s/\/+/\//g;
-        $filepath = Encode::encode("utf8", $filepath);
-
-        $thumbnailsSrc =~ s/\\/\//g;
-        $thumbnailsSrc =~ s/\/+/\//g;
-        $thumbnailsSrc   = Encode::encode("utf8", $thumbnailsSrc);
-    }
-
-    if ($^O eq "linux") {
-
-        $filepath =~ s/\\/\//g;
-        $filepath =~ s/\/+/\//g;
-        $filepath = Encode::encode("utf8", $filepath);
-
-        $thumbnailsSrc =~ s/\\/\//g;
-        $thumbnailsSrc =~ s/\/+/\//g;
-        $thumbnailsSrc   = Encode::encode("utf8", $thumbnailsSrc);
-    }
+    $filepath       = __encodePath($c, $filepath);
+    $thumbnailsSrc  = __encodePath($c, $thumbnailsSrc);
 
     # Generate preview
     if (-r $filepath) {
@@ -226,7 +197,6 @@ sub preview {
             $c->render_static();
         }
     }
-
 
     $c->render_json({  });
 }
@@ -301,26 +271,8 @@ sub _generatePreviewFile {
     my $thumbnailFolder = "$folderEncoded/.thumbnails";
     my $thumbnailFile   = "$folderOriginal/.thumbnails/$filenameOriginal-$size.png";
 
-    if ($^O eq "MSWin32") {
-        $thumbnailFolder =~ s/\//\\/g;
-        $thumbnailFolder =~ s/\\+/\\/g;
-        $thumbnailFile  =~ s/\//\\/g;
-        $thumbnailFile  =~ s/\\+/\\/g;
-    }
-
-    if ($^O eq "darwin") {
-        $thumbnailFolder =~ s/\\/\//g;
-        $thumbnailFolder =~ s/\/+/\//g;
-        $thumbnailFile  =~ s/\\/\//g;
-        $thumbnailFile  =~ s/\/+/\//g;
-    }
-
-    if ($^O eq "linux") {
-        $thumbnailFolder =~ s/\\/\//g;
-        $thumbnailFolder =~ s/\/+/\//g;
-        $thumbnailFile  =~ s/\\/\//g;
-        $thumbnailFile  =~ s/\/+/\//g;
-    }
+    $thumbnailFolder = __adaptPath($c, $thumbnailFolder);
+    $thumbnailFile   = __adaptPath($c, $thumbnailFile);
 
     if ( lc($filextenOriginal) ~~ ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff']) {
 
@@ -347,20 +299,7 @@ sub _generatePreviewFile {
 
         my $pdfPath = "$folderEncoded/.thumbnails/$filenameEncoded.pdf";
 
-        if ($^O eq "MSWin32") {
-            $pdfPath =~ s/\//\\/g;
-            $pdfPath =~ s/\\+/\\/g;
-        }
-
-        if ($^O eq "darwin") {
-            $pdfPath =~ s/\\/\//g;
-            $pdfPath =~ s/\/+/\//g;
-        }
-
-        if ($^O eq "linux") {
-            $pdfPath =~ s/\\/\//g;
-            $pdfPath =~ s/\/+/\//g;
-        }
+        $pdfPath = __adaptPath($c, $pdfPath);
 
         my $response = __convert($c, $filepathEncoded, $extension, "pdf");
         open my $FILE, ">", $pdfPath || die "Can't open <$pdfPath> : $!";
@@ -396,6 +335,31 @@ sub _generatePreviewFile {
         }
     }
 
+}
+
+sub __adaptPath {
+    my ($c, $string) = @_;
+
+    $string =~ s/\//\\/g    if ($^O eq "MSWin32");
+    $string =~ s/\\+/\\/g   if ($^O eq "MSWin32");
+
+    $string =~ s/\\/\//g    if ($^O eq "darwin");
+    $string =~ s/\/+/\//g   if ($^O eq "darwin");
+
+    $string =~ s/\\/\//g    if ($^O eq "linux");
+    $string =~ s/\/+/\//g   if ($^O eq "linux");
+
+    return $string;
+}
+
+sub __encodePath {
+    my ($c, $string) = @_;
+
+    $string = Encode::encode("cp1251", $string) if ($^O eq "MSWin32");
+    $string = Encode::encode("utf8", $string)   if ($^O eq "darwin");
+    $string = Encode::encode("utf8", $string)   if ($^O eq "linux");
+
+    return $string;
 }
 
 sub __convert {

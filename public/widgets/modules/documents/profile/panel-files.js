@@ -79,42 +79,42 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
             },
             "-",
             {
-                icon: _ico("document-globe"),
+                icon: _ico("arrow-transition-270"),
                 cls: "x-btn-text-icon",
                 text: _("Upload files"),
                 disabled:true,
                 ref: "../btnUpload",
                 scope:this,
                 handler: this.cmpUpload
+            },
+            "->",
+            {
+                icon: _ico("arrow-transition-090"),
+                cls: "x-btn-text-icon",
+                text: _("As archive"),
+                scope:this,
+                handler: function() {
+                    window.location = "/files/download/?rnd="+ Math.random() +"&document="+ this.oid;
+                }
+            },
+            {
+                //icon: _ico("arrow-transition-090"),
+                //cls: "x-btn-text-icon",
+                text: _("Documents"),
+                scope:this,
+                handler: function() {
+                    window.location = "/files/download/?rnd="+ Math.random() +"&filter=documents&document="+ this.oid;
+                }
+            },
+            {
+                //icon: _ico("arrow-transition-090"),
+                //cls: "x-btn-text-icon",
+                text: _("Images"),
+                scope:this,
+                handler: function() {
+                    window.location = "/files/download/?rnd="+ Math.random() +"&filter=images&document="+ this.oid;
+                }
             }
-            //"->",
-            //{
-            //    icon: _ico("arrow-270-medium"),
-            //    cls: "x-btn-text-icon",
-            //    text: _("Download zip"),
-            //    scope:this,
-            //    handler: function() {
-            //        window.location = "/documents/"+ this.oid +"/zip/all/?rnd="+ Math.random();
-            //    }
-            //},
-            //{
-            //    icon: _ico("arrow-270-medium"),
-            //    cls: "x-btn-text-icon",
-            //    text: _("Download documents"),
-            //    scope:this,
-            //    handler: function() {
-            //        window.location = "/documents/"+ this.oid +"/zip/txt/?rnd="+ Math.random();
-            //    }
-            //},
-            //{
-            //    icon: _ico("arrow-270-medium"),
-            //    cls: "x-btn-text-icon",
-            //    text: _("Download images"),
-            //    scope:this,
-            //    handler: function() {
-            //        window.location = "/documents/"+ this.oid +"/zip/img/?rnd="+ Math.random();
-            //    }
-            //}
         ];
 
         Ext.apply(this, {
