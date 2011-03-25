@@ -183,7 +183,7 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
     saveFilterState: function() {
         var form = this.getForm();
         var params = {};
-        params.edition    = { id: form.findField("edition").hiddenField.value,  text: form.findField("edition").getRawValue()  };
+        params.edition    = { id: form.findField("edition").hiddenField.value, text: form.findField("edition").getRawValue()  };
         params.group     = { id: form.findField("group").hiddenField.value,    text: form.findField("group").getRawValue()    };
         params.fascicle  = { id: form.findField("fascicle").hiddenField.value, text: form.findField("fascicle").getRawValue() };
         Ext.state.Manager.set(this.stateId + "-filter", params);
