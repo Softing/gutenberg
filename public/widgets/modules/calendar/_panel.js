@@ -52,6 +52,7 @@ Inprint.calendar.Panel = Ext.extend(Ext.Panel, {
                     minSize: 200,
                     maxSize: 600,
                     layout:"fit",
+                    collapsed: true,
                     collapseMode: 'mini',
                     items: this.panels.help
                 }
