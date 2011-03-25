@@ -14,7 +14,7 @@ Inprint.documents.downloads.Main = Ext.extend(Ext.grid.GridPanel, {
             baseParams: { pictures: true },
             url: _url("/downloads/list/"),
             fields: [
-                "id",
+                "id", "downloaded",
                 "edition", "edition_shortcut",
                 "fascicle", "fascicle_shortcut",
                 "document", "document_shortcut",
@@ -44,10 +44,17 @@ Inprint.documents.downloads.Main = Ext.extend(Ext.grid.GridPanel, {
                     }
                 },
 
-                { id:'filename', header: _("File"),     dataIndex:'filename', renderer: function(v) { return String.format("<b>{0}</b>", v); } },
+                { id:'filename', header: _("File"),     dataIndex:'filename',
+                    renderer: function(value, p, record) {
+                        var color;
+                        record.get("downloaded") == 0 ? color = "black" : color = "#cccccc";
+
+                        return String.format("<span style=\"color:{1}\"><b>{0}</b></span>", value, color);
+                    }
+                },
 
                 { id:'edition',  header: _("Edition"),  dataIndex:'edition_shortcut', width: 120 },
-                { id:'fascicle', header: _("Fascicle"), dataIndex:'fascicle_shortcut', width: 50 },
+                { id:'fascicle', header: _("Fascicle"), dataIndex:'fascicle_shortcut', width: 80 },
 
                 { id:'document', header: _("Document"), dataIndex:'document_shortcut', width: 200 },
                 { id: 'size',    header: _("Size"),     dataIndex:'size',     width:60, renderer:Ext.util.Format.fileSize},
