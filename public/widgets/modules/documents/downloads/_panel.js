@@ -47,7 +47,7 @@ Inprint.documents.downloads.Main = Ext.extend(Ext.grid.GridPanel, {
                 { id:'filename', header: _("File"),     dataIndex:'filename',
                     renderer: function(value, p, record) {
                         var color;
-                        record.get("downloaded") == 0 ? color = "black" : color = "#cccccc";
+                        record.get("downloaded") == 0 ? color = "black" : color = "#6E6E6E";
 
                         return String.format("<span style=\"color:{1}\"><b>{0}</b></span>", value, color);
                     }
