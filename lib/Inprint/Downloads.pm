@@ -42,10 +42,8 @@ sub list {
             to_char(fls.created, 'YYYY-MM-DD HH24:MI:SS') as created,
             to_char(fls.updated, 'YYYY-MM-DD HH24:MI:SS') as updated
         FROM documents dcm, cache_files fls
-        WHERE dcm.filepath = fls.file_path
+        WHERE dcm.filepath = fls.file_path AND dcm.fascicle <> '99999999-9999-9999-9999-999999999999'
     ";
-
-    $sql .= " AND dcm.edition <> '99999999-9999-9999-9999-999999999999' ";
 
     if ($i_edition && $i_edition =~ m/^[a-z|0-9]{8}(-[a-z|0-9]{4}){3}-[a-z|0-9]{12}+$/) {
         $sql .= " AND dcm.edition=? ";
