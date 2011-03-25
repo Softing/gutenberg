@@ -67,11 +67,13 @@ Inprint.documents.downloads.Main = Ext.extend(Ext.grid.GridPanel, {
         this.tbar = [
 
             {
-                icon: _ico("arrow-transition-090"),
+                scope:this,
+                disabled: true,
+                ref: "../btnSave",
+                handler: this.cmpSave,
                 cls: "x-btn-text-icon",
                 text: _("Get archive"),
-                scope:this,
-                handler: this.cmpSave
+                icon: _ico("arrow-transition-090")
             },
 
             "->",
@@ -175,17 +177,22 @@ Inprint.documents.downloads.Main = Ext.extend(Ext.grid.GridPanel, {
 
     onRender: function() {
         Inprint.documents.downloads.Main.superclass.onRender.apply(this, arguments);
+
+        this.getSelectionModel().on("selectionchange", function(sm) {
+            sm.getCount() == 0 ? this.btnSave.disable() : this.btnSave.enable();
+        }, this);
+
     },
 
     cmpSave: function () {
 
         // generate a new unique id
-        var id = Ext.id();
+        var frameid = Ext.id();
 
         // create a new iframe element
         var frame = document.createElement('iframe');
-        frame.id = id;
-        frame.name = id;
+        frame.id = frameid;
+        frame.name = frameid;
         frame.className = 'x-hidden';
 
         // use blank src for Internet Explorer
@@ -198,15 +205,15 @@ Inprint.documents.downloads.Main = Ext.extend(Ext.grid.GridPanel, {
 
         // also set the name for Internet Explorer
         if (Ext.isIE) {
-            document.frames[id].name = id;
+            document.frames[frameid].name = frameid;
         }
 
         //  create a new form element
         var form = Ext.DomHelper.append(document.body, {
-                tag: 'form',
-                method: 'post',
-                action: "/downloads/download/",
-                target: id
+            tag: 'form',
+            method: 'post',
+            action: "/downloads/download/",
+            target: frameid
         });
 
         Ext.each(this.getSelectionModel().getSelections(), function(record) {
@@ -218,19 +225,8 @@ Inprint.documents.downloads.Main = Ext.extend(Ext.grid.GridPanel, {
             form.appendChild(hidden);
         });
 
-        // create a callback function that does some cleaning afterwards
-        var callback = function () {
-                Ext.EventManager.removeListener(frame, 'load', callback, this);
-                setTimeout(function () {
-                        document.body.removeChild(form);
-                }, 100);
-                setTimeout(function () {
-                        document.body.removeChild(frame);
-                }, 110);
-        };
+        document.body.appendChild(form);
 
-        // attach callback and submit the form
-        Ext.EventManager.on(frame, 'load', callback, this);
         form.submit();
     }
 

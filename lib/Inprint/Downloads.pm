@@ -12,6 +12,7 @@ use warnings;
 use Encode;
 use File::Path;
 use File::Basename;
+use File::stat;
 use MIME::Base64;
 use HTTP::Request;
 use LWP::UserAgent;
@@ -67,7 +68,7 @@ sub list {
     }
 
     if ($i_fascicle && $i_fascicle =~ m/^[a-z|0-9]{8}(-[a-z|0-9]{4}){3}-[a-z|0-9]{12}+$/) {
-        $sql .= " AND dcm.edition=? ";
+        $sql .= " AND dcm.fascicle=? ";
         push @params, $i_fascicle;
     }
 
@@ -192,19 +193,19 @@ sub download {
 
     rmtree($tempFolder);
 
-    $c->tx->res->headers->content_type("application/x-7z-compressed");
-    $c->res->content->asset(Mojo::Asset::File->new(path => $tempArchive));
-
     my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
 
     $year += 1900; $mon++;
 
     my $archname = "Downloads_for_${year}_${mon}_${mday}_${hour}${min}${sec}";
 
+    $c->res->content->asset(Mojo::Asset::File->new(path => $tempArchive));
+
     my $headers = Mojo::Headers->new;
     $headers->add("Content-Type", "application/x-7z-compressed;name=$archname.7z");
     $headers->add("Content-Disposition", "attachment;filename=$archname.7z");
     $headers->add("Content-Description", "7z");
+    $headers->add("Content-Length", -s $tempArchive);
     $c->res->content->headers($headers);
 
     $c->render_static();
