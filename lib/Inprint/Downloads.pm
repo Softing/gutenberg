@@ -10,6 +10,7 @@ use strict;
 use warnings;
 
 use Encode;
+use File::Path;
 use File::Basename;
 use MIME::Base64;
 use HTTP::Request;
@@ -160,6 +161,7 @@ sub download {
     }
 
     my $cmd;
+    
     if ($^O eq "MSWin32") {
         $cmd = " LANG=ru_RU.UTF-8 7z a -l -mx0 \"$tempArchive\" $fileListString >/dev/null 2>&1 ";
     }
@@ -167,17 +169,12 @@ sub download {
         $cmd = " LANG=ru_RU.UTF-8 /opt/local/bin/7z a -l -mx0 \"$tempArchive\" $fileListString >/dev/null 2>&1 ";
     }
     if ($^O eq "linux") {
-        my $cmd = " LANG=ru_RU.UTF-8 7z a -l -mx0 \"$tempArchive\" $fileListString >/dev/null 2>&1 ";
+        $cmd = " LANG=ru_RU.UTF-8 7z a -l -mx0 \"$tempArchive\" $fileListString >/dev/null 2>&1 ";
     }
+    
     system($cmd) if $fileListString;
-
-    # Clear tempfolder
-    opendir(my $dh, $tempFolder) || die "can't opendir $tempFolder: $!";
-    foreach my $tmplink ( grep { !/^\.\.?/ } readdir($dh) ) {
-        unlink "$tempFolder/$tmplink";
-    }
-    closedir $dh;
-    unlink $tempFolder;
+    
+    rmtree($tempFolder);
 
     $c->tx->res->headers->content_type("application/x-7z-compressed");
     $c->res->content->asset(Mojo::Asset::File->new(path => $tempArchive));
