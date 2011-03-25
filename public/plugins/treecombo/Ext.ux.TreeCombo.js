@@ -190,6 +190,7 @@ Ext.ux.form.TreeCombo = Ext.extend(Ext.form.TriggerField, {
         this.fireEvent('select', this, node);
         this.collapse();
     }
+
 });
 
 Ext.reg('treecombo', Ext.ux.form.TreeCombo);
