@@ -46,11 +46,8 @@ Inprint.documents.downloads.Main = Ext.extend(Ext.grid.GridPanel, {
 
                 { id:'filename', header: _("File"),     dataIndex:'filename', renderer: function(v) { return String.format("<b>{0}</b>", v); } },
 
-                { id:'editions', header: _("Edition"),  dataIndex:'edition_shortcut', width: 160,
-                    renderer: function(value, p, record) {
-                        return String.format("{0}/{1}", record.get("edition_shortcut"), record.get("fascicle_shortcut"));
-                    }
-                },
+                { id:'edition',  header: _("Edition"),  dataIndex:'edition_shortcut', width: 80 },
+                { id:'fascicle', header: _("Fascicle"), dataIndex:'fascicle_shortcut', width: 80 },
 
                 { id:'document', header: _("Document"), dataIndex:'document_shortcut', width: 200 },
                 { id: 'size',    header: _("Size"),     dataIndex:'size',     width:60, renderer:Ext.util.Format.fileSize},
