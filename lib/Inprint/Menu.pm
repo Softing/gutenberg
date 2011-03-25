@@ -47,6 +47,10 @@ sub index
         push @{ $DocumentsSection->{menu} }, { id => "documents-archive" };
         push @{ $DocumentsSection->{menu} }, { id => "documents-briefcase" };
         push @{ $DocumentsSection->{menu} }, { id => "documents-recycle" };
+
+        push @{ $DocumentsSection->{menu} }, '-';
+
+        push @{ $DocumentsSection->{menu} }, { id => "document-downloads" };
     }
 
     ############################################################################

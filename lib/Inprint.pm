@@ -61,7 +61,6 @@ sub startup {
     $self->plugins->namespaces([qw(Mojo::Plugins)]);
     $self->plugin("inprint-access");
 
-
     # Create Routes
     $self->routes->route('/setup/database/')->to('setup#database');
     #$self->routes->route('/setup/store/')->to('setup#store');
@@ -117,8 +116,6 @@ sub startup {
     $self->createRoutes($sessionBridge, "catalog/organization",             [ "create", "read", "update", "delete", "tree", "map", "unmap" ]);
     $self->createRoutes($sessionBridge, "catalog/readiness",                [ "create", "read", "update", "delete", "list" ]);
     $self->createRoutes($sessionBridge, "catalog/roles",                    [ "create", "read", "update", "delete", "list", "map", "mapping" ]);
-
-    #$self->createRoutes($sessionBridge, "catalog/rules",                    [ "list", "mapping", "map" ]);
 
     $sessionBridge->route('/catalog/rules/list/')           ->to('catalog-rules#list');
     $sessionBridge->route('/catalog/rules/clear/')          ->to('catalog-rules#clear');
@@ -203,6 +200,10 @@ sub startup {
     $sessionBridge->route('/documents/files/publish/')      ->to('documents-files#publish');
     $sessionBridge->route('/documents/files/unpublish/')    ->to('documents-files#unpublish');
     $sessionBridge->route('/documents/files/description/')  ->to('documents-files#description');
+
+    # Downloads
+    $sessionBridge->route('/downloads/list/')               ->to('downloads#list');
+    $sessionBridge->route('/downloads/download/')           ->to('downloads#download');
 
     # Fascicles routes
     $self->createRoutes($sessionBridge, "fascicle",                         [ "seance", "check", "open", "close", "save", "capture" ]);
