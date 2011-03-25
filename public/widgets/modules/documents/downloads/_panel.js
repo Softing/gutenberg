@@ -44,7 +44,7 @@ Inprint.documents.downloads.Main = Ext.extend(Ext.grid.GridPanel, {
                     }
                 },
 
-                { id:'filename', header: _("File"),     dataIndex:'filename'},
+                { id:'filename', header: _("File"),     dataIndex:'filename', renderer: function(v) { return String.format("<b>{0}</b>", v); } },
 
                 { id:'editions', header: _("Edition"),  dataIndex:'edition_shortcut', width: 160,
                     renderer: function(value, p, record) {
