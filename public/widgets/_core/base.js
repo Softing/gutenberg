@@ -8,8 +8,8 @@
 
 // Global functions and variables
 
-var EXTJS_VERSION = "3.3.1";
-var EXTJS_PATH    = "/ext-3.3.1";
+var EXTJS_VERSION = "3.3.2";
+var EXTJS_PATH    = "/ext-3.3.2";
 
 /* Icons functions */
 
@@ -161,7 +161,7 @@ function _arrayAccessCheck(records, fields) {
 
 // Executor
 
-Ext.BLANK_IMAGE_URL = '/ext-3.3.1/resources/images/default/s.gif';
+Ext.BLANK_IMAGE_URL = '/ext-3.3.2/resources/images/default/s.gif';
 
 Ext.ns('Inprint');
 

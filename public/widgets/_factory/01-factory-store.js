@@ -233,7 +233,6 @@ Inprint.factory.Store = function() {
                 configuration = Ext.apply(configuration, defaults);
                 configuration = Ext.apply(configuration, items[myclass]);
                 configuration = Ext.apply(configuration, config);
-
                 return new Ext.data.JsonStore(configuration);
             }
 

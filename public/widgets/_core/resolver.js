@@ -197,7 +197,7 @@ Inprint.ObjectResolver = function() {
                 Inprint.layout.getPanel().layout.setActiveItem(0);
             }
 
-            Inprint.layout.getPanel().remove(panel);
+            Inprint.layout.getPanel().remove(panel, true);
             Inprint.layout.getPanel().doLayout();
         }
     };
