@@ -22,7 +22,7 @@ use base 'Inprint::BaseController';
 sub list {
     my $c = shift;
 
-    my $result;
+    my @result;
     my @errors;
     my @params;
 
@@ -34,13 +34,18 @@ sub list {
 
     my $sql = "
         SELECT
+
             fls.id,
-            dcm.id as document, dcm.title document_shortcut, dcm.edition, dcm.edition_shortcut, dcm.fascicle, dcm.fascicle_shortcut,
-            fls.file_name filename, fls.file_description description,
-            fls.file_mime mime, fls.file_extension extension, fls.file_published published,
-            fls.file_size size, fls.file_length length,
+
+            dcm.id as document, dcm.title document_shortcut, dcm.edition,
+            dcm.edition_shortcut, dcm.fascicle, dcm.fascicle_shortcut,
+
+            fls.file_path, fls.file_name, fls.file_description, fls.file_mime,
+            fls.file_extension, fls.file_published, fls.file_size, fls.file_length,
+
             to_char(fls.created, 'YYYY-MM-DD HH24:MI:SS') as created,
             to_char(fls.updated, 'YYYY-MM-DD HH24:MI:SS') as updated
+
         FROM documents dcm, cache_files fls
         WHERE dcm.filepath = fls.file_path AND dcm.fascicle <> '99999999-9999-9999-9999-999999999999'
     ";
@@ -71,40 +76,117 @@ sub list {
     }
 
     $sql .= " ORDER BY fls.updated DESC, fls.file_path ";
-    $result = $c->sql->Q($sql, \@params)->Hashes;
+    my $files = $c->sql->Q($sql, \@params)->Hashes;
 
-    $c->smart_render(\@errors, $result);
+    my $rootPath    = $c->config->get("store.path");
+
+    foreach my $file (@$files) {
+        my $filePath = "$rootPath/" . $file->{file_path} ."/". $file->{file_name};
+        $filePath = __adaptPath($c, $filePath);
+        $filePath = __encodePath($c, $filePath);
+
+        if (-e -r $filePath) {
+            push @result, {
+                id                => $file->{id},
+                document          => $file->{document},
+                document_shortcut => $file->{document_shortcut},
+                edition           => $file->{edition},
+                edition_shortcut  => $file->{edition_shortcut},
+                fascicle          => $file->{fascicle},
+                fascicle_shortcut => $file->{fascicle_shortcut},
+                filename          => $file->{file_name},
+                description       => $file->{file_description},
+                mime              => $file->{file_mime},
+                extension         => $file->{file_extension},
+                published         => $file->{file_published},
+                size              => $file->{file_size},
+                length            => $file->{file_length},
+                created           => $file->{file_length},
+                updated           => $file->{file_length},
+            }
+        }
+    }
+
+    $c->smart_render(\@errors, \@result);
 }
 
 sub download {
+
     my $c = shift;
 
-    my $tmpid = $c->uuid;
-    #my $tmpfpath = "/tmp/inprint-$tmpid.7z";
-    #
-    #my $fileListString;
-    #foreach my $item (@input) {
-    #    next unless (-e -r $item->{filepath});
-    #    $fileListString .= ' "'. $item->{filepath} .'" ';
-    #}
-    #
-    #system (" touch /tmp/2222 ");
-    #system (" echo 2222 > /tmp/2222 ");
-    #
-    #if ($^O eq "MSWin32") {
-    #    system ("LANG=ru_RU.UTF-8 7z a -mx0 \"$tmpfpath\" $fileListString >/dev/null 2>&1");
-    #}
-    #if ($^O eq "darwin") {
-    #    system ("LANG=ru_RU.UTF-8 /opt/local/bin/7z a -mx0 \"$tmpfpath\" $fileListString >/dev/null 2>&1");
-    #}
-    #if ($^O eq "linux") {
-    #    system "LANG=ru_RU.UTF-8 7z a -mx0 \"$tmpfpath\" $fileListString >/dev/null 2>&1";
-    #}
+    my @i_files = $c->param("file[]");
+
+    my $temp        = $c->uuid;
+    my $rootPath    = $c->config->get("store.path");
+    my $tempPath    = "/tmp";
+    my $tempFolder  = "$tempPath/inprint-$temp";
+    my $tempArchive = "$tempPath/inprint-$temp.7z";
+
+    mkdir $tempFolder;
+
+    die "Can't create temporary folder $tempFolder" unless (-e -w $tempFolder);
+
+    my $fileListString;
+
+    foreach my $item (@i_files) {
+
+        my ($docid, $fileid) = split "::", $item;
+
+        next unless ($fileid);
+        next unless ($docid);
+
+        my $file = $c->sql->Q(" SELECT id, file_path, file_name FROM cache_files WHERE id=?", $fileid)->Hash;
+        my $document = $c->sql->Q(" SELECT id, title FROM documents WHERE id=?", $docid)->Hash;
+
+        next unless ($file->{id});
+        next unless ($document->{id});
+
+        my $path1 = "$rootPath/" . $file->{file_path} ."/". $file->{file_name};
+        my $path2 = "$tempFolder/" . $document->{title} ."__". $file->{file_name};
+
+        $path1 = __adaptPath($c, $path1);
+        $path1 = __encodePath($c, $path1);
+
+        $path2 = __adaptPath($c, $path2);
+        $path2 = __encodePath($c, $path2);
+
+        next unless (-e -r $path1);
+
+        symlink $path1, $path2;
+
+        die "Can't read symlink $path2" unless (-e -r $path2);
+
+        $fileListString .= ' "'. $path2 .'" ';
+    }
+
+    my $cmd;
+    if ($^O eq "MSWin32") {
+        $cmd = " LANG=ru_RU.UTF-8 7z a -l -mx0 \"$tempArchive\" $fileListString >/dev/null 2>&1 ";
+    }
+    if ($^O eq "darwin") {
+        $cmd = " LANG=ru_RU.UTF-8 /opt/local/bin/7z a -l -mx0 \"$tempArchive\" $fileListString >/dev/null 2>&1 ";
+    }
+    if ($^O eq "linux") {
+        my $cmd = " LANG=ru_RU.UTF-8 7z a -l -mx0 \"$tempArchive\" $fileListString >/dev/null 2>&1 ";
+    }
+    system($cmd) if $fileListString;
+
+    # Clear tempfolder
+    opendir(my $dh, $tempFolder) || die "can't opendir $tempFolder: $!";
+    foreach my $tmplink ( grep { !/^\.\.?/ } readdir($dh) ) {
+        unlink "$tempFolder/$tmplink";
+    }
+    closedir $dh;
+    unlink $tempFolder;
 
     $c->tx->res->headers->content_type("application/x-7z-compressed");
-    #$c->res->content->asset(Mojo::Asset::File->new(path => $tmpfpath));
-    #
-    my $archname = $tmpid; $archname =~ s/\s+/_/g;
+    $c->res->content->asset(Mojo::Asset::File->new(path => $tempArchive));
+
+    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+
+    $year += 1900; $mon++;
+
+    my $archname = "Downloads_for_${year}_${mon}_${mday}_${hour}${min}${sec}";
 
     my $headers = Mojo::Headers->new;
     $headers->add("Content-Type", "application/x-7z-compressed;name=$archname.7z");
@@ -113,8 +195,25 @@ sub download {
     $c->res->content->headers($headers);
 
     $c->render_static();
+}
 
-    $c->render_json({});
+sub __adaptPath {
+    my ($c, $string) = @_;
+    $string =~ s/\//\\/g    if ($^O eq "MSWin32");
+    $string =~ s/\\+/\\/g   if ($^O eq "MSWin32");
+    $string =~ s/\\/\//g    if ($^O eq "darwin");
+    $string =~ s/\/+/\//g   if ($^O eq "darwin");
+    $string =~ s/\\/\//g    if ($^O eq "linux");
+    $string =~ s/\/+/\//g   if ($^O eq "linux");
+    return $string;
+}
+
+sub __encodePath {
+    my ($c, $string) = @_;
+    $string = Encode::encode("cp1251", $string) if ($^O eq "MSWin32");
+    $string = Encode::encode("utf8", $string)   if ($^O eq "darwin");
+    $string = Encode::encode("utf8", $string)   if ($^O eq "linux");
+    return $string;
 }
 
 1;

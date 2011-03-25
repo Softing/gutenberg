@@ -109,17 +109,14 @@ sub download {
     # Download archive
     if ($#input > 0 ) {
 
-        my $tmpid = $c->uuid;
-        my $tmpfpath = "/tmp/inprint-$tmpid.7z";
-
         my $fileListString;
         foreach my $item (@input) {
             next unless (-e -r $item->{filepath});
             $fileListString .= ' "'. $item->{filepath} .'" ';
         }
 
-        system (" touch /tmp/2222 ");
-        system (" echo 2222 > /tmp/2222 ");
+        my $tmpid = $c->uuid;
+        my $tmpfpath = "/tmp/inprint-$tmpid.7z";
 
         if ($^O eq "MSWin32") {
             system ("LANG=ru_RU.UTF-8 7z a -mx0 \"$tmpfpath\" $fileListString >/dev/null 2>&1");
@@ -339,26 +336,20 @@ sub _generatePreviewFile {
 
 sub __adaptPath {
     my ($c, $string) = @_;
-
     $string =~ s/\//\\/g    if ($^O eq "MSWin32");
     $string =~ s/\\+/\\/g   if ($^O eq "MSWin32");
-
     $string =~ s/\\/\//g    if ($^O eq "darwin");
     $string =~ s/\/+/\//g   if ($^O eq "darwin");
-
     $string =~ s/\\/\//g    if ($^O eq "linux");
     $string =~ s/\/+/\//g   if ($^O eq "linux");
-
     return $string;
 }
 
 sub __encodePath {
     my ($c, $string) = @_;
-
     $string = Encode::encode("cp1251", $string) if ($^O eq "MSWin32");
     $string = Encode::encode("utf8", $string)   if ($^O eq "darwin");
     $string = Encode::encode("utf8", $string)   if ($^O eq "linux");
-
     return $string;
 }
 
