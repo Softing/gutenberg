@@ -45,6 +45,8 @@ sub list {
         WHERE dcm.filepath = fls.file_path
     ";
 
+    $sql .= " AND dcm.edition <> '99999999-9999-9999-9999-999999999999' ";
+
     if ($i_edition && $i_edition =~ m/^[a-z|0-9]{8}(-[a-z|0-9]{4}){3}-[a-z|0-9]{12}+$/) {
         $sql .= " AND dcm.edition=? ";
         push @params, $i_edition;
@@ -105,7 +107,7 @@ sub download {
     #$c->res->content->asset(Mojo::Asset::File->new(path => $tmpfpath));
     #
     my $archname = $tmpid; $archname =~ s/\s+/_/g;
-    
+
     my $headers = Mojo::Headers->new;
     $headers->add("Content-Type", "application/x-7z-compressed;name=$archname.7z");
     $headers->add("Content-Disposition", "attachment;filename=$archname.7z");

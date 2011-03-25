@@ -46,7 +46,7 @@ Inprint.documents.downloads.Main = Ext.extend(Ext.grid.GridPanel, {
 
                 { id:'filename', header: _("File"),     dataIndex:'filename'},
 
-                { id:'editions', header: _("Edition"),  dataIndex:'edition_shortcut', width: 120,
+                { id:'editions', header: _("Edition"),  dataIndex:'edition_shortcut', width: 160,
                     renderer: function(value, p, record) {
                         return String.format("{0}/{1}", record.get("edition_shortcut"), record.get("fascicle_shortcut"));
                     }
