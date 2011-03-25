@@ -70,7 +70,7 @@ sub list {
         $sql.= " AND (". join(" OR ", @filter) .") ";
     }
 
-    $sql .= " ORDER BY fls.updated, fls.file_path ";
+    $sql .= " ORDER BY fls.updated ASC, fls.file_path ";
     $result = $c->sql->Q($sql, \@params)->Hashes;
 
     $c->smart_render(\@errors, $result);
