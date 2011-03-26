@@ -1,10 +1,7 @@
-/*
- * Inprint Content 4.5
- * Copyright(c) 2001-2010, Softing, LLC.
- * licensing@softing.ru
- *
- * http://softing.ru/license
- */
+// Inprint Content 5.0
+// Copyright(c) 2001-2011, Softing, LLC.
+// licensing@softing.ru
+// http://softing.ru/license
 
 //Inprint.TaskbarBtn = Ext.extend(Ext.Button, {
 Inprint.TaskbarBtn = Ext.extend(Ext.Toolbar.SplitButton, {

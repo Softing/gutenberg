@@ -1,10 +1,7 @@
-/*
- * Inprint Content 4.5
- * Copyright(c) 2001-2010, Softing, LLC.
- * licensing@softing.ru
- *
- * http://softing.ru/license
- */
+// Inprint Content 5.0
+// Copyright(c) 2001-2011, Softing, LLC.
+// licensing@softing.ru
+// http://softing.ru/license
 
 Inprint.ObjectResolver = function() {
 
@@ -62,31 +59,31 @@ Inprint.ObjectResolver = function() {
                 icon: "/icon/layout.png"
             };
 
-            // Create panel icon
+            if (item.oid)  { config.oid = item.oid; }
+            if (item.aid)  { config.aid = item.aid; }
             if (item.icon) { config.icon = item.icon; }
-            if (item.oid) { config.oid = item.oid; }
-            if (item.aid) { config.aid = item.aid; }
 
             config.title = this.makeTitle(config.oid, config.aid, config.icon, item.text, item.description);
 
             // Create panel Tools
-            var tools = [];
-            tools.push({
-                id: "refresh",
-                qtip: _("Refresh this panel"),
-                scope: this,
-                handler: function(event, toolEl, panel) {
-                    this.reload(panel);
+            var tools = [
+                {
+                    id: "refresh",
+                    qtip: _("Reload this panel"),
+                    scope: this,
+                    handler: function(event, toolEl, panel) {
+                        this.reload(panel);
+                    }
+                },
+                {
+                    id: "close",
+                    qtip: _("Close this panel"),
+                    scope: this,
+                    handler: function(event, toolEl, panel) {
+                        this.remove(panel);
+                    }
                 }
-            });
-            tools.push({
-                id: "close",
-                qtip: _("Close this panel"),
-                scope: this,
-                handler: function(event, toolEl, panel) {
-                    this.remove(panel);
-                }
-            });
+            ];
 
             config.tools = tools;
             var xobject = Inprint.registry[item.aid].xobject;
@@ -121,7 +118,7 @@ Inprint.ObjectResolver = function() {
 
         makeTitle: function(oid, aid, icon, text, description) {
 
-            var title = "<div style=\"padding-left:21px;background:url(" + icon + ") 0px -2px no-repeat;\">";
+            var title = "<div style=\"padding-left:21px;background:url(" + icon + ") 0px -1px no-repeat;\">";
             title += _(text) ;
             title += "&nbsp;<a href=\"?aid="+ aid +"";
 

@@ -233,6 +233,9 @@ our %Lexicon = (
     "Circulation"
  => "Тираж",
 
+    "Clear rights"
+ => "",
+
     "Close"
  => "Закрыть",
 
@@ -359,6 +362,9 @@ our %Lexicon = (
     "Displaying documents {0} - {1} of {2}"
  => "Показаны документы {0} - {1} из {2}",
 
+    "Document"
+ => "",
+
     "Document capture"
  => "",
 
@@ -377,20 +383,11 @@ our %Lexicon = (
     "Domain"
  => "Домен",
 
-    "Download documents"
- => "Скачать материал",
-
     "Download file"
  => "Скачать файл",
 
-    "Download files"
- => "Скачать файлы",
-
-    "Download images"
- => "Скачать иллюстрации",
-
-    "Download zip"
- => "Скачать 7zip",
+    "Downloads"
+ => "",
 
     "Dumb window"
  => "Пустое окно",
@@ -593,11 +590,11 @@ our %Lexicon = (
     "ID"
  => "",
 
-    "Images"
- => "Иллюстрации",
-
     "INN"
  => "ИНН",
+
+    "Images"
+ => "Иллюстрации",
 
     "Index"
  => "Рубрикатор",
@@ -641,16 +638,13 @@ our %Lexicon = (
     "Limit"
  => "Ограничение",
 
-    "Limitation..."
+    "List of downloads"
  => "",
 
     "Loading"
- => "Загрузка",
-
-    "Loading text"
  => "",
 
-    "Loading..."
+    "Loading text"
  => "",
 
     "Login"
@@ -809,9 +803,6 @@ our %Lexicon = (
     "Please enter your text"
  => "Пожалуйста, введите текст",
 
-    "Please wait..."
- => "",
-
     "Position"
  => "Должность",
 
@@ -905,6 +896,9 @@ our %Lexicon = (
     "Renaming a file"
  => "",
 
+    "Reports"
+ => "",
+
     "Request"
  => "Заявка",
 
@@ -965,17 +959,8 @@ our %Lexicon = (
     "Select a file extension"
  => "",
 
-    "Select a paid status..."
- => "Выбрать статус платежа",
-
-    "Select a request status..."
- => "Выбрать статус заявки",
-
     "Select a type"
  => "",
-
-    "Select a willingness..."
- => "Выбрать статус готовности",
 
     "Select an file"
  => "",
@@ -986,9 +971,6 @@ our %Lexicon = (
     "Select issue"
  => "",
 
-    "Select..."
- => "Выбрать...",
-
     "Serial"
  => "",
 
@@ -998,7 +980,13 @@ our %Lexicon = (
     "Shortcut"
  => "Ярлык",
 
-    "Show only with RSS"
+    "Show all"
+ => "",
+
+    "Show with RSS"
+ => "",
+
+    "Show without RSS"
  => "",
 
     "Simple Text (txt)"
@@ -1006,9 +994,6 @@ our %Lexicon = (
 
     "Size"
  => "Размер",
-
-    "Software error"
- => "",
 
     "Squib"
  => "Подверстка",
@@ -1081,9 +1066,6 @@ our %Lexicon = (
 
     "This change can not be undone!"
  => "Это действие не может быть отменено",
-
-    "Titl"
- => "",
 
     "Title"
  => "Название",

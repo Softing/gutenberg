@@ -1,18 +1,15 @@
-/*
- * Inprint Content 4.5
- * Copyright(c) 2001-2010, Softing, LLC.
- * licensing@softing.ru
- * 
- * http://softing.ru/license
- */
+// Inprint Content 5.0
+// Copyright(c) 2001-2011, Softing, LLC.
+// licensing@softing.ru
+// http://softing.ru/license
 
 Inprint.Portal = Ext.extend(Ext.ux.Portal, {
     id:'inprint-portal',
     initComponent: function() {
-      
+
         //var width  = Ext.getBody().getViewSize().width - 20;
         //var height = Ext.getBody().getViewSize().height - 85;
-        
+
         var tools = [{
             id:'gear',
             handler: function(){
@@ -24,7 +21,7 @@ Inprint.Portal = Ext.extend(Ext.ux.Portal, {
                 panel.ownerCt.remove(panel, true);
             }
         }];
-        
+
         Ext.apply(this, {
             border:false,
             bodyBorder: false
@@ -50,9 +47,9 @@ Inprint.Portal = Ext.extend(Ext.ux.Portal, {
             //        html: "test"
             //    }]
             //}]
-            
+
         });
-        
+
         Inprint.Portal.superclass.initComponent.apply(this, arguments);
     }
 });
@@ -61,7 +58,7 @@ Inprint.Portal = Ext.extend(Ext.ux.Portal, {
 //
 //,listeners: {
 //    'drop': function(e){
-//        Ext.Msg.alert('Portlet Dropped', e.panel.title + '<br />Column: ' + 
+//        Ext.Msg.alert('Portlet Dropped', e.panel.title + '<br />Column: ' +
 //            e.columnIndex + '<br />Position: ' + e.position);
 //    }
 //}

@@ -1,23 +1,9 @@
+// Inprint Content 5.0
+// Copyright(c) 2001-2011, Softing, LLC.
+// licensing@softing.ru
+// http://softing.ru/license
+
 Inprint.factory.Combo = function() {
-
-    var defaults = {
-        xtype: "combo",
-
-        clearable:false,
-
-        editable:false,
-        forceSelection: true,
-        triggerAction: "all",
-
-        minChars:2,
-        queryDelay: 50,
-
-        minListWidth: 200,
-        valueField: "id",
-        displayField: "title",
-        emptyText: _("Select..."),
-        fieldLabel: _("Label")
-    };
 
     var items = {};
 
@@ -99,13 +85,6 @@ Inprint.factory.Combo = function() {
             fieldLabel: _("Module"),
             emptyText: _("Module") + "..."
         },
-
-        //// Calendar
-        //"/calendar/combo/groups/": {
-        //    hiddenName: "calendar-group",
-        //    fieldLabel: _("Edition"),
-        //    emptyText: _("Edition") + "..."
-        //},
 
         // Fascicles
         "/fascicle/combos/templates/": {
@@ -233,36 +212,9 @@ Inprint.factory.Combo = function() {
 
     return {
 
-        getConfig: function(url, config, storeconfig) {
+        getConfig: function(url, comboconfig, storeconfig) {
 
-            var combo = {};
-
-            // Add defaults
-            Ext.apply(combo, defaults);
-
-            // Add combo item
-            if (combos[url]) {
-                Ext.apply(combo, combos[url]);
-            }
-
-            // Add store
-            if (!config) {
-                config = {};
-            }
-            if (!storeconfig) {
-                storeconfig = {};
-            }
-
-            if (config.baseParams) {
-                storeconfig.baseParams = config.baseParams;
-            }
-            Ext.apply(combo, {
-                store: Inprint.factory.Store.json( url, storeconfig )
-            });
-
-            // Add icons
-
-            var tpl = new Ext.XTemplate(
+            var combotpl = new Ext.XTemplate(
                 '<tpl for=".">'+
                     '<div class="x-combo-list-item" style="'+
                     '{[ this.haveIcon(values) ]}'+
@@ -310,23 +262,54 @@ Inprint.factory.Combo = function() {
                 }
             );
 
-            Ext.apply(combo, {
-                tpl: tpl,
-                itemSelector: "div.x-combo-list-item"
-            });
+            var combo = {
+                xtype: "combo",
+                editable:false,
+                clearable:false,
 
-            // Add custom config
-            if (combos[url] && config) {
-                Ext.apply(combo, config);
-            }
+                valueField: "id",
+                displayField: "title",
+
+                fieldLabel: _("Label"),
+                emptyText: _("Select..."),
+
+                minChars:2,
+                queryDelay: 50,
+                minListWidth: 200,
+
+                forceSelection: true,
+                triggerAction: "all",
+
+                tpl: combotpl,
+                itemSelector: "div.x-combo-list-item",
+
+                store: {
+                    url: url,
+                    root: "data",
+                    params: { },
+                    idProperty: "id",
+                    autoDestroy: true,
+                    xtype: "jsonstore",
+                    fields: Inprint.store.Columns.common.combo
+                }
+            };
+
+            // Add predefined configuration
+            Ext.apply(combo, combos[url]);
+
+            // Add custom configuration
+            if (comboconfig) Ext.apply(combo, comboconfig);
+            // Add store configuration
+            if (storeconfig) Ext.apply(combo.store, storeconfig);
+            // Add baseparams to store configuration
+            if (comboconfig.baseParams)  Ext.apply(combo.store, config.baseParams);
 
             return combo;
-
         },
 
-        create: function(url, config, storeconfig) {
+        create: function(url, comboconfig, storeconfig) {
             if (combos[url]) {
-                var combo = this.getConfig(url, config, storeconfig);
+                var combo = this.getConfig(url, comboconfig, storeconfig);
                 return combo;
             }
             alert("Can't find combobox <" + url + ">");

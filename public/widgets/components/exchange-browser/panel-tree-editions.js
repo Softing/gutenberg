@@ -37,7 +37,7 @@ Inprint.cmp.ExcahngeBrowser.TreeEditions = Ext.extend(Ext.tree.TreePanel, {
         Inprint.cmp.ExcahngeBrowser.TreeEditions.superclass.onRender.apply(this, arguments);
 
         this.on("beforeload", function() {
-            this.body.mask(_("Please wait..."));
+            this.body.mask(_("Loading data..."));
         });
 
         this.on("load", function() {

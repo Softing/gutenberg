@@ -3,7 +3,7 @@ Inprint.cmp.adverta.Templates = Ext.extend(Ext.grid.GridPanel, {
     initComponent: function() {
 
         this.urls = {
-            "list": "/fascicle/templates/modules/"
+            "list": "/fascicle/templates/modules/list/"
         };
 
         var selection = this.parent.selection;

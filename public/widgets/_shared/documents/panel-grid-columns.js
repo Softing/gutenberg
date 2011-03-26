@@ -1,3 +1,8 @@
+// Inprint Content 5.0
+// Copyright(c) 2001-2011, Softing, LLC.
+// licensing@softing.ru
+// http://softing.ru/license
+
 Inprint.documents.GridColumns = function() {
 
     return {
@@ -5,10 +10,8 @@ Inprint.documents.GridColumns = function() {
         viewed: {
             id : 'viewed',
             fixed : true,
-            menuDisabled : true,
             header : '&nbsp;',
             width : 26,
-            sortable : true,
             renderer : function(value, p, record) {
                 if (!record.data.islooked) {
                     return '<img title="Материал был просмотрен текущим владельцем" src="'+ _ico("flag") +'">';
@@ -22,7 +25,6 @@ Inprint.documents.GridColumns = function() {
             dataIndex: "title",
             header: _("Title"),
             width: 210,
-            sortable: true,
             renderer : function(value, p, record){
 
                 var color = 'black';
@@ -66,7 +68,7 @@ Inprint.documents.GridColumns = function() {
                     }
                 }
 
-                var result = "<span style=\"font-size:12px;font-weight:bold;\">"+ header +"</span>";
+                var result = "<span style=\"font-size:11px;font-weight:bold;\">"+ header +"</span>";
                 if (linksResult.length > 0 ) {
                     result += "<span> &nbsp;&mdash;&nbsp; "+ linksResult.join(",&nbsp; ") + "</span>";
                 }
@@ -78,7 +80,6 @@ Inprint.documents.GridColumns = function() {
         edition: {
             id:"edition",
             width: 80,
-            sortable: true,
             header: _("Edition"),
             dataIndex: "edition_shortcut"
         },
@@ -86,7 +87,6 @@ Inprint.documents.GridColumns = function() {
         maingroup: {
             id:"maingroup",
             width: 80,
-            sortable: true,
             header: _("Department"),
             dataIndex: "maingroup_shortcut"
         },
@@ -95,7 +95,6 @@ Inprint.documents.GridColumns = function() {
             id:"workgroup",
             width: 80,
             hidden: true,
-            sortable: true,
             header: _("Where"),
             dataIndex: "workgroup_shortcut"
         },
@@ -105,7 +104,6 @@ Inprint.documents.GridColumns = function() {
             dataIndex: "fascicle_shortcut",
             header: _("Fascicle"),
             width: 70,
-            sortable: true,
             renderer : function(value, p, record) {
                 return value;
             }
@@ -115,31 +113,27 @@ Inprint.documents.GridColumns = function() {
             id:"headline",
             dataIndex: "headline_shortcut",
             header: _("Headline"),
-            width: 90,
-            sortable: true
+            width: 90
         },
 
         rubric: {
             id:"rubric",
             dataIndex: "rubric_shortcut",
             header: _("Rubric"),
-            width: 80,
-            sortable: true
+            width: 80
         },
 
         pages: {
             id:"pages",
             dataIndex: "pages",
             header: _("Pages"),
-            width: 55,
-            sortable: true
+            width: 55
         },
 
         progress: {
             id:"progress",
             dataIndex: "progress",
             header: _("Progress"),
-            sortable: true,
             width: 75,
             renderer : function(v, p, record) {
 
@@ -177,7 +171,6 @@ Inprint.documents.GridColumns = function() {
             dataIndex: "manager_shortcut",
             header: _("Manager"),
             width: 100,
-            sortable: true,
             renderer : function(v, p, record) {
                 if (record.data.workgroup == record.data.manager) {
                     v = '<b>' +v+ '</b>';
@@ -191,7 +184,6 @@ Inprint.documents.GridColumns = function() {
             dataIndex: "holder_shortcut",
             header: _("Holder"),
             width: 100,
-            sortable: true,
             renderer : function(v, p, record) {
                 if (record.data.workgroup == record.data.holder) {
                     v = '<b>' +v+ '</b>';
@@ -204,8 +196,7 @@ Inprint.documents.GridColumns = function() {
             id:"images",
             dataIndex: "images",
             header : '<img src="'+ _ico("camera") +'">',
-            width:30,
-            sortable: true
+            width:30
         },
 
         size:{
@@ -213,7 +204,6 @@ Inprint.documents.GridColumns = function() {
             dataIndex: "rsize",
             header : '<img src="'+ _ico("edit") +'">',
             width:40,
-            sortable: true,
             renderer : function(value, p, record) {
                 if (record.data.rsize) {
                     return record.data.rsize;
@@ -231,8 +221,8 @@ Inprint.documents.GridColumns = function() {
             dataIndex: "created",
             header: _("Created"),
             width: 80,
-            sortable: true,
-            xtype: 'datecolumn', format: 'M d H:i'
+            xtype: 'datecolumn',
+            format: 'M d H:i'
         },
 
         updated: {
@@ -241,8 +231,8 @@ Inprint.documents.GridColumns = function() {
             dataIndex: "updated",
             header: _("Updated"),
             width: 80,
-            sortable: true,
-            xtype: 'datecolumn', format: 'M d H:i'
+            xtype: 'datecolumn',
+            format: 'M d H:i'
         },
 
         uploaded: {
@@ -251,8 +241,8 @@ Inprint.documents.GridColumns = function() {
             dataIndex: "uploaded",
             header: _("Uploaded"),
             width: 80,
-            sortable: true,
-            xtype: 'datecolumn', format: 'M d H:i'
+            xtype: 'datecolumn',
+            format: 'M d H:i'
         },
 
         moved: {
@@ -261,8 +251,8 @@ Inprint.documents.GridColumns = function() {
             dataIndex: "moved",
             header: _("Moved"),
             width: 80,
-            sortable: true,
-            xtype: 'datecolumn', format: 'M d H:i'
+            xtype: 'datecolumn',
+            format: 'M d H:i'
         }
 
     };

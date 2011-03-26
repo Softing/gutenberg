@@ -46,7 +46,7 @@ Inprint.cmp.PrincipalsSelector.Tree = Ext.extend(Ext.tree.TreePanel, {
         Inprint.cmp.PrincipalsSelector.Tree.superclass.onRender.apply(this, arguments);
 
         this.on("beforeload", function() {
-            this.body.mask(_("Please wait..."));
+            this.body.mask(_("Loading data..."));
         });
 
         this.on("load", function() {

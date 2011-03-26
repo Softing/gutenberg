@@ -1,65 +1,64 @@
-Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
+// Inprint Content 5.0
+// Copyright(c) 2001-2011, Softing, LLC.
+// licensing@softing.ru
+// http://softing.ru/license
+
+Inprint.documents.Grid = Ext.extend(Inprint.grid.GridPanel, {
 
     initComponent: function() {
 
+        var store = Inprint.factory.Store.array( "/documents/array/" , {
+            remoteSort: true,
+            totalProperty: 'total',
+            baseParams: { gridmode: this.gridmode }
+        });
+
+        var sm      = new Ext.grid.CheckboxSelectionModel();
         var actions = new Inprint.documents.GridActions();
         var columns = new Inprint.documents.GridColumns();
 
-        this.components = {};
-
-        this.urls = {
-            "list":       "/documents/list/"
-        };
-
-        this.store = Inprint.factory.Store.json(this.urls.list, {
-            remoteSort: true,
-            totalProperty: 'total',
-            baseParams: {
-                gridmode: this.gridmode
-            }
+        var colModel = new Ext.grid.ColumnModel({
+            defaults: {
+                sortable: true,
+                menuDisabled: true
+            },
+            columns: [
+                sm,
+                columns.viewed,
+                columns.title,
+                columns.edition,
+                columns.maingroup,
+                columns.manager,
+                columns.workgroup,
+                columns.fascicle,
+                columns.headline,
+                columns.rubric,
+                columns.pages,
+                columns.progress,
+                columns.holder,
+                columns.images,
+                columns.size,
+                columns.created,
+                columns.updated,
+                columns.uploaded,
+                columns.moved
+            ]
         });
 
-        this.sm = new Ext.grid.CheckboxSelectionModel();
-
-        this.columns = [
-            this.sm,
-            columns.viewed,
-            columns.title,
-            columns.edition,
-            columns.maingroup,
-            columns.manager,
-            columns.workgroup,
-            columns.fascicle,
-            columns.headline,
-            columns.rubric,
-            columns.pages,
-            columns.progress,
-            columns.holder,
-            columns.images,
-            columns.size,
-            columns.created,
-            columns.updated,
-            columns.uploaded,
-            columns.moved
-        ];
-
-        this.filter = new Inprint.documents.GridFilter({
+        var filter = new Inprint.documents.GridFilter({
             stateId: this.stateId,
             gridmode: this.gridmode
         });
 
-        this.filter.on("filter", function(filter, params) {
-            this.cmpLoad(params);
-        }, this);
-
-        this.tbar = {
+        var tbar = {
             xtype    : 'container',
             layout   : 'anchor',
-            height   : 27 * 2,
-            defaults : { height : 27, anchor : '100%' },
+            height   : 28 +25,
+            defaults : { anchor : '100%' },
             items    : [
                 {
                     xtype: "toolbar",
+                    height: 28,
                     items : [
                         {
                             icon: _ico("plus-button"),
@@ -165,55 +164,64 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
                             scope:this,
                             handler: actions.Delete
                         }
-
                     ]
                 },
                 {
                     xtype: "toolbar",
-                    items : this.filter
+                    height : 25,
+                    items : filter
                 }
             ]
         };
 
-        this.bbar = new Ext.PagingToolbar({
+        var bbar = new Ext.PagingToolbar({
             pageSize: 60,
-            store: this.store,
+            store: store,
             displayInfo: true,
             displayMsg: _("Displaying documents {0} - {1} of {2}"),
             emptyMsg: _("No documents to display")
         });
 
         Ext.apply(this, {
-            border:false,
-            stripeRows: true,
-            //columnLines: true,
-            trackMouseOver: false,
+
+            sm: sm,
+            store: store,
+            colModel: colModel,
+
+            tbar: tbar,
+            bbar: bbar,
+
             autoExpandColumn: "title",
-            sm: this.sm,
-            tbar: this.tbar,
-            columns: this.columns,
-            bbar: this.bbar,
+
             viewConfig: {
+
+                deferEmptyText  : false,
+                emptyText: _("Suitable data is not found"),
+
                 getRowClass: function(record, rowIndex, rp, ds) {
 
-                    var css = '';
+                    var css = "";
 
                     if (Inprint.session.member && Inprint.session.member.id == record.get("manager") ) {
-                        css = 'inprint-document-grid-current-manager-bg';
+                        css = "inprint-grid-yellow-bg";
                     }
 
                     if (record.get("workgroup") == record.get("holder")) {
-                        css = 'inprint-document-grid-current-department-bg';
+                        css = "inprint-grid-yellow-bg";
                     }
 
                     if (Inprint.session.member && Inprint.session.member.id == record.get("holder") ) {
-                        css = 'inprint-document-grid-current-user-bg';
+                        css = "inprint-grid-green-bg";
                     }
 
                     return css;
                 }
+
             }
+
         });
+
+        this.filter = filter;
 
         Inprint.documents.Grid.superclass.initComponent.apply(this, arguments);
 
@@ -223,8 +231,12 @@ Inprint.documents.Grid = Ext.extend(Ext.grid.GridPanel, {
 
         Inprint.documents.Grid.superclass.onRender.apply(this, arguments);
 
+        this.filter.on("filter", function(filter, params) {
+            this.cmpLoad(params);
+        }, this);
+
         this.filter.on("restore", function(filter, params) {
-            this.store.load({ params: Ext.apply({start:0, limit:60}, params) });
+            this.cmpLoad({ params: Ext.apply({start:0, limit:60}, params) }, true);
         }, this);
 
         this.on("dblclick", function(e){

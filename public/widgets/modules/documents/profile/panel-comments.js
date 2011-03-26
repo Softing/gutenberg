@@ -42,13 +42,11 @@ Inprint.documents.Profile.Comments = Ext.extend(Ext.Panel, {
                 }
             ]
         });
-        // Call parent (required)
+
         Inprint.documents.Profile.Comments.superclass.initComponent.apply(this, arguments);
     },
 
-    // Override other inherited methods
     onRender: function() {
-        // Call parent (required)
         Inprint.documents.Profile.Comments.superclass.onRender.apply(this, arguments);
     },
 
@@ -78,7 +76,7 @@ Inprint.documents.Profile.Comments = Ext.extend(Ext.Panel, {
         Ext.MessageBox.show({
             title: _("Comments"),
             msg: _("Please enter your text"),
-            width:300,
+            width:400,
             buttons: Ext.MessageBox.OKCANCEL,
             multiline: true,
             scope:this,

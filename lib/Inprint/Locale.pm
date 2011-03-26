@@ -41,7 +41,8 @@ sub index {
     $jsonString = "
         var inprintLocalization = $jsonString;
         function _(arg, vals) {
-            var string = inprintLocalization[arg] || arg;
+
+            var string = inprintLocalization[arg.replace('...', '')] || arg;
             if (vals) {
                 for (var i=0; i<vals.length;i++) {
                     string = string.replace('%'+ (i+1), vals[i]);

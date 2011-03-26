@@ -117,10 +117,10 @@ sub startup {
     $self->createRoutes($sessionBridge, "catalog/readiness",                [ "create", "read", "update", "delete", "list" ]);
     $self->createRoutes($sessionBridge, "catalog/roles",                    [ "create", "read", "update", "delete", "list", "map", "mapping" ]);
 
-    $sessionBridge->route('/catalog/rules/list/')           ->to('catalog-rules#list');
-    $sessionBridge->route('/catalog/rules/clear/')          ->to('catalog-rules#clear');
-    $sessionBridge->route('/catalog/rules/map/')            ->to('catalog-rules#map');
-    $sessionBridge->route('/catalog/rules/mapping/')        ->to('catalog-rules#mapping');
+    $sessionBridge->route('/catalog/rules/list/')            ->to('catalog-rules#list');
+    $sessionBridge->route('/catalog/rules/clear/')           ->to('catalog-rules#clear');
+    $sessionBridge->route('/catalog/rules/map/')             ->to('catalog-rules#map');
+    $sessionBridge->route('/catalog/rules/mapping/')         ->to('catalog-rules#mapping');
 
     $self->createRoutes($sessionBridge, "catalog/members",                  [ "create", "delete", "list", "rules", "setup" ]);
     $self->createRoutes($sessionBridge, "catalog/stages",                   [ "create", "read", "update", "delete", "list", "map-principals", "unmap-principals", "principals-mapping" ]);
@@ -130,25 +130,26 @@ sub startup {
     $self->createRoutes($sessionBridge, "catalog/rubrics",                  [ "list", "read", "create", "update", "delete" ]);
 
     # Common routes
-    $sessionBridge->route('/common/transfer/editions/')     ->to('common-transfer#editions');
-    $sessionBridge->route('/common/transfer/branches/')     ->to('common-transfer#branches');
-    $sessionBridge->route('/common/transfer/list/')         ->to('common-transfer#list');
+    $sessionBridge->route('/common/transfer/branches/')      ->to('common-transfer#branches');
+    $sessionBridge->route('/common/transfer/editions/')      ->to('common-transfer#editions');
+    $sessionBridge->route('/common/transfer/list/')          ->to('common-transfer#list');
 
     # Documents routes
-    $sessionBridge->route('/documents/create/')             ->to('documents#create');
-    $sessionBridge->route('/documents/read/')               ->to('documents#read');
-    $sessionBridge->route('/documents/update/')             ->to('documents#update');
-    $sessionBridge->route('/documents/delete/')             ->to('documents#delete');
-    $sessionBridge->route('/documents/list/')               ->to('documents#list');
-    $sessionBridge->route('/documents/capture/')            ->to('documents#capture');
-    $sessionBridge->route('/documents/transfer/')           ->to('documents#transfer');
-    $sessionBridge->route('/documents/briefcase/')          ->to('documents#briefcase');
-    $sessionBridge->route('/documents/move/')               ->to('documents#move');
-    $sessionBridge->route('/documents/copy/')               ->to('documents#copy');
-    $sessionBridge->route('/documents/duplicate/')          ->to('documents#duplicate');
-    $sessionBridge->route('/documents/recycle/')            ->to('documents#recycle');
-    $sessionBridge->route('/documents/restore/')            ->to('documents#restore');
-    $sessionBridge->route('/documents/say/')                ->to('documents#say');
+    $sessionBridge->route('/documents/array/')               ->to('documents#array');
+    $sessionBridge->route('/documents/briefcase/')           ->to('documents#briefcase');
+    $sessionBridge->route('/documents/capture/')             ->to('documents#capture');
+    $sessionBridge->route('/documents/copy/')                ->to('documents#copy');
+    $sessionBridge->route('/documents/create/')              ->to('documents#create');
+    $sessionBridge->route('/documents/delete/')              ->to('documents#delete');
+    $sessionBridge->route('/documents/duplicate/')           ->to('documents#duplicate');
+    $sessionBridge->route('/documents/list/')                ->to('documents#list');
+    $sessionBridge->route('/documents/move/')                ->to('documents#move');
+    $sessionBridge->route('/documents/read/')                ->to('documents#read');
+    $sessionBridge->route('/documents/recycle/')             ->to('documents#recycle');
+    $sessionBridge->route('/documents/restore/')             ->to('documents#restore');
+    $sessionBridge->route('/documents/say/')                 ->to('documents#say');
+    $sessionBridge->route('/documents/transfer/')            ->to('documents#transfer');
+    $sessionBridge->route('/documents/update/')              ->to('documents#update');
 
     $sessionBridge->route('/documents/hotsave/list/')        ->to('documents-hotsave#list');
     $sessionBridge->route('/documents/hotsave/read/')        ->to('documents-hotsave#read');

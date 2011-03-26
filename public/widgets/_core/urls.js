@@ -3,4 +3,3 @@
 // licensing@softing.ru
 // http://softing.ru/license
 
-Ext.namespace("Inprint.documents.recycle");

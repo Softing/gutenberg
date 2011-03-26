@@ -46,12 +46,57 @@ sub read {
     $c->render_json({ success => $success, errors => \@errors, data => $document || {} });
 }
 
-
 # Get documents list
+
+sub array {
+    my ($c, $params) = @_;
+
+    my $searchResult = Inprint::Models::Documents::search($c, $params);
+
+    my $total = $searchResult->{total};
+    my $records = $searchResult->{result};
+
+    my @columns = (
+        'id', 'access',
+        'edition',  'edition_shortcut',
+        'fascicle', 'fascicle_shortcut',
+        'headline', 'headline_shortcut',
+        'rubric', 'rubric_shortcut',
+        'copygroup',
+        'holder','creator','manager','holder_shortcut','creator_shortcut','manager_shortcut',
+        'maingroup','maingroup_shortcut',
+        'workgroup','workgroup_shortcut','ingroups',
+        'islooked','isopen',
+        'branch','branch_shortcut','stage','stage_shortcut','color','progress',
+        'title','author','pages',
+        'pdate','psize','rdate','rsize',
+        'images','files', 'links',
+        'created',
+        'updated',
+        'uploaded',
+        'moved');
+
+    my @result;
+    foreach my $record (@$records) {
+        my @row;
+        foreach my $column (@columns) {
+            push @row, $record->{$column};
+        }
+        push @result, \@row;
+    }
+
+    $c->render_json( { "data" => \@result, "total" => $total } );
+}
+
 sub list {
     my ($c, $params) = @_;
+
     my $searchResult = Inprint::Models::Documents::search($c, $params);
-    $c->render_json( { "data" => $searchResult->{result}, "total" => $searchResult->{total} } );
+
+    my $total = $searchResult->{total};
+    my $records = $searchResult->{result};
+
+    $c->render_json( { "data" => $records, "total" => $total } );
 }
 
 sub create {

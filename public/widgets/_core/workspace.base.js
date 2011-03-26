@@ -1,39 +1,27 @@
-/*
- * Inprint Content 4.5
- * Copyright(c) 2001-2010, Softing, LLC.
- * licensing@softing.ru
- *
- * http://softing.ru/license
- */
+// Inprint Content 5.0
+// Copyright(c) 2001-2011, Softing, LLC.
+// licensing@softing.ru
+// http://softing.ru/license
 
 Inprint.Workspace = function() {
-
-    // Activate state sore
-
-    var items = [];
 
     var Portal  = new Inprint.Portal();
     var Menu    = new Inprint.Menu();
     var Taskbar = new Inprint.Taskbar();
 
-    // Create Panel
     var Panel = new Ext.Panel({
         layout: 'card',
-        activeItem: 0,
-        border:false,
-        bodyStyle: 'background:none;',
-        items: Portal
-    });
+        border: false,
+        bodyBorder:false,
+        bodyStyle: 'padding:2px;background:transparent;',
+        items: [],
+        tbar: Menu,
+        bbar: Taskbar
+    })
 
     var Viewport = new Ext.Viewport({
         layout: 'fit',
-        items: new Ext.Panel({
-            layout: 'fit',
-            bodyStyle: 'padding:5px;background:none;',
-            tbar: Menu,
-            items: Panel,
-            bbar: Taskbar
-        })
+        items: Panel
     });
 
     return {

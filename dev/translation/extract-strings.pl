@@ -138,6 +138,10 @@ foreach my $lang (@langs) {
     say $file "";
     say $file "our \%Lexicon = (\n";
 
+    for (0 .. $#result) {
+        $result[$_] =~ s/\.\.\.//g;
+    }
+
     my $tab = "    ";
     my %seen = ();
     foreach my $item (@result) {
@@ -149,6 +153,8 @@ foreach my $lang (@langs) {
         my $value = $translation->{$item};
 
         if ($item ~~ @words) {
+            $param =~ s/\.\.\.//g;
+            $value =~ s/\.\.\.//g;
             say $file "    $param\n => \"$value\",\n";
         }
 
