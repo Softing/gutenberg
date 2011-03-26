@@ -1,0 +1,11 @@
+/*
+ * Inprint Content 5.0
+ * Copyright(c) 2001-2011, Softing, LLC.
+ * licensing@softing.ru
+ * http://softing.ru/license
+ */
+
+.x-tree-node-collapsed .x-tree-node-icon, .x-tree-node-expanded .x-tree-node-icon, .x-tree-node-leaf .x-tree-node-icon {
+  width: 16px;
+  height: 16px;
+}

@@ -1,0 +1,25 @@
+/*
+ * Inprint Content 5.0
+ * Copyright(c) 2001-2011, Softing, LLC.
+ * licensing@softing.ru
+ * http://softing.ru/license
+ */
+
+.inprint-document-profile table {
+    border:1px solid silver;
+    border-collapse:collapse;
+    margin-top:10px;
+    font-size:11px;
+}
+
+.inprint-document-profile th {
+    border:1px solid silver;
+    background:#f5f5f5;
+    font-weight:bold;
+    padding:2px 4px;
+}
+
+.inprint-document-profile td {
+    border:1px solid silver;
+    padding:2px 4px;
+}
