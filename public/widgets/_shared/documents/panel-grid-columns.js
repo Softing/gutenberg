@@ -56,10 +56,10 @@ Inprint.documents.GridColumns = function() {
                         var document = record.get("id");
 
                         linksResult.push(String.format(
-                            "<a style=\"color:{3}\" href=\"/?aid=document-editor&oid={0}&pid={1}&text={2}\" "+
+                            "<a style=\"color:{4}\" href=\"/?aid=document-editor&oid={0}&pid={1}&text={2}\" "+
                                 "onClick=\"Inprint.ObjectResolver.resolve({'aid':'document-editor','oid':'{0}','pid':'{1}','description':'{2}'});return false;\">"+
-                                "<nobr>{2}</nobr></a>",
-                            file, document, escape(text) , color
+                                "<nobr>{3}</nobr></a>",
+                            file, document, escape(text), text, color
                         ));
 
                     }
