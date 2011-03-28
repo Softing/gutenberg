@@ -106,8 +106,7 @@ Inprint.ObjectResolver = function() {
             panel.taskBtn = Inprint.layout.getTaskbar().addButton({
                 panel: panel,
                 icon:  panel.icon,
-                text:  Ext.util.Format.ellipsis(_(item.text), 10),
-                description: item.description
+                text:  Ext.util.Format.ellipsis(_(unescape(item.description || item.text)), 10)
             });
             panel.taskBtn.toggle();
 

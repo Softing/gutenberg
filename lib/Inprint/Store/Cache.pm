@@ -27,7 +27,12 @@ sub makeRecord {
     my $mimetype = extractMimeType($c, $extension);
 
     my $cacheRecord = $c->sql->Q("
-                SELECT * FROM cache_files WHERE file_path=? AND file_name=?
+                SELECT
+                    id, file_path, file_name, file_extension, file_mime,
+                    file_digest, file_thumbnail, file_description, file_size,
+                    file_length, file_meta, file_exists, file_published,
+                    created, updated
+                FROM cache_files WHERE file_path=? AND file_name=?
             ", [ $filepath, $filename ])->Hash;
 
     unless ($cacheRecord->{id}) {
@@ -52,7 +57,14 @@ sub getRecordById {
     my $c = shift;
     my $id = shift;
 
-    my $record = $c->sql->Q(" SELECT * FROM cache_files WHERE id=?", [ $id ])->Hash;
+    my $record = $c->sql->Q("
+        SELECT
+            id, file_path, file_name, file_extension, file_mime,
+            file_digest, file_thumbnail, file_description, file_size,
+            file_length, file_meta, file_exists, file_published,
+            to_char(created, 'YYYY-MM-DD HH24:MI:SS') as created,
+            to_char(updated, 'YYYY-MM-DD HH24:MI:SS') as updated
+        FROM cache_files WHERE id=?", [ $id ])->Hash;
 
     return $record;
 }
@@ -62,8 +74,14 @@ sub getRecordByPath {
     my ($path, $filename) = @_;
 
     my $record = $c->sql->Q("
-            SELECT * FROM cache_files WHERE file_path=? AND file_name=?
-            ", [ $path, $filename ])->Hash;
+        SELECT
+            id, file_path, file_name, file_extension, file_mime,
+            file_digest, file_thumbnail, file_description, file_size,
+            file_length, file_meta, file_exists, file_published,
+            to_char(created, 'YYYY-MM-DD HH24:MI:SS') as created,
+            to_char(updated, 'YYYY-MM-DD HH24:MI:SS') as updated
+        FROM cache_files WHERE file_path=? AND file_name=?
+    ", [ $path, $filename ])->Hash;
 
     return $record;
 }
@@ -79,7 +97,8 @@ sub getRecordsByPath {
             file_description as description, file_extension as extension,
             file_size as size, file_length as length,
             file_published as published,
-            created as created, updated as updated
+            to_char(created, 'YYYY-MM-DD HH24:MI:SS') as created,
+            to_char(updated, 'YYYY-MM-DD HH24:MI:SS') as updated
         FROM cache_files
         WHERE file_exists = true AND file_path=? ";
 

@@ -404,6 +404,9 @@ our %Lexicon = (
     "Edit request"
  => "",
 
+    "Edit text"
+ => "",
+
     "Editing of the Module"
  => "",
 
@@ -740,8 +743,14 @@ our %Lexicon = (
     "OpenOffice.org (odt)"
  => "",
 
+    "Operation failed"
+ => "",
+
     "Organization"
  => "Организация",
+
+    "Original file"
+ => "Оригинал",
 
     "Out date"
  => "",
@@ -922,6 +931,9 @@ our %Lexicon = (
 
     "Rules"
  => "Правила",
+
+    "Safe download"
+ => "",
 
     "Save"
  => "Сохранить",
@@ -1113,6 +1125,9 @@ our %Lexicon = (
  => "",
 
     "View plan"
+ => "",
+
+    "View text"
  => "",
 
     "W"

@@ -17,6 +17,8 @@ use LWP::UserAgent;
 use Image::Magick;
 use Digest::file qw(digest_file_hex);
 
+use Inprint::Check;
+
 use base 'Inprint::BaseController';
 
 sub download {
@@ -26,6 +28,8 @@ sub download {
     my @i_files       = $c->param("id");
     my $i_document    = $c->param("document");
     my $i_filter      = $c->param("filter");
+
+    my $i_original    = $c->param("original");
 
     my $document;
     if ($i_document) {
@@ -39,7 +43,7 @@ sub download {
     my $rootpath = $c->config->get("store.path");
 
     my $sql = "
-        SELECT file_path || '/' || file_name as file_path, file_name, file_extension, file_mime
+        SELECT file_path as file_path, file_name, file_name, file_extension, file_mime
         FROM cache_files WHERE true
     ";
 
@@ -68,7 +72,13 @@ sub download {
         my $extension = $cacheRecord->{file_extension};
         my $mimetype  = $cacheRecord->{file_mime};
 
-        my $filepath = "$rootpath/" . $cacheRecord->{file_path};
+        my $filepath = $rootpath. "/" . $cacheRecord->{file_path};
+
+        if ($i_original eq "true") {
+            $filepath .= "/.origins";
+        }
+
+        $filepath .= "/". $cacheRecord->{file_name};
 
         $filepath  = __adaptPath($c, $filepath);
         $filename  = __adaptPath($c, $filename);
@@ -103,7 +113,7 @@ sub download {
         $headers->add("Content-Description", $extension);
         $c->res->content->headers($headers);
 
-        $c->render_static();
+        $c->render_static($filepath);
     }
 
     # Download archive
@@ -139,7 +149,7 @@ sub download {
         $headers->add("Content-Description", "7z");
         $c->res->content->headers($headers);
 
-        $c->render_static();
+        $c->render_static($tmpfpath);
 
     }
 

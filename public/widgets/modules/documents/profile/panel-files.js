@@ -29,7 +29,12 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
             autoLoad:false,
             url: _url("/documents/files/list/"),
             baseParams: { document: this.config.document },
-            fields: [ "id", "document", "name", "description", "mime", "extension", "published",  "size", "length", "created", "updated" ]
+            fields: [
+                "id", "document", "name", "description", "mime", "extension",
+                "published", "size", "length",
+                { name: "created", type: "date", dateFormat: "c" },
+                { name: "updated", type: "date", dateFormat: "c" }
+            ]
         });
 
         // Column model
@@ -76,12 +81,19 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                     return String.format("<img src=\"/files/preview/{0}x80\" style=\"border:1px solid silver;\"/></a>", v);
                 }
             },
-            { id:'name', header: _("File"),dataIndex:'name', width:250},
-            { id: 'description', header: _("Description"),dataIndex:'description', width:150},
-            { id: 'size', header: _("Size"), dataIndex:'size', width:100, renderer:Ext.util.Format.fileSize},
-            { id: 'size', header: _("Length"), dataIndex:'length', width:100},
-            { id: 'created', header: _("Created"), dataIndex:'created', width:120 },
-            { id: 'updated', header: _("Updated") ,dataIndex:'updated', width:120 }
+            { id:'name', header: _("File"), dataIndex:'name', width:250,
+                renderer: function(value, meta, record){
+                    var text = String.format("<h2>{0}</h2>", value);
+                    if (record.get("description")) {
+                        text += String.format("<div><i>{0}</i></div>", record.get("description"));
+                    }
+                    text += String.format("<div style=\"padding:5px 0px;\"><a href=\"/files/download/{0}?original=true\">{1}</a></div>", record.get("id"), _("Original file"));
+                    return text;
+            }},
+            { id: "size", dataIndex:'size', header: _("Size"), width: 70, renderer: Ext.util.Format.fileSize},
+            { id: "length", dataIndex:'length', header: _("Characters"), width: 50},
+            { id: "created", dataIndex: "created", header: _("Created"), width: 100, xtype: 'datecolumn', format: 'M d H:i' },
+            { id: "updated", dataIndex: "updated", header: _("Updated"), width: 100, xtype: 'datecolumn', format: 'M d H:i' }
         ];
 
         this.tbar = [
@@ -139,7 +151,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
             stripeRows: true,
             columnLines: true,
             sm: this.selectionModel,
-            autoExpandColumn: "description"
+            autoExpandColumn: "name"
         });
 
         // Call parent (required)
