@@ -207,7 +207,7 @@ our %Lexicon = (
  => "",
 
     "Category"
- => "",
+ => "Раздел",
 
     "Change"
  => "Изменить",
@@ -420,7 +420,7 @@ our %Lexicon = (
  => "Издания",
 
     "Editor"
- => "",
+ => "Редактор",
 
     "Editorial house"
  => "",

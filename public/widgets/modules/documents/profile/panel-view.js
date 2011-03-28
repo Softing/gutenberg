@@ -112,11 +112,11 @@ Inprint.documents.Profile.View = Ext.extend(Ext.Panel, {
                 },
                 {
                     border:false,
-                    tpl: this.tmpl3
+                    tpl: this.tmpl2
                 },
                 {
                     border:false,
-                    tpl: this.tmpl2
+                    tpl: this.tmpl3
                 }
             ]
         });
@@ -138,8 +138,8 @@ Inprint.documents.Profile.View = Ext.extend(Ext.Panel, {
             '<th width="70">'+ _("Issue") +'</td>',
             '<th width="90">'+ _("Category") +'</th>',
             '<th width="90">'+ _("Rubric") +'</th>',
-            '<th width="50">'+ _("Length") +'</th>',
-            '<th width="80">'+ _("Group") +'</td>',
+            '<th width="50">'+ _("Characters") +'</th>',
+            '<th width="80">'+ _("Department") +'</td>',
             '<th width="100">'+ _("Editor") +'</th>',
             '<th width="130">'+ _("Author") +'</th>',
             '<th width="90">'+ _("Date") +'</th>',
@@ -170,6 +170,27 @@ Inprint.documents.Profile.View = Ext.extend(Ext.Panel, {
     ),
 
     tmpl2: new Ext.XTemplate(
+        '<tpl if="history">',
+            '<table width="99%" align="center" style="border:0px;">',
+            '<td style="border:0px;">',
+                '<tpl for="history">',
+                    '<div style="display: inline;padding:3px;padding-left:12px;margin-right:10px;float:left;background:url(/icons/arrow-000-small.png) -3px 2px  no-repeat;">',
+                        '<div style="font-weight:bold;border-bottom:2px solid #{color};">{destination_shortcut}</div>',
+                        '<div style="font-size:90%;">{stage_shortcut}</div>',
+                        '<div style="font-size:90%;">{[ this.fmtDate( values.created ) ]}</div>',
+                    '</div>',
+                '</tpl>',
+                '<div style="clear:both;"></div>',
+            '</td>',
+            '</table>',
+        '</tpl>',
+        {
+            fmtDate : function(date) { return _fmtDate(date, 'M j, H:i'); },
+            fmtString : function(string) { if (!string) { string = ''; } return string; }
+        }
+    ),
+
+    tmpl3: new Ext.XTemplate(
         '<tpl if="fascicles">',
             '<table width="99%" align="center">',
             '<tr style="background:#f5f5f5;">',
@@ -186,27 +207,6 @@ Inprint.documents.Profile.View = Ext.extend(Ext.Panel, {
                     '<td>{[ this.fmtString( values.rubric_shortcut ) ]}</td>',
                 '</tr>',
             '</tpl>',
-            '</table>',
-        '</tpl>',
-        {
-            fmtDate : function(date) { return _fmtDate(date, 'M j, H:i'); },
-            fmtString : function(string) { if (!string) { string = ''; } return string; }
-        }
-    ),
-
-    tmpl3: new Ext.XTemplate(
-        '<tpl if="history">',
-            '<table width="99%" align="center" style="border:0px;">',
-            '<td style="border:0px;">',
-                '<tpl for="history">',
-                    '<div style="display: inline;padding:3px;padding-left:12px;margin-right:10px;float:left;background:url(/icons/arrow-000-small.png) -3px 2px  no-repeat;">',
-                        '<div style="font-weight:bold;border-bottom:2px solid #{color};">{destination_shortcut}</div>',
-                        '<div style="font-size:90%;">{stage_shortcut}</div>',
-                        '<div style="font-size:90%;">{[ this.fmtDate( values.created ) ]}</div>',
-                    '</div>',
-                '</tpl>',
-                '<div style="clear:both;"></div>',
-            '</td>',
             '</table>',
         '</tpl>',
         {

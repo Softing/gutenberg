@@ -35,6 +35,7 @@ sub read {
                 dcm.headline, dcm.headline_shortcut,
                 dcm.rubric, dcm.rubric_shortcut,
                 dcm.workgroup, dcm.workgroup_shortcut,
+                dcm.maingroup, dcm.maingroup_shortcut,
                 dcm.inworkgroups, dcm.copygroup,
                 dcm.holder,  dcm.holder_shortcut,
                 dcm.creator, dcm.creator_shortcut,
