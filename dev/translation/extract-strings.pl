@@ -26,9 +26,8 @@ find({ wanted => sub {
 
 find({ wanted => sub {
     my $filename = $File::Find::name;
-    if ( (/\.js$/) ) {
-        push @jsfiles, $filename;
-    }
+    return if $filename =~ m/public\/widgets\/plugins\//;
+    push @jsfiles, $filename if ( (/\.js$/) );
 }}, "../../public/widgets");
 
 @jsfiles = sort { $a cmp $b } @jsfiles;
@@ -54,9 +53,8 @@ my @pmfiles;
 
 find({ wanted => sub {
     my $filename = $File::Find::name;
-    if ( (/\.pm$/) ) {
-        push @pmfiles, $filename;
-    }
+    return if $filename =~ m/lib\/Inprint\/Plugins/;
+    push @pmfiles, $filename if ( (/\.pm$/) );
 }}, "../../lib/Inprint");
 
 foreach my $path (@pmfiles) {
@@ -152,7 +150,7 @@ foreach my $lang (@langs) {
         my $param = '"' .$item. '"';
         my $value = $translation->{$item};
 
-        if ($item ~~ @words) {
+        if ($item ~~ @result) {
             $param =~ s/\.\.\.//g;
             $value =~ s/\.\.\.//g;
             say $file "    $param\n => \"$value\",\n";

@@ -23,9 +23,6 @@ our %Lexicon = (
     "Access"
  => "Доступ",
 
-    "Access denide"
- => "",
-
     "Access rights management"
  => "",
 
@@ -221,14 +218,8 @@ our %Lexicon = (
     "Change stage"
  => "",
 
-    "Change the file description"
- => "",
-
-    "Change the file name"
- => "",
-
-    "Changes have been saved"
- => "Изменения сохранены",
+    "Characters"
+ => "Знаки",
 
     "Circulation"
  => "Тираж",
@@ -323,9 +314,6 @@ our %Lexicon = (
     "Default destination"
  => "Назначение по умолчанию",
 
-    "Default feed"
- => "",
-
     "Defaults"
  => "По умолчанию",
 
@@ -337,9 +325,6 @@ our %Lexicon = (
 
     "Delete file"
  => "Удалить файл",
-
-    "Delete the file?"
- => "Удалить файл?",
 
     "Deleting a category"
  => "Удалить рубрику?",
@@ -363,7 +348,7 @@ our %Lexicon = (
  => "Показаны документы {0} - {1} из {2}",
 
     "Document"
- => "",
+ => "Материалы",
 
     "Document capture"
  => "",
@@ -387,7 +372,7 @@ our %Lexicon = (
  => "Скачать файл",
 
     "Downloads"
- => "",
+ => "Загрузки",
 
     "Dumb window"
  => "Пустое окно",
@@ -515,9 +500,6 @@ our %Lexicon = (
     "Fascicles"
  => "Выпуски",
 
-    "Feeds"
- => "Ленты",
-
     "File"
  => "Файл",
 
@@ -638,14 +620,20 @@ our %Lexicon = (
     "Limit"
  => "Ограничение",
 
-    "List of downloads"
+    "Limitation"
  => "",
+
+    "List of downloads"
+ => "Список загрузок",
 
     "Loading"
- => "",
+ => "Загрузка",
+
+    "Loading data"
+ => "Загрузка данных",
 
     "Loading text"
- => "",
+ => "Загрузка текста",
 
     "Login"
  => "Логин",
@@ -672,9 +660,6 @@ our %Lexicon = (
  => "",
 
     "Microsoft Word (doc)"
- => "",
-
-    "Modification of the file"
  => "",
 
     "Modification of the file description"
@@ -857,9 +842,6 @@ our %Lexicon = (
     "RS"
  => "РС",
 
-    "RSS feeds"
- => "",
-
     "Readiness"
  => "Готовность",
 
@@ -875,14 +857,14 @@ our %Lexicon = (
     "Recycle bin"
  => "",
 
-    "Refresh this panel"
- => "",
-
     "Release addition"
  => "",
 
     "Reload"
  => "Обновить",
+
+    "Reload this panel"
+ => "Обновить эту панель",
 
     "Remove"
  => "Удалить",
@@ -947,9 +929,6 @@ our %Lexicon = (
     "Save recursive"
  => "",
 
-    "Saving"
- => "",
-
     "Saving text"
  => "",
 
@@ -959,7 +938,16 @@ our %Lexicon = (
     "Select a file extension"
  => "",
 
+    "Select a paid status"
+ => "",
+
+    "Select a request status"
+ => "",
+
     "Select a type"
+ => "",
+
+    "Select a willingness"
  => "",
 
     "Select an file"
@@ -979,15 +967,6 @@ our %Lexicon = (
 
     "Shortcut"
  => "Ярлык",
-
-    "Show all"
- => "",
-
-    "Show with RSS"
- => "",
-
-    "Show without RSS"
- => "",
 
     "Simple Text (txt)"
  => "",
@@ -1015,9 +994,6 @@ our %Lexicon = (
 
     "System Information"
  => "",
-
-    "System event"
- => "Новое событие",
 
     "System information"
  => "Системная информация",
@@ -1063,9 +1039,6 @@ our %Lexicon = (
 
     "The rights"
  => "",
-
-    "This change can not be undone!"
- => "Это действие не может быть отменено",
 
     "Title"
  => "Название",
@@ -1114,9 +1087,6 @@ our %Lexicon = (
 
     "Updated"
  => "Обновлен",
-
-    "Upload"
- => "Загрузить",
 
     "Upload document"
  => "",
