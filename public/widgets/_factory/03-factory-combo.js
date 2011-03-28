@@ -302,7 +302,7 @@ Inprint.factory.Combo = function() {
             // Add store configuration
             if (storeconfig) Ext.apply(combo.store, storeconfig);
             // Add baseparams to store configuration
-            if (comboconfig.baseParams)  Ext.apply(combo.store, config.baseParams);
+            if (comboconfig.baseParams)  Ext.apply(combo.store, comboconfig.baseParams);
 
             return combo;
         },
