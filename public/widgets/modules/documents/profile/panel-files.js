@@ -189,7 +189,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                                     aid: "document-editor",
                                     oid: record.get("id"),
                                     pid: record.get("document"),
-                                    description: escape(record.get("filename"))
+                                    description: escape(record.get("name"))
                                 });
                             }
                         });

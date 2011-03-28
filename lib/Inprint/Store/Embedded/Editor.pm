@@ -27,9 +27,7 @@ sub readFile {
     my $extension = __getExtension($c, $filepath);
 
     if ($extension ~~ ["doc", "docx", "odt", "rtf"]) {
-
         $responce = convert($c, $filepath, $extension, "html");
-
         if ($^O eq "linux") {
             $responce->{text} = Encode::decode_utf8( $responce->{text} );
         }
@@ -39,19 +37,15 @@ sub readFile {
         if ($^O eq "MSWin32") {
             $responce->{text} = Encode::decode("windows-1251", $responce->{text} );
         }
-
     }
 
     if ($extension ~~ ["txt"]) {
-
         open my $FILE, "<", $filepath;
         while (<$FILE>) { $responce->{text} .= $_; }
         close $FILE;
-
         if ($^O eq "MSWin32") {
             $responce->{text} = Encode::decode("windows-1251", $responce->{text});
         }
-
         $responce->{text} =~ s/\r?\n/<br>/g;
     }
 
@@ -269,9 +263,7 @@ sub convert {
     close $INPUT;
 
     $fileContent = encode_base64($fileContent);
-
     $ooRequest->content( $fileContent );
-
     my $result = __processResponce($c, $ooUagent->request($ooRequest));
 
     return $result;
@@ -382,7 +374,7 @@ sub __clearHtml {
 
     );
 
-    #$data =~ s/<title>(.*?)<\/title>//ig;
+    $html =~ s/<title>(.*?)<\/title>//ig;
 
     $html = $scrubber->scrub($html);
 
@@ -391,6 +383,14 @@ sub __clearHtml {
     $html =~ s/\r+/ /g;
 
     $html =~ s/<table/<table border=1/ig;
+    
+    #use HTML::Clean;
+    #my $h = new HTML::Clean(\$html);
+    #
+    #$h->compat();
+    #$h->strip();
+    #my $data = $h->data();
+    #die $$data;
 
     #$data =~ s/(<br>)+/<br>/ig;
     #$data =~ s/<p><br>\s+<\/p>/ /ig;
