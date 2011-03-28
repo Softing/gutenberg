@@ -43,39 +43,45 @@ Inprint.documents.downloads.Main = Ext.extend(Ext.grid.GridPanel, {
                         return image;
                     }
                 },
-
                 { id:'filename', header: _("File"),     dataIndex:'filename',
                     renderer: function(value, p, record) {
-
                         if (record.get("downloaded") == 0 ) {
                             return String.format("<span style=\"color:{1}\"><b>{0}</b></span>", value, "black");
                         } else {
                             return String.format("<span style=\"color:{1}\">{0}</span>", value, "#6E6E6E");
                         }
-
                     }
                 },
-
-                { id:'edition',  header: _("Edition"),  dataIndex:'edition_shortcut', width: 120 },
-                { id:'fascicle', header: _("Fascicle"), dataIndex:'fascicle_shortcut', width: 80 },
-
-                { id:'document', header: _("Document"), dataIndex:'document_shortcut', width: 200 },
-                { id: 'size',    header: _("Size"),     dataIndex:'size',     width:60, renderer:Ext.util.Format.fileSize},
-                { id: 'length',  header: _("Length"),   dataIndex:'length',   width:60 },
-                { id: 'created', header: _("Created"),  dataIndex:'created',  width:90, xtype: 'datecolumn', format: 'M d H:i' },
-                { id: 'updated', header: _("Updated"),  dataIndex:'updated',  width:90, xtype: 'datecolumn', format: 'M d H:i' }
+                { id:'edition',  header: _("Edition"),      dataIndex:'edition_shortcut', width: 120 },
+                { id:'fascicle', header: _("Fascicle"),     dataIndex:'fascicle_shortcut', width: 80 },
+                { id:'document', header: _("Document"),     dataIndex:'document_shortcut', width: 200 },
+                { id: 'size',    header: _("Size"),         dataIndex:'size',     width:60, renderer:Ext.util.Format.fileSize},
+                { id: 'length',  header: _("Characters"),   dataIndex:'length',   width:60 },
+                { id: 'created', header: _("Created"),      dataIndex:'created',  width:90, xtype: 'datecolumn', format: 'M d H:i' },
+                { id: 'updated', header: _("Updated"),      dataIndex:'updated',  width:90, xtype: 'datecolumn', format: 'M d H:i' }
             ]
         });
 
         this.tbar = [
 
             {
+                id: "save",
                 scope:this,
                 disabled: true,
                 ref: "../btnSave",
                 handler: this.cmpSave,
                 cls: "x-btn-text-icon",
                 text: _("Get archive"),
+                icon: _ico("arrow-transition-090")
+            },
+            {
+                id: "savesafe",
+                scope:this,
+                disabled: true,
+                ref: "../btnSaveSafe",
+                handler: this.cmpSaveSafe,
+                cls: "x-btn-text-icon",
+                text: _("Safe download"),
                 icon: _ico("arrow-transition-090")
             },
 
@@ -183,11 +189,12 @@ Inprint.documents.downloads.Main = Ext.extend(Ext.grid.GridPanel, {
 
         this.getSelectionModel().on("selectionchange", function(sm) {
             sm.getCount() == 0 ? this.btnSave.disable() : this.btnSave.enable();
+            sm.getCount() == 0 ? this.btnSaveSafe.disable() : this.btnSaveSafe.enable();
         }, this);
 
     },
 
-    cmpSave: function () {
+    cmpSave: function (params) {
 
         // generate a new unique id
         var frameid = Ext.id();
@@ -213,17 +220,24 @@ Inprint.documents.downloads.Main = Ext.extend(Ext.grid.GridPanel, {
 
         //  create a new form element
         var form = Ext.DomHelper.append(document.body, {
-            tag: 'form',
-            method: 'post',
+            tag: "form",
+            method: "post",
             action: "/downloads/download/",
             target: frameid
         });
 
+        if (params && params.translitEnabled) {
+            var hidden = document.createElement("input");
+            hidden.type = "hidden";
+            hidden.name = "safemode";
+            hidden.value = "true";
+            form.appendChild(hidden);
+        }
+
         Ext.each(this.getSelectionModel().getSelections(), function(record) {
-            // create hidden input element with the 'action'
-            var hidden = document.createElement('input');
-            hidden.type = 'hidden';
-            hidden.name = 'file[]';
+            var hidden = document.createElement("input");
+            hidden.type = "hidden";
+            hidden.name = "file[]";
             hidden.value = record.get("document") +"::"+ record.get("id");
             form.appendChild(hidden);
         });
@@ -231,6 +245,12 @@ Inprint.documents.downloads.Main = Ext.extend(Ext.grid.GridPanel, {
         document.body.appendChild(form);
 
         form.submit();
+    },
+
+    cmpSaveSafe: function() {
+        this.cmpSave({
+            translitEnabled: true
+        });
     }
 
 });

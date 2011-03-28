@@ -13,11 +13,7 @@ use Encode;
 use File::Path;
 use File::Basename;
 use File::stat;
-use MIME::Base64;
-use HTTP::Request;
-use LWP::UserAgent;
-use Image::Magick;
-use Digest::file qw(digest_file_hex);
+use Text::Unidecode;
 
 use base 'Inprint::BaseController';
 
@@ -127,7 +123,8 @@ sub download {
 
     my $c = shift;
 
-    my @i_files = $c->param("file[]");
+    my @i_files     = $c->param("file[]");
+    my $i_safemode  = $c->param("safemode");
 
     my $temp        = $c->uuid;
     my $rootPath    = $c->config->get("store.path");
@@ -156,25 +153,31 @@ sub download {
         next unless ($file->{id});
         next unless ($document->{id});
 
-        my $path1 = "$rootPath/" . $file->{file_path} ."/". $file->{file_name};
-        my $path2 = "$tempFolder/" . $document->{title} ."__". $file->{file_name};
+        my $pathSource  = "$rootPath/" . $file->{file_path} ."/". $file->{file_name};
+        my $pathSymlink = "$tempFolder/" . $document->{title} ."__". $file->{file_name};
 
-        $path1 = __adaptPath($c, $path1);
-        $path1 = __encodePath($c, $path1);
+        if ($i_safemode eq 'true') {
+            $pathSymlink = unidecode($pathSymlink);
+            $pathSymlink =~ s/[^\w|\d|\\|\/|\.|-]//g;
+            $pathSymlink =~ s/\s+/_/g;
+        }
 
-        $path2 = __adaptPath($c, $path2);
-        $path2 = __encodePath($c, $path2);
+        $pathSource = __adaptPath($c, $pathSource);
+        $pathSource = __encodePath($c, $pathSource);
 
-        next unless (-e -r $path1);
+        $pathSymlink = __adaptPath($c, $pathSymlink);
+        $pathSymlink = __encodePath($c, $pathSymlink);
 
-        symlink $path1, $path2;
+        next unless (-e -r $pathSource);
 
-        die "Can't read symlink $path2" unless (-e -r $path2);
+        symlink $pathSource, $pathSymlink;
+
+        die "Can't read symlink $pathSymlink" unless (-e -r $pathSymlink);
 
         $c->sql->Do(" DELETE FROM cache_downloads WHERE member=? AND document=? AND file=? ", [ $currentMember, $document->{id}, $file->{id} ]);
         $c->sql->Do(" INSERT INTO cache_downloads (member, document, file) VALUES (?,?,?) ", [ $currentMember, $document->{id}, $file->{id} ]);
 
-        $fileListString .= ' "'. $path2 .'" ';
+        $fileListString .= ' "'. $pathSymlink .'" ';
     }
 
     my $cmd;
@@ -208,7 +211,7 @@ sub download {
     $headers->add("Content-Length", -s $tempArchive);
     $c->res->content->headers($headers);
 
-    $c->render_static();
+    $c->render_static($tempArchive);
 }
 
 sub __adaptPath {
