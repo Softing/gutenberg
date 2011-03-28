@@ -404,9 +404,6 @@ our %Lexicon = (
     "Edit request"
  => "",
 
-    "Edit text"
- => "",
-
     "Editing of the Module"
  => "",
 
