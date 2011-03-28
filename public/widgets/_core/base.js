@@ -99,6 +99,7 @@ Ext.onReady(function() {
         Inprint.ObjectResolver.resolve({
             aid: params.aid,
             oid: params.oid,
+            pid: params.pid,
             text: params.text,
             description: params.description
         });

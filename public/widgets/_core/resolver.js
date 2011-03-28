@@ -59,11 +59,13 @@ Inprint.ObjectResolver = function() {
                 icon: "/icon/layout.png"
             };
 
-            if (item.oid)  { config.oid = item.oid; }
             if (item.aid)  { config.aid = item.aid; }
+            if (item.oid)  { config.oid = item.oid; }
+            if (item.pid)  { config.pid = item.pid; }
+
             if (item.icon) { config.icon = item.icon; }
 
-            config.title = this.makeTitle(config.oid, config.aid, config.icon, item.text, item.description);
+            config.title = this.makeTitle(config.aid, config.oid, config.pid, config.icon, item.text, item.description);
 
             // Create panel Tools
             var tools = [
@@ -88,7 +90,7 @@ Inprint.ObjectResolver = function() {
             config.tools = tools;
             var xobject = Inprint.registry[item.aid].xobject;
             if (xobject && typeof(xobject) == "function") {
-                config.items = { xtype: config.aid, oid: config.oid };
+                config.items = { xtype: config.aid, oid: config.oid, pid: config.pid };
             } else {
                 config.items = new Ext.Panel({
                     html:"<h1>" + _("Not implemented") + "</h1>"
@@ -116,23 +118,16 @@ Inprint.ObjectResolver = function() {
 
         },
 
-        makeTitle: function(oid, aid, icon, text, description) {
+        makeTitle: function(aid, oid, pid, icon, text, description) {
 
             var title = "<div style=\"padding-left:21px;background:url(" + icon + ") 0px -1px no-repeat;\">";
             title += _(text) ;
             title += "&nbsp;<a href=\"?aid="+ aid +"";
 
-            if (oid) {
-                title += "&oid=" + oid;
-            }
-
-            if (text) {
-                title += "&text=" + text;
-            }
-
-            if (description) {
-                title += "&description=" + description;
-            }
+            if (oid) title += "&oid=" + oid;
+            if (pid) title += "&pid=" + pid;
+            if (text) title += "&text=" + text;
+            if (description) title += "&description=" + description;
 
             title += "\" onClick=\"return false;\">[#]</a>";
             if (description) {
