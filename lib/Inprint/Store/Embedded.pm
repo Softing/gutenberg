@@ -196,9 +196,9 @@ sub fileRead {
     die "Can't find file <$filepath_encoded>" unless -e $filepath_encoded;
     die "Can't read file <$filepath_encoded>" unless -r $filepath_encoded;
 
-    my $text = Inprint::Store::Embedded::Editor::readFile($c, "html", $filepath_encoded);
+    my $returnText = Inprint::Store::Embedded::Editor::readFile($c, "html", $filepath_encoded);
 
-    return $text ;
+    return $returnText;
 }
 
 sub fileSave {
@@ -369,15 +369,14 @@ sub getFolderPath {
         }
     }
 
-    if ($^O eq "MSWin32") {
-        $path =~ s/\//\\/g;
-        $path =~ s/\\+/\\/g;
-    }
+    $path =~ s/\//\\/g  if ($^O eq "MSWin32");
+    $path =~ s/\\+/\\/g if ($^O eq "MSWin32");
 
-    if ($^O eq "linux") {
-        $path =~ s/\\/\//g;
-        $path =~ s/\/+/\//g;
-    }
+    $path =~ s/\\/\//g  if ($^O eq "darwin");
+    $path =~ s/\/+/\//g if ($^O eq "darwin");
+
+    $path =~ s/\\/\//g  if ($^O eq "linux");
+    $path =~ s/\/+/\//g if ($^O eq "linux");
 
     return $path;
 }

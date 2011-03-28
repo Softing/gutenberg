@@ -5,8 +5,9 @@ Inprint.documents.Editor = Ext.extend(Ext.Panel, {
         this.panels = {};
 
         this.panels.form     = new Inprint.documents.editor.FormPanel({
-            parent:this,
-            oid: this.oid
+            parent: this,
+            file: this.oid,
+            document: this.pid
         });
 
         this.panels.versions = new Inprint.documents.editor.Versions({
@@ -79,6 +80,6 @@ Inprint.documents.Editor = Ext.extend(Ext.Panel, {
 Inprint.registry.register("document-editor", {
     icon: "document-word-text",
     text: _("Text editor"),
-    description: _("Text editing"),
+    description: _("Text editor"),
     xobject: Inprint.documents.Editor
 });

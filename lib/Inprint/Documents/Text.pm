@@ -17,40 +17,63 @@ use base 'Inprint::BaseController';
 sub get {
     my $c = shift;
 
-    my $i_oid = $c->param("oid");
-
     my @errors;
-    my $success = $c->json->false;
+    my $access;
+    my $result;
 
-    Inprint::Check::uuid($c, \@errors, "document", $i_oid);
-    my $html = Inprint::Store::Embedded::fileRead($c, $i_oid);
+    my $i_file = $c->param("file");
+    my $i_document = $c->param("document");
 
-    $success = $c->json->true unless (@errors);
-    $c->render_json( { success => $success, errors => \@errors, data => $html } );
+    Inprint::Check::uuid($c, \@errors, "file", $i_file);
+    Inprint::Check::uuid($c, \@errors, "file", $i_document);
+
+    my $file = $c->sql->Q(" SELECT * FROM cache_files WHERE id=? ", $i_file)->Hash;
+    my $document = $c->sql->Q(" SELECT * FROM documents WHERE id=? ", $i_document)->Hash;
+
+    unless (@errors) {
+        $result = Inprint::Store::Embedded::fileRead($c, $file->{id});
+        $result->{access} = Inprint::Documents::Access::get($c, $document->{id});
+    }
+
+    $c->smart_render(\@errors, $result);
+
 }
 
 sub set {
     my $c = shift;
 
-    my $i_oid  = $c->param("oid");
-    my $i_text = $c->param("text");
-
     my $html;
+    my $access;
+
     my @errors;
-    my $success = $c->json->false;
 
-    my $access = Inprint::Documents::Access::get($c, $i_oid);
+    my $i_file = $c->param("file");
+    my $i_text = $c->param("text");
+    my $i_document = $c->param("document");
 
-#    push @errors, { id => "access", msg => "Denide by [files.work]"}
-#        unless ($access->{"files.work"});
+    Inprint::Check::uuid($c, \@errors, "file", $i_file);
+    Inprint::Check::uuid($c, \@errors, "document", $i_document);
+
+    my $file = Inprint::Check::dbrecord($c, \@errors, "cache_files", "file", $i_file);
+    my $document = Inprint::Check::dbrecord($c, \@errors, "documents", "document", $i_document);
 
     unless (@errors) {
-        $html = Inprint::Store::Embedded::fileSave($c, $i_oid, $i_text);
+        $access = Inprint::Documents::Access::get($c, $document->{id});
+
+        if ($access->{"fedit"}) {
+            $html = Inprint::Store::Embedded::fileSave($c, $file->{id}, $i_text);
+        } else {
+            $html = $i_text;
+            push @errors, { id => "access", msg => "Access denide" };
+        }
     }
 
-    $success = $c->json->true unless (@errors);
-    $c->render_json( { success => $success, errors => \@errors, data => $html } );
+    my $result = {
+        text => $html,
+        access => $access
+    };
 
+    $c->smart_render(\@errors, $result);
 }
 
 1;

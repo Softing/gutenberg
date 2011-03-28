@@ -34,7 +34,7 @@ Inprint.documents.GridColumns = function() {
                 }
 
                 var header = String.format(
-                    '<a style="color:{2}" href="/?aid=document-profile&oid={0}&text={1}" '+
+                    '<a style="color:{2}" href="/workspace/?aid=document-profile&oid={0}&text={1}" '+
                         'onClick="'+
                             "Inprint.ObjectResolver.resolve({aid:'document-profile',oid:'{0}',text:'{1}'});"+
                         'return false;">{1}'+
@@ -50,20 +50,17 @@ Inprint.documents.GridColumns = function() {
                 if (links) {
                     for (var f=0; f<links.length;f++) {
 
-                        if (access.fedit) {
-                            linksResult.push(
-                                String.format(
-                                    "<a style=\"color:{2}\" href=\"/?aid=document-editor&oid={0}&text={1}\" "+
-                                        "onClick=\"Inprint.ObjectResolver.resolve({aid:'document-editor',oid:'{0}',text:'{1}'});"+
-                                        "return false;\"><nobr>{1}</nobr></a>",
-                                    links[f].id, links[f].name, "gray"
-                                )
-                            );
-                        } else {
-                            linksResult.push(
-                                String.format("<nobr>{0}</nobr>", links[f].name)
-                            );
+                        var color = "black";
+                        if (!access.fedit) {
+                            color = "gray";
                         }
+
+                        linksResult.push(String.format(
+                            "<a style=\"color:{3}\" href=\"/?aid=document-editor&oid={0}&pid={2}&text={1}\" "+
+                                "onClick=\"Inprint.ObjectResolver.resolve({'aid':'document-editor','oid':'{0}','pid':'{2}','text':'{1}'});return false;\">"+
+                                "<nobr>{1}</nobr></a>",
+                            links[f].id, links[f].name, record.get("id"), color
+                        ));
 
                     }
                 }

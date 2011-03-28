@@ -17,10 +17,10 @@ Inprint.documents.editor.FormPanel = Ext.extend( Ext.form.FormPanel,
                 statusAlign : 'right',
                 items : [
                     {
-                        ref: "../btnSave",
-                        disabled:true,
                         scope : this,
-                        text : '<b>Сохранить текст</b>',
+                        disabled:true,
+                        ref: "../btnSave",
+                        text : _("Save"),
                         cls : 'x-btn-text-icon',
                         icon: _ico("disk-black"),
                         handler : function() {
@@ -34,6 +34,19 @@ Inprint.documents.editor.FormPanel = Ext.extend( Ext.form.FormPanel,
         });
 
         Inprint.documents.editor.FormPanel.superclass.initComponent.apply(this, arguments);
+    },
+
+    // Override other inherited methods
+    onRender: function() {
+
+        Inprint.documents.editor.FormPanel.superclass.onRender.apply(this, arguments);
+
+        this.getForm().timeout = 15;
+        this.getForm().url = '/documents/text/set/';
+        this.getForm().baseParams = {
+            file: this.file,
+            document: this.document
+        };
 
         this.on('beforeaction', function() {
             this.body.mask(_("Saving text") + '...');
@@ -42,29 +55,28 @@ Inprint.documents.editor.FormPanel = Ext.extend( Ext.form.FormPanel,
 
         this.on('actionfailed', function() {
             this.body.unmask();
-            this.btnSave.enable();
-            Ext.MessageBox.alert(_("Error"), _("Unable to save text"));
+            var rspns = Ext.util.JSON.decode(action.response.responseText);
+            if (rspns.data.error) {
+                Ext.MessageBox.alert( _("Error"), rspns.data.error);
+            } else {
+                Ext.MessageBox.alert(_("Error"), _("Unable to save text"));
+            }
+            if (rspns.data.access ) {
+                rspns.data.access.fedit? this.btnSave.enable() : this.btnSave.disable();
+            }
+
         }, this);
 
-    },
-
-    // Override other inherited methods
-    onRender: function() {
-
-        Inprint.documents.editor.FormPanel.superclass.onRender.apply(this, arguments);
-
-        this.getForm().timeout = 5;
-        this.getForm().url = '/documents/text/set/';
-        this.getForm().baseParams = {
-            oid: this.oid
-        };
-
-        this.on('actioncomplete', function() {
-
+        this.on('actioncomplete', function(form, action) {
             this.body.unmask();
-            this.btnSave.enable();
-
             this.parent.cmpReload();
+            var rspns = Ext.util.JSON.decode(action.response.responseText);
+            if (rspns.data.error) {
+                Ext.MessageBox.alert( _("Error"), rspns.data.error);
+            }
+            if (rspns.data.access ) {
+                rspns.data.access.fedit? this.btnSave.enable() : this.btnSave.disable();
+            }
 
         }, this);
 
@@ -75,31 +87,33 @@ Inprint.documents.editor.FormPanel = Ext.extend( Ext.form.FormPanel,
 
         this.editor.on('initialize', function() {
 
-            this.body.mask(_("Loading text"));
+            this.body.mask(_("Loading data..."));
 
             Ext.Ajax.request({
                 url : '/documents/text/get/',
                 scope : this,
                 params : {
-                    oid : this.oid
+                    file : this.file,
+                    document: this.document
                 },
-                success : function(response, options)
-                {
-                    var rspns = Ext.util.JSON.decode(response.responseText);
+                callback:  function(options, success, response) {
                     this.body.unmask();
-
-                    this.editor.setValue(rspns.data);
-                    this.btnSave.enable();
-
+                    var rspns = Ext.util.JSON.decode(response.responseText);
+                    if (rspns.data.error) {
+                        Ext.MessageBox.alert( _("Error"), rspns.data.error);
+                    }
+                    if (rspns.data.access ) {
+                        rspns.data.access.fedit? this.btnSave.enable() : this.btnSave.disable();
+                    }
+                },
+                success: function(response, options) {
+                    var rspns = Ext.util.JSON.decode(response.responseText);
+                    this.editor.setValue(rspns.data.text);
                 },
                 failure : function(response, options) {
-                    this.body.unmask();
-                    this.getBottomToolbar().items.get('save').enable();
-                    Ext.MessageBox.alert('Ошибка!', 'Операция не удалась, текст не получен');
+                    Ext.MessageBox.alert( _("Error"), _("Operation failed"));
                 }
             }, this);
-
-            var count = this.CmpGetCharCount( this.editor.getValue() );
 
          }, this);
 

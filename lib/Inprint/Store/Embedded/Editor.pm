@@ -19,21 +19,25 @@ use HTML::Scrubber;
 use Inprint::Store::Embedded::Utils;
 
 sub readFile {
+
     my ($c, $filetype, $filepath) = @_;
 
-    my $result;
+    my $responce = {};
 
     my $extension = __getExtension($c, $filepath);
 
     if ($extension ~~ ["doc", "docx", "odt", "rtf"]) {
 
-        my $response = convert($c, $filepath, $extension, "html");
+        $responce = convert($c, $filepath, $extension, "html");
 
         if ($^O eq "linux") {
-            $result = Encode::decode_utf8( $response->{responseBody} );
+            $responce->{text} = Encode::decode_utf8( $responce->{text} );
+        }
+        if ($^O eq "darwin") {
+            $responce->{text} = Encode::decode_utf8( $responce->{text} );
         }
         if ($^O eq "MSWin32") {
-            $result = Encode::decode("windows-1251", $response->{responseBody} );
+            $responce->{text} = Encode::decode("windows-1251", $responce->{text} );
         }
 
     }
@@ -41,19 +45,19 @@ sub readFile {
     if ($extension ~~ ["txt"]) {
 
         open my $FILE, "<", $filepath;
-        while (<$FILE>) { $result .= $_; }
+        while (<$FILE>) { $responce->{text} .= $_; }
         close $FILE;
 
         if ($^O eq "MSWin32") {
-            $result = Encode::decode("windows-1251", $result);
+            $responce->{text} = Encode::decode("windows-1251", $responce->{text});
         }
 
-        $result =~ s/\r?\n/<br>/g;
+        $responce->{text} =~ s/\r?\n/<br>/g;
     }
 
-    $result = __clearHtml($result);
+    $responce->{text} = __clearHtml($responce->{text});
 
-    return $result;
+    return $responce;
 }
 
 sub writeFile {
@@ -73,7 +77,7 @@ sub writeFile {
 
         open my $FILE, ">", "$filepath.$extension" || die "Can't open <$filepath> : $!";
         binmode $FILE;
-            print $FILE $response->{responseBody};
+            print $FILE $response->{text};
         close $FILE;
 
     }
@@ -91,7 +95,7 @@ sub writeFile {
 
         open my $TMPFILE, ">", $tmpFilePath || die "Can't open <$tmpFilePath> : $!";
         binmode $TMPFILE;
-            print $TMPFILE $response1->{responseBody};
+            print $TMPFILE $response1->{text};
         close $TMPFILE;
 
         die "Can't read tmp file <$tmpFilePath>" unless -r $tmpFilePath;
@@ -100,7 +104,7 @@ sub writeFile {
 
         open my $FILE, ">", $filepath || die "Can't read <$filepath> : $!";
         binmode $FILE;
-            print $FILE $response2->{responseBody};
+            print $FILE $response2->{text};
         close $FILE;
 
         my $relativePath = Inprint::Store::Embedded::Utils::getRelativePath($c, $basepath);
@@ -224,28 +228,7 @@ sub getMetadata {
 
         $ooRequest->content( $fileContent );
 
-        my $responseBody;
-        my $ParagraphCount = 0;
-        my $CharacterCount = 0;
-        my $WordCount = 0;
-
-        my $ooResponse = $ooUagent->request($ooRequest);
-        if ($ooResponse->is_success()) {
-
-            $ParagraphCount = $ooResponse->header("Softing-Meta-WordCount");
-            $CharacterCount = $ooResponse->header("Softing-Meta-CharacterCount");
-            $WordCount = $ooResponse->header("Softing-Meta-WordCount");
-
-        } else {
-            die $ooResponse->as_string;
-        }
-
-        $metadata = {
-            responseBody => $responseBody,
-            ParagraphCount => $ParagraphCount,
-            CharacterCount => $CharacterCount,
-            WordCount => $WordCount
-        };
+        $metadata = __processResponce($c, $ooUagent->request($ooRequest));
 
     }
 
@@ -289,33 +272,38 @@ sub convert {
 
     $ooRequest->content( $fileContent );
 
-    my $responseBody;
-    my $ParagraphCount = 0;
-    my $CharacterCount = 0;
-    my $WordCount = 0;
+    my $result = __processResponce($c, $ooUagent->request($ooRequest));
 
-    my $ooResponse = $ooUagent->request($ooRequest);
-    if ($ooResponse->is_success()) {
-
-        $ParagraphCount = $ooResponse->header("Softing-Meta-WordCount");
-        $CharacterCount = $ooResponse->header("Softing-Meta-CharacterCount");
-        $WordCount = $ooResponse->header("Softing-Meta-WordCount");
-
-        $responseBody = MIME::Base64::decode($ooResponse->content);
-
-    } else {
-        die $ooResponse->as_string;
-    }
-
-    return {
-        responseBody => $responseBody,
-        ParagraphCount => $ParagraphCount,
-        CharacterCount => $CharacterCount,
-        WordCount => $WordCount
-    }
+    return $result;
 }
 
 ################################################################################
+
+sub __processResponce {
+    my ($c, $response) = @_;
+
+    my $result;
+
+    if ($response->is_success()) {
+        $result = {
+            text            => MIME::Base64::decode($response->content),
+            ParagraphCount  => $response->header("Softing-Meta-WordCount"),
+            CharacterCount  => $response->header("Softing-Meta-CharacterCount"),
+            WordCount       => $response->header("Softing-Meta-WordCount")
+        }
+    } else {
+        print STDERR $response->as_string;
+        $result = {
+            text            => "",
+            error           => $response->as_string,
+            ParagraphCount  => 0,
+            CharacterCount  => 0,
+            WordCount       => 0
+        }
+    }
+
+    return $result;
+}
 
 sub __getExtension {
     my ($c, $filepath) = @_;
@@ -330,15 +318,15 @@ sub __clearPath {
 
     my ($c, $filepath) = @_;
 
-    if ($^O eq "MSWin32") {
-        $filepath =~ s/\//\\/g;
-        $filepath =~ s/\\+/\\/g;
-    }
+    $filepath =~ s/\//\\/g  if ($^O eq "MSWin32");
+    $filepath =~ s/\\+/\\/g if ($^O eq "MSWin32");
 
-    if ($^O eq "linux") {
-        $filepath =~ s/\\/\//g;
-        $filepath =~ s/\/+/\//g;
-    }
+    $filepath =~ s/\\/\//g  if ($^O eq "darwin");
+    $filepath =~ s/\/+/\//g if ($^O eq "darwin");
+
+
+    $filepath =~ s/\\/\//g  if ($^O eq "linux");
+    $filepath =~ s/\/+/\//g if ($^O eq "linux");
 
     return $filepath;
 }
