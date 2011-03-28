@@ -98,7 +98,7 @@ Inprint.plugins.rss.Profile = Ext.extend(Ext.Panel, {
         };
 
         this.cmpAccess();
-        this.getEl().mask(_("Loading") + "...");
+        this.getEl().mask(_("Loading data...") + "...");
 
         this.form.load({
             url: this.urls.read,

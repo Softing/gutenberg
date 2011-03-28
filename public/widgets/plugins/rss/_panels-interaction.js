@@ -5,7 +5,7 @@ Inprint.plugins.rss.Interaction = function(parent, panels) {
 
     profile.on("render", function() {
         var el = this.getEl();
-        setTimeout(function() { el.mask("Please, select document"); }, 10);
+        setTimeout(function() { el.mask( _("Please, select document") ); }, 10);
     }, profile);
 
     profile.panels.form.on("actioncomplete", function (form, action) {
@@ -24,10 +24,10 @@ Inprint.plugins.rss.Interaction = function(parent, panels) {
            profile.cmpFill(sm.getSelected().get("id"));
         }
         if (sm.getCount() > 1) {
-            profile.getEl().mask("Please, select document");
+            profile.getEl().mask( _("Please, select document") );
         }
         if (sm.getCount() === 0) {
-            profile.getEl().mask("Please, select document");
+            profile.getEl().mask( _("Please, select document") );
         }
     });
 

@@ -77,7 +77,7 @@ Inprint.plugins.rss.control.Grid = Ext.extend(Ext.grid.GridPanel, {
         this.getSelectionModel().clearSelections();
         this.getStore().rejectChanges();
 
-        this.body.mask(_("Loading"));
+        this.body.mask(_("Loading data..."));
 
         Ext.Ajax.request({
             url: this.urls.fill,

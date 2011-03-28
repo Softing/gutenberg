@@ -46,7 +46,7 @@ Inprint.plugins.rss.control.Tree = Ext.extend(Ext.tree.TreePanel, {
         this.getRootNode().on("expand", function(node) {
             node.firstChild.select();
         });
-        this.getLoader().on("beforeload", function() { this.body.mask(_("Loading")); }, this);
+        this.getLoader().on("beforeload", function() { this.body.mask(_("Loading data...")); }, this);
         this.getLoader().on("load", function() { this.body.unmask(); }, this);
         this.getRootNode().expand();
     },
@@ -151,7 +151,7 @@ Inprint.plugins.rss.control.Tree = Ext.extend(Ext.tree.TreePanel, {
         }
 
         win.show(this);
-        win.body.mask(_("Loading..."));
+        win.body.mask(_("Loading data..."));
         this.components["edit-window"] = win;
 
         var form = win.items.first().getForm();

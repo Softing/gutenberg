@@ -11,19 +11,17 @@ Inprint.plugins.rss.Grid = Ext.extend(Ext.grid.EditorGridPanel, {
             "list": _url("/plugin/rss/list/")
         };
 
-        var fields = Inprint.factory.StoreFields["/documents/list/"];
+        var fields = Inprint.store.Columns.documents.list;
         fields.push("rss_id", "rss_published", "rss_sortorder");
 
-        this.store = new Ext.data.JsonStore(Ext.apply(
-            Inprint.factory.StoreDefaults, {
-                autoLoad:true,
-                remoteSort: true,
-                totalProperty: 'total',
-                url: this.urls.list,
-                baseParams: { flt_rssonly: false },
-                fields: fields
-            })
-        );
+        this.store = Inprint.factory.Store.json( "/documents/list/" , {
+            autoLoad:true,
+            remoteSort: true,
+            totalProperty: 'total',
+            url: this.urls.list,
+            baseParams: { flt_rssonly: false },
+            fields: fields
+        });
 
         this.sm = new Ext.grid.CheckboxSelectionModel();
 
@@ -145,16 +143,12 @@ Inprint.plugins.rss.Grid = Ext.extend(Ext.grid.EditorGridPanel, {
 
                     var css = '';
 
-                    //if (Inprint.session.member && Inprint.session.member.id == record.get("manager") ) {
-                    //    css = 'inprint-document-grid-current-manager-bg';
-                    //}
-
                     if (record.get("rss_id") ) {
-                        css = 'inprint-document-grid-current-department-bg';
+                        css = "inprint-grid-yellow-bg";
                     }
 
                     if (record.get("rss_published") ) {
-                        css = 'inprint-document-grid-current-user-bg';
+                        css = "inprint-grid-green-bg";
                     }
 
                     return css;
