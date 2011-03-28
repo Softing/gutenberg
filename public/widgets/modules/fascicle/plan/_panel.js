@@ -78,7 +78,7 @@ Inprint.fascicle.plan.Panel = Ext.extend(Ext.Panel, {
                 description += '&nbsp;[Полос&nbsp;'+ rsp.fascicle.pc +'='+ rsp.fascicle.dc +'+'+ rsp.fascicle.ac;
                 description += '&nbsp;|&nbsp;'+ rsp.fascicle.dav +'%/'+ rsp.fascicle.aav +'%]';
 
-                var title = Inprint.ObjectResolver.makeTitle(this.parent.oid, this.parent.aid, this.parent.icon, shortcut, description);
+                var title = Inprint.ObjectResolver.makeTitle(this.parent.aid, this.parent.oid, null, this.parent.icon, shortcut, description);
                 this.parent.setTitle(title);
 
                 this.panels.pages.getStore().loadData({ data: rsp.pages });
