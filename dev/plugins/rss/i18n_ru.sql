@@ -14,13 +14,19 @@ INSERT INTO plugins.l18n (plugin, l18n_language, l18n_original, l18n_translation
     VALUES ('rss', 'ru', 'RSS feeds', 'RSS ленты');
 
 INSERT INTO plugins.l18n (plugin, l18n_language, l18n_original, l18n_translation)
+    VALUES ('rss', 'ru', 'Access denide', 'Доступ запрещен');
+
+INSERT INTO plugins.l18n (plugin, l18n_language, l18n_original, l18n_translation)
+    VALUES ('rss', 'ru', 'Please, select document', 'Пожалуйста, выберите материал');
+
+INSERT INTO plugins.l18n (plugin, l18n_language, l18n_original, l18n_translation)
     VALUES ('rss', 'ru', 'Publish', 'Опубликовать');
 
 INSERT INTO plugins.l18n (plugin, l18n_language, l18n_original, l18n_translation)
     VALUES ('rss', 'ru', 'Unpublish', 'Снять с публикации');
 
 INSERT INTO plugins.l18n (plugin, l18n_language, l18n_original, l18n_translation)
-    VALUES ('rss', 'ru', 'Show...', 'Показать...');
+    VALUES ('rss', 'ru', 'Show', 'Показать');
 
 INSERT INTO plugins.l18n (plugin, l18n_language, l18n_original, l18n_translation)
     VALUES ('rss', 'ru', 'Show all', 'Показать все');
