@@ -29,7 +29,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
             autoLoad:false,
             url: _url("/documents/files/list/"),
             baseParams: { document: this.config.document },
-            fields: [ "id", "name", "description", "mime", "extension", "published",  "size", "length", "created", "updated" ]
+            fields: [ "id", "document", "name", "description", "mime", "extension", "published",  "size", "length", "created", "updated" ]
         });
 
         // Column model
@@ -52,11 +52,28 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
                 width: 100,
                 dataIndex: "id",
                 sortable: false,
+                scope: this,
                 renderer: function(v, p, record) {
+
                     if(record.get("name").match(/^.+\.(jpg|jpeg|png|gif|tiff|png)$/i)) {
-                        return  '<a target="_blank" href="/files/preview/'+ v +'"><img src="/files/preview/'+ v +'x80" style="border:1px solid silver;"/></a>';
+                        return  String.format(
+                            "<a target=\"_blank\" href=\"/files/preview/{0}\"><img src=\"/files/preview/{0}x80\" style=\"border:1px solid silver;\"/></a>",
+                        v);
                     }
-                    return  '<a target="_blank" href="/files/download/'+ v +'"><img src="/files/preview/'+ v +'x80" style="border:1px solid silver;"/></a>';
+
+                    if(record.get("name").match(/^.+\.(rtf|txt|doc|docx|odt)$/i)) {
+                        var file     = record.get("id");
+                        var filename = record.get("name");
+                        var document = record.get("document");
+                        return String.format(
+                            "<a href=\"/?aid=document-editor&oid={0}&pid={1}&text={2}\" "+
+                                "onClick=\"Inprint.ObjectResolver.resolve({'aid':'document-editor','oid':'{0}','pid':'{1}','description':'{2}'});return false;\">"+
+                                "<img src=\"/files/preview/{3}x80\" style=\"border:1px solid silver;\"/></a></a>",
+                            file, document, escape(filename), v
+                        );
+                    }
+
+                    return String.format("<img src=\"/files/preview/{0}x80\" style=\"border:1px solid silver;\"/></a>", v);
                 }
             },
             { id:'name', header: _("File"),dataIndex:'name', width:250},
@@ -133,21 +150,6 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
 
         Inprint.documents.Profile.Files.superclass.onRender.apply(this, arguments);
 
-        this.on("rowdblclick", function(thisGrid, rowIndex, evtObj) {
-            evtObj.stopEvent();
-            var record = thisGrid.getStore().getAt(rowIndex);
-            if(record.get("name").match(/^.+\.(doc|docx|odt|rtf|txt)$/i)) {
-                if (this.access["fedit"]  === true) {
-                    Inprint.ObjectResolver.resolve({
-                        aid: "document-editor",
-                        oid:  record.get("id"),
-                        text: record.get("filename"),
-                        description: _("Text editing")
-                    });
-                }
-            }
-        }, this);
-
         this.on("rowcontextmenu", function(thisGrid, rowIndex, evtObj) {
 
             evtObj.stopEvent();
@@ -159,24 +161,27 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
 
             if ( selCount > 0 ) {
 
-                if (this.access["fedit"]  === true) {
-                    if ( selCount == 1 ) {
-                        if(record.get("name").match(/^.+\.(doc|docx|odt|rtf|txt)$/i)) {
-                            rowCtxMenuItems.push({
-                                icon: _ico("pencil"),
-                                cls: "x-btn-text-icon",
-                                text: _("Edit Text"),
-                                scope:this,
-                                handler : function() {
-                                    Inprint.ObjectResolver.resolve({
-                                        aid: "document-editor",
-                                        oid:  record.get("id"),
-                                        text: record.get("filename"),
-                                        description: _("Text editing")
-                                    });
-                                }
-                            });
-                        }
+                if ( selCount == 1 ) {
+                    if(record.get("name").match(/^.+\.(doc|docx|odt|rtf|txt)$/i)) {
+
+                        var btnIcon = (this.access["fedit"]  === true) ? _ico("pencil") : _ico("pencil");
+                        var btnText = (this.access["fedit"]  === true) ? _("Edit text") : _("View text");
+
+                        rowCtxMenuItems.push({
+                            scope:this,
+                            icon: btnIcon,
+                            text: btnText,
+                            cls: "x-btn-text-icon",
+                            handler : function() {
+                                Inprint.ObjectResolver.resolve({
+                                    aid: "document-editor",
+                                    oid: record.get("id"),
+                                    pid: record.get("document"),
+                                    description: escape(record.get("filename"))
+                                });
+                            }
+                        });
+
                     }
                 }
 

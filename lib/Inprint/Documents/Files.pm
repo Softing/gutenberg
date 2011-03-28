@@ -32,6 +32,10 @@ sub list {
         $result = Inprint::Store::Cache::getRecordsByPath($c, $folder, "all", ['doc', 'xls', 'rtf', 'odt', 'png', 'jpg', 'gif']);
     }
 
+    foreach my $item (@$result) {
+        $item->{document} = $document->{id};
+    }
+
     $success = $c->json->true unless (@errors);
     $c->render_json({ success => $success, errors => \@errors, data => $result });
 }

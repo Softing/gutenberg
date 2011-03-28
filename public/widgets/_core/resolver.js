@@ -65,7 +65,7 @@ Inprint.ObjectResolver = function() {
 
             if (item.icon) { config.icon = item.icon; }
 
-            config.title = this.makeTitle(config.aid, config.oid, config.pid, config.icon, item.text, item.description);
+            config.title = this.makeTitle(config.aid, config.oid, config.pid, config.icon, unescape(item.text), unescape(item.description));
 
             // Create panel Tools
             var tools = [

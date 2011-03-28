@@ -50,16 +50,16 @@ Inprint.documents.GridColumns = function() {
                 if (links) {
                     for (var f=0; f<links.length;f++) {
 
-                        var color = "black";
-                        if (!access.fedit) {
-                            color = "gray";
-                        }
+                        var color    = (access.fedit) ? "black" : "gray";
+                        var text     = links[f].name;
+                        var file     = links[f].id;
+                        var document = record.get("id");
 
                         linksResult.push(String.format(
-                            "<a style=\"color:{3}\" href=\"/?aid=document-editor&oid={0}&pid={2}&text={1}\" "+
-                                "onClick=\"Inprint.ObjectResolver.resolve({'aid':'document-editor','oid':'{0}','pid':'{2}','text':'{1}'});return false;\">"+
-                                "<nobr>{1}</nobr></a>",
-                            links[f].id, links[f].name, record.get("id"), color
+                            "<a style=\"color:{3}\" href=\"/?aid=document-editor&oid={0}&pid={1}&text={2}\" "+
+                                "onClick=\"Inprint.ObjectResolver.resolve({'aid':'document-editor','oid':'{0}','pid':'{1}','description':'{2}'});return false;\">"+
+                                "<nobr>{2}</nobr></a>",
+                            file, document, escape(text) , color
                         ));
 
                     }
