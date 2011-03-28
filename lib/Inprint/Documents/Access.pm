@@ -19,27 +19,13 @@ sub get {
     my $document = $c->sql->Q(" SELECT * FROM documents WHERE id=? ", [ $id ])->Hash;
 
     my %access = ();
-
-    my @rules = qw(
-       documents.update
-       documents.capture
-       documents.move
-       documents.transfer
-       documents.briefcase
-       documents.delete
-       documents.recover
-       documents.discuss
-       files.add
-       files.delete
-       files.work
-    );
-
     my $current_member = $c->QuerySessionGet("member.id");
+    my @rules = qw( update capture move transfer briefcase delete recover discuss fadd fdelete fedit );
 
     foreach (@rules) {
 
         if ($document->{holder} eq $current_member) {
-            if ($c->access->Check(["catalog.$_:*"], $document->{workgroup})) {
+            if ($c->access->Check(["catalog.documents.$_:*"], $document->{workgroup})) {
                 $access{$_} = 1;
             } else {
                 $access{$_} = 0;
@@ -47,7 +33,7 @@ sub get {
         }
 
         if ($document->{holder} ne $current_member) {
-            if ($c->access->Check("catalog.$_:group", $document->{workgroup})) {
+            if ($c->access->Check("catalog.documents.$_:group", $document->{workgroup})) {
                 $access{$_} = 1;
             } else {
                 $access{$_} = 0;
