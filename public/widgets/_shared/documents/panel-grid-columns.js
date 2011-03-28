@@ -166,7 +166,7 @@ Inprint.documents.GridColumns = function() {
             }
         },
 
-        manager:{
+        manager: {
             id:"manager",
             dataIndex: "manager_shortcut",
             header: _("Manager"),
@@ -179,7 +179,7 @@ Inprint.documents.GridColumns = function() {
             }
         },
 
-        holder:{
+        holder: {
             id:"holder",
             dataIndex: "holder_shortcut",
             header: _("Holder"),
@@ -192,14 +192,14 @@ Inprint.documents.GridColumns = function() {
             }
         },
 
-        images:{
+        images: {
             id:"images",
             dataIndex: "images",
             header : '<img src="'+ _ico("camera") +'">',
             width:30
         },
 
-        size:{
+        size: {
             id:"size",
             dataIndex: "rsize",
             header : '<img src="'+ _ico("edit") +'">',
@@ -226,7 +226,7 @@ Inprint.documents.GridColumns = function() {
         },
 
         updated: {
-            id:"Updated",
+            id:"updated",
             hidden:true,
             dataIndex: "updated",
             header: _("Updated"),
