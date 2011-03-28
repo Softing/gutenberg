@@ -239,8 +239,9 @@ Inprint.documents.Grid = Ext.extend(Inprint.grid.GridPanel, {
             this.cmpLoad({ params: Ext.apply({start:0, limit:60}, params) }, true);
         }, this);
 
-        this.on("dblclick", function(e){
-            Inprint.ObjectResolver.resolve({ aid:'document-profile', oid:this.getValue("id"), text:this.getValue("title") });
+        this.on("rowdblclick", function(grid, index, e){
+            var record = grid.getStore().getAt(index);
+            Inprint.ObjectResolver.resolve({ aid:'document-profile', oid: record.get("id"), description: escape(record.get("title")) });
         }, this);
 
     }
