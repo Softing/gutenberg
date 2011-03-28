@@ -269,6 +269,16 @@ sub principal {
     return $item;
 }
 
+# Comomn
+
+sub dbrecord {
+    my ($c, $errors, $table, $title, $id) = @_;
+    undef my $item;
+    $item = $c->sql->Q(" SELECT * FROM $table WHERE id=? ", [ $id ])->Hash unless (@$errors);
+    push @$errors, { id => $title, msg => "Can't find record"} unless ($item->{id});
+    return $item;
+}
+
 # Render error
 
 sub checkErrors {
