@@ -108,8 +108,8 @@ sub download {
         $c->res->content->asset(Mojo::Asset::File->new(path => $filepath));
 
         my $headers = Mojo::Headers->new;
-        $headers->add("Content-Type", "$mimetype;name=$filename");
-        $headers->add("Content-Disposition", "attachment;filename=$filename");
+        $headers->add("Content-Type", "$mimetype; name=$filename");
+        $headers->add("Content-Disposition", "attachment; filename=$filename");
         $headers->add("Content-Description", $extension);
         $c->res->content->headers($headers);
 
