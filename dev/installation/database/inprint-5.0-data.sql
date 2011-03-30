@@ -1,3 +1,8 @@
+-- Inprint Content 5.0
+-- Copyright(c) 2001-2010, Softing, LLC.
+-- licensing@softing.ru
+-- http://softing.ru/license
+
 -------------------------------------------------------------------------------------------------
 -- System Rules
 -------------------------------------------------------------------------------------------------
@@ -75,13 +80,13 @@ INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, descrip
 VALUES ('5b27108a-2108-4846-a0a8-3c369f873590', 'catalog', 'documents', 'update', 60, 'Can edit the profile', 'key', '');
 
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
-VALUES ('bff78ebf-2cba-466e-9e3c-89f13a0882fc', 'catalog', 'files', 'work', 70, 'Can work with files', 'key', '');
+VALUES ('bff78ebf-2cba-466e-9e3c-89f13a0882fc', 'catalog', 'documents', 'fedit', 70, 'Can work with files', 'key', '');
 
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
-VALUES ('f4ad42ed-b46b-4b4e-859f-1b69b918a64a', 'catalog', 'files', 'add', 80, 'Can add files', 'key', '');
+VALUES ('f4ad42ed-b46b-4b4e-859f-1b69b918a64a', 'catalog', 'documents', 'fadd', 80, 'Can add files', 'key', '');
 
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
-VALUES ('fe9cd446-2f4b-4844-9b91-5092c0cabece', 'catalog', 'files', 'delete', 90, 'Can delete files', 'key', '');
+VALUES ('fe9cd446-2f4b-4844-9b91-5092c0cabece', 'catalog', 'documents', 'fdelete', 90, 'Can delete files', 'key', '');
 
 INSERT INTO rules(id, section, subsection, term, sortorder, title, icon, description)
 VALUES ('d782679e-3f0a-4499-bda6-8c2600a3e761', 'catalog', 'documents', 'capture', 100, 'Can capture documents', 'key', '');

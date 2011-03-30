@@ -1,0 +1,63 @@
+-- Inprint Content 5.0
+-- Copyright(c) 2001-2010, Softing, LLC.
+-- licensing@softing.ru
+-- http://softing.ru/license
+
+GRANT ALL ON plugins.l18n TO inprint;
+GRANT ALL ON plugins.menu TO inprint;
+GRANT ALL ON plugins.routes TO inprint;
+GRANT ALL ON plugins.rules TO inprint;
+GRANT ALL ON public.ad_advertisers TO inprint;
+GRANT ALL ON public.ad_index TO inprint;
+GRANT ALL ON public.ad_modules TO inprint;
+GRANT ALL ON public.ad_pages TO inprint;
+GRANT ALL ON public.ad_places TO inprint;
+GRANT ALL ON public.ad_requests TO inprint;
+GRANT ALL ON public.branches TO inprint;
+GRANT ALL ON public.cache_access TO inprint;
+GRANT ALL ON public.cache_files TO inprint;
+GRANT ALL ON public.cache_hotsave TO inprint;
+GRANT ALL ON public.cache_versions TO inprint;
+GRANT ALL ON public.cache_visibility TO inprint;
+GRANT ALL ON public.catalog TO inprint;
+GRANT ALL ON public.comments TO inprint;
+GRANT ALL ON public.documents TO inprint;
+GRANT ALL ON public.editions TO inprint;
+GRANT ALL ON public.editions_options TO inprint;
+GRANT ALL ON public.fascicles TO inprint;
+GRANT ALL ON public.fascicles_indx_headlines TO inprint;
+GRANT ALL ON public.fascicles_indx_rubrics TO inprint;
+GRANT ALL ON public.fascicles_map_documents TO inprint;
+GRANT ALL ON public.fascicles_map_modules TO inprint;
+GRANT ALL ON public.fascicles_map_requests TO inprint;
+GRANT ALL ON public.fascicles_modules TO inprint;
+GRANT ALL ON public.fascicles_options TO inprint;
+GRANT ALL ON public.fascicles_pages TO inprint;
+GRANT ALL ON public.fascicles_requests TO inprint;
+GRANT ALL ON public.fascicles_tmpl_index TO inprint;
+GRANT ALL ON public.fascicles_tmpl_modules TO inprint;
+GRANT ALL ON public.fascicles_tmpl_pages TO inprint;
+GRANT ALL ON public.fascicles_tmpl_places TO inprint;
+GRANT ALL ON public.history TO inprint;
+GRANT ALL ON public.indx_headlines TO inprint;
+GRANT ALL ON public.indx_rubrics TO inprint;
+GRANT ALL ON public.indx_tags TO inprint;
+GRANT ALL ON public.logs TO inprint;
+GRANT ALL ON public.map_member_to_catalog TO inprint;
+GRANT ALL ON public.map_member_to_rule TO inprint;
+GRANT ALL ON public.map_principals_to_stages TO inprint;
+GRANT ALL ON public.map_role_to_rule TO inprint;
+GRANT ALL ON public.members TO inprint;
+GRANT ALL ON public.migration TO inprint;
+GRANT ALL ON public.options TO inprint;
+GRANT ALL ON public.profiles TO inprint;
+GRANT ALL ON public.readiness TO inprint;
+GRANT ALL ON public.roles TO inprint;
+GRANT ALL ON public.rss TO inprint;
+GRANT ALL ON public.rss_feeds TO inprint;
+GRANT ALL ON public.rss_feeds_mapping TO inprint;
+GRANT ALL ON public.rss_feeds_options TO inprint;
+GRANT ALL ON public.rules TO inprint;
+GRANT ALL ON public.sessions TO inprint;
+GRANT ALL ON public.stages TO inprint;
+GRANT ALL ON public.state TO inprint;

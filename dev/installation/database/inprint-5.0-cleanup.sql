@@ -1,3 +1,8 @@
+-- Inprint Content 5.0
+-- Copyright(c) 2001-2010, Softing, LLC.
+-- licensing@softing.ru
+-- http://softing.ru/license
+
 DELETE FROM ad_advertisers;
 DELETE FROM ad_modules;
 DELETE FROM ad_places;

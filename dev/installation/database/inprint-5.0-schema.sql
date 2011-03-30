@@ -1,10 +1,11 @@
+-- Inprint Content 5.0
+-- Copyright(c) 2001-2010, Softing, LLC.
+-- licensing@softing.ru
+-- http://softing.ru/license
+
 --
 -- PostgreSQL database dump
 --
-
--- Dumped from database version 8.4.5
--- Dumped by pg_dump version 9.0.1
--- Started on 2010-12-23 01:24:18
 
 SET statement_timeout = 0;
 SET client_encoding = 'UTF8';
@@ -13,28 +14,52 @@ SET check_function_bodies = false;
 SET client_min_messages = warning;
 SET escape_string_warning = off;
 
+BEGIN;
+
 --
--- TOC entry 535 (class 2612 OID 16386)
--- Name: plpgsql; Type: PROCEDURAL LANGUAGE; Schema: -; Owner: -
+-- Name: plugins; Type: SCHEMA; Schema: -; Owner: inprint
 --
 
-CREATE PROCEDURAL LANGUAGE plpgsql;
+CREATE SCHEMA plugins;
 
+
+ALTER SCHEMA plugins OWNER TO inprint;
+
+--
+-- Name: plpgsql; Type: PROCEDURAL LANGUAGE; Schema: -; Owner: inprint
+--
 
 SET search_path = public, pg_catalog;
 
 --
--- TOC entry 385 (class 0 OID 0)
--- Name: lquery; Type: SHELL TYPE; Schema: public; Owner: -
+-- Name: lquery; Type: SHELL TYPE; Schema: public; Owner: inprint
 --
+
+-- CREATE LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION make_plpgsql()
+RETURNS VOID
+LANGUAGE SQL
+AS $$
+CREATE LANGUAGE plpgsql;
+$$;
+
+SELECT
+    CASE
+    WHEN EXISTS(
+        SELECT 1
+        FROM pg_catalog.pg_language
+        WHERE lanname='plpgsql'
+    )
+    THEN NULL
+    ELSE make_plpgsql() END;
+
+DROP FUNCTION make_plpgsql();
 
 CREATE TYPE lquery;
 
-
 --
--- TOC entry 8 (class 1255 OID 78145)
--- Dependencies: 3 385
--- Name: lquery_in(cstring); Type: FUNCTION; Schema: public; Owner: -
+-- Name: lquery_in(cstring); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION lquery_in(cstring) RETURNS lquery
@@ -42,10 +67,10 @@ CREATE FUNCTION lquery_in(cstring) RETURNS lquery
     AS '$libdir/ltree', 'lquery_in';
 
 
+ALTER FUNCTION public.lquery_in(cstring) OWNER TO inprint;
+
 --
--- TOC entry 20 (class 1255 OID 78146)
--- Dependencies: 3 385
--- Name: lquery_out(lquery); Type: FUNCTION; Schema: public; Owner: -
+-- Name: lquery_out(lquery); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION lquery_out(lquery) RETURNS cstring
@@ -53,10 +78,10 @@ CREATE FUNCTION lquery_out(lquery) RETURNS cstring
     AS '$libdir/ltree', 'lquery_out';
 
 
+ALTER FUNCTION public.lquery_out(lquery) OWNER TO inprint;
+
 --
--- TOC entry 384 (class 1247 OID 78144)
--- Dependencies: 8 3 20
--- Name: lquery; Type: TYPE; Schema: public; Owner: -
+-- Name: lquery; Type: TYPE; Schema: public; Owner: inprint
 --
 
 CREATE TYPE lquery (
@@ -68,18 +93,17 @@ CREATE TYPE lquery (
 );
 
 
+ALTER TYPE public.lquery OWNER TO inprint;
+
 --
--- TOC entry 388 (class 0 OID 0)
--- Name: ltree; Type: SHELL TYPE; Schema: public; Owner: -
+-- Name: ltree; Type: SHELL TYPE; Schema: public; Owner: inprint
 --
 
 CREATE TYPE ltree;
 
 
 --
--- TOC entry 21 (class 1255 OID 78149)
--- Dependencies: 3 388
--- Name: ltree_in(cstring); Type: FUNCTION; Schema: public; Owner: -
+-- Name: ltree_in(cstring); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION ltree_in(cstring) RETURNS ltree
@@ -87,10 +111,10 @@ CREATE FUNCTION ltree_in(cstring) RETURNS ltree
     AS '$libdir/ltree', 'ltree_in';
 
 
+ALTER FUNCTION public.ltree_in(cstring) OWNER TO inprint;
+
 --
--- TOC entry 22 (class 1255 OID 78150)
--- Dependencies: 3 388
--- Name: ltree_out(ltree); Type: FUNCTION; Schema: public; Owner: -
+-- Name: ltree_out(ltree); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION ltree_out(ltree) RETURNS cstring
@@ -98,10 +122,10 @@ CREATE FUNCTION ltree_out(ltree) RETURNS cstring
     AS '$libdir/ltree', 'ltree_out';
 
 
+ALTER FUNCTION public.ltree_out(ltree) OWNER TO inprint;
+
 --
--- TOC entry 387 (class 1247 OID 78148)
--- Dependencies: 21 22 3
--- Name: ltree; Type: TYPE; Schema: public; Owner: -
+-- Name: ltree; Type: TYPE; Schema: public; Owner: inprint
 --
 
 CREATE TYPE ltree (
@@ -113,18 +137,17 @@ CREATE TYPE ltree (
 );
 
 
+ALTER TYPE public.ltree OWNER TO inprint;
+
 --
--- TOC entry 391 (class 0 OID 0)
--- Name: ltree_gist; Type: SHELL TYPE; Schema: public; Owner: -
+-- Name: ltree_gist; Type: SHELL TYPE; Schema: public; Owner: inprint
 --
 
 CREATE TYPE ltree_gist;
 
 
 --
--- TOC entry 23 (class 1255 OID 78153)
--- Dependencies: 3 391
--- Name: ltree_gist_in(cstring); Type: FUNCTION; Schema: public; Owner: -
+-- Name: ltree_gist_in(cstring); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION ltree_gist_in(cstring) RETURNS ltree_gist
@@ -132,10 +155,10 @@ CREATE FUNCTION ltree_gist_in(cstring) RETURNS ltree_gist
     AS '$libdir/ltree', 'ltree_gist_in';
 
 
+ALTER FUNCTION public.ltree_gist_in(cstring) OWNER TO inprint;
+
 --
--- TOC entry 24 (class 1255 OID 78154)
--- Dependencies: 3 391
--- Name: ltree_gist_out(ltree_gist); Type: FUNCTION; Schema: public; Owner: -
+-- Name: ltree_gist_out(ltree_gist); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION ltree_gist_out(ltree_gist) RETURNS cstring
@@ -143,10 +166,10 @@ CREATE FUNCTION ltree_gist_out(ltree_gist) RETURNS cstring
     AS '$libdir/ltree', 'ltree_gist_out';
 
 
+ALTER FUNCTION public.ltree_gist_out(ltree_gist) OWNER TO inprint;
+
 --
--- TOC entry 390 (class 1247 OID 78152)
--- Dependencies: 3 24 23
--- Name: ltree_gist; Type: TYPE; Schema: public; Owner: -
+-- Name: ltree_gist; Type: TYPE; Schema: public; Owner: inprint
 --
 
 CREATE TYPE ltree_gist (
@@ -158,18 +181,17 @@ CREATE TYPE ltree_gist (
 );
 
 
+ALTER TYPE public.ltree_gist OWNER TO inprint;
+
 --
--- TOC entry 394 (class 0 OID 0)
--- Name: ltxtquery; Type: SHELL TYPE; Schema: public; Owner: -
+-- Name: ltxtquery; Type: SHELL TYPE; Schema: public; Owner: inprint
 --
 
 CREATE TYPE ltxtquery;
 
 
 --
--- TOC entry 25 (class 1255 OID 78157)
--- Dependencies: 3 394
--- Name: ltxtq_in(cstring); Type: FUNCTION; Schema: public; Owner: -
+-- Name: ltxtq_in(cstring); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION ltxtq_in(cstring) RETURNS ltxtquery
@@ -177,10 +199,10 @@ CREATE FUNCTION ltxtq_in(cstring) RETURNS ltxtquery
     AS '$libdir/ltree', 'ltxtq_in';
 
 
+ALTER FUNCTION public.ltxtq_in(cstring) OWNER TO inprint;
+
 --
--- TOC entry 26 (class 1255 OID 78158)
--- Dependencies: 3 394
--- Name: ltxtq_out(ltxtquery); Type: FUNCTION; Schema: public; Owner: -
+-- Name: ltxtq_out(ltxtquery); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION ltxtq_out(ltxtquery) RETURNS cstring
@@ -188,10 +210,10 @@ CREATE FUNCTION ltxtq_out(ltxtquery) RETURNS cstring
     AS '$libdir/ltree', 'ltxtq_out';
 
 
+ALTER FUNCTION public.ltxtq_out(ltxtquery) OWNER TO inprint;
+
 --
--- TOC entry 393 (class 1247 OID 78156)
--- Dependencies: 3 25 26
--- Name: ltxtquery; Type: TYPE; Schema: public; Owner: -
+-- Name: ltxtquery; Type: TYPE; Schema: public; Owner: inprint
 --
 
 CREATE TYPE ltxtquery (
@@ -203,10 +225,10 @@ CREATE TYPE ltxtquery (
 );
 
 
+ALTER TYPE public.ltxtquery OWNER TO inprint;
+
 --
--- TOC entry 27 (class 1255 OID 78160)
--- Dependencies: 386 389 3
--- Name: _lt_q_regex(ltree[], lquery[]); Type: FUNCTION; Schema: public; Owner: -
+-- Name: _lt_q_regex(ltree[], lquery[]); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION _lt_q_regex(ltree[], lquery[]) RETURNS boolean
@@ -214,10 +236,10 @@ CREATE FUNCTION _lt_q_regex(ltree[], lquery[]) RETURNS boolean
     AS '$libdir/ltree', '_lt_q_regex';
 
 
+ALTER FUNCTION public._lt_q_regex(ltree[], lquery[]) OWNER TO inprint;
+
 --
--- TOC entry 28 (class 1255 OID 78161)
--- Dependencies: 386 389 3
--- Name: _lt_q_rregex(lquery[], ltree[]); Type: FUNCTION; Schema: public; Owner: -
+-- Name: _lt_q_rregex(lquery[], ltree[]); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION _lt_q_rregex(lquery[], ltree[]) RETURNS boolean
@@ -225,10 +247,10 @@ CREATE FUNCTION _lt_q_rregex(lquery[], ltree[]) RETURNS boolean
     AS '$libdir/ltree', '_lt_q_rregex';
 
 
+ALTER FUNCTION public._lt_q_rregex(lquery[], ltree[]) OWNER TO inprint;
+
 --
--- TOC entry 29 (class 1255 OID 78162)
--- Dependencies: 387 384 389 3
--- Name: _ltq_extract_regex(ltree[], lquery); Type: FUNCTION; Schema: public; Owner: -
+-- Name: _ltq_extract_regex(ltree[], lquery); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION _ltq_extract_regex(ltree[], lquery) RETURNS ltree
@@ -236,10 +258,10 @@ CREATE FUNCTION _ltq_extract_regex(ltree[], lquery) RETURNS ltree
     AS '$libdir/ltree', '_ltq_extract_regex';
 
 
+ALTER FUNCTION public._ltq_extract_regex(ltree[], lquery) OWNER TO inprint;
+
 --
--- TOC entry 30 (class 1255 OID 78163)
--- Dependencies: 3 389 384
--- Name: _ltq_regex(ltree[], lquery); Type: FUNCTION; Schema: public; Owner: -
+-- Name: _ltq_regex(ltree[], lquery); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION _ltq_regex(ltree[], lquery) RETURNS boolean
@@ -247,10 +269,10 @@ CREATE FUNCTION _ltq_regex(ltree[], lquery) RETURNS boolean
     AS '$libdir/ltree', '_ltq_regex';
 
 
+ALTER FUNCTION public._ltq_regex(ltree[], lquery) OWNER TO inprint;
+
 --
--- TOC entry 31 (class 1255 OID 78164)
--- Dependencies: 384 3 389
--- Name: _ltq_rregex(lquery, ltree[]); Type: FUNCTION; Schema: public; Owner: -
+-- Name: _ltq_rregex(lquery, ltree[]); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION _ltq_rregex(lquery, ltree[]) RETURNS boolean
@@ -258,10 +280,10 @@ CREATE FUNCTION _ltq_rregex(lquery, ltree[]) RETURNS boolean
     AS '$libdir/ltree', '_ltq_rregex';
 
 
+ALTER FUNCTION public._ltq_rregex(lquery, ltree[]) OWNER TO inprint;
+
 --
--- TOC entry 32 (class 1255 OID 78165)
--- Dependencies: 3
--- Name: _ltree_compress(internal); Type: FUNCTION; Schema: public; Owner: -
+-- Name: _ltree_compress(internal); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION _ltree_compress(internal) RETURNS internal
@@ -269,10 +291,10 @@ CREATE FUNCTION _ltree_compress(internal) RETURNS internal
     AS '$libdir/ltree', '_ltree_compress';
 
 
+ALTER FUNCTION public._ltree_compress(internal) OWNER TO inprint;
+
 --
--- TOC entry 33 (class 1255 OID 78166)
--- Dependencies: 3
--- Name: _ltree_consistent(internal, internal, smallint, oid, internal); Type: FUNCTION; Schema: public; Owner: -
+-- Name: _ltree_consistent(internal, internal, smallint, oid, internal); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION _ltree_consistent(internal, internal, smallint, oid, internal) RETURNS boolean
@@ -280,10 +302,10 @@ CREATE FUNCTION _ltree_consistent(internal, internal, smallint, oid, internal) R
     AS '$libdir/ltree', '_ltree_consistent';
 
 
+ALTER FUNCTION public._ltree_consistent(internal, internal, smallint, oid, internal) OWNER TO inprint;
+
 --
--- TOC entry 34 (class 1255 OID 78167)
--- Dependencies: 387 389 387 3
--- Name: _ltree_extract_isparent(ltree[], ltree); Type: FUNCTION; Schema: public; Owner: -
+-- Name: _ltree_extract_isparent(ltree[], ltree); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION _ltree_extract_isparent(ltree[], ltree) RETURNS ltree
@@ -291,10 +313,10 @@ CREATE FUNCTION _ltree_extract_isparent(ltree[], ltree) RETURNS ltree
     AS '$libdir/ltree', '_ltree_extract_isparent';
 
 
+ALTER FUNCTION public._ltree_extract_isparent(ltree[], ltree) OWNER TO inprint;
+
 --
--- TOC entry 35 (class 1255 OID 78168)
--- Dependencies: 3 387 389 387
--- Name: _ltree_extract_risparent(ltree[], ltree); Type: FUNCTION; Schema: public; Owner: -
+-- Name: _ltree_extract_risparent(ltree[], ltree); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION _ltree_extract_risparent(ltree[], ltree) RETURNS ltree
@@ -302,10 +324,10 @@ CREATE FUNCTION _ltree_extract_risparent(ltree[], ltree) RETURNS ltree
     AS '$libdir/ltree', '_ltree_extract_risparent';
 
 
+ALTER FUNCTION public._ltree_extract_risparent(ltree[], ltree) OWNER TO inprint;
+
 --
--- TOC entry 36 (class 1255 OID 78169)
--- Dependencies: 389 387 3
--- Name: _ltree_isparent(ltree[], ltree); Type: FUNCTION; Schema: public; Owner: -
+-- Name: _ltree_isparent(ltree[], ltree); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION _ltree_isparent(ltree[], ltree) RETURNS boolean
@@ -313,10 +335,10 @@ CREATE FUNCTION _ltree_isparent(ltree[], ltree) RETURNS boolean
     AS '$libdir/ltree', '_ltree_isparent';
 
 
+ALTER FUNCTION public._ltree_isparent(ltree[], ltree) OWNER TO inprint;
+
 --
--- TOC entry 37 (class 1255 OID 78170)
--- Dependencies: 3
--- Name: _ltree_penalty(internal, internal, internal); Type: FUNCTION; Schema: public; Owner: -
+-- Name: _ltree_penalty(internal, internal, internal); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION _ltree_penalty(internal, internal, internal) RETURNS internal
@@ -324,10 +346,10 @@ CREATE FUNCTION _ltree_penalty(internal, internal, internal) RETURNS internal
     AS '$libdir/ltree', '_ltree_penalty';
 
 
+ALTER FUNCTION public._ltree_penalty(internal, internal, internal) OWNER TO inprint;
+
 --
--- TOC entry 38 (class 1255 OID 78171)
--- Dependencies: 3
--- Name: _ltree_picksplit(internal, internal); Type: FUNCTION; Schema: public; Owner: -
+-- Name: _ltree_picksplit(internal, internal); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION _ltree_picksplit(internal, internal) RETURNS internal
@@ -335,10 +357,10 @@ CREATE FUNCTION _ltree_picksplit(internal, internal) RETURNS internal
     AS '$libdir/ltree', '_ltree_picksplit';
 
 
+ALTER FUNCTION public._ltree_picksplit(internal, internal) OWNER TO inprint;
+
 --
--- TOC entry 39 (class 1255 OID 78172)
--- Dependencies: 387 389 3
--- Name: _ltree_r_isparent(ltree, ltree[]); Type: FUNCTION; Schema: public; Owner: -
+-- Name: _ltree_r_isparent(ltree, ltree[]); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION _ltree_r_isparent(ltree, ltree[]) RETURNS boolean
@@ -346,10 +368,10 @@ CREATE FUNCTION _ltree_r_isparent(ltree, ltree[]) RETURNS boolean
     AS '$libdir/ltree', '_ltree_r_isparent';
 
 
+ALTER FUNCTION public._ltree_r_isparent(ltree, ltree[]) OWNER TO inprint;
+
 --
--- TOC entry 40 (class 1255 OID 78173)
--- Dependencies: 389 387 3
--- Name: _ltree_r_risparent(ltree, ltree[]); Type: FUNCTION; Schema: public; Owner: -
+-- Name: _ltree_r_risparent(ltree, ltree[]); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION _ltree_r_risparent(ltree, ltree[]) RETURNS boolean
@@ -357,10 +379,10 @@ CREATE FUNCTION _ltree_r_risparent(ltree, ltree[]) RETURNS boolean
     AS '$libdir/ltree', '_ltree_r_risparent';
 
 
+ALTER FUNCTION public._ltree_r_risparent(ltree, ltree[]) OWNER TO inprint;
+
 --
--- TOC entry 41 (class 1255 OID 78174)
--- Dependencies: 387 389 3
--- Name: _ltree_risparent(ltree[], ltree); Type: FUNCTION; Schema: public; Owner: -
+-- Name: _ltree_risparent(ltree[], ltree); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION _ltree_risparent(ltree[], ltree) RETURNS boolean
@@ -368,10 +390,10 @@ CREATE FUNCTION _ltree_risparent(ltree[], ltree) RETURNS boolean
     AS '$libdir/ltree', '_ltree_risparent';
 
 
+ALTER FUNCTION public._ltree_risparent(ltree[], ltree) OWNER TO inprint;
+
 --
--- TOC entry 42 (class 1255 OID 78175)
--- Dependencies: 3
--- Name: _ltree_same(internal, internal, internal); Type: FUNCTION; Schema: public; Owner: -
+-- Name: _ltree_same(internal, internal, internal); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION _ltree_same(internal, internal, internal) RETURNS internal
@@ -379,10 +401,10 @@ CREATE FUNCTION _ltree_same(internal, internal, internal) RETURNS internal
     AS '$libdir/ltree', '_ltree_same';
 
 
+ALTER FUNCTION public._ltree_same(internal, internal, internal) OWNER TO inprint;
+
 --
--- TOC entry 43 (class 1255 OID 78176)
--- Dependencies: 3
--- Name: _ltree_union(internal, internal); Type: FUNCTION; Schema: public; Owner: -
+-- Name: _ltree_union(internal, internal); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION _ltree_union(internal, internal) RETURNS integer
@@ -390,10 +412,10 @@ CREATE FUNCTION _ltree_union(internal, internal) RETURNS integer
     AS '$libdir/ltree', '_ltree_union';
 
 
+ALTER FUNCTION public._ltree_union(internal, internal) OWNER TO inprint;
+
 --
--- TOC entry 44 (class 1255 OID 78177)
--- Dependencies: 3 393 389
--- Name: _ltxtq_exec(ltree[], ltxtquery); Type: FUNCTION; Schema: public; Owner: -
+-- Name: _ltxtq_exec(ltree[], ltxtquery); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION _ltxtq_exec(ltree[], ltxtquery) RETURNS boolean
@@ -401,10 +423,10 @@ CREATE FUNCTION _ltxtq_exec(ltree[], ltxtquery) RETURNS boolean
     AS '$libdir/ltree', '_ltxtq_exec';
 
 
+ALTER FUNCTION public._ltxtq_exec(ltree[], ltxtquery) OWNER TO inprint;
+
 --
--- TOC entry 45 (class 1255 OID 78178)
--- Dependencies: 393 389 387 3
--- Name: _ltxtq_extract_exec(ltree[], ltxtquery); Type: FUNCTION; Schema: public; Owner: -
+-- Name: _ltxtq_extract_exec(ltree[], ltxtquery); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION _ltxtq_extract_exec(ltree[], ltxtquery) RETURNS ltree
@@ -412,10 +434,10 @@ CREATE FUNCTION _ltxtq_extract_exec(ltree[], ltxtquery) RETURNS ltree
     AS '$libdir/ltree', '_ltxtq_extract_exec';
 
 
+ALTER FUNCTION public._ltxtq_extract_exec(ltree[], ltxtquery) OWNER TO inprint;
+
 --
--- TOC entry 46 (class 1255 OID 78179)
--- Dependencies: 389 3 393
--- Name: _ltxtq_rexec(ltxtquery, ltree[]); Type: FUNCTION; Schema: public; Owner: -
+-- Name: _ltxtq_rexec(ltxtquery, ltree[]); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION _ltxtq_rexec(ltxtquery, ltree[]) RETURNS boolean
@@ -423,17 +445,17 @@ CREATE FUNCTION _ltxtq_rexec(ltxtquery, ltree[]) RETURNS boolean
     AS '$libdir/ltree', '_ltxtq_rexec';
 
 
+ALTER FUNCTION public._ltxtq_rexec(ltxtquery, ltree[]) OWNER TO inprint;
+
 --
--- TOC entry 94 (class 1255 OID 78746)
--- Dependencies: 535 3
--- Name: access_delete_after_trigger(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: access_delete_after_trigger(); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION access_delete_after_trigger() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 DECLARE
-    arg_type varchar; 
+    arg_type varchar;
 BEGIN
     arg_type := TG_ARGV[0];
 
@@ -446,29 +468,27 @@ END;
 $$;
 
 
+ALTER FUNCTION public.access_delete_after_trigger() OWNER TO inprint;
+
 --
--- TOC entry 95 (class 1255 OID 78745)
--- Dependencies: 535 3
--- Name: access_insert_after_trigger(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: access_insert_after_trigger(); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION access_insert_after_trigger() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 DECLARE
-    arg_type varchar; 
+    arg_type varchar;
 BEGIN
 
     arg_type := TG_ARGV[0];
 
-    --RAISE EXCEPTION '%', arg_type;
-
     EXECUTE ' DELETE FROM cache_access WHERE type=''' ||arg_type|| ''' AND binding=''' ||NEW.id|| '''; ';
-    
-    IF arg_type = 'editions' THEN 
+
+    IF arg_type = 'editions' THEN
         EXECUTE '
             INSERT INTO cache_access
-                SELECT ''editions'' AS type, t1.path, t1.id AS binding, t2.id AS member, ARRAY( 
+                SELECT ''editions'' AS type, t1.path, t1.id AS binding, t2.id AS member, ARRAY(
                     SELECT DISTINCT (((a2.section::text || ''.''::text) || a2.subsection::text) || ''.''::text) || a2.term::text AS term
                     FROM map_member_to_rule a1, rules a2
                     WHERE a2.id = a1.term AND a2.section = ''' ||arg_type|| ''' AND a1.member = t2.id AND (a1.binding IN ( SELECT id FROM editions WHERE path @> t1.path))
@@ -477,10 +497,10 @@ BEGIN
                 WHERE t1.id = ''' ||NEW.id|| ''' ORDER BY t1.path;';
     END IF;
 
-    IF arg_type = 'catalog' THEN 
+    IF arg_type = 'catalog' THEN
         EXECUTE '
             INSERT INTO cache_access
-                SELECT ''catalog'' AS type, t1.path, t1.id AS binding, t2.id AS member, ARRAY( 
+                SELECT ''catalog'' AS type, t1.path, t1.id AS binding, t2.id AS member, ARRAY(
                     SELECT DISTINCT a2.section::text || ''.''::text || a2.subsection::text || ''.''::text || a2.term::text || '':''::text || a1.area AS term
                     FROM map_member_to_rule a1, rules a2
                     WHERE a2.id = a1.term AND a2.section = ''catalog'' AND a1.member = t2.id AND (a1.binding IN ( SELECT id FROM catalog WHERE path @> t1.path))
@@ -490,81 +510,95 @@ BEGIN
     END IF;
 
     EXECUTE ' DELETE FROM cache_access WHERE array_dims(terms) is null ';
-    
+
     RETURN NEW;
 END;
 $$;
 
 
+ALTER FUNCTION public.access_insert_after_trigger() OWNER TO inprint;
+
 --
--- TOC entry 99 (class 1255 OID 78744)
--- Dependencies: 3 535
--- Name: access_update_after_trigger(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: access_update_after_trigger(); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION access_update_after_trigger() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 DECLARE
-    arg_type varchar; 
+    arg_type varchar;
+    arecords RECORD;
 BEGIN
+
     arg_type := TG_ARGV[0];
 
-    -- DELETE RULES FOR OLD POSITION
-
-     EXECUTE ' DELETE FROM cache_access WHERE path ~ (''' || OLD.path::text || '.*'')::lquery; ';
+    EXECUTE ' DELETE FROM cache_access WHERE type=''' ||arg_type|| ''' AND binding=''' ||NEW.id|| '''; ';
 
     -- CREATE RULES FOR NEW POSITION
 
-    IF arg_type = 'editions' THEN 
-        EXECUTE '
-            INSERT INTO cache_access
-                SELECT ''editions'' AS type, t1.path, t1.id AS binding, t2.id AS member, ARRAY( 
-                    SELECT DISTINCT (((a2.section::text || ''.''::text) || a2.subsection::text) || ''.''::text) || a2.term::text AS term
+    IF arg_type = 'editions' THEN
+
+        FOR arecords IN
+            SELECT
+                'editions' AS type, t1.path, t1.id AS binding, t2.id AS member,
+                ARRAY(
+                    SELECT DISTINCT (((a2.section::text || '.'::text) || a2.subsection::text) || '.'::text) || a2.term::text AS term
                     FROM map_member_to_rule a1, rules a2
-                    WHERE a2.id = a1.term AND a2.section = ''' ||arg_type|| ''' AND a1.member = t2.id AND (a1.binding IN ( SELECT id FROM editions WHERE path @> t1.path))
+                    WHERE a2.id = a1.term AND a2.section = 'editions' AND a1.member = t2.id AND (a1.binding IN ( SELECT id FROM editions WHERE path @> t1.path))
                 ) AS terms
-                FROM editions t1, members t2
-                WHERE t1.path ~ (''' || NEW.path::text || '.*'')::lquery ORDER BY t1.path;';
+            FROM editions t1, members t2
+            WHERE t1.path ~ (NEW.path::text || '.*')::lquery ORDER BY t1.path
+        LOOP
+            DELETE FROM cache_access WHERE type='editions' AND path=arecords.path AND binding=arecords.binding AND member=arecords.member;
+            INSERT INTO cache_access (type, path, binding, member, terms) VALUES ('editions', arecords.path, arecords.binding, arecords.member, arecords.terms);
+        END LOOP;
+
     END IF;
 
-    IF arg_type = 'catalog' THEN 
-        EXECUTE '
-            INSERT INTO cache_access
-                SELECT ''catalog'' AS type, t1.path, t1.id AS binding, t2.id AS member, ARRAY( 
-                    SELECT DISTINCT a2.section::text || ''.''::text || a2.subsection::text || ''.''::text || a2.term::text || '':''::text || a1.area AS term
+    IF arg_type = 'catalog' THEN
+
+        FOR arecords IN
+            SELECT
+                'catalog' AS type, t1.path, t1.id AS binding, t2.id AS member,
+                ARRAY(
+                    SELECT DISTINCT a2.section::text || '.'::text || a2.subsection::text || '.'::text || a2.term::text || ':'::text || a1.area AS term
                     FROM map_member_to_rule a1, rules a2
-                    WHERE a2.id = a1.term AND a2.section = ''catalog'' AND a1.member = t2.id AND (a1.binding IN ( SELECT id FROM catalog WHERE path @> t1.path))
+                    WHERE a2.id = a1.term AND a2.section = 'catalog' AND a1.member = t2.id AND (a1.binding IN ( SELECT id FROM catalog WHERE path @> t1.path))
                 ) AS terms
-                FROM catalog t1, members t2
-                WHERE t1.path ~ (''' || NEW.path::text || '.*'')::lquery ORDER BY t1.path;';
+            FROM catalog t1, members t2
+            WHERE t1.path ~ ( NEW.path::text || '.*')::lquery ORDER BY t1.path
+        LOOP
+            DELETE FROM cache_access WHERE type='catalog' AND path=arecords.path AND binding=arecords.binding AND member=arecords.member;
+            INSERT INTO cache_access (type, path, binding, member, terms) VALUES ('catalog', arecords.path, arecords.binding, arecords.member, arecords.terms);
+        END LOOP;
+
     END IF;
 
     EXECUTE ' DELETE FROM cache_access WHERE array_dims(terms) is null ';
 
     EXECUTE '
-        UPDATE cache_visibility t1 
+        UPDATE cache_visibility t1
             SET parents = ARRAY(
                     SELECT t2.id FROM ' ||arg_type|| ' t2 WHERE (
                         ARRAY(
-                            SELECT t3.id FROM ' ||arg_type|| ' t3 WHERE 
-                                t3.path ~ ((t2.path::text || ''.*''::text)::lquery)) 
-                                && 
+                            SELECT t3.id FROM ' ||arg_type|| ' t3 WHERE
+                                t3.path ~ ((t2.path::text || ''.*''::text)::lquery))
+                                &&
                                 ARRAY(select t4.binding from map_member_to_rule t4 WHERE member=t1.member AND term=t1.termid )
                     )
-                ) 
+                )
             WHERE ''' ||NEW.id|| ''' = ANY(t1.parents)
     ';
-    
+
     return NEW;
 END;
 $$;
 
 
+ALTER FUNCTION public.access_update_after_trigger() OWNER TO inprint;
+
 --
--- TOC entry 47 (class 1255 OID 78183)
--- Dependencies: 3
--- Name: digest(text, text); Type: FUNCTION; Schema: public; Owner: -
+-- Name: digest(text, text); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION digest(text, text) RETURNS bytea
@@ -572,78 +606,138 @@ CREATE FUNCTION digest(text, text) RETURNS bytea
     AS '$libdir/pgcrypto', 'pg_digest';
 
 
+ALTER FUNCTION public.digest(text, text) OWNER TO inprint;
+
 --
--- TOC entry 100 (class 1255 OID 211311)
--- Dependencies: 535 3
--- Name: fascicles_map_documents_delete_after_trigger(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: fascicles_map_documents_delete_after_trigger(); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION fascicles_map_documents_delete_after_trigger() RETURNS trigger
     LANGUAGE plpgsql
     AS $_$
 DECLARE
-    arg_seqnums integer[]; 
+    arg_seqnums integer[];
 BEGIN
 
     EXECUTE 'SELECT ARRAY(
                 SELECT t2.seqnum
-                FROM fascicles_map_documents t1, fascicles_pages t2 
+                FROM fascicles_map_documents t1, fascicles_pages t2
                 WHERE t2.id = t1.page AND t1.fascicle = $1 AND t1.entity = $2
                 ORDER BY t2.seqnum
             );'
         INTO arg_seqnums USING OLD.fascicle, OLD.entity;
-
-    --RAISE EXCEPTION '%', arg_seqnums;
 
     EXECUTE 'UPDATE documents SET pages=array_to_string($1, '','') WHERE id=$2'
         USING arg_seqnums, OLD.entity;
 
     EXECUTE 'UPDATE documents SET firstpage=$1 WHERE id=$2'
         USING arg_seqnums[1], OLD.entity;
-    
+
     return OLD;
 END;
 $_$;
 
 
+ALTER FUNCTION public.fascicles_map_documents_delete_after_trigger() OWNER TO inprint;
+
 --
--- TOC entry 98 (class 1255 OID 144838)
--- Dependencies: 3 535
--- Name: fascicles_map_documents_update_after_trigger(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: fascicles_map_documents_update_after_trigger(); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION fascicles_map_documents_update_after_trigger() RETURNS trigger
     LANGUAGE plpgsql
     AS $_$
 DECLARE
-    arg_seqnums integer[]; 
+    arg_seqnums integer[];
 BEGIN
 
     EXECUTE 'SELECT ARRAY(
                 SELECT t2.seqnum
-                FROM fascicles_map_documents t1, fascicles_pages t2 
+                FROM fascicles_map_documents t1, fascicles_pages t2
                 WHERE t2.id = t1.page AND t1.fascicle = $1 AND t1.entity = $2
                 ORDER BY t2.seqnum
             );'
         INTO arg_seqnums USING NEW.fascicle, NEW.entity;
-
-    --RAISE EXCEPTION '%', arg_seqnums;
 
     EXECUTE 'UPDATE documents SET pages=array_to_string($1, '','') WHERE id=$2'
         USING arg_seqnums, NEW.entity;
 
     EXECUTE 'UPDATE documents SET firstpage=$1 WHERE id=$2'
         USING arg_seqnums[1], NEW.entity;
-    
+
     return NEW;
 END;
 $_$;
 
 
+ALTER FUNCTION public.fascicles_map_documents_update_after_trigger() OWNER TO inprint;
+
 --
--- TOC entry 48 (class 1255 OID 78184)
--- Dependencies: 387 387 3
--- Name: index(ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
+-- Name: fascicles_map_modules_delete_after_trigger(); Type: FUNCTION; Schema: public; Owner: inprint
+--
+
+CREATE FUNCTION fascicles_map_modules_delete_after_trigger() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $_$
+DECLARE
+    arg_seqnums integer[];
+BEGIN
+
+    EXECUTE 'SELECT ARRAY(
+                SELECT t2.seqnum
+                FROM fascicles_map_modules t1, fascicles_pages t2
+                WHERE t2.id = t1.page AND t1.fascicle = $1 AND t1.module = $2
+                ORDER BY t2.seqnum
+            );'
+        INTO arg_seqnums USING OLD.fascicle, OLD.module;
+
+    EXECUTE 'UPDATE fascicles_requests SET pages=array_to_string($1, '','') WHERE module=$2'
+        USING arg_seqnums, OLD.module;
+
+    EXECUTE 'UPDATE fascicles_requests SET firstpage=$1 WHERE module=$2'
+        USING arg_seqnums[1], OLD.module;
+
+    return OLD;
+END;
+$_$;
+
+
+ALTER FUNCTION public.fascicles_map_modules_delete_after_trigger() OWNER TO inprint;
+
+--
+-- Name: fascicles_map_modules_update_after_trigger(); Type: FUNCTION; Schema: public; Owner: inprint
+--
+
+CREATE FUNCTION fascicles_map_modules_update_after_trigger() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $_$
+DECLARE
+    arg_seqnums integer[];
+BEGIN
+
+    EXECUTE 'SELECT ARRAY(
+                SELECT t2.seqnum
+                FROM fascicles_map_modules t1, fascicles_pages t2
+                WHERE t2.id = t1.page AND t1.fascicle = $1 AND t1.module = $2
+                ORDER BY t2.seqnum
+            );'
+        INTO arg_seqnums USING NEW.fascicle, NEW.module;
+
+    EXECUTE 'UPDATE fascicles_requests SET pages=array_to_string($1, '','') WHERE module=$2'
+        USING arg_seqnums, NEW.module;
+
+    EXECUTE 'UPDATE fascicles_requests SET firstpage=$1 WHERE module=$2'
+        USING arg_seqnums[1], NEW.module;
+
+    return NEW;
+END;
+$_$;
+
+
+ALTER FUNCTION public.fascicles_map_modules_update_after_trigger() OWNER TO inprint;
+
+--
+-- Name: index(ltree, ltree); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION index(ltree, ltree) RETURNS integer
@@ -651,10 +745,10 @@ CREATE FUNCTION index(ltree, ltree) RETURNS integer
     AS '$libdir/ltree', 'ltree_index';
 
 
+ALTER FUNCTION public.index(ltree, ltree) OWNER TO inprint;
+
 --
--- TOC entry 49 (class 1255 OID 78185)
--- Dependencies: 3 387 387
--- Name: index(ltree, ltree, integer); Type: FUNCTION; Schema: public; Owner: -
+-- Name: index(ltree, ltree, integer); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION index(ltree, ltree, integer) RETURNS integer
@@ -662,10 +756,10 @@ CREATE FUNCTION index(ltree, ltree, integer) RETURNS integer
     AS '$libdir/ltree', 'ltree_index';
 
 
+ALTER FUNCTION public.index(ltree, ltree, integer) OWNER TO inprint;
+
 --
--- TOC entry 50 (class 1255 OID 78186)
--- Dependencies: 389 387 3
--- Name: lca(ltree[]); Type: FUNCTION; Schema: public; Owner: -
+-- Name: lca(ltree[]); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION lca(ltree[]) RETURNS ltree
@@ -673,10 +767,10 @@ CREATE FUNCTION lca(ltree[]) RETURNS ltree
     AS '$libdir/ltree', '_lca';
 
 
+ALTER FUNCTION public.lca(ltree[]) OWNER TO inprint;
+
 --
--- TOC entry 51 (class 1255 OID 78187)
--- Dependencies: 387 387 3 387
--- Name: lca(ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
+-- Name: lca(ltree, ltree); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION lca(ltree, ltree) RETURNS ltree
@@ -684,10 +778,10 @@ CREATE FUNCTION lca(ltree, ltree) RETURNS ltree
     AS '$libdir/ltree', 'lca';
 
 
+ALTER FUNCTION public.lca(ltree, ltree) OWNER TO inprint;
+
 --
--- TOC entry 52 (class 1255 OID 78188)
--- Dependencies: 3 387 387 387 387
--- Name: lca(ltree, ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
+-- Name: lca(ltree, ltree, ltree); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION lca(ltree, ltree, ltree) RETURNS ltree
@@ -695,10 +789,10 @@ CREATE FUNCTION lca(ltree, ltree, ltree) RETURNS ltree
     AS '$libdir/ltree', 'lca';
 
 
+ALTER FUNCTION public.lca(ltree, ltree, ltree) OWNER TO inprint;
+
 --
--- TOC entry 53 (class 1255 OID 78189)
--- Dependencies: 3 387 387 387 387 387
--- Name: lca(ltree, ltree, ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
+-- Name: lca(ltree, ltree, ltree, ltree); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION lca(ltree, ltree, ltree, ltree) RETURNS ltree
@@ -706,10 +800,10 @@ CREATE FUNCTION lca(ltree, ltree, ltree, ltree) RETURNS ltree
     AS '$libdir/ltree', 'lca';
 
 
+ALTER FUNCTION public.lca(ltree, ltree, ltree, ltree) OWNER TO inprint;
+
 --
--- TOC entry 54 (class 1255 OID 78190)
--- Dependencies: 387 387 387 387 387 3 387
--- Name: lca(ltree, ltree, ltree, ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
+-- Name: lca(ltree, ltree, ltree, ltree, ltree); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION lca(ltree, ltree, ltree, ltree, ltree) RETURNS ltree
@@ -717,10 +811,10 @@ CREATE FUNCTION lca(ltree, ltree, ltree, ltree, ltree) RETURNS ltree
     AS '$libdir/ltree', 'lca';
 
 
+ALTER FUNCTION public.lca(ltree, ltree, ltree, ltree, ltree) OWNER TO inprint;
+
 --
--- TOC entry 55 (class 1255 OID 78191)
--- Dependencies: 387 387 3 387 387 387 387 387
--- Name: lca(ltree, ltree, ltree, ltree, ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
+-- Name: lca(ltree, ltree, ltree, ltree, ltree, ltree); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION lca(ltree, ltree, ltree, ltree, ltree, ltree) RETURNS ltree
@@ -728,10 +822,10 @@ CREATE FUNCTION lca(ltree, ltree, ltree, ltree, ltree, ltree) RETURNS ltree
     AS '$libdir/ltree', 'lca';
 
 
+ALTER FUNCTION public.lca(ltree, ltree, ltree, ltree, ltree, ltree) OWNER TO inprint;
+
 --
--- TOC entry 56 (class 1255 OID 78192)
--- Dependencies: 387 3 387 387 387 387 387 387 387
--- Name: lca(ltree, ltree, ltree, ltree, ltree, ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
+-- Name: lca(ltree, ltree, ltree, ltree, ltree, ltree, ltree); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION lca(ltree, ltree, ltree, ltree, ltree, ltree, ltree) RETURNS ltree
@@ -739,10 +833,10 @@ CREATE FUNCTION lca(ltree, ltree, ltree, ltree, ltree, ltree, ltree) RETURNS ltr
     AS '$libdir/ltree', 'lca';
 
 
+ALTER FUNCTION public.lca(ltree, ltree, ltree, ltree, ltree, ltree, ltree) OWNER TO inprint;
+
 --
--- TOC entry 57 (class 1255 OID 78193)
--- Dependencies: 387 3 387 387 387 387 387 387 387 387
--- Name: lca(ltree, ltree, ltree, ltree, ltree, ltree, ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
+-- Name: lca(ltree, ltree, ltree, ltree, ltree, ltree, ltree, ltree); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION lca(ltree, ltree, ltree, ltree, ltree, ltree, ltree, ltree) RETURNS ltree
@@ -750,10 +844,10 @@ CREATE FUNCTION lca(ltree, ltree, ltree, ltree, ltree, ltree, ltree, ltree) RETU
     AS '$libdir/ltree', 'lca';
 
 
+ALTER FUNCTION public.lca(ltree, ltree, ltree, ltree, ltree, ltree, ltree, ltree) OWNER TO inprint;
+
 --
--- TOC entry 58 (class 1255 OID 78194)
--- Dependencies: 3 387 386
--- Name: lt_q_regex(ltree, lquery[]); Type: FUNCTION; Schema: public; Owner: -
+-- Name: lt_q_regex(ltree, lquery[]); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION lt_q_regex(ltree, lquery[]) RETURNS boolean
@@ -761,10 +855,10 @@ CREATE FUNCTION lt_q_regex(ltree, lquery[]) RETURNS boolean
     AS '$libdir/ltree', 'lt_q_regex';
 
 
+ALTER FUNCTION public.lt_q_regex(ltree, lquery[]) OWNER TO inprint;
+
 --
--- TOC entry 59 (class 1255 OID 78195)
--- Dependencies: 386 3 387
--- Name: lt_q_rregex(lquery[], ltree); Type: FUNCTION; Schema: public; Owner: -
+-- Name: lt_q_rregex(lquery[], ltree); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION lt_q_rregex(lquery[], ltree) RETURNS boolean
@@ -772,10 +866,10 @@ CREATE FUNCTION lt_q_rregex(lquery[], ltree) RETURNS boolean
     AS '$libdir/ltree', 'lt_q_rregex';
 
 
+ALTER FUNCTION public.lt_q_rregex(lquery[], ltree) OWNER TO inprint;
+
 --
--- TOC entry 60 (class 1255 OID 78196)
--- Dependencies: 384 387 3
--- Name: ltq_regex(ltree, lquery); Type: FUNCTION; Schema: public; Owner: -
+-- Name: ltq_regex(ltree, lquery); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION ltq_regex(ltree, lquery) RETURNS boolean
@@ -783,10 +877,10 @@ CREATE FUNCTION ltq_regex(ltree, lquery) RETURNS boolean
     AS '$libdir/ltree', 'ltq_regex';
 
 
+ALTER FUNCTION public.ltq_regex(ltree, lquery) OWNER TO inprint;
+
 --
--- TOC entry 61 (class 1255 OID 78197)
--- Dependencies: 387 3 384
--- Name: ltq_rregex(lquery, ltree); Type: FUNCTION; Schema: public; Owner: -
+-- Name: ltq_rregex(lquery, ltree); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION ltq_rregex(lquery, ltree) RETURNS boolean
@@ -794,10 +888,10 @@ CREATE FUNCTION ltq_rregex(lquery, ltree) RETURNS boolean
     AS '$libdir/ltree', 'ltq_rregex';
 
 
+ALTER FUNCTION public.ltq_rregex(lquery, ltree) OWNER TO inprint;
+
 --
--- TOC entry 62 (class 1255 OID 78198)
--- Dependencies: 3 387
--- Name: ltree2text(ltree); Type: FUNCTION; Schema: public; Owner: -
+-- Name: ltree2text(ltree); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION ltree2text(ltree) RETURNS text
@@ -805,10 +899,10 @@ CREATE FUNCTION ltree2text(ltree) RETURNS text
     AS '$libdir/ltree', 'ltree2text';
 
 
+ALTER FUNCTION public.ltree2text(ltree) OWNER TO inprint;
+
 --
--- TOC entry 63 (class 1255 OID 78199)
--- Dependencies: 387 3 387 387
--- Name: ltree_addltree(ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
+-- Name: ltree_addltree(ltree, ltree); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION ltree_addltree(ltree, ltree) RETURNS ltree
@@ -816,10 +910,10 @@ CREATE FUNCTION ltree_addltree(ltree, ltree) RETURNS ltree
     AS '$libdir/ltree', 'ltree_addltree';
 
 
+ALTER FUNCTION public.ltree_addltree(ltree, ltree) OWNER TO inprint;
+
 --
--- TOC entry 64 (class 1255 OID 78200)
--- Dependencies: 387 387 3
--- Name: ltree_addtext(ltree, text); Type: FUNCTION; Schema: public; Owner: -
+-- Name: ltree_addtext(ltree, text); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION ltree_addtext(ltree, text) RETURNS ltree
@@ -827,10 +921,10 @@ CREATE FUNCTION ltree_addtext(ltree, text) RETURNS ltree
     AS '$libdir/ltree', 'ltree_addtext';
 
 
+ALTER FUNCTION public.ltree_addtext(ltree, text) OWNER TO inprint;
+
 --
--- TOC entry 65 (class 1255 OID 78201)
--- Dependencies: 3 387 387
--- Name: ltree_cmp(ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
+-- Name: ltree_cmp(ltree, ltree); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION ltree_cmp(ltree, ltree) RETURNS integer
@@ -838,10 +932,10 @@ CREATE FUNCTION ltree_cmp(ltree, ltree) RETURNS integer
     AS '$libdir/ltree', 'ltree_cmp';
 
 
+ALTER FUNCTION public.ltree_cmp(ltree, ltree) OWNER TO inprint;
+
 --
--- TOC entry 66 (class 1255 OID 78202)
--- Dependencies: 3
--- Name: ltree_compress(internal); Type: FUNCTION; Schema: public; Owner: -
+-- Name: ltree_compress(internal); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION ltree_compress(internal) RETURNS internal
@@ -849,10 +943,10 @@ CREATE FUNCTION ltree_compress(internal) RETURNS internal
     AS '$libdir/ltree', 'ltree_compress';
 
 
+ALTER FUNCTION public.ltree_compress(internal) OWNER TO inprint;
+
 --
--- TOC entry 67 (class 1255 OID 78203)
--- Dependencies: 3
--- Name: ltree_consistent(internal, internal, smallint, oid, internal); Type: FUNCTION; Schema: public; Owner: -
+-- Name: ltree_consistent(internal, internal, smallint, oid, internal); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION ltree_consistent(internal, internal, smallint, oid, internal) RETURNS boolean
@@ -860,10 +954,10 @@ CREATE FUNCTION ltree_consistent(internal, internal, smallint, oid, internal) RE
     AS '$libdir/ltree', 'ltree_consistent';
 
 
+ALTER FUNCTION public.ltree_consistent(internal, internal, smallint, oid, internal) OWNER TO inprint;
+
 --
--- TOC entry 68 (class 1255 OID 78204)
--- Dependencies: 3
--- Name: ltree_decompress(internal); Type: FUNCTION; Schema: public; Owner: -
+-- Name: ltree_decompress(internal); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION ltree_decompress(internal) RETURNS internal
@@ -871,10 +965,10 @@ CREATE FUNCTION ltree_decompress(internal) RETURNS internal
     AS '$libdir/ltree', 'ltree_decompress';
 
 
+ALTER FUNCTION public.ltree_decompress(internal) OWNER TO inprint;
+
 --
--- TOC entry 69 (class 1255 OID 78205)
--- Dependencies: 387 387 3
--- Name: ltree_eq(ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
+-- Name: ltree_eq(ltree, ltree); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION ltree_eq(ltree, ltree) RETURNS boolean
@@ -882,10 +976,10 @@ CREATE FUNCTION ltree_eq(ltree, ltree) RETURNS boolean
     AS '$libdir/ltree', 'ltree_eq';
 
 
+ALTER FUNCTION public.ltree_eq(ltree, ltree) OWNER TO inprint;
+
 --
--- TOC entry 70 (class 1255 OID 78206)
--- Dependencies: 387 3 387
--- Name: ltree_ge(ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
+-- Name: ltree_ge(ltree, ltree); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION ltree_ge(ltree, ltree) RETURNS boolean
@@ -893,10 +987,10 @@ CREATE FUNCTION ltree_ge(ltree, ltree) RETURNS boolean
     AS '$libdir/ltree', 'ltree_ge';
 
 
+ALTER FUNCTION public.ltree_ge(ltree, ltree) OWNER TO inprint;
+
 --
--- TOC entry 71 (class 1255 OID 78207)
--- Dependencies: 387 3 387
--- Name: ltree_gt(ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
+-- Name: ltree_gt(ltree, ltree); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION ltree_gt(ltree, ltree) RETURNS boolean
@@ -904,10 +998,10 @@ CREATE FUNCTION ltree_gt(ltree, ltree) RETURNS boolean
     AS '$libdir/ltree', 'ltree_gt';
 
 
+ALTER FUNCTION public.ltree_gt(ltree, ltree) OWNER TO inprint;
+
 --
--- TOC entry 72 (class 1255 OID 78208)
--- Dependencies: 3 387 387
--- Name: ltree_isparent(ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
+-- Name: ltree_isparent(ltree, ltree); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION ltree_isparent(ltree, ltree) RETURNS boolean
@@ -915,10 +1009,10 @@ CREATE FUNCTION ltree_isparent(ltree, ltree) RETURNS boolean
     AS '$libdir/ltree', 'ltree_isparent';
 
 
+ALTER FUNCTION public.ltree_isparent(ltree, ltree) OWNER TO inprint;
+
 --
--- TOC entry 73 (class 1255 OID 78209)
--- Dependencies: 387 3 387
--- Name: ltree_le(ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
+-- Name: ltree_le(ltree, ltree); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION ltree_le(ltree, ltree) RETURNS boolean
@@ -926,10 +1020,10 @@ CREATE FUNCTION ltree_le(ltree, ltree) RETURNS boolean
     AS '$libdir/ltree', 'ltree_le';
 
 
+ALTER FUNCTION public.ltree_le(ltree, ltree) OWNER TO inprint;
+
 --
--- TOC entry 74 (class 1255 OID 78210)
--- Dependencies: 387 3 387
--- Name: ltree_lt(ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
+-- Name: ltree_lt(ltree, ltree); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION ltree_lt(ltree, ltree) RETURNS boolean
@@ -937,10 +1031,10 @@ CREATE FUNCTION ltree_lt(ltree, ltree) RETURNS boolean
     AS '$libdir/ltree', 'ltree_lt';
 
 
+ALTER FUNCTION public.ltree_lt(ltree, ltree) OWNER TO inprint;
+
 --
--- TOC entry 75 (class 1255 OID 78211)
--- Dependencies: 387 3 387
--- Name: ltree_ne(ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
+-- Name: ltree_ne(ltree, ltree); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION ltree_ne(ltree, ltree) RETURNS boolean
@@ -948,10 +1042,10 @@ CREATE FUNCTION ltree_ne(ltree, ltree) RETURNS boolean
     AS '$libdir/ltree', 'ltree_ne';
 
 
+ALTER FUNCTION public.ltree_ne(ltree, ltree) OWNER TO inprint;
+
 --
--- TOC entry 76 (class 1255 OID 78212)
--- Dependencies: 3
--- Name: ltree_penalty(internal, internal, internal); Type: FUNCTION; Schema: public; Owner: -
+-- Name: ltree_penalty(internal, internal, internal); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION ltree_penalty(internal, internal, internal) RETURNS internal
@@ -959,10 +1053,10 @@ CREATE FUNCTION ltree_penalty(internal, internal, internal) RETURNS internal
     AS '$libdir/ltree', 'ltree_penalty';
 
 
+ALTER FUNCTION public.ltree_penalty(internal, internal, internal) OWNER TO inprint;
+
 --
--- TOC entry 77 (class 1255 OID 78213)
--- Dependencies: 3
--- Name: ltree_picksplit(internal, internal); Type: FUNCTION; Schema: public; Owner: -
+-- Name: ltree_picksplit(internal, internal); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION ltree_picksplit(internal, internal) RETURNS internal
@@ -970,10 +1064,10 @@ CREATE FUNCTION ltree_picksplit(internal, internal) RETURNS internal
     AS '$libdir/ltree', 'ltree_picksplit';
 
 
+ALTER FUNCTION public.ltree_picksplit(internal, internal) OWNER TO inprint;
+
 --
--- TOC entry 78 (class 1255 OID 78214)
--- Dependencies: 387 3 387
--- Name: ltree_risparent(ltree, ltree); Type: FUNCTION; Schema: public; Owner: -
+-- Name: ltree_risparent(ltree, ltree); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION ltree_risparent(ltree, ltree) RETURNS boolean
@@ -981,10 +1075,10 @@ CREATE FUNCTION ltree_risparent(ltree, ltree) RETURNS boolean
     AS '$libdir/ltree', 'ltree_risparent';
 
 
+ALTER FUNCTION public.ltree_risparent(ltree, ltree) OWNER TO inprint;
+
 --
--- TOC entry 79 (class 1255 OID 78215)
--- Dependencies: 3
--- Name: ltree_same(internal, internal, internal); Type: FUNCTION; Schema: public; Owner: -
+-- Name: ltree_same(internal, internal, internal); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION ltree_same(internal, internal, internal) RETURNS internal
@@ -992,10 +1086,10 @@ CREATE FUNCTION ltree_same(internal, internal, internal) RETURNS internal
     AS '$libdir/ltree', 'ltree_same';
 
 
+ALTER FUNCTION public.ltree_same(internal, internal, internal) OWNER TO inprint;
+
 --
--- TOC entry 80 (class 1255 OID 78216)
--- Dependencies: 3 387 387
--- Name: ltree_textadd(text, ltree); Type: FUNCTION; Schema: public; Owner: -
+-- Name: ltree_textadd(text, ltree); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION ltree_textadd(text, ltree) RETURNS ltree
@@ -1003,10 +1097,10 @@ CREATE FUNCTION ltree_textadd(text, ltree) RETURNS ltree
     AS '$libdir/ltree', 'ltree_textadd';
 
 
+ALTER FUNCTION public.ltree_textadd(text, ltree) OWNER TO inprint;
+
 --
--- TOC entry 81 (class 1255 OID 78217)
--- Dependencies: 3
--- Name: ltree_union(internal, internal); Type: FUNCTION; Schema: public; Owner: -
+-- Name: ltree_union(internal, internal); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION ltree_union(internal, internal) RETURNS integer
@@ -1014,10 +1108,10 @@ CREATE FUNCTION ltree_union(internal, internal) RETURNS integer
     AS '$libdir/ltree', 'ltree_union';
 
 
+ALTER FUNCTION public.ltree_union(internal, internal) OWNER TO inprint;
+
 --
--- TOC entry 82 (class 1255 OID 78218)
--- Dependencies: 3
--- Name: ltreeparentsel(internal, oid, internal, integer); Type: FUNCTION; Schema: public; Owner: -
+-- Name: ltreeparentsel(internal, oid, internal, integer); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION ltreeparentsel(internal, oid, internal, integer) RETURNS double precision
@@ -1025,10 +1119,10 @@ CREATE FUNCTION ltreeparentsel(internal, oid, internal, integer) RETURNS double 
     AS '$libdir/ltree', 'ltreeparentsel';
 
 
+ALTER FUNCTION public.ltreeparentsel(internal, oid, internal, integer) OWNER TO inprint;
+
 --
--- TOC entry 83 (class 1255 OID 78219)
--- Dependencies: 393 387 3
--- Name: ltxtq_exec(ltree, ltxtquery); Type: FUNCTION; Schema: public; Owner: -
+-- Name: ltxtq_exec(ltree, ltxtquery); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION ltxtq_exec(ltree, ltxtquery) RETURNS boolean
@@ -1036,10 +1130,10 @@ CREATE FUNCTION ltxtq_exec(ltree, ltxtquery) RETURNS boolean
     AS '$libdir/ltree', 'ltxtq_exec';
 
 
+ALTER FUNCTION public.ltxtq_exec(ltree, ltxtquery) OWNER TO inprint;
+
 --
--- TOC entry 84 (class 1255 OID 78220)
--- Dependencies: 3 387 393
--- Name: ltxtq_rexec(ltxtquery, ltree); Type: FUNCTION; Schema: public; Owner: -
+-- Name: ltxtq_rexec(ltxtquery, ltree); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION ltxtq_rexec(ltxtquery, ltree) RETURNS boolean
@@ -1047,10 +1141,10 @@ CREATE FUNCTION ltxtq_rexec(ltxtquery, ltree) RETURNS boolean
     AS '$libdir/ltree', 'ltxtq_rexec';
 
 
+ALTER FUNCTION public.ltxtq_rexec(ltxtquery, ltree) OWNER TO inprint;
+
 --
--- TOC entry 85 (class 1255 OID 78221)
--- Dependencies: 3 387
--- Name: nlevel(ltree); Type: FUNCTION; Schema: public; Owner: -
+-- Name: nlevel(ltree); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION nlevel(ltree) RETURNS integer
@@ -1058,10 +1152,10 @@ CREATE FUNCTION nlevel(ltree) RETURNS integer
     AS '$libdir/ltree', 'nlevel';
 
 
+ALTER FUNCTION public.nlevel(ltree) OWNER TO inprint;
+
 --
--- TOC entry 97 (class 1255 OID 78769)
--- Dependencies: 535 3
--- Name: rules_delete_after_trigger(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: rules_delete_after_trigger(); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION rules_delete_after_trigger() RETURNS trigger
@@ -1075,89 +1169,34 @@ BEGIN
     IF OLD.section = 'editions' OR OLD.section = 'catalog' THEN
         EXECUTE 'SELECT m.path FROM ' || OLD.section || ' AS m WHERE m.id = $1'
             INTO arg_path USING OLD.binding;
-        EXECUTE 'SELECT section||''.''||subsection||''.''||term FROM rules WHERE id = $1'
+        EXECUTE 'SELECT term_text FROM view_rules WHERE id = $1'
             INTO arg_term_name USING OLD.term;
     END IF;
 
-    
-
-    IF OLD.section = 'editions' THEN    
-    
-        EXECUTE 'DELETE FROM cache_access WHERE type=''' ||OLD.section|| ''' AND member=''' ||OLD.member|| ''' AND path ~ (''' || arg_path::text || '.*'')::lquery ';
-        EXECUTE 'DELETE FROM cache_visibility WHERE type=''' ||OLD.section|| ''' AND member=''' ||OLD.member|| ''' AND term LIKE ''' ||arg_term_name|| ''' ';
-        
-        EXECUTE '
-            INSERT INTO cache_access
-                SELECT ''' ||OLD.section|| ''' AS type, t1.path, t1.id AS binding, t2.id AS member, ARRAY( 
-                    SELECT DISTINCT a2.section::text || ''.''::text || a2.subsection::text || ''.''::text || a2.term::text AS term
-                    FROM map_member_to_rule a1, rules a2
-                    WHERE a2.id = a1.term AND a2.section = ''' ||OLD.section|| ''' AND a1.member = t2.id AND (a1.binding IN ( SELECT id FROM ' ||OLD.section|| ' WHERE path @> t1.path))
-                ) AS terms
-                FROM ' ||OLD.section|| ' t1, members t2
-                WHERE t2.id=''' ||OLD.member|| ''' AND t1.path ~ (''' || arg_path::text || '.*'')::lquery ORDER BY t1.path;
-        ';
-        
-        EXECUTE '
-            INSERT INTO cache_visibility
-                SELECT ''' ||OLD.section|| ''' AS type, ''' ||OLD.member|| ''' as member, ''' ||arg_term_name|| ''' AS term, ''' ||OLD.term|| ''' as termid,
-                ARRAY( 
-                    SELECT id FROM ' ||OLD.section|| ' WHERE 
-                        path @> ARRAY( SELECT path from map_member_to_rule t1, ' ||OLD.section|| ' t2 WHERE t2.id = t1.binding AND t1.member=''' ||OLD.member|| ''' AND t1.term = ''' ||OLD.term|| ''')
-                ) as parents,
-                ARRAY( 
-                    SELECT id FROM ' ||OLD.section|| ' WHERE 
-                        path <@ ARRAY( SELECT path from map_member_to_rule t1, ' ||OLD.section|| ' t2 WHERE t2.id = t1.binding AND t1.member=''' ||OLD.member|| ''' AND t1.term = ''' ||OLD.term|| ''')
-                ) as childrens
-        ';
-        
+    IF OLD.section = 'editions' THEN
+		IF arg_path IS NOT null AND arg_term_name IS NOT NULL THEN
+			EXECUTE 'DELETE FROM cache_access WHERE type=''' ||OLD.section|| ''' AND member=''' ||OLD.member|| ''' AND path ~ (''' || arg_path::text || '.*'')::lquery ';
+			EXECUTE 'DELETE FROM cache_visibility WHERE type=''' ||OLD.section|| ''' AND member=''' ||OLD.member|| ''' AND term LIKE ''' ||arg_term_name|| ''' ';
+		END IF;
     END IF;
 
     IF OLD.section = 'catalog' THEN
-        /*
-        EXECUTE 'DELETE FROM cache_access WHERE type=''' ||OLD.section|| ''' AND member=''' ||OLD.member|| ''' AND path ~ (''' || arg_path::text || '.*'')::lquery ';
-        EXECUTE 'DELETE FROM cache_visibility WHERE type=''' ||OLD.section|| ''' AND member=''' ||OLD.member|| ''' AND term LIKE ''' ||arg_term_name|| ':' ||OLD.area|| ''' ';
-        
-        EXECUTE '
-            INSERT INTO cache_access
-                SELECT ''' ||OLD.section|| ''' AS type, t1.path, t1.id AS binding, t2.id AS member, ARRAY( 
-                    SELECT DISTINCT a2.section::text || ''.''::text || a2.subsection::text || ''.''::text || a2.term::text || '':''::text || a1.area AS term
-                    FROM map_member_to_rule a1, rules a2
-                    WHERE a2.id = a1.term AND a2.section = ''' ||OLD.section|| ''' AND a1.member = ''' ||OLD.member|| ''' AND (a1.binding IN ( SELECT id FROM ' ||OLD.section|| ' WHERE path @> t1.path))
-                ) AS terms
-                FROM ' ||OLD.section|| ' t1, members t2
-                WHERE t2.id=''' ||OLD.member|| ''' AND t1.path ~ (''' || arg_path::text || '.*'')::lquery ORDER BY t1.path;
-        ';
-        
-        EXECUTE '
-            INSERT INTO cache_visibility
-                SELECT ''' ||OLD.section|| ''' AS type, ''' ||OLD.member|| ''' as member, ''' ||arg_term_name|| '''||'':''||''' ||OLD.area|| ''' AS term, ''' ||OLD.term|| ''' as termid,
-                ARRAY( 
-                    SELECT id FROM ' ||OLD.section|| ' WHERE 
-                        path @> ARRAY( 
-                            SELECT path from map_member_to_rule t1, ' ||OLD.section|| ' t2 
-                            WHERE t2.id = t1.binding AND t1.member=''' ||OLD.member|| ''' AND t1.term = ''' ||OLD.term|| ''' AND t1.area = ''' ||OLD.area|| '''
-                        )
-                ) as parents,
-                ARRAY( 
-                    SELECT id FROM ' ||OLD.section|| ' WHERE 
-                        path <@ ARRAY( 
-                            SELECT path from map_member_to_rule t1, ' ||OLD.section|| ' t2 
-                            WHERE t2.id = t1.binding AND t1.member=''' ||OLD.member|| ''' AND t1.term = ''' ||OLD.term|| ''' AND t1.area = ''' ||OLD.area|| '''
-                        )
-                ) as childrens
-        ';
-        */
+		IF arg_path IS NOT null AND arg_term_name IS NOT NULL THEN
+			EXECUTE 'DELETE FROM cache_access WHERE type=''' ||OLD.section|| ''' AND member=''' ||OLD.member|| ''' AND path ~ (''' || arg_path::text || '.*'')::lquery ';
+			EXECUTE 'DELETE FROM cache_visibility WHERE type=''' ||OLD.section|| ''' AND member=''' ||OLD.member|| ''' AND term LIKE ''' ||arg_term_name|| ':' ||OLD.area|| ''' ';
+		END IF;
     END IF;
 
-    RETURN OLD;    
+    RETURN OLD;
 END;
+
 $_$;
 
 
+ALTER FUNCTION public.rules_delete_after_trigger() OWNER TO inprint;
+
 --
--- TOC entry 96 (class 1255 OID 78762)
--- Dependencies: 535 3
--- Name: rules_insert_after_trigger(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: rules_insert_after_trigger(); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION rules_insert_after_trigger() RETURNS trigger
@@ -1175,103 +1214,110 @@ BEGIN
         EXECUTE '
             INSERT INTO cache_access("type", path, binding, member, terms)
             VALUES (
-                ''domain'', ''00000000000000000000000000000000''::ltree, ''00000000-0000-0000-0000-000000000000'', ''' ||NEW.member|| ''', 
-                ARRAY( 
+                ''domain'', ''00000000000000000000000000000000''::ltree, ''00000000-0000-0000-0000-000000000000'', ''' ||NEW.member|| ''',
+                ARRAY(
                     SELECT DISTINCT (((a2.section::text || ''.''::text) || a2.subsection::text) || ''.''::text) || a2.term::text AS term
-                    FROM map_member_to_rule a1, rules a2
+                    FROM map_member_to_rule a1, view_rules a2
                     WHERE a2.id = a1.term AND a2.section = ''domain'' AND a1.member = ''' ||NEW.member|| '''
                 )
            );
         ';
-    
+
     END IF;
 
     IF NEW.section = 'editions' OR NEW.section = 'catalog' THEN
 
         EXECUTE 'SELECT m.path FROM ' || NEW.section || ' AS m WHERE m.id = $1'
             INTO arg_path USING NEW.binding;
-        EXECUTE 'SELECT section||''.''||subsection||''.''||term FROM rules WHERE id = $1'
+
+        EXECUTE 'SELECT term_text FROM view_rules WHERE id = $1'
             INTO arg_term_name USING NEW.term;
+
     END IF;
 
     IF NEW.section = 'editions' THEN
+		IF arg_path IS NOT null AND arg_term_name IS NOT NULL THEN
+			EXECUTE 'DELETE FROM cache_access WHERE type=''' ||NEW.section|| ''' AND member=''' ||NEW.member|| ''' AND path ~ (''' || arg_path::text || '.*'')::lquery; ';
+			EXECUTE 'DELETE FROM cache_visibility WHERE type=''' ||NEW.section|| ''' AND member=''' ||NEW.member|| ''' AND term LIKE ''' ||arg_term_name|| '''; ';
 
-        EXECUTE 'DELETE FROM cache_access WHERE type=''' ||NEW.section|| ''' AND member=''' ||NEW.member|| ''' AND path ~ (''' || arg_path::text || '.*'')::lquery; ';
-        EXECUTE 'DELETE FROM cache_visibility WHERE type=''' ||NEW.section|| ''' AND member=''' ||NEW.member|| ''' AND term LIKE ''' ||arg_term_name|| '''; ';
-    
-        EXECUTE '
-            INSERT INTO cache_access
-                SELECT ''' ||NEW.section|| ''' AS type, t1.path, t1.id AS binding, t2.id AS member, ARRAY( 
-                    SELECT DISTINCT a2.section::text || ''.''::text || a2.subsection::text || ''.''::text || a2.term::text AS term
-                    FROM map_member_to_rule a1, rules a2
-                    WHERE a2.id = a1.term AND a2.section = ''' ||NEW.section|| ''' AND a1.member = t2.id AND (a1.binding IN ( SELECT id FROM ' ||NEW.section|| ' WHERE path @> t1.path))
-                ) AS terms
-                FROM ' ||NEW.section|| ' t1, members t2
-                WHERE t2.id=''' ||NEW.member|| ''' AND t1.path ~ (''' || arg_path::text || '.*'')::lquery ORDER BY t1.path;
-        ';
-        
-        EXECUTE '
-            INSERT INTO cache_visibility
-                SELECT ''' ||NEW.section|| ''' AS type, ''' ||NEW.member|| ''' as member, ''' ||arg_term_name|| ''' AS term, ''' ||NEW.term|| ''' as termid,
-                ARRAY( 
-                    SELECT id FROM ' ||NEW.section|| ' WHERE 
-                        path @> ARRAY( SELECT path from map_member_to_rule t1, ' ||NEW.section|| ' t2 WHERE t2.id = t1.binding AND t1.member=''' ||NEW.member|| ''' AND t1.term = ''' ||NEW.term|| ''')
-                ) as parents,
-                ARRAY( 
-                    SELECT id FROM ' ||NEW.section|| ' WHERE 
-                        path <@ ARRAY( SELECT path from map_member_to_rule t1, ' ||NEW.section|| ' t2 WHERE t2.id = t1.binding AND t1.member=''' ||NEW.member|| ''' AND t1.term = ''' ||NEW.term|| ''')
-                ) as childrens
-                
-        ';
+			EXECUTE '
+				INSERT INTO cache_access
+					SELECT ''' ||NEW.section|| ''' AS type, t1.path, t1.id AS binding, t2.id AS member, ARRAY(
+						SELECT DISTINCT a2.section::text || ''.''::text || a2.subsection::text || ''.''::text || a2.term::text AS term
+						FROM map_member_to_rule a1, view_rules a2
+						WHERE a2.id = a1.term AND a2.section = ''' ||NEW.section|| ''' AND a1.member = t2.id AND (a1.binding IN ( SELECT id FROM ' ||NEW.section|| ' WHERE path @> t1.path))
+					) AS terms
+					FROM ' ||NEW.section|| ' t1, members t2
+					WHERE t2.id=''' ||NEW.member|| ''' AND t1.path ~ (''' || arg_path::text || '.*'')::lquery ORDER BY t1.path;
+			';
+
+			EXECUTE '
+				INSERT INTO cache_visibility
+					SELECT ''' ||NEW.section|| ''' AS type, ''' ||NEW.member|| ''' as member, ''' ||arg_term_name|| ''' AS term, ''' ||NEW.term|| ''' as termid,
+					ARRAY(
+						SELECT id FROM ' ||NEW.section|| ' WHERE
+							path @> ARRAY( SELECT path from map_member_to_rule t1, ' ||NEW.section|| ' t2 WHERE t2.id = t1.binding AND t1.member=''' ||NEW.member|| ''' AND t1.term = ''' ||NEW.term|| ''')
+					) as parents,
+					ARRAY(
+						SELECT id FROM ' ||NEW.section|| ' WHERE
+							path <@ ARRAY( SELECT path from map_member_to_rule t1, ' ||NEW.section|| ' t2 WHERE t2.id = t1.binding AND t1.member=''' ||NEW.member|| ''' AND t1.term = ''' ||NEW.term|| ''')
+					) as childrens
+
+			';
+		END IF;
     END IF;
 
     IF NEW.section = 'catalog' THEN
+		
+		IF arg_path IS NOT null AND arg_term_name IS NOT NULL THEN
 
-        EXECUTE 'DELETE FROM cache_access WHERE type=''' ||NEW.section|| ''' AND member=''' ||NEW.member|| ''' AND path ~ (''' || arg_path::text || '.*'')::lquery; ';
-        EXECUTE 'DELETE FROM cache_visibility WHERE type=''' ||NEW.section|| ''' AND member=''' ||NEW.member|| ''' AND term LIKE ''' ||arg_term_name|| ':' ||NEW.area|| ''' ';
-    
-        EXECUTE '
-            INSERT INTO cache_access
-                SELECT ''' ||NEW.section|| ''' AS type, t1.path, t1.id AS binding, t2.id AS member, ARRAY( 
-                    SELECT DISTINCT a2.section::text || ''.''::text || a2.subsection::text || ''.''::text || a2.term::text || '':''::text || a1.area AS term
-                    FROM map_member_to_rule a1, rules a2
-                    WHERE a2.id = a1.term AND a2.section = ''' ||NEW.section|| ''' AND a1.member = ''' ||NEW.member|| ''' AND (a1.binding IN ( SELECT id FROM ' ||NEW.section|| ' WHERE path @> t1.path))
-                ) AS terms
-                FROM ' ||NEW.section|| ' t1, members t2
-                WHERE t2.id=''' ||NEW.member|| ''' AND t1.path ~ (''' || arg_path::text || '.*'')::lquery ORDER BY t1.path;
-        ';
-        
-        EXECUTE '
-            INSERT INTO cache_visibility
-                SELECT ''' ||NEW.section|| ''' AS type, ''' ||NEW.member|| ''' as member, ''' ||arg_term_name|| '''||'':''||''' ||NEW.area|| ''' AS term, ''' ||NEW.term|| ''' as termid,
-                ARRAY( 
-                    SELECT id FROM ' ||NEW.section|| ' WHERE 
-                        path @> ARRAY( 
-                            SELECT path from map_member_to_rule t1, ' ||NEW.section|| ' t2 
-                            WHERE t2.id = t1.binding AND t1.member=''' ||NEW.member|| ''' AND t1.term = ''' ||NEW.term|| ''' AND t1.area = ''' ||NEW.area|| '''
-                        )
-                ) as parents,
-                ARRAY( 
-                    SELECT id FROM ' ||NEW.section|| ' WHERE 
-                        path <@ ARRAY( 
-                            SELECT path from map_member_to_rule t1, ' ||NEW.section|| ' t2 
-                            WHERE t2.id = t1.binding AND t1.member=''' ||NEW.member|| ''' AND t1.term = ''' ||NEW.term|| ''' AND t1.area = ''' ||NEW.area|| '''
-                        )
-                ) as childrens
-        ';
-        
+			EXECUTE 'DELETE FROM cache_access WHERE type=''' ||NEW.section|| ''' AND member=''' ||NEW.member|| ''' AND path ~ (''' || arg_path::text || '.*'')::lquery; ';
+			EXECUTE 'DELETE FROM cache_visibility WHERE type=''' ||NEW.section|| ''' AND member=''' ||NEW.member|| ''' AND term LIKE ''' ||arg_term_name|| ':' ||NEW.area|| ''' ';
+
+			EXECUTE '
+				INSERT INTO cache_access
+					SELECT ''' ||NEW.section|| ''' AS type, t1.path, t1.id AS binding, t2.id AS member, ARRAY(
+						SELECT DISTINCT a2.section::text || ''.''::text || a2.subsection::text || ''.''::text || a2.term::text || '':''::text || a1.area AS term
+						FROM map_member_to_rule a1, view_rules a2
+						WHERE a2.id = a1.term AND a2.section = ''' ||NEW.section|| ''' AND a1.member = ''' ||NEW.member|| ''' AND (a1.binding IN ( SELECT id FROM ' ||NEW.section|| ' WHERE path @> t1.path))
+					) AS terms
+					FROM ' ||NEW.section|| ' t1, members t2
+					WHERE t2.id=''' ||NEW.member|| ''' AND t1.path ~ (''' || arg_path::text || '.*'')::lquery ORDER BY t1.path;
+			';
+
+			EXECUTE '
+				INSERT INTO cache_visibility
+					SELECT ''' ||NEW.section|| ''' AS type, ''' ||NEW.member|| ''' as member, ''' ||arg_term_name|| '''||'':''||''' ||NEW.area|| ''' AS term, ''' ||NEW.term|| ''' as termid,
+					ARRAY(
+						SELECT id FROM ' ||NEW.section|| ' WHERE
+							path @> ARRAY(
+								SELECT path from map_member_to_rule t1, ' ||NEW.section|| ' t2
+								WHERE t2.id = t1.binding AND t1.member=''' ||NEW.member|| ''' AND t1.term = ''' ||NEW.term|| ''' AND t1.area = ''' ||NEW.area|| '''
+							)
+					) as parents,
+					ARRAY(
+						SELECT id FROM ' ||NEW.section|| ' WHERE
+							path <@ ARRAY(
+								SELECT path from map_member_to_rule t1, ' ||NEW.section|| ' t2
+								WHERE t2.id = t1.binding AND t1.member=''' ||NEW.member|| ''' AND t1.term = ''' ||NEW.term|| ''' AND t1.area = ''' ||NEW.area|| '''
+							)
+					) as childrens
+			';
+
+		END IF;
     END IF;
-    
+
     RETURN NEW;
-    
+
 END;
+
 $_$;
 
 
+ALTER FUNCTION public.rules_insert_after_trigger() OWNER TO inprint;
+
 --
--- TOC entry 86 (class 1255 OID 78222)
--- Dependencies: 387 3 387
--- Name: subltree(ltree, integer, integer); Type: FUNCTION; Schema: public; Owner: -
+-- Name: subltree(ltree, integer, integer); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION subltree(ltree, integer, integer) RETURNS ltree
@@ -1279,10 +1325,10 @@ CREATE FUNCTION subltree(ltree, integer, integer) RETURNS ltree
     AS '$libdir/ltree', 'subltree';
 
 
+ALTER FUNCTION public.subltree(ltree, integer, integer) OWNER TO inprint;
+
 --
--- TOC entry 88 (class 1255 OID 78224)
--- Dependencies: 3 387 387
--- Name: subpath(ltree, integer); Type: FUNCTION; Schema: public; Owner: -
+-- Name: subpath(ltree, integer); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION subpath(ltree, integer) RETURNS ltree
@@ -1290,10 +1336,10 @@ CREATE FUNCTION subpath(ltree, integer) RETURNS ltree
     AS '$libdir/ltree', 'subpath';
 
 
+ALTER FUNCTION public.subpath(ltree, integer) OWNER TO inprint;
+
 --
--- TOC entry 87 (class 1255 OID 78223)
--- Dependencies: 3 387 387
--- Name: subpath(ltree, integer, integer); Type: FUNCTION; Schema: public; Owner: -
+-- Name: subpath(ltree, integer, integer); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION subpath(ltree, integer, integer) RETURNS ltree
@@ -1301,10 +1347,10 @@ CREATE FUNCTION subpath(ltree, integer, integer) RETURNS ltree
     AS '$libdir/ltree', 'subpath';
 
 
+ALTER FUNCTION public.subpath(ltree, integer, integer) OWNER TO inprint;
+
 --
--- TOC entry 89 (class 1255 OID 78225)
--- Dependencies: 3 387
--- Name: text2ltree(text); Type: FUNCTION; Schema: public; Owner: -
+-- Name: text2ltree(text); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION text2ltree(text) RETURNS ltree
@@ -1312,10 +1358,10 @@ CREATE FUNCTION text2ltree(text) RETURNS ltree
     AS '$libdir/ltree', 'text2ltree';
 
 
+ALTER FUNCTION public.text2ltree(text) OWNER TO inprint;
+
 --
--- TOC entry 90 (class 1255 OID 78226)
--- Dependencies: 535 3
--- Name: tree_delete_after_trigger(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: tree_delete_after_trigger(); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION tree_delete_after_trigger() RETURNS trigger
@@ -1323,15 +1369,15 @@ CREATE FUNCTION tree_delete_after_trigger() RETURNS trigger
     AS $$
 BEGIN
     EXECUTE ' DELETE FROM ' || TG_TABLE_NAME || ' WHERE path ~ (''' || OLD.path::text || '.*{1}'')::lquery; ';
-    RETURN OLD; 
+    RETURN OLD;
 END;
 $$;
 
 
+ALTER FUNCTION public.tree_delete_after_trigger() OWNER TO inprint;
+
 --
--- TOC entry 91 (class 1255 OID 78227)
--- Dependencies: 3 535
--- Name: tree_insert_before_trigger(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: tree_insert_before_trigger(); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION tree_insert_before_trigger() RETURNS trigger
@@ -1343,7 +1389,7 @@ DECLARE
 BEGIN
 
 	new_id := replace(NEW.id::text, '-',  '');
-        
+
 	IF NEW.path IS NOT NULL THEN
 	-- передан, какой-то материализованный путь
 	-- обрезаем в материализованном пути id вставляемого узла, если он есть
@@ -1351,15 +1397,15 @@ BEGIN
 		THEN subpath(NEW.path, 0, -1)
 		ELSE NEW.path
 	END;
-	
+
 	-- проверяем существование родителя
         EXECUTE 'SELECT mp.path FROM ' || TG_TABLE_NAME || ' AS mp WHERE mp.path = $1 OR replace(mp.id::text, ''-'',  '''') = $2'
 	INTO new_path USING new_path, new_path::text;
-	
+
 	-- родителя не нашли
         IF new_path IS NULL OR new_path = '' THEN
             NEW.path := new_id;
-	
+
 	-- родителя нашли
         ELSE
             NEW.path := new_path || new_id;
@@ -1372,17 +1418,17 @@ END;
 $_$;
 
 
+ALTER FUNCTION public.tree_insert_before_trigger() OWNER TO inprint;
+
 --
--- TOC entry 92 (class 1255 OID 78228)
--- Dependencies: 535 3
--- Name: tree_update_after_trigger(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: tree_update_after_trigger(); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION tree_update_after_trigger() RETURNS trigger
     LANGUAGE plpgsql
     AS $_$
 DECLARE
-	tid     ltree;  
+	tid     ltree;
 	new_id	ltree;
 BEGIN
 
@@ -1392,9 +1438,9 @@ BEGIN
 	NEW.id := OLD.id;
 
 	-- Приводим NULL значение материализованного пути к ID
-	NEW.path := CASE WHEN NEW.path IS NULL 
+	NEW.path := CASE WHEN NEW.path IS NULL
 		THEN new_id::text
-		ELSE NEW.path::text 
+		ELSE NEW.path::text
 	END;
 
 	-- Есть ли у нас изменения материализованного пути
@@ -1402,7 +1448,7 @@ BEGIN
 
 		-- Проверяем что новое значение материализованного пути
 		-- лежит не пределах подчинения и что на его конце ID
-		IF NEW.path ~ ('*.' || new_id::text || '.*{1,}')::lquery 
+		IF NEW.path ~ ('*.' || new_id::text || '.*{1,}')::lquery
 		   OR NEW.path ~ ('*.!' || new_id::text)::lquery
 		THEN
 			RAISE EXCEPTION 'Bad path! id = %', new_id;
@@ -1410,7 +1456,7 @@ BEGIN
 
 		-- Если уровень больше 1 то стоит проверить родителя
 		IF nlevel(NEW.path) > 1 THEN
-			EXECUTE 'SELECT replace(m.id::text, ''-'',  '''') FROM ' ||TG_TABLE_NAME|| ' AS m 
+			EXECUTE 'SELECT replace(m.id::text, ''-'',  '''') FROM ' ||TG_TABLE_NAME|| ' AS m
 				WHERE m.path = subpath($1, 0, nlevel($2) - 1)'
 			INTO tid USING NEW.path, NEW.path;
 			IF tid IS NULL THEN
@@ -1427,10 +1473,10 @@ END;
 $_$;
 
 
+ALTER FUNCTION public.tree_update_after_trigger() OWNER TO inprint;
+
 --
--- TOC entry 93 (class 1255 OID 78229)
--- Dependencies: 3
--- Name: uuid_generate_v4(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: uuid_generate_v4(); Type: FUNCTION; Schema: public; Owner: inprint
 --
 
 CREATE FUNCTION uuid_generate_v4() RETURNS uuid
@@ -1438,10 +1484,10 @@ CREATE FUNCTION uuid_generate_v4() RETURNS uuid
     AS '$libdir/uuid-ossp', 'uuid_generate_v4';
 
 
+ALTER FUNCTION public.uuid_generate_v4() OWNER TO inprint;
+
 --
--- TOC entry 1240 (class 2617 OID 78232)
--- Dependencies: 387 3 74 387
--- Name: <; Type: OPERATOR; Schema: public; Owner: -
+-- Name: <; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR < (
@@ -1455,10 +1501,10 @@ CREATE OPERATOR < (
 );
 
 
+ALTER OPERATOR public.< (ltree, ltree) OWNER TO inprint;
+
 --
--- TOC entry 1243 (class 2617 OID 78233)
--- Dependencies: 387 387 3 73
--- Name: <=; Type: OPERATOR; Schema: public; Owner: -
+-- Name: <=; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR <= (
@@ -1472,10 +1518,10 @@ CREATE OPERATOR <= (
 );
 
 
+ALTER OPERATOR public.<= (ltree, ltree) OWNER TO inprint;
+
 --
--- TOC entry 1241 (class 2617 OID 78235)
--- Dependencies: 75 387 3 387
--- Name: <>; Type: OPERATOR; Schema: public; Owner: -
+-- Name: <>; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR <> (
@@ -1489,10 +1535,10 @@ CREATE OPERATOR <> (
 );
 
 
+ALTER OPERATOR public.<> (ltree, ltree) OWNER TO inprint;
+
 --
--- TOC entry 1246 (class 2617 OID 78237)
--- Dependencies: 387 3 387 78 82
--- Name: <@; Type: OPERATOR; Schema: public; Owner: -
+-- Name: <@; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR <@ (
@@ -1505,10 +1551,10 @@ CREATE OPERATOR <@ (
 );
 
 
+ALTER OPERATOR public.<@ (ltree, ltree) OWNER TO inprint;
+
 --
--- TOC entry 1248 (class 2617 OID 78239)
--- Dependencies: 39 3 387 389
--- Name: <@; Type: OPERATOR; Schema: public; Owner: -
+-- Name: <@; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR <@ (
@@ -1521,10 +1567,10 @@ CREATE OPERATOR <@ (
 );
 
 
+ALTER OPERATOR public.<@ (ltree, ltree[]) OWNER TO inprint;
+
 --
--- TOC entry 1250 (class 2617 OID 78241)
--- Dependencies: 387 3 389 41
--- Name: <@; Type: OPERATOR; Schema: public; Owner: -
+-- Name: <@; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR <@ (
@@ -1537,10 +1583,10 @@ CREATE OPERATOR <@ (
 );
 
 
+ALTER OPERATOR public.<@ (ltree[], ltree) OWNER TO inprint;
+
 --
--- TOC entry 1249 (class 2617 OID 78234)
--- Dependencies: 69 387 3 387
--- Name: =; Type: OPERATOR; Schema: public; Owner: -
+-- Name: =; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR = (
@@ -1555,10 +1601,10 @@ CREATE OPERATOR = (
 );
 
 
+ALTER OPERATOR public.= (ltree, ltree) OWNER TO inprint;
+
 --
--- TOC entry 1242 (class 2617 OID 78230)
--- Dependencies: 387 387 3 71
--- Name: >; Type: OPERATOR; Schema: public; Owner: -
+-- Name: >; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR > (
@@ -1572,10 +1618,10 @@ CREATE OPERATOR > (
 );
 
 
+ALTER OPERATOR public.> (ltree, ltree) OWNER TO inprint;
+
 --
--- TOC entry 1245 (class 2617 OID 78231)
--- Dependencies: 70 387 3 387
--- Name: >=; Type: OPERATOR; Schema: public; Owner: -
+-- Name: >=; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR >= (
@@ -1589,26 +1635,10 @@ CREATE OPERATOR >= (
 );
 
 
---
--- TOC entry 1254 (class 2617 OID 78242)
--- Dependencies: 386 58 3 387
--- Name: ?; Type: OPERATOR; Schema: public; Owner: -
---
-
-CREATE OPERATOR ? (
-    PROCEDURE = lt_q_regex,
-    LEFTARG = ltree,
-    RIGHTARG = lquery[],
-    COMMUTATOR = ?,
-    RESTRICT = contsel,
-    JOIN = contjoinsel
-);
-
+ALTER OPERATOR public.>= (ltree, ltree) OWNER TO inprint;
 
 --
--- TOC entry 1252 (class 2617 OID 78243)
--- Dependencies: 3 59 387 386
--- Name: ?; Type: OPERATOR; Schema: public; Owner: -
+-- Name: ?; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR ? (
@@ -1621,15 +1651,15 @@ CREATE OPERATOR ? (
 );
 
 
+ALTER OPERATOR public.? (lquery[], ltree) OWNER TO inprint;
+
 --
--- TOC entry 1256 (class 2617 OID 78244)
--- Dependencies: 27 3 389 386
--- Name: ?; Type: OPERATOR; Schema: public; Owner: -
+-- Name: ?; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR ? (
-    PROCEDURE = _lt_q_regex,
-    LEFTARG = ltree[],
+    PROCEDURE = lt_q_regex,
+    LEFTARG = ltree,
     RIGHTARG = lquery[],
     COMMUTATOR = ?,
     RESTRICT = contsel,
@@ -1637,10 +1667,10 @@ CREATE OPERATOR ? (
 );
 
 
+ALTER OPERATOR public.? (ltree, lquery[]) OWNER TO inprint;
+
 --
--- TOC entry 1255 (class 2617 OID 78245)
--- Dependencies: 389 28 3 386
--- Name: ?; Type: OPERATOR; Schema: public; Owner: -
+-- Name: ?; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR ? (
@@ -1653,10 +1683,26 @@ CREATE OPERATOR ? (
 );
 
 
+ALTER OPERATOR public.? (lquery[], ltree[]) OWNER TO inprint;
+
 --
--- TOC entry 1257 (class 2617 OID 78246)
--- Dependencies: 387 35 3 389 387
--- Name: ?<@; Type: OPERATOR; Schema: public; Owner: -
+-- Name: ?; Type: OPERATOR; Schema: public; Owner: inprint
+--
+
+CREATE OPERATOR ? (
+    PROCEDURE = _lt_q_regex,
+    LEFTARG = ltree[],
+    RIGHTARG = lquery[],
+    COMMUTATOR = ?,
+    RESTRICT = contsel,
+    JOIN = contjoinsel
+);
+
+
+ALTER OPERATOR public.? (ltree[], lquery[]) OWNER TO inprint;
+
+--
+-- Name: ?<@; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR ?<@ (
@@ -1666,10 +1712,10 @@ CREATE OPERATOR ?<@ (
 );
 
 
+ALTER OPERATOR public.?<@ (ltree[], ltree) OWNER TO inprint;
+
 --
--- TOC entry 1258 (class 2617 OID 78247)
--- Dependencies: 389 393 387 45 3
--- Name: ?@; Type: OPERATOR; Schema: public; Owner: -
+-- Name: ?@; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR ?@ (
@@ -1679,10 +1725,10 @@ CREATE OPERATOR ?@ (
 );
 
 
+ALTER OPERATOR public.?@ (ltree[], ltxtquery) OWNER TO inprint;
+
 --
--- TOC entry 1259 (class 2617 OID 78248)
--- Dependencies: 389 387 34 3 387
--- Name: ?@>; Type: OPERATOR; Schema: public; Owner: -
+-- Name: ?@>; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR ?@> (
@@ -1692,10 +1738,10 @@ CREATE OPERATOR ?@> (
 );
 
 
+ALTER OPERATOR public.?@> (ltree[], ltree) OWNER TO inprint;
+
 --
--- TOC entry 1260 (class 2617 OID 78249)
--- Dependencies: 384 389 3 29 387
--- Name: ?~; Type: OPERATOR; Schema: public; Owner: -
+-- Name: ?~; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR ?~ (
@@ -1705,26 +1751,10 @@ CREATE OPERATOR ?~ (
 );
 
 
---
--- TOC entry 1263 (class 2617 OID 78250)
--- Dependencies: 83 3 387 393
--- Name: @; Type: OPERATOR; Schema: public; Owner: -
---
-
-CREATE OPERATOR @ (
-    PROCEDURE = ltxtq_exec,
-    LEFTARG = ltree,
-    RIGHTARG = ltxtquery,
-    COMMUTATOR = @,
-    RESTRICT = contsel,
-    JOIN = contjoinsel
-);
-
+ALTER OPERATOR public.?~ (ltree[], lquery) OWNER TO inprint;
 
 --
--- TOC entry 1261 (class 2617 OID 78251)
--- Dependencies: 84 3 393 387
--- Name: @; Type: OPERATOR; Schema: public; Owner: -
+-- Name: @; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR @ (
@@ -1737,15 +1767,15 @@ CREATE OPERATOR @ (
 );
 
 
+ALTER OPERATOR public.@ (ltxtquery, ltree) OWNER TO inprint;
+
 --
--- TOC entry 1265 (class 2617 OID 78252)
--- Dependencies: 393 44 389 3
--- Name: @; Type: OPERATOR; Schema: public; Owner: -
+-- Name: @; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR @ (
-    PROCEDURE = _ltxtq_exec,
-    LEFTARG = ltree[],
+    PROCEDURE = ltxtq_exec,
+    LEFTARG = ltree,
     RIGHTARG = ltxtquery,
     COMMUTATOR = @,
     RESTRICT = contsel,
@@ -1753,10 +1783,10 @@ CREATE OPERATOR @ (
 );
 
 
+ALTER OPERATOR public.@ (ltree, ltxtquery) OWNER TO inprint;
+
 --
--- TOC entry 1264 (class 2617 OID 78253)
--- Dependencies: 46 389 393 3
--- Name: @; Type: OPERATOR; Schema: public; Owner: -
+-- Name: @; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR @ (
@@ -1769,10 +1799,26 @@ CREATE OPERATOR @ (
 );
 
 
+ALTER OPERATOR public.@ (ltxtquery, ltree[]) OWNER TO inprint;
+
 --
--- TOC entry 1244 (class 2617 OID 78236)
--- Dependencies: 387 3 82 72 387
--- Name: @>; Type: OPERATOR; Schema: public; Owner: -
+-- Name: @; Type: OPERATOR; Schema: public; Owner: inprint
+--
+
+CREATE OPERATOR @ (
+    PROCEDURE = _ltxtq_exec,
+    LEFTARG = ltree[],
+    RIGHTARG = ltxtquery,
+    COMMUTATOR = @,
+    RESTRICT = contsel,
+    JOIN = contjoinsel
+);
+
+
+ALTER OPERATOR public.@ (ltree[], ltxtquery) OWNER TO inprint;
+
+--
+-- Name: @>; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR @> (
@@ -1785,10 +1831,10 @@ CREATE OPERATOR @> (
 );
 
 
+ALTER OPERATOR public.@> (ltree, ltree) OWNER TO inprint;
+
 --
--- TOC entry 1247 (class 2617 OID 78238)
--- Dependencies: 3 387 389 36
--- Name: @>; Type: OPERATOR; Schema: public; Owner: -
+-- Name: @>; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR @> (
@@ -1801,10 +1847,10 @@ CREATE OPERATOR @> (
 );
 
 
+ALTER OPERATOR public.@> (ltree[], ltree) OWNER TO inprint;
+
 --
--- TOC entry 1266 (class 2617 OID 78240)
--- Dependencies: 389 3 387 40
--- Name: @>; Type: OPERATOR; Schema: public; Owner: -
+-- Name: @>; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR @> (
@@ -1817,10 +1863,10 @@ CREATE OPERATOR @> (
 );
 
 
+ALTER OPERATOR public.@> (ltree, ltree[]) OWNER TO inprint;
+
 --
--- TOC entry 1267 (class 2617 OID 78255)
--- Dependencies: 78 3 387 387
--- Name: ^<@; Type: OPERATOR; Schema: public; Owner: -
+-- Name: ^<@; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR ^<@ (
@@ -1833,10 +1879,10 @@ CREATE OPERATOR ^<@ (
 );
 
 
+ALTER OPERATOR public.^<@ (ltree, ltree) OWNER TO inprint;
+
 --
--- TOC entry 1269 (class 2617 OID 78257)
--- Dependencies: 39 3 387 389
--- Name: ^<@; Type: OPERATOR; Schema: public; Owner: -
+-- Name: ^<@; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR ^<@ (
@@ -1849,10 +1895,10 @@ CREATE OPERATOR ^<@ (
 );
 
 
+ALTER OPERATOR public.^<@ (ltree, ltree[]) OWNER TO inprint;
+
 --
--- TOC entry 1270 (class 2617 OID 78259)
--- Dependencies: 41 3 389 387
--- Name: ^<@; Type: OPERATOR; Schema: public; Owner: -
+-- Name: ^<@; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR ^<@ (
@@ -1865,26 +1911,10 @@ CREATE OPERATOR ^<@ (
 );
 
 
---
--- TOC entry 1272 (class 2617 OID 78260)
--- Dependencies: 58 3 387 386
--- Name: ^?; Type: OPERATOR; Schema: public; Owner: -
---
-
-CREATE OPERATOR ^? (
-    PROCEDURE = lt_q_regex,
-    LEFTARG = ltree,
-    RIGHTARG = lquery[],
-    COMMUTATOR = ^?,
-    RESTRICT = contsel,
-    JOIN = contjoinsel
-);
-
+ALTER OPERATOR public.^<@ (ltree[], ltree) OWNER TO inprint;
 
 --
--- TOC entry 1271 (class 2617 OID 78261)
--- Dependencies: 3 386 387 59
--- Name: ^?; Type: OPERATOR; Schema: public; Owner: -
+-- Name: ^?; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR ^? (
@@ -1897,15 +1927,15 @@ CREATE OPERATOR ^? (
 );
 
 
+ALTER OPERATOR public.^? (lquery[], ltree) OWNER TO inprint;
+
 --
--- TOC entry 1275 (class 2617 OID 78262)
--- Dependencies: 27 3 389 386
--- Name: ^?; Type: OPERATOR; Schema: public; Owner: -
+-- Name: ^?; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR ^? (
-    PROCEDURE = _lt_q_regex,
-    LEFTARG = ltree[],
+    PROCEDURE = lt_q_regex,
+    LEFTARG = ltree,
     RIGHTARG = lquery[],
     COMMUTATOR = ^?,
     RESTRICT = contsel,
@@ -1913,10 +1943,10 @@ CREATE OPERATOR ^? (
 );
 
 
+ALTER OPERATOR public.^? (ltree, lquery[]) OWNER TO inprint;
+
 --
--- TOC entry 1273 (class 2617 OID 78263)
--- Dependencies: 3 28 389 386
--- Name: ^?; Type: OPERATOR; Schema: public; Owner: -
+-- Name: ^?; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR ^? (
@@ -1929,26 +1959,26 @@ CREATE OPERATOR ^? (
 );
 
 
+ALTER OPERATOR public.^? (lquery[], ltree[]) OWNER TO inprint;
+
 --
--- TOC entry 1277 (class 2617 OID 78264)
--- Dependencies: 83 3 387 393
--- Name: ^@; Type: OPERATOR; Schema: public; Owner: -
+-- Name: ^?; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
-CREATE OPERATOR ^@ (
-    PROCEDURE = ltxtq_exec,
-    LEFTARG = ltree,
-    RIGHTARG = ltxtquery,
-    COMMUTATOR = ^@,
+CREATE OPERATOR ^? (
+    PROCEDURE = _lt_q_regex,
+    LEFTARG = ltree[],
+    RIGHTARG = lquery[],
+    COMMUTATOR = ^?,
     RESTRICT = contsel,
     JOIN = contjoinsel
 );
 
 
+ALTER OPERATOR public.^? (ltree[], lquery[]) OWNER TO inprint;
+
 --
--- TOC entry 1276 (class 2617 OID 78265)
--- Dependencies: 3 84 387 393
--- Name: ^@; Type: OPERATOR; Schema: public; Owner: -
+-- Name: ^@; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR ^@ (
@@ -1961,15 +1991,15 @@ CREATE OPERATOR ^@ (
 );
 
 
+ALTER OPERATOR public.^@ (ltxtquery, ltree) OWNER TO inprint;
+
 --
--- TOC entry 1280 (class 2617 OID 78266)
--- Dependencies: 393 44 3 389
--- Name: ^@; Type: OPERATOR; Schema: public; Owner: -
+-- Name: ^@; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR ^@ (
-    PROCEDURE = _ltxtq_exec,
-    LEFTARG = ltree[],
+    PROCEDURE = ltxtq_exec,
+    LEFTARG = ltree,
     RIGHTARG = ltxtquery,
     COMMUTATOR = ^@,
     RESTRICT = contsel,
@@ -1977,10 +2007,10 @@ CREATE OPERATOR ^@ (
 );
 
 
+ALTER OPERATOR public.^@ (ltree, ltxtquery) OWNER TO inprint;
+
 --
--- TOC entry 1278 (class 2617 OID 78267)
--- Dependencies: 389 3 393 46
--- Name: ^@; Type: OPERATOR; Schema: public; Owner: -
+-- Name: ^@; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR ^@ (
@@ -1993,10 +2023,26 @@ CREATE OPERATOR ^@ (
 );
 
 
+ALTER OPERATOR public.^@ (ltxtquery, ltree[]) OWNER TO inprint;
+
 --
--- TOC entry 1281 (class 2617 OID 78254)
--- Dependencies: 387 72 387 3
--- Name: ^@>; Type: OPERATOR; Schema: public; Owner: -
+-- Name: ^@; Type: OPERATOR; Schema: public; Owner: inprint
+--
+
+CREATE OPERATOR ^@ (
+    PROCEDURE = _ltxtq_exec,
+    LEFTARG = ltree[],
+    RIGHTARG = ltxtquery,
+    COMMUTATOR = ^@,
+    RESTRICT = contsel,
+    JOIN = contjoinsel
+);
+
+
+ALTER OPERATOR public.^@ (ltree[], ltxtquery) OWNER TO inprint;
+
+--
+-- Name: ^@>; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR ^@> (
@@ -2009,10 +2055,10 @@ CREATE OPERATOR ^@> (
 );
 
 
+ALTER OPERATOR public.^@> (ltree, ltree) OWNER TO inprint;
+
 --
--- TOC entry 1251 (class 2617 OID 78256)
--- Dependencies: 3 36 387 389
--- Name: ^@>; Type: OPERATOR; Schema: public; Owner: -
+-- Name: ^@>; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR ^@> (
@@ -2025,10 +2071,10 @@ CREATE OPERATOR ^@> (
 );
 
 
+ALTER OPERATOR public.^@> (ltree[], ltree) OWNER TO inprint;
+
 --
--- TOC entry 1253 (class 2617 OID 78258)
--- Dependencies: 387 3 389 40
--- Name: ^@>; Type: OPERATOR; Schema: public; Owner: -
+-- Name: ^@>; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR ^@> (
@@ -2041,26 +2087,10 @@ CREATE OPERATOR ^@> (
 );
 
 
---
--- TOC entry 1268 (class 2617 OID 78268)
--- Dependencies: 3 60 384 387
--- Name: ^~; Type: OPERATOR; Schema: public; Owner: -
---
-
-CREATE OPERATOR ^~ (
-    PROCEDURE = ltq_regex,
-    LEFTARG = ltree,
-    RIGHTARG = lquery,
-    COMMUTATOR = ^~,
-    RESTRICT = contsel,
-    JOIN = contjoinsel
-);
-
+ALTER OPERATOR public.^@> (ltree, ltree[]) OWNER TO inprint;
 
 --
--- TOC entry 1262 (class 2617 OID 78269)
--- Dependencies: 387 384 3 61
--- Name: ^~; Type: OPERATOR; Schema: public; Owner: -
+-- Name: ^~; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR ^~ (
@@ -2073,15 +2103,15 @@ CREATE OPERATOR ^~ (
 );
 
 
+ALTER OPERATOR public.^~ (lquery, ltree) OWNER TO inprint;
+
 --
--- TOC entry 1279 (class 2617 OID 78270)
--- Dependencies: 384 3 389 30
--- Name: ^~; Type: OPERATOR; Schema: public; Owner: -
+-- Name: ^~; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR ^~ (
-    PROCEDURE = _ltq_regex,
-    LEFTARG = ltree[],
+    PROCEDURE = ltq_regex,
+    LEFTARG = ltree,
     RIGHTARG = lquery,
     COMMUTATOR = ^~,
     RESTRICT = contsel,
@@ -2089,10 +2119,10 @@ CREATE OPERATOR ^~ (
 );
 
 
+ALTER OPERATOR public.^~ (ltree, lquery) OWNER TO inprint;
+
 --
--- TOC entry 1274 (class 2617 OID 78271)
--- Dependencies: 389 31 3 384
--- Name: ^~; Type: OPERATOR; Schema: public; Owner: -
+-- Name: ^~; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR ^~ (
@@ -2105,10 +2135,26 @@ CREATE OPERATOR ^~ (
 );
 
 
+ALTER OPERATOR public.^~ (lquery, ltree[]) OWNER TO inprint;
+
 --
--- TOC entry 1282 (class 2617 OID 78272)
--- Dependencies: 63 387 387 387 3
--- Name: ||; Type: OPERATOR; Schema: public; Owner: -
+-- Name: ^~; Type: OPERATOR; Schema: public; Owner: inprint
+--
+
+CREATE OPERATOR ^~ (
+    PROCEDURE = _ltq_regex,
+    LEFTARG = ltree[],
+    RIGHTARG = lquery,
+    COMMUTATOR = ^~,
+    RESTRICT = contsel,
+    JOIN = contjoinsel
+);
+
+
+ALTER OPERATOR public.^~ (ltree[], lquery) OWNER TO inprint;
+
+--
+-- Name: ||; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR || (
@@ -2118,10 +2164,10 @@ CREATE OPERATOR || (
 );
 
 
+ALTER OPERATOR public.|| (ltree, ltree) OWNER TO inprint;
+
 --
--- TOC entry 1283 (class 2617 OID 78273)
--- Dependencies: 387 64 387 3
--- Name: ||; Type: OPERATOR; Schema: public; Owner: -
+-- Name: ||; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR || (
@@ -2131,10 +2177,10 @@ CREATE OPERATOR || (
 );
 
 
+ALTER OPERATOR public.|| (ltree, text) OWNER TO inprint;
+
 --
--- TOC entry 1284 (class 2617 OID 78274)
--- Dependencies: 387 80 3 387
--- Name: ||; Type: OPERATOR; Schema: public; Owner: -
+-- Name: ||; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR || (
@@ -2144,26 +2190,10 @@ CREATE OPERATOR || (
 );
 
 
---
--- TOC entry 1286 (class 2617 OID 78275)
--- Dependencies: 387 60 384 3
--- Name: ~; Type: OPERATOR; Schema: public; Owner: -
---
-
-CREATE OPERATOR ~ (
-    PROCEDURE = ltq_regex,
-    LEFTARG = ltree,
-    RIGHTARG = lquery,
-    COMMUTATOR = ~,
-    RESTRICT = contsel,
-    JOIN = contjoinsel
-);
-
+ALTER OPERATOR public.|| (text, ltree) OWNER TO inprint;
 
 --
--- TOC entry 1285 (class 2617 OID 78276)
--- Dependencies: 61 384 3 387
--- Name: ~; Type: OPERATOR; Schema: public; Owner: -
+-- Name: ~; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR ~ (
@@ -2176,15 +2206,15 @@ CREATE OPERATOR ~ (
 );
 
 
+ALTER OPERATOR public.~ (lquery, ltree) OWNER TO inprint;
+
 --
--- TOC entry 1288 (class 2617 OID 78277)
--- Dependencies: 3 389 30 384
--- Name: ~; Type: OPERATOR; Schema: public; Owner: -
+-- Name: ~; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR ~ (
-    PROCEDURE = _ltq_regex,
-    LEFTARG = ltree[],
+    PROCEDURE = ltq_regex,
+    LEFTARG = ltree,
     RIGHTARG = lquery,
     COMMUTATOR = ~,
     RESTRICT = contsel,
@@ -2192,10 +2222,10 @@ CREATE OPERATOR ~ (
 );
 
 
+ALTER OPERATOR public.~ (ltree, lquery) OWNER TO inprint;
+
 --
--- TOC entry 1287 (class 2617 OID 78278)
--- Dependencies: 384 3 389 31
--- Name: ~; Type: OPERATOR; Schema: public; Owner: -
+-- Name: ~; Type: OPERATOR; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR ~ (
@@ -2208,10 +2238,26 @@ CREATE OPERATOR ~ (
 );
 
 
+ALTER OPERATOR public.~ (lquery, ltree[]) OWNER TO inprint;
+
 --
--- TOC entry 1400 (class 2616 OID 78280)
--- Dependencies: 3 1509 389 390
--- Name: gist__ltree_ops; Type: OPERATOR CLASS; Schema: public; Owner: -
+-- Name: ~; Type: OPERATOR; Schema: public; Owner: inprint
+--
+
+CREATE OPERATOR ~ (
+    PROCEDURE = _ltq_regex,
+    LEFTARG = ltree[],
+    RIGHTARG = lquery,
+    COMMUTATOR = ~,
+    RESTRICT = contsel,
+    JOIN = contjoinsel
+);
+
+
+ALTER OPERATOR public.~ (ltree[], lquery) OWNER TO inprint;
+
+--
+-- Name: gist__ltree_ops; Type: OPERATOR CLASS; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR CLASS gist__ltree_ops
@@ -2234,10 +2280,10 @@ CREATE OPERATOR CLASS gist__ltree_ops
     FUNCTION 7 _ltree_same(internal,internal,internal);
 
 
+ALTER OPERATOR CLASS public.gist__ltree_ops USING gist OWNER TO inprint;
+
 --
--- TOC entry 1401 (class 2616 OID 78297)
--- Dependencies: 1510 390 387 3
--- Name: gist_ltree_ops; Type: OPERATOR CLASS; Schema: public; Owner: -
+-- Name: gist_ltree_ops; Type: OPERATOR CLASS; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR CLASS gist_ltree_ops
@@ -2265,10 +2311,10 @@ CREATE OPERATOR CLASS gist_ltree_ops
     FUNCTION 7 ltree_same(internal,internal,internal);
 
 
+ALTER OPERATOR CLASS public.gist_ltree_ops USING gist OWNER TO inprint;
+
 --
--- TOC entry 1402 (class 2616 OID 78319)
--- Dependencies: 1511 387 3
--- Name: ltree_ops; Type: OPERATOR CLASS; Schema: public; Owner: -
+-- Name: ltree_ops; Type: OPERATOR CLASS; Schema: public; Owner: inprint
 --
 
 CREATE OPERATOR CLASS ltree_ops
@@ -2281,12 +2327,87 @@ CREATE OPERATOR CLASS ltree_ops
     FUNCTION 1 ltree_cmp(ltree,ltree);
 
 
+ALTER OPERATOR CLASS public.ltree_ops USING btree OWNER TO inprint;
+
+SET search_path = plugins, pg_catalog;
+
+SET default_tablespace = '';
+
 SET default_with_oids = false;
 
 --
--- TOC entry 1802 (class 1259 OID 144768)
--- Dependencies: 2153 2155 2156 3
--- Name: ad_advertisers; Type: TABLE; Schema: public; Owner: -
+-- Name: l18n; Type: TABLE; Schema: plugins; Owner: inprint; Tablespace:
+--
+
+CREATE TABLE l18n (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    plugin character varying NOT NULL,
+    l18n_language character varying NOT NULL,
+    l18n_original character varying NOT NULL,
+    l18n_translation character varying NOT NULL
+);
+
+
+ALTER TABLE plugins.l18n OWNER TO inprint;
+
+--
+-- Name: menu; Type: TABLE; Schema: plugins; Owner: inprint; Tablespace:
+--
+
+CREATE TABLE menu (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    plugin character varying NOT NULL,
+    menu_section character varying NOT NULL,
+    menu_id character varying NOT NULL,
+    menu_sortorder integer DEFAULT 0 NOT NULL,
+    menu_enabled boolean DEFAULT false NOT NULL
+);
+
+
+ALTER TABLE plugins.menu OWNER TO inprint;
+
+--
+-- Name: routes; Type: TABLE; Schema: plugins; Owner: inprint; Tablespace:
+--
+
+CREATE TABLE routes (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    plugin character varying NOT NULL,
+    route_url character varying NOT NULL,
+    route_controller character varying NOT NULL,
+    route_action character varying NOT NULL,
+    route_name character varying,
+    route_enabled boolean DEFAULT false NOT NULL,
+    route_authentication boolean DEFAULT true NOT NULL
+);
+
+
+ALTER TABLE plugins.routes OWNER TO inprint;
+
+--
+-- Name: rules; Type: TABLE; Schema: plugins; Owner: inprint; Tablespace:
+--
+
+CREATE TABLE rules (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    plugin character varying NOT NULL,
+    rule_term character varying NOT NULL,
+    rule_section character varying,
+    rule_subsection character varying,
+    rule_icon character varying NOT NULL,
+    rule_title character varying NOT NULL,
+    rule_description character varying NOT NULL,
+    rule_sortorder integer DEFAULT 0 NOT NULL,
+    rule_enabled boolean DEFAULT false NOT NULL
+);
+
+
+ALTER TABLE plugins.rules OWNER TO inprint;
+
+SET search_path = public, pg_catalog;
+
+--
+-- Name: ad_advertisers; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE ad_advertisers (
@@ -2310,33 +2431,31 @@ CREATE TABLE ad_advertisers (
 );
 
 
+ALTER TABLE public.ad_advertisers OWNER TO inprint;
+
 --
--- TOC entry 1801 (class 1259 OID 144766)
--- Dependencies: 1802 3
--- Name: ad_advertisers_serialnum_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: ad_advertisers_serialnum_seq; Type: SEQUENCE; Schema: public; Owner: inprint
 --
 
 CREATE SEQUENCE ad_advertisers_serialnum_seq
     START WITH 1
     INCREMENT BY 1
-    NO MINVALUE
     NO MAXVALUE
+    NO MINVALUE
     CACHE 1;
 
 
+ALTER TABLE public.ad_advertisers_serialnum_seq OWNER TO inprint;
+
 --
--- TOC entry 2365 (class 0 OID 0)
--- Dependencies: 1801
--- Name: ad_advertisers_serialnum_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: ad_advertisers_serialnum_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: inprint
 --
 
 ALTER SEQUENCE ad_advertisers_serialnum_seq OWNED BY ad_advertisers.serialnum;
 
 
 --
--- TOC entry 1822 (class 1259 OID 211738)
--- Dependencies: 2224 2225 2226 3
--- Name: ad_index; Type: TABLE; Schema: public; Owner: -
+-- Name: ad_index; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE ad_index (
@@ -2350,10 +2469,10 @@ CREATE TABLE ad_index (
 );
 
 
+ALTER TABLE public.ad_index OWNER TO inprint;
+
 --
--- TOC entry 1817 (class 1259 OID 211411)
--- Dependencies: 2197 2198 2199 2200 2201 2202 2203 2204 2205 3
--- Name: ad_modules; Type: TABLE; Schema: public; Owner: -
+-- Name: ad_modules; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE ad_modules (
@@ -2361,7 +2480,6 @@ CREATE TABLE ad_modules (
     edition uuid NOT NULL,
     page uuid NOT NULL,
     title character varying NOT NULL,
-    shortcut character varying NOT NULL,
     description character varying,
     amount integer DEFAULT 1 NOT NULL,
     area double precision DEFAULT 0 NOT NULL,
@@ -2374,17 +2492,16 @@ CREATE TABLE ad_modules (
 );
 
 
+ALTER TABLE public.ad_modules OWNER TO inprint;
+
 --
--- TOC entry 1825 (class 1259 OID 211772)
--- Dependencies: 2234 2235 2236 2237 3
--- Name: ad_pages; Type: TABLE; Schema: public; Owner: -
+-- Name: ad_pages; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE ad_pages (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
     edition uuid NOT NULL,
     title character varying NOT NULL,
-    shortcut character varying NOT NULL,
     description character varying,
     bydefault boolean DEFAULT false NOT NULL,
     w character varying[],
@@ -2394,27 +2511,26 @@ CREATE TABLE ad_pages (
 );
 
 
+ALTER TABLE public.ad_pages OWNER TO inprint;
+
 --
--- TOC entry 1818 (class 1259 OID 211428)
--- Dependencies: 2206 2207 2208 3
--- Name: ad_places; Type: TABLE; Schema: public; Owner: -
+-- Name: ad_places; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE ad_places (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
     edition uuid NOT NULL,
     title character varying NOT NULL,
-    shortcut character varying NOT NULL,
     description character varying,
     created timestamp(0) with time zone DEFAULT now(),
     updated timestamp(0) with time zone DEFAULT now()
 );
 
 
+ALTER TABLE public.ad_places OWNER TO inprint;
+
 --
--- TOC entry 1804 (class 1259 OID 144796)
--- Dependencies: 2157 2159 2160 3
--- Name: ad_requests; Type: TABLE; Schema: public; Owner: -
+-- Name: ad_requests; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE ad_requests (
@@ -2437,33 +2553,31 @@ CREATE TABLE ad_requests (
 );
 
 
+ALTER TABLE public.ad_requests OWNER TO inprint;
+
 --
--- TOC entry 1803 (class 1259 OID 144794)
--- Dependencies: 1804 3
--- Name: ad_requests_serialnum_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: ad_requests_serialnum_seq; Type: SEQUENCE; Schema: public; Owner: inprint
 --
 
 CREATE SEQUENCE ad_requests_serialnum_seq
     START WITH 1
     INCREMENT BY 1
-    NO MINVALUE
     NO MAXVALUE
+    NO MINVALUE
     CACHE 1;
 
 
+ALTER TABLE public.ad_requests_serialnum_seq OWNER TO inprint;
+
 --
--- TOC entry 2366 (class 0 OID 0)
--- Dependencies: 1803
--- Name: ad_requests_serialnum_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: ad_requests_serialnum_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: inprint
 --
 
 ALTER SEQUENCE ad_requests_serialnum_seq OWNED BY ad_requests.serialnum;
 
 
 --
--- TOC entry 1777 (class 1259 OID 78326)
--- Dependencies: 2111 2112 2113 3
--- Name: branches; Type: TABLE; Schema: public; Owner: -
+-- Name: branches; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE branches (
@@ -2478,10 +2592,10 @@ CREATE TABLE branches (
 );
 
 
+ALTER TABLE public.branches OWNER TO inprint;
+
 --
--- TOC entry 1795 (class 1259 OID 78891)
--- Dependencies: 3 387
--- Name: cache_access; Type: TABLE; Schema: public; Owner: -
+-- Name: cache_access; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE cache_access (
@@ -2493,10 +2607,56 @@ CREATE TABLE cache_access (
 );
 
 
+ALTER TABLE public.cache_access OWNER TO inprint;
+
 --
--- TOC entry 1778 (class 1259 OID 78335)
--- Dependencies: 2114 2115 2116 387 3
--- Name: catalog; Type: TABLE; Schema: public; Owner: -
+-- Name: cache_files; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
+--
+
+CREATE TABLE cache_files (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    file_path character varying NOT NULL,
+    file_name character varying NOT NULL,
+    file_extension character varying NOT NULL,
+    file_mime character varying NOT NULL,
+    file_digest character varying NOT NULL,
+    file_thumbnail character varying,
+    file_description character varying,
+    file_size integer DEFAULT 0 NOT NULL,
+    file_length integer DEFAULT 0 NOT NULL,
+    file_meta character varying,
+    file_exists boolean DEFAULT true NOT NULL,
+    file_published boolean DEFAULT false NOT NULL,
+    created timestamp(6) with time zone DEFAULT now() NOT NULL,
+    updated timestamp(6) with time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE public.cache_files OWNER TO inprint;
+
+--
+-- Name: cache_hotsave; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
+--
+
+CREATE TABLE cache_hotsave (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    hotsave_origin character varying NOT NULL,
+    hotsave_path character varying NOT NULL,
+    hotsave_branch uuid NOT NULL,
+    hotsave_branch_shortcut character varying NOT NULL,
+    hotsave_stage uuid NOT NULL,
+    hotsave_stage_shortcut character varying NOT NULL,
+    hotsave_color character varying NOT NULL,
+    hotsave_creator uuid NOT NULL,
+    hotsave_creator_shortcut character varying NOT NULL,
+    created timestamp(6) with time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE public.cache_hotsave OWNER TO inprint;
+
+--
+-- Name: catalog; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE catalog (
@@ -2512,10 +2672,10 @@ CREATE TABLE catalog (
 );
 
 
+ALTER TABLE public.catalog OWNER TO inprint;
+
 --
--- TOC entry 1779 (class 1259 OID 78360)
--- Dependencies: 2117 2118 2119 387 3
--- Name: editions; Type: TABLE; Schema: public; Owner: -
+-- Name: editions; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE editions (
@@ -2529,10 +2689,10 @@ CREATE TABLE editions (
 );
 
 
+ALTER TABLE public.editions OWNER TO inprint;
+
 --
--- TOC entry 1792 (class 1259 OID 78657)
--- Dependencies: 2144 3
--- Name: map_member_to_rule; Type: TABLE; Schema: public; Owner: -
+-- Name: map_member_to_rule; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE map_member_to_rule (
@@ -2545,10 +2705,10 @@ CREATE TABLE map_member_to_rule (
 );
 
 
+ALTER TABLE public.map_member_to_rule OWNER TO inprint;
+
 --
--- TOC entry 1784 (class 1259 OID 78439)
--- Dependencies: 2124 2125 2126 3
--- Name: members; Type: TABLE; Schema: public; Owner: -
+-- Name: members; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE members (
@@ -2560,10 +2720,10 @@ CREATE TABLE members (
 );
 
 
+ALTER TABLE public.members OWNER TO inprint;
+
 --
--- TOC entry 1793 (class 1259 OID 78701)
--- Dependencies: 2145 2146 3
--- Name: rules; Type: TABLE; Schema: public; Owner: -
+-- Name: rules; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE rules (
@@ -2578,20 +2738,41 @@ CREATE TABLE rules (
 );
 
 
+ALTER TABLE public.rules OWNER TO inprint;
+
 --
--- TOC entry 1794 (class 1259 OID 78720)
--- Dependencies: 1914 3 387
--- Name: cache_rules; Type: VIEW; Schema: public; Owner: -
+-- Name: cache_rules; Type: VIEW; Schema: public; Owner: inprint
 --
 
 CREATE VIEW cache_rules AS
     (SELECT 'edition' AS type, t1.path, t1.id AS binding, t2.id AS member, ARRAY(SELECT DISTINCT (((((a2.section)::text || '.'::text) || (a2.subsection)::text) || '.'::text) || (a2.term)::text) AS term FROM map_member_to_rule a1, rules a2 WHERE (((a2.id = a1.term) AND (a1.member = t2.id)) AND (a1.binding IN (SELECT editions.id FROM editions WHERE (editions.path @> t1.path))))) AS terms FROM editions t1, members t2 ORDER BY t1.path) UNION (SELECT 'catalog' AS type, t1.path, t1.id AS binding, t2.id AS member, ARRAY(SELECT DISTINCT (((((a2.section)::text || '.'::text) || (a2.subsection)::text) || '.'::text) || (a2.term)::text) AS term FROM map_member_to_rule a1, rules a2 WHERE (((a2.id = a1.term) AND (a1.member = t2.id)) AND (a1.binding IN (SELECT catalog.id FROM catalog WHERE (catalog.path @> t1.path))))) AS terms FROM catalog t1, members t2 ORDER BY t1.path);
 
 
+ALTER TABLE public.cache_rules OWNER TO inprint;
+
 --
--- TOC entry 1796 (class 1259 OID 78920)
--- Dependencies: 3
--- Name: cache_visibility; Type: TABLE; Schema: public; Owner: -
+-- Name: cache_versions; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
+--
+
+CREATE TABLE cache_versions (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    version_origin character varying NOT NULL,
+    version_path character varying NOT NULL,
+    version_branch uuid NOT NULL,
+    version_branch_shortcut character varying NOT NULL,
+    version_stage uuid NOT NULL,
+    version_stage_shortcut character varying NOT NULL,
+    version_color character varying NOT NULL,
+    version_creator uuid NOT NULL,
+    version_creator_shortcut character varying NOT NULL,
+    created timestamp(6) with time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE public.cache_versions OWNER TO inprint;
+
+--
+-- Name: cache_visibility; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE cache_visibility (
@@ -2604,10 +2785,10 @@ CREATE TABLE cache_visibility (
 );
 
 
+ALTER TABLE public.cache_visibility OWNER TO inprint;
+
 --
--- TOC entry 1816 (class 1259 OID 211300)
--- Dependencies: 2194 2195 2196 387 3
--- Name: comments; Type: TABLE; Schema: public; Owner: -
+-- Name: comments; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE comments (
@@ -2625,10 +2806,10 @@ CREATE TABLE comments (
 );
 
 
+ALTER TABLE public.comments OWNER TO inprint;
+
 --
--- TOC entry 1805 (class 1259 OID 210063)
--- Dependencies: 2161 2162 2163 2164 2165 2166 2167 2168 2169 2170 2171 3
--- Name: documents; Type: TABLE; Schema: public; Owner: -
+-- Name: documents; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE documents (
@@ -2644,6 +2825,8 @@ CREATE TABLE documents (
     ineditions uuid[],
     copygroup uuid,
     movegroup uuid,
+    maingroup uuid NOT NULL,
+    maingroup_shortcut character varying NOT NULL,
     workgroup uuid NOT NULL,
     workgroup_shortcut character varying NOT NULL,
     inworkgroups uuid[],
@@ -2677,14 +2860,16 @@ CREATE TABLE documents (
     islooked boolean DEFAULT false NOT NULL,
     isopen boolean DEFAULT false NOT NULL,
     created timestamp(6) with time zone DEFAULT now() NOT NULL,
-    updated timestamp(6) with time zone DEFAULT now() NOT NULL
+    updated timestamp(6) with time zone DEFAULT now() NOT NULL,
+    uploaded timestamp(6) with time zone DEFAULT now() NOT NULL,
+    moved timestamp(6) with time zone DEFAULT now() NOT NULL
 );
 
 
+ALTER TABLE public.documents OWNER TO inprint;
+
 --
--- TOC entry 1806 (class 1259 OID 210088)
--- Dependencies: 2172 2173 2174 3
--- Name: editions_options; Type: TABLE; Schema: public; Owner: -
+-- Name: editions_options; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE editions_options (
@@ -2697,53 +2882,92 @@ CREATE TABLE editions_options (
 );
 
 
+ALTER TABLE public.editions_options OWNER TO inprint;
+
 --
--- TOC entry 1812 (class 1259 OID 210181)
--- Dependencies: 2180 2181 2182 2183 2184 2185 3
--- Name: fascicles; Type: TABLE; Schema: public; Owner: -
+-- Name: fascicles; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE fascicles (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    base_edition uuid NOT NULL,
+
     edition uuid NOT NULL,
-    variation uuid NOT NULL,
-    title character varying NOT NULL,
+    parent uuid NOT NULL,
+
+    fastype character varying DEFAULT 'issue',
+
+    variation uuid NOT NULL DEFAULT uuid_generate_v4(),
+
     shortcut character varying NOT NULL,
     description character varying,
+
+    circulation integer DEFAULT 0,
+
+    pnum character varying,
+    anum character varying,
+
     manager uuid,
-    begindate timestamp(6) with time zone,
-    enddate timestamp(6) with time zone,
-    is_system boolean DEFAULT false NOT NULL,
-    is_enabled boolean DEFAULT false NOT NULL,
-    is_blocked boolean DEFAULT false NOT NULL,
+
+    enabled boolean NOT NULL DEFAULT false,
+    archived boolean NOT NULL DEFAULT false,
+
+    flagdoc varchar DEFAULT 'bydate',
+    flagadv varchar DEFAULT 'bydate',
+
+    datedoc timestamp(6) with time zone,
+    dateadv timestamp(6) with time zone,
+
+    dateprint timestamp(6) with time zone,
+    dateout timestamp(6) with time zone,
+
     created timestamp(6) with time zone DEFAULT now() NOT NULL,
     updated timestamp(6) with time zone DEFAULT now() NOT NULL
 );
 
 
+ALTER TABLE public.fascicles OWNER TO inprint;
+
 --
--- TOC entry 1799 (class 1259 OID 144476)
--- Dependencies: 2147 2148 2149 3
--- Name: fascicles_index; Type: TABLE; Schema: public; Owner: -
+-- Name: fascicles_indx_headlines; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
-CREATE TABLE fascicles_index (
+CREATE TABLE fascicles_indx_headlines (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
     edition uuid NOT NULL,
     fascicle uuid NOT NULL,
-    page uuid NOT NULL,
-    headline uuid NOT NULL,
-    place uuid NOT NULL,
+    tag uuid NOT NULL,
+    bydefault boolean DEFAULT false NOT NULL,
+    title character varying NOT NULL,
+    description character varying NOT NULL,
     created timestamp(6) with time zone DEFAULT now() NOT NULL,
     updated timestamp(6) with time zone DEFAULT now() NOT NULL
 );
 
 
+ALTER TABLE public.fascicles_indx_headlines OWNER TO inprint;
+
 --
--- TOC entry 1800 (class 1259 OID 144494)
--- Dependencies: 2150 2151 2152 3
--- Name: fascicles_map_documents; Type: TABLE; Schema: public; Owner: -
+-- Name: fascicles_indx_rubrics; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
+--
+
+CREATE TABLE fascicles_indx_rubrics (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    edition uuid NOT NULL,
+    fascicle uuid NOT NULL,
+    headline uuid NOT NULL,
+    tag uuid NOT NULL,
+    title character varying NOT NULL,
+    description character varying NOT NULL,
+    created timestamp(6) with time zone DEFAULT now() NOT NULL,
+    updated timestamp(6) with time zone DEFAULT now() NOT NULL,
+    bydefault boolean DEFAULT false NOT NULL
+);
+
+
+ALTER TABLE public.fascicles_indx_rubrics OWNER TO inprint;
+
+--
+-- Name: fascicles_map_documents; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE fascicles_map_documents (
@@ -2757,10 +2981,10 @@ CREATE TABLE fascicles_map_documents (
 );
 
 
+ALTER TABLE public.fascicles_map_documents OWNER TO inprint;
+
 --
--- TOC entry 1826 (class 1259 OID 211784)
--- Dependencies: 2238 2239 2240 2241 3
--- Name: fascicles_map_modules; Type: TABLE; Schema: public; Owner: -
+-- Name: fascicles_map_modules; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE fascicles_map_modules (
@@ -2777,10 +3001,27 @@ CREATE TABLE fascicles_map_modules (
 );
 
 
+ALTER TABLE public.fascicles_map_modules OWNER TO inprint;
+
 --
--- TOC entry 1827 (class 1259 OID 211796)
--- Dependencies: 2242 2243 2244 2245 2246 3
--- Name: fascicles_modules; Type: TABLE; Schema: public; Owner: -
+-- Name: fascicles_map_requests; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
+--
+
+CREATE TABLE fascicles_map_requests (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    edition uuid NOT NULL,
+    fascicle uuid NOT NULL,
+    page uuid,
+    entity uuid,
+    created timestamp(0) with time zone DEFAULT now(),
+    updated timestamp(0) with time zone DEFAULT now()
+);
+
+
+ALTER TABLE public.fascicles_map_requests OWNER TO inprint;
+
+--
+-- Name: fascicles_modules; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE fascicles_modules (
@@ -2790,7 +3031,6 @@ CREATE TABLE fascicles_modules (
     place uuid NOT NULL,
     origin uuid NOT NULL,
     title character varying NOT NULL,
-    shortcut character varying NOT NULL,
     description character varying,
     amount integer DEFAULT 1 NOT NULL,
     w character varying,
@@ -2801,10 +3041,10 @@ CREATE TABLE fascicles_modules (
 );
 
 
+ALTER TABLE public.fascicles_modules OWNER TO inprint;
+
 --
--- TOC entry 1807 (class 1259 OID 210108)
--- Dependencies: 2175 2176 2177 3
--- Name: fascicles_options; Type: TABLE; Schema: public; Owner: -
+-- Name: fascicles_options; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE fascicles_options (
@@ -2818,10 +3058,10 @@ CREATE TABLE fascicles_options (
 );
 
 
+ALTER TABLE public.fascicles_options OWNER TO inprint;
+
 --
--- TOC entry 1821 (class 1259 OID 211631)
--- Dependencies: 2221 2222 2223 3
--- Name: fascicles_pages; Type: TABLE; Schema: public; Owner: -
+-- Name: fascicles_pages; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE fascicles_pages (
@@ -2838,10 +3078,70 @@ CREATE TABLE fascicles_pages (
 );
 
 
+ALTER TABLE public.fascicles_pages OWNER TO inprint;
+
 --
--- TOC entry 1823 (class 1259 OID 211749)
--- Dependencies: 2227 2228 2229 3
--- Name: fascicles_tmpl_index; Type: TABLE; Schema: public; Owner: -
+-- Name: fascicles_requests; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
+--
+
+CREATE TABLE fascicles_requests (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    serialnum integer NOT NULL,
+    edition uuid NOT NULL,
+    fascicle uuid NOT NULL,
+    advertiser uuid NOT NULL,
+    advertiser_shortcut character varying NOT NULL,
+    place uuid NOT NULL,
+    place_shortcut character varying NOT NULL,
+    manager uuid NOT NULL,
+    manager_shortcut character varying NOT NULL,
+    amount integer DEFAULT 1 NOT NULL,
+    origin uuid NOT NULL,
+    origin_shortcut character varying NOT NULL,
+    origin_area double precision DEFAULT 0 NOT NULL,
+    origin_x character varying DEFAULT '1/1'::character varying NOT NULL,
+    origin_y character varying DEFAULT '1/1'::character varying NOT NULL,
+    origin_w character varying DEFAULT '1/1'::character varying NOT NULL,
+    origin_h character varying DEFAULT '1/1'::character varying NOT NULL,
+    module uuid,
+    pages character varying,
+    firstpage integer,
+    shortcut character varying NOT NULL,
+    description character varying,
+    status character varying NOT NULL,
+    payment character varying NOT NULL,
+    readiness character varying NOT NULL,
+    created timestamp(0) with time zone DEFAULT now(),
+    updated timestamp(0) with time zone DEFAULT now(),
+    squib character varying NOT NULL
+);
+
+
+ALTER TABLE public.fascicles_requests OWNER TO inprint;
+
+--
+-- Name: fascicles_requests_serialnum_seq; Type: SEQUENCE; Schema: public; Owner: inprint
+--
+
+CREATE SEQUENCE fascicles_requests_serialnum_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fascicles_requests_serialnum_seq OWNER TO inprint;
+
+--
+-- Name: fascicles_requests_serialnum_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: inprint
+--
+
+ALTER SEQUENCE fascicles_requests_serialnum_seq OWNED BY fascicles_requests.serialnum;
+
+
+--
+-- Name: fascicles_tmpl_index; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE fascicles_tmpl_index (
@@ -2856,10 +3156,10 @@ CREATE TABLE fascicles_tmpl_index (
 );
 
 
+ALTER TABLE public.fascicles_tmpl_index OWNER TO inprint;
+
 --
--- TOC entry 1820 (class 1259 OID 211611)
--- Dependencies: 2212 2213 2214 2215 2216 2217 2218 2219 2220 3
--- Name: fascicles_tmpl_modules; Type: TABLE; Schema: public; Owner: -
+-- Name: fascicles_tmpl_modules; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE fascicles_tmpl_modules (
@@ -2868,7 +3168,6 @@ CREATE TABLE fascicles_tmpl_modules (
     fascicle uuid NOT NULL,
     page uuid NOT NULL,
     title character varying NOT NULL,
-    shortcut character varying NOT NULL,
     description character varying,
     amount integer DEFAULT 1 NOT NULL,
     area double precision DEFAULT 0 NOT NULL,
@@ -2881,10 +3180,10 @@ CREATE TABLE fascicles_tmpl_modules (
 );
 
 
+ALTER TABLE public.fascicles_tmpl_modules OWNER TO inprint;
+
 --
--- TOC entry 1824 (class 1259 OID 211760)
--- Dependencies: 2230 2231 2232 2233 3
--- Name: fascicles_tmpl_pages; Type: TABLE; Schema: public; Owner: -
+-- Name: fascicles_tmpl_pages; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE fascicles_tmpl_pages (
@@ -2892,7 +3191,6 @@ CREATE TABLE fascicles_tmpl_pages (
     origin uuid NOT NULL,
     fascicle uuid NOT NULL,
     title character varying NOT NULL,
-    shortcut character varying NOT NULL,
     description character varying,
     bydefault boolean DEFAULT false NOT NULL,
     w character varying[],
@@ -2902,10 +3200,10 @@ CREATE TABLE fascicles_tmpl_pages (
 );
 
 
+ALTER TABLE public.fascicles_tmpl_pages OWNER TO inprint;
+
 --
--- TOC entry 1819 (class 1259 OID 211589)
--- Dependencies: 2209 2210 2211 3
--- Name: fascicles_tmpl_places; Type: TABLE; Schema: public; Owner: -
+-- Name: fascicles_tmpl_places; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE fascicles_tmpl_places (
@@ -2913,17 +3211,16 @@ CREATE TABLE fascicles_tmpl_places (
     origin uuid NOT NULL,
     fascicle uuid NOT NULL,
     title character varying NOT NULL,
-    shortcut character varying NOT NULL,
     description character varying,
     created timestamp(0) with time zone DEFAULT now(),
     updated timestamp(0) with time zone DEFAULT now()
 );
 
 
+ALTER TABLE public.fascicles_tmpl_places OWNER TO inprint;
+
 --
--- TOC entry 1815 (class 1259 OID 211290)
--- Dependencies: 2192 2193 3
--- Name: history; Type: TABLE; Schema: public; Owner: -
+-- Name: history; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE history (
@@ -2948,50 +3245,62 @@ CREATE TABLE history (
 );
 
 
+ALTER TABLE public.history OWNER TO inprint;
+
 --
--- TOC entry 1813 (class 1259 OID 210251)
--- Dependencies: 2186 2187 2188 3
--- Name: index; Type: TABLE; Schema: public; Owner: -
+-- Name: indx_headlines; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
-CREATE TABLE index (
+CREATE TABLE indx_headlines (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
     edition uuid NOT NULL,
-    nature character varying NOT NULL,
-    parent uuid NOT NULL,
+    tag uuid NOT NULL,
     title character varying NOT NULL,
-    shortcut character varying NOT NULL,
-    description character varying NOT NULL,
+    description character varying,
+    bydefault boolean DEFAULT false NOT NULL,
     created timestamp(6) with time zone DEFAULT now() NOT NULL,
     updated timestamp(6) with time zone DEFAULT now() NOT NULL
 );
 
 
+ALTER TABLE public.indx_headlines OWNER TO inprint;
+
 --
--- TOC entry 1814 (class 1259 OID 210262)
--- Dependencies: 2189 2190 2191 3
--- Name: index_fascicles; Type: TABLE; Schema: public; Owner: -
+-- Name: indx_rubrics; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
-CREATE TABLE index_fascicles (
+CREATE TABLE indx_rubrics (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
     edition uuid NOT NULL,
-    fascicle uuid NOT NULL,
-    origin uuid NOT NULL,
-    nature character varying NOT NULL,
-    parent uuid NOT NULL,
+    headline uuid NOT NULL,
+    tag uuid NOT NULL,
     title character varying NOT NULL,
-    shortcut character varying NOT NULL,
-    description character varying NOT NULL,
+    description character varying,
+    created timestamp(6) with time zone DEFAULT now() NOT NULL,
+    updated timestamp(6) with time zone DEFAULT now() NOT NULL,
+    bydefault boolean DEFAULT false NOT NULL
+);
+
+
+ALTER TABLE public.indx_rubrics OWNER TO inprint;
+
+--
+-- Name: indx_tags; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
+--
+
+CREATE TABLE indx_tags (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    title character varying NOT NULL,
+    description character varying,
     created timestamp(6) with time zone DEFAULT now() NOT NULL,
     updated timestamp(6) with time zone DEFAULT now() NOT NULL
 );
 
 
+ALTER TABLE public.indx_tags OWNER TO inprint;
+
 --
--- TOC entry 1780 (class 1259 OID 78394)
--- Dependencies: 2120 2121 3
--- Name: logs; Type: TABLE; Schema: public; Owner: -
+-- Name: logs; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE logs (
@@ -3009,10 +3318,10 @@ CREATE TABLE logs (
 );
 
 
+ALTER TABLE public.logs OWNER TO inprint;
+
 --
--- TOC entry 1781 (class 1259 OID 78418)
--- Dependencies: 2122 3
--- Name: map_member_to_catalog; Type: TABLE; Schema: public; Owner: -
+-- Name: map_member_to_catalog; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE map_member_to_catalog (
@@ -3022,10 +3331,10 @@ CREATE TABLE map_member_to_catalog (
 );
 
 
+ALTER TABLE public.map_member_to_catalog OWNER TO inprint;
+
 --
--- TOC entry 1782 (class 1259 OID 78429)
--- Dependencies: 2123 3
--- Name: map_principals_to_stages; Type: TABLE; Schema: public; Owner: -
+-- Name: map_principals_to_stages; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE map_principals_to_stages (
@@ -3036,10 +3345,10 @@ CREATE TABLE map_principals_to_stages (
 );
 
 
+ALTER TABLE public.map_principals_to_stages OWNER TO inprint;
+
 --
--- TOC entry 1783 (class 1259 OID 78433)
--- Dependencies: 3
--- Name: map_role_to_rule; Type: TABLE; Schema: public; Owner: -
+-- Name: map_role_to_rule; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE map_role_to_rule (
@@ -3049,10 +3358,10 @@ CREATE TABLE map_role_to_rule (
 );
 
 
+ALTER TABLE public.map_role_to_rule OWNER TO inprint;
+
 --
--- TOC entry 1785 (class 1259 OID 78448)
--- Dependencies: 2127 3
--- Name: migration; Type: TABLE; Schema: public; Owner: -
+-- Name: migration; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE migration (
@@ -3063,10 +3372,10 @@ CREATE TABLE migration (
 );
 
 
+ALTER TABLE public.migration OWNER TO inprint;
+
 --
--- TOC entry 1786 (class 1259 OID 78455)
--- Dependencies: 2128 3
--- Name: options; Type: TABLE; Schema: public; Owner: -
+-- Name: options; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE options (
@@ -3077,10 +3386,10 @@ CREATE TABLE options (
 );
 
 
+ALTER TABLE public.options OWNER TO inprint;
+
 --
--- TOC entry 1808 (class 1259 OID 210157)
--- Dependencies: 2178 2179 3
--- Name: profiles; Type: TABLE; Schema: public; Owner: -
+-- Name: profiles; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE profiles (
@@ -3102,10 +3411,10 @@ CREATE TABLE profiles (
 );
 
 
+ALTER TABLE public.profiles OWNER TO inprint;
+
 --
--- TOC entry 1787 (class 1259 OID 78470)
--- Dependencies: 2129 2130 2131 3
--- Name: readiness; Type: TABLE; Schema: public; Owner: -
+-- Name: readiness; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE readiness (
@@ -3120,10 +3429,10 @@ CREATE TABLE readiness (
 );
 
 
+ALTER TABLE public.readiness OWNER TO inprint;
+
 --
--- TOC entry 1788 (class 1259 OID 78479)
--- Dependencies: 2132 2133 2134 3
--- Name: roles; Type: TABLE; Schema: public; Owner: -
+-- Name: roles; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE roles (
@@ -3136,10 +3445,74 @@ CREATE TABLE roles (
 );
 
 
+ALTER TABLE public.roles OWNER TO inprint;
+
 --
--- TOC entry 1789 (class 1259 OID 78502)
--- Dependencies: 2135 2136 2137 3
--- Name: sessions; Type: TABLE; Schema: public; Owner: -
+-- Name: rss; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
+--
+
+CREATE TABLE rss (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    document uuid NOT NULL,
+    link character varying NOT NULL,
+    title character varying NOT NULL,
+    description character varying NOT NULL,
+    fulltext character varying,
+    published boolean DEFAULT false NOT NULL,
+    created timestamp(6) with time zone DEFAULT now() NOT NULL,
+    updated timestamp(6) with time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE public.rss OWNER TO inprint;
+
+--
+-- Name: rss_feeds; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
+--
+
+CREATE TABLE rss_feeds (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    url character varying NOT NULL,
+    title character varying NOT NULL,
+    description character varying NOT NULL,
+    published boolean DEFAULT false NOT NULL,
+    created timestamp(6) with time zone DEFAULT now() NOT NULL,
+    updated timestamp(6) with time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE public.rss_feeds OWNER TO inprint;
+
+--
+-- Name: rss_feeds_mapping; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
+--
+
+CREATE TABLE rss_feeds_mapping (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    feed uuid NOT NULL,
+    nature character varying NOT NULL,
+    tag uuid NOT NULL
+);
+
+
+ALTER TABLE public.rss_feeds_mapping OWNER TO inprint;
+
+--
+-- Name: rss_feeds_options; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
+--
+
+CREATE TABLE rss_feeds_options (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    feed uuid NOT NULL,
+    option_name character varying NOT NULL,
+    option_value character varying NOT NULL
+);
+
+
+ALTER TABLE public.rss_feeds_options OWNER TO inprint;
+
+--
+-- Name: sessions; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE sessions (
@@ -3151,10 +3524,10 @@ CREATE TABLE sessions (
 );
 
 
+ALTER TABLE public.sessions OWNER TO inprint;
+
 --
--- TOC entry 1790 (class 1259 OID 78511)
--- Dependencies: 2138 2139 2140 3
--- Name: stages; Type: TABLE; Schema: public; Owner: -
+-- Name: stages; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE stages (
@@ -3170,10 +3543,10 @@ CREATE TABLE stages (
 );
 
 
+ALTER TABLE public.stages OWNER TO inprint;
+
 --
--- TOC entry 1791 (class 1259 OID 78520)
--- Dependencies: 2141 2142 2143 3
--- Name: state; Type: TABLE; Schema: public; Owner: -
+-- Name: state; Type: TABLE; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE TABLE state (
@@ -3186,468 +3559,133 @@ CREATE TABLE state (
 );
 
 
+ALTER TABLE public.state OWNER TO inprint;
+
 --
--- TOC entry 1809 (class 1259 OID 210167)
--- Dependencies: 1917 3
--- Name: view_principals; Type: VIEW; Schema: public; Owner: -
+-- Name: view_principals; Type: VIEW; Schema: public; Owner: inprint
 --
 
 CREATE VIEW view_principals AS
     SELECT t1.id, 'member' AS type, t2.title, t2.shortcut, t2.job_position AS description FROM members t1, profiles t2 WHERE (t1.id = t2.id) UNION SELECT catalog.id, 'group' AS type, catalog.title, catalog.shortcut, catalog.description FROM catalog;
 
 
+ALTER TABLE public.view_principals OWNER TO inprint;
+
 --
--- TOC entry 1810 (class 1259 OID 210171)
--- Dependencies: 1918 3
--- Name: view_assignments; Type: VIEW; Schema: public; Owner: -
+-- Name: view_assignments; Type: VIEW; Schema: public; Owner: inprint
 --
 
 CREATE VIEW view_assignments AS
     SELECT t1.id, t1.catalog, t5.shortcut AS catalog_shortcut, t6.type AS principal_type, t1.principal, t6.shortcut AS principal_shortcut, t2.id AS branch, t2.shortcut AS branch_shortcut, t1.stage, t3.shortcut AS stage_shortcut, t4.id AS readiness, t4.shortcut AS readiness_shortcut, t4.weight AS progress, t4.color FROM map_principals_to_stages t1, branches t2, stages t3, readiness t4, catalog t5, view_principals t6 WHERE (((((t2.id = t3.branch) AND (t3.id = t1.stage)) AND (t4.id = t3.readiness)) AND (t5.id = t1.catalog)) AND (t6.id = t1.principal));
 
 
+ALTER TABLE public.view_assignments OWNER TO inprint;
+
 --
--- TOC entry 1811 (class 1259 OID 210175)
--- Dependencies: 1919 3
--- Name: view_members; Type: VIEW; Schema: public; Owner: -
+-- Name: view_members; Type: VIEW; Schema: public; Owner: inprint
 --
 
 CREATE VIEW view_members AS
     SELECT t1.id, t1.login, t1.password, t2.title, t2.shortcut, t2.job_position, ARRAY(SELECT map_member_to_catalog.catalog FROM map_member_to_catalog WHERE (map_member_to_catalog.member = t1.id)) AS catalog FROM members t1, profiles t2 WHERE (t1.id = t2.id);
 
 
---
--- TOC entry 1798 (class 1259 OID 78933)
--- Dependencies: 1916 3
--- Name: view_rules; Type: VIEW; Schema: public; Owner: -
---
-
-CREATE VIEW view_rules AS
-    SELECT rules.id, rules.term, rules.section, rules.subsection, rules.icon, rules.title, rules.description, rules.sortorder, (((((rules.section)::text || '.'::text) || (rules.subsection)::text) || '.'::text) || (rules.term)::text) AS term_text FROM rules;
-
+ALTER TABLE public.view_members OWNER TO inprint;
 
 --
--- TOC entry 1797 (class 1259 OID 78928)
--- Dependencies: 1915 387 3
--- Name: view_rules_old; Type: VIEW; Schema: public; Owner: -
+-- Name: view_rules; Type: VIEW; Schema: public; Owner: inprint
+--
+
+CREATE VIEW "public"."view_rules" AS 
+	SELECT rules.id, 'system' AS plugin, rules.term, rules.section, rules.subsection, rules.icon, rules.title, rules.description, rules.sortorder, true AS enabled, (((((rules.section)::text || '.'::text) || (rules.subsection)::text) || '.'::text) || (rules.term)::text) AS term_text FROM rules 
+	UNION 
+	SELECT rules.id, rules.plugin, rules.rule_term AS term, rules.rule_section AS section, rules.rule_subsection AS subsection, rules.rule_icon AS icon, rules.rule_title AS title, rules.rule_description AS description, rules.rule_sortorder AS sortorder, rules.rule_enabled AS enabled, (((((rules.rule_section)::text || '.'::text) || (rules.rule_subsection)::text) || '.'::text) || (rules.rule_term)::text) AS term_text FROM plugins.rules;
+
+
+ALTER TABLE public.view_rules OWNER TO inprint;
+
+--
+-- Name: view_rules_old; Type: VIEW; Schema: public; Owner: inprint
 --
 
 CREATE VIEW view_rules_old AS
     (SELECT t2.id, t1.member, t2.section, t2.subsection, t2.term, t1.area, t1.binding, '00000000000000000000000000000000'::ltree AS path, ARRAY['00000000-0000-0000-0000-000000000000'::uuid] AS childrens FROM map_member_to_rule t1, rules t2 WHERE (((t1.section)::text = 'domain'::text) AND (t2.id = t1.term)) UNION SELECT t2.id, t1.member, t2.section, t2.subsection, t2.term, t1.area, t1.binding, t3.path, ARRAY(SELECT catalog.id FROM catalog WHERE (catalog.path ~ (((t3.path)::text || '.*'::text))::lquery)) AS childrens FROM map_member_to_rule t1, rules t2, editions t3 WHERE ((((t1.section)::text = 'editions'::text) AND (t2.id = t1.term)) AND (t3.id = t1.binding))) UNION SELECT t2.id, t1.member, t2.section, t2.subsection, t2.term, t1.area, t1.binding, t3.path, ARRAY(SELECT catalog.id FROM catalog WHERE (catalog.path ~ (((t3.path)::text || '.*'::text))::lquery)) AS childrens FROM map_member_to_rule t1, rules t2, catalog t3 WHERE ((((t1.section)::text = 'catalog'::text) AND (t2.id = t1.term)) AND (t3.id = t1.binding));
 
 
+ALTER TABLE public.view_rules_old OWNER TO inprint;
+
 --
--- TOC entry 2154 (class 2604 OID 144772)
--- Dependencies: 1801 1802 1802
--- Name: serialnum; Type: DEFAULT; Schema: public; Owner: -
+-- Name: serialnum; Type: DEFAULT; Schema: public; Owner: inprint
 --
 
 ALTER TABLE ad_advertisers ALTER COLUMN serialnum SET DEFAULT nextval('ad_advertisers_serialnum_seq'::regclass);
 
 
 --
--- TOC entry 2158 (class 2604 OID 144800)
--- Dependencies: 1803 1804 1804
--- Name: serialnum; Type: DEFAULT; Schema: public; Owner: -
+-- Name: serialnum; Type: DEFAULT; Schema: public; Owner: inprint
 --
 
 ALTER TABLE ad_requests ALTER COLUMN serialnum SET DEFAULT nextval('ad_requests_serialnum_seq'::regclass);
 
 
 --
--- TOC entry 2290 (class 2606 OID 144779)
--- Dependencies: 1802 1802
--- Name: ad_advertisers_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: serialnum; Type: DEFAULT; Schema: public; Owner: inprint
 --
 
-ALTER TABLE ONLY ad_advertisers
-    ADD CONSTRAINT ad_advertisers_pkey PRIMARY KEY (id);
+ALTER TABLE fascicles_requests ALTER COLUMN serialnum SET DEFAULT nextval('fascicles_requests_serialnum_seq'::regclass);
 
 
---
--- TOC entry 2323 (class 2606 OID 211748)
--- Dependencies: 1822 1822
--- Name: ad_index_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY ad_index
-    ADD CONSTRAINT ad_index_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 2312 (class 2606 OID 211427)
--- Dependencies: 1817 1817
--- Name: ad_modules_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY ad_modules
-    ADD CONSTRAINT ad_modules_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 2329 (class 2606 OID 211783)
--- Dependencies: 1825 1825
--- Name: ad_pages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY ad_pages
-    ADD CONSTRAINT ad_pages_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 2314 (class 2606 OID 211438)
--- Dependencies: 1818 1818
--- Name: ad_places_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY ad_places
-    ADD CONSTRAINT ad_places_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 2292 (class 2606 OID 144807)
--- Dependencies: 1804 1804
--- Name: ad_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY ad_requests
-    ADD CONSTRAINT ad_requests_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 2282 (class 2606 OID 78898)
--- Dependencies: 1795 1795 1795 1795
--- Name: cache_access_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY cache_access
-    ADD CONSTRAINT cache_access_pkey PRIMARY KEY (type, member, binding);
-
-
---
--- TOC entry 2284 (class 2606 OID 78927)
--- Dependencies: 1796 1796 1796 1796
--- Name: cache_visibility_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY cache_visibility
-    ADD CONSTRAINT cache_visibility_pkey PRIMARY KEY (type, member, term);
-
-
---
--- TOC entry 2250 (class 2606 OID 78551)
--- Dependencies: 1778 1778
--- Name: catalog_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY catalog
-    ADD CONSTRAINT catalog_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 2248 (class 2606 OID 78553)
--- Dependencies: 1777 1777
--- Name: chains_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY branches
-    ADD CONSTRAINT chains_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 2310 (class 2606 OID 211310)
--- Dependencies: 1816 1816
--- Name: comments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY comments
-    ADD CONSTRAINT comments_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 2294 (class 2606 OID 210081)
--- Dependencies: 1805 1805
--- Name: documents_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY documents
-    ADD CONSTRAINT documents_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 2296 (class 2606 OID 210098)
--- Dependencies: 1806 1806
--- Name: editions_options_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY editions_options
-    ADD CONSTRAINT editions_options_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 2252 (class 2606 OID 78557)
--- Dependencies: 1779 1779
--- Name: editions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY editions
-    ADD CONSTRAINT editions_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 2286 (class 2606 OID 144483)
--- Dependencies: 1799 1799
--- Name: fascicles_index_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY fascicles_index
-    ADD CONSTRAINT fascicles_index_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 2288 (class 2606 OID 144501)
--- Dependencies: 1800 1800
--- Name: fascicles_map_documents_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY fascicles_map_documents
-    ADD CONSTRAINT fascicles_map_documents_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 2331 (class 2606 OID 211795)
--- Dependencies: 1826 1826
--- Name: fascicles_map_modules_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY fascicles_map_modules
-    ADD CONSTRAINT fascicles_map_modules_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 2333 (class 2606 OID 211808)
--- Dependencies: 1827 1827
--- Name: fascicles_modules_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY fascicles_modules
-    ADD CONSTRAINT fascicles_modules_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 2298 (class 2606 OID 210118)
--- Dependencies: 1807 1807
--- Name: fascicles_options_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY fascicles_options
-    ADD CONSTRAINT fascicles_options_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 2320 (class 2606 OID 211641)
--- Dependencies: 1821 1821
--- Name: fascicles_pages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY fascicles_pages
-    ADD CONSTRAINT fascicles_pages_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 2302 (class 2606 OID 210194)
--- Dependencies: 1812 1812
--- Name: fascicles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY fascicles
-    ADD CONSTRAINT fascicles_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 2325 (class 2606 OID 211759)
--- Dependencies: 1823 1823
--- Name: fascicles_tmpl_index_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY fascicles_tmpl_index
-    ADD CONSTRAINT fascicles_tmpl_index_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 2318 (class 2606 OID 211627)
--- Dependencies: 1820 1820
--- Name: fascicles_tmpl_modules_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY fascicles_tmpl_modules
-    ADD CONSTRAINT fascicles_tmpl_modules_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 2327 (class 2606 OID 211771)
--- Dependencies: 1824 1824
--- Name: fascicles_tmpl_pages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY fascicles_tmpl_pages
-    ADD CONSTRAINT fascicles_tmpl_pages_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 2316 (class 2606 OID 211599)
--- Dependencies: 1819 1819
--- Name: fascicles_tmpl_places_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY fascicles_tmpl_places
-    ADD CONSTRAINT fascicles_tmpl_places_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 2308 (class 2606 OID 211299)
--- Dependencies: 1815 1815
--- Name: history_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY history
-    ADD CONSTRAINT history_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 2306 (class 2606 OID 210272)
--- Dependencies: 1814 1814 1814 1814 1814
--- Name: index_fascicles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY index_fascicles
-    ADD CONSTRAINT index_fascicles_pkey PRIMARY KEY (id, edition, fascicle, origin);
-
-
---
--- TOC entry 2304 (class 2606 OID 210261)
--- Dependencies: 1813 1813
--- Name: index_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY index
-    ADD CONSTRAINT index_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 2254 (class 2606 OID 78565)
--- Dependencies: 1780 1780
--- Name: logs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY logs
-    ADD CONSTRAINT logs_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 2256 (class 2606 OID 78573)
--- Dependencies: 1781 1781 1781
--- Name: map_member_to_catalog_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY map_member_to_catalog
-    ADD CONSTRAINT map_member_to_catalog_pkey PRIMARY KEY (member, catalog);
-
-
---
--- TOC entry 2278 (class 2606 OID 78665)
--- Dependencies: 1792 1792
--- Name: map_member_to_rule_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY map_member_to_rule
-    ADD CONSTRAINT map_member_to_rule_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 2258 (class 2606 OID 78577)
--- Dependencies: 1782 1782 1782 1782
--- Name: map_principals_to_stages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY map_principals_to_stages
-    ADD CONSTRAINT map_principals_to_stages_pkey PRIMARY KEY (id, stage, principal);
-
-
---
--- TOC entry 2260 (class 2606 OID 78579)
--- Dependencies: 1783 1783 1783 1783
--- Name: map_role_to_rule_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY map_role_to_rule
-    ADD CONSTRAINT map_role_to_rule_pkey PRIMARY KEY (role, rule, mode);
-
+SET search_path = plugins, pg_catalog;
 
 --
--- TOC entry 2262 (class 2606 OID 78583)
--- Dependencies: 1784 1784
--- Name: member_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: l18n_l18n_original_key; Type: CONSTRAINT; Schema: plugins; Owner: inprint; Tablespace:
 --
 
-ALTER TABLE ONLY members
-    ADD CONSTRAINT member_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY l18n
+    ADD CONSTRAINT l18n_l18n_original_key UNIQUE (l18n_original);
 
 
 --
--- TOC entry 2300 (class 2606 OID 210166)
--- Dependencies: 1808 1808
--- Name: member_profiles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: l18n_pkey; Type: CONSTRAINT; Schema: plugins; Owner: inprint; Tablespace:
 --
 
-ALTER TABLE ONLY profiles
-    ADD CONSTRAINT member_profiles_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY l18n
+    ADD CONSTRAINT l18n_pkey PRIMARY KEY (id);
 
 
 --
--- TOC entry 2272 (class 2606 OID 78585)
--- Dependencies: 1789 1789
--- Name: member_session_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: menu_pkey; Type: CONSTRAINT; Schema: plugins; Owner: inprint; Tablespace:
 --
 
-ALTER TABLE ONLY sessions
-    ADD CONSTRAINT member_session_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY menu
+    ADD CONSTRAINT menu_pkey PRIMARY KEY (id);
 
 
 --
--- TOC entry 2264 (class 2606 OID 78587)
--- Dependencies: 1785 1785
--- Name: migration_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: menu_plugin_key; Type: CONSTRAINT; Schema: plugins; Owner: inprint; Tablespace:
 --
 
-ALTER TABLE ONLY migration
-    ADD CONSTRAINT migration_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY menu
+    ADD CONSTRAINT menu_plugin_key UNIQUE (plugin, menu_section, menu_id);
 
 
 --
--- TOC entry 2266 (class 2606 OID 78589)
--- Dependencies: 1786 1786
--- Name: options_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: routes_pkey; Type: CONSTRAINT; Schema: plugins; Owner: inprint; Tablespace:
 --
 
-ALTER TABLE ONLY options
-    ADD CONSTRAINT options_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY routes
+    ADD CONSTRAINT routes_pkey PRIMARY KEY (id);
 
 
 --
--- TOC entry 2270 (class 2606 OID 78591)
--- Dependencies: 1788 1788
--- Name: roles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: routes_plugin_key; Type: CONSTRAINT; Schema: plugins; Owner: inprint; Tablespace:
 --
 
-ALTER TABLE ONLY roles
-    ADD CONSTRAINT roles_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY routes
+    ADD CONSTRAINT routes_plugin_key UNIQUE (plugin, route_url);
 
 
 --
--- TOC entry 2280 (class 2606 OID 78710)
--- Dependencies: 1793 1793
--- Name: rules_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: rules_pkey; Type: CONSTRAINT; Schema: plugins; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY rules
@@ -3655,9 +3693,465 @@ ALTER TABLE ONLY rules
 
 
 --
--- TOC entry 2274 (class 2606 OID 78597)
--- Dependencies: 1790 1790
--- Name: stages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: rules_plugin_key; Type: CONSTRAINT; Schema: plugins; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY rules
+    ADD CONSTRAINT rules_plugin_key UNIQUE (plugin, rule_term);
+
+
+SET search_path = public, pg_catalog;
+
+--
+-- Name: ad_advertisers_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY ad_advertisers
+    ADD CONSTRAINT ad_advertisers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: ad_index_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY ad_index
+    ADD CONSTRAINT ad_index_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: ad_modules_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY ad_modules
+    ADD CONSTRAINT ad_modules_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: ad_pages_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY ad_pages
+    ADD CONSTRAINT ad_pages_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: ad_places_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY ad_places
+    ADD CONSTRAINT ad_places_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: ad_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY ad_requests
+    ADD CONSTRAINT ad_requests_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: cache_access_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY cache_access
+    ADD CONSTRAINT cache_access_pkey PRIMARY KEY (type, member, binding);
+
+
+--
+-- Name: cache_files_entity_key; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY cache_files
+    ADD CONSTRAINT cache_files_entity_key UNIQUE (file_path, file_name);
+
+
+--
+-- Name: cache_files_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY cache_files
+    ADD CONSTRAINT cache_files_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: cache_hotsave_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY cache_hotsave
+    ADD CONSTRAINT cache_hotsave_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: cache_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY cache_versions
+    ADD CONSTRAINT cache_versions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: cache_visibility_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY cache_visibility
+    ADD CONSTRAINT cache_visibility_pkey PRIMARY KEY (type, member, term);
+
+
+--
+-- Name: catalog_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY catalog
+    ADD CONSTRAINT catalog_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: chains_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY branches
+    ADD CONSTRAINT chains_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: comments_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY comments
+    ADD CONSTRAINT comments_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: documents_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY documents
+    ADD CONSTRAINT documents_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: editions_options_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY editions_options
+    ADD CONSTRAINT editions_options_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: editions_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY editions
+    ADD CONSTRAINT editions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: fascicles_indx_headlines_edition_key; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY fascicles_indx_headlines
+    ADD CONSTRAINT fascicles_indx_headlines_edition_key UNIQUE (edition, fascicle, tag);
+
+
+--
+-- Name: fascicles_indx_headlines_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY fascicles_indx_headlines
+    ADD CONSTRAINT fascicles_indx_headlines_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: fascicles_indx_rubrics_edition_key; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY fascicles_indx_rubrics
+    ADD CONSTRAINT fascicles_indx_rubrics_edition_key UNIQUE (edition, fascicle, headline, tag);
+
+
+--
+-- Name: fascicles_indx_rubrics_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY fascicles_indx_rubrics
+    ADD CONSTRAINT fascicles_indx_rubrics_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: fascicles_map_documents_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY fascicles_map_documents
+    ADD CONSTRAINT fascicles_map_documents_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: fascicles_map_modules_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY fascicles_map_modules
+    ADD CONSTRAINT fascicles_map_modules_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: fascicles_map_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY fascicles_map_requests
+    ADD CONSTRAINT fascicles_map_requests_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: fascicles_modules_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY fascicles_modules
+    ADD CONSTRAINT fascicles_modules_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: fascicles_options_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY fascicles_options
+    ADD CONSTRAINT fascicles_options_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: fascicles_pages_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY fascicles_pages
+    ADD CONSTRAINT fascicles_pages_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: fascicles_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY fascicles
+    ADD CONSTRAINT fascicles_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: fascicles_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY fascicles_requests
+    ADD CONSTRAINT fascicles_requests_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: fascicles_tmpl_index_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY fascicles_tmpl_index
+    ADD CONSTRAINT fascicles_tmpl_index_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: fascicles_tmpl_modules_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY fascicles_tmpl_modules
+    ADD CONSTRAINT fascicles_tmpl_modules_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: fascicles_tmpl_pages_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY fascicles_tmpl_pages
+    ADD CONSTRAINT fascicles_tmpl_pages_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: fascicles_tmpl_places_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY fascicles_tmpl_places
+    ADD CONSTRAINT fascicles_tmpl_places_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: history_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY history
+    ADD CONSTRAINT history_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: indx_headlines_edition_key; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY indx_headlines
+    ADD CONSTRAINT indx_headlines_edition_key UNIQUE (edition, tag);
+
+
+--
+-- Name: indx_headlines_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY indx_headlines
+    ADD CONSTRAINT indx_headlines_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: indx_rubrics_edition_key; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY indx_rubrics
+    ADD CONSTRAINT indx_rubrics_edition_key UNIQUE (edition, headline, tag);
+
+
+--
+-- Name: indx_rubrics_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY indx_rubrics
+    ADD CONSTRAINT indx_rubrics_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: indx_tags_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY indx_tags
+    ADD CONSTRAINT indx_tags_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: logs_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY logs
+    ADD CONSTRAINT logs_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: map_member_to_catalog_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY map_member_to_catalog
+    ADD CONSTRAINT map_member_to_catalog_pkey PRIMARY KEY (member, catalog);
+
+
+--
+-- Name: map_member_to_rule_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY map_member_to_rule
+    ADD CONSTRAINT map_member_to_rule_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: map_principals_to_stages_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY map_principals_to_stages
+    ADD CONSTRAINT map_principals_to_stages_pkey PRIMARY KEY (id, stage, principal);
+
+
+--
+-- Name: map_role_to_rule_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY map_role_to_rule
+    ADD CONSTRAINT map_role_to_rule_pkey PRIMARY KEY (role, rule, mode);
+
+
+--
+-- Name: member_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY members
+    ADD CONSTRAINT member_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: member_profiles_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY profiles
+    ADD CONSTRAINT member_profiles_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: member_session_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY sessions
+    ADD CONSTRAINT member_session_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: migration_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY migration
+    ADD CONSTRAINT migration_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: options_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY options
+    ADD CONSTRAINT options_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: roles_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY roles
+    ADD CONSTRAINT roles_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: rss_feeds_mapping_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY rss_feeds_mapping
+    ADD CONSTRAINT rss_feeds_mapping_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: rss_feeds_options_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY rss_feeds_options
+    ADD CONSTRAINT rss_feeds_options_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: rss_feeds_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY rss_feeds
+    ADD CONSTRAINT rss_feeds_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: rss_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY rss
+    ADD CONSTRAINT rss_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: rules_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
+--
+
+ALTER TABLE ONLY rules
+    ADD CONSTRAINT rules_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: stages_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY stages
@@ -3665,9 +4159,7 @@ ALTER TABLE ONLY stages
 
 
 --
--- TOC entry 2276 (class 2606 OID 78599)
--- Dependencies: 1791 1791
--- Name: state_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: state_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY state
@@ -3675,9 +4167,7 @@ ALTER TABLE ONLY state
 
 
 --
--- TOC entry 2268 (class 2606 OID 78601)
--- Dependencies: 1787 1787
--- Name: statuses_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: statuses_pkey; Type: CONSTRAINT; Schema: public; Owner: inprint; Tablespace:
 --
 
 ALTER TABLE ONLY readiness
@@ -3685,18 +4175,14 @@ ALTER TABLE ONLY readiness
 
 
 --
--- TOC entry 2321 (class 1259 OID 211821)
--- Dependencies: 1821
--- Name: fki_; Type: INDEX; Schema: public; Owner: -
+-- Name: fki_; Type: INDEX; Schema: public; Owner: inprint; Tablespace:
 --
 
 CREATE INDEX fki_ ON fascicles_pages USING btree (origin);
 
 
 --
--- TOC entry 2348 (class 2620 OID 78759)
--- Dependencies: 94 1778
--- Name: catalog_access_delete_after; Type: TRIGGER; Schema: public; Owner: -
+-- Name: catalog_access_delete_after; Type: TRIGGER; Schema: public; Owner: inprint
 --
 
 CREATE TRIGGER catalog_access_delete_after
@@ -3706,9 +4192,7 @@ CREATE TRIGGER catalog_access_delete_after
 
 
 --
--- TOC entry 2349 (class 2620 OID 78760)
--- Dependencies: 95 1778
--- Name: catalog_access_insert_after; Type: TRIGGER; Schema: public; Owner: -
+-- Name: catalog_access_insert_after; Type: TRIGGER; Schema: public; Owner: inprint
 --
 
 CREATE TRIGGER catalog_access_insert_after
@@ -3718,9 +4202,7 @@ CREATE TRIGGER catalog_access_insert_after
 
 
 --
--- TOC entry 2350 (class 2620 OID 78761)
--- Dependencies: 99 1778
--- Name: catalog_access_update_after; Type: TRIGGER; Schema: public; Owner: -
+-- Name: catalog_access_update_after; Type: TRIGGER; Schema: public; Owner: inprint
 --
 
 CREATE TRIGGER catalog_access_update_after
@@ -3730,9 +4212,7 @@ CREATE TRIGGER catalog_access_update_after
 
 
 --
--- TOC entry 2345 (class 2620 OID 78604)
--- Dependencies: 1778 90
--- Name: catalog_delete_after; Type: TRIGGER; Schema: public; Owner: -
+-- Name: catalog_delete_after; Type: TRIGGER; Schema: public; Owner: inprint
 --
 
 CREATE TRIGGER catalog_delete_after
@@ -3742,9 +4222,7 @@ CREATE TRIGGER catalog_delete_after
 
 
 --
--- TOC entry 2346 (class 2620 OID 78605)
--- Dependencies: 1778 91
--- Name: catalog_insert_before; Type: TRIGGER; Schema: public; Owner: -
+-- Name: catalog_insert_before; Type: TRIGGER; Schema: public; Owner: inprint
 --
 
 CREATE TRIGGER catalog_insert_before
@@ -3754,9 +4232,7 @@ CREATE TRIGGER catalog_insert_before
 
 
 --
--- TOC entry 2347 (class 2620 OID 78606)
--- Dependencies: 1778 92
--- Name: catalog_update_after; Type: TRIGGER; Schema: public; Owner: -
+-- Name: catalog_update_after; Type: TRIGGER; Schema: public; Owner: inprint
 --
 
 CREATE TRIGGER catalog_update_after
@@ -3766,9 +4242,7 @@ CREATE TRIGGER catalog_update_after
 
 
 --
--- TOC entry 2356 (class 2620 OID 78768)
--- Dependencies: 1779 94
--- Name: editions_access_delete_after; Type: TRIGGER; Schema: public; Owner: -
+-- Name: editions_access_delete_after; Type: TRIGGER; Schema: public; Owner: inprint
 --
 
 CREATE TRIGGER editions_access_delete_after
@@ -3778,9 +4252,7 @@ CREATE TRIGGER editions_access_delete_after
 
 
 --
--- TOC entry 2355 (class 2620 OID 78766)
--- Dependencies: 1779 95
--- Name: editions_access_insert_after; Type: TRIGGER; Schema: public; Owner: -
+-- Name: editions_access_insert_after; Type: TRIGGER; Schema: public; Owner: inprint
 --
 
 CREATE TRIGGER editions_access_insert_after
@@ -3790,9 +4262,7 @@ CREATE TRIGGER editions_access_insert_after
 
 
 --
--- TOC entry 2354 (class 2620 OID 78765)
--- Dependencies: 1779 99
--- Name: editions_access_update_after; Type: TRIGGER; Schema: public; Owner: -
+-- Name: editions_access_update_after; Type: TRIGGER; Schema: public; Owner: inprint
 --
 
 CREATE TRIGGER editions_access_update_after
@@ -3802,9 +4272,7 @@ CREATE TRIGGER editions_access_update_after
 
 
 --
--- TOC entry 2351 (class 2620 OID 78607)
--- Dependencies: 90 1779
--- Name: editions_delete_after; Type: TRIGGER; Schema: public; Owner: -
+-- Name: editions_delete_after; Type: TRIGGER; Schema: public; Owner: inprint
 --
 
 CREATE TRIGGER editions_delete_after
@@ -3814,9 +4282,7 @@ CREATE TRIGGER editions_delete_after
 
 
 --
--- TOC entry 2352 (class 2620 OID 78608)
--- Dependencies: 91 1779
--- Name: editions_insert_before; Type: TRIGGER; Schema: public; Owner: -
+-- Name: editions_insert_before; Type: TRIGGER; Schema: public; Owner: inprint
 --
 
 CREATE TRIGGER editions_insert_before
@@ -3826,9 +4292,7 @@ CREATE TRIGGER editions_insert_before
 
 
 --
--- TOC entry 2353 (class 2620 OID 78609)
--- Dependencies: 92 1779
--- Name: editions_update_after; Type: TRIGGER; Schema: public; Owner: -
+-- Name: editions_update_after; Type: TRIGGER; Schema: public; Owner: inprint
 --
 
 CREATE TRIGGER editions_update_after
@@ -3838,9 +4302,7 @@ CREATE TRIGGER editions_update_after
 
 
 --
--- TOC entry 2360 (class 2620 OID 211314)
--- Dependencies: 1800 100
--- Name: fascicles_map_documents_delete_after; Type: TRIGGER; Schema: public; Owner: -
+-- Name: fascicles_map_documents_delete_after; Type: TRIGGER; Schema: public; Owner: inprint
 --
 
 CREATE TRIGGER fascicles_map_documents_delete_after
@@ -3850,9 +4312,7 @@ CREATE TRIGGER fascicles_map_documents_delete_after
 
 
 --
--- TOC entry 2359 (class 2620 OID 144843)
--- Dependencies: 1800 98
--- Name: fascicles_map_documents_update_after; Type: TRIGGER; Schema: public; Owner: -
+-- Name: fascicles_map_documents_update_after; Type: TRIGGER; Schema: public; Owner: inprint
 --
 
 CREATE TRIGGER fascicles_map_documents_update_after
@@ -3862,9 +4322,27 @@ CREATE TRIGGER fascicles_map_documents_update_after
 
 
 --
--- TOC entry 2358 (class 2620 OID 78771)
--- Dependencies: 1792 97
--- Name: rules_mapping_delete_after; Type: TRIGGER; Schema: public; Owner: -
+-- Name: fascicles_map_modules_delete_after; Type: TRIGGER; Schema: public; Owner: inprint
+--
+
+CREATE TRIGGER fascicles_map_modules_delete_after
+    AFTER DELETE ON fascicles_map_modules
+    FOR EACH ROW
+    EXECUTE PROCEDURE fascicles_map_modules_delete_after_trigger();
+
+
+--
+-- Name: fascicles_map_modules_update_after; Type: TRIGGER; Schema: public; Owner: inprint
+--
+
+CREATE TRIGGER fascicles_map_modules_update_after
+    AFTER INSERT OR UPDATE ON fascicles_map_modules
+    FOR EACH ROW
+    EXECUTE PROCEDURE fascicles_map_modules_update_after_trigger();
+
+
+--
+-- Name: rules_mapping_delete_after; Type: TRIGGER; Schema: public; Owner: inprint
 --
 
 CREATE TRIGGER rules_mapping_delete_after
@@ -3874,9 +4352,7 @@ CREATE TRIGGER rules_mapping_delete_after
 
 
 --
--- TOC entry 2357 (class 2620 OID 78764)
--- Dependencies: 96 1792
--- Name: rules_mapping_insert_after; Type: TRIGGER; Schema: public; Owner: -
+-- Name: rules_mapping_insert_after; Type: TRIGGER; Schema: public; Owner: inprint
 --
 
 CREATE TRIGGER rules_mapping_insert_after
@@ -3886,9 +4362,7 @@ CREATE TRIGGER rules_mapping_insert_after
 
 
 --
--- TOC entry 2336 (class 2606 OID 78899)
--- Dependencies: 1795 1784 2261
--- Name: cache_access_member_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: cache_access_member_fkey; Type: FK CONSTRAINT; Schema: public; Owner: inprint
 --
 
 ALTER TABLE ONLY cache_access
@@ -3896,9 +4370,39 @@ ALTER TABLE ONLY cache_access
 
 
 --
--- TOC entry 2337 (class 2606 OID 211832)
--- Dependencies: 1805 2293 1800
--- Name: fascicles_map_documents_entity_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fascicles_edition_fkey; Type: FK CONSTRAINT; Schema: public; Owner: inprint
+--
+
+ALTER TABLE ONLY fascicles
+    ADD CONSTRAINT fascicles_edition_fkey FOREIGN KEY (edition) REFERENCES editions(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: fascicles_indx_headlines_fascicle_fkey; Type: FK CONSTRAINT; Schema: public; Owner: inprint
+--
+
+ALTER TABLE ONLY fascicles_indx_headlines
+    ADD CONSTRAINT fascicles_indx_headlines_fascicle_fkey FOREIGN KEY (fascicle) REFERENCES fascicles(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: fascicles_indx_rubrics_fascicle_fkey; Type: FK CONSTRAINT; Schema: public; Owner: inprint
+--
+
+ALTER TABLE ONLY fascicles_indx_rubrics
+    ADD CONSTRAINT fascicles_indx_rubrics_fascicle_fkey FOREIGN KEY (fascicle) REFERENCES fascicles(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: fascicles_indx_rubrics_headline_fkey; Type: FK CONSTRAINT; Schema: public; Owner: inprint
+--
+
+ALTER TABLE ONLY fascicles_indx_rubrics
+    ADD CONSTRAINT fascicles_indx_rubrics_headline_fkey FOREIGN KEY (headline) REFERENCES fascicles_indx_headlines(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: fascicles_map_documents_entity_fkey; Type: FK CONSTRAINT; Schema: public; Owner: inprint
 --
 
 ALTER TABLE ONLY fascicles_map_documents
@@ -3906,9 +4410,15 @@ ALTER TABLE ONLY fascicles_map_documents
 
 
 --
--- TOC entry 2338 (class 2606 OID 211867)
--- Dependencies: 1800 2319 1821
--- Name: fascicles_map_documents_page_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fascicles_map_documents_fascicle_fkey; Type: FK CONSTRAINT; Schema: public; Owner: inprint
+--
+
+ALTER TABLE ONLY fascicles_map_documents
+    ADD CONSTRAINT fascicles_map_documents_fascicle_fkey FOREIGN KEY (fascicle) REFERENCES fascicles(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: fascicles_map_documents_page_fkey; Type: FK CONSTRAINT; Schema: public; Owner: inprint
 --
 
 ALTER TABLE ONLY fascicles_map_documents
@@ -3916,9 +4426,15 @@ ALTER TABLE ONLY fascicles_map_documents
 
 
 --
--- TOC entry 2342 (class 2606 OID 211862)
--- Dependencies: 1826 2332 1827
--- Name: fascicles_map_modules_module_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fascicles_map_modules_fascicle_fkey; Type: FK CONSTRAINT; Schema: public; Owner: inprint
+--
+
+ALTER TABLE ONLY fascicles_map_modules
+    ADD CONSTRAINT fascicles_map_modules_fascicle_fkey FOREIGN KEY (fascicle) REFERENCES fascicles(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: fascicles_map_modules_module_fkey; Type: FK CONSTRAINT; Schema: public; Owner: inprint
 --
 
 ALTER TABLE ONLY fascicles_map_modules
@@ -3926,9 +4442,7 @@ ALTER TABLE ONLY fascicles_map_modules
 
 
 --
--- TOC entry 2341 (class 2606 OID 211857)
--- Dependencies: 1821 2319 1826
--- Name: fascicles_map_modules_page_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fascicles_map_modules_page_fkey; Type: FK CONSTRAINT; Schema: public; Owner: inprint
 --
 
 ALTER TABLE ONLY fascicles_map_modules
@@ -3936,9 +4450,23 @@ ALTER TABLE ONLY fascicles_map_modules
 
 
 --
--- TOC entry 2343 (class 2606 OID 211847)
--- Dependencies: 1820 2317 1827
--- Name: fascicles_modules_origin_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fascicles_map_requests_fascicle_fkey; Type: FK CONSTRAINT; Schema: public; Owner: inprint
+--
+
+ALTER TABLE ONLY fascicles_map_requests
+    ADD CONSTRAINT fascicles_map_requests_fascicle_fkey FOREIGN KEY (fascicle) REFERENCES fascicles(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: fascicles_modules_fascicle_fkey; Type: FK CONSTRAINT; Schema: public; Owner: inprint
+--
+
+ALTER TABLE ONLY fascicles_modules
+    ADD CONSTRAINT fascicles_modules_fascicle_fkey FOREIGN KEY (fascicle) REFERENCES fascicles(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: fascicles_modules_origin_fkey; Type: FK CONSTRAINT; Schema: public; Owner: inprint
 --
 
 ALTER TABLE ONLY fascicles_modules
@@ -3946,9 +4474,7 @@ ALTER TABLE ONLY fascicles_modules
 
 
 --
--- TOC entry 2344 (class 2606 OID 211852)
--- Dependencies: 1827 2315 1819
--- Name: fascicles_modules_place_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fascicles_modules_place_fkey; Type: FK CONSTRAINT; Schema: public; Owner: inprint
 --
 
 ALTER TABLE ONLY fascicles_modules
@@ -3956,9 +4482,23 @@ ALTER TABLE ONLY fascicles_modules
 
 
 --
--- TOC entry 2340 (class 2606 OID 211816)
--- Dependencies: 1821 1824 2326
--- Name: fascicles_pages_origin_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fascicles_options_fascicle_fkey; Type: FK CONSTRAINT; Schema: public; Owner: inprint
+--
+
+ALTER TABLE ONLY fascicles_options
+    ADD CONSTRAINT fascicles_options_fascicle_fkey FOREIGN KEY (fascicle) REFERENCES fascicles(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: fascicles_pages_fascicle_fkey; Type: FK CONSTRAINT; Schema: public; Owner: inprint
+--
+
+ALTER TABLE ONLY fascicles_pages
+    ADD CONSTRAINT fascicles_pages_fascicle_fkey FOREIGN KEY (fascicle) REFERENCES fascicles(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: fascicles_pages_origin_fkey; Type: FK CONSTRAINT; Schema: public; Owner: inprint
 --
 
 ALTER TABLE ONLY fascicles_pages
@@ -3966,9 +4506,31 @@ ALTER TABLE ONLY fascicles_pages
 
 
 --
--- TOC entry 2339 (class 2606 OID 211827)
--- Dependencies: 1820 2326 1824
--- Name: fascicles_tmpl_modules_page_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fascicles_requests_fascicle_fkey; Type: FK CONSTRAINT; Schema: public; Owner: inprint
+--
+
+ALTER TABLE ONLY fascicles_requests
+    ADD CONSTRAINT fascicles_requests_fascicle_fkey FOREIGN KEY (fascicle) REFERENCES fascicles(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: fascicles_tmpl_index_fascicle_fkey; Type: FK CONSTRAINT; Schema: public; Owner: inprint
+--
+
+ALTER TABLE ONLY fascicles_tmpl_index
+    ADD CONSTRAINT fascicles_tmpl_index_fascicle_fkey FOREIGN KEY (fascicle) REFERENCES fascicles(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: fascicles_tmpl_modules_fascicle_fkey; Type: FK CONSTRAINT; Schema: public; Owner: inprint
+--
+
+ALTER TABLE ONLY fascicles_tmpl_modules
+    ADD CONSTRAINT fascicles_tmpl_modules_fascicle_fkey FOREIGN KEY (fascicle) REFERENCES fascicles(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: fascicles_tmpl_modules_page_fkey; Type: FK CONSTRAINT; Schema: public; Owner: inprint
 --
 
 ALTER TABLE ONLY fascicles_tmpl_modules
@@ -3976,9 +4538,47 @@ ALTER TABLE ONLY fascicles_tmpl_modules
 
 
 --
--- TOC entry 2334 (class 2606 OID 78610)
--- Dependencies: 1781 2261 1784
--- Name: map_member_to_catalog_member_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fascicles_tmpl_pages_fascicle_fkey; Type: FK CONSTRAINT; Schema: public; Owner: inprint
+--
+
+ALTER TABLE ONLY fascicles_tmpl_pages
+    ADD CONSTRAINT fascicles_tmpl_pages_fascicle_fkey FOREIGN KEY (fascicle) REFERENCES fascicles(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: fascicles_tmpl_places_fascicle_fkey; Type: FK CONSTRAINT; Schema: public; Owner: inprint
+--
+
+ALTER TABLE ONLY fascicles_tmpl_places
+    ADD CONSTRAINT fascicles_tmpl_places_fascicle_fkey FOREIGN KEY (fascicle) REFERENCES fascicles(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: indx_headlines_edition_fkey; Type: FK CONSTRAINT; Schema: public; Owner: inprint
+--
+
+ALTER TABLE ONLY indx_headlines
+    ADD CONSTRAINT indx_headlines_edition_fkey FOREIGN KEY (edition) REFERENCES editions(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: indx_rubrics_edition_fkey; Type: FK CONSTRAINT; Schema: public; Owner: inprint
+--
+
+ALTER TABLE ONLY indx_rubrics
+    ADD CONSTRAINT indx_rubrics_edition_fkey FOREIGN KEY (edition) REFERENCES editions(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: indx_rubrics_headline_fkey; Type: FK CONSTRAINT; Schema: public; Owner: inprint
+--
+
+ALTER TABLE ONLY indx_rubrics
+    ADD CONSTRAINT indx_rubrics_headline_fkey FOREIGN KEY (headline) REFERENCES indx_headlines(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: map_member_to_catalog_member_fkey; Type: FK CONSTRAINT; Schema: public; Owner: inprint
 --
 
 ALTER TABLE ONLY map_member_to_catalog
@@ -3986,18 +4586,25 @@ ALTER TABLE ONLY map_member_to_catalog
 
 
 --
--- TOC entry 2335 (class 2606 OID 78615)
--- Dependencies: 1788 2269 1783
--- Name: map_role_to_rule_role_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: map_role_to_rule_role_fkey; Type: FK CONSTRAINT; Schema: public; Owner: inprint
 --
 
 ALTER TABLE ONLY map_role_to_rule
     ADD CONSTRAINT map_role_to_rule_role_fkey FOREIGN KEY (role) REFERENCES roles(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
--- Completed on 2010-12-23 01:24:19
+--
+-- Name: public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM postgres;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
 
 --
 -- PostgreSQL database dump complete
 --
 
+COMMIT;
