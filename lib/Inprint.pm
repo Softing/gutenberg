@@ -385,9 +385,11 @@ sub startup {
     $sessionBridge->route("/fascicle/templates/index/save/")        ->to("fascicle-templates-index#save");
 
     # Files
-    $postinitBridge->route('/files/preview/:id')                 ->to('files#preview');
-    $postinitBridge->route('/files/download/:id')                ->to('files#download');
-    $postinitBridge->route('/files/download/')                   ->to('files#download');
+    $postinitBridge->route('/files/preview/:id')                    ->to('files#preview');
+    $postinitBridge->route('/files/download/:id')                   ->to('files#download');
+    $postinitBridge->route('/files/download/')                      ->to('files#download');
+    $postinitBridge->route('/files/view/:id')                       ->to('files#view');
+    $postinitBridge->route('/files/view/')                          ->to('files#view');
 
     # Images
     $sessionBridge->route('/aimgs/fascicle/page/:id/:w/:h')     ->to('images#fascicle_page');

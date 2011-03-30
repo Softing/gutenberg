@@ -21,9 +21,10 @@ use Inprint::Check;
 
 use base 'Inprint::BaseController';
 
-sub download {
+sub view {
 
     my $c = shift;
+    my $options = shift || {};
 
     my @i_files       = $c->param("id");
     my $i_document    = $c->param("document");
@@ -109,8 +110,12 @@ sub download {
 
         my $headers = Mojo::Headers->new;
         $headers->add("Content-Type", "$mimetype; name=$filename");
-        $headers->add("Content-Disposition", "attachment; filename=$filename");
-        $headers->add("Content-Description", $extension);
+
+        if ($options->{disposition}) {
+            $headers->add("Content-Disposition", "attachment; filename=$filename");
+            $headers->add("Content-Description", $extension);
+        }
+
         $c->res->content->headers($headers);
 
         $c->render_static($filepath);
@@ -153,6 +158,15 @@ sub download {
 
     }
 
+    $c->render_json({  });
+}
+
+sub download {
+    my $c = shift;
+
+    $c->view({
+        disposition => 1
+    });
     $c->render_json({  });
 }
 

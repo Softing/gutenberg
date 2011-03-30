@@ -150,8 +150,9 @@ sub feed {
             my $files = Inprint::Store::Cache::getRecordsByPath($c, $folder, "all", [ "png","jpg","jpeg","gif","wmv","wma","mpeg","mp3" ]);
 
             foreach my $file (@$files) {
+
                 $rss_feed .= "\n";
-                my $fileurl  = "$siteurl/files/download/". $file->{id} .".". $file->{extension};
+                my $fileurl  = "$siteurl/files/view/". $file->{id} .".". $file->{extension};
                 my $filemime = $file->{mime};
                 my $filedesc = $file->{description};
 
