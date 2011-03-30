@@ -108,11 +108,11 @@ INSERT INTO catalog (id, path, title, shortcut, description, type, capables, cre
 INSERT INTO editions (id, path, title, shortcut, description, created, updated)
     VALUES ('00000000-0000-0000-0000-000000000000', '00000000000000000000000000000000', 'All editions', 'All editions', 'All editions', now(), now());
 
-INSERT INTO fascicles(id, edition, parent, title, shortcut, description, manager, variation, deadline, advert_deadline, created, updated)
-    VALUES ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', 'Briefcase', 'Briefcase', 'Briefcase', null, '00000000-0000-0000-0000-000000000000', now(), now(), now(), now());
+INSERT INTO fascicles( id, edition, parent, fastype, variation, shortcut, description, circulation, pnum, anum, manager, enabled, archived, flagdoc, flagadv, datedoc, dateadv, dateprint, dateout, created, updated)
+    VALUES ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', 'system', '00000000-0000-0000-0000-000000000000', 'Briefcase', 'Briefcase', 0, 0, 0, null, true, false, 'bydate', 'bydate', '2020-01-01 00:00:00+00', '2020-01-01 00:00:00+00', '2020-01-01 00:00:00+00', '2020-01-01 00:00:00+00', now(), now());
 
-INSERT INTO fascicles(id, edition, parent, title, shortcut, description, manager, variation, deadline, advert_deadline, created, updated)
-    VALUES ('99999999-9999-9999-9999-999999999999', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', 'Recycle bin', 'Recycle bin', 'Recycle bin', null, '00000000-0000-0000-0000-000000000000', now(), now(), now(), now());
+INSERT INTO fascicles( id, edition, parent, fastype, variation, shortcut, description, circulation, pnum, anum, manager, enabled, archived, flagdoc, flagadv, datedoc, dateadv, dateprint, dateout, created, updated)
+    VALUES ('99999999-9999-9999-9999-999999999999', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', 'system', '00000000-0000-0000-0000-000000000000', 'Recycle bin', 'Recycle bin', 0, 0, 0, null, true, false, 'bydate', 'bydate', '2020-01-01 00:00:00+00', '2020-01-01 00:00:00+00', '2020-01-01 00:00:00+00', '2020-01-01 00:00:00+00', now(), now());
 
 INSERT INTO branches(id, edition, mtype, title, shortcut, description, created, updated)
     VALUES ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', 'Default branch', 'Default', 'This is default branch for everything', now(), now());
@@ -123,12 +123,6 @@ INSERT INTO readiness(id, color, weight, title, shortcut, description, created, 
 INSERT INTO stages(id, branch, readiness, weight, title, shortcut, description, created, updated)
 	VALUES ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', 0, 'Default stage' , 'Default', 'This is default stage', now(), now());
 
-UPDATE fascicles SET deadline='2020-01-01 16:23:10+03'
- 	WHERE id = '00000000-0000-0000-0000-000000000000';
-	
-UPDATE fascicles SET deadline='2020-01-01 16:23:10+03'
- 	WHERE id = '99999999-9999-9999-9999-999999999999';
-	
 -------------------------------------------------------------------------------------------------
 -- Rubrication
 -------------------------------------------------------------------------------------------------
@@ -228,10 +222,10 @@ UPDATE catalog SET title = 'Издательский дом', shortcut = 'Изд
 UPDATE editions SET title = 'Все издания', shortcut = 'Все издания', description = 'Все издания'
  	WHERE id = '00000000-0000-0000-0000-000000000000';
 
-UPDATE fascicles SET title = 'Портфель', shortcut = 'Портфель', description = 'Портфель'
+UPDATE fascicles SET shortcut = 'Портфель', description = 'Портфель'
  	WHERE id = '00000000-0000-0000-0000-000000000000';
 
-UPDATE fascicles SET title = 'Корзина', shortcut = 'Корзина', description = 'Корзина'
+UPDATE fascicles SET shortcut = 'Корзина', description = 'Корзина'
  	WHERE id = '99999999-9999-9999-9999-999999999999';
 
 UPDATE documents SET fascicle_shortcut = 'Портфель'
@@ -273,15 +267,15 @@ UPDATE rules SET sortorder=70, title = 'Может управлять рубри
 
 -- Catalog Rules
 
-UPDATE rules SET sortorder=10, title = 'Может просматривать материалы' WHERE id = 'ac0a0d95-c4d3-4bd7-93c3-cc0fc230936f';
-UPDATE rules SET sortorder=20, title = 'Может создавать материалы' WHERE id = 'ee992171-d275-4d24-8def-7ff02adec408';
-UPDATE rules SET sortorder=30, title = 'Может назначать в отдел' WHERE id = '6033984a-a762-4392-b086-a8d2cdac4221';
-UPDATE rules SET sortorder=40, title = 'Может удалять материалы' WHERE id = '3040f8e1-051c-4876-8e8e-0ca4910e7e45';
-UPDATE rules SET sortorder=50, title = 'Может восстанавливать материалы' WHERE id = 'beba3e8d-86e5-4e98-b3eb-368da28dba5f';
-UPDATE rules SET sortorder=60, title = 'Может редактировать профиль материала' WHERE id = '5b27108a-2108-4846-a0a8-3c369f873590';
-UPDATE rules SET sortorder=70, title = 'Может работать с файлами материала' WHERE id = 'bff78ebf-2cba-466e-9e3c-89f13a0882fc';
-UPDATE rules SET sortorder=80, title = 'Мжет добавлять файлы в материал' WHERE id = 'f4ad42ed-b46b-4b4e-859f-1b69b918a64a';
-UPDATE rules SET sortorder=90, title = 'Может удалять материалы' WHERE id = 'fe9cd446-2f4b-4844-9b91-5092c0cabece';
+UPDATE rules SET sortorder=10,  title = 'Может просматривать материалы' WHERE id = 'ac0a0d95-c4d3-4bd7-93c3-cc0fc230936f';
+UPDATE rules SET sortorder=20,  title = 'Может создавать материалы' WHERE id = 'ee992171-d275-4d24-8def-7ff02adec408';
+UPDATE rules SET sortorder=30,  title = 'Может назначать в отдел' WHERE id = '6033984a-a762-4392-b086-a8d2cdac4221';
+UPDATE rules SET sortorder=40,  title = 'Может удалять материалы' WHERE id = '3040f8e1-051c-4876-8e8e-0ca4910e7e45';
+UPDATE rules SET sortorder=50,  title = 'Может восстанавливать материалы' WHERE id = 'beba3e8d-86e5-4e98-b3eb-368da28dba5f';
+UPDATE rules SET sortorder=60,  title = 'Может редактировать профиль материала' WHERE id = '5b27108a-2108-4846-a0a8-3c369f873590';
+UPDATE rules SET sortorder=70,  title = 'Может работать с файлами материала' WHERE id = 'bff78ebf-2cba-466e-9e3c-89f13a0882fc';
+UPDATE rules SET sortorder=80,  title = 'Мжет добавлять файлы в материал' WHERE id = 'f4ad42ed-b46b-4b4e-859f-1b69b918a64a';
+UPDATE rules SET sortorder=90,  title = 'Может удалять материалы' WHERE id = 'fe9cd446-2f4b-4844-9b91-5092c0cabece';
 UPDATE rules SET sortorder=100, title = 'Может захватывать материалы' WHERE id = 'd782679e-3f0a-4499-bda6-8c2600a3e761';
 UPDATE rules SET sortorder=110, title = 'Может передавать материалы другим сотрудникам' WHERE id = 'b946bd84-93fc-4a70-b325-d23c2804b2e9';
 UPDATE rules SET sortorder=120, title = 'Может перемещать материалы между выпусками' WHERE id = 'b7adafe9-2d5b-44f3-aa87-681fd48466fa';
