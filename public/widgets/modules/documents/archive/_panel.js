@@ -53,6 +53,7 @@ Inprint.documents.archive.Panel = Ext.extend(Inprint.documents.Grid, {
 
 Inprint.registry.register("documents-archive", {
     icon: "folders-stack",
-    text:  _("Archive"),
+    menutext:  _("Archive"),
+    text:  _("Archival documents"),
     xobject: Inprint.documents.archive.Panel
 });

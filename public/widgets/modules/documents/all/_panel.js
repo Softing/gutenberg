@@ -75,6 +75,7 @@ Inprint.documents.all.Panel = Ext.extend(Inprint.documents.Grid, {
 
 Inprint.registry.register("documents-all", {
     icon: "documents-stack",
-    text:  _("All"),
+    menutext:  _("Available"),
+    text:  _("Available documents"),
     xobject: Inprint.documents.all.Panel
 });

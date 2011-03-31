@@ -65,6 +65,8 @@ Inprint.ObjectResolver = function() {
 
             if (item.icon) { config.icon = item.icon; }
 
+            var xobject = Inprint.registry[item.aid].xobject;
+
             config.title = this.makeTitle(config.aid, config.oid, config.pid, config.icon, unescape(item.text), unescape(item.description));
 
             // Create panel Tools
@@ -88,7 +90,7 @@ Inprint.ObjectResolver = function() {
             ];
 
             config.tools = tools;
-            var xobject = Inprint.registry[item.aid].xobject;
+
             if (xobject && typeof(xobject) == "function") {
                 config.items = { xtype: config.aid, oid: config.oid, pid: config.pid };
             } else {
@@ -122,16 +124,12 @@ Inprint.ObjectResolver = function() {
             var title = "<div style=\"padding-left:21px;background:url(" + icon + ") 0px -1px no-repeat;\">";
             title += _(text) ;
             title += "&nbsp;<a href=\"?aid="+ aid +"";
-
             if (oid) title += "&oid=" + oid;
             if (pid) title += "&pid=" + pid;
             if (text) title += "&text=" + text;
-            if (description) title += "&description=" + description;
-
+            if (description && description != 'undefined') title += "&description=" + description;
             title += "\" onClick=\"return false;\">[#]</a>";
-            if (description) {
-                title += "&nbsp;-&nbsp;" + description;
-            }
+            if (description && description != 'undefined') title += "&nbsp;-&nbsp;" + description;
             title += "</div>";
 
             return title;

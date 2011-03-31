@@ -77,10 +77,8 @@ Inprint.Menu = Ext.extend(Ext.Toolbar,{
                 }
             }
 
-            btn.text    = item.menutext || Inprint.registry[btn.aid].menutext || item.text || Inprint.registry[btn.aid].text;
-            btn.tooltip = item.tooltip || Inprint.registry[btn.aid].tooltip;
-
-            btn.description = item.description;
+            btn.text        = item.menutext     || Inprint.registry[btn.aid].menutext || item.text || Inprint.registry[btn.aid].text;
+            btn.tooltip     = item.tooltip      || Inprint.registry[btn.aid].tooltip
 
             // Обрабатываем подменю
             if (item.menu) {
@@ -93,16 +91,22 @@ Inprint.Menu = Ext.extend(Ext.Toolbar,{
 
             // Обрабатываем кнопку
             else {
+
                 btn.scope = this;
+
+                // Internal handler
                 if (Inprint.registry[btn.aid].handler) {
                     btn.handler = Inprint.registry[btn.aid].handler;
-                } else {
+                }
+
+                // Resolve window
+                else {
                     btn.handler = function() {
                         Inprint.ObjectResolver.resolve({
                             aid:  btn.aid,
                             oid:  btn.oid,
-                            text: btn.text,
-                            description: btn.description
+                            text: item.text || Inprint.registry[btn.aid].text,
+                            description: item.description || Inprint.registry[btn.aid].description
                         });
                     };
                 }
