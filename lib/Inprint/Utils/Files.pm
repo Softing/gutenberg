@@ -1,4 +1,10 @@
 package Inprint::Utils::Files;
+
+# Inprint Content 5.0
+# Copyright(c) 2001-2011, Softing, LLC.
+# licensing@softing.ru
+# http://softing.ru/license
+
 use strict;
 use warnings;
 
@@ -11,26 +17,26 @@ use POSIX qw(strftime);
 sub GetExtension {
     my $c = shift;
     my $filepath = shift;
-    
+
     my ($name,$path,$suffix) = fileparse($filepath, qr/(\.[^.]+){1}?/);
     $suffix =~ s/^.//g;
-    
+
     return lc($suffix);
 }
 
 sub GetDigest {
     my $c = shift;
     my $filepath = shift;
-    
+
     return digest_file_hex($filepath, "MD5");
 }
 
 sub GetMimeType {
     my $c = shift;
     my $filepath = shift;
-    
+
     my ($name,$path,$suffix) = fileparse($filepath, qr/(\.[^.]+){1}?/);
-    
+
     return ExtractMimeType($c, $suffix) || "application/octets-stream";
 }
 
@@ -51,17 +57,17 @@ sub GetFileModifiedDate {
 sub GetFileSize {
     my $c = shift;
     my $filepath = shift;
-    
+
     my $filesize = File::Util::size($filepath);
-    
+
     if ($filesize > 1024) {
         $filesize = sprintf("%.2f", $filesize / 1024) ."Kb";
     }
-    
+
     if ($filesize > 1024*1024) {
         $filesize = sprintf("%.2f", $filesize / 1024^2) ."Mb";
     }
-    
+
     return $filesize;
 }
 
@@ -70,18 +76,18 @@ sub GetFileSize {
 sub ProcessFilePath {
     my $c = shift;
     my $filepath = shift;
-    
+
     $filepath =~ s/\\+/\\/g;
     $filepath =~ s/\/+/\//g;
-    
+
     if ($^O eq "MSWin32") {
         $filepath =~ s/\/+/\\/g;
     }
-    
+
     if ($^O eq "linux") {
         $filepath =~ s/\\+/\//g;
     }
-    
+
     return $filepath;
 }
 
@@ -297,7 +303,7 @@ sub ExtractMimeType {
     "odm" => "application/vnd.oasis.opendocument.text-master",
     "oth" => "application/vnd.oasis.opendocument.text-web",
     };
-    
+
     return $MimeTypes->{$suffix} || undef;
 }
 
