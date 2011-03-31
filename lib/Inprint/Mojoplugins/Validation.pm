@@ -22,34 +22,7 @@ sub register {
             my @rules;
             my $result = 0;
 
-            $member = $c->getSessionValue("member.id") unless ($member);
-
-            if (ref $terms eq "ARRAY") {
-                @rules = @$terms;
-            } else {
-                push @rules, $terms;
-            }
-
-            for (my $i=0; $i <= $#rules; $i++) {
-                my ($term, $area) = split /:/, $rules[$i];
-                if ($area eq "*") {
-                    splice @rules, $i, $i, "$term:member", "$term:group";
-                }
-            }
-            my %seen;@rules = grep { ! $seen{$_}++ } @rules;
-
-            if ($member && @rules) {
-                my @data;
-                my $sql = " SELECT true FROM cache_access WHERE member=? AND ? && terms ";
-                push @data, $member;
-                push @data, \@rules;
-                if ($binding) {
-                    $sql .= " AND binding=?";
-                    push @data, $binding;
-                }
-
-                $result = $c->Q("SELECT EXISTS ($sql)", \@data)->Value();
-            }
+            $result = $c->objectAcess($terms, $binding, $member);
 
             if ($errors) {
                 unless ($result) {

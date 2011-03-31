@@ -8,7 +8,7 @@ package Inprint::Plugins::Rss::Files;
 use strict;
 use warnings;
 
-use Inprint::Check;
+
 use Inprint::Store::Embedded;
 
 use base 'Inprint::BaseController';
@@ -21,8 +21,8 @@ sub list {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "document", $i_document);
-    my $document = Inprint::Check::document($c, \@errors, $i_document);
+    $c->check_uuid( \@errors, "document", $i_document);
+    my $document = $c->check_record(\@errors, "documents", "document", $i_document);
 
     my $feed = $c->Q(" SELECT * FROM plugins_rss.rss WHERE entity=? ", [ $i_document ])->Hash;
 
@@ -53,8 +53,8 @@ sub upload {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "document", $i_document);
-    my $document = Inprint::Check::document($c, \@errors, $i_document);
+    $c->check_uuid( \@errors, "document", $i_document);
+    my $document = $c->check_record(\@errors, "documents", "document", $i_document);
 
     my $feed = $c->Q(" SELECT * FROM plugins_rss.rss WHERE entity=? ", [ $i_document ])->Hash;
     push @errors, { id => "feed", msg => "Can't find object"} unless ($feed->{id});
@@ -78,8 +78,8 @@ sub publish {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "document", $i_document);
-    my $document = Inprint::Check::document($c, \@errors, $i_document);
+    $c->check_uuid( \@errors, "document", $i_document);
+    my $document = $c->check_record(\@errors, "documents", "document", $i_document);
 
     unless (@errors) {
         foreach my $file(@i_files) {
@@ -100,8 +100,8 @@ sub unpublish {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "document", $i_document);
-    my $document = Inprint::Check::document($c, \@errors, $i_document);
+    $c->check_uuid( \@errors, "document", $i_document);
+    my $document = $c->check_record(\@errors, "documents", "document", $i_document);
 
     unless (@errors) {
         foreach my $file(@i_files) {
@@ -123,8 +123,8 @@ sub description {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "document", $i_document);
-    my $document = Inprint::Check::document($c, \@errors, $i_document);
+    $c->check_uuid( \@errors, "document", $i_document);
+    my $document = $c->check_record(\@errors, "documents", "document", $i_document);
 
     unless (@errors) {
         foreach my $file (@i_files) {
@@ -145,8 +145,8 @@ sub delete {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "document", $i_document);
-    my $document = Inprint::Check::document($c, \@errors, $i_document);
+    $c->check_uuid( \@errors, "document", $i_document);
+    my $document = $c->check_record(\@errors, "documents", "document", $i_document);
 
     unless (@errors) {
         foreach my $file(@i_files) {

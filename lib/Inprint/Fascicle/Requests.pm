@@ -9,7 +9,7 @@ use utf8;
 use strict;
 use warnings;
 
-use Inprint::Check;
+
 use Inprint::Models::Fascicle::Request;
 
 use base 'Inprint::BaseController';
@@ -21,7 +21,7 @@ sub read {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "id", $i_request);
+    $c->check_uuid( \@errors, "id", $i_request);
 
     my $result = [];
 
@@ -67,7 +67,7 @@ sub list {
         column => $c->param("sort")
     };
 
-    Inprint::Check::uuid($c, \@errors, "id", $filter->{flt_fascicle});
+    $c->check_uuid( \@errors, "id", $filter->{flt_fascicle});
 
     unless (@errors) {
         $result = Inprint::Models::Fascicle::Request::search($c, $filter, $sorting);
@@ -102,8 +102,8 @@ sub create {
     $i_payment   = "no" unless ($i_payment);
     $i_readiness = "no" unless ($i_readiness);
 
-    Inprint::Check::text($c, \@errors, "shortcut", $i_shortcut);
-    Inprint::Check::text($c, \@errors, "description", $i_description);
+    $c->check_text( \@errors, "shortcut", $i_shortcut);
+    $c->check_text( \@errors, "description", $i_description);
 
     unless ($i_module) {
         unless ($i_template) {
@@ -111,14 +111,14 @@ sub create {
         }
     }
 
-    Inprint::Check::uuid($c, \@errors, "module", $i_module) if (length $i_module > 0);
-    Inprint::Check::uuid($c, \@errors, "template", $i_template) if (length $i_template > 0);
+    $c->check_uuid( \@errors, "module", $i_module) if (length $i_module > 0);
+    $c->check_uuid( \@errors, "template", $i_template) if (length $i_template > 0);
 
-    my $fascicle   = Inprint::Check::fascicle($c, \@errors, $i_fascicle);
-    my $advertiser = Inprint::Check::advertiser($c, \@errors, $i_advertiser);
-
+    my $fascicle   = $c->check_record(\@errors, "fascicles", "fascicle", $i_fascicle);
+    my $advertiser = $c->check_record(\@errors, "ad_advertisers", "advertiser", $i_advertiser);
+    
     #push @errors, { id => "access", msg => "Not enough permissions"}
-    #    unless ($c->access->Check("domain.roles.manage"));
+    #    unless ($c->objectAccess("domain.roles.manage"));
 
     if ($i_module) {
 
@@ -286,11 +286,11 @@ sub update {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "id", $i_id);
-    Inprint::Check::text($c, \@errors, "shortcut", $i_shortcut);
-    Inprint::Check::text($c, \@errors, "description", $i_description);
+    $c->check_uuid( \@errors, "id", $i_id);
+    $c->check_text( \@errors, "shortcut", $i_shortcut);
+    $c->check_text( \@errors, "description", $i_description);
 
-    Inprint::Check::access($c, \@errors, "domain.roles.manage");
+    $c->check_access( \@errors, "domain.roles.manage");
 
     #my $module = $c->Q(" SELECT * FROM fascile_modules WHERE id=? ", [ $i_module ])->Hash;
     #my $place  = $c->Q(" SELECT * FROM fascile_tmpl_places WHERE id=? ", [ $module->{place} ])->Hash;
@@ -327,7 +327,7 @@ sub move {
     my $success = $c->json->false;
 
     #push @errors, { id => "access", msg => "Not enough permissions"}
-    #    unless ($c->access->Check("domain.roles.manage"));
+    #    unless ($c->objectAccess("domain.roles.manage"));
 
     my @pages;
 
@@ -401,7 +401,7 @@ sub delete {
     my $success = $c->json->false;
 
     #push @errors, { id => "access", msg => "Not enough permissions"}
-    #    unless ($c->access->Check("domain.roles.manage"));
+    #    unless ($c->objectAccess("domain.roles.manage"));
 
     unless (@errors) {
 

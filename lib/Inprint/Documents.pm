@@ -10,7 +10,7 @@ use warnings;
 
 use File::Copy::Recursive qw(fcopy rcopy dircopy fmove rmove dirmove);
 
-use Inprint::Check;
+
 
 use Inprint::Utils;
 use Inprint::Utils::Files;
@@ -35,7 +35,7 @@ sub read {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "id", $i_id);
+    $c->check_uuid( \@errors, "id", $i_id);
 
     my $document;
     unless (@errors) {
@@ -135,23 +135,23 @@ sub create {
         $manager = $current_member;
     }
 
-    Inprint::Check::text($c, \@errors, "title", $i_title);
-    Inprint::Check::date($c, \@errors, "enddate", $i_enddate);
-    Inprint::Check::uuid($c, \@errors, "edition", $i_edition);
-    Inprint::Check::uuid($c, \@errors, "workgroup", $i_workgroup);
-    Inprint::Check::uuid($c, \@errors, "manager", $manager);
-    Inprint::Check::uuid($c, \@errors, "fascicle", $i_fascicle);
+    $c->check_text( \@errors, "title", $i_title);
+    $c->check_date( \@errors, "enddate", $i_enddate);
+    $c->check_uuid( \@errors, "edition", $i_edition);
+    $c->check_uuid( \@errors, "workgroup", $i_workgroup);
+    $c->check_uuid( \@errors, "manager", $manager);
+    $c->check_uuid( \@errors, "fascicle", $i_fascicle);
 
     # Check user access to this function
     unless ( @errors ) {
         if ( $i_workgroup ) {
-            Inprint::Check::access($c, \@errors, "catalog.documents.create:*",  $i_workgroup);
+            $c->check_access( \@errors, "catalog.documents.create:*",  $i_workgroup);
         }
         if ( $i_fascicle && $i_fascicle ne "00000000-0000-0000-0000-000000000000") {
-            Inprint::Check::access($c, \@errors, "editions.documents.assign", $i_edition);
+            $c->check_access( \@errors, "editions.documents.assign", $i_edition);
         }
         if ($current_member ne $manager) {
-            Inprint::Check::access($c, \@errors, "catalog.documents.assign:*",  $i_workgroup);
+            $c->check_access( \@errors, "catalog.documents.assign:*",  $i_workgroup);
         }
     }
 
@@ -210,7 +210,7 @@ sub create {
 
     }
 
-    my $edition = Inprint::Check::edition($c, \@errors, $i_edition);
+    my $edition = $c->check_record(\@errors, "editions", "edition", $i_edition);
     unless ( @errors ) {
 
         push @fields, "edition";
@@ -228,7 +228,8 @@ sub create {
 
     }
 
-    my $workgroup = Inprint::Check::department($c, \@errors, $i_workgroup);
+    my $workgroup = $c->check_record(\@errors, "catalog", "department", $i_workgroup);
+
     unless ( @errors ) {
 
         push @fields, "workgroup";
@@ -260,7 +261,8 @@ sub create {
         push @data, $c->getSessionValue("member.shortcut") || "<Unknown>";
     }
 
-    my $holder = Inprint::Check::principal($c, \@errors, $manager);
+    my $holder = $c->check_record(\@errors, "view_principals", "principal", $i_manager);
+
     unless ( @errors ) {
         push @fields, "manager";
         push @data, $holder->{id};
@@ -324,7 +326,7 @@ sub create {
     }
 
     # Fascicle
-    my $fascicle = Inprint::Check::fascicle($c, \@errors, $i_fascicle);
+    my $fascicle = $c->check_record(\@errors, "fascicles", "fascicle", $i_fascicle);
     unless ( @errors ) {
         push @fields, "fascicle";
         push @fields, "fascicle_shortcut";
@@ -392,7 +394,7 @@ sub create {
 
         # Get new document
         my $document = $c->Q(" SELECT * FROM documents WHERE id=? ", [ $id ])->Hash;
-        my $principal = Inprint::Check::principal($c, \@errors, $c->getSessionValue("member.id"));
+        my $principal = $c->check_record(\@errors, "view_principals", "principal", $c->getSessionValue("member.id"));
 
         # Create document comment
         if ($i_comment) {
@@ -479,14 +481,14 @@ sub update {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "id", $i_id);
-    Inprint::Check::text($c, \@errors, "title", $i_title);
+    $c->check_uuid( \@errors, "id", $i_id);
+    $c->check_text( \@errors, "title", $i_title);
 
-    Inprint::Check::text($c, \@errors, "author", $i_author) if ($i_author);
-    Inprint::Check::int($c, \@errors, "size", $i_size) if ($i_size);
-    Inprint::Check::date($c, \@errors, "enddate", $i_enddate) if ($i_enddate);
+    $c->check_text( \@errors, "author", $i_author) if ($i_author);
+    $c->check_int( \@errors, "size", $i_size) if ($i_size);
+    $c->check_date( \@errors, "enddate", $i_enddate) if ($i_enddate);
 
-    my $document = Inprint::Check::document($c, \@errors, $i_id);
+    my $document = $c->check_record(\@errors, "documents", "document", $i_id);
 
     # Rubrication
     my $headline; unless ( @errors ) {
@@ -509,9 +511,9 @@ sub update {
         }
     }
 
-    my $canAssign = Inprint::Check::access($c, undef, "catalog.documents.assign:*", $document->{workgroup});
-    my $maingroup = Inprint::Check::principal($c, \@errors, $i_maingroup) if ($canAssign);
-    my $manager   = Inprint::Check::principal($c, \@errors, $i_manager) if ($canAssign);
+    my $canAssign = $c->check_access( undef, "catalog.documents.assign:*", $document->{workgroup});
+    my $maingroup = $c->check_record(\@errors, "view_principals", "principal", $i_maingroup) if ($canAssign);
+    my $manager   = $c->check_record(\@errors, "view_principals", "principal", $i_manager) if ($canAssign);
 
     # Update assignation
     unless (@errors) {
@@ -524,7 +526,7 @@ sub update {
     }
 
     unless (@errors) {
-        my $canUpdate = Inprint::Check::access($c, undef, "catalog.documents.update:*", $document->{workgroup});
+        my $canUpdate = $c->check_access( undef, "catalog.documents.update:*", $document->{workgroup});
         if ($canUpdate) {
 
             # Update workgroup
@@ -1090,11 +1092,11 @@ sub say {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "id", $i_id);
-    Inprint::Check::text($c, \@errors, "text", $i_text);
+    $c->check_uuid( \@errors, "id", $i_id);
+    $c->check_text( \@errors, "text", $i_text);
 
-    my $document  = Inprint::Check::document($c, \@errors, $i_id);
-    my $principal = Inprint::Check::principal($c, \@errors, $c->getSessionValue("member.id"));
+    my $document  = $c->check_record(\@errors, "documents", "document", $i_id);
+    my $principal = $c->check_record(\@errors, "view_principals", "principal", $c->getSessionValue("member.id"));
 
     unless (@errors) {
         Inprint::Models::Documents::say($c,
@@ -1124,7 +1126,7 @@ sub recycle {
                 next unless ($document->{id});
 
                 if ($document->{workgroup}) {
-                    if ($c->access->Check("catalog.documents.delete:*", $document->{workgroup})) {
+                    if ($c->objectAccess("catalog.documents.delete:*", $document->{workgroup})) {
 
                         # Remove document from old fascicle composition
                         $c->Do(" DELETE FROM fascicles_map_documents WHERE fascicle=? AND entity=? ", [ $document->{fascicle}, $document->{id} ]);
@@ -1158,7 +1160,7 @@ sub restore {
             if ($c->is_uuid($id)) {
                 my $document = Inprint::Utils::GetDocumentById($c, id => $id);
                 if ($document->{workgroup}) {
-                    if ($c->access->Check("catalog.documents.delete:*", $document->{workgroup})) {
+                    if ($c->objectAccess("catalog.documents.delete:*", $document->{workgroup})) {
                         $c->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $document->{id} ]);
                         $c->reindex($document->{id}, $document->{edition}, $fascicle->{id}, $document->{headline}, $document->{rubric});
                     }

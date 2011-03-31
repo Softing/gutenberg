@@ -8,7 +8,7 @@ package Inprint::Documents::Versions;
 use strict;
 use warnings;
 
-use Inprint::Check;
+
 
 use base 'Inprint::BaseController';
 
@@ -20,7 +20,7 @@ sub list {
     my @errors;
     my $success = $c->json->false;
 
-    #Inprint::Check::uuid($c, \@errors, "document", $i_oid);
+    #$c->check_uuid( \@errors, "document", $i_oid);
     #my $html = Inprint::Store::Embedded::fileRead($c, $i_oid);
 
     my @data;

@@ -25,7 +25,7 @@ sub get {
     foreach (@rules) {
 
         if ($document->{holder} eq $current_member) {
-            if ($c->access->Check(["catalog.documents.$_:*"], $document->{workgroup})) {
+            if ($c->objectAccess(["catalog.documents.$_:*"], $document->{workgroup})) {
                 $access{$_} = 1;
             } else {
                 $access{$_} = 0;
@@ -33,7 +33,7 @@ sub get {
         }
 
         if ($document->{holder} ne $current_member) {
-            if ($c->access->Check("catalog.documents.$_:group", $document->{workgroup})) {
+            if ($c->objectAccess("catalog.documents.$_:group", $document->{workgroup})) {
                 $access{$_} = 1;
             } else {
                 $access{$_} = 0;

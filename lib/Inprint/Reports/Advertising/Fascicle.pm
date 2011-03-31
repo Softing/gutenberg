@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 use Encode;
-use Inprint::Check;
+
 use Spreadsheet::WriteExcel;
 
 use utf8;
@@ -24,9 +24,9 @@ sub index {
 
     my @errors;
 
-    Inprint::Check::uuid($c, \@errors, "fascicle", $i_fascicle);
-    my $fascicle = Inprint::Check::fascicle($c, \@errors, $i_fascicle);
-    my $edition  = Inprint::Check::edition($c, \@errors, $fascicle->{edition});
+    $c->check_uuid( \@errors, "fascicle", $i_fascicle);
+    my $fascicle = $c->check_record(\@errors, "fascicles", "fascicle", $i_fascicle);
+    my $edition  = $c->check_record(\@errors, "editions", "edition", $fascicle->{edition});
 
     my $filename = "отчет по рекламе ". $edition->{shortcut} ."-". $fascicle->{shortcut} .".xls";
 

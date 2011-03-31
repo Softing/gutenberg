@@ -24,7 +24,7 @@ sub fascicles {
         WHERE t1.edition = t2.id AND t1.is_system = false AND edition = ANY(?)
     ";
 
-    my $editions = $c->access->GetChildrens("editions.documents.work");
+    my $editions = $c->objectChildrens("editions.documents.work");
     push @data, $editions;
 
     if ($i_edition) {
@@ -286,8 +286,8 @@ sub createSqlFilter {
     my $current_member = $c->getSessionValue("member.id");
 
     # Set view restrictions
-    my $editions = $c->access->GetBindings("editions.documents.work");
-    my $departments = $c->access->GetBindings("catalog.documents.view:*");
+    my $editions = $c->objectBindings("editions.documents.work");
+    my $departments = $c->objectBindings("catalog.documents.view:*");
 
     $sql_filters .= " AND ( ";
 

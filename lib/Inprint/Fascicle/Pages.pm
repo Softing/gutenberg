@@ -8,7 +8,7 @@ package Inprint::Fascicle::Pages;
 use strict;
 use warnings;
 
-use Inprint::Check;
+
 
 use Inprint::Fascicle::Utils;
 use Inprint::Models::Fascicle::Page;
@@ -50,9 +50,9 @@ sub create {
 
     my @errors;
 
-    Inprint::Check::uuid($c, \@errors, "template", $i_template);
-    Inprint::Check::uuid($c, \@errors, "fascicle", $i_fascicle);
-    my $fascicle = Inprint::Check::fascicle($c, \@errors, $i_fascicle );
+    $c->check_uuid( \@errors, "template", $i_template);
+    $c->check_uuid( \@errors, "fascicle", $i_fascicle);
+    my $fascicle = $c->check_record(\@errors, "fascicles", "fascicle", $i_fascicle);
 
     my $template = {};
     unless (@errors) {
@@ -169,8 +169,8 @@ sub update {
 
     my @errors;
 
-    Inprint::Check::uuid($c, \@errors, "fascicle", $i_fascicle);
-    my $fascicle = Inprint::Check::fascicle($c, \@errors, $i_fascicle );
+    $c->check_uuid( \@errors, "fascicle", $i_fascicle);
+    my $fascicle = $c->check_record(\@errors, "fascicles", "fascicle", $i_fascicle);
 
     push @errors, { id => "fascicle", msg => "Can't find object"}
         unless ($fascicle->{id});
@@ -206,10 +206,10 @@ sub move {
 
     my @errors;
 
-    Inprint::Check::int($c, \@errors, "after", $i_after);
-    Inprint::Check::uuid($c, \@errors, "fascicle", $i_fascicle);
+    $c->check_int( \@errors, "after", $i_after);
+    $c->check_uuid( \@errors, "fascicle", $i_fascicle);
 
-    my $fascicle = Inprint::Check::fascicle($c, \@errors, $i_fascicle );
+    my $fascicle = $c->check_record(\@errors, "fascicles", "fascicle", $i_fascicle);
 
     unless (@errors) {
 
@@ -312,9 +312,9 @@ sub right {
 
     my @errors;
 
-    Inprint::Check::int($c, \@errors, "amount", $i_amount);
-    Inprint::Check::uuid($c, \@errors, "fascicle", $i_fascicle);
-    my $fascicle = Inprint::Check::fascicle($c, \@errors, $i_fascicle );
+    $c->check_int( \@errors, "amount", $i_amount);
+    $c->check_uuid( \@errors, "fascicle", $i_fascicle);
+    my $fascicle = $c->check_record(\@errors, "fascicles", "fascicle", $i_fascicle);
 
     unless (@errors) {
 
@@ -365,10 +365,10 @@ sub left {
 
     my @errors;
 
-    Inprint::Check::int($c, \@errors, "amount", $i_amount);
-    Inprint::Check::uuid($c, \@errors, "fascicle", $i_fascicle);
+    $c->check_int( \@errors, "amount", $i_amount);
+    $c->check_uuid( \@errors, "fascicle", $i_fascicle);
 
-    my $fascicle = Inprint::Check::fascicle($c, \@errors, $i_fascicle );
+    my $fascicle = $c->check_record(\@errors, "fascicles", "fascicle", $i_fascicle);
 
     unless (@errors) {
 
@@ -440,8 +440,8 @@ sub clean {
 
     my @errors;
 
-    Inprint::Check::uuid($c, \@errors, "fascicle", $i_fascicle);
-    my $fascicle = Inprint::Check::fascicle($c, \@errors, $i_fascicle );
+    $c->check_uuid( \@errors, "fascicle", $i_fascicle);
+    my $fascicle = $c->check_record(\@errors, "fascicles", "fascicle", $i_fascicle);
 
     unless (@errors) {
         foreach my $item (@i_pages) {
@@ -478,8 +478,8 @@ sub delete {
     my @errors;
     #my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "fascicle", $i_fascicle);
-    my $fascicle = Inprint::Check::fascicle($c, \@errors, $i_fascicle );
+    $c->check_uuid( \@errors, "fascicle", $i_fascicle);
+    my $fascicle = $c->check_record(\@errors, "fascicles", "fascicle", $i_fascicle);
 
     unless (@errors) {
 

@@ -8,7 +8,7 @@ package Inprint::Common::Transfer;
 use strict;
 use warnings;
 
-use Inprint::Check;
+
 
 use base 'Inprint::BaseController';
 
@@ -23,14 +23,14 @@ sub editions {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "id", $i_node);
+    $c->check_uuid( \@errors, "id", $i_node);
 
     unless (@errors) {
 
         my $sql;
         my @data;
 
-        my $bindings = $c->access->GetBindings("editions.documents.work");
+        my $bindings = $c->objectBindings("editions.documents.work");
 
         if ($i_node eq "00000000-0000-0000-0000-000000000000") {
             $sql = "

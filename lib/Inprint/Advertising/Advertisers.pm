@@ -111,7 +111,7 @@ sub create {
         unless ($c->is_text($i_description));
     
     #push @errors, { id => "access", msg => "Not enough permissions"}
-    #    unless ($c->access->Check("domain.roles.manage"));
+    #    unless ($c->objectAccess("domain.roles.manage"));
     
     my $edition;
     unless (@errors) {
@@ -173,7 +173,7 @@ sub update {
         unless ($c->is_text($i_description));
     
     #push @errors, { id => "access", msg => "Not enough permissions"}
-    #    unless ($c->access->Check("domain.roles.manage"));
+    #    unless ($c->objectAccess("domain.roles.manage"));
     
     unless (@errors) {
         $c->Do("
@@ -203,7 +203,7 @@ sub delete {
     my $success = $c->json->false;
     
     #push @errors, { id => "access", msg => "Not enough permissions"}
-    #    unless ($c->access->Check("domain.roles.manage"));
+    #    unless ($c->objectAccess("domain.roles.manage"));
     
     unless (@errors) {
         foreach my $id (@ids) {

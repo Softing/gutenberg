@@ -29,7 +29,7 @@ sub fascicles {
         FROM fascicles t1, editions t2 WHERE t2.id=t1.edition AND t1.enabled = true
     ";
 
-    my $editions = $c->access->GetChildrens("editions.documents.work");
+    my $editions = $c->objectChildrens("editions.documents.work");
     $sql .= " AND t1.edition = ANY(?) ";
     push @params, $editions;
 

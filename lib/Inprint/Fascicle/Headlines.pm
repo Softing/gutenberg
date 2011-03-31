@@ -8,7 +8,7 @@ package Inprint::Fascicle::Headlines;
 use strict;
 use warnings;
 
-use Inprint::Check;
+
 use Inprint::Models::Fascicle::Headline;
 
 use base 'Inprint::BaseController';
@@ -20,7 +20,7 @@ sub read {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "id", $i_id);
+    $c->check_uuid( \@errors, "id", $i_id);
 
     my $result = [];
 
@@ -41,9 +41,9 @@ sub tree {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "fascicle", $i_fascicle);
+    $c->check_uuid( \@errors, "fascicle", $i_fascicle);
 
-    my $fascicle = Inprint::Check::fascicle($c, \@errors, $i_fascicle);
+    my $fascicle = $c->check_record(\@errors, "fascicles", "fascicle", $i_fascicle);
 
     my @result;
     unless (@errors) {
@@ -90,13 +90,13 @@ sub create {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "fascicle", $i_fascicle);
-    Inprint::Check::text($c, \@errors, "title", $i_title);
-    Inprint::Check::text($c, \@errors, "description", $i_description, 1);
+    $c->check_uuid( \@errors, "fascicle", $i_fascicle);
+    $c->check_text( \@errors, "title", $i_title);
+    $c->check_text( \@errors, "description", $i_description, 1);
 
-    my $fascicle = Inprint::Check::fascicle($c, \@errors, $i_fascicle);
+    my $fascicle = $c->check_record(\@errors, "fascicles", "fascicle", $i_fascicle);
 
-    Inprint::Check::access($c, \@errors, "editions.index.manage", $fascicle->{edition});
+    $c->check_access( \@errors, "editions.index.manage", $fascicle->{edition});
 
     unless (@errors) {
         Inprint::Models::Fascicle::Headline::create($c, $id, $fascicle->{edition}, $fascicle->{id}, $i_bydefault, $i_title, $i_description);
@@ -117,14 +117,14 @@ sub update {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "id", $i_id);
-    Inprint::Check::text($c, \@errors, "title", $i_title);
-    Inprint::Check::text($c, \@errors, "description", $i_description, 1);
+    $c->check_uuid( \@errors, "id", $i_id);
+    $c->check_text( \@errors, "title", $i_title);
+    $c->check_text( \@errors, "description", $i_description, 1);
 
     my $oldItem = Inprint::Models::Fascicle::Headline::read($c, $i_id);
 
-    Inprint::Check::object($c, \@errors, "headline", $oldItem);
-    Inprint::Check::access($c, \@errors, "editions.index.manage", $oldItem->{edition});
+    $c->check_object( \@errors, "headline", $oldItem);
+    $c->check_access( \@errors, "editions.index.manage", $oldItem->{edition});
 
     unless (@errors) {
 
@@ -153,12 +153,12 @@ sub delete {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "id", $i_id);
+    $c->check_uuid( \@errors, "id", $i_id);
 
     my $item = Inprint::Models::Fascicle::Headline::read($c, $i_id);
 
-    Inprint::Check::object($c, \@errors, "headline", $item);
-    Inprint::Check::access($c, \@errors, "editions.index.manage", $item->{edition});
+    $c->check_object( \@errors, "headline", $item);
+    $c->check_access( \@errors, "editions.index.manage", $item->{edition});
 
     unless (@errors) {
 

@@ -46,11 +46,11 @@ sub managers {
         $sql .= " AND ( 1=1 ";
 
         # Filter by rules
-        my $create_bindings = $c->access->GetChildrens("catalog.documents.create:*");
+        my $create_bindings = $c->objectChildrens("catalog.documents.create:*");
         $sql .= " OR t2.catalog = ANY(?) ";
         push @params, $create_bindings;
 
-        my $assign_bindings = $c->access->GetChildrens("catalog.documents.assign:*");
+        my $assign_bindings = $c->objectChildrens("catalog.documents.assign:*");
         $sql .= " OR  t2.catalog = ANY(?) ";
         push @params, $assign_bindings;
 
@@ -60,7 +60,7 @@ sub managers {
         $result = $c->Q($sql, \@params)->Hashes;
 
         if ($i_workgroup) {
-            if ($c->access->Check("catalog.documents.assign:*", $i_workgroup)) {
+            if ($c->objectAccess("catalog.documents.assign:*", $i_workgroup)) {
                 unshift @$result, {
                     "icon" => "users",
                     "title" => $c->l("Add to the department"),
@@ -109,7 +109,7 @@ sub fascicles {
         ";
 
         if ($i_term) {
-            my $bindings = $c->access->GetChildrens($i_term);
+            my $bindings = $c->objectChildrens($i_term);
             $sql .= " AND t1.edition = ANY(?) ";
             push @params, $bindings;
         }
@@ -120,7 +120,7 @@ sub fascicles {
 
         $result = $c->Q(" $sql ORDER BY t1.dateout DESC, t2.shortcut, t1.shortcut ", \@params)->Hashes;
 
-        if ($c->access->Check($i_term, $i_edition)) {
+        if ($c->objectAccess($i_term, $i_edition)) {
             unshift @$result, {
                 id => "00000000-0000-0000-0000-000000000000",
                 icon => "briefcase",

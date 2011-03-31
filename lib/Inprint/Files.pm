@@ -17,7 +17,7 @@ use LWP::UserAgent;
 use Image::Magick;
 use Digest::file qw(digest_file_hex);
 
-use Inprint::Check;
+
 
 use base 'Inprint::BaseController';
 

@@ -129,7 +129,7 @@ sub create {
         unless ($c->is_text($i_description));
 
     push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.departments.manage"));
+        unless ($c->objectAccess("domain.departments.manage"));
 
     unless (@errors) {
         my $path = $c->Q(" SELECT path FROM catalog WHERE id =? ", [ $i_path ])->Value;
@@ -177,7 +177,7 @@ sub update {
         unless ($c->is_text($i_description));
 
     push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.departments.manage"));
+        unless ($c->objectAccess("domain.departments.manage"));
 
     unless (@errors) {
         my $path = $c->Q(" SELECT path FROM catalog WHERE id =? ", [ $i_path ])->Value;
@@ -208,7 +208,7 @@ sub map {
         unless ($c->is_uuid($i_group));
 
     push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.departments.manage"));
+        unless ($c->objectAccess("domain.departments.manage"));
 
     unless (@errors) {
         foreach my $member (@i_members) {
@@ -236,7 +236,7 @@ sub unmap {
         unless ($c->is_uuid($i_group));
 
     push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.departments.manage"));
+        unless ($c->objectAccess("domain.departments.manage"));
 
     unless (@errors) {
         foreach my $member (@i_members) {
@@ -261,7 +261,7 @@ sub delete {
         unless ($c->is_uuid($i_id));
 
     push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.departments.manage"));
+        unless ($c->objectAccess("domain.departments.manage"));
 
     unless (@errors) {
         $c->Do(" DELETE FROM catalog WHERE id =? ", [ $i_id ]);

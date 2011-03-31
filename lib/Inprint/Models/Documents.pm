@@ -10,7 +10,7 @@ use warnings;
 
 use File::Copy::Recursive qw(fcopy rcopy dircopy fmove rmove dirmove);
 
-use Inprint::Check;
+
 
 use Inprint::Utils;
 use Inprint::Utils::Files;
@@ -71,13 +71,13 @@ sub read {
     foreach (@rules) {
 
         if ($document->{holder} eq $current_member) {
-            if ($c->access->Check(["catalog.$_:member"], $document->{workgroup})) {
+            if ($c->objectAccess(["catalog.$_:member"], $document->{workgroup})) {
                 $document->{access}->{$_} = $c->json->true;
             }
         }
 
         if ($document->{holder} ne $current_member) {
-            if ($c->access->Check("catalog.$_:group", $document->{workgroup})) {
+            if ($c->objectAccess("catalog.$_:group", $document->{workgroup})) {
                 $document->{access}->{$_} = $c->json->true;
             }
         }
@@ -174,8 +174,8 @@ sub search {
     my $sql_filters = " ";
 
     # Set view restrictions
-    my $editions = $c->access->GetBindings("editions.documents.work");
-    my $departments = $c->access->GetBindings("catalog.documents.view:*");
+    my $editions = $c->objectBindings("editions.documents.work");
+    my $departments = $c->objectBindings("catalog.documents.view:*");
 
     $sql_filters .= " AND ( ";
     $sql_filters .= "    dcm.edition = ANY(?) ";
@@ -360,12 +360,12 @@ sub search {
 
         foreach (@rules) {
             if ($document->{holder} eq $current_member) {
-                if ($c->access->Check(["catalog.documents.$_:*"], $document->{workgroup})) {
+                if ($c->objectAccess(["catalog.documents.$_:*"], $document->{workgroup})) {
                     $document->{access}->{$_} = $c->json->true;
                 }
             }
             if ($document->{holder} ne $current_member) {
-                if ($c->access->Check("catalog.documents.$_:group", $document->{workgroup})) {
+                if ($c->objectAccess("catalog.documents.$_:group", $document->{workgroup})) {
                     $document->{access}->{$_} = $c->json->true;
                 }
             }

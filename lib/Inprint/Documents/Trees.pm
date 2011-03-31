@@ -8,7 +8,7 @@ package Inprint::Documents::Trees;
 use strict;
 use warnings;
 
-use Inprint::Check;
+
 
 use base 'Inprint::BaseController';
 
@@ -24,15 +24,15 @@ sub editions {
 
     $i_node = "00000000-0000-0000-0000-000000000000" if $i_node eq "all";
 
-    Inprint::Check::uuid($c, \@errors, "node", $i_node);
-    Inprint::Check::rule($c, \@errors, "term", $i_term);
+    $c->check_uuid( \@errors, "node", $i_node);
+    $c->check_rule( \@errors, "term", $i_term);
 
     unless (@errors) {
 
         my $sql;
         my @data;
 
-        my $bindings = $c->access->GetBindings($i_term);
+        my $bindings = $c->objectBindings($i_term);
 
         if ($i_node eq "00000000-0000-0000-0000-000000000000") {
 
@@ -96,10 +96,10 @@ sub workgroups {
 
     $i_node = "00000000-0000-0000-0000-000000000000" if $i_node eq "all";
 
-    Inprint::Check::uuid($c, \@errors, "node", $i_node);
-    Inprint::Check::rule($c, \@errors, "node", $i_term);
+    $c->check_uuid( \@errors, "node", $i_node);
+    $c->check_rule( \@errors, "node", $i_term);
 
-    my $bindings = $c->access->GetBindings($i_term);
+    my $bindings = $c->objectBindings($i_term);
 
     unless (@errors) {
 
@@ -165,7 +165,7 @@ sub fascicles {
 
     $i_node = "00000000-0000-0000-0000-000000000000" if $i_node eq "all";
 
-    Inprint::Check::uuid($c, \@errors, "node", $i_node);
+    $c->check_uuid( \@errors, "node", $i_node);
 
     unless (@errors) {
 

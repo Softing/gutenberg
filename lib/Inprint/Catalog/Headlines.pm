@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 use Inprint::Models::Headline;
-use Inprint::Check;
+
 
 use base 'Inprint::BaseController';
 
@@ -109,10 +109,10 @@ sub create {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "edition", $i_edition);
-    Inprint::Check::text($c, \@errors, "title", $i_title);
-    Inprint::Check::text($c, \@errors, "description", $i_description);
-    Inprint::Check::access($c, \@errors, "domain.index.manage");
+    $c->check_uuid( \@errors, "edition", $i_edition);
+    $c->check_text( \@errors, "title", $i_title);
+    $c->check_text( \@errors, "description", $i_description);
+    $c->check_access( \@errors, "domain.index.manage");
 
     my $edition = $c->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
     push @errors, { id => "edition", msg => "Incorrectly filled field"}
@@ -137,10 +137,10 @@ sub update {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "id", $i_id);
-    Inprint::Check::text($c, \@errors, "title", $i_title);
-    Inprint::Check::text($c, \@errors, "description", $i_description);
-    Inprint::Check::access($c, \@errors, "domain.index.manage");
+    $c->check_uuid( \@errors, "id", $i_id);
+    $c->check_text( \@errors, "title", $i_title);
+    $c->check_text( \@errors, "description", $i_description);
+    $c->check_access( \@errors, "domain.index.manage");
 
     my $headline = Inprint::Models::Headline::read($c, $i_id);
     push @errors, { id => "id", msg => "Incorrectly filled field"}
@@ -165,7 +165,7 @@ sub delete {
         unless ($c->is_uuid($i_id));
 
     push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.index.manage"));
+        unless ($c->objectAccess("domain.index.manage"));
 
     unless (@errors) {
         Inprint::Models::Headline::delete($c, $i_id);

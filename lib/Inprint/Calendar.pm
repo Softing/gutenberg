@@ -13,7 +13,7 @@ use Inprint::Models::Fascicle;
 use Inprint::Models::Fascicle::Template;
 use Inprint::Models::Fascicle::Attachment;
 
-use Inprint::Check;
+
 
 use base 'Inprint::BaseController';
 
@@ -28,7 +28,7 @@ sub tree {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "id", $i_node);
+    $c->check_uuid( \@errors, "id", $i_node);
 
     my @result;
 
@@ -37,7 +37,7 @@ sub tree {
         my $sql;
         my @data;
 
-        my $bindings = $c->access->GetBindings(["editions.calendar.manage", "editions.calendar.work"]);
+        my $bindings = $c->objectBindings(["editions.calendar.manage", "editions.calendar.work"]);
 
         if ($i_node eq "00000000-0000-0000-0000-000000000000") {
             $sql = "
@@ -98,7 +98,7 @@ sub list {
     my $i_archive = $c->param("archive") || "false";
 
     my $edition  = $c->Q("SELECT * FROM editions WHERE id=?", [ $i_edition ])->Hash;
-    my $editions = $c->access->GetChildrens("editions.documents.work");
+    my $editions = $c->objectChildrens("editions.documents.work");
 
     # Common sql
     my $sql = "
@@ -248,30 +248,30 @@ sub createIssue {
     }
 
     if ($i_type eq "attachment") {
-        Inprint::Check::uuid($c, \@errors, "parent", $i_parent);
+        $c->check_uuid( \@errors, "parent", $i_parent);
     }
 
     $i_parent = $i_edition unless ($i_parent);
 
-    Inprint::Check::uuid($c, \@errors, "edition", $i_edition);
+    $c->check_uuid( \@errors, "edition", $i_edition);
 
-    Inprint::Check::text($c, \@errors, "shortcut",    $i_shortcut);
-    Inprint::Check::text($c, \@errors, "description", $i_description, 1);
+    $c->check_text( \@errors, "shortcut",    $i_shortcut);
+    $c->check_text( \@errors, "description", $i_description, 1);
 
-    Inprint::Check::int($c, \@errors, "circulation", $i_circulation, 1);
+    $c->check_int( \@errors, "circulation", $i_circulation, 1);
 
-    Inprint::Check::date($c, \@errors, "dateadv",   $i_dateadv, 1);
-    Inprint::Check::date($c, \@errors, "datedoc",   $i_datedoc, 1);
-    Inprint::Check::date($c, \@errors, "dateout",   $i_dateout, 1);
-    Inprint::Check::date($c, \@errors, "dateprint", $i_dateprint, 1);
+    $c->check_date( \@errors, "dateadv",   $i_dateadv, 1);
+    $c->check_date( \@errors, "datedoc",   $i_datedoc, 1);
+    $c->check_date( \@errors, "dateout",   $i_dateout, 1);
+    $c->check_date( \@errors, "dateprint", $i_dateprint, 1);
 
-    Inprint::Check::flag($c, \@errors, "flagdoc", $i_flagdoc, 1);
-    Inprint::Check::flag($c, \@errors, "flagadv", $i_flagadv, 1);
+    $c->check_flag( \@errors, "flagdoc", $i_flagdoc, 1);
+    $c->check_flag( \@errors, "flagadv", $i_flagadv, 1);
 
-    Inprint::Check::int($c, \@errors, "anum", $i_anum, 1);
-    Inprint::Check::int($c, \@errors, "pnum", $i_pnum, 1);
+    $c->check_int( \@errors, "anum", $i_anum, 1);
+    $c->check_int( \@errors, "pnum", $i_pnum, 1);
 
-    my $edition = Inprint::Check::edition($c, \@errors, $i_edition);
+    my $edition = $c->check_record(\@errors, "editions", "edition", $i_edition);
 
     unless (@errors) {
 
@@ -325,14 +325,14 @@ sub createAttachment {
 
     # Checks
 
-    Inprint::Check::uuid($c, \@errors, "parent", $i_parent);
-    Inprint::Check::uuid($c, \@errors, "edition", $i_edition);
+    $c->check_uuid( \@errors, "parent", $i_parent);
+    $c->check_uuid( \@errors, "edition", $i_edition);
 
-    Inprint::Check::int($c, \@errors, "circulation", $i_circulation, 1);
-    Inprint::Check::uuid($c, \@errors, "tempalte", $i_template, 1);
+    $c->check_int( \@errors, "circulation", $i_circulation, 1);
+    $c->check_uuid( \@errors, "tempalte", $i_template, 1);
 
-    my $edition = Inprint::Check::edition($c, \@errors, $i_edition);
-    my $parent  = Inprint::Check::fascicle($c, \@errors, $i_parent);
+    my $edition = $c->check_record(\@errors, "editions", "edition", $i_edition);
+    my $parent  = $c->check_record(\@errors, "fascicles", "fascicle", $i_fascicle);
 
     unless (@errors) {
 
@@ -380,12 +380,12 @@ sub createTemplate {
 
     # Checks
 
-    Inprint::Check::uuid($c, \@errors, "edition", $i_edition);
+    $c->check_uuid( \@errors, "edition", $i_edition);
 
-    Inprint::Check::text($c, \@errors, "shortcut",    $i_shortcut);
-    Inprint::Check::text($c, \@errors, "description", $i_description, 1);
+    $c->check_text( \@errors, "shortcut",    $i_shortcut);
+    $c->check_text( \@errors, "description", $i_description, 1);
 
-        my $edition = Inprint::Check::edition($c, \@errors, $i_edition);
+        my $edition = $c->check_record(\@errors, "editions", "edition", $i_edition);
 
     unless (@errors) {
 

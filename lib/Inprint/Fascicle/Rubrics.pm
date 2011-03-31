@@ -80,7 +80,7 @@ sub create {
         unless ($headline->{id});
 
     push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("editions.index.manage", $headline->{edition}));
+        unless ($c->objectAccess("editions.index.manage", $headline->{edition}));
 
     unless (@errors) {
         Inprint::Models::Fascicle::Rubric::create(
@@ -113,7 +113,7 @@ sub update {
         unless ($oldItem->{id});
 
     push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("editions.index.manage", $oldItem->{edition}));
+        unless ($c->objectAccess("editions.index.manage", $oldItem->{edition}));
 
     unless (@errors) {
 
@@ -151,7 +151,7 @@ sub delete {
         unless ($item->{id});
 
     push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("editions.index.manage", $item->{edition}));
+        unless ($c->objectAccess("editions.index.manage", $item->{edition}));
 
     unless (@errors) {
 

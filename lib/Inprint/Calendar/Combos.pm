@@ -51,7 +51,7 @@ sub parents {
             AND t2.id = t1.edition
     ";
 
-    my $access = $c->access->GetBindings("editions.calendar.manage");
+    my $access = $c->objectBindings("editions.calendar.manage");
     $sql .= " AND edition = ANY(?) ";
     push @data, $access;
 
@@ -81,7 +81,7 @@ sub sources {
             AND t1.fastype = 'template'
     ";
 
-    my $access = $c->access->GetBindings("editions.calendar.manage");
+    my $access = $c->objectBindings("editions.calendar.manage");
     $sql .= " AND edition = ANY(?) ";
     push @data, $access;
 

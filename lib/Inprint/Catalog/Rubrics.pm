@@ -79,7 +79,7 @@ sub create {
         unless ($c->is_text($i_description));
 
     push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.index.manage"));
+        unless ($c->objectAccess("domain.index.manage"));
 
     my $headline = $c->Q(" SELECT * FROM indx_headlines WHERE id=? ", [ $i_headline ])->Hash;
     push @errors, { id => "headline", msg => "Incorrectly filled field"}
@@ -114,7 +114,7 @@ sub update {
         unless ($c->is_text($i_description));
 
     push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.index.manage"));
+        unless ($c->objectAccess("domain.index.manage"));
 
     my $rubric = Inprint::Models::Rubric::read($c, $i_id);
     push @errors, { id => "id", msg => "Incorrectly filled field"}
@@ -139,7 +139,7 @@ sub delete {
         unless ($c->is_uuid($i_id));
 
     push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.index.manage"));
+        unless ($c->objectAccess("domain.index.manage"));
 
     unless (@errors) {
         Inprint::Models::Rubric::delete($c, $i_id);

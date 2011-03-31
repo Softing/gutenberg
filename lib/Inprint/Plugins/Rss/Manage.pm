@@ -8,7 +8,7 @@ package Inprint::Plugins::Rss::Manage;
 use strict;
 use warnings;
 
-use Inprint::Check;
+
 
 use base 'Inprint::BaseController';
 
@@ -131,7 +131,7 @@ sub list {
             upload => $c->json->false,
         };
         if ($item->{workgroup}) {
-            if ( Inprint::Check::access($c, \@errors, "catalog.documents.rss:*", $item->{workgroup})) {
+            if ( $c->check_access( \@errors, "catalog.documents.rss:*", $item->{workgroup})) {
                 $item->{access}->{rss} = $c->json->true;
                 if ($item->{id}) {
                     $item->{access}->{upload} = $c->json->true;
@@ -151,8 +151,8 @@ sub read {
 
     my $i_document = $c->param("document") || undef;
 
-    Inprint::Check::uuid($c, \@errors, "document", $i_document);
-    my $document = Inprint::Check::document($c, \@errors, $i_document);
+    $c->check_uuid( \@errors, "document", $i_document);
+    my $document = $c->check_record(\@errors, "documents", "document", $i_document);
 
     unless (@errors) {
 
@@ -168,7 +168,7 @@ sub read {
             upload => $c->json->false,
         };
 
-        if ($document->{workgroup} && $c->access->Check("catalog.documents.rss:*", $document->{workgroup})) {
+        if ($document->{workgroup} && $c->objectAccess("catalog.documents.rss:*", $document->{workgroup})) {
             $result->{access}->{rss}    = $c->json->true;
             $result->{access}->{upload} = $c->json->true if ($result->{id});
         }
@@ -190,8 +190,8 @@ sub update {
     my $i_description = $c->param("description") || undef;
     my $i_fulltext    = $c->param("fulltext") || undef;
 
-    Inprint::Check::uuid($c, \@errors, "document", $i_document);
-    my $document = Inprint::Check::document($c, \@errors, $i_document);
+    $c->check_uuid( \@errors, "document", $i_document);
+    my $document = $c->check_record(\@errors, "documents", "document", $i_document);
 
     unless (@errors) {
 
@@ -283,10 +283,10 @@ sub publish {
     my @i_ids = $c->param("id");
 
     foreach my $id (@i_ids) {
-        Inprint::Check::uuid($c, \@errors, "document", $id);
-        my $document = Inprint::Check::document($c, \@errors, $id);
+        $c->check_uuid( \@errors, "document", $id);
+        my $document = $c->check_record(\@errors, "documents", "document", $id);
 
-        next unless ($document->{workgroup} && $c->access->Check("catalog.documents.rss:*", $document->{workgroup}));
+        next unless ($document->{workgroup} && $c->objectAccess("catalog.documents.rss:*", $document->{workgroup}));
 
         my $rss = $c->Q(" SELECT * FROM plugins_rss.rss WHERE entity=? ", [ $id ])->Hash;
 
@@ -307,10 +307,10 @@ sub unpublish {
 
     foreach my $id (@i_ids) {
 
-        Inprint::Check::uuid($c, \@errors, "document", $id);
-        my $document = Inprint::Check::document($c, \@errors, $id);
+        $c->check_uuid( \@errors, "document", $id);
+        my $document = $c->check_record(\@errors, "documents", "document", $id);
 
-        next unless ($document->{workgroup} && $c->access->Check("catalog.documents.rss:*", $document->{workgroup}));
+        next unless ($document->{workgroup} && $c->objectAccess("catalog.documents.rss:*", $document->{workgroup}));
 
         my $rss = $c->Q(" SELECT * FROM plugins_rss.rss WHERE entity=? ", [ $id ])->Hash;
 

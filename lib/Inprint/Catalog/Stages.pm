@@ -9,7 +9,7 @@ use utf8;
 use strict;
 use warnings;
 
-use Inprint::Check;
+
 
 use base 'Inprint::BaseController';
 
@@ -20,7 +20,7 @@ sub read {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "id", $i_id);
+    $c->check_uuid( \@errors, "id", $i_id);
 
     my $result = [];
 
@@ -42,7 +42,7 @@ sub list {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "id", $i_edition);
+    $c->check_uuid( \@errors, "id", $i_edition);
 
     my $result = [];
 
@@ -100,13 +100,13 @@ sub create {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "branch", $i_edition);
-    Inprint::Check::uuid($c, \@errors, "readiness", $i_readiness);
-    Inprint::Check::int($c, \@errors, "weight", $i_weight);
-    Inprint::Check::text($c, \@errors, "title", $i_title);
-    Inprint::Check::text($c, \@errors, "shortcut", $i_shortcut);
+    $c->check_uuid( \@errors, "branch", $i_edition);
+    $c->check_uuid( \@errors, "readiness", $i_readiness);
+    $c->check_int( \@errors, "weight", $i_weight);
+    $c->check_text( \@errors, "title", $i_title);
+    $c->check_text( \@errors, "shortcut", $i_shortcut);
 
-    Inprint::Check::access($c, \@errors, "domain.exchange.manage");
+    $c->check_access( \@errors, "domain.exchange.manage");
 
     unless (@errors) {
 
@@ -152,13 +152,13 @@ sub update {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "id", $i_id);
-    Inprint::Check::uuid($c, \@errors, "readiness", $i_readiness);
-    Inprint::Check::int($c, \@errors, "weight", $i_weight);
-    Inprint::Check::text($c, \@errors, "title", $i_title);
-    Inprint::Check::text($c, \@errors, "shortcut", $i_shortcut);
+    $c->check_uuid( \@errors, "id", $i_id);
+    $c->check_uuid( \@errors, "readiness", $i_readiness);
+    $c->check_int( \@errors, "weight", $i_weight);
+    $c->check_text( \@errors, "title", $i_title);
+    $c->check_text( \@errors, "shortcut", $i_shortcut);
 
-    Inprint::Check::access($c, \@errors, "domain.exchange.manage");
+    $c->check_access( \@errors, "domain.exchange.manage");
 
     unless (@errors) {
         $c->Do("
@@ -180,7 +180,7 @@ sub principalsMapping {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "stage", $i_stage);
+    $c->check_uuid( \@errors, "stage", $i_stage);
 
     my $result = [];
 
@@ -215,13 +215,13 @@ sub mapPrincipals {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "stage", $i_stage);
-    Inprint::Check::uuid($c, \@errors, "catalog", $i_catalog);
+    $c->check_uuid( \@errors, "stage", $i_stage);
+    $c->check_uuid( \@errors, "catalog", $i_catalog);
 
-    Inprint::Check::access($c, \@errors, "domain.exchange.manage");
+    $c->check_access( \@errors, "domain.exchange.manage");
 
     foreach my $member (@i_members) {
-        Inprint::Check::uuid($c, \@errors, "member", $member);
+        $c->check_uuid( \@errors, "member", $member);
     }
 
     unless (@errors) {
@@ -244,7 +244,7 @@ sub unmapPrincipals {
     my $success = $c->json->false;
 
     push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.exchange.manage"));
+        unless ($c->objectAccess("domain.exchange.manage"));
 
     unless (@errors) {
         foreach my $member (@i_members) {
@@ -267,7 +267,7 @@ sub delete {
     my $success = $c->json->false;
 
     push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.exchange.manage"));
+        unless ($c->objectAccess("domain.exchange.manage"));
 
     unless (@errors) {
         foreach my $id (@ids) {

@@ -8,7 +8,7 @@ package Inprint::Documents::Text;
 use strict;
 use warnings;
 
-use Inprint::Check;
+
 use Inprint::Documents::Access;
 use Inprint::Store::Embedded;
 
@@ -24,8 +24,8 @@ sub get {
     my $i_file = $c->param("file");
     my $i_document = $c->param("document");
 
-    Inprint::Check::uuid($c, \@errors, "file", $i_file);
-    Inprint::Check::uuid($c, \@errors, "file", $i_document);
+    $c->check_uuid( \@errors, "file", $i_file);
+    $c->check_uuid( \@errors, "file", $i_document);
 
     my $file = $c->Q(" SELECT * FROM cache_files WHERE id=? ", $i_file)->Hash;
     my $document = $c->Q(" SELECT * FROM documents WHERE id=? ", $i_document)->Hash;
@@ -51,11 +51,11 @@ sub set {
     my $i_text = $c->param("text");
     my $i_document = $c->param("document");
 
-    Inprint::Check::uuid($c, \@errors, "file", $i_file);
-    Inprint::Check::uuid($c, \@errors, "document", $i_document);
+    $c->check_uuid( \@errors, "file", $i_file);
+    $c->check_uuid( \@errors, "document", $i_document);
 
-    my $file = Inprint::Check::dbrecord($c, \@errors, "cache_files", "file", $i_file);
-    my $document = Inprint::Check::dbrecord($c, \@errors, "documents", "document", $i_document);
+    my $file = $c->check_record(\@errors, "cache_files", "file", $i_file);
+    my $document = $c->check_record(\@errors, "documents", "document", $i_document);
 
     unless (@errors) {
         $access = Inprint::Documents::Access::get($c, $document->{id});

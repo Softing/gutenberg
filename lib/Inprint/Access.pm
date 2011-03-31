@@ -23,7 +23,7 @@ sub index {
     my $result = {};
 
     foreach my $term (@terms) {
-        my $exists = $c->access->Check($term, $binding);
+        my $exists = $c->objectAccess($term, $binding);
         my ($prefix, $suffix) = split /:/, $term;
         if ( $exists ) {
             $result->{$prefix} = $c->json->true;

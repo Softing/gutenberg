@@ -99,7 +99,7 @@ sub create {
         unless ($c->is_text($i_description));
 
     #push @errors, { id => "access", msg => "Not enough permissions"}
-    #    unless ($c->access->Check("domain.roles.manage"));
+    #    unless ($c->objectAccess("domain.roles.manage"));
 
     #push @errors, { id => "width", msg => "Incorrectly filled field"}
     #    unless ($c->is_int($i_w));
@@ -204,7 +204,7 @@ sub delete {
     my $success = $c->json->false;
 
     #push @errors, { id => "access", msg => "Not enough permissions"}
-    #    unless ($c->access->Check("domain.roles.manage"));
+    #    unless ($c->objectAccess("domain.roles.manage"));
 
     unless (@errors) {
         foreach my $id (@pages) {

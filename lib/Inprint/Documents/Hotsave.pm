@@ -12,7 +12,7 @@ use warnings;
 
 use HTML::Scrubber;
 
-use Inprint::Check;
+
 
 use base 'Inprint::BaseController';
 
@@ -24,11 +24,11 @@ sub list {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "file", $i_file);
+    $c->check_uuid( \@errors, "file", $i_file);
 
     my $cacheRecord = $c->Q(" SELECT * FROM cache_files WHERE id=? ", [ $i_file ])->Hash;
 
-    Inprint::Check::uuid($c, \@errors, "record", $cacheRecord->{id} );
+    $c->check_uuid( \@errors, "record", $cacheRecord->{id} );
 
     my $filename = $cacheRecord->{file_path} ."/". $cacheRecord->{file_name};
     $filename =~ s/\/+/\//g;
@@ -54,7 +54,7 @@ sub read {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "version", $i_version);
+    $c->check_uuid( \@errors, "version", $i_version);
 
     my $fileContent;
 

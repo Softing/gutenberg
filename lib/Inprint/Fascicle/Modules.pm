@@ -9,7 +9,7 @@ use utf8;
 use strict;
 use warnings;
 
-use Inprint::Check;
+
 
 use base 'Inprint::BaseController';
 
@@ -132,9 +132,9 @@ sub create {
     my $success = $c->json->false;
 
     #push @errors, { id => "access", msg => "Not enough permissions"}
-    #    unless ($c->access->Check("domain.roles.manage"));
+    #    unless ($c->objectAccess("domain.roles.manage"));
 
-    my $fascicle   = Inprint::Check::fascicle($c, \@errors, $i_fascicle);
+    my $fascicle   = $c->check_record(\@errors, "fascicles", "fascicle", $i_fascicle);
 
     $c->fail_render(\@errors);
 
@@ -240,7 +240,7 @@ sub update {
         unless ($c->is_text($i_description));
 
     #push @errors, { id => "access", msg => "Not enough permissions"}
-    #    unless ($c->access->Check("domain.roles.manage"));
+    #    unless ($c->objectAccess("domain.roles.manage"));
 
     push @errors, { id => "amount", msg => "Incorrectly filled field"}
         unless ($c->is_int($i_amount));
@@ -297,7 +297,7 @@ sub delete {
     my $success = $c->json->false;
 
     #push @errors, { id => "access", msg => "Not enough permissions"}
-    #    unless ($c->access->Check("domain.roles.manage"));
+    #    unless ($c->objectAccess("domain.roles.manage"));
 
     unless (@errors) {
         foreach my $id (@ids) {

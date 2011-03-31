@@ -49,7 +49,7 @@ sub fascicles {
     ";
 
     if ($i_term) {
-        my $access = $c->access->GetBindingsByTerm($i_term);
+        my $access = $c->objectBindingsByTerm($i_term);
         $sql .= " AND edition = ANY(?) ";
         push @data, $access;
     }

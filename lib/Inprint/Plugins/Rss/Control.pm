@@ -8,7 +8,7 @@ package Inprint::Plugins::Rss::Control;
 use strict;
 use warnings;
 
-use Inprint::Check;
+
 
 use base 'Inprint::BaseController';
 
@@ -21,7 +21,7 @@ sub tree {
     $i_node = '00000000-0000-0000-0000-000000000000' unless ($i_node);
     $i_node = '00000000-0000-0000-0000-000000000000' if ($i_node eq "root-node");
 
-    Inprint::Check::uuid($c, \@errors, "id", $i_node);
+    $c->check_uuid( \@errors, "id", $i_node);
 
     unless (@errors) {
 
@@ -140,10 +140,10 @@ sub create {
     my $i_title       = $c->param("title");
     my $i_description = $c->param("description");
 
-    Inprint::Check::url($c, \@errors,  "url", $i_url);
-    Inprint::Check::text($c, \@errors, "title", $i_title);
-    Inprint::Check::text($c, \@errors, "description", $i_description, 1);
-    #Inprint::Check::access($c, \@errors,  "");
+    $c->check_url( \@errors,  "url", $i_url);
+    $c->check_text( \@errors, "title", $i_title);
+    $c->check_text( \@errors, "description", $i_description, 1);
+    #$c->check_access( \@errors,  "");
 
     unless (@errors) {
         $c->Do("
@@ -162,7 +162,7 @@ sub read {
     my $result = [];
 
     my $i_id = $c->param("id");
-    Inprint::Check::uuid($c, \@errors,  "id", $i_id);
+    $c->check_uuid( \@errors,  "id", $i_id);
 
     unless (@errors) {
         $result = $c->Q("
@@ -185,11 +185,11 @@ sub update {
     my $i_title       = $c->param("title");
     my $i_description = $c->param("description");
 
-    Inprint::Check::uuid($c, \@errors, "id", $i_id);
-    Inprint::Check::url($c,  \@errors, "url", $i_url);
-    Inprint::Check::text($c, \@errors, "title", $i_title);
-    Inprint::Check::text($c, \@errors, "description", $i_description, 1);
-    #Inprint::Check::access($c, \@errors,  "");
+    $c->check_uuid( \@errors, "id", $i_id);
+    $c->check_url(  \@errors, "url", $i_url);
+    $c->check_text( \@errors, "title", $i_title);
+    $c->check_text( \@errors, "description", $i_description, 1);
+    #$c->check_access( \@errors,  "");
 
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         if ($i_id eq "00000000-0000-0000-0000-000000000000");
@@ -213,8 +213,8 @@ sub delete {
 
     my $i_id = $c->param("id");
 
-    Inprint::Check::uuid($c, \@errors,  "id", $i_id);
-    #Inprint::Check::access($c, \@errors,  "");
+    $c->check_uuid( \@errors,  "id", $i_id);
+    #$c->check_access( \@errors,  "");
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         if ($i_id eq "00000000-0000-0000-0000-000000000000");
 
@@ -231,8 +231,8 @@ sub fill {
 
     my @errors;
 
-    Inprint::Check::uuid($c, \@errors,  "feed", $i_feed);
-    #Inprint::Check::access($c, \@errors,  "");
+    $c->check_uuid( \@errors,  "feed", $i_feed);
+    #$c->check_access( \@errors,  "");
 
     my $result = []; unless (@errors) {
         $result = $c->Q("
@@ -254,8 +254,8 @@ sub save {
     my $i_feed    = $c->param("feed");
     my @i_rubrics = $c->param("rubrics");
 
-    Inprint::Check::uuid($c, \@errors,  "feed", $i_feed);
-    #Inprint::Check::access($c, \@errors,  "");
+    $c->check_uuid( \@errors,  "feed", $i_feed);
+    #$c->check_access( \@errors,  "");
 
     $c->Do(" DELETE FROM plugins_rss.rss_feeds_mapping WHERE feed=? ", [ $i_feed ]);
 

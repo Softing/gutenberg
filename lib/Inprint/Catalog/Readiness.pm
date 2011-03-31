@@ -75,7 +75,7 @@ sub create {
         unless ($c->is_int($i_percent));
     
     push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.readiness.manage"));
+        unless ($c->objectAccess("domain.readiness.manage"));
     
     unless (@errors) {
         $c->Do("
@@ -122,7 +122,7 @@ sub update {
         unless ($c->is_int($i_percent));
     
     push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.readiness.manage"));
+        unless ($c->objectAccess("domain.readiness.manage"));
     
     unless (@errors) {
         $c->Do("
@@ -144,7 +144,7 @@ sub delete {
     my $success = $c->json->false;
 
     push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->access->Check("domain.readiness.manage"));
+        unless ($c->objectAccess("domain.readiness.manage"));
 
     unless (@errors) {
         foreach my $id (@i_ids) {

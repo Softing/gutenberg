@@ -9,7 +9,7 @@ use utf8;
 use strict;
 use warnings;
 
-use Inprint::Check;
+
 
 use base 'Inprint::BaseController';
 
@@ -20,7 +20,7 @@ sub read {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "id", $i_id);
+    $c->check_uuid( \@errors, "id", $i_id);
 
     my $result = [];
 
@@ -50,7 +50,7 @@ sub tree {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "id", $i_node);
+    $c->check_uuid( \@errors, "id", $i_node);
 
     my @result;
 
@@ -105,13 +105,13 @@ sub create {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::path($c, \@errors, "path", $i_path);
-    Inprint::Check::text($c, \@errors, "title", $i_title);
-    Inprint::Check::text($c, \@errors, "shortcut", $i_shortcut);
+    $c->check_path( \@errors, "path", $i_path);
+    $c->check_text( \@errors, "title", $i_title);
+    $c->check_text( \@errors, "shortcut", $i_shortcut);
 
-    Inprint::Check::access($c, \@errors, "domain.editions.manage");
+    $c->check_access( \@errors, "domain.editions.manage");
 
-    my $parent = Inprint::Check::edition($c, \@errors, $i_path);
+    my $parent = $c->check_record(\@errors, "editions", "edition", $i_path);
 
     unless (@errors) {
         $c->Do("
@@ -136,17 +136,17 @@ sub update {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "id", $i_id);
-    Inprint::Check::path($c, \@errors, "path", $i_path);
-    Inprint::Check::text($c, \@errors, "title", $i_title);
-    Inprint::Check::text($c, \@errors, "shortcut", $i_shortcut);
+    $c->check_uuid( \@errors, "id", $i_id);
+    $c->check_path( \@errors, "path", $i_path);
+    $c->check_text( \@errors, "title", $i_title);
+    $c->check_text( \@errors, "shortcut", $i_shortcut);
 
-    Inprint::Check::access($c, \@errors, "domain.editions.manage");
+    $c->check_access( \@errors, "domain.editions.manage");
 
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         if ($i_id eq "00000000-0000-0000-0000-000000000000");
 
-    my $parent = Inprint::Check::edition($c, \@errors, $i_path);
+    my $parent = $c->check_record(\@errors, "editions", "edition", $i_path);
 
     unless (@errors) {
 
@@ -169,8 +169,8 @@ sub delete {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "id", $i_id);
-    Inprint::Check::access($c, \@errors, "domain.editions.manage");
+    $c->check_uuid( \@errors, "id", $i_id);
+    $c->check_access( \@errors, "domain.editions.manage");
 
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         if ($i_id eq "00000000-0000-0000-0000-000000000000");

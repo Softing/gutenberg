@@ -8,7 +8,7 @@ package Inprint::Documents::Files;
 use strict;
 use warnings;
 
-use Inprint::Check;
+
 use Inprint::Store::Cache;
 use Inprint::Store::Embedded;
 
@@ -22,8 +22,8 @@ sub list {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "document", $i_document);
-    my $document = Inprint::Check::document($c, \@errors, $i_document);
+    $c->check_uuid( \@errors, "document", $i_document);
+    my $document = $c->check_record(\@errors, "documents", "document", $i_document);
 
     my $result = [];
     unless (@errors) {
@@ -50,10 +50,10 @@ sub create {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "document", $i_document);
-    Inprint::Check::exists($c, \@errors, "filename", $i_filename);
+    $c->check_uuid( \@errors, "document", $i_document);
+    $c->check_exists( \@errors, "filename", $i_filename);
 
-    my $document = Inprint::Check::document($c, \@errors, $i_document);
+    my $document = $c->check_record(\@errors, "documents", "document", $i_document);
 
     unless (@errors) {
         my $folder = Inprint::Store::Embedded::getFolderPath($c, "documents", $document->{created}, $document->{copygroup}, 1);
@@ -86,8 +86,8 @@ sub uploadFlash {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "document", $i_document);
-    my $document = Inprint::Check::document($c, \@errors, $i_document);
+    $c->check_uuid( \@errors, "document", $i_document);
+    my $document = $c->check_record(\@errors, "documents", "document", $i_document);
 
     unless (@errors) {
         my $upload = $c->req->upload("Filedata");
@@ -108,8 +108,8 @@ sub uploadHtml {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "document", $i_document);
-    my $document = Inprint::Check::document($c, \@errors, $i_document);
+    $c->check_uuid( \@errors, "document", $i_document);
+    my $document = $c->check_record(\@errors, "documents", "document", $i_document);
 
     unless (@errors) {
         my $folder = Inprint::Store::Embedded::getFolderPath($c, "documents", $document->{created}, $document->{copygroup}, 1);
@@ -134,8 +134,8 @@ sub publish {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "document", $i_document);
-    my $document = Inprint::Check::document($c, \@errors, $i_document);
+    $c->check_uuid( \@errors, "document", $i_document);
+    my $document = $c->check_record(\@errors, "documents", "document", $i_document);
 
     unless (@errors) {
         foreach my $file(@i_files) {
@@ -156,8 +156,8 @@ sub unpublish {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "document", $i_document);
-    my $document = Inprint::Check::document($c, \@errors, $i_document);
+    $c->check_uuid( \@errors, "document", $i_document);
+    my $document = $c->check_record(\@errors, "documents", "document", $i_document);
 
     unless (@errors) {
         foreach my $file(@i_files) {
@@ -179,8 +179,8 @@ sub description {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "document", $i_document);
-    my $document = Inprint::Check::document($c, \@errors, $i_document);
+    $c->check_uuid( \@errors, "document", $i_document);
+    my $document = $c->check_record(\@errors, "documents", "document", $i_document);
 
     unless (@errors) {
         foreach my $file (@i_files) {
@@ -201,8 +201,8 @@ sub rename {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "document", $i_document);
-    my $document = Inprint::Check::document($c, \@errors, $i_document);
+    $c->check_uuid( \@errors, "document", $i_document);
+    my $document = $c->check_record(\@errors, "documents", "document", $i_document);
 
     unless (@errors) {
     }
@@ -219,8 +219,8 @@ sub delete {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "document", $i_document);
-    my $document = Inprint::Check::document($c, \@errors, $i_document);
+    $c->check_uuid( \@errors, "document", $i_document);
+    my $document = $c->check_record(\@errors, "documents", "document", $i_document);
 
     unless (@errors) {
         foreach my $file(@i_files) {

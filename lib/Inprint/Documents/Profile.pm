@@ -68,7 +68,7 @@ sub read {
         foreach (@rules) {
 
             if ($document->{holder} eq $current_member) {
-                if ($c->access->Check(["catalog.documents.$_:*"], $document->{workgroup})) {
+                if ($c->objectAccess(["catalog.documents.$_:*"], $document->{workgroup})) {
                     $document->{access}->{$_} = $c->json->true;
                 } else {
                     $document->{access}->{$_} = $c->json->false;
@@ -76,7 +76,7 @@ sub read {
             }
 
             if ($document->{holder} ne $current_member) {
-                if ($c->access->Check("catalog.documents.$_:group", $document->{workgroup})) {
+                if ($c->objectAccess("catalog.documents.$_:group", $document->{workgroup})) {
                     $document->{access}->{$_} = $c->json->true;
                 } else {
                     $document->{access}->{$_} = $c->json->false;

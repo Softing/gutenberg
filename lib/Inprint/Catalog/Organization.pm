@@ -8,7 +8,7 @@ package Inprint::Catalog::Organization;
 use strict;
 use warnings;
 
-use Inprint::Check;
+
 
 use base 'Inprint::BaseController';
 
@@ -102,13 +102,13 @@ sub create {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::path($c, \@errors, "path", $i_path);
-    Inprint::Check::text($c, \@errors, "title", $i_title);
-    Inprint::Check::text($c, \@errors, "shortcut", $i_shortcut);
+    $c->check_path( \@errors, "path", $i_path);
+    $c->check_text( \@errors, "title", $i_title);
+    $c->check_text( \@errors, "shortcut", $i_shortcut);
 
-    Inprint::Check::access($c, \@errors, "domain.departments.manage");
+    $c->check_access( \@errors, "domain.departments.manage");
 
-    my $parent = Inprint::Check::department($c, \@errors, $i_path);
+    my $parent = $c->check_record(\@errors, "catalog", "department", $i_path);
 
     unless (@errors) {
         $c->Do("
@@ -133,17 +133,17 @@ sub update {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "id", $i_id);
-    Inprint::Check::path($c, \@errors, "path", $i_path);
-    Inprint::Check::text($c, \@errors, "title", $i_title);
-    Inprint::Check::text($c, \@errors, "shortcut", $i_shortcut);
+    $c->check_uuid( \@errors, "id", $i_id);
+    $c->check_path( \@errors, "path", $i_path);
+    $c->check_text( \@errors, "title", $i_title);
+    $c->check_text( \@errors, "shortcut", $i_shortcut);
 
-    Inprint::Check::access($c, \@errors, "domain.departments.manage");
+    $c->check_access( \@errors, "domain.departments.manage");
 
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         if ($i_id eq "00000000-0000-0000-0000-000000000000");
 
-    my $parent = Inprint::Check::department($c, \@errors, $i_path);
+    my $parent = $c->check_record(\@errors, "catalog", "department", $i_path);
 
     unless (@errors) {
         unless (@errors) {
@@ -165,8 +165,8 @@ sub delete {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "id", $i_id);
-    Inprint::Check::access($c, \@errors, "domain.departments.manage");
+    $c->check_uuid( \@errors, "id", $i_id);
+    $c->check_access( \@errors, "domain.departments.manage");
 
     my $null = "00000000-0000-0000-0000-000000000000";
 
@@ -193,11 +193,11 @@ sub map {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "group", $i_group);
-    Inprint::Check::access($c, \@errors, "domain.departments.manage");
+    $c->check_uuid( \@errors, "group", $i_group);
+    $c->check_access( \@errors, "domain.departments.manage");
 
     foreach my $member (@i_members) {
-        Inprint::Check::uuid($c, \@errors, "member", $member);
+        $c->check_uuid( \@errors, "member", $member);
     }
 
     unless (@errors) {
@@ -220,11 +220,11 @@ sub unmap {
     my @errors;
     my $success = $c->json->false;
 
-    Inprint::Check::uuid($c, \@errors, "group", $i_group);
-    Inprint::Check::access($c, \@errors, "domain.departments.manage");
+    $c->check_uuid( \@errors, "group", $i_group);
+    $c->check_access( \@errors, "domain.departments.manage");
 
     foreach my $member (@i_members) {
-        Inprint::Check::uuid($c, \@errors, "member", $member);
+        $c->check_uuid( \@errors, "member", $member);
     }
 
     unless (@errors) {
