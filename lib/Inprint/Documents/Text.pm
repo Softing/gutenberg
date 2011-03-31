@@ -12,7 +12,7 @@ use warnings;
 use Inprint::Documents::Access;
 use Inprint::Store::Embedded;
 
-use base 'Inprint::BaseController';
+use base 'Mojolicious::Controller';
 
 sub get {
     my $c = shift;

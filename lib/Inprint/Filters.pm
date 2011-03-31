@@ -8,7 +8,7 @@ package Inprint::Filters;
 use strict;
 use warnings;
 
-use base 'Inprint::BaseController';
+use base 'Mojolicious::Controller';
 
 sub mysession
 {

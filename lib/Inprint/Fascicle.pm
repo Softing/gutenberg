@@ -15,7 +15,7 @@ use Inprint::Fascicle::Utils;
 use Inprint::Models::Documents;
 use Inprint::Models::Fascicle::Request;
 
-use base 'Inprint::BaseController';
+use base 'Mojolicious::Controller';
 
 sub seance {
 

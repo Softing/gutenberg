@@ -10,7 +10,7 @@ use warnings;
 
 use Inprint::Utils::Pages;
 
-use base 'Inprint::BaseController';
+use base 'Mojolicious::Controller';
 
 sub initialize {
 

@@ -8,7 +8,7 @@ package Inprint::Fascicle::Utils;
 use strict;
 use warnings;
 
-use base 'Inprint::BaseController';
+use base 'Mojolicious::Controller';
 
 sub updateDocumentsPagesCache {
     my ($c, $fascicle) = @_;

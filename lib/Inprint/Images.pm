@@ -13,7 +13,7 @@ use POSIX qw/ceil floor/;
 use GD;
 use GD::Text::Wrap;
 
-use base 'Inprint::BaseController';
+use base 'Mojolicious::Controller';
 
 sub fascicle_page {
 

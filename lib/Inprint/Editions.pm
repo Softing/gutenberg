@@ -8,7 +8,7 @@ package Inprint::Editions;
 use strict;
 use warnings;
 
-use base 'Inprint::BaseController';
+use base 'Mojolicious::Controller';
 
 sub tree {
 

@@ -19,7 +19,7 @@ use Digest::file qw(digest_file_hex);
 
 
 
-use base 'Inprint::BaseController';
+use base 'Mojolicious::Controller';
 
 sub view {
 

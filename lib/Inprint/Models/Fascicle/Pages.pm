@@ -11,7 +11,7 @@ use warnings;
 use Inprint::Utils::Pages;
 use Inprint::Models::Fascicle::Page;
 
-use base 'Inprint::BaseController';
+use base 'Mojolicious::Controller';
 
 sub move {
 

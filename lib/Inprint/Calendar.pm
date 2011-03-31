@@ -13,9 +13,7 @@ use Inprint::Models::Fascicle;
 use Inprint::Models::Fascicle::Template;
 use Inprint::Models::Fascicle::Attachment;
 
-
-
-use base 'Inprint::BaseController';
+use base 'Mojolicious::Controller';
 
 sub tree {
 

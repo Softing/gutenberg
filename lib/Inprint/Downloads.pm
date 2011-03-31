@@ -15,7 +15,7 @@ use File::Basename;
 use File::stat;
 use Text::Unidecode;
 
-use base 'Inprint::BaseController';
+use base 'Mojolicious::Controller';
 
 sub list {
     my $c = shift;

@@ -13,7 +13,7 @@ use HTML::Scrubber;
 
 use Inprint::Store::Embedded;
 
-use base 'Inprint::BaseController';
+use base 'Mojolicious::Controller';
 
 sub feeds {
     my $c = shift;

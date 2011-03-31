@@ -8,7 +8,7 @@ package Inprint::Documents::Profile;
 use strict;
 use warnings;
 
-use base 'Inprint::BaseController';
+use base 'Mojolicious::Controller';
 
 use Inprint::Store::Embedded;
 

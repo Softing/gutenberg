@@ -8,7 +8,7 @@ package Inprint::Fascicle::Combos;
 use strict;
 use warnings;
 
-use base 'Inprint::BaseController';
+use base 'Mojolicious::Controller';
 
 sub templates {
     my $c = shift;

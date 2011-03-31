@@ -11,7 +11,7 @@ use warnings;
 
 use File::Find;
 
-use base 'Inprint::BaseController';
+use base 'Mojolicious::Controller';
 
 sub index
 {

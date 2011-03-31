@@ -11,7 +11,7 @@ use warnings;
 
 use Inprint::Store::Embedded;
 
-use base 'Inprint::BaseController';
+use base 'Mojolicious::Controller';
 
 sub list {
     my $c = shift;

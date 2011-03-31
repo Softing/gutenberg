@@ -11,7 +11,7 @@ use warnings;
 
 use Inprint::Models::Fascicle::Headline;
 
-use base 'Inprint::BaseController';
+use base 'Mojolicious::Controller';
 
 sub read {
     my $c = shift;

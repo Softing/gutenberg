@@ -12,7 +12,7 @@ use warnings;
 
 use Inprint::Models::Fascicle::Request;
 
-use base 'Inprint::BaseController';
+use base 'Mojolicious::Controller';
 
 sub read {
     my $c = shift;

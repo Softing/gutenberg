@@ -23,7 +23,7 @@ use Inprint::Models::Fascicle::Rubric;
 use Inprint::Store::Embedded;
 use Inprint::Store::Cache;
 
-use base 'Inprint::BaseController';
+use base 'Mojolicious::Controller';
 
 # Read document
 sub read {

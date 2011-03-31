@@ -8,7 +8,7 @@ package Inprint::Calendar::Combos;
 use strict;
 use warnings;
 
-use base 'Inprint::BaseController';
+use base 'Mojolicious::Controller';
 
 sub editions {
     my $c = shift;

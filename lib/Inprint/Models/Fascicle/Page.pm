@@ -8,7 +8,7 @@ package Inprint::Models::Fascicle::Page;
 use strict;
 use warnings;
 
-use base 'Inprint::BaseController';
+use base 'Mojolicious::Controller';
 
 sub read {
 

@@ -10,7 +10,7 @@ use warnings;
 
 use File::Path qw(make_path);
 
-use base 'Inprint::BaseController';
+use base 'Mojolicious::Controller';
 
 sub image {
     my $c = shift;

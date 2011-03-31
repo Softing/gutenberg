@@ -14,7 +14,7 @@ use Spreadsheet::WriteExcel;
 
 use utf8;
 
-use base 'Inprint::BaseController';
+use base 'Mojolicious::Controller';
 
 sub index {
 

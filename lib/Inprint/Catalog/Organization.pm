@@ -10,7 +10,7 @@ use warnings;
 
 
 
-use base 'Inprint::BaseController';
+use base 'Mojolicious::Controller';
 
 sub read {
     my $c = shift;

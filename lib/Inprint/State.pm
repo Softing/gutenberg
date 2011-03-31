@@ -8,7 +8,7 @@ package Inprint::State;
 use strict;
 use warnings;
 
-use base 'Inprint::BaseController';
+use base 'Mojolicious::Controller';
 
 sub index {
     my $c = shift;

@@ -8,7 +8,7 @@ package Inprint::Catalog::Principals;
 use strict;
 use warnings;
 
-use base 'Inprint::BaseController';
+use base 'Mojolicious::Controller';
 
 sub list {
 

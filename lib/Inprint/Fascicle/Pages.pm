@@ -16,7 +16,7 @@ use Inprint::Models::Fascicle::Pages;
 
 use Inprint::Utils::Pages;
 
-use base 'Inprint::BaseController';
+use base 'Mojolicious::Controller';
 
 sub read {
 
