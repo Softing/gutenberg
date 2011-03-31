@@ -1,7 +1,7 @@
 package Inprint::I18N::ru;
 
-# Inprint Content 5.0
-# Copyright(c) 2001-2011, Softing, LLC.
+# Inprint Content 4.5
+# Copyright(c) 2001-2010, Softing, LLC.
 # licensing@softing.ru
 # http://softing.ru/license
 
@@ -131,6 +131,9 @@ our %Lexicon = (
     "Approved"
  => "Утверждено",
 
+    "Archival documents"
+ => "",
+
     "Archive"
  => "Архив",
 
@@ -154,6 +157,12 @@ our %Lexicon = (
 
     "Author"
  => "Автор",
+
+    "Available"
+ => "",
+
+    "Available documents"
+ => "",
 
     "BIK"
  => "БИК",
@@ -402,6 +411,9 @@ our %Lexicon = (
  => "Редактировать профиль",
 
     "Edit request"
+ => "",
+
+    "Edit text"
  => "",
 
     "Editing of the Module"
