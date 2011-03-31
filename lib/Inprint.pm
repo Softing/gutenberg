@@ -192,9 +192,9 @@ sub startup {
     $sessionBridge->route('/catalog/stages/update/')            ->to('catalog-stages#update');
     $sessionBridge->route('/catalog/stages/delete/')            ->to('catalog-stages#delete');
     $sessionBridge->route('/catalog/stages/list/')              ->to('catalog-stages#list');
-    $sessionBridge->route('/catalog/stages/map-principals/')    ->to('catalog-stages#map-principals');
-    $sessionBridge->route('/catalog/stages/unmap-principals/')  ->to('catalog-stages#unmap-principals');
-    $sessionBridge->route('/catalog/stages/principals-mapping/')->to('catalog-stages#principals-mapping');
+    $sessionBridge->route('/catalog/stages/map-principals/')    ->to('catalog-stages#mapPrincipals');
+    $sessionBridge->route('/catalog/stages/unmap-principals/')  ->to('catalog-stages#unmapPrincipals');
+    $sessionBridge->route('/catalog/stages/principals-mapping/')->to('catalog-stages#principalsMapping');
 
     $sessionBridge->route('/catalog/principals/list/')          ->to('catalog-principals#list');
 
