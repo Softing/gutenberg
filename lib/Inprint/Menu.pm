@@ -117,7 +117,7 @@ sub index
 
         my $menuItem = $c->fascicleHadler($fascicle);
 
-        my $accessFascicleView = $c->objectAccess("editions.layouts.view",   $fascicle->{edition});
+        my $accessFascicleView = $c->objectDirectAccess("editions.layouts.view", $fascicle->{edition});
 
         # Attachments
         if( @{ $menuItem->{menu} } && @{ $fascicle->{attachments} }) {
@@ -126,7 +126,7 @@ sub index
 
         foreach my $attachment (@{ $fascicle->{attachments} }) {
             my $menuSubitem = $c->fascicleHadler($attachment);
-            my $accessAttachmentView = $c->objectAccess("editions.layouts.view",   $attachment->{edition});
+            my $accessAttachmentView = $c->objectDirectAccess("editions.layouts.view",   $attachment->{edition});
             if ($accessAttachmentView) {
                 $accessFascicleView = 1;
                 push @{ $menuItem->{menu} }, $menuSubitem;

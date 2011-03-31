@@ -58,9 +58,43 @@ sub register {
 
     $app->helper(
         objectDirectAccess => sub {
-            my $c = shift;
-                die 2;
-            return $c;
+            my ($c, $terms, $binding, $member) = @_;
+
+            my @rules;
+            my $result = 0;
+
+            unless ($member) {
+                $member = $c->getSessionValue("member.id");
+            }
+
+            if (ref $terms eq "ARRAY") {
+                @rules = @$terms;
+            } else {
+                push @rules, $terms;
+            }
+
+            my %seen; @rules = grep { ! $seen{$_}++ } @rules;
+
+            if ($member && @rules) {
+
+                my @data;
+
+                my $sql = "
+                    SELECT true
+                    FROM map_member_to_rule map LEFT JOIN rules ON map.term = rules.id
+                    WHERE member=? AND rules.section || '.' || rules.subsection || '.' || rules.term = ANY(?) ";
+                push @data, $member;
+                push @data, \@rules;
+
+                if ($binding) {
+                    $sql .= " AND binding=?";
+                    push @data, $binding;
+                }
+
+                $result = $c->sql->Q("SELECT EXISTS ($sql)", \@data)->Value();
+            }
+
+            return $result;
         } );
 
     $app->helper(
