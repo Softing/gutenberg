@@ -27,7 +27,7 @@ sub register {
             my @rules;
             my $result = 0;
 
-            $result = $c->objectAcess($terms, $binding, $member);
+            $result = $c->objectAccess($terms, $binding, $member);
 
             if ($errors) {
                 unless ($result) {
