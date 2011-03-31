@@ -25,7 +25,7 @@ sub tree {
 
     unless (@errors) {
 
-        my $data = $c->sql->Q(
+        my $data = $c->Q(
             "SELECT t1.* FROM plugins_rss.rss_feeds t1 ORDER BY title "
             )->Hashes;
 
@@ -55,7 +55,7 @@ sub list {
     unless (@errors) {
 
         # Find editions
-        my $editions = $c->sql->Q("
+        my $editions = $c->Q("
                 SELECT editions.*,
                     (
                         SELECT COUNT(*) FROM indx_headlines indx
@@ -79,7 +79,7 @@ sub list {
             push @$result, $record;
 
             # Find headlines
-            my $headlines = $c->sql->Q("
+            my $headlines = $c->Q("
                     SELECT *,
                         (
                             SELECT COUNT(*) FROM indx_rubrics indx
@@ -104,7 +104,7 @@ sub list {
 
                 push @$result, $record2;
 
-                my $rubrics = $c->sql->Q("
+                my $rubrics = $c->Q("
                         SELECT *
                         FROM indx_rubrics
                         WHERE headline=?
@@ -146,7 +146,7 @@ sub create {
     #Inprint::Check::access($c, \@errors,  "");
 
     unless (@errors) {
-        $c->sql->Do("
+        $c->Do("
             INSERT INTO plugins_rss.rss_feeds (id, url, title, description)
                 VALUES (?, ?, ?, ?)
         ", [ $id, $i_url, $i_title, $i_description ]);
@@ -165,7 +165,7 @@ sub read {
     Inprint::Check::uuid($c, \@errors,  "id", $i_id);
 
     unless (@errors) {
-        $result = $c->sql->Q("
+        $result = $c->Q("
                 SELECT *
                 FROM plugins_rss.rss_feeds
                 WHERE id=? ",
@@ -196,7 +196,7 @@ sub update {
 
     unless (@errors) {
 
-        $c->sql->Do("
+        $c->Do("
                 UPDATE plugins_rss.rss_feeds
                 SET url=?, title=?, description=?
                 WHERE id=? ",
@@ -219,7 +219,7 @@ sub delete {
         if ($i_id eq "00000000-0000-0000-0000-000000000000");
 
     unless (@errors) {
-        $c->sql->Do(" DELETE FROM plugins_rss.rss_feeds WHERE id=? ", [ $i_id ]);
+        $c->Do(" DELETE FROM plugins_rss.rss_feeds WHERE id=? ", [ $i_id ]);
     }
 
     $c->smart_render(\@errors);
@@ -235,7 +235,7 @@ sub fill {
     #Inprint::Check::access($c, \@errors,  "");
 
     my $result = []; unless (@errors) {
-        $result = $c->sql->Q("
+        $result = $c->Q("
                 SELECT tag || '::' || nature
                 FROM plugins_rss.rss_feeds_mapping
                 WHERE feed=? ",
@@ -257,7 +257,7 @@ sub save {
     Inprint::Check::uuid($c, \@errors,  "feed", $i_feed);
     #Inprint::Check::access($c, \@errors,  "");
 
-    $c->sql->Do(" DELETE FROM plugins_rss.rss_feeds_mapping WHERE feed=? ", [ $i_feed ]);
+    $c->Do(" DELETE FROM plugins_rss.rss_feeds_mapping WHERE feed=? ", [ $i_feed ]);
 
     foreach my $rubric_str (@i_rubrics) {
 
@@ -265,7 +265,7 @@ sub save {
 
         next unless $tag || $nature;
 
-        $c->sql->Do("
+        $c->Do("
                 INSERT INTO plugins_rss.rss_feeds_mapping (feed, nature, tag)
                 VALUES (?, ?, ?)
             ", [ $i_feed, $nature, $tag ]);

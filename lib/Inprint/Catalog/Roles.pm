@@ -24,7 +24,7 @@ sub read {
     my $result = [];
     
     unless (@errors) {
-        $result = $c->sql->Q("
+        $result = $c->Q("
             SELECT id, title, shortcut, description
             FROM roles
             WHERE id =?
@@ -37,7 +37,7 @@ sub read {
 
 sub list {
     my $c = shift;
-    my $result = $c->sql->Q("
+    my $result = $c->Q("
         SELECT id, title, shortcut, description,
             array_to_string(
                 ARRAY(
@@ -77,7 +77,7 @@ sub create {
         unless ($c->access->Check("domain.roles.manage"));
     
     unless (@errors) {
-        $c->sql->Do("
+        $c->Do("
             INSERT INTO roles(id, title, shortcut, description, created, updated)
             VALUES (?, ?, ?, ?, now(), now());
         ", [ $id, $i_title, $i_shortcut, $i_description ]);
@@ -114,7 +114,7 @@ sub update {
         unless ($c->access->Check("domain.roles.manage"));
     
     unless (@errors) {
-        $c->sql->Do("
+        $c->Do("
             UPDATE roles
                 SET title=?, shortcut=?, description=?, updated=now()
             WHERE id =?;
@@ -138,7 +138,7 @@ sub delete {
     unless (@errors) {
         foreach my $id (@ids) {
             if ($c->is_uuid($id)) {
-                $c->sql->Do(" DELETE FROM roles WHERE id=? ", [ $id ]);
+                $c->Do(" DELETE FROM roles WHERE id=? ", [ $id ]);
             }
         }
     }
@@ -162,11 +162,11 @@ sub map {
         unless ($c->access->Check("domain.roles.manage"));
     
     unless (@errors) {
-        $c->sql->Do(" DELETE FROM map_role_to_rule WHERE role=? ", [ $i_id ]);
+        $c->Do(" DELETE FROM map_role_to_rule WHERE role=? ", [ $i_id ]);
         foreach my $string (@i_rules) {
             my ($rule, $mode) = split "::", $string;
             if ($c->is_uuid($i_id) && $c->is_text($rule) && $c->is_text($mode)) {
-                $c->sql->Do(" INSERT INTO map_role_to_rule(role, rule, mode) VALUES (?, ?, ?); ", [$i_id, $rule, $mode]);
+                $c->Do(" INSERT INTO map_role_to_rule(role, rule, mode) VALUES (?, ?, ?); ", [$i_id, $rule, $mode]);
             }
         }
     }
@@ -186,7 +186,7 @@ sub mapping {
     my $result = {};
 
     if ($c->is_uuid($i_id)) {
-        my $data = $c->sql->Q(" SELECT role, rule, mode FROM map_role_to_rule WHERE role =? ", [ $i_id ])->Hashes;
+        my $data = $c->Q(" SELECT role, rule, mode FROM map_role_to_rule WHERE role =? ", [ $i_id ])->Hashes;
         foreach my $item (@$data) {
             $result->{ $item->{rule} } = $item->{mode};
         }

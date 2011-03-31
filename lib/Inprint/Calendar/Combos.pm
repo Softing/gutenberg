@@ -29,7 +29,7 @@ sub editions {
 
     $sql .= " ORDER BY title_path ";
 
-    my $result = $c->sql->Q($sql, \@params)->Hashes;
+    my $result = $c->Q($sql, \@params)->Hashes;
     $c->render_json( { data => $result } );
 }
 
@@ -55,7 +55,7 @@ sub parents {
     $sql .= " AND edition = ANY(?) ";
     push @data, $access;
 
-    my $result = $c->sql->Q("
+    my $result = $c->Q("
         $sql
         ORDER BY t2.shortcut, t1.shortcut
     ", \@data)->Hashes;
@@ -85,7 +85,7 @@ sub sources {
     $sql .= " AND edition = ANY(?) ";
     push @data, $access;
 
-    my $result = $c->sql->Q("
+    my $result = $c->Q("
         $sql
         ORDER BY t2.shortcut, t1.shortcut
     ", \@data)->Hashes;

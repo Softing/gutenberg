@@ -45,7 +45,7 @@ sub tree {
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_edition));
 
-    my $edition = $c->sql->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
+    my $edition = $c->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
     push @errors, { id => "edition", msg => "Incorrectly filled field"}
         unless ($edition->{id});
 
@@ -55,7 +55,7 @@ sub tree {
         my $sql;
         my @data;
 
-        my $editions = $c->sql->Q("
+        my $editions = $c->Q("
                 SELECT id FROM editions WHERE path @> ? order by path asc;
             ", [ $edition->{path} ])->Values;
 
@@ -74,11 +74,11 @@ sub tree {
         push @data, $editions;
         push @data, $edition->{id};
 
-        my $data = $c->sql->Q($sql, \@data)->Hashes;
+        my $data = $c->Q($sql, \@data)->Hashes;
 
         foreach my $item (@$data) {
 
-            my $count = $c->sql->Q(" SELECT count(*) FROM indx_rubrics WHERE headline=? ", [ $item->{id} ])->Value;
+            my $count = $c->Q(" SELECT count(*) FROM indx_rubrics WHERE headline=? ", [ $item->{id} ])->Value;
 
             my $record = {
                 id      => $item->{id},
@@ -114,7 +114,7 @@ sub create {
     Inprint::Check::text($c, \@errors, "description", $i_description);
     Inprint::Check::access($c, \@errors, "domain.index.manage");
 
-    my $edition = $c->sql->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
+    my $edition = $c->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
     push @errors, { id => "edition", msg => "Incorrectly filled field"}
         unless ($edition->{id});
 

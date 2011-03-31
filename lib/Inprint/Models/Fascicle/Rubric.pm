@@ -13,15 +13,15 @@ sub create {
     my $tag = Inprint::Models::Tag::getByTitle($c, $title, $description);
 
     if ($tag->{id}) {
-        $c->sql->Do("
+        $c->Do("
             INSERT INTO fascicles_indx_rubrics (id, edition, fascicle, headline, tag, title, description, created, updated)
                 VALUES (?, ?, ?, ?, ?, ?, ?, now(), now());
             ", [ $id, $edition, $fascicle, $headline, $tag->{id}, $tag->{title}, $tag->{description} || "" ]);
         if ($bydefault eq "on") {
-            $c->sql->Do("
+            $c->Do("
                 UPDATE fascicles_indx_rubrics SET bydefault=false WHERE fascicle=? AND headline=?;
                 ", [ $fascicle, $headline ]);
-            $c->sql->Do("
+            $c->Do("
                 UPDATE fascicles_indx_rubrics SET bydefault=true WHERE id=?;
                 ", [ $id ]);
         }
@@ -34,7 +34,7 @@ sub read {
     my $c = shift;
     my $id = shift;
 
-    my $result = $c->sql->Q("
+    my $result = $c->Q("
         SELECT id, edition, fascicle, headline, tag, title, description, created, updated
         FROM fascicles_indx_rubrics WHERE id=? ",
         [ $id ])->Hash;
@@ -45,7 +45,7 @@ sub read {
 sub findByTag {
     my $c = shift;
     my ($fascicle, $headline, $tag) = shift;
-    my $result = $c->sql->Q("
+    my $result = $c->Q("
         SELECT id, edition, headline, tag, title, description, created, updated
         FROM fascicles_indx_rubrics WHERE fascicle=? AND headline=? AND tag=? ",
         [ $fascicle, $headline, $tag ])->Hash;
@@ -59,13 +59,13 @@ sub update {
     my $tag = Inprint::Models::Tag::getByTitle($c, $title, $description);
 
     if ($tag->{id}) {
-        $c->sql->Do(" UPDATE fascicles_indx_rubrics SET tag=?, title=?, description=? WHERE id=? ",
+        $c->Do(" UPDATE fascicles_indx_rubrics SET tag=?, title=?, description=? WHERE id=? ",
             [ $tag->{id}, $tag->{title}, $tag->{description} || "", $id ]);
         if ($bydefault eq "on") {
-            $c->sql->Do("
+            $c->Do("
                 UPDATE fascicles_indx_rubrics SET bydefault=false WHERE fascicle=? AND headline=?;
                 ", [ $fascicle, $headline ]);
-            $c->sql->Do("
+            $c->Do("
                 UPDATE fascicles_indx_rubrics SET bydefault=true WHERE id=?;
                 ", [ $id ]);
         }
@@ -78,7 +78,7 @@ sub delete {
     my $c  = shift;
     my $id = shift;
 
-    $c->sql->Do("
+    $c->Do("
         DELETE FROM fascicles_indx_rubrics WHERE id =?
             AND id <> '00000000-0000-0000-0000-000000000000' ",
         [ $id ]);

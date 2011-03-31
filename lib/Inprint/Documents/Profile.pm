@@ -27,7 +27,7 @@ sub read {
     my $document;
     unless (@errors) {
 
-        $document = $c->sql->Q("
+        $document = $c->Q("
             SELECT
                 dcm.id,
                 dcm.edition, dcm.edition_shortcut,
@@ -56,10 +56,10 @@ sub read {
         ", [ $i_id ])->Hash;
 
         $document->{access} = {};
-        my $current_member = $c->QuerySessionGet("member.id");
+        my $current_member = $c->getSessionValue("member.id");
 
         if ($document->{holder} eq $current_member) {
-            $c->sql->Do("UPDATE documents SET islooked=true WHERE id=?", $document->{id});
+            $c->Do("UPDATE documents SET islooked=true WHERE id=?", $document->{id});
         }
 
         # Get document rules
@@ -92,18 +92,18 @@ sub read {
 
         # Update images count
         my @images = ("jpg", "jpeg", "png", "gif", "bmp", "tiff" );
-        my $imgCount = $c->sql->Q(" SELECT count(*) FROM cache_files WHERE file_path=? AND file_exists = true AND file_extension=ANY(?) ", [ $relativePath, \@images ])->Value;
-        $c->sql->Do("UPDATE documents SET images=? WHERE filepath=? ", [ $imgCount || 0, $relativePath ]);
+        my $imgCount = $c->Q(" SELECT count(*) FROM cache_files WHERE file_path=? AND file_exists = true AND file_extension=ANY(?) ", [ $relativePath, \@images ])->Value;
+        $c->Do("UPDATE documents SET images=? WHERE filepath=? ", [ $imgCount || 0, $relativePath ]);
 
         # Update rsize count
         my @documents = ("doc", "docx", "odt", "rtf", "txt" );
-        my $lengthCount = $c->sql->Q(" SELECT sum(file_length) FROM cache_files WHERE file_path=? AND file_exists = true AND file_extension=ANY(?) ", [ $relativePath, \@documents ])->Value;
-        $c->sql->Do("UPDATE documents SET rsize=? WHERE filepath=? ", [ $lengthCount || 0, $relativePath ]);
+        my $lengthCount = $c->Q(" SELECT sum(file_length) FROM cache_files WHERE file_path=? AND file_exists = true AND file_extension=ANY(?) ", [ $relativePath, \@documents ])->Value;
+        $c->Do("UPDATE documents SET rsize=? WHERE filepath=? ", [ $lengthCount || 0, $relativePath ]);
     }
 
     # Get history
     unless (@errors) {
-        $document->{history} = $c->sql->Q("
+        $document->{history} = $c->Q("
             SELECT
                 id, entity, operation, color, weight,
                 branch, branch_shortcut, stage, stage_shortcut,
@@ -115,7 +115,7 @@ sub read {
 
     # Get co-documents
     unless (@errors) {
-        $document->{fascicles} = $c->sql->Q("
+        $document->{fascicles} = $c->Q("
             SELECT
                 dcm.edition,  dcm.edition_shortcut,
                 dcm.fascicle, dcm.fascicle_shortcut,
@@ -128,7 +128,7 @@ sub read {
 
     # Get comments
     unless (@errors) {
-        $document->{comments} = $c->sql->Q("
+        $document->{comments} = $c->Q("
             SELECT
                 id, entity, path,
                 member, member_shortcut,

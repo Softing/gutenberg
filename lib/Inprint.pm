@@ -58,28 +58,23 @@ sub startup {
     # Load Plugins
     $self->plugin('i18n');
 
-    $self->plugins->namespaces([qw(Mojo::Plugins)]);
-    $self->plugin("inprint-access");
-
-    # Create Routes
-    $self->routes->route('/setup/database/')                    ->to('setup#database');
-    #$self->routes->route('/setup/store/')                      ->to('setup#store');
-    $self->routes->route('/setup/import/')                      ->to('setup#import');
-    $self->routes->route('/setup/success/')                     ->to('setup#success');
-
-    $self->routes->route('/errors/database/')                   ->to('errors#database');
-
-    my $preinitBridge  = $self->routes->bridge                  ->to('selftest#preinit');
-    my $storeBridge    = $preinitBridge->bridge                 ->to('selftest#store');
-    my $postinitBridge = $storeBridge->bridge                   ->to('selftest#postinit');
+    $self->plugin("Inprint::Mojoplugins::Common");
+    $self->plugin("Inprint::Mojoplugins::Confidence");
+    $self->plugin("Inprint::Mojoplugins::Database");
+    $self->plugin("Inprint::Mojoplugins::Events");
+    $self->plugin("Inprint::Mojoplugins::Localization");
+    $self->plugin("Inprint::Mojoplugins::Logger");
+    $self->plugin("Inprint::Mojoplugins::Render");
+    $self->plugin("Inprint::Mojoplugins::Session");
+    $self->plugin("Inprint::Mojoplugins::Validation");
 
     # Add routes
-    $postinitBridge->route('/login/')->to('session#login');
-    $postinitBridge->route('/workspace/login/')                 ->to('session#login');
-    $postinitBridge->route('/locale/')                          ->to('locale#index');
+    $self->routes->route('/login/')                             ->to('session#login');
+    $self->routes->route('/workspace/login/')                   ->to('session#login');
+    $self->routes->route('/locale/')                            ->to('locale#index');
 
     # Add sessionable routes
-    my $sessionBridge  = $postinitBridge->bridge                ->to('filters#mysession');
+    my $sessionBridge  = $self->routes->bridge                  ->to('filters#mysession');
 
     # Access Framework
     $sessionBridge->route('/access/')                           ->to('access#index');
@@ -385,11 +380,11 @@ sub startup {
     $sessionBridge->route("/fascicle/templates/index/save/")        ->to("fascicle-templates-index#save");
 
     # Files
-    $postinitBridge->route('/files/preview/:id')                    ->to('files#preview');
-    $postinitBridge->route('/files/download/:id')                   ->to('files#download');
-    $postinitBridge->route('/files/download/')                      ->to('files#download');
-    $postinitBridge->route('/files/view/:id')                       ->to('files#view');
-    $postinitBridge->route('/files/view/')                          ->to('files#view');
+    $self->routes->route('/files/preview/:id')                    ->to('files#preview');
+    $self->routes->route('/files/download/:id')                   ->to('files#download');
+    $self->routes->route('/files/download/')                      ->to('files#download');
+    $self->routes->route('/files/view/:id')                       ->to('files#view');
+    $self->routes->route('/files/view/')                          ->to('files#view');
 
     # Images
     $sessionBridge->route('/aimgs/fascicle/page/:id/:w/:h')     ->to('images#fascicle_page');
@@ -448,7 +443,7 @@ sub startup {
             $sessionBridge->route($url)->to($action);
         }
         unless ($route->{route_authentication}) {
-            $postinitBridge->route($url)->to($action);
+            $self->routes->route($url)->to($action);
         }
     }
 

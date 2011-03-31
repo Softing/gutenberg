@@ -103,7 +103,7 @@ sub writeFile {
 
         my $relativePath = Inprint::Store::Embedded::Utils::getRelativePath($c, $basepath);
 
-        $c->sql->Do(
+        $c->Do(
             "UPDATE cache_files SET file_length=? WHERE file_path=? AND file_name=?",
             [ $response2->{"CharacterCount"}, $relativePath, "$basename.$extension" ]);
 
@@ -156,13 +156,13 @@ sub createHotSave {
 
     my $relativePath = Inprint::Store::Embedded::Utils::getRelativePath($c, $basepath);
 
-    my $cmember  = $c->QuerySessionGet("member.id");
+    my $cmember  = $c->getSessionValue("member.id");
 
-    my $member  = $c->sql->Q("SELECT * FROM profiles WHERE id=?", [ $cmember ])->Hash;
-    my $copyid  = $c->sql->Q("SELECT copygroup FROM documents WHERE filepath=?", [ $relativePath ])->Value;
-    my $history = $c->sql->Q("SELECT * FROM history WHERE entity=? ORDER BY created LIMIT 1", [ $copyid ])->Hash;
+    my $member  = $c->Q("SELECT * FROM profiles WHERE id=?", [ $cmember ])->Hash;
+    my $copyid  = $c->Q("SELECT copygroup FROM documents WHERE filepath=?", [ $relativePath ])->Value;
+    my $history = $c->Q("SELECT * FROM history WHERE entity=? ORDER BY created LIMIT 1", [ $copyid ])->Hash;
 
-    $c->sql->Do("
+    $c->Do("
         INSERT INTO cache_hotsave(
             hotsave_origin, hotsave_path,
             hotsave_branch, hotsave_branch_shortcut,

@@ -40,7 +40,7 @@ sub editions {
         push @data, $i_node;
         push @data, $i_node;
         
-        my $data = $c->sql->Q("$sql ORDER BY shortcut", \@data)->Hashes;
+        my $data = $c->Q("$sql ORDER BY shortcut", \@data)->Hashes;
         
         foreach my $item (@$data) {
             my $record = {

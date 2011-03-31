@@ -27,7 +27,7 @@ sub read {
 
     unless (@errors) {
 
-        $result = $c->sql->Q("
+        $result = $c->Q("
             SELECT
                 id, serialnum, edition, fascicle, advertiser, advertiser_shortcut,
                 place, place_shortcut, manager, manager_shortcut, amount, origin,
@@ -38,7 +38,7 @@ sub read {
             WHERE id=?
         ", [ $i_request ])->Hash;
 
-        $result->{pages} = $c->sql->Q("
+        $result->{pages} = $c->Q("
             SELECT
                 t1.id ||'::'|| t1.seqnum
             FROM fascicles_pages t1, fascicles_map_modules t2
@@ -124,14 +124,14 @@ sub create {
 
         my $module;
         unless(@errors) {
-            $module = $c->sql->Q(" SELECT * FROM fascicles_modules WHERE id=? ", [ $i_module ])->Hash;
+            $module = $c->Q(" SELECT * FROM fascicles_modules WHERE id=? ", [ $i_module ])->Hash;
             push @errors, { id => "module", msg => "Can't find object"}
                 unless ($module->{id});
         }
 
         my $place;
         unless(@errors) {
-            $place = $c->sql->Q("
+            $place = $c->Q("
                     SELECT t1.* FROM fascicles_tmpl_places t1
                     WHERE t1.id=?
                 ", [ $module->{place} ])->Hash;
@@ -141,7 +141,7 @@ sub create {
 
         my $template;
         unless(@errors) {
-            $template = $c->sql->Q("
+            $template = $c->Q("
                     SELECT t1.* FROM fascicles_tmpl_modules t1
                     WHERE t1.id=?
                 ", [ $module->{origin} ])->Hash;
@@ -151,7 +151,7 @@ sub create {
 
         my $pages;
         unless(@errors) {
-            $pages = $c->sql->Q("
+            $pages = $c->Q("
                     SELECT t2.seqnum
                     FROM fascicles_map_modules t1, fascicles_pages t2
                     WHERE t2.id = t1.page AND t1.fascicle=? AND t1.module=?
@@ -160,7 +160,7 @@ sub create {
         }
 
         unless (@errors) {
-            $c->sql->Do("
+            $c->Do("
                 INSERT INTO fascicles_requests(
                     id,
                     edition, fascicle,
@@ -190,7 +190,7 @@ sub create {
                 $fascicle->{edition}, $fascicle->{id},
                 $advertiser->{id}, $advertiser->{shortcut},
                 $place->{id}, $place->{title},
-                $c->QuerySessionGet("member.id"), $c->QuerySessionGet("member.shortcut"),
+                $c->getSessionValue("member.id"), $c->getSessionValue("member.shortcut"),
                 $template->{id}, $template->{title}, $template->{area},  $template->{x},  $template->{y},  $template->{w},  $template->{h},
                 $module->{id}, $module->{amount},
                 join (', ', @$pages), @$pages[0],
@@ -205,14 +205,14 @@ sub create {
 
         my $template;
         unless(@errors) {
-            $template = $c->sql->Q(" SELECT * FROM fascicles_tmpl_modules WHERE id=? ", [ $i_template ])->Hash;
+            $template = $c->Q(" SELECT * FROM fascicles_tmpl_modules WHERE id=? ", [ $i_template ])->Hash;
             push @errors, { id => "template", msg => "Can't find object"}
                 unless ($template->{id});
         }
 
         my $place;
         unless(@errors) {
-            $place = $c->sql->Q("
+            $place = $c->Q("
                     SELECT t1.* FROM fascicles_tmpl_places t1, fascicles_tmpl_index t2
                     WHERE t2.place=t1.id AND t2.nature='module' AND t2.entity=?
                 ", [ $template->{id} ])->Hash;
@@ -221,7 +221,7 @@ sub create {
         }
 
         unless (@errors) {
-            $c->sql->Do("
+            $c->Do("
                 INSERT INTO fascicles_requests(
                     id,
                     edition, fascicle,
@@ -249,7 +249,7 @@ sub create {
                 $fascicle->{edition}, $fascicle->{id},
                 $advertiser->{id}, $advertiser->{shortcut},
                 $place->{id}, $place->{title},
-                $c->QuerySessionGet("member.id"), $c->QuerySessionGet("member.shortcut"),
+                $c->getSessionValue("member.id"), $c->getSessionValue("member.shortcut"),
                 $template->{id}, $template->{title}, $template->{area},  $template->{x},  $template->{y},  $template->{w},  $template->{h},
                 $template->{amount},
                 $i_shortcut, $i_description,
@@ -292,11 +292,11 @@ sub update {
 
     Inprint::Check::access($c, \@errors, "domain.roles.manage");
 
-    #my $module = $c->sql->Q(" SELECT * FROM fascile_modules WHERE id=? ", [ $i_module ])->Hash;
-    #my $place  = $c->sql->Q(" SELECT * FROM fascile_tmpl_places WHERE id=? ", [ $module->{place} ])->Hash;
+    #my $module = $c->Q(" SELECT * FROM fascile_modules WHERE id=? ", [ $i_module ])->Hash;
+    #my $place  = $c->Q(" SELECT * FROM fascile_tmpl_places WHERE id=? ", [ $module->{place} ])->Hash;
 
     unless (@errors) {
-        $c->sql->Do("
+        $c->Do("
             UPDATE fascicles_requests SET
                 advertiser=?,
                 status=?, squib=?, payment=?, readiness=?,
@@ -334,7 +334,7 @@ sub move {
     foreach my $string (@i_pages) {
 
         my ($page_id, $seqnum) = split "::", $string;
-        my $page = $c->sql->Q(" SELECT * FROM fascicles_pages WHERE id=? AND seqnum=? ", [ $page_id, $seqnum ])->Hash;
+        my $page = $c->Q(" SELECT * FROM fascicles_pages WHERE id=? AND seqnum=? ", [ $page_id, $seqnum ])->Hash;
 
         if ($page->{id}) {
             push @pages, $page;
@@ -351,24 +351,24 @@ sub move {
             my $request;
 
             if ($c->is_uuid($id)) {
-                $request = $c->sql->Q(" SELECT * FROM fascicles_requests WHERE id=? ", [ $id ])->Hash;
+                $request = $c->Q(" SELECT * FROM fascicles_requests WHERE id=? ", [ $id ])->Hash;
             }
 
             my $module;
 
             if ($request->{id}) {
-                $module = $c->sql->Q(" SELECT * FROM fascicles_modules WHERE id=? ", [ $request->{module} ])->Hash;
+                $module = $c->Q(" SELECT * FROM fascicles_modules WHERE id=? ", [ $request->{module} ])->Hash;
             }
 
             if ($module->{id}) {
 
                 $c->sql->bt;
 
-                $c->sql->Do(" DELETE FROM fascicles_map_modules WHERE module=? ", [ $request->{module} ]);
+                $c->Do(" DELETE FROM fascicles_map_modules WHERE module=? ", [ $request->{module} ]);
 
                 foreach my $page ( @pages ) {
 
-                    $c->sql->Do("
+                    $c->Do("
                         INSERT INTO fascicles_map_modules(
                             edition, fascicle, module, page, placed, x, y, created, updated)
                         VALUES (?, ?, ?, ?, false, ?, ?, now(), now());
@@ -410,7 +410,7 @@ sub delete {
             my $request;
 
             if ($c->is_uuid($id)) {
-                $request = $c->sql->Q(" SELECT * FROM fascicles_requests WHERE id=? ", [ $id ])->Hash;
+                $request = $c->Q(" SELECT * FROM fascicles_requests WHERE id=? ", [ $id ])->Hash;
             }
 
             if ($request->{id}) {
@@ -419,13 +419,13 @@ sub delete {
 
                 if ($d_request eq "true") {
 
-                    $c->sql->Do(" DELETE FROM fascicles_requests WHERE id=? ", [ $request->{id} ]);
+                    $c->Do(" DELETE FROM fascicles_requests WHERE id=? ", [ $request->{id} ]);
 
-                    my $exist = $c->sql->Q(" SELECT EXISTS ( SELECT id FROM fascicles_requests WHERE module=? ) ", [ $request->{module} ])->Value;
+                    my $exist = $c->Q(" SELECT EXISTS ( SELECT id FROM fascicles_requests WHERE module=? ) ", [ $request->{module} ])->Value;
 
                     if ($d_module eq "true") {
                         unless ($exist) {
-                            $c->sql->Do(" DELETE FROM fascicles_modules WHERE id=? ", [ $request->{module} ]);
+                            $c->Do(" DELETE FROM fascicles_modules WHERE id=? ", [ $request->{module} ]);
                         }
                     }
 

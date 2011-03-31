@@ -57,7 +57,7 @@ sub managers {
         $sql .= " ) ";
         $sql .= " ORDER BY icon, t1.shortcut; ";
 
-        $result = $c->sql->Q($sql, \@params)->Hashes;
+        $result = $c->Q($sql, \@params)->Hashes;
 
         if ($i_workgroup) {
             if ($c->access->Check("catalog.documents.assign:*", $i_workgroup)) {
@@ -114,11 +114,11 @@ sub fascicles {
             push @params, $bindings;
         }
 
-        my $editions = $c->sql->Q(" SELECT id FROM editions WHERE path ~ ('*.' || replace(?, '-', '')::text || '.*')::lquery ", [$i_edition])->Values;
+        my $editions = $c->Q(" SELECT id FROM editions WHERE path ~ ('*.' || replace(?, '-', '')::text || '.*')::lquery ", [$i_edition])->Values;
         $sql .= " AND t1.edition = ANY(?) ";
         push @params, $editions;
 
-        $result = $c->sql->Q(" $sql ORDER BY t1.dateout DESC, t2.shortcut, t1.shortcut ", \@params)->Hashes;
+        $result = $c->Q(" $sql ORDER BY t1.dateout DESC, t2.shortcut, t1.shortcut ", \@params)->Hashes;
 
         if ($c->access->Check($i_term, $i_edition)) {
             unshift @$result, {
@@ -152,19 +152,19 @@ sub headlines {
         unless ($c->is_uuid($i_fascicle));
 
     my $edition; unless (@errors) {
-        $edition = $c->sql->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
+        $edition = $c->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
         push @errors, { id => "edition", msg => "Incorrectly filled field"}
             unless ($edition->{id});
     }
 
     my $fascicle; unless (@errors) {
-        $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
+        $fascicle = $c->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
         push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
             unless ($fascicle->{id});
     }
 
     unless (@errors) {
-        $result = $c->sql->Q("
+        $result = $c->Q("
             SELECT DISTINCT tag as id, title FROM fascicles_indx_headlines
             WHERE fascicle=?
             ORDER BY title",
@@ -192,19 +192,19 @@ sub rubrics {
         unless ($c->is_uuid($i_headline));
 
     my $fascicle; unless (@errors) {
-        $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
+        $fascicle = $c->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
         push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
             unless ($fascicle->{id});
     }
 
     my $headline; unless (@errors) {
-        $headline = $c->sql->Q(" SELECT * FROM fascicles_indx_headlines WHERE fascicle=? AND tag=? ", [ $i_fascicle, $i_headline ])->Hash;
+        $headline = $c->Q(" SELECT * FROM fascicles_indx_headlines WHERE fascicle=? AND tag=? ", [ $i_fascicle, $i_headline ])->Hash;
         push @errors, { id => "headline", msg => "Incorrectly filled field"}
             unless ($headline->{id});
     }
 
     unless (@errors) {
-        $result = $c->sql->Q("
+        $result = $c->Q("
             SELECT DISTINCT tag as id, title FROM fascicles_indx_rubrics
             WHERE fascicle=? AND headline = ?
             ORDER BY title",

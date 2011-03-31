@@ -18,7 +18,7 @@ sub image {
     my $i_id = $c->param("id");
 
     if ($i_id eq "self") {
-        $i_id = $c->QuerySessionGet("member.id");
+        $i_id = $c->getSessionValue("member.id");
     }
 
     my $path = $c->config->get("store.path");
@@ -47,7 +47,7 @@ sub read {
     }
 
     if ($i_id) {
-        $result = $c->sql->Q("
+        $result = $c->Q("
             SELECT distinct t1.id, t1.login, t2.title, t2.shortcut, t2.job_position as position
             FROM members t1
             LEFT JOIN profiles t2 ON t1.id = t2.id
@@ -106,32 +106,32 @@ sub update {
 
         # Process profile
         if ($i_login) {
-            my $login_exists = $c->sql->Q(" SELECT id FROM members WHERE login=? ", [ $i_login ])->Value;
+            my $login_exists = $c->Q(" SELECT id FROM members WHERE login=? ", [ $i_login ])->Value;
             unless ($login_exists) {
-                $c->sql->Do("UPDATE members SET login=? WHERE id=? ",[ $i_login, $i_id ]);
+                $c->Do("UPDATE members SET login=? WHERE id=? ",[ $i_login, $i_id ]);
             }
         }
         if ($i_password) {
-            $c->sql->Do("UPDATE members SET password=encode( digest(?, 'sha256'), 'hex') WHERE id=?",[ $i_password, $i_id ]);
+            $c->Do("UPDATE members SET password=encode( digest(?, 'sha256'), 'hex') WHERE id=?",[ $i_password, $i_id ]);
         }
 
         # Update Profile
 
-        my $count = $c->sql->Q("SELECT count(*) FROM profiles WHERE id=?",[$i_id])->Value;
+        my $count = $c->Q("SELECT count(*) FROM profiles WHERE id=?",[$i_id])->Value;
 
         if ($count) {
-            $c->sql->Do("UPDATE profiles SET title=?, shortcut=?, job_position=?, updated=now() WHERE id=?",[$i_title, $i_shortcut, $i_position, $i_id]);
+            $c->Do("UPDATE profiles SET title=?, shortcut=?, job_position=?, updated=now() WHERE id=?",[$i_title, $i_shortcut, $i_position, $i_id]);
         } else {
-            $c->sql->Do("
+            $c->Do("
                 INSERT INTO profiles(id, title, shortcut, job_position, created, updated)
                 VALUES (?, ?, ?, ?, now(), now());",
             [ $i_id, $i_title, $i_shortcut, $i_position]);
         }
 
         # Update Documents
-        $c->sql->Do("UPDATE documents SET creator_shortcut=? WHERE creator=?",  [ $i_shortcut, $i_id ]);
-        $c->sql->Do("UPDATE documents SET manager_shortcut=? WHERE manager=?",  [ $i_shortcut, $i_id ]);
-        $c->sql->Do("UPDATE documents SET holder_shortcut=? WHERE holder=?",    [ $i_shortcut, $i_id ]);
+        $c->Do("UPDATE documents SET creator_shortcut=? WHERE creator=?",  [ $i_shortcut, $i_id ]);
+        $c->Do("UPDATE documents SET manager_shortcut=? WHERE manager=?",  [ $i_shortcut, $i_id ]);
+        $c->Do("UPDATE documents SET holder_shortcut=? WHERE holder=?",    [ $i_shortcut, $i_id ]);
 
     }
 

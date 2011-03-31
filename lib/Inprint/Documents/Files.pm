@@ -59,7 +59,7 @@ sub create {
         my $folder = Inprint::Store::Embedded::getFolderPath($c, "documents", $document->{created}, $document->{copygroup}, 1);
         Inprint::Store::Embedded::fileCreate($c, $folder, $i_filename, $i_description);
 
-        $c->sql->Do("UPDATE documents SET uploaded=now() WHERE id=?", [ $i_document ]);
+        $c->Do("UPDATE documents SET uploaded=now() WHERE id=?", [ $i_document ]);
     }
 
     $success = $c->json->true unless (@errors);
@@ -93,7 +93,7 @@ sub uploadFlash {
         my $upload = $c->req->upload("Filedata");
         my $folder = Inprint::Store::Embedded::getFolderPath($c, "documents", $document->{created}, $document->{copygroup}, 1);
         Inprint::Store::Embedded::fileUpload($c, $folder, $upload);
-        $c->sql->Do("UPDATE documents SET uploaded=now() WHERE id=?", [ $i_document ]);
+        $c->Do("UPDATE documents SET uploaded=now() WHERE id=?", [ $i_document ]);
     }
 
     $success = $c->json->true unless (@errors);
@@ -117,7 +117,7 @@ sub uploadHtml {
             my $upload = $c->req->upload("file$_");
             Inprint::Store::Embedded::fileUpload($c, $folder, $upload) if ($upload);
         }
-        $c->sql->Do("UPDATE documents SET uploaded=now() WHERE id=?", [ $i_document ]);
+        $c->Do("UPDATE documents SET uploaded=now() WHERE id=?", [ $i_document ]);
     }
 
     $success = $c->json->true unless (@errors);

@@ -20,7 +20,7 @@ sub Create {
     my $errors = [];
     my $id = $c->uuid();
 
-    my $exists_title = $c->sql->Q("
+    my $exists_title = $c->Q("
         SELECT count(*)
         FROM fascicles_indx_headlines
         WHERE fascicle=? AND lower(title)=lower(?)
@@ -29,7 +29,7 @@ sub Create {
     push @$errors, { id => "title", msg => "Already exists"}
         if ($exists_title);
 
-    my $exists_shortcut = $c->sql->Q("
+    my $exists_shortcut = $c->Q("
             SELECT count(*)
             FROM fascicles_indx_headlines
             WHERE fascicle=? AND lower(shortcut)=lower(?)
@@ -38,20 +38,20 @@ sub Create {
     push @$errors, { id => "shortcut", msg => "Already exists"}
         if ($exists_shortcut);
 
-    my $headline_origin = $c->sql->Q("
+    my $headline_origin = $c->Q("
             SELECT id FROM indx_headlines WHERE edition=ANY(
                 SELECT id FROM editions WHERE path @> (SELECT path FROM editions WHERE id=?)
             ) AND lower(shortcut)=lower(?)
         ", [ $edition, $shortcut ])->Value;
 
     unless (@$errors) {
-        $c->sql->Do("
+        $c->Do("
             INSERT INTO fascicles_indx_headlines(id, edition, fascicle, origin, title, shortcut, description, created, updated)
             VALUES (?, ?, ?, ?, ?, ?, ?, now(), now());
         ", [ $id, $edition, $fascicle, $headline_origin || $id, $title, $shortcut, $description ]);
     }
 
-    my $headline = $c->sql->Q("
+    my $headline = $c->Q("
             SELECT * FROM fascicles_indx_headlines
             WHERE fascicle=? AND lower(shortcut)=lower(?) ",
         [ $fascicle, $shortcut])->Hash();

@@ -16,7 +16,7 @@ sub groups {
 
     my $c = shift;
 
-    my $result = $c->sql->Q("
+    my $result = $c->Q("
         SELECT
             t1.id, t1.title, t1.shortcut, t1.description,
             repeat('&nbsp;', t2.depth * 2) || '- ' || t1.shortcut as path
@@ -37,7 +37,7 @@ sub fascicles {
     
     $sql .= " ORDER BY is_system DESC, enddate, title ";
     
-    my $result = $c->sql->Q($sql)->Hashes;
+    my $result = $c->Q($sql)->Hashes;
     
     $c->render_json( { data => $result } );
 }
@@ -48,7 +48,7 @@ sub headlines {
     
     my $cgi_fascicle = $c->param("flt_fascicle");
 
-    my $result = $c->sql->Q("
+    my $result = $c->Q("
         SELECT t1.id, t1.rule, t1.name, t1.shortcut, t2.name as groupby
         FROM rules t1
             LEFT JOIN rules t2 ON t1.group = t2.rule
@@ -65,7 +65,7 @@ sub rubrics {
     
     my $cgi_fascicle = $c->param("flt_fascicle");
 
-    my $result = $c->sql->Q("
+    my $result = $c->Q("
         SELECT t1.id, t1.rule, t1.name, t1.shortcut, t2.name as groupby
         FROM rules t1
             LEFT JOIN rules t2 ON t1.group = t2.rule
@@ -88,7 +88,7 @@ sub holders {
         ORDER BY t2.title
     ";
     
-    my $result = $c->sql->Q($sql)->Hashes;
+    my $result = $c->Q($sql)->Hashes;
 
     $c->render_json( { data => $result } );
 }
@@ -105,7 +105,7 @@ sub managers {
         ORDER BY t2.title
     ";
 
-    my $result = $c->sql->Q($sql)->Hashes;
+    my $result = $c->Q($sql)->Hashes;
 
     $c->render_json( { data => $result } );
 }
@@ -114,7 +114,7 @@ sub progress {
 
     my $c = shift;
 
-    my $result = $c->sql->Q("
+    my $result = $c->Q("
         SELECT t1.id, t1.rule, t1.name, t1.shortcut, t2.name as groupby
         FROM rules t1
             LEFT JOIN rules t2 ON t1.group = t2.rule

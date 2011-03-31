@@ -37,7 +37,7 @@ sub read {
         success => $c->json->true
     };
 
-    $result->{data} = $c->sql->Q("
+    $result->{data} = $c->Q("
         SELECT param as name, value FROM state WHERE member = ?
     ", [ $sid ])->Hashes;
 
@@ -60,10 +60,10 @@ sub update {
 
     foreach (@{$data}) {
         if ( $sid && $_->{name} && $_->{value} ) {
-            $c->sql->Do("
+            $c->Do("
                 DELETE FROM state WHERE member=? AND param=?
             ", [ $sid, $_->{name} ]);
-            $c->sql->Do("
+            $c->Do("
                 INSERT INTO state(member, param, value, created, updated)
                 VALUES (?, ?, ?, now(), now());
             ", [ $sid, $_->{name}, $_->{value} ]);

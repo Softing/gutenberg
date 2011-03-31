@@ -58,7 +58,7 @@ sub editions {
             push @data, $bindings;
         }
 
-        my $data = $c->sql->Q("$sql ORDER BY shortcut", \@data)->Hashes;
+        my $data = $c->Q("$sql ORDER BY shortcut", \@data)->Hashes;
 
         foreach my $item (@$data) {
             my $record = {
@@ -88,9 +88,9 @@ sub branches {
 
     my $i_node = $c->param("node");
 
-    my $branch = $c->sql->Q(" SELECT id FROM branches WHERE edition=? LIMIT 1 ", [ $i_node ])->Value;
+    my $branch = $c->Q(" SELECT id FROM branches WHERE edition=? LIMIT 1 ", [ $i_node ])->Value;
 
-    my $data = $c->sql->Q("
+    my $data = $c->Q("
         SELECT t1.id, t1.branch, t1.readiness, t1.weight, t1.title, t1.shortcut, t1.description,
             t2.shortcut as readiness_shortcut, t2.color as readiness_color
         FROM stages t1, readiness t2
@@ -125,7 +125,7 @@ sub list {
 
     my $i_stage = $c->param("node");
 
-    my $result = $c->sql->Q("
+    my $result = $c->Q("
         SELECT t1.id, t1.stage, t1.catalog, t1.principal,
             t2.shortcut as catalog_shortcut,
             t3.shortcut as stage_shortcut,

@@ -65,7 +65,7 @@ sub tree {
             push @data, $bindings;
         }
 
-        my $data = $c->sql->Q("$sql ORDER BY shortcut", \@data)->Hashes;
+        my $data = $c->Q("$sql ORDER BY shortcut", \@data)->Hashes;
 
         foreach my $item (@$data) {
             my $record = {
@@ -97,7 +97,7 @@ sub list {
     my $i_fastype = $c->param("fastype") || "issue";
     my $i_archive = $c->param("archive") || "false";
 
-    my $edition  = $c->sql->Q("SELECT * FROM editions WHERE id=?", [ $i_edition ])->Hash;
+    my $edition  = $c->Q("SELECT * FROM editions WHERE id=?", [ $i_edition ])->Hash;
     my $editions = $c->access->GetChildrens("editions.documents.work");
 
     # Common sql
@@ -137,7 +137,7 @@ sub list {
 
     $sql_parent .= " ORDER BY t1.dateout DESC ";
 
-    my $result = $c->sql->Q($sql_parent, \@params)->Hashes;
+    my $result = $c->Q($sql_parent, \@params)->Hashes;
 
     foreach my $node (@{ $result }) {
 
@@ -145,7 +145,7 @@ sub list {
         $node->{icon} = "/icons/blue-folder-open.png";
 
         my $sql_childrens = $sql . " AND t1.parent=? ORDER BY t1.dateout DESC ";
-        $node->{children} = $c->sql->Q($sql_childrens, [ $node->{id} ])->Hashes;
+        $node->{children} = $c->Q($sql_childrens, [ $node->{id} ])->Hashes;
 
         foreach my $subnode (@{ $node->{children} }) {
             $node->{leaf} = $c->json->false;
@@ -447,13 +447,13 @@ sub delete {
     my @errors;
 
     # Get fascicle
-    my $fascicle = $c->sql->Q("
+    my $fascicle = $c->Q("
         SELECT id, shortcut FROM fascicles WHERE id=? ",
         [ $i_fascicle ])->Hash;
     next unless ($fascicle->{id});
 
     # Get childrens
-    my $childrens = $c->sql->Q("
+    my $childrens = $c->Q("
         SELECT id, shortcut FROM fascicles WHERE parent=? ",
         [ $i_fascicle ])->Hashes;
 
@@ -469,7 +469,7 @@ sub delete {
         Inprint::Models::Fascicle::delete($c, $fascicle->{id});
 
         # Update documents
-        #$c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $id ]);
+        #$c->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $id ]);
         #Inprint::Utils::Documents::MoveDocumentIndexToFascicle($c, \@errors, $fascicle->{id});
 
     $c->sql->et;

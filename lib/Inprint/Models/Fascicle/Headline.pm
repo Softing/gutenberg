@@ -14,16 +14,16 @@ sub create {
 
     if ($tag->{id}) {
 
-        $c->sql->Do("
+        $c->Do("
             INSERT INTO fascicles_indx_headlines (id, edition, fascicle, tag, title, description, created, updated)
                 VALUES (?, ?, ?, ?, ?, ?, now(), now());
             ", [ $id, $edition, $fascicle, $tag->{id}, $tag->{title}, $tag->{description} || "" ]);
 
         if ($bydefault eq "on") {
-            $c->sql->Do("
+            $c->Do("
                 UPDATE fascicles_indx_headlines SET bydefault=false WHERE fascicle=?;
                 ", [ $fascicle ]);
-            $c->sql->Do("
+            $c->Do("
                 UPDATE fascicles_indx_headlines SET bydefault=true WHERE id=?;
                 ", [ $id ]);
         }
@@ -36,7 +36,7 @@ sub create {
 sub read {
     my $c = shift;
     my $id = shift;
-    my $result = $c->sql->Q("
+    my $result = $c->Q("
         SELECT id, edition, fascicle, tag, title, description, bydefault, created, updated
         FROM fascicles_indx_headlines WHERE id=? ",
         [ $id ])->Hash;
@@ -46,7 +46,7 @@ sub read {
 sub findByTag {
     my $c = shift;
     my ($fascicle, $tag) = shift;
-    my $result = $c->sql->Q("
+    my $result = $c->Q("
         SELECT id, edition, fascicle, tag, title, description, bydefault, created, updated
         FROM fascicles_indx_headlines WHERE fascicle=? AND tag=? ",
         [ $fascicle, $tag ])->Hash;
@@ -61,14 +61,14 @@ sub update {
 
     if ($tag->{id}) {
 
-        $c->sql->Do(" UPDATE fascicles_indx_headlines SET tag=?, title=?, description=? WHERE id=? ",
+        $c->Do(" UPDATE fascicles_indx_headlines SET tag=?, title=?, description=? WHERE id=? ",
             [ $tag->{id}, $tag->{title}, $tag->{description} || "", $id ]);
 
         if ($bydefault eq "on") {
-            $c->sql->Do("
+            $c->Do("
                 UPDATE fascicles_indx_headlines SET bydefault=false WHERE fascicle=?;
                 ", [ $fascicle ]);
-            $c->sql->Do("
+            $c->Do("
                 UPDATE fascicles_indx_headlines SET bydefault=true WHERE id=?;
                 ", [ $id ]);
         }
@@ -83,11 +83,11 @@ sub delete {
     my $id = shift;
 
     # Delete rubrics
-    $c->sql->Do("
+    $c->Do("
         DELETE FROM fascicles_indx_rubrics WHERE headline=? ", [ $id ]);
 
     # Delete headline
-    $c->sql->Do("
+    $c->Do("
         DELETE FROM fascicles_indx_headlines WHERE id=?
             AND id <> '00000000-0000-0000-0000-000000000000' ", [ $id ]);
 

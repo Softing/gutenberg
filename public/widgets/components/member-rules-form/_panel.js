@@ -23,23 +23,6 @@ Inprint.cmp.memberRulesForm.Window = Ext.extend(Ext.Window, {
                 this.panels.domain,
                 this.panels.editions,
                 this.panels.organization
-            ],
-            tbar: [
-                {
-                    icon: _ico("disk-black"),
-                    cls: "x-btn-text-icon",
-                    text: _("Save"),
-                    ref: "../btnSave",
-                    scope:this
-                },
-                '->',
-                {
-                    icon: _ico("broom"),
-                    cls: "x-btn-text-icon",
-                    text: _("Clear rights"),
-                    ref: "../btnClear",
-                    scope:this
-                }
             ]
         });
 

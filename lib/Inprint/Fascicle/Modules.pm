@@ -35,22 +35,22 @@ sub read {
 
     unless (@errors) {
 
-        $result = $c->sql->Q("
+        $result = $c->Q("
             SELECT id, edition, fascicle, origin, title, description, amount, area, w, h, created, updated
             FROM fascicles_modules
             WHERE id=?;
         ", [ $i_id ])->Hash;
 
-        #$result->{pages} = $c->sql->Q("
+        #$result->{pages} = $c->Q("
         #    SELECT page, module
         #    FROM fascicles_map_modules WHERE module=?
         #", [ $result->{id} ])->Hashes;
         #
-        #my $pages = $c->sql->Q("
+        #my $pages = $c->Q("
         #    SELECT DISTINCT page FROM fascicles_map_modules WHERE module=?
         #", [ $result->{id} ])->Values;
 
-        $result->{composition} = $c->sql->Q("
+        $result->{composition} = $c->Q("
             SELECT t2.page, t1.id, t1.title, t1.w, t1.h, t2.x, t2.y
             FROM fascicles_modules t1, fascicles_map_modules t2
             WHERE page=ANY(?) AND t2.module=t1.id
@@ -82,7 +82,7 @@ sub list {
         foreach my $code (@i_pages) {
             my ($page_id, $seqnum) = split '::', $code;
 
-            my $page = $c->sql->Q("
+            my $page = $c->Q("
                 SELECT id, edition, fascicle, origin, headline, seqnum, w, h, created, updated
                 FROM fascicles_pages WHERE id=? AND seqnum=?
             ", [ $page_id, $seqnum ])->Hash;
@@ -110,7 +110,7 @@ sub list {
     }
 
     unless (@errors) {
-        $result = $c->sql->Q(" $sql ", \@params)->Hashes;
+        $result = $c->Q(" $sql ", \@params)->Hashes;
         $c->render_json( { data => $result } );
     }
 
@@ -136,12 +136,12 @@ sub create {
 
     my $fascicle   = Inprint::Check::fascicle($c, \@errors, $i_fascicle);
 
-    Inprint::Check::checkErrors($c, \@errors);
+    $c->fail_render(\@errors);
 
     # Find modules by mapping;
     my @modules;
     foreach my $map (@i_mapping) {
-        my $module = $c->sql->Q("
+        my $module = $c->Q("
             SELECT
                 t1.id,
                 t2.place as place,
@@ -157,7 +157,7 @@ sub create {
     push @errors, { id => "page", msg => "Modules not equal $#i_mapping"}
         unless ($#modules == $#i_mapping);
 
-    Inprint::Check::checkErrors($c, \@errors);
+    $c->fail_render(\@errors);
 
     # Find pages
     my @pages;
@@ -165,7 +165,7 @@ sub create {
 
         my ($page_id, $seqnum) = split '::', $code;
 
-        my $page = $c->sql->Q("
+        my $page = $c->Q("
             SELECT id, edition, fascicle, origin, headline, seqnum, w, h, created, updated
             FROM fascicles_pages WHERE id=? AND seqnum=?
         ", [ $page_id, $seqnum ])->Hash;
@@ -177,7 +177,7 @@ sub create {
     push @errors, { id => "page", msg => "Pages not equal $#i_pages"}
         unless ($#pages == $#i_pages);
 
-    Inprint::Check::checkErrors($c, \@errors);
+    $c->fail_render(\@errors);
 
     foreach my $module (@modules) {
 
@@ -185,7 +185,7 @@ sub create {
 
             my $module_id = $c->uuid;
 
-            $c->sql->Do("
+            $c->Do("
                 INSERT INTO fascicles_modules(id, edition, fascicle, place, origin, title, description, amount, area, w, h,  created, updated)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
             ", [
@@ -197,7 +197,7 @@ sub create {
             ]);
 
             foreach my $page (@pages) {
-                $c->sql->Do("
+                $c->Do("
                     INSERT INTO fascicles_map_modules(edition, fascicle, module, page, placed, x, y, created, updated)
                     VALUES (?, ?, ?, ?, ?, ?, ?, now(), now());
                 ", [
@@ -278,7 +278,7 @@ sub update {
     $area = $size_w * $size_h * $i_amount;
 
     unless (@errors) {
-        $c->sql->Do("
+        $c->Do("
             UPDATE fascicles_tmpl_modules
                 SET title=?, description=?, amount=?, area=?, x=?, y=?, w=?, h=?, updated=now()
             WHERE id =?;
@@ -305,12 +305,12 @@ sub delete {
             my $module;
 
             if ($c->is_uuid($id)) {
-                $module = $c->sql->Q(" SELECT * FROM fascicles_modules WHERE id=? ", [ $id ])->Hash;
+                $module = $c->Q(" SELECT * FROM fascicles_modules WHERE id=? ", [ $id ])->Hash;
             }
 
             if ($module->{id}) {
-                $c->sql->Do(" DELETE FROM fascicles_modules WHERE id=? ", [ $module->{id} ]);
-                $c->sql->Do(" DELETE FROM fascicles_map_modules WHERE module=? ", [ $module->{id} ]);
+                $c->Do(" DELETE FROM fascicles_modules WHERE id=? ", [ $module->{id} ]);
+                $c->Do(" DELETE FROM fascicles_map_modules WHERE module=? ", [ $module->{id} ]);
             }
 
         }

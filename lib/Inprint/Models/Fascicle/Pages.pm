@@ -32,7 +32,7 @@ sub move {
 
     unless (@errors) {
 
-        my $composition = $c->sql->Q("
+        my $composition = $c->Q("
             SELECT id, edition, fascicle, headline, seqnum, w, h, created, updated
             FROM fascicles_pages WHERE fascicle = ?; ",[
                 $i_fascicle
@@ -44,7 +44,7 @@ sub move {
 
         foreach my $item (@i_pages) {
             my ($id, $seqnum) = split "::", $item;
-            my $page = $c->sql->Q(" SELECT * FROM fascicles_pages WHERE id=? AND seqnum=? ", [ $id, $seqnum ])->Hash;
+            my $page = $c->Q(" SELECT * FROM fascicles_pages WHERE id=? AND seqnum=? ", [ $id, $seqnum ])->Hash;
             if ($page->{id}) {
                 push @inputPages, $page;
             }
@@ -108,7 +108,7 @@ sub move {
         $c->sql->bt;
         foreach my $page (@$composition) {
             if ( $page->{id} && $page->{is_updated} == 1) {
-                $c->sql->Do(" UPDATE fascicles_pages SET seqnum=? WHERE id=? ", [$page->{seqnum}, $page->{id}]);
+                $c->Do(" UPDATE fascicles_pages SET seqnum=? WHERE id=? ", [$page->{seqnum}, $page->{id}]);
             }
         }
         $c->sql->et;
@@ -138,7 +138,7 @@ sub right {
 
     unless (@errors) {
 
-        my $composition = $c->sql->Q("
+        my $composition = $c->Q("
             SELECT id, edition, fascicle, headline, seqnum, w, h, created, updated
             FROM fascicles_pages WHERE fascicle = ?; ",[
                 $i_fascicle
@@ -146,7 +146,7 @@ sub right {
 
 
         my ($id, $seqnum) = split "::", $i_page;
-        my $page = $c->sql->Q(" SELECT * FROM fascicles_pages WHERE id=? AND seqnum=? ", [ $id, $seqnum ])->Hash;
+        my $page = $c->Q(" SELECT * FROM fascicles_pages WHERE id=? AND seqnum=? ", [ $id, $seqnum ])->Hash;
 
         if ($page->{id}) {
 
@@ -161,7 +161,7 @@ sub right {
         $c->sql->bt;
         foreach my $page (@$composition) {
             if ( $page->{id} && $page->{is_updated} == 1) {
-                $c->sql->Do(" UPDATE fascicles_pages SET seqnum=? WHERE id=? ", [$page->{seqnum}, $page->{id}]);
+                $c->Do(" UPDATE fascicles_pages SET seqnum=? WHERE id=? ", [$page->{seqnum}, $page->{id}]);
             }
         }
         $c->sql->et;
@@ -192,14 +192,14 @@ sub left {
 
     unless (@errors) {
 
-        my $composition = $c->sql->Q("
+        my $composition = $c->Q("
             SELECT id, edition, fascicle, headline, seqnum, w, h, created, updated
             FROM fascicles_pages WHERE fascicle = ?; ",[
                 $i_fascicle
             ])->Hashes;
 
         my ($id, $seqnum) = split "::", $i_page;
-        my $page = $c->sql->Q(" SELECT * FROM fascicles_pages WHERE id=? AND seqnum=? ", [ $id, $seqnum ])->Hash;
+        my $page = $c->Q(" SELECT * FROM fascicles_pages WHERE id=? AND seqnum=? ", [ $id, $seqnum ])->Hash;
 
         if ($page->{id}) {
 
@@ -236,7 +236,7 @@ sub left {
         $c->sql->bt;
         foreach my $page (@$composition) {
             if ( $page->{id} && $page->{is_updated} == 1) {
-                $c->sql->Do(" UPDATE fascicles_pages SET seqnum=? WHERE id=? ", [$page->{seqnum}, $page->{id}]);
+                $c->Do(" UPDATE fascicles_pages SET seqnum=? WHERE id=? ", [$page->{seqnum}, $page->{id}]);
             }
         }
         $c->sql->et;
@@ -284,7 +284,7 @@ sub clean {
     push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_fascicle));
 
-    my $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id = ? ", [ $i_fascicle ])->Hash;
+    my $fascicle = $c->Q(" SELECT * FROM fascicles WHERE id = ? ", [ $i_fascicle ])->Hash;
 
     push @errors, { id => "fascicle", msg => "Can't find object"}
         unless ($fascicle->{id});
@@ -292,18 +292,18 @@ sub clean {
     unless (@errors) {
         foreach my $item (@i_pages) {
             my ($id, $seqnum) = split "::", $item;
-            my $page = $c->sql->Q(" SELECT * FROM fascicles_pages WHERE id=? AND seqnum=? ", [ $id, $seqnum ])->Hash;
+            my $page = $c->Q(" SELECT * FROM fascicles_pages WHERE id=? AND seqnum=? ", [ $id, $seqnum ])->Hash;
             if ($page->{id}) {
                 $c->sql->bt;
 
                 if ($i_documents eq "true") {
-                    $c->sql->Do(" DELETE FROM fascicles_map_documents WHERE page=? ", [ $page->{id} ]);
+                    $c->Do(" DELETE FROM fascicles_map_documents WHERE page=? ", [ $page->{id} ]);
                 }
 
                 if ($i_adverts eq "true") {
-                    my $modules = $c->sql->Q(" SELECT DISTINCT module FROM fascicles_map_modules WHERE page=? ", [ $page->{id} ])->Values;
-                    $c->sql->Do(" DELETE FROM fascicles_modules WHERE id=ANY(?) ", [ $modules ]);
-                    #$c->sql->Do(" UPDATE fascicles_map_modules SET placed=false WHERE page=? ", [ $page->{id} ]);
+                    my $modules = $c->Q(" SELECT DISTINCT module FROM fascicles_map_modules WHERE page=? ", [ $page->{id} ])->Values;
+                    $c->Do(" DELETE FROM fascicles_modules WHERE id=ANY(?) ", [ $modules ]);
+                    #$c->Do(" UPDATE fascicles_map_modules SET placed=false WHERE page=? ", [ $page->{id} ]);
                 }
 
                 $c->sql->et;
@@ -328,7 +328,7 @@ sub delete {
     push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_fascicle));
 
-    my $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id = ? ", [ $i_fascicle ])->Hash;
+    my $fascicle = $c->Q(" SELECT * FROM fascicles WHERE id = ? ", [ $i_fascicle ])->Hash;
 
     push @errors, { id => "fascicle", msg => "Can't find object"}
         unless ($fascicle->{id});
@@ -337,18 +337,18 @@ sub delete {
         foreach my $item (@i_pages) {
             my ($id, $seqnum) = split "::", $item;
 
-            my $page    = $c->sql->Q(" SELECT * FROM fascicles_pages WHERE id=? AND seqnum=? ", [ $id, $seqnum ])->Hash;
+            my $page    = $c->Q(" SELECT * FROM fascicles_pages WHERE id=? AND seqnum=? ", [ $id, $seqnum ])->Hash;
             next unless ($page->{id});
 
             $c->sql->bt;
 
-            my $modules = $c->sql->Q(" SELECT module FROM fascicles_map_modules WHERE page=?", [ $page->{id} ])->Values;
+            my $modules = $c->Q(" SELECT module FROM fascicles_map_modules WHERE page=?", [ $page->{id} ])->Values;
 
             foreach my $id (@$modules) {
-                $c->sql->Do(" DELETE FROM fascicles_modules WHERE id=? ", [ $id ]);
+                $c->Do(" DELETE FROM fascicles_modules WHERE id=? ", [ $id ]);
             }
 
-            $c->sql->Do(" DELETE FROM fascicles_pages WHERE id=? ", [ $page->{id} ]);
+            $c->Do(" DELETE FROM fascicles_pages WHERE id=? ", [ $page->{id} ]);
 
             $c->sql->et;
         }

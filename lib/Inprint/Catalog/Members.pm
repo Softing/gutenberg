@@ -60,7 +60,7 @@ sub list {
     }
 
     if ($i_node) {
-        $result = $c->sql->Q(" $sql ORDER BY t2.shortcut ", \@params)->Hashes;
+        $result = $c->Q(" $sql ORDER BY t2.shortcut ", \@params)->Hashes;
     }
 
     $c->render_json( { data => $result } );
@@ -97,7 +97,7 @@ sub create {
     push @{ $result->{errors} }, { id => "shortcut", msg => "" }
         unless $i_shortcut;
 
-    my $login = $c->sql->Q(
+    my $login = $c->Q(
         " SELECT true FROM members WHERE login=?", [ $i_login ])->Value;
 
     if ($login) {
@@ -112,18 +112,18 @@ sub create {
 
         my $id = $c->uuid();
 
-        $c->sql->Do("
+        $c->Do("
             INSERT INTO members (id, login, password)
                 VALUES (?,?,encode( digest(?, 'sha256'), 'hex'))
         ", [ $id, $i_login, $i_password ]);
 
-        $c->sql->Do("
+        $c->Do("
             INSERT INTO map_member_to_catalog (member, catalog)
                 VALUES (?,?)
             ", [ $id, '00000000-0000-0000-0000-000000000000' ]);
 
 
-        $c->sql->Do("
+        $c->Do("
             INSERT INTO profiles (id, title, shortcut, job_position)
                 VALUES (?,?,?,?)
             ", [ $id, $i_title, $i_shortcut, $i_position ]);
@@ -138,7 +138,7 @@ sub delete {
     my @ids = $c->param("id");
 
     foreach my $id (@ids) {
-        $c->sql->Do(" DELETE FROM members WHERE id=? ", [ $id ]);
+        $c->Do(" DELETE FROM members WHERE id=? ", [ $id ]);
     }
 
     $c->render_json( { success => 1 } );
@@ -148,9 +148,9 @@ sub rules {
 
     my $c = shift;
 
-    my $i_member = $c->param("member") || $c->QuerySessionGet("member.id");
+    my $i_member = $c->param("member") || $c->getSessionValue("member.id");
 
-    my $result = $c->sql->Q("
+    my $result = $c->Q("
         (
             SELECT t1.area, t1.binding, t2.shortcut as binding_shortcut
             FROM map_member_to_rule t1, editions t2
@@ -177,7 +177,7 @@ sub rules {
     ", [ $i_member, $i_member, $i_member, $i_member ])->Hashes;
 
     foreach my $item (@$result) {
-        $item->{rules} = $c->sql->Q("
+        $item->{rules} = $c->Q("
             SELECT t2.title
             FROM map_member_to_rule t1, rules t2
             WHERE t1.member=? AND t1.area=? AND binding=? AND t2.id=t1.term
@@ -190,7 +190,7 @@ sub rules {
 sub setup {
     my $c = shift;
 
-    my $member_id     = $c->QuerySessionGet("member.id");
+    my $member_id     = $c->getSessionValue("member.id");
 
     my $i_title       = $c->param("title");
     my $i_shortcut    = $c->param("shortcut");
@@ -251,20 +251,20 @@ sub setup {
 
     unless (@errors) {
 
-        $c->sql->Do("DELETE FROM profiles WHERE id=?", [ $member_id ]);
-        $c->sql->Do("INSERT INTO profiles (id, title, shortcut, job_position) VALUES (?, ?, ?, ?)",[
+        $c->Do("DELETE FROM profiles WHERE id=?", [ $member_id ]);
+        $c->Do("INSERT INTO profiles (id, title, shortcut, job_position) VALUES (?, ?, ?, ?)",[
             $member_id, $i_title, $i_shortcut, $i_position
         ]);
 
-        $c->sql->Do("DELETE FROM options WHERE option_name=? AND member=?", ["default.edition", $member_id]);
-        $c->sql->Do("INSERT INTO options (member, option_name, option_value) VALUES (?, ?, ?)", [$member_id, "default.edition", $i_edition]);
-        $c->sql->Do("DELETE FROM options WHERE option_name=? AND member=?", ["default.edition.name", $member_id]);
-        $c->sql->Do("INSERT INTO options (member, option_name, option_value) VALUES (?, ?, ?)", [$member_id, "default.edition.name", $i_edition_shortcut]);
+        $c->Do("DELETE FROM options WHERE option_name=? AND member=?", ["default.edition", $member_id]);
+        $c->Do("INSERT INTO options (member, option_name, option_value) VALUES (?, ?, ?)", [$member_id, "default.edition", $i_edition]);
+        $c->Do("DELETE FROM options WHERE option_name=? AND member=?", ["default.edition.name", $member_id]);
+        $c->Do("INSERT INTO options (member, option_name, option_value) VALUES (?, ?, ?)", [$member_id, "default.edition.name", $i_edition_shortcut]);
 
-        $c->sql->Do("DELETE FROM options WHERE option_name=? AND member=?", ["default.workgroup", $member_id]);
-        $c->sql->Do("INSERT INTO options (member, option_name, option_value) VALUES (?, ?, ?)", [$member_id, "default.workgroup", $i_workgroup]);
-        $c->sql->Do("DELETE FROM options WHERE option_name=? AND member=?", ["default.workgroup.name", $member_id]);
-        $c->sql->Do("INSERT INTO options (member, option_name, option_value) VALUES (?, ?, ?)", [$member_id, "default.workgroup.name", $i_workgroup_shortcut]);
+        $c->Do("DELETE FROM options WHERE option_name=? AND member=?", ["default.workgroup", $member_id]);
+        $c->Do("INSERT INTO options (member, option_name, option_value) VALUES (?, ?, ?)", [$member_id, "default.workgroup", $i_workgroup]);
+        $c->Do("DELETE FROM options WHERE option_name=? AND member=?", ["default.workgroup.name", $member_id]);
+        $c->Do("INSERT INTO options (member, option_name, option_value) VALUES (?, ?, ?)", [$member_id, "default.workgroup.name", $i_workgroup_shortcut]);
     }
 
     $success = $c->json->true unless (@errors);

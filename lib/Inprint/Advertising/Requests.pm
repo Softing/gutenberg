@@ -24,7 +24,7 @@ sub read {
     my $result = [];
     
     unless (@errors) {
-        $result = $c->sql->Q("
+        $result = $c->Q("
             SELECT
             
                 t1.id, t1.serialnum, t1.title, t1.shortcut, t1.status, t1.payment, t1.readiness, t1.created, t1.updated, 
@@ -112,7 +112,7 @@ sub list {
     }
     
     unless (@errors) {
-        $result = $c->sql->Q(" $sql ", \@data)->Hashes;
+        $result = $c->Q(" $sql ", \@data)->Hashes;
         $c->render_json( { data => $result } );
     }
     
@@ -160,7 +160,7 @@ sub create {
     #    unless ($c->access->Check("domain.roles.manage"));
     
     unless (@errors) {
-        $c->sql->Do("
+        $c->Do("
             INSERT INTO ad_requests(
             id, title, shortcut, description,
             edition, advertiser, manager, fascicle, place, module,
@@ -218,7 +218,7 @@ sub update {
         unless ($c->access->Check("domain.roles.manage"));
     
     unless (@errors) {
-        $c->sql->Do("
+        $c->Do("
             UPDATE ad_requests SET
                 title=?, shortcut=?, description=?, 
                 advertiser=?, manager=?, 
@@ -254,7 +254,7 @@ sub delete {
     unless (@errors) {
         foreach my $id (@ids) {
             if ($c->is_uuid($id)) {
-                $c->sql->Do(" DELETE FROM ad_requests WHERE id=? ", [ $id ]);
+                $c->Do(" DELETE FROM ad_requests WHERE id=? ", [ $id ]);
             }
         }
     }

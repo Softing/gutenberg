@@ -28,7 +28,7 @@
 #    my $grid_w = $i_w || 110;
 #    my $grid_h = $i_h || 140;
 #    
-#    my $page = $c->sql->Q("
+#    my $page = $c->Q("
 #        SELECT id, edition, fascicle, origin, headline, seqnum, w, h, created, updated
 #        FROM fascicles_pages WHERE id=?
 #    ", [ $i_page ])->Hash;
@@ -52,7 +52,7 @@
 #    
 #    $c->draw_page($img, $grid, $page->{w}, $page->{h});
 #    
-#    my $modules = $c->sql->Q("
+#    my $modules = $c->Q("
 #        SELECT
 #            t1.id, t1.shortcut, t1.w, t1.h, t2.x, t2.y
 #        FROM fascicles_modules t1, fascicles_map_modules t2

@@ -23,7 +23,7 @@ sub read {
     my $result = [];
 
     unless (@errors) {
-        $result = $c->sql->Q("
+        $result = $c->Q("
             SELECT t1.*,
                 subpath(path, -2,1) as parent,
                 (select shortcut from catalog where subpath(path, -1,1) = subpath(t1.path, -2,1) ) as parent_shortcut
@@ -59,7 +59,7 @@ sub headlines {
         ";
         push @data, $i_node;
 
-        my $data = $c->sql->Q($sql, \@data)->Hashes;
+        my $data = $c->Q($sql, \@data)->Hashes;
 
         foreach my $item (@$data) {
             my $record = {
@@ -92,7 +92,7 @@ sub rubrics {
 
     my $result;
     unless (@errors) {
-        $result = $c->sql->Q("
+        $result = $c->Q("
             SELECT DISTINCT id, shortcut as title FROM fascicles_indx_rubrics
             WHERE fascicle=?
             ORDER BY shortcut
@@ -132,13 +132,13 @@ sub create {
         unless ($c->access->Check("domain.departments.manage"));
 
     unless (@errors) {
-        my $path = $c->sql->Q(" SELECT path FROM catalog WHERE id =? ", [ $i_path ])->Value;
+        my $path = $c->Q(" SELECT path FROM catalog WHERE id =? ", [ $i_path ])->Value;
 
         push @errors, { id => "path", msg => "Incorrectly filled field"}
             unless ($c->is_path($path));
 
         unless (@errors) {
-            $c->sql->Do("
+            $c->Do("
                 INSERT INTO catalog (id, title, shortcut, description, path, type, capables)
                     VALUES (?, ?, ?, ?, replace(?, '-',  '')::ltree, ?, ?)
             ", [ $id, $i_title, $i_shortcut, $i_description, $path, 'default', [] ]);
@@ -180,13 +180,13 @@ sub update {
         unless ($c->access->Check("domain.departments.manage"));
 
     unless (@errors) {
-        my $path = $c->sql->Q(" SELECT path FROM catalog WHERE id =? ", [ $i_path ])->Value;
+        my $path = $c->Q(" SELECT path FROM catalog WHERE id =? ", [ $i_path ])->Value;
 
         push @errors, { id => "path", msg => "Incorrectly filled field"}
             unless ($c->is_path($path));
 
         unless (@errors) {
-            $c->sql->Do(" UPDATE catalog SET title=?, shortcut=?, description=?, path=replace(?, '-',  '')::ltree WHERE id=? ",
+            $c->Do(" UPDATE catalog SET title=?, shortcut=?, description=?, path=replace(?, '-',  '')::ltree WHERE id=? ",
                 [ $i_title, $i_shortcut, $i_description, "$path.$i_id", $i_id ]);
         }
     }
@@ -213,8 +213,8 @@ sub map {
     unless (@errors) {
         foreach my $member (@i_members) {
             if ($c->is_uuid($member)) {
-                $c->sql->Do(" DELETE FROM map_member_to_catalog WHERE id=? AND catalog=? ", [ $member, $i_group ]);
-                $c->sql->Do(" INSERT INTO map_member_to_catalog( member, catalog) VALUES (?, ?) ", [ $member, $i_group ]);
+                $c->Do(" DELETE FROM map_member_to_catalog WHERE id=? AND catalog=? ", [ $member, $i_group ]);
+                $c->Do(" INSERT INTO map_member_to_catalog( member, catalog) VALUES (?, ?) ", [ $member, $i_group ]);
             }
         }
     }
@@ -241,7 +241,7 @@ sub unmap {
     unless (@errors) {
         foreach my $member (@i_members) {
             if ($c->is_uuid($member)) {
-                $c->sql->Do(" DELETE FROM map_member_to_catalog WHERE member=? AND catalog=? ", [ $member, $i_group ]);
+                $c->Do(" DELETE FROM map_member_to_catalog WHERE member=? AND catalog=? ", [ $member, $i_group ]);
             }
         }
     }
@@ -264,7 +264,7 @@ sub delete {
         unless ($c->access->Check("domain.departments.manage"));
 
     unless (@errors) {
-        $c->sql->Do(" DELETE FROM catalog WHERE id =? ", [ $i_id ]);
+        $c->Do(" DELETE FROM catalog WHERE id =? ", [ $i_id ]);
     }
 
     $success = $c->json->true unless (@errors);

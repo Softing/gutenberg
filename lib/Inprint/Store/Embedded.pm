@@ -59,7 +59,7 @@ sub updateCache {
             );
 
         unless ($cacheRecord->{file_exists}) {
-            $c->sql->Do("
+            $c->Do("
                     UPDATE cache_files SET file_exists=true WHERE id=?
                 ", [ $cacheRecord->{id} ]);
         }
@@ -68,7 +68,7 @@ sub updateCache {
         my $metadata = Inprint::Store::Embedded::Editor::getMetadata($c, $filepath);
 
         if ($metadata->{CharacterCount} > 0) {
-            $c->sql->Do("
+            $c->Do("
                     UPDATE cache_files SET file_length=? WHERE id=?
                 ", [ $metadata->{CharacterCount}, $cacheRecord->{id} ]);
         }
@@ -241,7 +241,7 @@ sub fileChangeDescription {
     my $cache = Inprint::Store::Cache::getRecordById($c, $fid);
     return unless $cache->{id};
 
-    $c->sql->Do("UPDATE cache_files SET file_description=? WHERE id=?", [ $text, $fid ]);
+    $c->Do("UPDATE cache_files SET file_description=? WHERE id=?", [ $text, $fid ]);
 
     return $c;
 }
@@ -272,7 +272,7 @@ sub filePublish {
     my $cache = Inprint::Store::Cache::getRecordById($c, $fid);
     return unless $cache->{id};
 
-    $c->sql->Do("UPDATE cache_files SET file_published=true WHERE id=?", [ $fid ]);
+    $c->Do("UPDATE cache_files SET file_published=true WHERE id=?", [ $fid ]);
 
     return $c;
 }
@@ -284,7 +284,7 @@ sub fileUnpublish {
     my $cache = Inprint::Store::Cache::getRecordById($c, $fid);
     return unless $cache->{id};
 
-    $c->sql->Do("UPDATE cache_files SET file_published=false WHERE id=?", [ $fid ]);
+    $c->Do("UPDATE cache_files SET file_published=false WHERE id=?", [ $fid ]);
 
     return $c;
 }

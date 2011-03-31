@@ -24,7 +24,7 @@ sub read {
     my $result = [];
     
     unless (@errors) {
-        $result = $c->sql->Q("
+        $result = $c->Q("
             SELECT t1.id, t2.id as edition, t2.shortcut as edition_shortcut, t1.serialnum, t1.title, t1.shortcut, t1.description, t1.address, t1.contact, t1.phones, t1.inn, t1.kpp, t1.bank, t1.rs, t1.ks, t1.bik, t1.created, t1.updated
             FROM ad_advertisers t1, editions t2 WHERE t2.id = t1.edition AND t1.id=?
         ", [ $i_id ])->Hash;
@@ -59,11 +59,11 @@ sub list {
     
     unless (@errors) {
         
-        $total = $c->sql->Q("
+        $total = $c->Q("
             SELECT count(*) FROM ad_advertisers t1, editions t2 WHERE t2.id = t1.edition AND t1.edition=?
         ", [ $i_edition ])->Value;
         
-        $result = $c->sql->Q("
+        $result = $c->Q("
             SELECT t1.id, t2.id as edition, t2.shortcut as edition_shortcut, t1.serialnum, t1.title, t1.shortcut, t1.description, t1.address, t1.contact, t1.phones, t1.inn, t1.kpp, t1.bank, t1.rs, t1.ks, t1.bik, t1.created, t1.updated
             FROM ad_advertisers t1, editions t2 WHERE t2.id = t1.edition AND t1.edition=?
             ORDER BY t1.shortcut LIMIT ? OFFSET ?
@@ -115,13 +115,13 @@ sub create {
     
     my $edition;
     unless (@errors) {
-        $edition  = $c->sql->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
+        $edition  = $c->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
         push @errors, { id => "edition", msg => "Incorrectly filled field"}
             unless ($edition);
     }
     
     unless (@errors) {
-        $c->sql->Do("
+        $c->Do("
             INSERT INTO ad_advertisers(
                 id, edition, title, shortcut, description,
                 address, contact, phones,
@@ -176,7 +176,7 @@ sub update {
     #    unless ($c->access->Check("domain.roles.manage"));
     
     unless (@errors) {
-        $c->sql->Do("
+        $c->Do("
             UPDATE ad_advertisers SET
                 title=?, shortcut=?, description=?, 
                 address=?, contact=?, phones=?,
@@ -208,7 +208,7 @@ sub delete {
     unless (@errors) {
         foreach my $id (@ids) {
             if ($c->is_uuid($id)) {
-                $c->sql->Do(" DELETE FROM ad_advertisers WHERE id=? ", [ $id ]);
+                $c->Do(" DELETE FROM ad_advertisers WHERE id=? ", [ $id ]);
             }
         }
     }

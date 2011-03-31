@@ -11,7 +11,7 @@ sub create {
         $circulation, $pnum, $anum, $manager, $enabled, $archived, $flagdoc,
         $flagadv, $datedoc, $dateadv, $dateprint, $dateout) = @_;
 
-    $c->sql->Do("
+    $c->Do("
         INSERT INTO fascicles(
             id, edition, parent, fastype, variation, shortcut, description,
             circulation, pnum, anum, manager, enabled, archived, flagdoc,
@@ -29,7 +29,7 @@ sub read {
     my $c = shift;
     my $id = shift;
 
-    my $result = $c->sql->Q("
+    my $result = $c->Q("
         SELECT
             id, edition, parent, fastype, variation,
             shortcut, description,
@@ -58,7 +58,7 @@ sub update {
     my ($id, $enabled, $title, $shortcut,
         $description, $deadline, $advertisement ) = @_;
 
-    $c->sql->Do("
+    $c->Do("
         UPDATE fascicles
             SET enabled=?, title=?, shortcut=?, description=?, deadline=?, advert_deadline=?
         WHERE id =?;
@@ -71,21 +71,21 @@ sub delete {
     my $c  = shift;
     my $id = shift;
 
-    $c->sql->Do(" DELETE FROM fascicles_requests WHERE fascicle=? ", [ $id ]);
+    $c->Do(" DELETE FROM fascicles_requests WHERE fascicle=? ", [ $id ]);
 
-    $c->sql->Do(" DELETE FROM fascicles_modules WHERE fascicle=? ", [ $id ]);
-    $c->sql->Do(" DELETE FROM fascicles_options WHERE fascicle=? ", [ $id ]);
-    $c->sql->Do(" DELETE FROM fascicles_pages WHERE fascicle=? ", [ $id ]);
+    $c->Do(" DELETE FROM fascicles_modules WHERE fascicle=? ", [ $id ]);
+    $c->Do(" DELETE FROM fascicles_options WHERE fascicle=? ", [ $id ]);
+    $c->Do(" DELETE FROM fascicles_pages WHERE fascicle=? ", [ $id ]);
 
-    $c->sql->Do(" DELETE FROM fascicles_indx_rubrics WHERE fascicle=? ", [ $id ]);
-    $c->sql->Do(" DELETE FROM fascicles_indx_headlines WHERE fascicle=? ", [ $id ]);
+    $c->Do(" DELETE FROM fascicles_indx_rubrics WHERE fascicle=? ", [ $id ]);
+    $c->Do(" DELETE FROM fascicles_indx_headlines WHERE fascicle=? ", [ $id ]);
 
-    $c->sql->Do(" DELETE FROM fascicles_tmpl_index WHERE fascicle=? ", [ $id ]);
-    $c->sql->Do(" DELETE FROM fascicles_tmpl_modules WHERE fascicle=? ", [ $id ]);
-    $c->sql->Do(" DELETE FROM fascicles_tmpl_pages WHERE fascicle=? ", [ $id ]);
-    $c->sql->Do(" DELETE FROM fascicles_tmpl_places WHERE fascicle=? ", [ $id ]);
+    $c->Do(" DELETE FROM fascicles_tmpl_index WHERE fascicle=? ", [ $id ]);
+    $c->Do(" DELETE FROM fascicles_tmpl_modules WHERE fascicle=? ", [ $id ]);
+    $c->Do(" DELETE FROM fascicles_tmpl_pages WHERE fascicle=? ", [ $id ]);
+    $c->Do(" DELETE FROM fascicles_tmpl_places WHERE fascicle=? ", [ $id ]);
 
-    $c->sql->Do(" DELETE FROM fascicles WHERE id=? ", [ $id ]);
+    $c->Do(" DELETE FROM fascicles WHERE id=? ", [ $id ]);
 
     return $c;
 }
@@ -97,21 +97,21 @@ sub importFromDefaults {
 
     my %cache;
 
-    my $fascicle = $c->sql->Q("
+    my $fascicle = $c->Q("
         SELECT * FROM fascicles WHERE id=?;
         ", [ $id ])->Hash;
 
-    my $edition = $c->sql->Q("
+    my $edition = $c->Q("
         SELECT * FROM editions WHERE id=?; ",
         [ $fascicle->{edition} ])->Hash;
 
-    my $editions = $c->sql->Q("
+    my $editions = $c->Q("
         SELECT id FROM editions WHERE path @> ? order by path asc; ",
         [ $edition->{path} ])->Values;
 
     # Import Headlines && Rubrics
 
-    my $headlines = $c->sql->Q("
+    my $headlines = $c->Q("
         SELECT id, tag, bydefault, title, description
         FROM indx_headlines
         WHERE edition = ANY(?) ",
@@ -122,19 +122,19 @@ sub importFromDefaults {
         my $headline_id = $c->uuid();
         $cache{ $headline->{id} } = $headline_id;
 
-        $c->sql->Do("
+        $c->Do("
             INSERT INTO fascicles_indx_headlines(id, edition, fascicle, tag, bydefault, title, description, created, updated)
             VALUES (?, ?, ?, ?, ?, ?, ?, now(), now()); ",
             [ $headline_id, $edition->{id}, $fascicle->{id}, $headline->{tag}, $headline->{bydefault}, $headline->{title}, $headline->{description} || "" ]);
 
-        my $rubrics = $c->sql->Q("
+        my $rubrics = $c->Q("
             SELECT id, tag, title, description
             FROM indx_rubrics WHERE headline=? ",
             [ $headline->{id} ])->Hashes;
 
         foreach my $rubric (@$rubrics) {
             my $rubric_id = $c->uuid();
-            $c->sql->Do("
+            $c->Do("
                 INSERT INTO fascicles_indx_rubrics(id, edition, fascicle, tag, headline, title, description, created, updated)
                 VALUES (?, ?, ?, ?, ?, ?, ?, now(), now()); ",
                 [ $rubric_id, $edition->{id}, $fascicle->{id}, $rubric->{tag}, $headline_id, $rubric->{title}, $rubric->{description} ]);
@@ -144,7 +144,7 @@ sub importFromDefaults {
 
     # Import AD Pages && Modules
 
-    my $tmpl_pages   = $c->sql->Q(
+    my $tmpl_pages   = $c->Q(
         " SELECT id, edition, title, description, bydefault, w, h, created, updated FROM ad_pages WHERE edition = ANY(?) ",
         [ $editions ])->Hashes;
 
@@ -152,12 +152,12 @@ sub importFromDefaults {
 
         my $page_id = $c->uuid;
 
-        $c->sql->Do("
+        $c->Do("
             INSERT INTO fascicles_tmpl_pages(id, origin, fascicle, title, description, bydefault, w, h, created, updated)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, now(), now());
         ", [ $page_id, $page->{id}, $id, $page->{title}, $page->{description}, $page->{bydefault}, $page->{w}, $page->{h} ]);
 
-        my $tmpl_modules = $c->sql->Q("
+        my $tmpl_modules = $c->Q("
             SELECT id, edition, page, title, description, amount, area, x, y, w, h, created, updated
             FROM ad_modules WHERE page=? ", [ $page->{id} ])->Hashes;
 
@@ -166,7 +166,7 @@ sub importFromDefaults {
             my $module_id = $c->uuid();
             $cache{ $module->{id} } = $module_id;
 
-            $c->sql->Do("
+            $c->Do("
                 INSERT INTO fascicles_tmpl_modules(id, origin, fascicle, page, title, description, amount, area, x, y, w, h, created, updated)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
             ", [ $module_id, $module->{id},  $id, $page_id, $module->{title}, $module->{description}, $module->{amount}, $module->{area}, $module->{x}, $module->{y}, $module->{w}, $module->{h} ]);
@@ -177,14 +177,14 @@ sub importFromDefaults {
 
     # Import Places
 
-    my $tmpl_places  = $c->sql->Q(" SELECT id, edition, title, description, created, updated FROM ad_places WHERE edition = ANY(?) ", [ $editions ])->Hashes;
+    my $tmpl_places  = $c->Q(" SELECT id, edition, title, description, created, updated FROM ad_places WHERE edition = ANY(?) ", [ $editions ])->Hashes;
 
     foreach my $place (@$tmpl_places) {
 
         my $place_id = $c->uuid();
         $cache{ $place->{id} } = $place_id;
 
-        $c->sql->Do("
+        $c->Do("
             INSERT INTO fascicles_tmpl_places(id, origin, fascicle, title, description, created, updated)
                 VALUES (?, ?, ?, ?, ?, now(), now());
         ", [ $place_id, $place->{id}, $id, $place->{title}, $place->{description} ]);
@@ -193,7 +193,7 @@ sub importFromDefaults {
 
     # Import AD Index
 
-    my $tmpl_places_index = $c->sql->Q("
+    my $tmpl_places_index = $c->Q("
             SELECT id, edition, place, nature, entity, created, updated
             FROM ad_index WHERE edition = ?
         ", [ $edition->{id} ])->Hashes;
@@ -208,7 +208,7 @@ sub importFromDefaults {
         next unless $place_id;
         next unless $entity_id;
 
-        $c->sql->Do("
+        $c->Do("
             INSERT INTO fascicles_tmpl_index(id, edition, fascicle, place, nature, entity, created, updated)
                 VALUES (?, ?, ?, ?, ?, ?, now(), now());
         ", [ $indx_id, $edition->{id}, $id, $place_id, $indx->{nature}, $entity_id ]);
@@ -224,17 +224,17 @@ sub importFromFascicle {
 
     my %cache;
 
-    my $fascicle = $c->sql->Q("
+    my $fascicle = $c->Q("
         SELECT * FROM fascicles WHERE id=?;
         ", [ $id ])->Hash;
 
-    my $source = $c->sql->Q("
+    my $source = $c->Q("
         SELECT * FROM fascicles WHERE id=?;
         ", [ $sid ])->Hash;
 
     # Import Headlines && Rubrics
 
-    my $headlines = $c->sql->Q("
+    my $headlines = $c->Q("
         SELECT id, tag, bydefault, title, description
         FROM fascicles_indx_headlines
         WHERE fascicle = ? ",
@@ -245,19 +245,19 @@ sub importFromFascicle {
         my $headline_id = $c->uuid();
         $cache{ $headline->{id} } = $headline_id;
 
-        $c->sql->Do("
+        $c->Do("
             INSERT INTO fascicles_indx_headlines(id, edition, fascicle, tag, bydefault, title, description, created, updated)
             VALUES (?, ?, ?, ?, ?, ?, ?, now(), now()); ",
             [ $headline_id, $fascicle->{edition}, $fascicle->{id}, $headline->{tag}, $headline->{bydefault}, $headline->{title}, $headline->{description} || "" ]);
 
-        my $rubrics = $c->sql->Q("
+        my $rubrics = $c->Q("
             SELECT id, tag, title, description
             FROM fascicles_indx_rubrics WHERE headline=? ",
             [ $headline->{id} ])->Hashes;
 
         foreach my $rubric (@$rubrics) {
             my $rubric_id = $c->uuid();
-            $c->sql->Do("
+            $c->Do("
                 INSERT INTO fascicles_indx_rubrics(id, edition, fascicle, tag, headline, title, description, created, updated)
                 VALUES (?, ?, ?, ?, ?, ?, ?, now(), now()); ",
                 [ $rubric_id, $fascicle->{edition}, $fascicle->{id}, $rubric->{tag}, $headline_id, $rubric->{title}, $rubric->{description} ]);
@@ -267,7 +267,7 @@ sub importFromFascicle {
 
     # Import AD Pages && Modules
 
-    my $tmpl_pages   = $c->sql->Q(
+    my $tmpl_pages   = $c->Q(
         " SELECT id, title, description, bydefault, w, h FROM fascicles_tmpl_pages WHERE fascicle = ? ",
         [ $source->{id} ])->Hashes;
 
@@ -275,12 +275,12 @@ sub importFromFascicle {
 
         my $page_id = $c->uuid;
 
-        $c->sql->Do("
+        $c->Do("
             INSERT INTO fascicles_tmpl_pages(id, origin, fascicle, title, description, bydefault, w, h, created, updated)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, now(), now());
         ", [ $page_id, $page->{id}, $id, $page->{title}, $page->{description}, $page->{bydefault}, $page->{w}, $page->{h} ]);
 
-        my $tmpl_modules = $c->sql->Q("
+        my $tmpl_modules = $c->Q("
             SELECT id, page, title, description, amount, area, x, y, w, h, created, updated
             FROM fascicles_tmpl_modules WHERE page=? ", [ $page->{id} ])->Hashes;
 
@@ -289,7 +289,7 @@ sub importFromFascicle {
             my $module_id = $c->uuid();
             $cache{ $module->{id} } = $module_id;
 
-            $c->sql->Do("
+            $c->Do("
                 INSERT INTO fascicles_tmpl_modules(id, origin, fascicle, page, title, description, amount, area, x, y, w, h, created, updated)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
             ", [ $module_id, $module->{id},  $id, $page_id, $module->{title}, $module->{description}, $module->{amount}, $module->{area}, $module->{x}, $module->{y}, $module->{w}, $module->{h} ]);
@@ -300,7 +300,7 @@ sub importFromFascicle {
 
     # Import Places
 
-    my $tmpl_places  = $c->sql->Q("
+    my $tmpl_places  = $c->Q("
         SELECT id, title, description, created, updated
         FROM fascicles_tmpl_places WHERE fascicle=? ",
         [ $source->{id} ])->Hashes;
@@ -310,7 +310,7 @@ sub importFromFascicle {
         my $place_id = $c->uuid();
         $cache{ $place->{id} } = $place_id;
 
-        $c->sql->Do("
+        $c->Do("
             INSERT INTO fascicles_tmpl_places(id, origin, fascicle, title, description, created, updated)
                 VALUES (?, ?, ?, ?, ?, now(), now());
         ", [ $place_id, $place->{id}, $id, $place->{title}, $place->{description} ]);
@@ -319,7 +319,7 @@ sub importFromFascicle {
 
     # Import AD Index
 
-    my $tmpl_places_index = $c->sql->Q("
+    my $tmpl_places_index = $c->Q("
             SELECT id, place, nature, entity, created, updated
             FROM fascicles_tmpl_index WHERE fascicle = ?
         ", [ $source->{id} ])->Hashes;
@@ -334,7 +334,7 @@ sub importFromFascicle {
         next unless $place_id;
         next unless $entity_id;
 
-        $c->sql->Do("
+        $c->Do("
             INSERT INTO fascicles_tmpl_index(id, edition, fascicle, place, nature, entity, created, updated)
                 VALUES (?, ?, ?, ?, ?, ?, now(), now());
         ", [ $indx_id, $fascicle->{edition}, $id, $place_id, $indx->{nature}, $entity_id ]);

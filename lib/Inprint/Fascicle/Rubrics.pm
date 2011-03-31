@@ -45,7 +45,7 @@ sub list {
 
     my $result;
     unless (@errors) {
-        $result = $c->sql->Q("
+        $result = $c->Q("
             SELECT id, tag, title, description
             FROM fascicles_indx_rubrics WHERE headline=?
             ORDER BY title ASC ",
@@ -75,7 +75,7 @@ sub create {
     push @errors, { id => "title", msg => "Incorrectly filled field"}
         unless ($c->is_text($i_title));
 
-    my $headline = $c->sql->Q(" SELECT * FROM fascicles_indx_headlines WHERE id=? ", [ $i_headline ])->Hash;
+    my $headline = $c->Q(" SELECT * FROM fascicles_indx_headlines WHERE id=? ", [ $i_headline ])->Hash;
     push @errors, { id => "headline", msg => "Incorrectly filled field"}
         unless ($headline->{id});
 
@@ -126,7 +126,7 @@ sub update {
         my $newItem = Inprint::Models::Fascicle::Rubric::read($c, $i_id);
 
         # Update documents in fascicle
-        $c->sql->Do("
+        $c->Do("
             UPDATE documents SET rubric=?, rubric_shortcut=? WHERE fascicle=? AND rubric=?",
             [ $newItem->{tag}, $newItem->{title}, $oldItem->{fascicle}, $oldItem->{tag} ]);
 
@@ -159,7 +159,7 @@ sub delete {
         Inprint::Models::Fascicle::Rubric::delete($c, $i_id);
 
         # Update documents
-        $c->sql->Do("
+        $c->Do("
                 UPDATE documents SET
                     rubric   ='00000000-0000-0000-0000-000000000000', rubric_shortcut   = '--'
                 WHERE fascicle=? AND rubric=?

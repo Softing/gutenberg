@@ -42,6 +42,16 @@ Inprint.cmp.memberRulesForm.Domain.Restrictions = Ext.extend(Ext.grid.EditorGrid
             }
         ];
 
+        this.tbar = [
+            {
+                icon: _ico("disk-black"),
+                cls: "x-btn-text-icon",
+                text: _("Save"),
+                ref: "../btnSave",
+                scope:this
+            }
+        ];
+
         Ext.apply(this, {
             disabled: false,
             stripeRows: true,

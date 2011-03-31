@@ -58,7 +58,7 @@ sub tree {
         ";
         push @data, $fascicle->{id};
 
-        my $data = $c->sql->Q($sql, \@data)->Hashes;
+        my $data = $c->Q($sql, \@data)->Hashes;
 
         foreach my $item (@$data) {
             my $record = {
@@ -135,7 +135,7 @@ sub update {
         my $newItem = Inprint::Models::Fascicle::Headline::read($c, $i_id);
 
         # Update documents in fascicle
-        $c->sql->Do("UPDATE documents SET headline=?, headline_shortcut=? WHERE fascicle=? AND headline=?",
+        $c->Do("UPDATE documents SET headline=?, headline_shortcut=? WHERE fascicle=? AND headline=?",
             [ $newItem->{tag}, $newItem->{title}, $oldItem->{fascicle}, $oldItem->{tag} ]);
 
     }
@@ -166,7 +166,7 @@ sub delete {
         Inprint::Models::Fascicle::Headline::delete($c, $i_id);
 
         # Update documents
-        $c->sql->Do("
+        $c->Do("
                 UPDATE documents SET
                     headline ='00000000-0000-0000-0000-000000000000', headline_shortcut = '--',
                     rubric   ='00000000-0000-0000-0000-000000000000', rubric_shortcut   = '--'

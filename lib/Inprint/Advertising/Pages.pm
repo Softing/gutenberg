@@ -24,7 +24,7 @@ sub read {
     my $result = [];
 
     unless (@errors) {
-        $result = $c->sql->Q("
+        $result = $c->Q("
             SELECT id, edition, title, description, bydefault, w, h, created, updated FROM ad_pages WHERE id=?
         ", [ $i_id ])->Hash;
     }
@@ -46,7 +46,7 @@ sub list {
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_edition));
 
-    my $edition = $c->sql->Q(" SELECT * FROM editions WHERE id = ? ", [ $i_edition ])->Hash;
+    my $edition = $c->Q(" SELECT * FROM editions WHERE id = ? ", [ $i_edition ])->Hash;
 
     push @errors, { id => "edition", msg => "Incorrectly filled field"}
         unless ($edition->{id});
@@ -61,7 +61,7 @@ sub list {
 
         push @params, $edition->{id};
 
-        $result = $c->sql->Q(" $sql ", \@params)->Hashes;
+        $result = $c->Q(" $sql ", \@params)->Hashes;
 
     }
 
@@ -114,13 +114,13 @@ sub create {
     my $edition;
 
     #unless (@errors) {
-    #    $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $place->{fascicle} ])->Hash;
+    #    $fascicle = $c->Q(" SELECT * FROM fascicles WHERE id=? ", [ $place->{fascicle} ])->Hash;
     #    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
     #        unless ($fascicle);
     #}
 
     unless (@errors) {
-        $edition  = $c->sql->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
+        $edition  = $c->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
         push @errors, { id => "edition", msg => "Incorrectly filled field"}
             unless ($edition);
     }
@@ -132,12 +132,12 @@ sub create {
 
     unless (@errors) {
         if ($default == 1) {
-            $c->sql->Do(" UPDATE ad_pages SET bydefault=false WHERE edition=? ", [ $edition->{id} ]);
+            $c->Do(" UPDATE ad_pages SET bydefault=false WHERE edition=? ", [ $edition->{id} ]);
         }
     }
 
     unless (@errors) {
-        $c->sql->Do("
+        $c->Do("
             INSERT INTO ad_pages(id, edition, title, description, bydefault, w, h, created, updated)
             VALUES (?, ?, ?, ?, ?, ?, ?, now(), now());
         ", [ $id, $edition->{id}, $i_title, $i_description, $default, \@i_w, \@i_h ]);
@@ -172,7 +172,7 @@ sub update {
     push @errors, { id => "description", msg => "Incorrectly filled field"}
         unless ($c->is_text($i_description));
 
-    my $page = $c->sql->Q(" SELECT * FROM ad_pages WHERE id=?", [ $i_id ] )->Hash;
+    my $page = $c->Q(" SELECT * FROM ad_pages WHERE id=?", [ $i_id ] )->Hash;
 
     push @errors, { id => "page", msg => "Can't find object"}
         unless ($page->{id});
@@ -184,12 +184,12 @@ sub update {
 
     unless (@errors) {
         if ($default == 1) {
-            $c->sql->Do(" UPDATE ad_pages SET bydefault=false WHERE edition=? ", [ $page->{edition} ]);
+            $c->Do(" UPDATE ad_pages SET bydefault=false WHERE edition=? ", [ $page->{edition} ]);
         }
     }
 
     unless (@errors) {
-        $c->sql->Do("
+        $c->Do("
             UPDATE ad_pages SET title=?, description=?, bydefault=?, w=?, h=?, updated=now() WHERE id = ? ;
         ", [ $i_title, $i_description, $default, \@i_w, \@i_h, $page->{id} ]);
     }
@@ -211,8 +211,8 @@ sub delete {
     unless (@errors) {
         foreach my $id (@ids) {
             if ($c->is_uuid($id)) {
-                $c->sql->Do(" DELETE FROM ad_pages WHERE id=? ", [ $id ]);
-                $c->sql->Do(" DELETE FROM ad_modules WHERE page=? ", [ $id ]);
+                $c->Do(" DELETE FROM ad_pages WHERE id=? ", [ $id ]);
+                $c->Do(" DELETE FROM ad_modules WHERE page=? ", [ $id ]);
             }
         }
     }

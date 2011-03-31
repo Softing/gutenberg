@@ -23,7 +23,7 @@ sub Create {
     my $id = $c->uuid();
     my $errors      = [];
 
-    my $exists_title = $c->sql->Q("
+    my $exists_title = $c->Q("
             SELECT count(*)
             FROM fascicles_indx_rubrics
             WHERE fascicle=? AND headline=? AND lower(title)=lower(?)
@@ -32,7 +32,7 @@ sub Create {
     push @$errors, { id => "title", msg => "Already exists"}
         if ($exists_title);
 
-    my $exists_shortcut = $c->sql->Q("
+    my $exists_shortcut = $c->Q("
             SELECT count(*)
             FROM fascicles_indx_rubrics
             WHERE fascicle=? AND headline=? AND lower(shortcut)=lower(?)
@@ -41,20 +41,20 @@ sub Create {
     push @$errors, { id => "shortcut", msg => "Already exists"}
         if ($exists_shortcut);
 
-    my $rubric_origin = $c->sql->Q("
+    my $rubric_origin = $c->Q("
             SELECT id FROM indx_rubrics WHERE edition=ANY(
                 SELECT id FROM editions WHERE path @> (SELECT path FROM editions WHERE id=?)
             ) AND lower(shortcut)=lower(?)
         ", [ $edition, $shortcut ])->Value;
 
     unless (@$errors) {
-        $c->sql->Do("
+        $c->Do("
             INSERT INTO fascicles_indx_rubrics(id, edition, fascicle, origin, headline, title, shortcut, description, created, updated)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, now(), now());
         ", [ $id, $edition, $fascicle, $rubric_origin || $id, $headline, $title, $shortcut, $description ]);
     }
 
-    my $rubric = $c->sql->Q("
+    my $rubric = $c->Q("
             SELECT * FROM fascicles_indx_rubrics
             WHERE fascicle=? AND headline=? AND lower(shortcut)=lower(?::text) ",
         [ $fascicle, $headline, $shortcut ])->Hash;

@@ -13,7 +13,7 @@ use base 'Inprint::BaseController';
 sub list {
     my $c = shift;
     
-    my $result = $c->sql->Q("SELECT * FROM edition.edition ")->Hashes;
+    my $result = $c->Q("SELECT * FROM edition.edition ")->Hashes;
     
     $c->render_json({ data => $result });
 }

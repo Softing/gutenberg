@@ -26,14 +26,14 @@ sub list {
 
     Inprint::Check::uuid($c, \@errors, "file", $i_file);
 
-    my $cacheRecord = $c->sql->Q(" SELECT * FROM cache_files WHERE id=? ", [ $i_file ])->Hash;
+    my $cacheRecord = $c->Q(" SELECT * FROM cache_files WHERE id=? ", [ $i_file ])->Hash;
 
     Inprint::Check::uuid($c, \@errors, "record", $cacheRecord->{id} );
 
     my $filename = $cacheRecord->{file_path} ."/". $cacheRecord->{file_name};
     $filename =~ s/\/+/\//g;
 
-    my $data = $c->sql->Q(" SELECT
+    my $data = $c->Q(" SELECT
             id,
             hotsave_creator_shortcut as creator,
             hotsave_branch_shortcut as branch,
@@ -58,7 +58,7 @@ sub read {
 
     my $fileContent;
 
-    my $cacheRecord = $c->sql->Q(" SELECT hotsave_path FROM cache_hotsave WHERE id=? ", [ $i_version ])->Value;
+    my $cacheRecord = $c->Q(" SELECT hotsave_path FROM cache_hotsave WHERE id=? ", [ $i_version ])->Value;
 
     my $basepath = $c->config->get("store.path");
     my $filepath = "$basepath/$cacheRecord";

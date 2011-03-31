@@ -45,7 +45,7 @@ sub list {
 
     my $result;
     unless (@errors) {
-        $result = $c->sql->Q("
+        $result = $c->Q("
             SELECT id, tag, title, description
             FROM indx_rubrics WHERE headline=?
             ORDER BY title ASC ",
@@ -81,7 +81,7 @@ sub create {
     push @errors, { id => "access", msg => "Not enough permissions"}
         unless ($c->access->Check("domain.index.manage"));
 
-    my $headline = $c->sql->Q(" SELECT * FROM indx_headlines WHERE id=? ", [ $i_headline ])->Hash;
+    my $headline = $c->Q(" SELECT * FROM indx_headlines WHERE id=? ", [ $i_headline ])->Hash;
     push @errors, { id => "headline", msg => "Incorrectly filled field"}
         unless ($headline->{id});
 

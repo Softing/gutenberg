@@ -71,7 +71,7 @@ sub index {
         $worksheet->write(6, 4, "Размер\n в полосах" . $fascicle->{title}, $fmtHeader);
         $worksheet->write(6, 5, "Описание" . $fascicle->{title}, $fmtHeader);
 
-        my $requests = $c->sql->Q("
+        my $requests = $c->Q("
             SELECT requests.*, modules.id as module, modules.title as module_title, modules.description as module_description
             FROM fascicles_requests requests
                 LEFT OUTER JOIN fascicles_modules modules ON modules.id = requests.module

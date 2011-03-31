@@ -26,12 +26,12 @@ sub initialize {
 
         my @pages;
 
-        $data->{pages} = $c->sql->Q("
+        $data->{pages} = $c->Q("
             SELECT id, w, h, seqnum
             FROM fascicles_pages WHERE id = ANY(?) ORDER BY seqnum ASC
         ", [ \@i_pages ])->Hashes;
 
-        $data->{modules} = $c->sql->Q("
+        $data->{modules} = $c->Q("
             SELECT t1.id, t1.title, t1.w, t1.h, t2.page, t2.x, t2.y
             FROM fascicles_modules t1, fascicles_map_modules t2
             WHERE page=ANY(?) AND t2.module=t1.id
@@ -60,7 +60,7 @@ sub save {
 
             my $placed = 1;
 
-            $c->sql->Do("
+            $c->Do("
                 UPDATE fascicles_map_modules SET placed=?, x=?, y=? WHERE page=? AND module=? ",
                 [ $placed, $x, $y, $pageid, $moduleid ]);
 
@@ -91,7 +91,7 @@ sub templates {
 
     # Get templates from pages
     my $templates; unless (@errors) {
-        $templates = $c->sql->Q(" SELECT DISTINCT origin FROM fascicles_pages WHERE id= ANY(?) ", [ \@i_pages ])->Values;
+        $templates = $c->Q(" SELECT DISTINCT origin FROM fascicles_pages WHERE id= ANY(?) ", [ \@i_pages ])->Values;
         push @errors, { id => "page", msg => "Can't find object!"}
             unless (@$templates);
     }
@@ -126,7 +126,7 @@ sub templates {
     }
 
     unless (@errors) {
-        $result = $c->sql->Q(" $sql ", \@params)->Hashes;
+        $result = $c->Q(" $sql ", \@params)->Hashes;
         $c->render_json( { data => $result } );
     }
 
@@ -152,7 +152,7 @@ sub modules {
 
         foreach my $code (@i_pages) {
             my ($page_id, $seqnum) = split '::', $code;
-            my $page = $c->sql->Q("
+            my $page = $c->Q("
                 SELECT id, edition, fascicle, origin, headline, seqnum, w, h, created, updated
                 FROM fascicles_pages WHERE id=? AND seqnum=?
             ", [ $page_id, $seqnum ])->Hash;
@@ -179,7 +179,7 @@ sub modules {
 
     unless (@errors) {
 
-        $result = $c->sql->Q(" $sql ", \@params)->Hashes;
+        $result = $c->Q(" $sql ", \@params)->Hashes;
 
         foreach my $node (@{ $result }) {
 
@@ -188,7 +188,7 @@ sub modules {
             $node->{leaf} = $c->json->true;
             $node->{icon} = "/icons/table-medium.png";
 
-            $node->{page} = $c->sql->Q("
+            $node->{page} = $c->Q("
                 SELECT page FROM fascicles_map_modules WHERE module=?",
                 [ $node->{module} ])->Value;
 
@@ -213,7 +213,7 @@ sub modules {
                         AND t2.page=ANY(?)
                 ";
 
-                $node->{children} = $c->sql->Q($sql_childrens, [ $node->{module}, \@pages ])->Hashes;
+                $node->{children} = $c->Q($sql_childrens, [ $node->{module}, \@pages ])->Hashes;
                 foreach my $subnode (@{ $node->{children} }) {
                     $subnode->{id} = $c->uuid;
                     $subnode->{leaf} = $c->json->true;

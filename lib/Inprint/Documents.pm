@@ -112,7 +112,7 @@ sub create {
     my $id      = $c->uuid();
     my $copyid  = $id;
 
-    my $current_member = $c->QuerySessionGet("member.id");
+    my $current_member = $c->getSessionValue("member.id");
 
     my $i_edition    = $c->param("edition");
     my $i_workgroup  = $c->param("workgroup");
@@ -219,7 +219,7 @@ sub create {
         push @data, $edition->{shortcut};
 
         # Set ineditions[]
-        my $editions = $c->sql->Q("
+        my $editions = $c->Q("
             SELECT ARRAY( select id from editions where path @> ( select path from editions where id = ? ) ) ",
             [ $edition->{id} ])->Array;
 
@@ -244,7 +244,7 @@ sub create {
         push @data, $workgroup->{shortcut};
 
         # Set Inworkgroups[]
-        my $workgroups = $c->sql->Q("
+        my $workgroups = $c->Q("
             SELECT ARRAY( select id from catalog where path @> ( select path from catalog where id = ? ) ) ",
             [ $workgroup->{id} ])->Array;
 
@@ -256,8 +256,8 @@ sub create {
     unless ( @errors ) {
         push @fields, "creator";
         push @fields, "creator_shortcut";
-        push @data, $c->QuerySessionGet("member.id");
-        push @data, $c->QuerySessionGet("member.shortcut") || "<Unknown>";
+        push @data, $c->getSessionValue("member.id");
+        push @data, $c->getSessionValue("member.shortcut") || "<Unknown>";
     }
 
     my $holder = Inprint::Check::principal($c, \@errors, $manager);
@@ -277,9 +277,9 @@ sub create {
 
     my $stage; unless ( @errors ) {
 
-        my $parents = $c->sql->Q(" SELECT id FROM editions WHERE path @> ?", [ $edition->{path} ])->Values;
+        my $parents = $c->Q(" SELECT id FROM editions WHERE path @> ?", [ $edition->{path} ])->Values;
 
-        $stage = $c->sql->Q("
+        $stage = $c->Q("
             SELECT
                 t1.id as branch, t1.shortcut as branch_shortcut,
                 t2.id as stage, t2.shortcut as stage_shortcut,
@@ -337,7 +337,7 @@ sub create {
 
         if ($i_headline) {
 
-            $headline = $c->sql->Q("
+            $headline = $c->Q("
                 SELECT * FROM fascicles_indx_headlines WHERE fascicle=? AND tag=? ",
                 [ $fascicle->{id}, $i_headline ])->Hash;
 
@@ -351,7 +351,7 @@ sub create {
 
         if ($i_rubric) {
 
-            $rubric = $c->sql->Q("
+            $rubric = $c->Q("
                 SELECT * FROM fascicles_indx_rubrics WHERE fascicle=? AND tag=? ",
                 [ $fascicle->{id}, $i_rubric ])->Hash;
 
@@ -388,11 +388,11 @@ sub create {
         $c->sql->bt;
 
         # Crete document
-        $c->sql->Do(" INSERT INTO documents (" . ( join ",", @fields ) .") VALUES (". ( join ",", @placeholders ) .") ", \@data);
+        $c->Do(" INSERT INTO documents (" . ( join ",", @fields ) .") VALUES (". ( join ",", @placeholders ) .") ", \@data);
 
         # Get new document
-        my $document = $c->sql->Q(" SELECT * FROM documents WHERE id=? ", [ $id ])->Hash;
-        my $principal = Inprint::Check::principal($c, \@errors, $c->QuerySessionGet("member.id"));
+        my $document = $c->Q(" SELECT * FROM documents WHERE id=? ", [ $id ])->Hash;
+        my $principal = Inprint::Check::principal($c, \@errors, $c->getSessionValue("member.id"));
 
         # Create document comment
         if ($i_comment) {
@@ -403,7 +403,7 @@ sub create {
         }
 
         # Create history
-        $c->sql->Do("
+        $c->Do("
             INSERT INTO history(
                 entity, operation,
                 color, weight,
@@ -428,7 +428,7 @@ sub create {
             $document->{workgroup}, $document->{workgroup_shortcut},
         ]);
 
-        $c->sql->Do("
+        $c->Do("
             INSERT INTO history(
                 entity, operation,
                 color, weight,
@@ -491,7 +491,7 @@ sub update {
     # Rubrication
     my $headline; unless ( @errors ) {
         if ($i_headline) {
-            $headline = $c->sql->Q("
+            $headline = $c->Q("
                 SELECT * FROM fascicles_indx_headlines WHERE fascicle=? AND tag=? ",
                 [ $document->{fascicle}, $i_headline ])->Hash;
             push @errors, { id => "headline", msg => "Object not found"}
@@ -501,7 +501,7 @@ sub update {
 
     my $rubric; unless ( @errors ) {
         if ($i_rubric) {
-            $rubric = $c->sql->Q("
+            $rubric = $c->Q("
                 SELECT * FROM fascicles_indx_rubrics WHERE fascicle=? AND tag=? ",
                 [ $document->{fascicle}, $i_rubric ])->Hash;
             push @errors, { id => "rubric", msg => "Object not found"}
@@ -516,9 +516,9 @@ sub update {
     # Update assignation
     unless (@errors) {
         if ($canAssign) {
-            $c->sql->Do(" UPDATE documents SET maingroup=?, maingroup_shortcut=? WHERE id=? OR copygroup=?; ",
+            $c->Do(" UPDATE documents SET maingroup=?, maingroup_shortcut=? WHERE id=? OR copygroup=?; ",
                 [ $maingroup->{id}, $maingroup->{shortcut}, $document->{id}, $document->{id} ]);
-            $c->sql->Do(" UPDATE documents SET manager=?, manager_shortcut=? WHERE id=? OR copygroup=?; ",
+            $c->Do(" UPDATE documents SET manager=?, manager_shortcut=? WHERE id=? OR copygroup=?; ",
                 [ $manager->{id}, $manager->{shortcut}, $document->{id}, $document->{id} ]);
         }
     }
@@ -528,22 +528,22 @@ sub update {
         if ($canUpdate) {
 
             # Update workgroup
-            $c->sql->Do(" UPDATE documents SET title=?, author=?, psize=?, pdate=? WHERE id=? OR copygroup=?; ",
+            $c->Do(" UPDATE documents SET title=?, author=?, psize=?, pdate=? WHERE id=? OR copygroup=?; ",
                 [ $i_title, $i_author, $i_size, $i_enddate, $document->{id}, $document->{id} ]);
 
             # Update headline and rubric
             if ($headline->{id}) {
                 my $tag = Inprint::Models::Tag::getById($c, $headline->{tag});
-                $c->sql->Do(" UPDATE documents SET headline=?, headline_shortcut=? WHERE id=? ", [ $tag->{id}, $tag->{title}, $document->{id} ]);
+                $c->Do(" UPDATE documents SET headline=?, headline_shortcut=? WHERE id=? ", [ $tag->{id}, $tag->{title}, $document->{id} ]);
             } else {
-                $c->sql->Do(" UPDATE documents SET headline=null, headline_shortcut=null WHERE id=? ", [ $document->{id} ]);
+                $c->Do(" UPDATE documents SET headline=null, headline_shortcut=null WHERE id=? ", [ $document->{id} ]);
             }
 
             if ($headline->{id} && $rubric->{id}) {
                 my $tag = Inprint::Models::Tag::getById($c, $rubric->{tag});
-                $c->sql->Do(" UPDATE documents SET rubric=?, rubric_shortcut=? WHERE id=? ", [ $tag->{id}, $tag->{title}, $document->{id} ]);
+                $c->Do(" UPDATE documents SET rubric=?, rubric_shortcut=? WHERE id=? ", [ $tag->{id}, $tag->{title}, $document->{id} ]);
             } else {
-                $c->sql->Do(" UPDATE documents SET rubric=null, rubric_shortcut=null WHERE id=? ", [ $document->{id} ]);
+                $c->Do(" UPDATE documents SET rubric=null, rubric_shortcut=null WHERE id=? ", [ $document->{id} ]);
             }
 
         }
@@ -561,13 +561,13 @@ sub capture {
     my @errors;
     my $success = $c->json->false;
 
-    my $current_user      = $c->QuerySessionGet("member.id");
-    my $default_edition   = $c->QuerySessionGet("options.default.edition");
-    my $default_workgroup = $c->QuerySessionGet("options.default.workgroup");
+    my $current_user      = $c->getSessionValue("member.id");
+    my $default_edition   = $c->getSessionValue("options.default.edition");
+    my $default_workgroup = $c->getSessionValue("options.default.workgroup");
 
-    my $member    = $c->sql->Q(" SELECT id, shortcut FROM profiles WHERE id=? ", [ $current_user ])->Hash;
-    my $edition   = $c->sql->Q(" SELECT id, shortcut FROM editions WHERE id=? ", [ $default_edition ])->Hash;
-    my $workgroup = $c->sql->Q(" SELECT id, shortcut FROM catalog WHERE id=? ", [ $default_workgroup ])->Hash;
+    my $member    = $c->Q(" SELECT id, shortcut FROM profiles WHERE id=? ", [ $current_user ])->Hash;
+    my $edition   = $c->Q(" SELECT id, shortcut FROM editions WHERE id=? ", [ $default_edition ])->Hash;
+    my $workgroup = $c->Q(" SELECT id, shortcut FROM catalog WHERE id=? ", [ $default_workgroup ])->Hash;
 
     push @errors, { id => "member", msg => "Can't find object"}
         unless ( $member->{id} || $member->{shortcut} );
@@ -583,17 +583,17 @@ sub capture {
 
             $success = $c->json->true;
 
-            my $document = $c->sql->Q(" SELECT * FROM documents WHERE id=? ", [ $id ])->Hash;
+            my $document = $c->Q(" SELECT * FROM documents WHERE id=? ", [ $id ])->Hash;
 
             next unless ($document->{id});
 
             $c->sql->bt;
 
-            my $workgroups = $c->sql->Q("
+            my $workgroups = $c->Q("
                 SELECT ARRAY( select id from catalog where path @> ( select path from catalog where id = ? ) )
             ", [ $workgroup->{id} ])->Array;
 
-            $c->sql->Do("
+            $c->Do("
                 UPDATE documents SET
                     holder=?, holder_shortcut=?,
                     workgroup=?, workgroup_shortcut=?, inworkgroups=?,
@@ -605,7 +605,7 @@ sub capture {
                 $document->{id}
             ]);
 
-            $c->sql->Do("
+            $c->Do("
                 INSERT INTO history(
                     entity, operation,
                     color, weight,
@@ -652,13 +652,13 @@ sub transfer {
         unless ($c->is_uuid($transfer));
 
     # Check sender
-    my $current_member = $c->QuerySessionGet("member.id");
-    my $sender = $c->sql->Q(" SELECT * FROM profiles WHERE id = ? ", [ $current_member ])->Hash;
+    my $current_member = $c->getSessionValue("member.id");
+    my $sender = $c->Q(" SELECT * FROM profiles WHERE id = ? ", [ $current_member ])->Hash;
     push @errors, { id => "sender", msg => "Can't find object"}
         unless ($c->is_uuid($sender->{id}));
 
     # Check assigment
-    my $assignment = $c->sql->Q("
+    my $assignment = $c->Q("
         SELECT
             id,
             catalog, catalog_shortcut,
@@ -680,11 +680,11 @@ sub transfer {
 
             # TODO: Add access check
 
-            my $document = $c->sql->Q(" SELECT * FROM documents WHERE id=? ", [ $id ])->Hash;
+            my $document = $c->Q(" SELECT * FROM documents WHERE id=? ", [ $id ])->Hash;
 
             next unless ($document->{id});
 
-            my $workgroups = $c->sql->Q("
+            my $workgroups = $c->Q("
                 SELECT ARRAY( select id from catalog where path @> ( select path from catalog where id = ? ) )
             ", [ $assignment->{catalog} ])->Array;
 
@@ -695,7 +695,7 @@ sub transfer {
                 $assignment->{catalog_shortcut} = $assignment->{principal_shortcut};
             }
 
-            $c->sql->Do("
+            $c->Do("
                 UPDATE documents SET
                     holder=?, holder_shortcut=?,
                     workgroup=?, workgroup_shortcut=?, inworkgroups=?,
@@ -711,7 +711,7 @@ sub transfer {
                 $id
             ]);
 
-            $c->sql->Do("
+            $c->Do("
                 INSERT INTO history(
                     entity, operation,
                     color, weight,
@@ -750,7 +750,7 @@ sub briefcase {
     my @errors;
     my $success = $c->json->false;
 
-    my $fascicle = $c->sql->Q(" SELECT id, shortcut FROM fascicles WHERE id='00000000-0000-0000-0000-000000000000' ")->Hash;
+    my $fascicle = $c->Q(" SELECT id, shortcut FROM fascicles WHERE id='00000000-0000-0000-0000-000000000000' ")->Hash;
     push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
         unless ($fascicle->{id});
 
@@ -758,12 +758,12 @@ sub briefcase {
         foreach my $id (@ids) {
             $c->sql->bt;
 
-            my $document = $c->sql->Q(" SELECT * FROM documents WHERE id=? ", [ $id ])->Hash;
+            my $document = $c->Q(" SELECT * FROM documents WHERE id=? ", [ $id ])->Hash;
 
             next unless ($document->{id});
 
-            $c->sql->Do(" DELETE FROM fascicles_map_documents WHERE fascicle=? AND entity=? ", [ $document->{fascicle}, $document->{id} ]);
-            $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $document->{id} ]);
+            $c->Do(" DELETE FROM fascicles_map_documents WHERE fascicle=? AND entity=? ", [ $document->{fascicle}, $document->{id} ]);
+            $c->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $document->{id} ]);
 
             $c->reindex($document->{id}, $document->{edition}, $fascicle->{id}, $document->{headline}, $document->{rubric});
 
@@ -798,7 +798,7 @@ sub move {
     my $i_edition = $fascicle->{edition};
 
     if ($i_fascicle && $i_fascicle ne  "00000000-0000-0000-0000-000000000000") {
-        $i_edition = $c->sql->Q(" SELECT edition FROM fascicles WHERE id = ?", [ $fascicle->{id} ])->Value;
+        $i_edition = $c->Q(" SELECT edition FROM fascicles WHERE id = ?", [ $fascicle->{id} ])->Value;
         push @errors, { id => "edition", msg => "Incorrectly filled field"}
             unless ($c->is_uuid($i_edition));
     }
@@ -811,18 +811,18 @@ sub move {
 
         foreach my $id (@ids) {
 
-            my $document = $c->sql->Q(" SELECT * FROM documents WHERE id=? ", [ $id ])->Hash;
+            my $document = $c->Q(" SELECT * FROM documents WHERE id=? ", [ $id ])->Hash;
 
             next unless ($document->{id});
 
             # Remove document from old fascicle composition
             if ($document->{fascicle} ne $fascicle->{id}) {
-                $c->sql->Do(" DELETE FROM fascicles_map_documents WHERE fascicle=? AND entity=? ", [ $document->{fascicle}, $document->{id} ]);
+                $c->Do(" DELETE FROM fascicles_map_documents WHERE fascicle=? AND entity=? ", [ $document->{fascicle}, $document->{id} ]);
             }
 
             # Change fascicle to new
-            $c->sql->Do(" UPDATE documents SET edition=?,  edition_shortcut=?  WHERE id=? ", [ $edition->{id}, $edition->{shortcut}, $document->{id} ]);
-            $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $document->{id} ]);
+            $c->Do(" UPDATE documents SET edition=?,  edition_shortcut=?  WHERE id=? ", [ $edition->{id}, $edition->{shortcut}, $document->{id} ]);
+            $c->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $document->{id} ]);
 
             # Update indexation
             if ($i_change eq "yes") {
@@ -863,8 +863,8 @@ sub copy {
 
         foreach my $document_id (@ids) {
 
-            my $document = $c->sql->Q("SELECT * FROM documents WHERE id=?", [ $document_id ])->Hash;
-            my $exist = $c->sql->Q("SELECT true FROM documents WHERE copygroup=? AND fascicle=?", [ $document->{id}, $fascicle->{id} ])->Value;
+            my $document = $c->Q("SELECT * FROM documents WHERE id=?", [ $document_id ])->Hash;
+            my $exist = $c->Q("SELECT true FROM documents WHERE copygroup=? AND fascicle=?", [ $document->{id}, $fascicle->{id} ])->Value;
 
             if ( $document->{id} ) {
 
@@ -874,7 +874,7 @@ sub copy {
 
                     $c->sql->bt();
 
-                    $c->sql->Do("
+                    $c->Do("
                         INSERT INTO documents(
                             id,
                             creator, creator_shortcut,
@@ -927,13 +927,13 @@ sub copy {
                     ]);
 
                     # Change Edition
-                    my $editions = $c->sql->Q("
+                    my $editions = $c->Q("
                         SELECT ARRAY( select id from editions where path @> ( select path from editions where id = ? ) )
                     ", [ $edition->{id} ])->Array;
-                    $c->sql->Do(" UPDATE documents SET edition=?, edition_shortcut=?, ineditions=? WHERE id=? ", [ $edition->{id}, $edition->{shortcut}, $editions, $new_id ]);
+                    $c->Do(" UPDATE documents SET edition=?, edition_shortcut=?, ineditions=? WHERE id=? ", [ $edition->{id}, $edition->{shortcut}, $editions, $new_id ]);
 
                     # Change Fascicle
-                    $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $new_id ]);
+                    $c->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $new_id ]);
 
                     # Change Index
                     #if ($headline->{id}) {
@@ -977,7 +977,7 @@ sub duplicate {
 
         foreach my $document_id (@ids) {
 
-            my $document = $c->sql->Q("SELECT * FROM documents WHERE id=?", [ $document_id ])->Hash;
+            my $document = $c->Q("SELECT * FROM documents WHERE id=?", [ $document_id ])->Hash;
 
             if ( $document->{id} ) {
 
@@ -991,7 +991,7 @@ sub duplicate {
 
                 $c->sql->bt;
 
-                $c->sql->Do("
+                $c->Do("
                     INSERT INTO documents(
                         id,
                         creator, creator_shortcut,
@@ -1044,13 +1044,13 @@ sub duplicate {
                 ]);
 
                 # Change Edition
-                my $editions = $c->sql->Q("
+                my $editions = $c->Q("
                     SELECT ARRAY( select id from editions where path @> ( select path from editions where id = ? ) )
                 ", [ $edition->{id} ])->Array;
-                $c->sql->Do(" UPDATE documents SET edition=?, edition_shortcut=?, ineditions=? WHERE id=? ", [ $edition->{id}, $edition->{shortcut}, $editions, $new_id ]);
+                $c->Do(" UPDATE documents SET edition=?, edition_shortcut=?, ineditions=? WHERE id=? ", [ $edition->{id}, $edition->{shortcut}, $editions, $new_id ]);
 
                 # Change Fascicle
-                $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $new_id ]);
+                $c->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $new_id ]);
 
                 # Indexation
                 #if ($headline->{id}) {
@@ -1094,7 +1094,7 @@ sub say {
     Inprint::Check::text($c, \@errors, "text", $i_text);
 
     my $document  = Inprint::Check::document($c, \@errors, $i_id);
-    my $principal = Inprint::Check::principal($c, \@errors, $c->QuerySessionGet("member.id"));
+    my $principal = Inprint::Check::principal($c, \@errors, $c->getSessionValue("member.id"));
 
     unless (@errors) {
         Inprint::Models::Documents::say($c,
@@ -1127,10 +1127,10 @@ sub recycle {
                     if ($c->access->Check("catalog.documents.delete:*", $document->{workgroup})) {
 
                         # Remove document from old fascicle composition
-                        $c->sql->Do(" DELETE FROM fascicles_map_documents WHERE fascicle=? AND entity=? ", [ $document->{fascicle}, $document->{id} ]);
+                        $c->Do(" DELETE FROM fascicles_map_documents WHERE fascicle=? AND entity=? ", [ $document->{fascicle}, $document->{id} ]);
 
                         # Change document fascicle to sytem's Recycle fascicle
-                        $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $document->{id} ]);
+                        $c->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $document->{id} ]);
 
                         # Update fascicle indexation
                         $c->reindex($document->{id}, $document->{edition}, $fascicle->{id}, $document->{headline}, $document->{rubric});
@@ -1159,7 +1159,7 @@ sub restore {
                 my $document = Inprint::Utils::GetDocumentById($c, id => $id);
                 if ($document->{workgroup}) {
                     if ($c->access->Check("catalog.documents.delete:*", $document->{workgroup})) {
-                        $c->sql->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $document->{id} ]);
+                        $c->Do(" UPDATE documents SET fascicle=?, fascicle_shortcut=? WHERE id=? ", [ $fascicle->{id}, $fascicle->{shortcut}, $document->{id} ]);
                         $c->reindex($document->{id}, $document->{edition}, $fascicle->{id}, $document->{headline}, $document->{rubric});
                     }
                 }
@@ -1193,7 +1193,7 @@ sub reindex {
     my $new_headline;
     if ($headline) {
 
-        my $old_headline = $c->sql->Q("
+        my $old_headline = $c->Q("
             SELECT t1.id, t1.edition, t1.fascicle,
                 t2.id as tag, t2.title, t2.description
             FROM fascicles_indx_headlines t1, indx_tags t2
@@ -1202,7 +1202,7 @@ sub reindex {
 
         if ($old_headline->{id}) {
 
-            $new_headline = $c->sql->Q("
+            $new_headline = $c->Q("
                 SELECT * FROM fascicles_indx_headlines WHERE fascicle=? AND tag=?",
                 [ $fascicle, $old_headline->{tag} ])->Hash;
 
@@ -1210,7 +1210,7 @@ sub reindex {
                 Inprint::Models::Fascicle::Headline::create($c,
                     $c->uuid, $edition, $fascicle, undef,
                     $old_headline->{title}, $old_headline->{description});
-                $new_headline = $c->sql->Q("
+                $new_headline = $c->Q("
                     SELECT * FROM fascicles_indx_headlines WHERE fascicle=? AND tag=?",
                     [ $fascicle, $old_headline->{tag} ])->Hash;
             }
@@ -1221,7 +1221,7 @@ sub reindex {
     my $new_rubric;
     if ($new_headline->{id} && $rubric) {
 
-        my $old_rubric = $c->sql->Q("
+        my $old_rubric = $c->Q("
             SELECT t1.id, t1.edition, t1.fascicle,
                 t2.id as tag, t2.title, t2.description
             FROM fascicles_indx_rubrics t1, indx_tags t2
@@ -1230,7 +1230,7 @@ sub reindex {
 
         if ($old_rubric->{id}) {
 
-            $new_rubric = $c->sql->Q("
+            $new_rubric = $c->Q("
                 SELECT * FROM fascicles_indx_rubrics
                 WHERE fascicle=? AND headline=? AND tag=?",
                 [ $fascicle, $new_headline->{id}, $old_rubric->{tag} ])->Hash;
@@ -1239,7 +1239,7 @@ sub reindex {
                 Inprint::Models::Fascicle::Rubric::create($c,
                     $c->uuid, $edition, $fascicle, $new_headline->{id}, undef,
                     $old_rubric->{title}, $old_rubric->{description});
-                $new_rubric = $c->sql->Q("
+                $new_rubric = $c->Q("
                     SELECT * FROM fascicles_indx_rubrics
                     WHERE fascicle=? AND headline=? AND tag=?",
                     [ $fascicle, $new_headline->{id}, $old_rubric->{tag} ])->Hash;
@@ -1251,12 +1251,12 @@ sub reindex {
 
     if ($new_headline->{id}) {
         my $tag = Inprint::Models::Tag::getById($c, $new_headline->{tag});
-        $c->sql->Do(" UPDATE documents SET headline=?, headline_shortcut=? WHERE id=? ", [ $tag->{id}, $tag->{title}, $document ]);
+        $c->Do(" UPDATE documents SET headline=?, headline_shortcut=? WHERE id=? ", [ $tag->{id}, $tag->{title}, $document ]);
     }
 
     if ($new_rubric->{id}) {
         my $tag = Inprint::Models::Tag::getById($c, $new_rubric->{tag});
-        $c->sql->Do(" UPDATE documents SET rubric=?, rubric_shortcut=? WHERE id=? ", [ $tag->{id}, $tag->{title}, $document ]);
+        $c->Do(" UPDATE documents SET rubric=?, rubric_shortcut=? WHERE id=? ", [ $tag->{id}, $tag->{title}, $document ]);
     }
 
 

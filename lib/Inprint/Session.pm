@@ -37,7 +37,9 @@ sub login
 
         # пытаемся найти сотрудника с таким логином
         unless($json->{success} eq 'false'){
-           my $exist = $c->sql->Q(" SELECT count(*) FROM members WHERE login=?", [ $i_login ])->Value;
+
+           my $exist = $c->Q(" SELECT count(*) FROM members WHERE login=?", [ $i_login ])->Value;
+
            if ( $exist != 1 ){
               $json->{success} = 'false';
               push @{ $json->{errors} }, { msg => $c->l("The empoyee not found") }
@@ -47,7 +49,7 @@ sub login
         # пытаемся провести утентификацию
         unless($json->{success} eq 'false') {
 
-            my $member = $c->sql->Q(
+            my $member = $c->Q(
                 "   SELECT t1.id, t1.login
                     FROM members t1
                         LEFT JOIN profiles t2 ON t1.id = t2.id
@@ -63,11 +65,11 @@ sub login
 
                 # Мультилогин выключен, удаляем все предыдущие сессии для юзера
                 unless ( $c->config->{'core.multilogin'}) {
-                    $c->sql->Do("DELETE FROM sessions WHERE member =? ", [ $member->{id} ]);
+                    $c->Do("DELETE FROM sessions WHERE member =? ", [ $member->{id} ]);
                 }
 
                 # Insert session
-                $c->sql->Do("
+                $c->Do("
                     INSERT INTO sessions(id, member, ipaddress)
                         VALUES (?,?,'');
                 ",
@@ -77,13 +79,13 @@ sub login
                 $c->session( sid => $sid );
                 $c->session( member => $member->{id} );
 
-                $c->events->Create("system", undef, "login", "The user with login %1 was logged into the program", [ $i_login ]);
+                $c->event("system", undef, "login", "The user with login %1 was logged into the program", [ $i_login ]);
 
                 $json->{success}   = 'true';
 
             } else {
 
-                $c->events->Create("system", undef, "login", "The user with login %1 has entered the wrong password", [ $i_login ]);
+                $c->event("system", undef, "login", "The user with login %1 has entered the wrong password", [ $i_login ]);
 
                 $json->{success} = 'false';
                 push @{ $json->{errors} }, { msg => $c->l("Wrong password") }
@@ -97,12 +99,10 @@ sub login
 
 sub logout {
     my $c = shift;
-
-    $c->events->Create("system", undef, "logout", "The user has quitted the program", []);
-    $c->sql->Do("DELETE FROM sessions WHERE id=?", [ $c->session("sid") ] );
+    $c->event("system", undef, "logout", "The user has quitted the program", []);
+    $c->Do("DELETE FROM sessions WHERE id=?", [ $c->session("sid") ] );
     $c->redirect_to("/login");
     $c->rendered;
-
 }
 
 1;

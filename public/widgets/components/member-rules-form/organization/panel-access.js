@@ -70,6 +70,24 @@ Inprint.cmp.memberRulesForm.Organization.Restrictions = Ext.extend(Ext.grid.Edit
             }
         ];
 
+        this.tbar = [
+            {
+                icon: _ico("disk-black"),
+                cls: "x-btn-text-icon",
+                text: _("Save"),
+                ref: "../btnSave",
+                scope:this
+            },
+            '->',
+            {
+                icon: _ico("broom"),
+                cls: "x-btn-text-icon",
+                text: _("Clear rights"),
+                ref: "../btnClear",
+                scope:this
+            }
+        ];
+
         Ext.apply(this, {
             disabled:true,
             stripeRows: true,

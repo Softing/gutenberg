@@ -29,7 +29,7 @@ sub read {
 
     my ($c, $id) = @_;
 
-    my $document = $c->sql->Q("
+    my $document = $c->Q("
         SELECT
             dcm.id,
             dcm.edition, dcm.edition_shortcut,
@@ -61,7 +61,7 @@ sub read {
     ", [ $id ])->Hash;
 
     $document->{access} = {};
-    my $current_member = $c->QuerySessionGet("member.id");
+    my $current_member = $c->getSessionValue("member.id");
 
     my @rules = qw(
         documents.update documents.capture documents.move documents.transfer
@@ -125,7 +125,7 @@ sub search {
     my $holder   = $c->param("flt_holder")   || $params->{"flt_holder"}     || undef;
     my $progress = $c->param("flt_progress") || $params->{"flt_progress"}   || undef;
 
-    my $current_member = $c->QuerySessionGet("member.id");
+    my $current_member = $c->getSessionValue("member.id");
 
     # Create Query headers
     my $sql_query = "
@@ -192,7 +192,7 @@ sub search {
         # get documents fpor departments
         my @holders;
         $sql_filters .= " AND dcm.holder = ANY(?) ";
-        my $departments = $c->sql->Q(" SELECT catalog FROM map_member_to_catalog WHERE member=? ", [ $current_member ])->Values;
+        my $departments = $c->Q(" SELECT catalog FROM map_member_to_catalog WHERE member=? ", [ $current_member ])->Values;
         foreach (@$departments) {
             push @holders, $_;
         }
@@ -276,7 +276,7 @@ sub search {
     $sql_query .= $sql_filters;
 
     # Calculate total param
-    my $total = $c->sql->Q($sql_total, \@params)->Value || 0;
+    my $total = $c->Q($sql_total, \@params)->Value || 0;
 
     # Setup soting
     if ($dir && $sort) {
@@ -317,7 +317,7 @@ sub search {
         push @params, $start;
     }
 
-    my $result = $c->sql->Q($sql_query, \@params)->Hashes;
+    my $result = $c->Q($sql_query, \@params)->Hashes;
 
     foreach my $document (@$result) {
 
@@ -334,23 +334,23 @@ sub search {
 
         ## Fix filepath
         my $relativePath = Inprint::Store::Embedded::getRelativePath($c, "documents", $document->{created}, $document->{id}, 1);
-        $c->sql->Do("UPDATE documents SET filepath=? WHERE copygroup=?", [ $relativePath, $document->{copygroup} ]);
+        $c->Do("UPDATE documents SET filepath=? WHERE copygroup=?", [ $relativePath, $document->{copygroup} ]);
 
         # Update images count
         my @images = ("jpg", "jpeg", "png", "gif", "bmp", "tiff" );
-        my $imgCount = $c->sql->Q(" SELECT count(*) FROM cache_files WHERE file_path=? AND file_exists = true AND file_extension=ANY(?) ", [ $relativePath, \@images ])->Value;
-        $c->sql->Do("UPDATE documents SET images=? WHERE filepath=? ", [ $imgCount || 0, $relativePath ]);
+        my $imgCount = $c->Q(" SELECT count(*) FROM cache_files WHERE file_path=? AND file_exists = true AND file_extension=ANY(?) ", [ $relativePath, \@images ])->Value;
+        $c->Do("UPDATE documents SET images=? WHERE filepath=? ", [ $imgCount || 0, $relativePath ]);
 
         # Update rsize count
         my @documents = ("doc", "docx", "odt", "rtf", "txt" );
-        my $lengthCount = $c->sql->Q(" SELECT sum(file_length) FROM cache_files WHERE file_path=? AND file_exists = true AND file_extension=ANY(?) ", [ $relativePath, \@documents ])->Value;
-        $c->sql->Do("UPDATE documents SET rsize=? WHERE filepath=? ", [ $lengthCount || 0, $relativePath ]);
+        my $lengthCount = $c->Q(" SELECT sum(file_length) FROM cache_files WHERE file_path=? AND file_exists = true AND file_extension=ANY(?) ", [ $relativePath, \@documents ])->Value;
+        $c->Do("UPDATE documents SET rsize=? WHERE filepath=? ", [ $lengthCount || 0, $relativePath ]);
 
         # Get document pages
         $document->{pages} = Inprint::Utils::CollapsePagesToString($document->{pages});
 
         # get copyes count
-        my $copy_count = $c->sql->Q(" SELECT count(*) FROM documents WHERE copygroup=? ", [ $document->{copygroup} ])->Value;
+        my $copy_count = $c->Q(" SELECT count(*) FROM documents WHERE copygroup=? ", [ $document->{copygroup} ])->Value;
         if ($copy_count > 1) {
             $document->{title} = $document->{title} . " ($copy_count)";
         }
@@ -381,7 +381,7 @@ sub say {
 
     my ($c, $id, $stage, $stage_shortcut, $color, $member, $member_shortcut, $text) = @_;
 
-    $c->sql->Do("
+    $c->Do("
             INSERT INTO comments(
                 path, entity, member, member_shortcut, stage, stage_shortcut, stage_color, fulltext, created, updated)
             VALUES (null, ?, ?, ?, ?, ?, ?, ?, now(), now() ) ", [

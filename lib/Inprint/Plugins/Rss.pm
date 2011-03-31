@@ -18,7 +18,7 @@ use base 'Inprint::BaseController';
 sub feeds {
     my $c = shift;
 
-    my $feeds = $c->sql->Q("
+    my $feeds = $c->Q("
         SELECT id, url, title, description, published, created, updated
         FROM plugins_rss.rss_feeds
         ")->Hashes;
@@ -53,14 +53,14 @@ sub feed {
 
     my $siteurl = $c->config->get("public.url");
 
-    my $feed = $c->sql->Q("
+    my $feed = $c->Q("
         SELECT id, url, title, description, published, created, updated
         FROM plugins_rss.rss_feeds WHERE url=?
         ", [ $i_feed ])->Hash;
 
     $c->render(status => 404) unless $feed->{id};
 
-    my $index = $c->sql->Q("
+    my $index = $c->Q("
             SELECT tag, nature
             FROM plugins_rss.rss_feeds_mapping t1
             WHERE feed=?
@@ -125,7 +125,7 @@ sub feed {
 
     $sql .= " ORDER BY t1.priority DESC ";
 
-    my $rss_data = $c->sql->Q($sql, \@params)->Hashes;
+    my $rss_data = $c->Q($sql, \@params)->Hashes;
 
     foreach my $item (@$rss_data) {
 

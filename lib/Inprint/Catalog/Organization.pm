@@ -25,7 +25,7 @@ sub read {
     my $result = [];
 
     unless (@errors) {
-        $result = $c->sql->Q("
+        $result = $c->Q("
             SELECT t1.*,
                 subpath(path, -2,1) as parent,
                 (select shortcut from catalog where subpath(path, -1,1) = subpath(t1.path, -2,1) ) as parent_shortcut
@@ -67,7 +67,7 @@ sub tree {
         push @data, $i_node;
         push @data, $i_node;
 
-        my $data = $c->sql->Q("$sql ORDER BY shortcut", \@data)->Hashes;
+        my $data = $c->Q("$sql ORDER BY shortcut", \@data)->Hashes;
 
         foreach my $item (@$data) {
             my $record = {
@@ -111,7 +111,7 @@ sub create {
     my $parent = Inprint::Check::department($c, \@errors, $i_path);
 
     unless (@errors) {
-        $c->sql->Do("
+        $c->Do("
             INSERT INTO catalog (id, title, shortcut, description, path, type, capables)
                 VALUES (?, ?, ?, ?, replace(?, '-',  '')::ltree, ?, ?)
         ", [ $id, $i_title, $i_shortcut, $i_description, $parent->{path}, 'default', [] ]);
@@ -147,9 +147,9 @@ sub update {
 
     unless (@errors) {
         unless (@errors) {
-            $c->sql->Do(" UPDATE catalog SET title=?, shortcut=?, description=?, path=replace(?, '-',  '')::ltree WHERE id=? ",
+            $c->Do(" UPDATE catalog SET title=?, shortcut=?, description=?, path=replace(?, '-',  '')::ltree WHERE id=? ",
                 [ $i_title, $i_shortcut, $i_description, $parent->{path} . ".$i_id", $i_id ]);
-            $c->sql->Do(" UPDATE documents SET inworkgroups=?, workgroup=?, workgroup_shortcut=? WHERE workgroup=? ",
+            $c->Do(" UPDATE documents SET inworkgroups=?, workgroup=?, workgroup_shortcut=? WHERE workgroup=? ",
                 [ [$i_id], $i_id, $i_shortcut, $i_id ]);
         }
     }
@@ -174,9 +174,9 @@ sub delete {
         if ($i_id eq $null);
 
     unless (@errors) {
-        $c->sql->Do(" DELETE FROM catalog WHERE id =? ",
+        $c->Do(" DELETE FROM catalog WHERE id =? ",
             [ $i_id ]);
-        $c->sql->Do(" UPDATE documents SET inworkgroups=?, workgroup=?, workgroup_shortcut=? WHERE workgroup=? ",
+        $c->Do(" UPDATE documents SET inworkgroups=?, workgroup=?, workgroup_shortcut=? WHERE workgroup=? ",
             [ [$null], $null, $c->l("Editorial house"), $i_id ]);
     }
 
@@ -202,8 +202,8 @@ sub map {
 
     unless (@errors) {
         foreach my $member (@i_members) {
-            $c->sql->Do(" DELETE FROM map_member_to_catalog WHERE member=? AND catalog=? ", [ $member, $i_group ]);
-            $c->sql->Do(" INSERT INTO map_member_to_catalog( member, catalog) VALUES (?, ?) ", [ $member, $i_group ]);
+            $c->Do(" DELETE FROM map_member_to_catalog WHERE member=? AND catalog=? ", [ $member, $i_group ]);
+            $c->Do(" INSERT INTO map_member_to_catalog( member, catalog) VALUES (?, ?) ", [ $member, $i_group ]);
         }
     }
 
@@ -229,7 +229,7 @@ sub unmap {
 
     unless (@errors) {
         foreach my $member (@i_members) {
-            $c->sql->Do(" DELETE FROM map_member_to_catalog WHERE member=? AND catalog=? ", [ $member, $i_group ]);
+            $c->Do(" DELETE FROM map_member_to_catalog WHERE member=? AND catalog=? ", [ $member, $i_group ]);
         }
     }
 

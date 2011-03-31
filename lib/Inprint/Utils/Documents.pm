@@ -10,19 +10,19 @@ sub MoveDocumentIndexToFascicle {
     my $errors = shift;
     my $i_document = shift;
 
-    my $document = $c->sql->Q(" SELECT * FROM documents WHERE id=? ", [ $i_document ])->Hash;
+    my $document = $c->Q(" SELECT * FROM documents WHERE id=? ", [ $i_document ])->Hash;
     unless ($document->{id}) {
         push @$errors, { id => "document", msg => "Can't find object"};
         return;
     }
 
-    my $edition = $c->sql->Q(" SELECT * FROM editions  WHERE id=? ", [ $document->{edition} ])->Hash;
+    my $edition = $c->Q(" SELECT * FROM editions  WHERE id=? ", [ $document->{edition} ])->Hash;
     unless ($edition->{id}) {
         push @$errors, { id => "edition", msg => "Can't find object"};
         return;
     }
 
-    my $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $document->{fascicle} ])->Hash;
+    my $fascicle = $c->Q(" SELECT * FROM fascicles WHERE id=? ", [ $document->{fascicle} ])->Hash;
     unless ($fascicle->{id}) {
         push @$errors, { id => "fascicle", msg => "Can't find object"};
         return;
@@ -44,21 +44,21 @@ sub MoveDocumentIndexToFascicle {
 
     # Regular fascicle
 
-    my $editions = $c->sql->Q(" SELECT id FROM editions WHERE path @> ? order by path asc ", [ $edition->{path} ])->Values;
+    my $editions = $c->Q(" SELECT id FROM editions WHERE path @> ? order by path asc ", [ $edition->{path} ])->Values;
 
     # Check, if headline exist in this fascicle
 
-    my $headline = $c->sql->Q("
+    my $headline = $c->Q("
         SELECT * FROM fascicles_indx_headlines WHERE fascicle=? AND lower(shortcut)=lower(?) ",
         [ $fascicle->{id}, $document->{headline_shortcut} ])->Hash;
 
-    my $rubric = $c->sql->Q("
+    my $rubric = $c->Q("
         SELECT * FROM fascicles_indx_rubrics WHERE fascicle=? AND headline=? AND lower(shortcut)=lower(?) ",
         [ $fascicle->{id}, $headline->{id}, $document->{rubric_shortcut} ])->Hash;
 
     unless ($headline->{id} || $headline->{shortcut}) {
 
-        my $source_headline = $c->sql->Q("
+        my $source_headline = $c->Q("
                 SELECT title, shortcut, description FROM fascicles_indx_headlines
                 WHERE edition=ANY(?) AND lower(shortcut)=lower(?) LIMIT 1",
             [ $editions, $document->{headline_shortcut} ])->Hash;
@@ -71,12 +71,12 @@ sub MoveDocumentIndexToFascicle {
     }
 
     if ($headline->{id} && $headline->{shortcut}) {
-        $c->sql->Do(" UPDATE documents SET headline=?, headline_shortcut=? WHERE id=?", [ $headline->{id}, $headline->{shortcut}, $document->{id} ]);
+        $c->Do(" UPDATE documents SET headline=?, headline_shortcut=? WHERE id=?", [ $headline->{id}, $headline->{shortcut}, $document->{id} ]);
     }
 
     unless($rubric->{id} || $rubric->{shortcut}) {
 
-        my $source_rubric = $c->sql->Q("
+        my $source_rubric = $c->Q("
                 SELECT title, shortcut, description FROM fascicles_indx_rubrics
                 WHERE edition=ANY(?) AND lower(shortcut)=lower(?) LIMIT 1",
             [ $editions, $document->{rubric_shortcut} ])->Hash;
@@ -91,7 +91,7 @@ sub MoveDocumentIndexToFascicle {
 
 
     if ($rubric->{id} && $rubric->{shortcut}) {
-        $c->sql->Do(" UPDATE documents SET rubric=?, rubric_shortcut=? WHERE id=?", [ $rubric->{id}, $rubric->{shortcut}, $document->{id} ]);
+        $c->Do(" UPDATE documents SET rubric=?, rubric_shortcut=? WHERE id=?", [ $rubric->{id}, $rubric->{shortcut}, $document->{id} ]);
     }
 
     #die 3;

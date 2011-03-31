@@ -1,12 +1,15 @@
 Inprint.cmp.memberRulesForm.Domain = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
-        this.grid = new Inprint.cmp.memberRulesForm.Domain.Restrictions();
+
+        this.panels = {};
+        this.panels.grid = new Inprint.cmp.memberRulesForm.Domain.Restrictions();
+
         Ext.apply(this, {
             border:false,
             layout: "fit",
             title: _("Domain"),
-            items: this.grid
+            items: this.panels.grid
         });
         Inprint.cmp.memberRulesForm.Domain.superclass.initComponent.apply(this, arguments);
     },
@@ -16,7 +19,7 @@ Inprint.cmp.memberRulesForm.Domain = Ext.extend(Ext.Panel, {
     },
 
     cmpGetGrid: function() {
-        return this.grid;
+        return this.panels.grid;
     },
 
     cmpReload: function() {

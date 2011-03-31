@@ -45,7 +45,7 @@ sub fascicles {
     my $result;
 
     if ( $i_gridmode ne "briefcase" ){
-        $result = $c->sql->Q($sql, \@data)->Hashes;
+        $result = $c->Q($sql, \@data)->Hashes;
     }
 
     if ( $i_gridmode ne "archive" ){
@@ -89,7 +89,7 @@ sub headlines {
     ";
 
     if ($cgi_edition && $cgi_edition ne "all") {
-        my $editions = $c->sql->Q(" SELECT id FROM editions WHERE path <@ ( SELECT path FROM editions WHERE id=?)", [ $cgi_edition ])->Values;
+        my $editions = $c->Q(" SELECT id FROM editions WHERE path <@ ( SELECT path FROM editions WHERE id=?)", [ $cgi_edition ])->Values;
         $sql .= " AND dcm.edition = ANY(?) ";
         push @params, $editions;
     }
@@ -105,7 +105,7 @@ sub headlines {
 
     $sql .= " ORDER BY dcm.headline_shortcut ";
 
-    my $result = $c->sql->Q($sql, \@params)->Hashes;
+    my $result = $c->Q($sql, \@params)->Hashes;
 
     unshift @$result, {
         id => "all",
@@ -134,7 +134,7 @@ sub rubrics {
     ";
 
     if ($cgi_edition &&  $cgi_edition ne "all") {
-        my $editions = $c->sql->Q(" SELECT id FROM editions WHERE path <@ ( SELECT path FROM editions WHERE id=?)", [ $cgi_edition ])->Values;
+        my $editions = $c->Q(" SELECT id FROM editions WHERE path <@ ( SELECT path FROM editions WHERE id=?)", [ $cgi_edition ])->Values;
         $sql .= " AND dcm.edition = ANY(?) ";
         push @params, $editions;
     }
@@ -155,7 +155,7 @@ sub rubrics {
 
     $sql .= " ORDER BY dcm.rubric_shortcut ";
 
-    my $result = $c->sql->Q($sql, \@params)->Hashes;
+    my $result = $c->Q($sql, \@params)->Hashes;
 
     unshift @$result, {
         id => "all",
@@ -190,7 +190,7 @@ sub managers {
 
     $sql .= " ORDER BY icon, t2.shortcut; ";
 
-    my $result = $c->sql->Q($sql, \@params)->Hashes;
+    my $result = $c->Q($sql, \@params)->Hashes;
 
     unshift @$result, {
         id => "all",
@@ -225,7 +225,7 @@ sub holders {
 
     $sql .= " ORDER BY icon, t2.shortcut; ";
 
-    my $result = $c->sql->Q($sql, \@params)->Hashes;
+    my $result = $c->Q($sql, \@params)->Hashes;
 
     unshift @$result, {
         id => "all",
@@ -253,7 +253,7 @@ sub progress {
 
     $sql .= " ORDER BY progress, title ";
 
-    my $result = $c->sql->Q($sql, \@params)->Hashes;
+    my $result = $c->Q($sql, \@params)->Hashes;
 
     unshift @$result, {
         id => "all",
@@ -283,7 +283,7 @@ sub createSqlFilter {
 
     # Modes
 
-    my $current_member = $c->QuerySessionGet("member.id");
+    my $current_member = $c->getSessionValue("member.id");
 
     # Set view restrictions
     my $editions = $c->access->GetBindings("editions.documents.work");
@@ -307,7 +307,7 @@ sub createSqlFilter {
         # get documents fpor departments
         my @holders;
         $sql_filters .= " AND dcm.holder = ANY(?) ";
-        my $departments = $c->sql->Q(" SELECT catalog FROM map_member_to_catalog WHERE member=? ", [ $current_member ])->Values;
+        my $departments = $c->Q(" SELECT catalog FROM map_member_to_catalog WHERE member=? ", [ $current_member ])->Values;
         foreach (@$departments) {
             push @holders, $_;
         }

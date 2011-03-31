@@ -68,7 +68,7 @@ sub list {
         $sql_query .= " AND rss.id is not null AND rss.published=true";
         $sql_total .= " AND rss.id is not null AND rss.published=true";
 
-        my $index = $c->sql->Q("
+        my $index = $c->Q("
             SELECT tag, nature FROM plugins_rss.rss_feeds_mapping t1 WHERE feed=?
         ", $i_filter)->Hashes;
 
@@ -103,7 +103,7 @@ sub list {
     }
 
     # Get total
-    my $total  = $c->sql->Q($sql_total, \@params)->Value;
+    my $total  = $c->Q($sql_total, \@params)->Value;
 
     # Sorting
     if ($dir && $sort) {
@@ -122,7 +122,7 @@ sub list {
         push @params, $start;
     }
 
-    my $result = $c->sql->Q($sql_query, \@params)->Hashes;
+    my $result = $c->Q($sql_query, \@params)->Hashes;
 
 
     foreach my $item (@$result) {
@@ -156,7 +156,7 @@ sub read {
 
     unless (@errors) {
 
-        $result = $c->sql->Q("
+        $result = $c->Q("
                 SELECT id, entity, sitelink, title, description, fulltext,
                     published, created, updated
                 FROM plugins_rss.rss
@@ -198,7 +198,7 @@ sub update {
         my $enabled; $i_published eq "on" ? $enabled = 1 : $enabled = 0;
 
         # Get record
-        my $record = $c->sql->Q("
+        my $record = $c->Q("
                 SELECT id, entity, sitelink, title, description, fulltext,
                     published, created, updated
                 FROM plugins_rss.rss
@@ -207,7 +207,7 @@ sub update {
 
         # Update record
         if ($record->{id}) {
-            $c->sql->Do("
+            $c->Do("
                 UPDATE plugins_rss.rss
                     SET sitelink=?, title=?, description=?, fulltext=?,  published=?,
                         updated=now()
@@ -217,7 +217,7 @@ sub update {
 
         # Create record
         unless ($record->{id}) {
-            $c->sql->Do("
+            $c->Do("
                 INSERT
                     INTO plugins_rss.rss (id, entity, sitelink, title, description, fulltext,
                         published, created,  updated)
@@ -236,7 +236,7 @@ sub filter {
     my @errors;
 
     unless (@errors) {
-        $data = $c->sql->Q(" SELECT id, title FROM plugins_rss.rss_feeds ORDER BY title ")->Hashes;
+        $data = $c->Q(" SELECT id, title FROM plugins_rss.rss_feeds ORDER BY title ")->Hashes;
     }
 
     unshift @$data, {
@@ -268,7 +268,7 @@ sub save {
         my ($id, $sortorder) = split "::", $item;
 
         unless (@errors) {
-            $c->sql->Do(" UPDATE plugins_rss.rss SET priority=? WHERE entity=? ", [ $sortorder, $id ]);
+            $c->Do(" UPDATE plugins_rss.rss SET priority=? WHERE entity=? ", [ $sortorder, $id ]);
         }
     }
 
@@ -288,11 +288,11 @@ sub publish {
 
         next unless ($document->{workgroup} && $c->access->Check("catalog.documents.rss:*", $document->{workgroup}));
 
-        my $rss = $c->sql->Q(" SELECT * FROM plugins_rss.rss WHERE entity=? ", [ $id ])->Hash;
+        my $rss = $c->Q(" SELECT * FROM plugins_rss.rss WHERE entity=? ", [ $id ])->Hash;
 
         next unless $rss;
 
-        $c->sql->Do(" UPDATE plugins_rss.rss SET published=true WHERE entity=? ", [ $id ]);
+        $c->Do(" UPDATE plugins_rss.rss SET published=true WHERE entity=? ", [ $id ]);
     }
 
     $c->smart_render(\@errors);
@@ -312,11 +312,11 @@ sub unpublish {
 
         next unless ($document->{workgroup} && $c->access->Check("catalog.documents.rss:*", $document->{workgroup}));
 
-        my $rss = $c->sql->Q(" SELECT * FROM plugins_rss.rss WHERE entity=? ", [ $id ])->Hash;
+        my $rss = $c->Q(" SELECT * FROM plugins_rss.rss WHERE entity=? ", [ $id ])->Hash;
 
         next unless $rss;
 
-        $c->sql->Do(" UPDATE plugins_rss.rss SET published=false WHERE entity=? ", [ $id ]);
+        $c->Do(" UPDATE plugins_rss.rss SET published=false WHERE entity=? ", [ $id ]);
     }
 
     $c->smart_render(\@errors);

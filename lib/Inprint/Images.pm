@@ -29,17 +29,17 @@ sub fascicle_page {
     my $grid_w = $i_w || 110;
     my $grid_h = $i_h || 140;
 
-    my $page = $c->sql->Q("
+    my $page = $c->Q("
         SELECT id, edition, fascicle, origin, headline, seqnum, w, h, created, updated
         FROM fascicles_pages WHERE id=?
     ", [ $i_page ])->Hash;
 
-    $page->{allowed_places} = $c->sql->Q("
+    $page->{allowed_places} = $c->Q("
         SELECT place
         FROM fascicles_tmpl_index WHERE nature='headline' AND fascicle=? AND entity=?
     ", [ $page->{fascicle}, $page->{headline} ])->Values;
 
-    $page->{allowed_modules} = $c->sql->Q("
+    $page->{allowed_modules} = $c->Q("
         SELECT place
         FROM fascicles_tmpl_index WHERE nature='module' AND fascicle=? AND place=ANY(?)
     ", [ $page->{fascicle}, $page->{allowed_places} ])->Values;
@@ -63,7 +63,7 @@ sub fascicle_page {
 
     $c->draw_page($img, $grid, $page->{w}, $page->{h});
 
-    my $modules = $c->sql->Q("
+    my $modules = $c->Q("
         SELECT DISTINCT
                 t1.id, t1.title, t1.place, t1.w, t1.h, t2.placed, t2.x, t2.y,
                 t3.id as place, t3.title as place_title
@@ -76,7 +76,7 @@ sub fascicle_page {
 
     foreach my $module (@$modules) {
 
-        $module->{requets} = $c->sql->Q("
+        $module->{requets} = $c->Q("
             SELECT id, shortcut
             FROM fascicles_requests WHERE module=?
         ", [ $module->{id} ])->Hashes;

@@ -34,7 +34,7 @@ sub view {
 
     my $document;
     if ($i_document) {
-        $document = $c->sql->Q(" SELECT * FROM documents WHERE id=? ", $i_document)->Hash;
+        $document = $c->Q(" SELECT * FROM documents WHERE id=? ", $i_document)->Hash;
     }
 
     my @filter;
@@ -66,7 +66,7 @@ sub view {
     }
 
     my @input;
-    my $cacheRecords = $c->sql->Q($sql, \@params)->Hashes;
+    my $cacheRecords = $c->Q($sql, \@params)->Hashes;
     foreach my $cacheRecord (@$cacheRecords) {
 
         my $filename  = $cacheRecord->{file_name};
@@ -182,7 +182,7 @@ sub preview {
     my $success = $c->json->false;
 
     my $rootpath = $c->config->get("store.path");
-    my $sqlfilepath = $c->sql->Q("SELECT id, file_path, file_name, file_extension, file_thumbnail FROM cache_files WHERE id=?", [ $id ])->Hash;
+    my $sqlfilepath = $c->Q("SELECT id, file_path, file_name, file_extension, file_thumbnail FROM cache_files WHERE id=?", [ $id ])->Hash;
 
     my $folderOriginal   = $sqlfilepath->{file_path};
     my $filenameOriginal = $sqlfilepath->{file_name};
@@ -201,7 +201,7 @@ sub preview {
         my $digest = digest_file_hex($filepath, "MD5");
         if ($digest ne $sqlfilepath->{file_thumbnail} || !$sqlfilepath->{file_thumbnail} || ! -r $thumbnailsSrc) {
             _generatePreviewFile( $c, $size, $rootpath, $sqlfilepath->{file_path}, $sqlfilepath->{file_name}, $sqlfilepath->{file_extension} );
-            $c->sql->Do("UPDATE cache_files SET file_thumbnail=? WHERE id=?", [ $digest, $id ]);
+            $c->Do("UPDATE cache_files SET file_thumbnail=? WHERE id=?", [ $digest, $id ]);
         }
     }
 

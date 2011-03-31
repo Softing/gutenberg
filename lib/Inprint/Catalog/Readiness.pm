@@ -24,7 +24,7 @@ sub read {
     my $result = [];
     
     unless (@errors) {
-        $result = $c->sql->Q("
+        $result = $c->Q("
             SELECT id, color, weight as percent, title, shortcut, description, created, updated
             FROM readiness
             WHERE id=?
@@ -38,7 +38,7 @@ sub read {
 
 sub list {
     my $c = shift;
-    my $result = $c->sql->Q("
+    my $result = $c->Q("
         SELECT id, color, weight as percent, title, shortcut, description, created, updated
         FROM readiness ORDER BY weight, shortcut;
     ")->Hashes;
@@ -78,7 +78,7 @@ sub create {
         unless ($c->access->Check("domain.readiness.manage"));
     
     unless (@errors) {
-        $c->sql->Do("
+        $c->Do("
             INSERT INTO readiness (
                 id, color, weight, title, shortcut, description, created, updated)
             VALUES (?, ?, ?, ?, ?, ?, now(), now());
@@ -125,7 +125,7 @@ sub update {
         unless ($c->access->Check("domain.readiness.manage"));
     
     unless (@errors) {
-        $c->sql->Do("
+        $c->Do("
             UPDATE readiness SET color=?, weight=?, title=?, shortcut=?, description=?
             WHERE id=? ",
         [ $i_color, $i_percent, $i_title, $i_shortcut, $i_description, $i_id ]);
@@ -149,7 +149,7 @@ sub delete {
     unless (@errors) {
         foreach my $id (@i_ids) {
             if ($c->is_uuid($id)) {
-                $c->sql->Do(" DELETE FROM readiness WHERE id =? ", [ $id ]);
+                $c->Do(" DELETE FROM readiness WHERE id =? ", [ $id ]);
             }
         }
     }

@@ -44,6 +44,10 @@ sub Q {
         $value = [ $value ] if $value;
     }
 
+    print STDERR $query;
+    print STDERR $value;
+    print STDERR $trace;
+
     return new Inprint::Frameworks::SQLQuery($c->{conn}, $query, $value, $trace);
 }
 

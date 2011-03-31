@@ -24,7 +24,7 @@ sub templates {
         unless ($c->is_uuid($i_fascicle));
 
     unless (@errors) {
-        $result = $c->sql->Q("
+        $result = $c->Q("
             SELECT DISTINCT t1.id, title FROM fascicles_tmpl_pages t1
             WHERE t1.fascicle=?
             ORDER BY t1.title
@@ -59,7 +59,7 @@ sub headlines {
         unless ($c->is_uuid($i_fascicle));
 
     unless (@errors) {
-        $result = $c->sql->Q("
+        $result = $c->Q("
             SELECT DISTINCT id, title FROM fascicles_indx_headlines
             WHERE fascicle=?
             ORDER BY title ",
@@ -82,7 +82,7 @@ sub rubrics {
         unless ($c->is_uuid($i_headline));
 
     unless (@errors) {
-        $result = $c->sql->Q("
+        $result = $c->Q("
             SELECT DISTINCT id, title FROM fascicles_indx_rubrics
             WHERE fascicle=?
             ORDER BY title ",

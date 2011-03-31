@@ -10,7 +10,7 @@ sub read {
     my $c = shift;
     my $id = shift;
 
-    my $result = $c->sql->Q("
+    my $result = $c->Q("
             SELECT id, document, link, title, description, fulltext,
                 published, created, updated
             FROM rss
@@ -29,7 +29,7 @@ sub update {
 
     # Update record
     if ($record->{id}) {
-        $c->sql->Do("
+        $c->Do("
             UPDATE rss
                 SET link=?, title=?, description=?, fulltext=?,  published=?,
                     updated=now()
@@ -40,7 +40,7 @@ sub update {
     # Create record
     unless ($record->{id}) {
         my $record_id = $c->uuid;
-        $c->sql->Do("
+        $c->Do("
             INSERT
                 INTO rss (id, document, link, title, description, fulltext,
                     published, created,  updated)

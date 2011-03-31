@@ -23,7 +23,7 @@ sub seance {
 
     my $i_fascicle = $c->param("fascicle");
 
-    my $current_member = $c->QuerySessionGet("member.id");
+    my $current_member = $c->getSessionValue("member.id");
 
     my @errors;
     my $success = $c->json->false;
@@ -38,7 +38,7 @@ sub seance {
     my $summary;
 
     unless (@errors) {
-        $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id =? ", [ $i_fascicle ])->Hash;
+        $fascicle = $c->Q(" SELECT * FROM fascicles WHERE id =? ", [ $i_fascicle ])->Hash;
         push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
             unless $fascicle;
     }
@@ -51,7 +51,7 @@ sub seance {
         $summary   = $c->getSummary($fascicle->{id});
 
         if ($fascicle->{manager}) {
-            $fascicle->{manager_shortcut} = $c->sql->Q(" SELECT shortcut FROM profiles WHERE id=?", [$fascicle->{manager}])->Value;
+            $fascicle->{manager_shortcut} = $c->Q(" SELECT shortcut FROM profiles WHERE id=?", [$fascicle->{manager}])->Value;
         }
 
         $fascicle->{access} = {
@@ -81,9 +81,9 @@ sub seance {
             }
         }
 
-        my $statusbar_all = $c->sql->Q(" SELECT count(*) FROM fascicles_pages WHERE fascicle=? AND seqnum is not null ", [ $fascicle->{id} ])->Value;
+        my $statusbar_all = $c->Q(" SELECT count(*) FROM fascicles_pages WHERE fascicle=? AND seqnum is not null ", [ $fascicle->{id} ])->Value;
 
-        my $statusbar_adv = $c->sql->Q("
+        my $statusbar_adv = $c->Q("
                 SELECT sum(t1.area)
                 FROM fascicles_modules t1, fascicles_map_modules t2, fascicles_pages t3
                 WHERE
@@ -135,14 +135,14 @@ sub check {
     my @errors;
     my $success = $c->json->false;
 
-    my $current_member = $c->QuerySessionGet("member.id");
+    my $current_member = $c->getSessionValue("member.id");
 
     push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_fascicle));
 
     my $fascicle;
     unless (@errors) {
-        $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id =? ", [ $i_fascicle ])->Hash;
+        $fascicle = $c->Q(" SELECT * FROM fascicles WHERE id =? ", [ $i_fascicle ])->Hash;
         push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
             unless $fascicle;
     }
@@ -150,7 +150,7 @@ sub check {
     unless (@errors) {
 
         if ($fascicle->{manager}) {
-            $fascicle->{manager_shortcut} = $c->sql->Q(" SELECT shortcut FROM profiles WHERE id=?", [$fascicle->{manager}])->Value;
+            $fascicle->{manager_shortcut} = $c->Q(" SELECT shortcut FROM profiles WHERE id=?", [$fascicle->{manager}])->Value;
         }
 
         $fascicle->{access} = {
@@ -194,14 +194,14 @@ sub open {
     my @errors;
     my $success = $c->json->false;
 
-    my $current_member = $c->QuerySessionGet("member.id");
+    my $current_member = $c->getSessionValue("member.id");
 
     push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_fascicle));
 
     my $fascicle;
     unless (@errors) {
-        $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id =? ", [ $i_fascicle ])->Hash;
+        $fascicle = $c->Q(" SELECT * FROM fascicles WHERE id =? ", [ $i_fascicle ])->Hash;
         push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
             unless $fascicle;
     }
@@ -217,8 +217,8 @@ sub open {
     }
 
     unless (@errors) {
-        $c->sql->Do(" UPDATE fascicles SET manager=? WHERE id=?", [ $current_member, $fascicle->{id} ]);
-        $c->sql->Do(" UPDATE documents SET fascicle_blocked=true WHERE fascicle=?", [ $fascicle->{id} ]);
+        $c->Do(" UPDATE fascicles SET manager=? WHERE id=?", [ $current_member, $fascicle->{id} ]);
+        $c->Do(" UPDATE documents SET fascicle_blocked=true WHERE fascicle=?", [ $fascicle->{id} ]);
     }
 
     $success = $c->json->true unless (@errors);
@@ -233,21 +233,21 @@ sub close {
     my @errors;
     my $success = $c->json->false;
 
-    my $current_member = $c->QuerySessionGet("member.id");
+    my $current_member = $c->getSessionValue("member.id");
 
     push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_fascicle));
 
     my $fascicle;
     unless (@errors) {
-        $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id =? ", [ $i_fascicle ])->Hash;
+        $fascicle = $c->Q(" SELECT * FROM fascicles WHERE id =? ", [ $i_fascicle ])->Hash;
         push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
             unless $fascicle;
     }
 
     unless (@errors) {
-        $c->sql->Do(" UPDATE fascicles SET manager=null WHERE manager=? AND id=?", [ $current_member, $fascicle->{id} ]);
-        $c->sql->Do(" UPDATE documents SET fascicle_blocked=false WHERE fascicle=?", [ $fascicle->{id} ]);
+        $c->Do(" UPDATE fascicles SET manager=null WHERE manager=? AND id=?", [ $current_member, $fascicle->{id} ]);
+        $c->Do(" UPDATE documents SET fascicle_blocked=false WHERE fascicle=?", [ $fascicle->{id} ]);
     }
 
     $success = $c->json->true unless (@errors);
@@ -265,21 +265,21 @@ sub capture {
     my @errors;
     my $success = $c->json->false;
 
-    my $current_member = $c->QuerySessionGet("member.id");
+    my $current_member = $c->getSessionValue("member.id");
 
     push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_fascicle));
 
     my $fascicle;
     unless (@errors) {
-        $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id =? ", [ $i_fascicle ])->Hash;
+        $fascicle = $c->Q(" SELECT * FROM fascicles WHERE id =? ", [ $i_fascicle ])->Hash;
         push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
             unless $fascicle;
     }
 
     unless (@errors) {
-        $c->sql->Do(" UPDATE fascicles SET manager=? WHERE id=?", [ $current_member, $fascicle->{id} ]);
-        $c->sql->Do(" UPDATE documents SET fascicle_blocked=true WHERE fascicle=?", [ $fascicle->{id} ]);
+        $c->Do(" UPDATE fascicles SET manager=? WHERE id=?", [ $current_member, $fascicle->{id} ]);
+        $c->Do(" UPDATE documents SET fascicle_blocked=true WHERE fascicle=?", [ $fascicle->{id} ]);
     }
 
     $success = $c->json->true unless (@errors);
@@ -298,14 +298,14 @@ sub save {
     my @errors;
     my $success = $c->json->false;
 
-    my $current_member = $c->QuerySessionGet("member.id");
+    my $current_member = $c->getSessionValue("member.id");
 
     push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_fascicle));
 
     my $fascicle;
     unless (@errors) {
-        $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id =? ", [ $i_fascicle ])->Hash;
+        $fascicle = $c->Q(" SELECT * FROM fascicles WHERE id =? ", [ $i_fascicle ])->Hash;
         push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
             unless $fascicle;
     }
@@ -318,11 +318,11 @@ sub save {
             my ($id, $seqnumstr) = split '::', $node;
             next unless ($id);
 
-            my $document = $c->sql->Q(" SELECT * FROM documents WHERE id=? AND fascicle=? ", [ $id, $fascicle->{id} ])->Hash;
+            my $document = $c->Q(" SELECT * FROM documents WHERE id=? AND fascicle=? ", [ $id, $fascicle->{id} ])->Hash;
             next unless ($document->{id});
 
             # clear pages for document
-            $c->sql->Do("
+            $c->Do("
                 DELETE FROM fascicles_map_documents WHERE edition =? AND fascicle=? AND entity=?
                 ", [ $fascicle->{edition}, $fascicle->{id}, $document->{id} ]);
 
@@ -334,18 +334,18 @@ sub save {
                 # Change pages for document
                 if ($seqnum > 0) {
 
-                    my $page = $c->sql->Q("
+                    my $page = $c->Q("
                         SELECT * FROM fascicles_pages WHERE fascicle=? AND seqnum=? ",
                         [ $fascicle->{id}, $seqnum ])->Hash;
                     next unless ($page->{id});
 
                     unless ($page->{headline}) {
-                        $c->sql->Do("
+                        $c->Do("
                             UPDATE fascicles_pages SET headline = ? WHERE id=? ",
                             [ $document->{headline}, $page->{id}  ]);
                     }
 
-                    $c->sql->Do("
+                    $c->Do("
                         INSERT INTO fascicles_map_documents(edition, fascicle, page, entity, created, updated)
                         VALUES (?, ?, ?, ?, now(), now());
                     ", [ $fascicle->{edition}, $fascicle->{id}, $page->{id}, $document->{id} ]);
@@ -354,7 +354,7 @@ sub save {
 
                 # Remove document from all pages
                 if ($seqnum == 0) {
-                    $c->sql->Do("
+                    $c->Do("
                             DELETE FROM fascicles_map_documents WHERE edition =? AND fascicle=? AND entity=?
                         ", [ $fascicle->{edition}, $fascicle->{id}, $document->{id} ]);
                 }
@@ -391,7 +391,7 @@ sub getPages {
     my @pageorder;
 
     my $pages;
-    my $dbpages = $c->sql->Q("
+    my $dbpages = $c->Q("
         SELECT
             t1.id, t1.seqnum, t1.w, t1.h,
             t2.id as headline, t2.title as headline_shortcut
@@ -419,7 +419,7 @@ sub getPages {
 
     my $documents = {};
     my $doccount = 0;
-    my $dbdocuments = $c->sql->Q("
+    my $dbdocuments = $c->Q("
         SELECT DISTINCT t2.edition, t2.fascicle, t2.id, t2.title
         FROM fascicles_map_documents t1, documents t2
         WHERE t2.id = t1.entity AND t1.fascicle = ?
@@ -434,7 +434,7 @@ sub getPages {
             title => $item->{title}
         };
 
-        my $docpages = $c->sql->Q("
+        my $docpages = $c->Q("
             SELECT t2.id
             FROM fascicles_map_documents t1, fascicles_pages t2
             WHERE t2.id = t1.page AND t1.fascicle = ? AND entity = ?
@@ -450,7 +450,7 @@ sub getPages {
 
     my $holes;
 
-    my $dbholes = $c->sql->Q("
+    my $dbholes = $c->Q("
         SELECT t1.id, t1.title, t1.w, t1.h, t2.page, t2.x, t2.y
         FROM fascicles_modules t1, fascicles_map_modules t2
         WHERE t1.fascicle = ? AND t2.module=t1.id AND t2.placed=false
@@ -472,7 +472,7 @@ sub getPages {
 
     my $requests;
 
-    my $dbrequests = $c->sql->Q("
+    my $dbrequests = $c->Q("
         SELECT t1.id, t1.shortcut, t2.page
         FROM fascicles_requests t1, fascicles_map_modules t2
         WHERE t1.fascicle = ? AND t1.module=t2.module AND t2.placed=false
@@ -547,7 +547,7 @@ sub getSummary {
     my $data;
 
     # Get adv places
-    my $places = $c->sql->Q("
+    my $places = $c->Q("
         SELECT id, fascicle, title, description, created, updated
         FROM fascicles_tmpl_places WHERE fascicle = ? ORDER BY title
     ", [ $fascicle ])->Hashes;
@@ -555,7 +555,7 @@ sub getSummary {
     foreach my $place (@$places) {
 
         # Get adv modules for place
-        my $tmpl_modules = $c->sql->Q("
+        my $tmpl_modules = $c->Q("
             SELECT
                 t1.id, t1.origin, t1.fascicle, t1.page, t1.title,
                 t1.description, t1.amount, t1.area, t1.x, t1.y, t1.w, t1.h,
@@ -566,7 +566,7 @@ sub getSummary {
 
         foreach my $tmpl_module (@$tmpl_modules) {
 
-            my $pages = $c->sql->Q("
+            my $pages = $c->Q("
                     SELECT t3.seqnum
                     FROM fascicles_modules t1, fascicles_map_modules t2, fascicles_pages t3
                     WHERE t2.module=t1.id AND t2.page=t3.id
@@ -576,13 +576,13 @@ sub getSummary {
 
             $pages = join ", ", @$pages;
 
-            my $modules = $c->sql->Q("
+            my $modules = $c->Q("
                     SELECT count(*)
                     FROM fascicles_modules t1
                     WHERE t1.fascicle=? AND t1.place=? AND t1.origin=?
                 ", [ $fascicle, $place->{id}, $tmpl_module->{id} ])->Value || 0;
 
-            my $requests = $c->sql->Q("
+            my $requests = $c->Q("
                 SELECT count(*) FROM fascicles_requests WHERE fascicle=? AND place=? AND origin=?
             ", [ $fascicle, $place->{id}, $tmpl_module->{id} ])->Value || 0;
 

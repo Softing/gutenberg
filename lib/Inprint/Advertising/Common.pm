@@ -45,7 +45,7 @@ sub editions {
         ";
         push @data, $i_node;
 
-        my $data = $c->sql->Q("$sql", \@data)->Hashes;
+        my $data = $c->Q("$sql", \@data)->Hashes;
 
         foreach my $item (@$data) {
             my $record = {
@@ -113,7 +113,7 @@ sub fascicles {
         push @data, $i_node;
         push @data, $i_node;
 
-        my $data = $c->sql->Q("$sql", \@data)->Hashes;
+        my $data = $c->Q("$sql", \@data)->Hashes;
 
         foreach my $item (@$data) {
             my $record = {
@@ -185,7 +185,7 @@ sub places {
         push @data, $i_node;
         push @data, $i_node;
 
-        my $data = $c->sql->Q("$sql", \@data)->Hashes;
+        my $data = $c->Q("$sql", \@data)->Hashes;
 
         foreach my $item (@$data) {
             my $record = {

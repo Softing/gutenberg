@@ -24,7 +24,7 @@ sub read {
     my $result = [];
 
     unless (@errors) {
-        $result = $c->sql->Q("
+        $result = $c->Q("
             SELECT
                 t1.id,
                 t2.id as edition, t2.shortcut as edition_shortcut,
@@ -62,13 +62,13 @@ sub create {
     my $edition;
 
     unless (@errors) {
-        $edition  = $c->sql->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
+        $edition  = $c->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
         push @errors, { id => "edition", msg => "Incorrectly filled field"}
             unless ($edition);
     }
 
     unless (@errors) {
-        $c->sql->Do("
+        $c->Do("
             INSERT INTO ad_places(edition, title, description, created, updated)
             VALUES (?, ?, ?, now(), now());
         ", [ $edition->{id}, $i_title, $i_description ]);
@@ -101,7 +101,7 @@ sub update {
     #    unless ($c->access->Check("domain.roles.manage"));
 
     unless (@errors) {
-        $c->sql->Do(" UPDATE ad_places SET title=?, description=?, updated=now() WHERE id=?;",
+        $c->Do(" UPDATE ad_places SET title=?, description=?, updated=now() WHERE id=?;",
             [ $i_title, $i_description, $i_id ]);
     }
 
@@ -122,7 +122,7 @@ sub delete {
     unless (@errors) {
         foreach my $id (@ids) {
             if ($c->is_uuid($id)) {
-                $c->sql->Do(" DELETE FROM ad_places WHERE id=? ", [ $id ]);
+                $c->Do(" DELETE FROM ad_places WHERE id=? ", [ $id ]);
             }
         }
     }

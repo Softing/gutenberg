@@ -29,7 +29,7 @@ sub save {
         unless ($i_type ~~ [ "headline", "module" ]);
 
     my $edition; unless (@errors) {
-        $edition  = $c->sql->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
+        $edition  = $c->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
         push @errors, { id => "edition", msg => "Incorrectly filled field"}
             unless ($edition);
     }
@@ -38,14 +38,14 @@ sub save {
         unless ($c->is_uuid($i_place));
 
     my $place; unless (@errors) {
-        $place = $c->sql->Q(" SELECT * FROM ad_places WHERE id=? ", [ $i_place ])->Hash;
+        $place = $c->Q(" SELECT * FROM ad_places WHERE id=? ", [ $i_place ])->Hash;
         push @errors, { id => "place", msg => "Can't find object"}
             unless ($place);
     }
 
     unless (@errors) {
 
-        $c->sql->Do("
+        $c->Do("
                 DELETE FROM ad_index WHERE edition=? AND place=? AND nature=?
             ", [ $edition->{id}, $place->{id}, $i_type ]);
 
@@ -53,7 +53,7 @@ sub save {
 
             next unless ($c->is_uuid($item));
 
-            $c->sql->Do("
+            $c->Do("
                 INSERT INTO ad_index(edition, place, nature, entity, created, updated)
                     VALUES (?, ?, ?, ?, now(), now());
             ", [ $edition->{id}, $place->{id}, $i_type, $item ]);
@@ -82,13 +82,13 @@ sub headlines {
         unless ($c->is_uuid($i_edition));
 
     my $edition; unless (@errors) {
-        $edition  = $c->sql->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
+        $edition  = $c->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
         push @errors, { id => "edition", msg => "Incorrectly filled field"}
             unless ($edition);
     }
 
     my $editions = []; unless (@errors) {
-        $editions = $c->sql->Q("
+        $editions = $c->Q("
             SELECT id FROM editions WHERE path @> ? order by path asc;
         ", [ $edition->{path} ])->Values;
     }
@@ -97,7 +97,7 @@ sub headlines {
         unless ($c->is_uuid($i_place));
 
     my $place; unless (@errors) {
-        $place = $c->sql->Q(" SELECT * FROM ad_places WHERE id=? ", [ $i_place ])->Hash;
+        $place = $c->Q(" SELECT * FROM ad_places WHERE id=? ", [ $i_place ])->Hash;
         push @errors, { id => "place", msg => "Can't find object"}
             unless ($place);
     }
@@ -116,7 +116,7 @@ sub headlines {
     }
 
     unless (@errors) {
-        $result = $c->sql->Q(" $sql ", \@params)->Hashes;
+        $result = $c->Q(" $sql ", \@params)->Hashes;
         $c->render_json( { data => $result } );
     }
 
@@ -142,13 +142,13 @@ sub modules {
         unless ($c->is_uuid($i_edition));
 
     my $edition; unless (@errors) {
-        $edition  = $c->sql->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
+        $edition  = $c->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
         push @errors, { id => "edition", msg => "Incorrectly filled field"}
             unless ($edition);
     }
 
     my $editions = []; unless (@errors) {
-        $editions = $c->sql->Q("
+        $editions = $c->Q("
             SELECT id FROM editions WHERE path @> ? order by path asc;
         ", [ $edition->{path} ])->Values;
     }
@@ -157,7 +157,7 @@ sub modules {
         unless ($c->is_uuid($i_place));
 
     my $place; unless (@errors) {
-        $place = $c->sql->Q(" SELECT * FROM ad_places WHERE id=? ", [ $i_place ])->Hash;
+        $place = $c->Q(" SELECT * FROM ad_places WHERE id=? ", [ $i_place ])->Hash;
         push @errors, { id => "place", msg => "Can't find object"}
             unless ($place);
     }
@@ -177,7 +177,7 @@ sub modules {
     }
 
     unless (@errors) {
-        $result = $c->sql->Q(" $sql ", \@params)->Hashes;
+        $result = $c->Q(" $sql ", \@params)->Hashes;
         $c->render_json( { data => $result } );
     }
 

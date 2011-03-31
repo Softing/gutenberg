@@ -24,7 +24,7 @@ sub read {
     my $result = [];
 
     unless (@errors) {
-        $result = $c->sql->Q("
+        $result = $c->Q("
             SELECT id, fascicle, page, title, description, amount, area, x, y, w, h, created, updated
             FROM fascicles_tmpl_modules
             WHERE id=?;
@@ -53,13 +53,13 @@ sub list {
         unless ($c->is_uuid($i_page));
 
     #my $fascicle; unless (@errors) {
-    #    $fascicle  = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
+    #    $fascicle  = $c->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
     #    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
     #        unless ($fascicle);
     #}
 
     my $page; unless (@errors) {
-        $page  = $c->sql->Q(" SELECT * FROM fascicles_tmpl_pages WHERE id=?", [ $i_page ])->Hash;
+        $page  = $c->Q(" SELECT * FROM fascicles_tmpl_pages WHERE id=?", [ $i_page ])->Hash;
         push @errors, { id => "page", msg => "Incorrectly filled field"}
             unless ($page);
     }
@@ -78,7 +78,7 @@ sub list {
     }
 
     unless (@errors) {
-        $result = $c->sql->Q(" $sql ", \@params)->Hashes;
+        $result = $c->Q(" $sql ", \@params)->Hashes;
         $c->render_json( { data => $result } );
     }
 
@@ -142,13 +142,13 @@ sub create {
     #    unless ($c->access->Check("domain.roles.manage"));
 
     my $fascicle; unless (@errors) {
-        $fascicle  = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
+        $fascicle  = $c->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
         push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
             unless ($fascicle);
     }
 
     my $page; unless (@errors) {
-        $page  = $c->sql->Q(" SELECT * FROM fascicles_tmpl_pages WHERE id=? ", [ $i_page ])->Hash;
+        $page  = $c->Q(" SELECT * FROM fascicles_tmpl_pages WHERE id=? ", [ $i_page ])->Hash;
         push @errors, { id => "page", msg => "Incorrectly filled field"}
             unless ($page);
     }
@@ -166,7 +166,7 @@ sub create {
     $area = $size_w * $size_h * $i_amount;
 
     unless (@errors) {
-        $c->sql->Do("
+        $c->Do("
             INSERT INTO fascicles_tmpl_modules(id, fascicle, origin, page, title, description, amount, area, x, y, w, h, created, updated)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
         ", [
@@ -246,7 +246,7 @@ sub update {
     $area = $size_w * $size_h * $i_amount;
 
     unless (@errors) {
-        $c->sql->Do("
+        $c->Do("
             UPDATE fascicles_tmpl_modules
                 SET title=?, description=?, amount=?, area=?, x=?, y=?, w=?, h=?, updated=now()
             WHERE id =?;
@@ -270,7 +270,7 @@ sub delete {
     unless (@errors) {
         foreach my $id (@ids) {
             if ($c->is_uuid($id)) {
-                $c->sql->Do(" DELETE FROM fascicles_tmpl_modules WHERE id=? ", [ $id ]);
+                $c->Do(" DELETE FROM fascicles_tmpl_modules WHERE id=? ", [ $id ]);
             }
         }
     }

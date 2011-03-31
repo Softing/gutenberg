@@ -13,7 +13,7 @@ use base 'Inprint::BaseController';
 sub updateDocumentsPagesCache {
     my ($c, $fascicle) = @_;
 
-    $c->sql->Do("
+    $c->Do("
             UPDATE documents SET
                 pages = array_to_string(
                     ARRAY( SELECT seqnum FROM fascicles_pages as pages, fascicles_map_documents as mapping

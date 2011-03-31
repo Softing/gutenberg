@@ -25,7 +25,7 @@ sub read {
     my $result = [];
 
     unless (@errors) {
-        $result = $c->sql->Q("
+        $result = $c->Q("
             SELECT t1.*,
                 subpath(path, -2,1) as parent,
                 (select shortcut from editions where subpath(path, -1,1) = subpath(t1.path, -2,1) ) as parent_shortcut
@@ -69,7 +69,7 @@ sub tree {
         push @data, $i_node;
         push @data, $i_node;
 
-        my $data = $c->sql->Q("$sql ORDER BY shortcut", \@data)->Hashes;
+        my $data = $c->Q("$sql ORDER BY shortcut", \@data)->Hashes;
 
         foreach my $item (@$data) {
             my $record = {
@@ -114,7 +114,7 @@ sub create {
     my $parent = Inprint::Check::edition($c, \@errors, $i_path);
 
     unless (@errors) {
-        $c->sql->Do("
+        $c->Do("
             INSERT INTO editions (id, title, shortcut, description, path)
                 VALUES (?, ?, ?, ?, replace(?, '-',  '')::ltree)
         ", [ $id, $i_title, $i_shortcut, $i_description, $parent->{path} ]);
@@ -150,10 +150,10 @@ sub update {
 
     unless (@errors) {
 
-        $c->sql->Do(" UPDATE editions SET title=?, shortcut=?, description=?, path=replace(?, '-',  '')::ltree WHERE id=? ",
+        $c->Do(" UPDATE editions SET title=?, shortcut=?, description=?, path=replace(?, '-',  '')::ltree WHERE id=? ",
             [ $i_title, $i_shortcut, $i_description, $parent->{path} . ".$i_id", $i_id ]);
 
-        $c->sql->Do(" UPDATE documents SET edition_shortcut=? WHERE edition=? ",
+        $c->Do(" UPDATE documents SET edition_shortcut=? WHERE edition=? ",
             [ $i_shortcut, $i_id ]);
 
     }
@@ -176,7 +176,7 @@ sub delete {
         if ($i_id eq "00000000-0000-0000-0000-000000000000");
 
     unless (@errors) {
-        $c->sql->Do(" DELETE FROM editions WHERE id =? ", [ $i_id ]);
+        $c->Do(" DELETE FROM editions WHERE id =? ", [ $i_id ]);
     }
 
     $success = $c->json->true unless (@errors);

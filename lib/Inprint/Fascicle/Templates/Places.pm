@@ -38,7 +38,7 @@ sub tree {
 
         push @data, $i_node;
 
-        my $data = $c->sql->Q("$sql", \@data)->Hashes;
+        my $data = $c->Q("$sql", \@data)->Hashes;
 
         foreach my $item (@$data) {
             my $record = {
@@ -76,7 +76,7 @@ sub read {
     my $result = [];
 
     unless (@errors) {
-        $result = $c->sql->Q("
+        $result = $c->Q("
             SELECT
                 t1.id, t1.title, t1.description, t1.created, t1.updated
             FROM fascicles_tmpl_places t1
@@ -113,13 +113,13 @@ sub create {
     #    unless ($c->access->Check("domain.roles.manage"));
 
     my $fascicle; unless (@errors) {
-        $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
+        $fascicle = $c->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
         push @errors, { id => "fascicle", msg => "Can't find object"}
             unless ($fascicle);
     }
 
     unless (@errors) {
-        $c->sql->Do("
+        $c->Do("
             INSERT INTO fascicles_tmpl_places(id, origin, fascicle, title, description, created, updated)
             VALUES (?, ?, ?, ?, ?, now(), now());
         ", [ $id, $fascicle->{id}, $fascicle->{id}, $i_title, $i_description ]);
@@ -152,7 +152,7 @@ sub update {
     #    unless ($c->access->Check("domain.roles.manage"));
 
     unless (@errors) {
-        $c->sql->Do(" UPDATE fascicles_tmpl_places SET title=?, description=?, updated=now() WHERE id=?;",
+        $c->Do(" UPDATE fascicles_tmpl_places SET title=?, description=?, updated=now() WHERE id=?;",
             [ $i_title, $i_description, $i_id ]);
     }
 
@@ -173,9 +173,9 @@ sub delete {
     unless (@errors) {
         foreach my $id (@ids) {
             if ($c->is_uuid($id)) {
-                my $exists = $c->sql->Q(" SELECT EXISTS( SELECT id FROM fascicles_modules WHERE place=? ) ", [ $id ])->Value;
+                my $exists = $c->Q(" SELECT EXISTS( SELECT id FROM fascicles_modules WHERE place=? ) ", [ $id ])->Value;
                 unless ($exists) {
-                    $c->sql->Do(" DELETE FROM fascicles_tmpl_places WHERE id=? ", [ $id ]);
+                    $c->Do(" DELETE FROM fascicles_tmpl_places WHERE id=? ", [ $id ]);
                 }
             }
         }

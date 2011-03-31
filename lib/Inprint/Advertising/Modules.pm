@@ -24,7 +24,7 @@ sub read {
     my $result = [];
 
     unless (@errors) {
-        $result = $c->sql->Q("
+        $result = $c->Q("
             SELECT id, edition, page, title, description, amount, area, x, y, w, h, created, updated
             FROM ad_modules
             WHERE id=?;
@@ -53,13 +53,13 @@ sub list {
         unless ($c->is_uuid($i_page));
 
     my $edition; unless (@errors) {
-        $edition  = $c->sql->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
+        $edition  = $c->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
         push @errors, { id => "edition", msg => "Incorrectly filled field"}
             unless ($edition);
     }
 
     my $page; unless (@errors) {
-        $page  = $c->sql->Q(" SELECT * FROM ad_pages WHERE id=?", [ $i_page ])->Hash;
+        $page  = $c->Q(" SELECT * FROM ad_pages WHERE id=?", [ $i_page ])->Hash;
         push @errors, { id => "page", msg => "Incorrectly filled field"}
             unless ($page);
     }
@@ -78,7 +78,7 @@ sub list {
     }
 
     unless (@errors) {
-        $result = $c->sql->Q(" $sql ", \@params)->Hashes;
+        $result = $c->Q(" $sql ", \@params)->Hashes;
         $c->render_json( { data => $result } );
     }
 
@@ -142,13 +142,13 @@ sub create {
     #    unless ($c->access->Check("domain.roles.manage"));
 
     my $edition; unless (@errors) {
-        $edition  = $c->sql->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
+        $edition  = $c->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
         push @errors, { id => "edition", msg => "Incorrectly filled field"}
             unless ($edition);
     }
 
     my $page; unless (@errors) {
-        $page  = $c->sql->Q(" SELECT * FROM ad_pages WHERE id=? ", [ $i_page ])->Hash;
+        $page  = $c->Q(" SELECT * FROM ad_pages WHERE id=? ", [ $i_page ])->Hash;
         push @errors, { id => "page", msg => "Incorrectly filled field"}
             unless ($page);
     }
@@ -166,7 +166,7 @@ sub create {
     $area = $size_w * $size_h * $i_amount;
 
     unless (@errors) {
-        $c->sql->Do("
+        $c->Do("
             INSERT INTO ad_modules(id, edition, page, title, description, amount, area, x, y, w, h, created, updated)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
         ", [
@@ -246,7 +246,7 @@ sub update {
     $area = $size_w * $size_h * $i_amount;
 
     unless (@errors) {
-        $c->sql->Do("
+        $c->Do("
             UPDATE ad_modules
                 SET title=?, description=?, amount=?, area=?, x=?, y=?, w=?, h=?, updated=now()
             WHERE id =?;
@@ -270,7 +270,7 @@ sub delete {
     unless (@errors) {
         foreach my $id (@ids) {
             if ($c->is_uuid($id)) {
-                $c->sql->Do(" DELETE FROM ad_modules WHERE id=? ", [ $id ]);
+                $c->Do(" DELETE FROM ad_modules WHERE id=? ", [ $id ]);
             }
         }
     }

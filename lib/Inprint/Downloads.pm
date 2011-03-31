@@ -30,7 +30,7 @@ sub list {
     my $i_edition   = $c->param("flt_edition");
     my $i_fascicle  = $c->param("flt_fascicle");
 
-    my $currentMember = $c->QuerySessionGet("member.id");
+    my $currentMember = $c->getSessionValue("member.id");
 
     my $sql = "
         SELECT
@@ -84,7 +84,7 @@ sub list {
     }
 
     $sql .= " ORDER BY downloaded, fls.updated DESC, fls.file_path ";
-    my $files = $c->sql->Q($sql, \@params)->Hashes;
+    my $files = $c->Q($sql, \@params)->Hashes;
 
     my $rootPath    = $c->config->get("store.path");
 
@@ -138,7 +138,7 @@ sub download {
 
     my $fileListString;
 
-    my $currentMember = $c->QuerySessionGet("member.id");
+    my $currentMember = $c->getSessionValue("member.id");
 
     foreach my $item (@i_files) {
 
@@ -147,8 +147,8 @@ sub download {
         next unless ($fileid);
         next unless ($docid);
 
-        my $file = $c->sql->Q(" SELECT id, file_path, file_name FROM cache_files WHERE id=?", $fileid)->Hash;
-        my $document = $c->sql->Q(" SELECT id, title FROM documents WHERE id=?", $docid)->Hash;
+        my $file = $c->Q(" SELECT id, file_path, file_name FROM cache_files WHERE id=?", $fileid)->Hash;
+        my $document = $c->Q(" SELECT id, title FROM documents WHERE id=?", $docid)->Hash;
 
         next unless ($file->{id});
         next unless ($document->{id});
@@ -174,8 +174,8 @@ sub download {
 
         die "Can't read symlink $pathSymlink" unless (-e -r $pathSymlink);
 
-        $c->sql->Do(" DELETE FROM cache_downloads WHERE member=? AND document=? AND file=? ", [ $currentMember, $document->{id}, $file->{id} ]);
-        $c->sql->Do(" INSERT INTO cache_downloads (member, document, file) VALUES (?,?,?) ", [ $currentMember, $document->{id}, $file->{id} ]);
+        $c->Do(" DELETE FROM cache_downloads WHERE member=? AND document=? AND file=? ", [ $currentMember, $document->{id}, $file->{id} ]);
+        $c->Do(" INSERT INTO cache_downloads (member, document, file) VALUES (?,?,?) ", [ $currentMember, $document->{id}, $file->{id} ]);
 
         $fileListString .= ' "'. $pathSymlink .'" ';
     }

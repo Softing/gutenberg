@@ -19,7 +19,7 @@ sub list {
     my $result = [];
 
     if ($i_section) {
-        $result = $c->sql->Q("
+        $result = $c->Q("
             (
                 SELECT
                     t1.id,
@@ -52,12 +52,24 @@ sub clear {
     my $i_binding   = $c->param("binding");
 
     # Remove the lower Rules
-    if ($i_section ~~ [ "editions", "catalog" ])
-    {
-        $c->sql->Do("
+    if ($i_section ~~ [ "editions", "catalog" ]) {
+
+        $c->Do("
             DELETE FROM map_member_to_rule WHERE
                 member=?
                 AND section=?
+                AND binding = ANY (
+                    ARRAY(
+                        SELECT id FROM $i_section WHERE path ~
+                        ('*.' || replace(?, '-', '') || '.*')::lquery
+                    )
+                ) ",
+            [ $i_member, $i_section, $i_binding ]);
+
+        $c->Do("
+            DELETE FROM cache_access WHERE
+                member=?
+                AND type=?
                 AND binding = ANY (
                     ARRAY(
                         SELECT id FROM $i_section WHERE path ~
@@ -81,7 +93,7 @@ sub map {
     if ($i_section ~~ [ "domain", "editions", "catalog" ])
     {
 
-        $c->sql->Do("
+        $c->Do("
             DELETE FROM map_member_to_rule
                 WHERE member=? AND section=? AND binding=? ",
             [ $i_member, $i_section, $i_binding ]);
@@ -90,7 +102,7 @@ sub map {
         {
             my ($rule, $mode) = split "::", $string;
             if ($rule && $mode) {
-                $c->sql->Do("
+                $c->Do("
                     INSERT INTO map_member_to_rule(member, section, binding, area, term)
                         VALUES (?, ?, ?, ?, ?) ",
                     [$i_member, $i_section, $i_binding, $mode, $rule]);
@@ -128,7 +140,7 @@ sub mapping {
             push @data, $i_binding;
         }
 
-        my $data1 = $c->sql->Q($sql1, \@data)->Hashes;
+        my $data1 = $c->Q($sql1, \@data)->Hashes;
         foreach my $item (@$data1) {
             $result->{ $item->{term} } = {
                 type => "obtained",
@@ -137,13 +149,13 @@ sub mapping {
             };
         }
 
-        my $data2 = $c->sql->Q($sql2, \@data)->Values;
+        my $data2 = $c->Q($sql2, \@data)->Values;
         foreach my $item (@$data2) {
             foreach my $term (@$item) {
 
                 my ($term, $area) = split /:/, $term;
 
-                my $term_obj = $c->sql->Q(
+                my $term_obj = $c->Q(
                     "SELECT * FROM view_rules WHERE term_text = ?", [ $term ])->Hash;
 
                 next if $result->{ $term_obj->{id} };

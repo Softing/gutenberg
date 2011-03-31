@@ -1,14 +1,12 @@
 package Inprint::Frameworks::Access;
 
-# Inprint Content 4.5
-# Copyright(c) 2001-2010, Softing, LLC.
+# Inprint Content 5.0
+# Copyright(c) 2001-2011, Softing, LLC.
 # licensing@softing.ru
 # http://softing.ru/license
 
 use strict;
 use utf8;
-
-use Inprint::Frameworks::AccessQuery;
 
 sub new {
     my $class = shift;
@@ -24,11 +22,6 @@ sub SetHandler {
     $c->{handler} = $handler;
 }
 
-sub ExtractRules {
-    my $c = shift;
-    return $c;
-}
-
 sub Check {
     my $c = shift;
     my $terms   = shift;
@@ -39,7 +32,7 @@ sub Check {
     my $result = 0;
 
     unless ($member) {
-        $member = $c->{handler}->QuerySessionGet("member.id");
+        $member = $c->{handler}->getSessionValue("member.id");
     }
 
     if (ref $terms eq "ARRAY") {
@@ -54,15 +47,16 @@ sub Check {
             splice @rules, $i, $i, "$term:member", "$term:group";
         }
     }
-    my %seen;@rules = grep { ! $seen{$_}++ } @rules;
-
-    #die $member;
+    my %seen; @rules = grep { ! $seen{$_}++ } @rules;
 
     if ($member && @rules) {
+
         my @data;
+
         my $sql = " SELECT true FROM cache_access WHERE member=? AND ? && terms ";
         push @data, $member;
         push @data, \@rules;
+
         if ($binding) {
             $sql .= " AND binding=?";
             push @data, $binding;
@@ -83,7 +77,7 @@ sub GetBindings {
     my $result = [];
 
     unless ($member) {
-        $member = $c->{handler}->QuerySessionGet("member.id");
+        $member = $c->{handler}->getSessionValue("member.id");
     }
 
     my @rules;
@@ -123,7 +117,7 @@ sub GetChildrens {
     my $result = [];
 
     unless ($member) {
-        $member = $c->{handler}->QuerySessionGet("member.id");
+        $member = $c->{handler}->getSessionValue("member.id");
     }
 
     my @rules;

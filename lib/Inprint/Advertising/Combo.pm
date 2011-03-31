@@ -28,7 +28,7 @@ sub managers {
     my $result;
     
     unless(@errors){
-        $result = $c->sql->Q("
+        $result = $c->Q("
             SELECT DISTINCT
                 t1.id, t1.shortcut as title, t1.description as description, 'user' as icon
             FROM view_principals t1, map_member_to_catalog t2
@@ -62,7 +62,7 @@ sub advertisers {
     my $sql = " SELECT id, shortcut as title FROM ad_advertisers  WHERE 1=1 ";
     
     if ($i_edition) {
-        my $editions = $c->sql->Q(" SELECT id FROM editions WHERE path ~ ('*.' || replace(?, '-', '')::text || '.*')::lquery ", [$i_edition])->Values;
+        my $editions = $c->Q(" SELECT id FROM editions WHERE path ~ ('*.' || replace(?, '-', '')::text || '.*')::lquery ", [$i_edition])->Values;
         $sql .= " AND edition = ANY(?)";
         push @data, $editions;
     }
@@ -74,7 +74,7 @@ sub advertisers {
     
     my $result;
     unless(@errors){
-        $result = $c->sql->Q(" $sql ORDER BY title", \@data)->Hashes;
+        $result = $c->Q(" $sql ORDER BY title", \@data)->Hashes;
     }
     $c->render_json( { errors => \@errors, data => $result || [] } );
 }
@@ -103,12 +103,12 @@ sub fascicles {
     }
     
     if ($i_edition) {
-        my $editions = $c->sql->Q(" SELECT id FROM editions WHERE path ~ ('*.' || replace(?, '-', '')::text || '.*')::lquery ", [$i_edition])->Values;
+        my $editions = $c->Q(" SELECT id FROM editions WHERE path ~ ('*.' || replace(?, '-', '')::text || '.*')::lquery ", [$i_edition])->Values;
         $sql .= " AND edition = ANY(?)";
         push @data, $editions;
     }
     
-    my $result = $c->sql->Q("
+    my $result = $c->Q("
         $sql
         ORDER BY is_enabled DESC, t2.shortcut, t1.shortcut
     ", \@data)->Hashes;
@@ -120,7 +120,7 @@ sub places {
     
     my $i_fascicle = $c->param("fascicle") || undef;
     
-    my $result = $c->sql->Q("
+    my $result = $c->Q("
         SELECT id, title
         FROM fascicles_tmpl_places WHERE fascicle=?
         ORDER BY title
@@ -133,7 +133,7 @@ sub modules {
     
     my $i_place = $c->param("place") || undef;
     
-    my $result = $c->sql->Q("
+    my $result = $c->Q("
         SELECT t1.id, t1.shortcut as title
         FROM fascicles_tmpl_modules t1, fascicles_tmpl_index t2
         WHERE t2.entity=t1.id AND t2.nature='module' AND t2.place=?

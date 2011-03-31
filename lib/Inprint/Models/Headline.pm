@@ -18,22 +18,22 @@ sub create {
 
     # Do query
 
-    $c->sql->Do("
+    $c->Do("
         INSERT INTO indx_headlines (id, edition, tag, title, description, created, updated)
             VALUES (?, ?, ?, ?, ?, now(), now());
         ", [ $id, $edition, $tag->{id}, $tag->{title}, $tag->{description} || "" ]);
 
     if ($bydefault eq "on") {
-        $c->sql->Do("
+        $c->Do("
             UPDATE indx_headlines SET bydefault=false WHERE edition=?;
             ", [ $edition ]);
-        $c->sql->Do("
+        $c->Do("
             UPDATE indx_headlines SET bydefault=true WHERE id=?;
             ", [ $id ]);
     }
 
     # Update Briefcase
-    my $exists = $c->sql->Q("
+    my $exists = $c->Q("
         SELECT id FROM fascicles_indx_headlines WHERE fascicle=? AND tag=? ",
         [ "00000000-0000-0000-0000-000000000000", $tag->{id} ])->Value;
 
@@ -50,7 +50,7 @@ sub read {
     my $c = shift;
     my $id = shift;
 
-    my $result = $c->sql->Q("
+    my $result = $c->Q("
         SELECT id, edition, tag, title, description, bydefault, created, updated
         FROM indx_headlines WHERE id=? ",
         [ $id ])->Hash;
@@ -67,27 +67,27 @@ sub update {
     my $tag = Inprint::Models::Tag::getByTitle($c, $title, $description);
     return $c unless $tag->{id};
 
-    my $headline = $c->sql->Q("
+    my $headline = $c->Q("
         SELECT id, tag, title, description FROM indx_headlines WHERE id=? ",
         [ $id ])->Hash;
     return $c unless $headline->{id};
 
     # Do query
 
-    $c->sql->Do(" UPDATE indx_headlines SET tag=?, title=?, description=? WHERE id=? ",
+    $c->Do(" UPDATE indx_headlines SET tag=?, title=?, description=? WHERE id=? ",
         [ $tag->{id}, $tag->{title}, $tag->{description} || "", $id ]);
 
     if ($bydefault eq "on") {
-        $c->sql->Do("
+        $c->Do("
             UPDATE indx_headlines SET bydefault=false WHERE edition=?;
             ", [ $edition ]);
-        $c->sql->Do("
+        $c->Do("
             UPDATE indx_headlines SET bydefault=true WHERE id=?;
             ", [ $id ]);
     }
 
     # Update Briefcase
-    my $exists = $c->sql->Q("
+    my $exists = $c->Q("
         SELECT id FROM fascicles_indx_headlines WHERE fascicle=? AND tag=? ",
         [ "00000000-0000-0000-0000-000000000000", $tag->{id} ])->Value;
 
@@ -108,40 +108,40 @@ sub delete {
     my $c  = shift;
     my $id = shift;
 
-    my $headline = $c->sql->Q("
+    my $headline = $c->Q("
         SELECT * FROM indx_headlines WHERE id =? ",
         [ $id ])->Hash;
 
     return unless ($headline->{id});
 
-    $c->sql->Do("
+    $c->Do("
         DELETE FROM indx_rubrics WHERE headline=? ",
         [ $headline->{id} ]);
 
-    $c->sql->Do("
+    $c->Do("
         DELETE FROM indx_headlines WHERE id =?
             AND id <> '00000000-0000-0000-0000-000000000000' ",
         [ $headline->{id} ]);
 
-    my $briefcase_headline = $c->sql->Q("
+    my $briefcase_headline = $c->Q("
         SELECT * FROM fascicles_indx_headlines
         WHERE fascicle = '00000000-0000-0000-0000-000000000000' AND tag=?",
         [ $headline->{tag} ])->Hash;
 
     return unless ($briefcase_headline->{id});
 
-    my $linked = $c->sql->Q("
+    my $linked = $c->Q("
         SELECT count(*) FROM documents WHERE headline=? ",
         [ $briefcase_headline->{id} ])->Value;
 
     return unless ($linked == 0);
 
-    $c->sql->Do("
+    $c->Do("
         DELETE FROM fascicles_indx_rubrics
         WHERE fascicle = '00000000-0000-0000-0000-000000000000' AND headline=? ",
         [ $briefcase_headline->{id} ]);
 
-    $c->sql->Do("
+    $c->Do("
         DELETE FROM fascicles_indx_headlines
         WHERE fascicle = '00000000-0000-0000-0000-000000000000' AND id=? ",
         [ $briefcase_headline->{id} ]);

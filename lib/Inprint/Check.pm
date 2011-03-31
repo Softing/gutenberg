@@ -9,8 +9,6 @@ use utf8;
 use strict;
 use warnings;
 
-use Inprint::Frameworks::Access;
-
 sub exists {
     my ($c, $errors, $field, $value) = @_;
     unless (length($value) > 0) {
@@ -180,7 +178,7 @@ sub access {
     my @rules;
     my $result = 0;
 
-    $member = $c->QuerySessionGet("member.id") unless ($member);
+    $member = $c->getSessionValue("member.id") unless ($member);
 
     if (ref $terms eq "ARRAY") {
         @rules = @$terms;
@@ -206,7 +204,7 @@ sub access {
             push @data, $binding;
         }
 
-        $result = $c->sql->Q("SELECT EXISTS ($sql)", \@data)->Value();
+        $result = $c->Q("SELECT EXISTS ($sql)", \@data)->Value();
     }
 
     if ($errors) {
@@ -224,7 +222,7 @@ sub access {
 sub document {
     my ($c, $errors, $id) = @_;
     undef my $item;
-    $item = $c->sql->Q(" SELECT * FROM documents WHERE id=? ", [ $id ])->Hash unless (@$errors);
+    $item = $c->Q(" SELECT * FROM documents WHERE id=? ", [ $id ])->Hash unless (@$errors);
     push @$errors, { id => "document", msg => "Can't find object"} unless ($item->{id});
     return $item;
 }
@@ -232,7 +230,7 @@ sub document {
 sub department {
     my ($c, $errors, $id) = @_;
     undef my $item;
-    $item = $c->sql->Q(" SELECT * FROM catalog WHERE id=? ", [ $id ])->Hash unless (@$errors);
+    $item = $c->Q(" SELECT * FROM catalog WHERE id=? ", [ $id ])->Hash unless (@$errors);
     push @$errors, { id => "department", msg => "Can't find object"} unless ($item->{id});
     return $item;
 }
@@ -240,7 +238,7 @@ sub department {
 sub edition {
     my ($c, $errors, $id) = @_;
     undef my $item;
-    $item = $c->sql->Q(" SELECT * FROM editions WHERE id=? ", [ $id ])->Hash unless (@$errors);
+    $item = $c->Q(" SELECT * FROM editions WHERE id=? ", [ $id ])->Hash unless (@$errors);
     push @$errors, { id => "edition", msg => "Can't find object"} unless ($item->{id});
     return $item;
 }
@@ -248,7 +246,7 @@ sub edition {
 sub advertiser {
     my ($c, $errors, $id) = @_;
     undef my $item;
-    $item = $c->sql->Q(" SELECT * FROM ad_advertisers WHERE id=? ", [ $id ])->Hash unless (@$errors);
+    $item = $c->Q(" SELECT * FROM ad_advertisers WHERE id=? ", [ $id ])->Hash unless (@$errors);
     push @$errors, { id => "advertiser", msg => "Can't find object"} unless ($item->{id});
     return $item;
 }
@@ -256,7 +254,7 @@ sub advertiser {
 sub fascicle {
     my ($c, $errors, $id) = @_;
     undef my $item;
-    $item = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $id ])->Hash unless (@$errors);
+    $item = $c->Q(" SELECT * FROM fascicles WHERE id=? ", [ $id ])->Hash unless (@$errors);
     push @$errors, { id => "fascicle", msg => "Can't find object"} unless ($item->{id});
     return $item;
 }
@@ -264,7 +262,7 @@ sub fascicle {
 sub principal {
     my ($c, $errors, $id) = @_;
     undef my $item;
-    $item = $c->sql->Q(" SELECT * FROM view_principals WHERE id=? ", [ $id ])->Hash unless (@$errors);
+    $item = $c->Q(" SELECT * FROM view_principals WHERE id=? ", [ $id ])->Hash unless (@$errors);
     push @$errors, { id => "principal", msg => "Can't find object"} unless ($item->{id});
     return $item;
 }
@@ -274,20 +272,10 @@ sub principal {
 sub dbrecord {
     my ($c, $errors, $table, $title, $id) = @_;
     undef my $item;
-    $item = $c->sql->Q(" SELECT * FROM $table WHERE id=? ", [ $id ])->Hash unless (@$errors);
+    $item = $c->Q(" SELECT * FROM $table WHERE id=? ", [ $id ])->Hash unless (@$errors);
     push @$errors, { id => $title, msg => "Can't find record"} unless ($item->{id});
     return $item;
 }
 
-# Render error
-
-sub checkErrors {
-    my ($c, $errors) = @_;
-    if (@{ $errors }) {
-        $c->render_json({ success => $c->json->false, errors => \@$errors });
-        return;
-    }
-    return $c;
-}
 
 1;

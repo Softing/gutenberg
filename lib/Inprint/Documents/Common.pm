@@ -41,7 +41,7 @@ sub fascicles {
 
     $sql .= " ORDER BY t1.dateout DESC ";
 
-    my $result = $c->sql->Q($sql, \@params)->Hashes;
+    my $result = $c->Q($sql, \@params)->Hashes;
 
     $c->render_json( { data => $result } );
 }

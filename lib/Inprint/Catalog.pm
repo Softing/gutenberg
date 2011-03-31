@@ -16,7 +16,7 @@ sub tree {
 
     my $node = $c->param("node") || "00000000-0000-0000-0000-000000000000";
 
-    my $data = $c->sql->Q("
+    my $data = $c->Q("
         SELECT *, ( SELECT count(*) FROM catalog c2 WHERE c2.path ~ ('*.' || replace(?, '-', '')::text || '.*{2}')::lquery ) as have_childs
         FROM catalog
         WHERE
@@ -69,14 +69,14 @@ sub create {
     my $count = 0;
 
     unless (@{ $result->{errors} }) {
-        $path = $c->sql->Q(" SELECT path FROM catalog WHERE id =? ",
+        $path = $c->Q(" SELECT path FROM catalog WHERE id =? ",
         [ $i_path ])->Value;
     }
 
     push @{ $result->{errors} }, { id => "path", msg => "" } unless $path;
 
     unless (@{ $result->{errors} }) {
-        $count = $c->sql->Do("
+        $count = $c->Do("
             INSERT INTO catalog (id, title, shortcut, description, path, type, capables)
                 VALUES (?, ?, ?, ?, replace(?, '-',  '')::ltree, ?, ?)
         ", [ $id, $i_title, $i_shortcut, $i_description, "$path.$id", 'default', [] ]);
@@ -96,7 +96,7 @@ sub read {
         errors => []
     };
     push @{ $result->{errors} }, { id => "id", msg => "" } unless $i_id;
-    $result->{data} = $c->sql->Q("
+    $result->{data} = $c->Q("
         SELECT t1.*,
             subpath(path, -2,1) as parent,
             (select shortcut from catalog where subpath(path, -1,1) = subpath(t1.path, -2,1) ) as parent_shortcut
@@ -129,14 +129,14 @@ sub update {
     my $count = 0;
 
     unless (@{ $result->{errors} }) {
-        $path = $c->sql->Q(" SELECT path FROM catalog WHERE id =? ",
+        $path = $c->Q(" SELECT path FROM catalog WHERE id =? ",
         [ $i_path ])->Value;
     }
 
     push @{ $result->{errors} }, { id => "path", msg => "" } unless $path;
 
     unless (@{ $result->{errors} }) {
-        $count = $c->sql->Do(" UPDATE catalog SET title=?, shortcut=?, description=?, path=replace(?, '-',  '')::ltree WHERE id=? ",
+        $count = $c->Do(" UPDATE catalog SET title=?, shortcut=?, description=?, path=replace(?, '-',  '')::ltree WHERE id=? ",
             [ $i_title, $i_shortcut, $i_description, "$path.$i_id", $i_id ]);
     }
 
@@ -150,7 +150,7 @@ sub delete {
 
     my $id = $c->param("id");
 
-    $c->sql->Do(" DELETE FROM catalog WHERE id =? ", [ $id ]);
+    $c->Do(" DELETE FROM catalog WHERE id =? ", [ $id ]);
 
     $c->render_json( { } );
 }

@@ -26,7 +26,7 @@ sub makeRecord {
 
     my $mimetype = extractMimeType($c, $extension);
 
-    my $cacheRecord = $c->sql->Q("
+    my $cacheRecord = $c->Q("
                 SELECT
                     id, file_path, file_name, file_extension, file_mime,
                     file_digest, file_thumbnail, file_description, file_size,
@@ -37,7 +37,7 @@ sub makeRecord {
 
     unless ($cacheRecord->{id}) {
 
-        $c->sql->Do("
+        $c->Do("
                 INSERT INTO cache_files (
                     id, file_path, file_name, file_extension, file_mime,
                     file_digest, file_size, created, updated )
@@ -45,7 +45,7 @@ sub makeRecord {
             [ $c->uuid(), $filepath, $filename, $extension, $mimetype,
                 $digest, $filesize, $created, $updated ]);
 
-        $cacheRecord = $c->sql->Q("
+        $cacheRecord = $c->Q("
             SELECT * FROM cache_files WHERE file_path=? AND file_name=?
             ", [ $filepath, $filename ])->Hash;
     }
@@ -57,7 +57,7 @@ sub getRecordById {
     my $c = shift;
     my $id = shift;
 
-    my $record = $c->sql->Q("
+    my $record = $c->Q("
         SELECT
             id, file_path, file_name, file_extension, file_mime,
             file_digest, file_thumbnail, file_description, file_size,
@@ -73,7 +73,7 @@ sub getRecordByPath {
     my $c = shift;
     my ($path, $filename) = @_;
 
-    my $record = $c->sql->Q("
+    my $record = $c->Q("
         SELECT
             id, file_path, file_name, file_extension, file_mime,
             file_digest, file_thumbnail, file_description, file_size,
@@ -118,7 +118,7 @@ sub getRecordsByPath {
 
     $sql .= " ORDER BY file_published DESC, file_extension, file_name";
 
-    my $records = $c->sql->Q($sql, \@params)->Hashes;
+    my $records = $c->Q($sql, \@params)->Hashes;
 
     return $records;
 }
@@ -127,7 +127,7 @@ sub deleteRecordById {
     my $c = shift;
     my $id = shift;
 
-    $c->sql->Do(" UPDATE cache_files SET file_exists = false WHERE id=? ", [ $id ]);
+    $c->Do(" UPDATE cache_files SET file_exists = false WHERE id=? ", [ $id ]);
 
     return $c;
 }
@@ -138,7 +138,7 @@ sub cleanup {
 
     my $relativePath = getRelativePath($c, $folder);
 
-    my $cacheRecords = $c->sql->Q("
+    my $cacheRecords = $c->Q("
             SELECT * FROM cache_files WHERE file_path=?
             ", [ $relativePath ])->Hashes;
 

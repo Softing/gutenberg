@@ -9,8 +9,6 @@ use utf8;
 use strict;
 use warnings;
 
-use File::Find;
-
 use base 'Inprint::BaseController';
 
 sub index
@@ -66,7 +64,7 @@ sub index
     push @{ $AdvertisingSection->{menu} }, { id => "advert-index" };
 
     ############################################################################
-    # Fascicles and Composition
+    # Editions
     ############################################################################
 
     my $accessCalendarEditions = $c->access->Check("editions.calendar.view");
@@ -80,136 +78,65 @@ sub index
         push @{ $CalendarSection->{menu} }, { id => "briefcase-index", oid  => "00000000-0000-0000-0000-000000000000" };
     }
 
-    ## Выбираем выпуски
-    my $fascicles = $c->sql->Q("
+    ############################################################################
+    # Fascicles
+    ############################################################################
+
+    my @FasciclesSection;
+
+    my $fascicles = $c->Q("
         SELECT
             t1.id, t1.shortcut, t2.id as edition, t2.shortcut as edition_shortcut
         FROM fascicles t1, editions t2
         WHERE
-
             t1.edition = t2.id
-            AND t1.edition = ANY (?)
+
             AND t1.fastype = 'issue'
             AND t1.enabled = true
             AND t1.archived = false
-
         ORDER BY t1.dateout, t2.shortcut, t1.shortcut
-    ", [ $accessLayoutEditions ])->Hashes;
+    ")->Hashes;
 
-    my $composition  = {
-        id => "composition"
-    };
-
-    my @FasciclesSection;
-    foreach my $fascicle (@$fascicles) {
-
-        my $accessLayoutView     = $c->access->Check("editions.layouts.view",   $fascicle->{edition});
-        my $accessLayoutManage   = $c->access->Check("editions.layouts.manage", $fascicle->{edition});
-        my $accessAdvertManage   = $c->access->Check("editions.advert.manage",  $fascicle->{edition});
-
-        my $fascicle_menu = {
-            id   => "fascicle",
-            text => $fascicle->{edition_shortcut} . '/'. $fascicle->{shortcut},
-            menu => []
-        };
-
-        push @{ $fascicle_menu->{menu} }, {
-            id   => "fascicle-plan",
-            oid  => $fascicle->{id},
-            description => $fascicle->{shortcut}
-        } if $accessLayoutView;
-
-        push @{ $fascicle_menu->{menu} }, {
-            id   => "fascicle-planner",
-            oid  => $fascicle->{id},
-            description => $fascicle->{shortcut}
-        } if $accessLayoutManage;
-
-        push @{ $fascicle_menu->{menu} }, "-";
-
-        push @{ $fascicle_menu->{menu} }, {
-            id  => "fascicle-index",
-            oid => $fascicle->{id},
-            description => $fascicle->{shortcut}
-        } if $accessLayoutManage;
-
-        push @{ $fascicle_menu->{menu} }, {
-            id  => "fascicle-templates",
-            oid => $fascicle->{id},
-            description => $fascicle->{shortcut}
-        } if $accessLayoutManage;
-
-        push @{ $fascicle_menu->{menu} }, {
-            id  => "fascicle-places",
-            oid => $fascicle->{id},
-            description => $fascicle->{shortcut}
-        } if $accessLayoutManage;
-
-        my $childrens = $c->sql->Q("
+    foreach my $item (@$fascicles) {
+        $item->{attachments} = $c->Q("
             SELECT
                 t1.id, t1.shortcut, t2.id as edition, t2.shortcut as edition_shortcut
             FROM fascicles t1, editions t2
             WHERE
                 t1.edition = t2.id
-                AND t1.edition = ANY (?)
+
+                AND t1.fastype = 'attachment'
                 AND t1.enabled = true
+                AND t1.archived = false
                 AND t1.parent = ?
             ORDER BY t1.dateout, t2.shortcut, t1.shortcut
-        ", [ $accessLayoutEditions, $fascicle->{id} ])->Hashes;
-
-        foreach my $children (@$childrens) {
-
-            my $accessLayoutView     = $c->access->Check("editions.layouts.view",   $children->{edition});
-            my $accessLayoutManage   = $c->access->Check("editions.layouts.manage", $children->{edition});
-            my $accessAdvertManage   = $c->access->Check("editions.advert.manage",  $children->{edition});
-
-            my $children_menu = {
-                id   => "fascicle",
-                text => $children->{edition_shortcut} . '/'. $children->{shortcut},
-                menu => []
-            };
-
-            push @{ $children_menu->{menu} }, {
-                id   => "fascicle-plan",
-                oid  => $children->{id},
-                description => $children->{shortcut}
-            } if $accessLayoutView;
-
-            push @{ $children_menu->{menu} }, {
-                id   => "fascicle-planner",
-                oid  => $children->{id},
-                description => $children->{shortcut}
-            } if $accessLayoutManage;
-
-            push @{ $children_menu->{menu} }, "-";
-
-            push @{ $children_menu->{menu} }, {
-                id  => "fascicle-index",
-                oid => $children->{id},
-                description => $children->{shortcut}
-            } if $accessLayoutManage;
-
-            push @{ $children_menu->{menu} }, {
-                id  => "fascicle-templates",
-                oid => $children->{id},
-                description => $children->{shortcut}
-            } if $accessLayoutManage;
-
-            push @{ $children_menu->{menu} }, {
-                id  => "fascicle-places",
-                oid => $children->{id},
-                description => $children->{shortcut}
-            } if $accessLayoutManage;
-
-            push @{ $fascicle_menu->{menu} }, "-";
-            push @{ $fascicle_menu->{menu} }, $children_menu;
-        }
-
-        push @FasciclesSection, $fascicle_menu;
-
+        ", [ $item->{id} ])->Hashes;
     }
 
+    foreach my $fascicle (@{ $fascicles }) {
 
+        my $menuItem = $c->fascicleHadler($fascicle);
+
+        my $accessFascicleView = $c->access->Check("editions.layouts.view",   $fascicle->{edition});
+
+        # Attachments
+        if( @{ $menuItem->{menu} } && @{ $fascicle->{attachments} }) {
+            push @{ $menuItem->{menu} }, "-";
+        }
+
+        foreach my $attachment (@{ $fascicle->{attachments} }) {
+            my $menuSubitem = $c->fascicleHadler($attachment);
+            my $accessAttachmentView = $c->access->Check("editions.layouts.view",   $attachment->{edition});
+            if ($accessAttachmentView) {
+                $accessFascicleView = 1;
+                push @{ $menuItem->{menu} }, $menuSubitem;
+            }
+        }
+
+        if ($accessFascicleView) {
+            push @FasciclesSection, $menuItem;
+        }
+    }
 
     ############################################################################
     # Employee
@@ -217,7 +144,7 @@ sub index
 
     my $EmployeeSection = {
         id => "employee",
-        text => $c->QuerySessionGet("member.shortcut")
+        text => $c->getSessionValue("member.shortcut")
     };
     push @{ $EmployeeSection->{menu} }, { id => "employee-card" };
     push @{ $EmployeeSection->{menu} }, { id => "employee-settings" };
@@ -247,7 +174,7 @@ sub index
     # Plugins
     ############################################################################
 
-    my $plugs = $c->sql->Q("SELECT * FROM plugins.menu WHERE menu_enabled=true ORDER BY menu_section, menu_sortorder")->Hashes;
+    my $plugs = $c->Q("SELECT * FROM plugins.menu WHERE menu_enabled=true ORDER BY menu_section, menu_sortorder")->Hashes;
     foreach my $item (@$plugs) {
         my $exists = {};
         if ($item->{menu_section} eq "about") {
@@ -320,8 +247,59 @@ sub index
     push @result, $EmployeeSection;
     push @result, $SettingsSection if $accessViewSettings;
 
-    $c->render_json({ data => \@result });
+    $c->smart_render([], \@result);
 }
 
+sub fascicleHadler {
+
+    my ($c, $fascicle) = @_;
+
+    my $accessLayoutView   = $c->access->Check("editions.layouts.view",   $fascicle->{edition});
+    my $accessLayoutManage = $c->access->Check("editions.layouts.manage", $fascicle->{edition});
+    my $accessAdvertManage = $c->access->Check("editions.advert.manage",  $fascicle->{edition});
+
+    my $fascicle_menu = {
+        id   => "fascicle",
+        text => $fascicle->{edition_shortcut} . '/'. $fascicle->{shortcut},
+        menu => []
+    };
+
+    push @{ $fascicle_menu->{menu} }, {
+        id   => "fascicle-plan",
+        oid  => $fascicle->{id},
+        description => $fascicle->{shortcut}
+    } if ($accessLayoutView);
+
+    push @{ $fascicle_menu->{menu} }, {
+        id   => "fascicle-planner",
+        oid  => $fascicle->{id},
+        description => $fascicle->{shortcut}
+    } if $accessLayoutManage;
+
+    if ($accessLayoutView && $accessLayoutManage) {
+        push @{ $fascicle_menu->{menu} }, "-";
+    }
+
+    push @{ $fascicle_menu->{menu} }, {
+        id  => "fascicle-index",
+        oid => $fascicle->{id},
+        description => $fascicle->{shortcut}
+    } if $accessLayoutManage;
+
+    push @{ $fascicle_menu->{menu} }, {
+        id  => "fascicle-templates",
+        oid => $fascicle->{id},
+        description => $fascicle->{shortcut}
+    } if $accessLayoutManage;
+
+    push @{ $fascicle_menu->{menu} }, {
+        id  => "fascicle-places",
+        oid => $fascicle->{id},
+        description => $fascicle->{shortcut}
+    } if $accessLayoutManage;
+
+    return $fascicle_menu;
+
+}
 
 1;

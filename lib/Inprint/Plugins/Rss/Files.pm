@@ -24,7 +24,7 @@ sub list {
     Inprint::Check::uuid($c, \@errors, "document", $i_document);
     my $document = Inprint::Check::document($c, \@errors, $i_document);
 
-    my $feed = $c->sql->Q(" SELECT * FROM plugins_rss.rss WHERE entity=? ", [ $i_document ])->Hash;
+    my $feed = $c->Q(" SELECT * FROM plugins_rss.rss WHERE entity=? ", [ $i_document ])->Hash;
 
     #push @errors, { id => "feed", msg => "Can't find object"}
     #    unless ($feed->{id});
@@ -56,7 +56,7 @@ sub upload {
     Inprint::Check::uuid($c, \@errors, "document", $i_document);
     my $document = Inprint::Check::document($c, \@errors, $i_document);
 
-    my $feed = $c->sql->Q(" SELECT * FROM plugins_rss.rss WHERE entity=? ", [ $i_document ])->Hash;
+    my $feed = $c->Q(" SELECT * FROM plugins_rss.rss WHERE entity=? ", [ $i_document ])->Hash;
     push @errors, { id => "feed", msg => "Can't find object"} unless ($feed->{id});
 
     unless (@errors) {

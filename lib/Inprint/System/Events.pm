@@ -17,7 +17,7 @@ sub list {
     my @data;
     my $i_member = $c->param("member") || undef;
 
-    my $result = $c->sql->Q("
+    my $result = $c->Q("
         SELECT id, initiator, initiator_login, initiator_shortcut, initiator_position,
             entity, entity_type, message, message_type, message_variables, to_char(created, 'YYYY-MM-DD HH:MI:SS') as created
         FROM logs;

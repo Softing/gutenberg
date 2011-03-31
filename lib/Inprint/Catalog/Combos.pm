@@ -20,13 +20,13 @@ sub editions {
         FROM editions t1
     ";
 
-    my $result = $c->sql->Q(" $sql ORDER BY title_path ", \@params)->Hashes;
+    my $result = $c->Q(" $sql ORDER BY title_path ", \@params)->Hashes;
     $c->render_json( { data => $result } );
 }
 
 sub groups {
     my $c = shift;
-    my $result = $c->sql->Q("
+    my $result = $c->Q("
         SELECT t1.id, t1.shortcut as title, nlevel(path) as nlevel, '' as description,
             array_to_string( ARRAY( SELECT shortcut FROM catalog WHERE path @> t1.path ORDER BY nlevel(path) ), '.') as title_path
         FROM catalog t1
@@ -54,7 +54,7 @@ sub fascicles {
         push @data, $access;
     }
 
-    my $result = $c->sql->Q("
+    my $result = $c->Q("
         $sql
         ORDER BY is_enabled DESC, t2.shortcut, t1.shortcut
     ", \@data)->Hashes;
@@ -67,7 +67,7 @@ sub readiness {
         SELECT id, color, shortcut as title, description
         FROM readiness ORDER BY weight, shortcut;
     ";
-    my $result = $c->sql->Q($sql)->Hashes;
+    my $result = $c->Q($sql)->Hashes;
     $c->render_json( { data => $result } );
 }
 
@@ -75,7 +75,7 @@ sub roles {
     my $c = shift;
     my $sql = " SELECT id, title, shortcut, description FROM fascicles WHERE 1=1 ";
     $sql .= " ORDER BY is_system DESC, enddate, title ";
-    my $result = $c->sql->Q($sql)->Hashes;
+    my $result = $c->Q($sql)->Hashes;
     $c->render_json( { data => $result } );
 }
 

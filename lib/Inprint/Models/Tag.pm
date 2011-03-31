@@ -7,18 +7,18 @@ sub getByTitle {
     my $c = shift;
     my ($title, $description ) = @_;
 
-    my $tag = $c->sql->Q("
+    my $tag = $c->Q("
         SELECT id, title FROM indx_tags WHERE title=? ",
         [ $title ])->Hash;
 
     unless ($tag->{id}) {
 
-        $c->sql->Do("
+        $c->Do("
             INSERT INTO indx_tags (id, title, description, created, updated)
             VALUES (?, ?, ?, now(), now()); ",
             [ $c->uuid, $title, $description ]);
 
-        $tag = $c->sql->Q("
+        $tag = $c->Q("
             SELECT id, title FROM indx_tags WHERE title=? ",
             [ $title ])->Hash;
 
@@ -31,7 +31,7 @@ sub getById {
     my $c = shift;
     my ($id) = @_;
 
-    my $tag = $c->sql->Q("
+    my $tag = $c->Q("
         SELECT id, title FROM indx_tags WHERE id=? ",
         [ $id ])->Hash;
 

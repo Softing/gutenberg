@@ -62,7 +62,7 @@ sub editions {
             push @data, $bindings;
         }
 
-        my $data = $c->sql->Q("$sql ORDER BY shortcut ", \@data)->Hashes;
+        my $data = $c->Q("$sql ORDER BY shortcut ", \@data)->Hashes;
 
         foreach my $item (@$data) {
             my $record = {
@@ -132,7 +132,7 @@ sub workgroups {
             push @data, $bindings;
         }
 
-        my $data = $c->sql->Q("$sql ORDER BY shortcut", \@data)->Hashes;
+        my $data = $c->Q("$sql ORDER BY shortcut", \@data)->Hashes;
 
         foreach my $item (@$data) {
             my $record = {
@@ -196,7 +196,7 @@ sub fascicles {
             $leaf = $c->json->true;
         }
 
-        my $data = $c->sql->Q("$sql ORDER BY t1.shortcut", \@data)->Hashes;
+        my $data = $c->Q("$sql ORDER BY t1.shortcut", \@data)->Hashes;
 
         foreach my $item (@$data) {
             my $record = {

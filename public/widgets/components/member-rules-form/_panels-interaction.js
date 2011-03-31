@@ -4,13 +4,20 @@ Inprint.cmp.memberRulesForm.Interaction = function(main, panels) {
     var editionsPanel = main.cmpGetEditionsPanel();
     var organizationPanel = main.cmpGetOrganizationPanel();
 
-    main.panels.tabs.btnSave.on("click", function(){
+    var handlerSave = function(){
             main.cmpSave( main.panels.tabs.getActiveTab().cmpGetGrid() );
-        });
+        };
 
-    main.panels.tabs.btnClear.on("click", function(){
+    var handlerClear = function(){
             main.cmpClear( main.panels.tabs.getActiveTab().cmpGetGrid() );
-        });
+        };
+
+    main.panels.domain.cmpGetGrid().btnSave.on("click", handlerSave);
+    main.panels.editions.cmpGetGrid().btnSave.on("click", handlerSave);
+    main.panels.organization.cmpGetGrid().btnSave.on("click", handlerSave);
+
+    main.panels.editions.cmpGetGrid().btnClear.on("click", handlerClear);
+    main.panels.organization.cmpGetGrid().btnClear.on("click", handlerClear);
 
     // Domain
 

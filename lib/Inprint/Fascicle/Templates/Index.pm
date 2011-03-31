@@ -26,7 +26,7 @@ sub save {
         unless ($c->is_uuid($i_fascicle));
 
     my $fascicle; unless (@errors) {
-        $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
+        $fascicle = $c->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
         push @errors, { id => "facicle", msg => "Can't find object"}
             unless ($fascicle);
     }
@@ -35,7 +35,7 @@ sub save {
         unless ($c->is_uuid($i_place));
 
     my $place; unless (@errors) {
-        $place = $c->sql->Q(" SELECT * FROM fascicles_tmpl_places WHERE id=? ", [ $i_place ])->Hash;
+        $place = $c->Q(" SELECT * FROM fascicles_tmpl_places WHERE id=? ", [ $i_place ])->Hash;
         push @errors, { id => "place", msg => "Can't find object"}
             unless ($fascicle);
     }
@@ -45,7 +45,7 @@ sub save {
 
     unless (@errors) {
 
-        $c->sql->Do("
+        $c->Do("
                 DELETE FROM fascicles_tmpl_index WHERE fascicle=? AND place=? AND nature=?
             ", [ $fascicle->{id}, $place->{id}, $i_type ]);
 
@@ -53,7 +53,7 @@ sub save {
 
             next unless ($c->is_uuid($item));
 
-            $c->sql->Do("
+            $c->Do("
                 INSERT INTO fascicles_tmpl_index(edition, fascicle, place, nature, entity, created, updated)
                     VALUES (?, ?, ?, ?, ?, now(), now());
             ", [ $fascicle->{edition}, $fascicle->{id}, $place->{id}, $i_type, $item ]);
@@ -81,7 +81,7 @@ sub modules {
         unless ($c->is_uuid($i_fascicle));
 
     my $fascicle; unless (@errors) {
-        $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
+        $fascicle = $c->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
         push @errors, { id => "edition", msg => "Can't find object"}
             unless ($fascicle);
     }
@@ -90,7 +90,7 @@ sub modules {
         unless ($c->is_uuid($i_place));
 
     my $place; unless (@errors) {
-        $place = $c->sql->Q(" SELECT * FROM fascicles_tmpl_places WHERE id=? ", [ $i_place ])->Hash;
+        $place = $c->Q(" SELECT * FROM fascicles_tmpl_places WHERE id=? ", [ $i_place ])->Hash;
         push @errors, { id => "place", msg => "Can't find object"}
             unless ($fascicle);
     }
@@ -114,7 +114,7 @@ sub modules {
     }
 
     unless (@errors) {
-        $result = $c->sql->Q(" $sql ", \@params)->Hashes;
+        $result = $c->Q(" $sql ", \@params)->Hashes;
         $c->render_json( { data => $result } );
     }
 
@@ -140,7 +140,7 @@ sub headlines {
         unless ($c->is_uuid($i_fascicle));
 
     my $fascicle; unless (@errors) {
-        $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
+        $fascicle = $c->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
         push @errors, { id => "edition", msg => "Can't find object"}
             unless ($fascicle);
     }
@@ -149,7 +149,7 @@ sub headlines {
         unless ($c->is_uuid($i_place));
 
     my $place; unless (@errors) {
-        $place = $c->sql->Q(" SELECT * FROM fascicles_tmpl_places WHERE id=? ", [ $i_place ])->Hash;
+        $place = $c->Q(" SELECT * FROM fascicles_tmpl_places WHERE id=? ", [ $i_place ])->Hash;
         push @errors, { id => "place", msg => "Can't find object"}
             unless ($fascicle);
     }
@@ -168,7 +168,7 @@ sub headlines {
     }
 
     unless (@errors) {
-        $result = $c->sql->Q(" $sql ", \@params)->Hashes;
+        $result = $c->Q(" $sql ", \@params)->Hashes;
         $c->render_json( { data => $result } );
     }
 

@@ -25,7 +25,7 @@ sub read {
     my $result = [];
 
     unless (@errors) {
-        $result = $c->sql->Q(" SELECT id, branch, readiness, weight, title, shortcut, description FROM stages WHERE id=? ", [ $i_id ])->Hash;
+        $result = $c->Q(" SELECT id, branch, readiness, weight, title, shortcut, description FROM stages WHERE id=? ", [ $i_id ])->Hash;
     }
 
     $success = $c->json->true unless (@errors);
@@ -48,11 +48,11 @@ sub list {
 
     unless (@errors) {
 
-        my $idBranch = $c->sql->Q("
+        my $idBranch = $c->Q("
             SELECT id FROM branches WHERE edition=? LIMIT 1
         ", [$i_edition])->Value;
 
-        $result = $c->sql->Q("
+        $result = $c->Q("
             SELECT t1.id, t1.branch, t1.readiness, t1.weight, t1.title, t1.shortcut, t1.description,
                 t2.shortcut as readiness_shortcut, t2.color as readiness_color
             FROM stages t1, readiness t2
@@ -61,7 +61,7 @@ sub list {
         ", [ $idBranch ])->Hashes;
 
         foreach my $stage (@$result) {
-            $stage->{members} = $c->sql->Q("
+            $stage->{members} = $c->Q("
                 SELECT t1.id, t1.stage, t1.catalog, t1.principal,
                     t2.shortcut as catalog_shortcut,
                     t3.shortcut as stage_shortcut,
@@ -110,22 +110,22 @@ sub create {
 
     unless (@errors) {
 
-        my $idBranch = $c->sql->Q(" SELECT id FROM branches WHERE edition=? LIMIT 1 ", [$i_edition])->Value;
+        my $idBranch = $c->Q(" SELECT id FROM branches WHERE edition=? LIMIT 1 ", [$i_edition])->Value;
 
         unless ($idBranch) {
-            my $edition = $c->sql->Q(" SELECT * FROM editions WHERE id=? ", [$i_edition])->Hash;
-            $c->sql->Do("
+            my $edition = $c->Q(" SELECT * FROM editions WHERE id=? ", [$i_edition])->Hash;
+            $c->Do("
                 INSERT INTO branches(edition, mtype, title, shortcut, description, created, updated)
                 VALUES (?, ?, ?, ?, ?, now(), now());
              ", [ $edition->{id}, "document", $edition->{title}, $edition->{shortcut}, $edition->{description} ]);
-            $idBranch = $c->sql->Q(" SELECT id FROM branches WHERE edition=? LIMIT 1 ", [$i_edition])->Value;
+            $idBranch = $c->Q(" SELECT id FROM branches WHERE edition=? LIMIT 1 ", [$i_edition])->Value;
         }
 
         push @errors, { id => "access", msg => "Not enough permissions <$idBranch>"}
             unless ($c->is_uuid($idBranch));
 
         unless (@errors) {
-            $c->sql->Do("
+            $c->Do("
                 INSERT INTO stages (id, branch, readiness, weight, title, shortcut, description)
                     VALUES (?,?,?,?,?,?,?)
             ", [ $id, $idBranch, $i_readiness, $i_weight, $i_title, $i_shortcut, $i_description ]);
@@ -161,7 +161,7 @@ sub update {
     Inprint::Check::access($c, \@errors, "domain.exchange.manage");
 
     unless (@errors) {
-        $c->sql->Do("
+        $c->Do("
             UPDATE stages
                 SET readiness=?, weight=?, title=?, shortcut=?, description=?, updated=now()
             WHERE id =?;
@@ -185,7 +185,7 @@ sub principalsMapping {
     my $result = [];
 
     unless (@errors) {
-        $result = $c->sql->Q("
+        $result = $c->Q("
             SELECT t1.id, t1.stage, t1.catalog, t1.principal,
                 t2.shortcut as catalog_shortcut,
                 t3.shortcut as stage_shortcut,
@@ -226,8 +226,8 @@ sub mapPrincipals {
 
     unless (@errors) {
         foreach my $member (@i_members) {
-            $c->sql->Do(" DELETE FROM map_principals_to_stages WHERE stage=? AND catalog=? AND principal=? ", [ $i_stage, $i_catalog, $member ]);
-            $c->sql->Do(" INSERT INTO map_principals_to_stages(stage, catalog, principal) VALUES (?, ?, ?) ", [ $i_stage, $i_catalog, $member ]);
+            $c->Do(" DELETE FROM map_principals_to_stages WHERE stage=? AND catalog=? AND principal=? ", [ $i_stage, $i_catalog, $member ]);
+            $c->Do(" INSERT INTO map_principals_to_stages(stage, catalog, principal) VALUES (?, ?, ?) ", [ $i_stage, $i_catalog, $member ]);
         }
     }
 
@@ -249,7 +249,7 @@ sub unmapPrincipals {
     unless (@errors) {
         foreach my $member (@i_members) {
             if ($c->is_uuid($member)) {
-                $c->sql->Do(" DELETE FROM map_principals_to_stages WHERE id=? ", [ $member ]);
+                $c->Do(" DELETE FROM map_principals_to_stages WHERE id=? ", [ $member ]);
             }
         }
     }
@@ -272,7 +272,7 @@ sub delete {
     unless (@errors) {
         foreach my $id (@ids) {
             if ($c->is_uuid($id)) {
-                $c->sql->Do(" DELETE FROM stages WHERE id=? ", [ $id ]);
+                $c->Do(" DELETE FROM stages WHERE id=? ", [ $id ]);
             }
         }
     }

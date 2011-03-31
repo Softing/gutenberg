@@ -24,7 +24,7 @@ sub read {
     my $result = [];
 
     unless (@errors) {
-        $result = $c->sql->Q("
+        $result = $c->Q("
             SELECT id, fascicle, title, description, bydefault, w, h, created, updated FROM fascicles_tmpl_pages WHERE id=?
         ", [ $i_id ])->Hash;
     }
@@ -46,7 +46,7 @@ sub list {
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         unless ($c->is_uuid($i_fascicle));
 
-    my $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id = ? ", [ $i_fascicle ])->Hash;
+    my $fascicle = $c->Q(" SELECT * FROM fascicles WHERE id = ? ", [ $i_fascicle ])->Hash;
 
     push @errors, { id => "fascicle", msg => "Can't find object"}
         unless ($fascicle->{id});
@@ -58,7 +58,7 @@ sub list {
 
         push @params, $fascicle->{id};
 
-        $result = $c->sql->Q(" $sql ", \@params)->Hashes;
+        $result = $c->Q(" $sql ", \@params)->Hashes;
 
     }
 
@@ -112,13 +112,13 @@ sub create {
     my $fascicle;
 
     #unless (@errors) {
-    #    $fascicle = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $place->{fascicle} ])->Hash;
+    #    $fascicle = $c->Q(" SELECT * FROM fascicles WHERE id=? ", [ $place->{fascicle} ])->Hash;
     #    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
     #        unless ($fascicle);
     #}
 
     unless (@errors) {
-        $fascicle  = $c->sql->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
+        $fascicle  = $c->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
         push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
             unless ($fascicle);
     }
@@ -130,12 +130,12 @@ sub create {
 
     unless (@errors) {
         if ($default == 1) {
-            $c->sql->Do(" UPDATE fascicles_tmpl_pages SET bydefault=false WHERE fascicle=? ", [ $fascicle->{id} ]);
+            $c->Do(" UPDATE fascicles_tmpl_pages SET bydefault=false WHERE fascicle=? ", [ $fascicle->{id} ]);
         }
     }
 
     unless (@errors) {
-        $c->sql->Do("
+        $c->Do("
             INSERT INTO fascicles_tmpl_pages(id, fascicle, origin, title, description, bydefault, w, h, created, updated)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, now(), now());
         ", [ $id, $fascicle->{id}, $fascicle->{id}, $i_title, $i_description, $default, \@i_w, \@i_h ]);
@@ -170,7 +170,7 @@ sub update {
     push @errors, { id => "description", msg => "Incorrectly filled field"}
         unless ($c->is_text($i_description));
 
-    my $page = $c->sql->Q(" SELECT * FROM fascicles_tmpl_pages WHERE id=?", [ $i_id ] )->Hash;
+    my $page = $c->Q(" SELECT * FROM fascicles_tmpl_pages WHERE id=?", [ $i_id ] )->Hash;
 
     push @errors, { id => "page", msg => "Can't find object"}
         unless ($page->{id});
@@ -182,12 +182,12 @@ sub update {
 
     unless (@errors) {
         if ($default == 1) {
-            $c->sql->Do(" UPDATE fascicles_tmpl_pages SET bydefault=false WHERE fascicle=? ", [ $page->{fascicle} ]);
+            $c->Do(" UPDATE fascicles_tmpl_pages SET bydefault=false WHERE fascicle=? ", [ $page->{fascicle} ]);
         }
     }
 
     unless (@errors) {
-        $c->sql->Do("
+        $c->Do("
             UPDATE fascicles_tmpl_pages SET title=?, description=?, bydefault=?, w=?, h=?, updated=now() WHERE id = ? ;
         ", [ $i_title, $i_description, $default, \@i_w, \@i_h, $i_id ]);
     }
@@ -211,21 +211,21 @@ sub delete {
 
             next unless ($c->is_uuid($id));
 
-            my $page = $c->sql->Q("
+            my $page = $c->Q("
                 SELECT * FROM fascicles_tmpl_pages WHERE id=?",
                 [ $id ] )->Hash;
             next unless ($page->{id});
 
-            my $isConnected = $c->sql->Q("
+            my $isConnected = $c->Q("
                 SELECT EXISTS( SELECT id FROM fascicles_pages WHERE origin=?) ",
                 [ $id ] )->Value;
             next if ($isConnected);
 
-            $c->sql->Do("
+            $c->Do("
                 DELETE FROM fascicles_tmpl_pages WHERE id=? ",
                 [ $page->{id} ]);
 
-            $c->sql->Do("
+            $c->Do("
                 DELETE FROM fascicles_tmpl_modules WHERE page=? ",
                 [ $page->{id} ]);
 

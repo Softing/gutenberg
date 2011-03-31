@@ -11,7 +11,7 @@ sub GetEditionById {
     my @params = ($params{id});
     my $sql = " SELECT id, shortcut FROM editions WHERE id=? ";
 
-    my $result = $c->sql->Q($sql, \@params)->Hash;
+    my $result = $c->Q($sql, \@params)->Hash;
 
     return $result || undef;
 }
@@ -30,7 +30,7 @@ sub GetFascicleById {
         push @params, $params{id};
     }
 
-    my $result = $c->sql->Q($sql, \@params)->Hash;
+    my $result = $c->Q($sql, \@params)->Hash;
 
     return $result || undef;
 }
@@ -55,7 +55,7 @@ sub GetHeadlineById {
         push @params, $params{fascicle};
     }
 
-    my $result = $c->sql->Q($sql, \@params)->Hash;
+    my $result = $c->Q($sql, \@params)->Hash;
 
     return $result || undef;
 }
@@ -85,7 +85,7 @@ sub GetRubricById {
         push @params, $params{headline};
     }
 
-    my $result = $c->sql->Q($sql, \@params)->Hash;
+    my $result = $c->Q($sql, \@params)->Hash;
 
     return $result || undef;
 }
@@ -111,7 +111,7 @@ sub GetDocumentById {
     $sql .= " AND t1.id=?  ";
     push @params, $params{id};
 
-    my $result = $c->sql->Q($sql, \@params)->Hash;
+    my $result = $c->Q($sql, \@params)->Hash;
 
     return $result || undef;
 }

@@ -14,7 +14,7 @@ sub update {
 
     my $c = shift;
 
-    my $member_id     = $c->QuerySessionGet("member.id");
+    my $member_id     = $c->getSessionValue("member.id");
     
     my $i_edition            = $c->param("edition");
     my $i_edition_shortcut   = $c->param("edition-shortcut");
@@ -39,15 +39,15 @@ sub update {
     
     unless (@errors) {
         
-        $c->sql->Do("DELETE FROM options WHERE option_name=? AND member=?", ["default.edition", $member_id]);
-        $c->sql->Do("INSERT INTO OPTIONS (member, option_name, option_value) VALUES (?, ?, ?)", [$member_id, "default.edition", $i_edition]);
-        $c->sql->Do("DELETE FROM options WHERE option_name=? AND member=?", ["default.edition.name", $member_id]);
-        $c->sql->Do("INSERT INTO OPTIONS (member, option_name, option_value) VALUES (?, ?, ?)", [$member_id, "default.edition.name", $i_edition_shortcut]);
+        $c->Do("DELETE FROM options WHERE option_name=? AND member=?", ["default.edition", $member_id]);
+        $c->Do("INSERT INTO OPTIONS (member, option_name, option_value) VALUES (?, ?, ?)", [$member_id, "default.edition", $i_edition]);
+        $c->Do("DELETE FROM options WHERE option_name=? AND member=?", ["default.edition.name", $member_id]);
+        $c->Do("INSERT INTO OPTIONS (member, option_name, option_value) VALUES (?, ?, ?)", [$member_id, "default.edition.name", $i_edition_shortcut]);
         
-        $c->sql->Do("DELETE FROM options WHERE option_name=? AND member=?", ["default.workgroup", $member_id]);
-        $c->sql->Do("INSERT INTO OPTIONS (member, option_name, option_value) VALUES (?, ?, ?)", [$member_id, "default.workgroup", $i_workgroup]);
-        $c->sql->Do("DELETE FROM options WHERE option_name=? AND member=?", ["default.workgroup.name", $member_id]);
-        $c->sql->Do("INSERT INTO OPTIONS (member, option_name, option_value) VALUES (?, ?, ?)", [$member_id, "default.workgroup.name", $i_workgroup_shortcut]);
+        $c->Do("DELETE FROM options WHERE option_name=? AND member=?", ["default.workgroup", $member_id]);
+        $c->Do("INSERT INTO OPTIONS (member, option_name, option_value) VALUES (?, ?, ?)", [$member_id, "default.workgroup", $i_workgroup]);
+        $c->Do("DELETE FROM options WHERE option_name=? AND member=?", ["default.workgroup.name", $member_id]);
+        $c->Do("INSERT INTO OPTIONS (member, option_name, option_value) VALUES (?, ?, ?)", [$member_id, "default.workgroup.name", $i_workgroup_shortcut]);
     }
 
     $success = $c->json->true unless (@errors);

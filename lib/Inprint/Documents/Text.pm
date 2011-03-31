@@ -27,8 +27,8 @@ sub get {
     Inprint::Check::uuid($c, \@errors, "file", $i_file);
     Inprint::Check::uuid($c, \@errors, "file", $i_document);
 
-    my $file = $c->sql->Q(" SELECT * FROM cache_files WHERE id=? ", $i_file)->Hash;
-    my $document = $c->sql->Q(" SELECT * FROM documents WHERE id=? ", $i_document)->Hash;
+    my $file = $c->Q(" SELECT * FROM cache_files WHERE id=? ", $i_file)->Hash;
+    my $document = $c->Q(" SELECT * FROM documents WHERE id=? ", $i_document)->Hash;
 
     unless (@errors) {
         $result = Inprint::Store::Embedded::fileRead($c, $file->{id});

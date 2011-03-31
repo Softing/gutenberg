@@ -37,7 +37,7 @@ sub list {
         push @data1, "%$i_filter%";
     }
 
-    my $groups = $c->sql->Q(" $sql1 ORDER BY shortcut", \@data1)->Hashes;
+    my $groups = $c->Q(" $sql1 ORDER BY shortcut", \@data1)->Hashes;
 
     # Get members
 
@@ -60,7 +60,7 @@ sub list {
         push @data2, "%$i_filter%";
     }
 
-    my $members = $c->sql->Q(" $sql2  ORDER BY t2.shortcut ", \@data2)->Hashes;
+    my $members = $c->Q(" $sql2  ORDER BY t2.shortcut ", \@data2)->Hashes;
 
     @$result = (@$groups, @$members);
 

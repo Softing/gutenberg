@@ -62,7 +62,7 @@ sub search {
         push @params, $pagination->{start};
     }
 
-    return $c->sql->Q($sql_query, \@params)->Hashes;
+    return $c->Q($sql_query, \@params)->Hashes;
 }
 
 1;

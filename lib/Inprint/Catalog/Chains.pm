@@ -12,7 +12,7 @@ use base 'Inprint::BaseController';
 
 sub combo {
     my $c = shift;
-    my $result = $c->sql->Q("
+    my $result = $c->Q("
             SELECT t1.id, t1.name, t1.shortcut, t1.description,
                 t2.shortcut as catalog_shortcut
             FROM chains t1, catalog t2
@@ -54,7 +54,7 @@ sub create {
 
         my $id = $c->uuid();
 
-        $c->sql->Do("
+        $c->Do("
             INSERT INTO chains (id, catalog, name, shortcut, description)
                 VALUES (?,?,?,?,?)
         ", [ $id, $i_path, $i_name, $i_shortcut, $i_description ]);
@@ -67,7 +67,7 @@ sub create {
 sub read {
     my $c = shift;
     my $i_id = $c->param("id");
-    my $result = $c->sql->Q("
+    my $result = $c->Q("
         SELECT t1.*, t2.id as catalog_id, t2.shortcut as catalog_shortcut
         FROM chains t1, catalog t2
         WHERE t1.id=? AND t2.id = t1.catalog
@@ -106,7 +106,7 @@ sub update {
 
         $result->{success} = $c->json->true;
 
-        $c->sql->Do("
+        $c->Do("
             UPDATE chains
                 SET catalog=?, name=?, shortcut=?, description=?, updated=now()
             WHERE id =?;
@@ -120,7 +120,7 @@ sub delete {
     my $c = shift;
     my @ids = $c->param("id");
     foreach my $id (@ids) {
-        $c->sql->Do(" DELETE FROM chains WHERE id=? ", [ $id ]);
+        $c->Do(" DELETE FROM chains WHERE id=? ", [ $id ]);
     }
     $c->render_json( { success => $c->json->true } );
 }
