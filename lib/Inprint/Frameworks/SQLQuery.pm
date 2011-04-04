@@ -123,11 +123,9 @@ sub Hashes  {
     my $result;
 
     if ( $c->{value} ) {
-
         $result = $c->conn->run(fixup => sub {
             $_->selectall_arrayref( $c->{query}, { Slice => {} }, @{ $c->{value} } );
         });
-
     } else {
         $result = $c->conn->run(fixup => sub {
             $_->selectall_arrayref( $c->{query}, { Slice => {} });

@@ -62,18 +62,22 @@ Inprint.cmp.memberRulesForm.Window = Ext.extend(Ext.Window, {
         return this.panels.organization;
     },
 
-    cmpSave: function(grid, member) {
+    cmpSave: function(grid) {
+
+        var member  = this.memberId;
+        var binding = grid.cmpGetBinding();
+        var section = grid.cmpGetSection();
 
         var params = {
             rules:   [],
-            member:  this.memberId,
-            binding: grid.cmpGetBinding(),
-            section: grid.cmpGetSection()
+            member:  member,
+            binding: binding,
+            section: section
         };
 
         Ext.each(grid.getSelectionModel().getSelections(), function(record) {
             var id = record.get("id");
-            var mode = record.get("selection") || "member";
+            var mode = record.get("selection") || section;
             params.rules.push( id + "::" + mode );
         });
 
@@ -113,12 +117,22 @@ Inprint.cmp.memberRulesForm.Window = Ext.extend(Ext.Window, {
 
     cmpFill: function(grid) {
 
+        var section = grid.cmpGetSection();
+
         grid.getSelectionModel().clearSelections();
         grid.getStore().rejectChanges();
 
         grid.getStore().each(function(record) {
-            record.set("limit", _("Employee"));
-            record.set("selection", "member");
+
+            if (section == "editions") {
+                record.set("limit", _("Edition"));
+                record.set("selection", "edition");
+            }
+
+            if (section == "catalog") {
+                record.set("limit", _("Employee"));
+                record.set("selection", "member");
+            }
         });
 
         grid.body.mask(_("Loading"));
@@ -150,6 +164,16 @@ Inprint.cmp.memberRulesForm.Window = Ext.extend(Ext.Window, {
 
                         if (result.data[i].type == "obtained") {
                             grid.getSelectionModel().selectRecords([ record ], true);
+                        }
+
+                        if (mode == 'edition') {
+                            record.set("limit", _("Edition"));
+                            record.set("selection", "edition");
+                        }
+
+                        if (mode == 'editions') {
+                            record.set("limit", _("Editions"));
+                            record.set("selection", "editions");
                         }
 
                         if (mode == 'member') {

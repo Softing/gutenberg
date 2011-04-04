@@ -19,96 +19,8 @@ sub register {
 
     $app->helper(
         objectAccess => sub {
-            my ($c, $terms, $binding, $member) = @_;
-
-            my @rules;
-            my $result = 0;
-
-            unless ($member) {
-                $member = $c->getSessionValue("member.id");
-            }
-
-            if (ref $terms eq "ARRAY") {
-                @rules = @$terms;
-            } else {
-                push @rules, $terms;
-            }
-
-            for (my $i=0; $i <= $#rules; $i++) {
-                my ($term, $area) = split /:/, $rules[$i];
-                if ($area eq "*") {
-                    splice @rules, $i, $i, "$term:member", "$term:group";
-                }
-            }
-            my %seen; @rules = grep { ! $seen{$_}++ } @rules;
-
-            if ($member && @rules) {
-
-                my @data;
-
-                my $sql = " SELECT true FROM cache_access WHERE member=? AND ? && terms ";
-                push @data, $member;
-                push @data, \@rules;
-
-                if ($binding) {
-                    $sql .= " AND binding=?";
-                    push @data, $binding;
-                }
-
-                $result = $c->sql->Q("SELECT EXISTS ($sql)", \@data)->Value();
-            }
-
-            return $result;
-        } );
-
-    $app->helper(
-        objectDirectAccess => sub {
-            my ($c, $terms, $binding, $member) = @_;
-
-            my @rules;
-            my $result = 0;
-
-            unless ($member) {
-                $member = $c->getSessionValue("member.id");
-            }
-
-            if (ref $terms eq "ARRAY") {
-                @rules = @$terms;
-            } else {
-                push @rules, $terms;
-            }
-
-            my %seen; @rules = grep { ! $seen{$_}++ } @rules;
-
-            if ($member && @rules) {
-
-                my @data;
-
-                my $sql = "
-                    SELECT true
-                    FROM map_member_to_rule map LEFT JOIN rules ON map.term = rules.id
-                    WHERE member=? AND rules.section || '.' || rules.subsection || '.' || rules.term = ANY(?) ";
-                push @data, $member;
-                push @data, \@rules;
-
-                if ($binding) {
-                    $sql .= " AND binding=?";
-                    push @data, $binding;
-                }
-
-                $result = $c->sql->Q("SELECT EXISTS ($sql)", \@data)->Value();
-            }
-
-            return $result;
-        } );
-
-    $app->helper(
-        objectBindings => sub {
-
             my ($c, $terms, $member) = @_;
 
-            my $result = [];
-
             unless ($member) {
                 $member = $c->getSessionValue("member.id");
             }
@@ -122,23 +34,261 @@ sub register {
             }
 
             for (my $i=0; $i <= $#rules; $i++) {
-                my ($term, $area) = split /:/, $rules[$i];
-                if ($area eq "*") {
-                    splice @rules, $i, $i, "$term:member", "$term:group";
+                my ($terstring, $area) = split /:/, $rules[$i];
+                my ($section, $subsection, $term) = split /\./, $terstring;
+                if ($section eq "editions") {
+                    if ($area eq "*") {
+                        splice @rules, $i, $i, "$terstring:edition", "$terstring:editions";
+                    }
+                }
+                if ($section eq "catalog") {
+                    if ($area eq "*") {
+                        splice @rules, $i, $i, "$terstring:member", "$terstring:group";
+                    }
                 }
             }
 
             my %seen;
             @rules = grep { ! $seen{$_}++ } @rules;
 
-            if (@rules && $member) {
-                $result = $c->sql->Q("
-                    SELECT t1.binding FROM cache_access t1
-                    WHERE t1.member = ? AND ?::text[] && t1.terms;
-                ", [ $member, \@rules ])->Values();
+            foreach my $rule (@rules) {
+
+                my ($rulestring, $area) = split /:/, $rule;
+                my ($section, $subsection, $term) = split /\./, $rulestring;
+
+                $c->dbh()->{pg_placeholder_dollaronly} = 1;
+
+                my $binding = $c->Q("
+                    SELECT binding FROM map_member_to_rule as mapper WHERE 1=1
+                    AND mapper.termkey = \$1 AND member = \$2
+                ", [ $rule, $member ])->Values;
+
+                # Domain
+                if ($section eq "domain") {
+                    return 1 if $binding;
+                }
+
+                # Editions
+                if ($section eq "editions") {
+
+                    if ($area eq "edition") {
+                        return 1 if $binding;
+                    }
+                    if ($area eq "editions") {
+                        my $exists = $c->Q("
+                            SELECT EXISTS (
+                                SELECT true FROM editions WHERE path ? ARRAY(
+                                    SELECT ('*.' || replace(binding::text, '-', '')::text ||'.*')::lquery
+                                    FROM map_member_to_rule as mapper WHERE 1=1
+                                        AND mapper.termkey = \$1 AND member = \$2 )
+                            )"
+                        , [ $rule, $member ] )->Value;
+                        return 1 if ($exists);
+                    }
+                }
+
+                # Catalog
+                if ($section eq "catalog") {
+                    my $exists = $c->Q("
+                        SELECT EXISTS (
+                            SELECT true FROM catalog WHERE path ? ARRAY(
+                                SELECT ('*.' || replace(binding::text, '-', '')::text ||'.*')::lquery
+                                FROM map_member_to_rule as mapper WHERE 1=1
+                                    AND mapper.termkey = \$1 AND member = \$2 )
+                        )"
+                    , [ $rule, $member ] )->Value;
+                    return 1 if ($exists);
+                }
+
+                $c->dbh()->{pg_placeholder_dollaronly} = 0;
+
             }
 
-            return $result || [];
+            return 0;
+        } );
+
+        #    my ($c, $terms, $binding, $member) = @_;
+        #
+        #    my @rules;
+        #    my $result = 0;
+        #
+        #    unless ($member) {
+        #        $member = $c->getSessionValue("member.id");
+        #    }
+        #
+        #    if (ref $terms eq "ARRAY") {
+        #        @rules = @$terms;
+        #    } else {
+        #        push @rules, $terms;
+        #    }
+        #
+        #    for (my $i=0; $i <= $#rules; $i++) {
+        #        my ($terstring, $area) = split /:/, $rules[$i];
+        #        my ($section, $subsection, $term) = split /\./, $terstring;
+        #        if ($section eq "editions") {
+        #            if ($area eq "*") {
+        #                splice @rules, $i, $i, "$terstring:edition", "$terstring:editions";
+        #            }
+        #        }
+        #        if ($section eq "catalog") {
+        #            if ($area eq "*") {
+        #                splice @rules, $i, $i, "$terstring:member", "$terstring:group";
+        #            }
+        #        }
+        #    }
+        #
+        #    my %seen; @rules = grep { ! $seen{$_}++ } @rules;
+        #
+        #    if ($member && @rules) {
+        #
+        #        my @data;
+        #
+        #        my $sql = " SELECT true FROM cache_access WHERE member=? AND ? && terms ";
+        #        push @data, $member;
+        #        push @data, \@rules;
+        #
+        #        if ($binding) {
+        #            $sql .= " AND binding=?";
+        #            push @data, $binding;
+        #        }
+        #
+        #        $result = $c->sql->Q("SELECT EXISTS ($sql)", \@data)->Value();
+        #    }
+        #
+        #    return $result;
+        #} );
+
+        #$app->helper(
+        #    objectDirectAccess => sub {
+        #        my ($c, $terms, $binding, $member) = @_;
+        #
+        #        my @rules;
+        #        my $result = 0;
+        #
+        #        unless ($member) {
+        #            $member = $c->getSessionValue("member.id");
+        #        }
+        #
+        #        if (ref $terms eq "ARRAY") {
+        #            @rules = @$terms;
+        #        } else {
+        #            push @rules, $terms;
+        #        }
+        #
+        #        my %seen; @rules = grep { ! $seen{$_}++ } @rules;
+        #
+        #        if ($member && @rules) {
+        #
+        #            my @data;
+        #
+        #            my $sql = "
+        #                SELECT true
+        #                FROM map_member_to_rule mapper
+        #                WHERE member=? AND termkey = ANY(?) ";
+        #            push @data, $member;
+        #            push @data, \@rules;
+        #
+        #            if ($binding) {
+        #                $sql .= " AND binding=?";
+        #                push @data, $binding;
+        #            }
+        #
+        #            $result = $c->sql->Q("SELECT EXISTS ($sql)", \@data)->Value();
+        #        }
+        #
+        #        return $result;
+        #    } );
+
+    $app->helper(
+        objectBindings => sub {
+
+            my ($c, $terms, $member) = @_;
+
+            my @result;
+
+            unless ($member) {
+                $member = $c->getSessionValue("member.id");
+            }
+
+            my @rules;
+
+            if (ref $terms eq "ARRAY") {
+                @rules = @$terms;
+            } else {
+                push @rules, $terms;
+            }
+
+            for (my $i=0; $i <= $#rules; $i++) {
+                my ($terstring, $area) = split /:/, $rules[$i];
+                my ($section, $subsection, $term) = split /\./, $terstring;
+                if ($section eq "editions") {
+                    if ($area eq "*") {
+                        splice @rules, $i, $i, "$terstring:edition", "$terstring:editions";
+                    }
+                }
+                if ($section eq "catalog") {
+                    if ($area eq "*") {
+                        splice @rules, $i, $i, "$terstring:member", "$terstring:group";
+                    }
+                }
+            }
+
+            my %seen;
+            @rules = grep { ! $seen{$_}++ } @rules;
+
+            foreach my $rule (@rules) {
+
+                my $bindings = [];
+
+                my ($rulestring, $area) = split /:/, $rule;
+                my ($section, $subsection, $term) = split /\./, $rulestring;
+
+                $c->dbh()->{pg_placeholder_dollaronly} = 1;
+
+                # Editions
+                if ($section eq "editions") {
+                    if ($area eq "edition") {
+                        $bindings = $c->Q("
+                            SELECT binding FROM map_member_to_rule as mapper WHERE 1=1
+                                AND mapper.termkey = \$1
+                                AND member = \$2 "
+                        , [ $rule, $member ] )->Values;
+
+                    }
+                    if ($area eq "editions") {
+                        $bindings = $c->Q("
+                            SELECT id FROM editions WHERE path ? ARRAY(
+                                SELECT ('*.' || replace(binding::text, '-', '')::text ||'.*')::lquery
+                                FROM map_member_to_rule as mapper WHERE 1=1
+                                    AND mapper.termkey = \$1 AND member = \$2 ) "
+                        , [ $rule, $member ] )->Values;
+
+                    }
+                }
+
+                # Catalog
+                if ($section eq "catalog") {
+                        $bindings = $c->Q("
+                            SELECT id FROM catalog WHERE path ? ARRAY(
+                                SELECT ('*.' || replace(binding::text, '-', '')::text ||'.*')::lquery
+                                FROM map_member_to_rule as mapper WHERE 1=1
+                                    AND mapper.termkey = \$1 AND member = \$2 ) "
+                        , [ $rule, $member ] )->Values;
+                }
+
+                $c->dbh()->{pg_placeholder_dollaronly} = 0;
+
+
+                foreach (@$bindings) {
+                    push @result, $_;
+                }
+
+            }
+
+            my %seen2;
+            @result = grep { ! $seen2{$_}++ } @result;
+
+            return \@result;
         } );
 
     $app->helper(

@@ -34,6 +34,39 @@ Inprint.cmp.memberRulesForm.Editions.Restrictions = Ext.extend(Ext.grid.EditorGr
                 renderer: function (value, meta, record) {
                     return _(value);
                 }
+            },
+            {
+                id: "limit",
+                width: 120,
+                header: _("Limit"),
+                dataIndex: 'limit',
+                editor: new Ext.form.ComboBox({
+                    lazyRender : true,
+                    store: new Ext.data.ArrayStore({
+                        fields: ['id', 'name'],
+                        data: [
+                            [ 'edition', _("Edition")],
+                            [ 'editions', _("Editions")]
+                        ]
+                    }),
+                    mode: 'local',
+                    hiddenName: "id",
+                    valueField: "id",
+                    displayField:'name',
+                    editable:false,
+                    forceSelection: true,
+                    emptyText:_("Limitation..."),
+                    listeners: {
+                        expand: function(combo) {
+                            var store = combo.getStore();
+                            store.removeAll();
+                            store.loadData([
+                                [ 'edition', _("Edition")],
+                                [ 'editions', _("Editions")]
+                            ]);
+                        }
+                    }
+                })
             }
         ];
 
@@ -69,6 +102,14 @@ Inprint.cmp.memberRulesForm.Editions.Restrictions = Ext.extend(Ext.grid.EditorGr
 
     onRender: function() {
         Inprint.cmp.memberRulesForm.Editions.Restrictions.superclass.onRender.apply(this, arguments);
+
+        this.on("afteredit", function(e) {
+            var combo = this.getColumnModel().getCellEditor(e.column, e.row).field;
+            e.record.set("limit", combo.getRawValue());
+            e.record.set("selection", combo.getValue());
+            this.getSelectionModel().selectRow(e.row, true);
+        });
+
         this.getStore().load();
     },
 

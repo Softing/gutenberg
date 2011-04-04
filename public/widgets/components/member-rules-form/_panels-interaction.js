@@ -30,7 +30,6 @@ Inprint.cmp.memberRulesForm.Interaction = function(main, panels) {
     // Editions
 
     editionsPanel.cmpGetTree().getSelectionModel().on("selectionchange", function(sm, node) {
-
         var grid = editionsPanel.cmpGetGrid();
         grid.enable();
         grid.cmpSetBinding(node.id);

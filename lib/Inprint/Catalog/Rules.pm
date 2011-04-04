@@ -98,14 +98,24 @@ sub map {
                 WHERE member=? AND section=? AND binding=? ",
             [ $i_member, $i_section, $i_binding ]);
 
-        foreach my $string (@i_rules)
-        {
+        foreach my $string (@i_rules) {
+
             my ($rule, $mode) = split "::", $string;
             if ($rule && $mode) {
+
                 $c->Do("
-                    INSERT INTO map_member_to_rule(member, section, binding, area, term)
+                    INSERT INTO map_member_to_rule(member, section, binding, area, term )
                         VALUES (?, ?, ?, ?, ?) ",
                     [$i_member, $i_section, $i_binding, $mode, $rule]);
+
+                $c->Do("
+                    UPDATE map_member_to_rule set termkey =
+                        (   SELECT rules.section ||'.'|| rules.subsection ||'.'|| rules.term || ':' || mapper.area
+                            FROM map_member_to_rule as mapper, rules
+                            WHERE mapper.term = rules.id AND mapper.id = map_member_to_rule.id)
+
+                ");
+
             }
         }
 
@@ -127,44 +137,25 @@ sub mapping {
 
     if ($i_section ~~ [ "domain", "editions", "catalog" ]) {
 
-        my $sql1 = " SELECT member, section, area, term FROM map_member_to_rule WHERE member=? AND section=? ";
-        my $sql2 = " SELECT terms FROM cache_access WHERE member=? AND type=? ";
+        my $sql = "
+            SELECT member, section, area, term FROM map_member_to_rule WHERE member=? AND section=?
+        ";
 
         push @data, $i_member;
         push @data, $i_section;
 
         if ($i_binding) {
-            $sql1 .= " AND binding=? ";
-            $sql2 .= " AND binding=? ";
-
+            $sql .= " AND binding=? ";
             push @data, $i_binding;
         }
 
-        my $data1 = $c->Q($sql1, \@data)->Hashes;
-        foreach my $item (@$data1) {
+        my $data = $c->Q($sql, \@data)->Hashes;
+        foreach my $item (@$data) {
             $result->{ $item->{term} } = {
                 type => "obtained",
                 area => $item->{area},
                 icon => "key"
             };
-        }
-
-        my $data2 = $c->Q($sql2, \@data)->Values;
-        foreach my $item (@$data2) {
-            foreach my $term (@$item) {
-
-                my ($term, $area) = split /:/, $term;
-
-                my $term_obj = $c->Q(
-                    "SELECT * FROM view_rules WHERE term_text = ?", [ $term ])->Hash;
-
-                next if $result->{ $term_obj->{id} };
-                $result->{ $term_obj->{id} } = {
-                    type => "inherited",
-                    area => $area || $i_section,
-                    icon => "key--arrow"
-                }
-            }
         }
 
     }

@@ -36,17 +36,13 @@ sub SetDBH {
 sub Q {
     my $c = shift;
 
-    my $query = shift;
-    my $value = shift;
-    my $trace = shift;
+    my $query   = shift;
+    my $value   = shift;
+    my $trace   = shift;
 
     unless (ref($value) eq "ARRAY") {
         $value = [ $value ] if $value;
     }
-
-    print STDERR $query;
-    print STDERR $value;
-    print STDERR $trace;
 
     return new Inprint::Frameworks::SQLQuery($c->{conn}, $query, $value, $trace);
 }

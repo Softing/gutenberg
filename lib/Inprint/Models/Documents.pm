@@ -174,7 +174,7 @@ sub search {
     my $sql_filters = " ";
 
     # Set view restrictions
-    my $editions = $c->objectBindings("editions.documents.work");
+    my $editions = $c->objectBindings("editions.documents.work:*");
     my $departments = $c->objectBindings("catalog.documents.view:*");
 
     $sql_filters .= " AND ( ";
