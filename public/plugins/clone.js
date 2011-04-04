@@ -4,6 +4,9 @@
  * @return {Object/Array} Deep clone of an object or an array
  * @author Ing. Jozef Sakáloš
  */
+ 
+Ext.ns("Ext.ux.util");
+ 
 Ext.ux.util.clone = function(o) {
     if(!o || 'object' !== typeof o) {
         return o;
