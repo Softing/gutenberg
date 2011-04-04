@@ -38,7 +38,7 @@ sub register {
                 my ($section, $subsection, $term) = split /\./, $terstring;
 
                 if ($section eq "domain" && !$area) {
-                    $rules[$i] = "$terstring:member";
+                    $rules[$i] = "$terstring:domain";
                 }
 
                 if ($section eq "editions") {

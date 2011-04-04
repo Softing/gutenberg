@@ -124,6 +124,11 @@ Inprint.cmp.memberRulesForm.Window = Ext.extend(Ext.Window, {
 
         grid.getStore().each(function(record) {
 
+            if (section == "domain") {
+                record.set("limit", _("Domain"));
+                record.set("selection", "domain");
+            }
+
             if (section == "editions") {
                 record.set("limit", _("Edition"));
                 record.set("selection", "edition");
