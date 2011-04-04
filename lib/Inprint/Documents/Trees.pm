@@ -8,8 +8,6 @@ package Inprint::Documents::Trees;
 use strict;
 use warnings;
 
-
-
 use base 'Mojolicious::Controller';
 
 sub editions {

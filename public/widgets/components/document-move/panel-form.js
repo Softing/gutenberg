@@ -29,7 +29,7 @@ Inprint.cmp.MoveDocument.Form = Ext.extend(Ext.FormPanel, {
                             minListWidth: 250,
                             url: _url('/documents/trees/editions/'),
                             baseParams: {
-                                term: 'editions.documents.work'
+                                term: 'editions.documents.work:*'
                             },
                             rootVisible:true,
                             root: {
@@ -59,7 +59,7 @@ Inprint.cmp.MoveDocument.Form = Ext.extend(Ext.FormPanel, {
 
                         xc.getConfig("/documents/combos/fascicles/", {
                             disabled: true,
-                            baseParams: { term: 'editions.documents.assign' },
+                            baseParams: { term: 'editions.documents.assign:*' },
                             listeners: {
                                 scope: this,
                                 render: function(combo) {

@@ -10,7 +10,7 @@ Inprint.calendar.archive.Interaction = function(parent, panels) {
             grid.enable();
             grid.currentEdition = node.id;
 
-            _a(["editions.calendar.manage"], grid.currentEdition, function(access) {
+            _a(["editions.calendar.manage:*"], grid.currentEdition, function(access) {
 
                 if (access["editions.calendar.manage"] === true) {
                     _enable(grid.btnUnarchive);

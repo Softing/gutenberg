@@ -96,7 +96,7 @@ sub list {
     my $i_archive = $c->param("archive") || "false";
 
     my $edition  = $c->Q("SELECT * FROM editions WHERE id=?", [ $i_edition ])->Hash;
-    my $editions = $c->objectChildrens("editions.documents.work:*");
+    my $editions = $c->objectBindings("editions.documents.work:*");
 
     # Common sql
     my $sql = "

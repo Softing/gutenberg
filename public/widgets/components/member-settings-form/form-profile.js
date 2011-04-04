@@ -33,7 +33,7 @@ Inprint.cmp.memberSettingsForm.Form = Ext.extend(Ext.FormPanel, {
                                 minListWidth: 250,
                                 url: _url('/documents/trees/editions/'),
                                 baseParams: {
-                                    term: 'editions.documents.work'
+                                    term: 'editions.documents.work:*'
                                 },
                                 root: {
                                     id:'00000000-0000-0000-0000-000000000000',

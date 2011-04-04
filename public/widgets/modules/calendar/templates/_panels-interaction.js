@@ -12,7 +12,7 @@ Inprint.calendar.templates.Interaction = function(parent, panels) {
 
             _disable(grid.btnCreate, grid.btnUpdate, grid.btnDelete);
 
-            _a(["editions.calendar.manage"], grid.currentEdition, function(access) {
+            _a(["editions.calendar.manage:*"], grid.currentEdition, function(access) {
 
                 if (access["editions.calendar.manage"] === true) {
                     managed = true;

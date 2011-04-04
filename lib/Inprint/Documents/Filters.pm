@@ -24,7 +24,7 @@ sub fascicles {
         WHERE t1.edition = t2.id AND t1.is_system = false AND edition = ANY(?)
     ";
 
-    my $editions = $c->objectChildrens("editions.documents.work:*");
+    my $editions = $c->objectBindings("editions.documents.work:*");
     push @data, $editions;
 
     if ($i_edition) {

@@ -21,7 +21,7 @@ sub read {
     my $i_id           = $c->get_uuid(\@errors, "id");
 
     unless (@errors) {
-        $result = Inprint::Models::Fascicle::read($c, $i_id);
+        $result = Inprint::Models::Attachment::read($c, $i_id);
     }
 
     $c->smart_render(\@errors, $result);
@@ -53,7 +53,7 @@ sub create {
     my $i_doc_enabled  = $c->get_flag(\@errors, "doc_enabled", 1) || 0;
 
     unless (@errors) {
-        Inprint::Models::Fascicle::create(
+        Inprint::Models::Attachment::create(
             $c,
             $i_edition, $i_template,
             $i_shortcut, $i_description,
@@ -119,7 +119,7 @@ sub deadline {
     my $i_doc_enabled  = $c->get_flag(\@errors, "doc_enabled", 1) || 0;
 
     unless (@errors) {
-        Inprint::Models::Fascicle::deadline(
+        Inprint::Models::Attachment::deadline(
             $c, $i_id,
             $i_print_date, $i_release_date,
             $i_adv_date, $i_doc_date,
@@ -137,70 +137,11 @@ sub remove {
     my $i_id           = $c->get_uuid(\@errors, "id");
 
     unless (@errors) {
-        Inprint::Models::Fascicle::remove($c, $i_id);
+        Inprint::Models::Attachment::remove($c, $i_id);
     }
 
     $c->smart_render(\@errors);
 }
 
-sub archive {
-    my $c = shift;
-
-    my $result;
-    my @errors;
-
-    my $i_id           = $c->get_uuid(\@errors, "id");
-
-    unless (@errors) {
-        $result = Inprint::Models::Fascicle::archive($c, $i_id);
-    }
-
-    $c->smart_render(\@errors, $result);
-}
-
-sub unarchive {
-    my $c = shift;
-
-    my $result;
-    my @errors;
-
-    my $i_id           = $c->get_uuid(\@errors, "id");
-
-    unless (@errors) {
-        $result = Inprint::Models::Fascicle::unarchive($c, $i_id);
-    }
-
-    $c->smart_render(\@errors, $result);
-}
-
-sub enable {
-    my $c = shift;
-
-    my $result;
-    my @errors;
-
-    my $i_id           = $c->get_uuid(\@errors, "id");
-
-    unless (@errors) {
-        $result = Inprint::Models::Fascicle::enable($c, $i_id);
-    }
-
-    $c->smart_render(\@errors, $result);
-}
-
-sub disable {
-    my $c = shift;
-
-    my $result;
-    my @errors;
-
-    my $i_id           = $c->get_uuid(\@errors, "id");
-
-    unless (@errors) {
-        $result = Inprint::Models::Fascicle::disable($c, $i_id);
-    }
-
-    $c->smart_render(\@errors, $result);
-}
 
 1;

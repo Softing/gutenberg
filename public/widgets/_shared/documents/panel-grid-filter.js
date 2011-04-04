@@ -28,7 +28,7 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                 minListWidth: 250,
                 url: _url('/documents/trees/editions/'),
                 baseParams: {
-                    term: 'editions.documents.work'
+                    term: 'editions.documents.work:*'
                 },
                 rootVisible:true,
                 root: {
@@ -70,7 +70,7 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                 minListWidth: 250,
                 url: _url('/documents/trees/fascicles/'),
                 baseParams: {
-                    term: 'editions.documents.work'
+                    term: 'editions.documents.work:*'
                 },
                 rootVisible:true,
                 root: {

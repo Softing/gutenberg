@@ -31,6 +31,8 @@ ALTER TABLE fascicles ALTER COLUMN anum SET DEFAULT 0;
 
 ALTER TABLE fascicles ADD COLUMN deleted boolean;
 ALTER TABLE fascicles ALTER COLUMN deleted SET DEFAULT false;
+UPDATE fascicles SET deleted = false;
+ALTER TABLE fascicles ALTER COLUMN deleted SET NOT NULL;
 
 --
 

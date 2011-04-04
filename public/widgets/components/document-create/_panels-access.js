@@ -1,6 +1,6 @@
 Inprint.cmp.CreateDocument.Access = function(parent, form) {
 
-    _a(["catalog.documents.create:*", "catalog.documents.assign:*", "editions.documents.assign"], null, function(terms) {
+    _a(["catalog.documents.create:*", "catalog.documents.assign:*", "editions.documents.assign:*"], null, function(terms) {
         if(terms["catalog.documents.create"]) {
             parent.buttons[0].enable();
         }

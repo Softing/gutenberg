@@ -12,7 +12,7 @@ Inprint.calendar.fascicles.Interaction = function(parent, panels) {
 
             _disable(grid.btnUpdate, grid.btnDelete, grid.btnArchive, grid.btnDeadline, grid.btnTemplate, grid.btnFormat);
 
-            _a(["editions.calendar.manage"], grid.currentEdition, function(access) {
+            _a(["editions.calendar.manage:*"], grid.currentEdition, function(access) {
 
                 (access["editions.calendar.manage"] === true) ?
                     _enable(grid.btnCreate) : _disable(grid.btnCreate) ;
