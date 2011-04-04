@@ -19,7 +19,7 @@ sub register {
 
     $app->helper(
         objectAccess => sub {
-            my ($c, $terms, $member) = @_;
+            my ($c, $terms, $binding, $member) = @_;
 
             unless ($member) {
                 $member = $c->getSessionValue("member.id");
@@ -36,6 +36,11 @@ sub register {
             for (my $i=0; $i <= $#rules; $i++) {
                 my ($terstring, $area) = split /:/, $rules[$i];
                 my ($section, $subsection, $term) = split /\./, $terstring;
+
+                if ($section eq "domain" && !$area) {
+                    $rules[$i] = "$terstring:member";
+                }
+
                 if ($section eq "editions") {
                     if ($area eq "*") {
                         splice @rules, $i, $i, "$terstring:edition", "$terstring:editions";
@@ -58,45 +63,73 @@ sub register {
 
                 $c->dbh()->{pg_placeholder_dollaronly} = 1;
 
-                my $binding = $c->Q("
-                    SELECT binding FROM map_member_to_rule as mapper WHERE 1=1
-                    AND mapper.termkey = \$1 AND member = \$2
-                ", [ $rule, $member ])->Values;
+                my $sql = "SELECT binding FROM map_member_to_rule as mapper WHERE 1=1
+                    AND mapper.termkey = \$1 AND member = \$2";
+                my @params = ($rule, $member);
+
+                if ($binding) {
+                    $sql .= " AND binding=\$3 ";
+                    push @params, $binding;
+                }
+
+                my $bindings = $c->Q($sql, \@params)->Values;
 
                 # Domain
                 if ($section eq "domain") {
-                    return 1 if $binding;
+                    return 1 if @$bindings;
                 }
 
                 # Editions
                 if ($section eq "editions") {
 
                     if ($area eq "edition") {
-                        return 1 if $binding;
+                        return 1 if @$bindings;
                     }
+
                     if ($area eq "editions") {
-                        my $exists = $c->Q("
+
+                        my $subsql = "
                             SELECT EXISTS (
                                 SELECT true FROM editions WHERE path ? ARRAY(
                                     SELECT ('*.' || replace(binding::text, '-', '')::text ||'.*')::lquery
                                     FROM map_member_to_rule as mapper WHERE 1=1
-                                        AND mapper.termkey = \$1 AND member = \$2 )
-                            )"
-                        , [ $rule, $member ] )->Value;
-                        return 1 if ($exists);
+                                        AND mapper.termkey = \$1 AND member = \$2 ";
+
+                        my @subparams = ( $rule, $member );
+
+                        if ($binding) {
+                            $subsql .= " AND binding=\$3 ";
+                            push @subparams, $binding;
+                        }
+
+                        $subsql .= " )) ";
+
+                        my $exists = $c->Q($subsql, \@subparams)->Value;
+
+                        return 1 if $exists;
                     }
                 }
 
                 # Catalog
                 if ($section eq "catalog") {
-                    my $exists = $c->Q("
-                        SELECT EXISTS (
-                            SELECT true FROM catalog WHERE path ? ARRAY(
+
+                    my $subsql = "
+                        SELECT true FROM catalog WHERE path ? ARRAY(
                                 SELECT ('*.' || replace(binding::text, '-', '')::text ||'.*')::lquery
                                 FROM map_member_to_rule as mapper WHERE 1=1
-                                    AND mapper.termkey = \$1 AND member = \$2 )
-                        )"
-                    , [ $rule, $member ] )->Value;
+                                    AND mapper.termkey = \$1 AND member = \$2 ";
+
+                    my @subparams = ( $rule, $member );
+
+                    if ($binding) {
+                        $subsql .= " AND binding=\$3 ";
+                        push @subparams, $binding;
+                    }
+
+                    $subsql .= " ) ";
+
+                    my $exists = $c->Q($subsql, \@subparams)->Value;
+
                     return 1 if ($exists);
                 }
 

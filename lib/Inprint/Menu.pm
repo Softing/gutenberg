@@ -24,9 +24,9 @@ sub index
         ]
     };
 
-    #
+    ############################################################################
     # Documents menu items
-    #
+    ############################################################################
 
     my $accessViewDocuments   = $c->objectAccess(["catalog.documents.view:*"]);
     my $accessCreateDocuments = $c->objectAccess(["catalog.documents.create:*"]);
@@ -67,8 +67,8 @@ sub index
     # Editions
     ############################################################################
 
-    my $accessCalendarEditions = $c->objectAccess("editions.calendar.view");
-    my $accessLayoutEditions   = $c->objectBindings("editions.layouts.view");
+    my $accessCalendarEditions = $c->objectAccess("editions.calendar.view:*");
+    my $accessLayoutEditions   = $c->objectBindings("editions.layouts.view:*");
 
     my $CalendarSection = {
         id => "fascicles"
@@ -117,7 +117,8 @@ sub index
 
         my $menuItem = $c->fascicleHadler($fascicle);
 
-        my $accessFascicleView = $c->objectDirectAccess("editions.layouts.view", $fascicle->{edition});
+        my $accessFascicleView = $c->objectAccess(
+            "editions.layouts.view:*", $fascicle->{edition});
 
         # Attachments
         if( @{ $menuItem->{menu} } && @{ $fascicle->{attachments} }) {
@@ -126,7 +127,10 @@ sub index
 
         foreach my $attachment (@{ $fascicle->{attachments} }) {
             my $menuSubitem = $c->fascicleHadler($attachment);
-            my $accessAttachmentView = $c->objectDirectAccess("editions.layouts.view",   $attachment->{edition});
+
+            my $accessAttachmentView = $c->objectAccess(
+                "editions.layouts.view:*", $attachment->{edition});
+
             if ($accessAttachmentView) {
                 $accessFascicleView = 1;
                 push @{ $menuItem->{menu} }, $menuSubitem;
@@ -254,9 +258,9 @@ sub fascicleHadler {
 
     my ($c, $fascicle) = @_;
 
-    my $accessLayoutView   = $c->objectAccess("editions.layouts.view",   $fascicle->{edition});
-    my $accessLayoutManage = $c->objectAccess("editions.layouts.manage", $fascicle->{edition});
-    my $accessAdvertManage = $c->objectAccess("editions.advert.manage",  $fascicle->{edition});
+    my $accessLayoutView   = $c->objectAccess("editions.layouts.view:*",   $fascicle->{edition});
+    my $accessLayoutManage = $c->objectAccess("editions.layouts.manage:*", $fascicle->{edition});
+    my $accessAdvertManage = $c->objectAccess("editions.advert.manage:*",  $fascicle->{edition});
 
     my $fascicle_menu = {
         id   => "fascicle",
