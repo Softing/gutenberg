@@ -90,7 +90,6 @@ sub index
         FROM fascicles t1, editions t2
         WHERE
             t1.edition = t2.id
-
             AND t1.fastype = 'issue'
             AND t1.enabled = true
             AND t1.archived = false

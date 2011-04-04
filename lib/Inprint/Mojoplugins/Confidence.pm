@@ -97,16 +97,16 @@ sub register {
                                 SELECT true FROM editions WHERE path ? ARRAY(
                                     SELECT ('*.' || replace(binding::text, '-', '')::text ||'.*')::lquery
                                     FROM map_member_to_rule as mapper WHERE 1=1
-                                        AND mapper.termkey = \$1 AND member = \$2 ";
+                                        AND mapper.termkey = \$1 AND member = \$2 ) ";
 
                         my @subparams = ( $rule, $member );
 
                         if ($binding) {
-                            $subsql .= " AND binding=\$3 ";
+                            $subsql .= " AND path ~ ('*.' || replace(\$3, '-', '')::text ||'.*')::lquery ";
                             push @subparams, $binding;
                         }
 
-                        $subsql .= " )) ";
+                        $subsql .= " ) ";
 
                         my $exists = $c->Q($subsql, \@subparams)->Value;
                         $c->dbh()->{pg_placeholder_dollaronly} = 0;
@@ -121,15 +121,16 @@ sub register {
                     $c->dbh()->{pg_placeholder_dollaronly} = 1;
 
                     my $subsql = "
-                        SELECT true FROM catalog WHERE path ? ARRAY(
+                        SELECT EXISTS (
+                            SELECT true FROM catalog WHERE path ? ARRAY(
                                 SELECT ('*.' || replace(binding::text, '-', '')::text ||'.*')::lquery
                                 FROM map_member_to_rule as mapper WHERE 1=1
-                                    AND mapper.termkey = \$1 AND member = \$2 ";
+                                    AND mapper.termkey = \$1 AND member = \$2 ) ";
 
                     my @subparams = ( $rule, $member );
 
                     if ($binding) {
-                        $subsql .= " AND binding=\$3 ";
+                        $subsql .= " AND path ~ ('*.' || replace(\$3, '-', '')::text ||'.*')::lquery ";
                         push @subparams, $binding;
                     }
 
