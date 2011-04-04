@@ -35,7 +35,7 @@ sub tree {
         my $sql;
         my @data;
 
-        my $bindings = $c->objectBindings(["editions.calendar.manage", "editions.calendar.work"]);
+        my $bindings = $c->objectBindings(["editions.calendar.manage:*", "editions.calendar.work:*"]);
 
         if ($i_node eq "00000000-0000-0000-0000-000000000000") {
             $sql = "
@@ -96,7 +96,7 @@ sub list {
     my $i_archive = $c->param("archive") || "false";
 
     my $edition  = $c->Q("SELECT * FROM editions WHERE id=?", [ $i_edition ])->Hash;
-    my $editions = $c->objectChildrens("editions.documents.work");
+    my $editions = $c->objectChildrens("editions.documents.work:*");
 
     # Common sql
     my $sql = "

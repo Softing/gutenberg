@@ -30,7 +30,7 @@ sub editions {
         my $sql;
         my @data;
 
-        my $bindings = $c->objectBindings("editions.documents.work");
+        my $bindings = $c->objectBindings("editions.documents.work:*");
 
         if ($i_node eq "00000000-0000-0000-0000-000000000000") {
             $sql = "

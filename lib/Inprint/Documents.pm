@@ -146,7 +146,7 @@ sub create {
             $c->check_access( \@errors, "catalog.documents.create:*",  $i_workgroup);
         }
         if ( $i_fascicle && $i_fascicle ne "00000000-0000-0000-0000-000000000000") {
-            $c->check_access( \@errors, "editions.documents.assign", $i_edition);
+            $c->check_access( \@errors, "editions.documents.assign:*", $i_edition);
         }
         if ($current_member ne $manager) {
             $c->check_access( \@errors, "catalog.documents.assign:*",  $i_workgroup);

@@ -67,6 +67,8 @@ sub register {
                     AND mapper.termkey = \$1 AND member = \$2";
                 my @params = ($rule, $member);
 
+                $c->dbh()->{pg_placeholder_dollaronly} = 0;
+
                 if ($binding) {
                     $sql .= " AND binding=\$3 ";
                     push @params, $binding;
@@ -88,6 +90,8 @@ sub register {
 
                     if ($area eq "editions") {
 
+                        $c->dbh()->{pg_placeholder_dollaronly} = 1;
+
                         my $subsql = "
                             SELECT EXISTS (
                                 SELECT true FROM editions WHERE path ? ARRAY(
@@ -105,6 +109,7 @@ sub register {
                         $subsql .= " )) ";
 
                         my $exists = $c->Q($subsql, \@subparams)->Value;
+                        $c->dbh()->{pg_placeholder_dollaronly} = 0;
 
                         return 1 if $exists;
                     }
@@ -112,6 +117,8 @@ sub register {
 
                 # Catalog
                 if ($section eq "catalog") {
+
+                    $c->dbh()->{pg_placeholder_dollaronly} = 1;
 
                     my $subsql = "
                         SELECT true FROM catalog WHERE path ? ARRAY(
@@ -129,11 +136,10 @@ sub register {
                     $subsql .= " ) ";
 
                     my $exists = $c->Q($subsql, \@subparams)->Value;
+                    $c->dbh()->{pg_placeholder_dollaronly} = 0;
 
                     return 1 if ($exists);
                 }
-
-                $c->dbh()->{pg_placeholder_dollaronly} = 0;
 
             }
 
