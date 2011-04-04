@@ -94,7 +94,7 @@ sub index
             AND t1.fastype = 'issue'
             AND t1.enabled = true
             AND t1.archived = false
-        ORDER BY t1.dateout, t2.shortcut, t1.shortcut
+        ORDER BY t1.release_date, t2.shortcut, t1.shortcut
     ")->Hashes;
 
     foreach my $item (@$fascicles) {
@@ -109,7 +109,7 @@ sub index
                 AND t1.enabled = true
                 AND t1.archived = false
                 AND t1.parent = ?
-            ORDER BY t1.dateout, t2.shortcut, t1.shortcut
+            ORDER BY t1.release_date, t2.shortcut, t1.shortcut
         ", [ $item->{id} ])->Hashes;
     }
 

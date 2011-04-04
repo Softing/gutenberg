@@ -50,7 +50,238 @@ sub register {
             return $item;
         });
 
+    # NEW GET RULES
+
+    $app->helper(
+        get_uuid => sub {
+            my ($c, $errors, $field, $ifexists) = @_;
+            my $value = $c->param($field);
+            return $c->check_uuid($errors, $field, $value, $ifexists);
+        });
+
+    $app->helper(
+        get_date => sub {
+            my ($c, $errors, $field, $ifexists) = @_;
+            my $value = $c->param($field);
+            return $c->check_date($errors, $field, $value, $ifexists);
+        });
+
+    $app->helper(
+        get_datetime => sub {
+            my ($c, $errors, $field, $ifexists) = @_;
+            my $value = $c->param($field);
+            return $c->check_datetime($errors, $field, $value, $ifexists);
+        });
+
+    $app->helper(
+        get_int => sub {
+            my ($c, $errors, $field, $ifexists) = @_;
+            my $value = $c->param($field);
+            return $c->check_int($errors, $field, $value, $ifexists);
+        });
+
+    $app->helper(
+        get_float => sub {
+            my ($c, $errors, $field, $ifexists) = @_;
+            my $value = $c->param($field);
+            return $c->check_float($errors, $field, $value, $ifexists);
+        });
+
+    $app->helper(
+        get_flag => sub {
+            my ($c, $errors, $field, $ifexists) = @_;
+            my $value = $c->param($field);
+            return $c->check_flag($errors, $field, $value, $ifexists);
+        });
+
+    $app->helper(
+        get_text => sub {
+            my ($c, $errors, $field, $ifexists) = @_;
+            my $value = $c->param($field);
+            return $c->check_text($errors, $field, $value, $ifexists);
+        });
+
+    $app->helper(
+        get_url => sub {
+            my ($c, $errors, $field, $ifexists) = @_;
+            my $value = $c->param($field);
+            return $c->check_url($errors, $field, $value, $ifexists);
+        });
+
+    $app->helper(
+        get_path => sub {
+            my ($c, $errors, $field, $ifexists) = @_;
+            my $value = $c->param($field);
+            return $c->check_path($errors, $field, $value, $ifexists);
+        });
+
+
+
+
+
     # NEW CHECK RULES
+
+    $app->helper(
+        check_uuid => sub {
+            my ($c, $errors, $field, $value, $ifexists) = @_;
+
+            if ($ifexists && (!$value || $value eq "undefined")) {
+                return;
+            }
+
+            unless (length($value) > 0 && $value =~ m/^[a-z|0-9]{8}(-[a-z|0-9]{4}){3}-[a-z|0-9]{12}+$/) {
+                push @$errors, { id => $field, msg => "Incorrectly filled field"};
+                return 0;
+            }
+
+            return $value;
+        });
+
+    $app->helper(
+        check_date => sub {
+            my ($c, $errors, $field, $value, $ifexists) = @_;
+
+            if ($ifexists && (!$value || $value eq "undefined")) {
+                return;
+            }
+
+            unless (length($value) > 0 && $value =~ m/^[0-9]{4}-[0-9]{2}-[0-9]{2}+$/) {
+                push @$errors, { id => $field, msg => "Incorrectly filled field"};
+                return 0;
+            }
+
+            return $value;
+        });
+
+    $app->helper(
+        check_datetime => sub {
+            my ($c, $errors, $field, $value, $ifexists) = @_;
+
+            if ($ifexists && (!$value || $value eq "undefined")) {
+                return;
+            }
+
+            unless (length($value) > 0 && $value =~ m/^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/) {
+                push @$errors, { id => $field, msg => "Incorrectly filled field"};
+                return 0;
+            }
+
+            return $value;
+        });
+
+    $app->helper(
+        check_int => sub {
+            my ($c, $errors, $field, $value, $ifexists) = @_;
+
+            if ($ifexists && (!$value || $value eq "undefined")) {
+                return;
+            }
+
+            unless (length($value) > 0 && $value =~ m/^\-?[\d]+$/) {
+                push @$errors, { id => $field, msg => "Incorrectly filled field"};
+                return 0;
+            }
+
+            return $value;
+        });
+
+    $app->helper(
+        check_float => sub {
+            my ($c, $errors, $field, $value, $ifexists) = @_;
+
+            if ($ifexists && (!$value || $value eq "undefined")) {
+                return;
+            }
+
+            unless (length($value) > 0 && $value =~ m/^(\d{1,7}|(\d{1,7})?\.\d{0,2}|(\d{0,7})?(\.\d{0,7})?[Ee]((\+?0*[1-7])|-0*\d{1,2}))$/) {
+                push @$errors, { id => $field, msg => "Incorrectly filled field"};
+                return 0;
+            }
+
+            return $value;
+        });
+
+    $app->helper(
+        check_flag => sub {
+            my ($c, $errors, $field, $value, $ifexists) = @_;
+
+            if ($ifexists && (!$value || $value eq "undefined")) {
+                return;
+            }
+
+            unless (length($value) > 0 && $value =~ m/^[a-z|0-9]+$/) {
+                push @$errors, { id => $field, msg => "Incorrectly filled field"};
+                return 0;
+            }
+
+            return $value;
+        });
+
+    $app->helper(
+        check_text => sub {
+            my ($c, $errors, $field, $value, $ifexists) = @_;
+
+            if ($ifexists && (!$value || $value eq "undefined")) {
+                return;
+            }
+
+            unless (length($value) > 0) {
+            #unless (length($value) > 0 && $value =~ m/^[\w|\d|\s|:|\\|\/|"|'|#|\-|.|,|?]+$/) {
+                push @$errors, { id => $field, msg => "Incorrectly filled field"};
+                return 0;
+            }
+
+            return $value;
+        });
+
+    $app->helper(
+        check_url => sub {
+            my ($c, $errors, $field, $value, $ifexists) = @_;
+
+            if ($ifexists && (!$value || $value eq "undefined")) {
+                return;
+            }
+
+            unless (length($value) > 0) {
+            #unless (length($value) > 0 && $value =~ m/^[\w|\d|\s|:|\\|\/|"|'|#|\-|.|,|?]+$/) {
+                push @$errors, { id => $field, msg => "Incorrectly filled field"};
+                return 0;
+            }
+
+            return $value;
+        });
+
+    $app->helper(
+        check_path => sub {
+            my ($c, $errors, $field, $value, $ifexists) = @_;
+
+            if ($ifexists && (!$value || $value eq "undefined")) {
+                return;
+            }
+
+            unless (length($value) > 0 && $value =~ m/^[\w|\d|\.|-]+$/) {
+                push @$errors, { id => $field, msg => "Incorrectly filled field"};
+                return 0;
+            }
+
+            return $value;
+        });
+
+    $app->helper(
+        check_rule => sub {
+            my ($c, $errors, $field, $value, $ifexists) = @_;
+
+            if ($ifexists && (!$value || $value eq "undefined")) {
+                return;
+            }
+
+            unless (length($value) > 0 && $value =~ m/^[a-z|:|*|-|\.]+$/) {
+                push @$errors, { id => $field, msg => "Incorrectly filled field"};
+                return 0;
+            }
+
+            return $value;
+        });
 
     $app->helper(
         check_exists => sub {
@@ -63,159 +294,9 @@ sub register {
         });
 
     $app->helper(
-        check_uuid => sub {
-            my ($c, $errors, $field, $value, $ifexists) = @_;
-
-            if ($ifexists) {
-                return 1 unless $value;
-                return 1 if $value eq 'undefined';
-            }
-
-            unless (length($value) > 0 && $value =~ m/^[a-z|0-9]{8}(-[a-z|0-9]{4}){3}-[a-z|0-9]{12}+$/) {
-                push @$errors, { id => $field, msg => "Incorrectly filled field"};
-                return 0;
-            }
-            return 1;
-        });
-
-    $app->helper(
-        check_date => sub {
-            my ($c, $errors, $field, $value, $ifexists) = @_;
-
-            if ($ifexists) {
-                return 1 unless $value;
-                return 1 if $value eq 'undefined';
-            }
-
-            unless (length($value) > 0 && $value =~ m/^[0-9]{4}-[0-9]{2}-[0-9]{2}+$/) {
-                push @$errors, { id => $field, msg => "Incorrectly filled field"};
-                return 0;
-            }
-            return 1;
-        });
-
-    $app->helper(
-        check_int => sub {
-            my ($c, $errors, $field, $value, $ifexists) = @_;
-
-            if ($ifexists) {
-                return 1 unless $value;
-                return 1 if $value eq 'undefined';
-            }
-
-            unless (length($value) > 0 && $value =~ m/^\-?[\d]+$/) {
-                push @$errors, { id => $field, msg => "Incorrectly filled field"};
-                return 0;
-            }
-            return 1;
-        });
-
-    $app->helper(
-        check_float => sub {
-            my ($c, $errors, $field, $value, $ifexists) = @_;
-
-            if ($ifexists) {
-                return 1 unless $value;
-                return 1 if $value eq 'undefined';
-            }
-
-            unless (length($value) > 0 && $value =~ m/^(\d{1,7}|(\d{1,7})?\.\d{0,2}|(\d{0,7})?(\.\d{0,7})?[Ee]((\+?0*[1-7])|-0*\d{1,2}))$/) {
-                push @$errors, { id => $field, msg => "Incorrectly filled field"};
-                return 0;
-            }
-
-            return 1;
-        });
-
-    $app->helper(
-        check_flag => sub {
-            my ($c, $errors, $field, $value, $ifexists) = @_;
-
-            if ($ifexists) {
-                return 1 unless $value;
-                return 1 if $value eq 'undefined';
-            }
-
-            unless (length($value) > 0 && $value =~ m/^[a-z|0-9]+$/) {
-                push @$errors, { id => $field, msg => "Incorrectly filled field"};
-                return 0;
-            }
-
-            return 1;
-        });
-
-    $app->helper(
-        check_text => sub {
-            my ($c, $errors, $field, $value, $ifexists) = @_;
-
-            if ($ifexists) {
-                return 1 unless $value;
-                return 1 if $value eq 'undefined';
-            }
-
-            unless (length($value) > 0) {
-            #unless (length($value) > 0 && $value =~ m/^[\w|\d|\s|:|\\|\/|"|'|#|\-|.|,|?]+$/) {
-                push @$errors, { id => $field, msg => "Incorrectly filled field"};
-                return 0;
-            }
-
-            return 1;
-        });
-
-    $app->helper(
-        check_url => sub {
-            my ($c, $errors, $field, $value, $ifexists) = @_;
-
-            if ($ifexists) {
-                return 1 unless $value;
-                return 1 if $value eq 'undefined';
-            }
-
-            unless (length($value) > 0) {
-            #unless (length($value) > 0 && $value =~ m/^[\w|\d|\s|:|\\|\/|"|'|#|\-|.|,|?]+$/) {
-                push @$errors, { id => $field, msg => "Incorrectly filled field"};
-                return 0;
-            }
-
-            return 1;
-        });
-
-    $app->helper(
-        check_path => sub {
-            my ($c, $errors, $field, $value, $ifexists) = @_;
-
-            if ($ifexists) {
-                return 1 unless $value;
-                return 1 if $value eq 'undefined';
-            }
-
-            unless (length($value) > 0 && $value =~ m/^[\w|\d|\.|-]+$/) {
-                push @$errors, { id => $field, msg => "Incorrectly filled field"};
-                return 0;
-            }
-            return 1;
-        });
-
-    $app->helper(
-        check_rule => sub {
-            my ($c, $errors, $field, $value, $ifexists) = @_;
-
-            if ($ifexists) {
-                return 1 unless $value;
-                return 1 if $value eq 'undefined';
-            }
-
-            unless (length($value) > 0 && $value =~ m/^[a-z|:|*|-|\.]+$/) {
-                push @$errors, { id => $field, msg => "Incorrectly filled field"};
-                return 0;
-            }
-
-            return 1;
-        });
-
-    $app->helper(
         check_object => sub {
             my ($c, $errors, $field, $object) = @_;
+
             unless ($object && $object->{id}) {
                 push @$errors, { id => $field, msg => "Can't find object"};
                 return 0;
@@ -223,6 +304,8 @@ sub register {
 
             return 1;
         });
+
+
 
     # OLD CHECK RULES
 

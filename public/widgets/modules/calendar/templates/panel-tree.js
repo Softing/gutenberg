@@ -1,4 +1,4 @@
-Inprint.calendar.Tree = Ext.extend(Ext.tree.TreePanel, {
+Inprint.calendar.templates.Tree = Ext.extend(Ext.tree.TreePanel, {
 
     initComponent: function() {
 
@@ -9,7 +9,6 @@ Inprint.calendar.Tree = Ext.extend(Ext.tree.TreePanel, {
         };
 
         Ext.apply(this, {
-            title: _("Open issues"),
             autoScroll:true,
             dataUrl: this.urls.tree,
             border:false,
@@ -24,7 +23,7 @@ Inprint.calendar.Tree = Ext.extend(Ext.tree.TreePanel, {
             }
         });
 
-        Inprint.calendar.Tree.superclass.initComponent.apply(this, arguments);
+        Inprint.calendar.templates.Tree.superclass.initComponent.apply(this, arguments);
 
         this.on("beforeappend", function(tree, parent, node) {
             if (node.attributes.icon === undefined) {
@@ -39,7 +38,7 @@ Inprint.calendar.Tree = Ext.extend(Ext.tree.TreePanel, {
     },
 
     onRender: function() {
-        Inprint.calendar.Tree.superclass.onRender.apply(this, arguments);
+        Inprint.calendar.templates.Tree.superclass.onRender.apply(this, arguments);
         this.getRootNode().on("expand", function(node) {
             node.firstChild.select();
         });

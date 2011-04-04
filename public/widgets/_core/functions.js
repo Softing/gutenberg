@@ -3,16 +3,16 @@
 // licensing@softing.ru
 // http://softing.ru/license
 
+function _ico(icon) {
+   return "/icons/" + icon + ".png";
+}
+
 function _ico24(icon) {
    return "/icons-24/" + icon + ".png";
 }
 
 function _ico32(icon) {
    return "/icons-32/" + icon + ".png";
-}
-
-function _ico(icon) {
-   return "/icons/" + icon + ".png";
 }
 
 function _url(url) {

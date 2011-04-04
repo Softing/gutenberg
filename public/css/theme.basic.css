@@ -18,24 +18,10 @@ body {
     background-image: url(/icons-32/exclamation.png) !important;
 }
 
-/* Safari override fixes */
-/*.ext-safari .x-date-picker {
-    width: 185px;
+.x-tab-panel-noborder .x-tab-panel-header-noborder {
+    border:0px;
 }
 
-.ext-safari .x-panel-tbar  .x-form-text {
-    height:20px !important;
-}*/
-
-/* Chrome override fixes */
-/*.ext-chrome .x-date-picker {
-    width: 185px;
+ul.x-tab-strip-top {
+  border-bottom-color: #AEAEAE;
 }
-
-.ext-chrome .x-panel-tbar  .x-form-text {
-    height:20px !important;
-}
-
-.x-mask-loading div {
-   background-image: url(/images/ajax-loader.gif) !important;
-}*/

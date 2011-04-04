@@ -1,4 +1,4 @@
-Inprint.calendar.forms.Update = Ext.extend( Ext.form.FormPanel,
+Inprint.calendar.fascicles.Update = Ext.extend( Ext.form.FormPanel,
 {
 
     initComponent: function()
@@ -26,28 +26,13 @@ Inprint.calendar.forms.Update = Ext.extend( Ext.form.FormPanel,
 
                             {
                                 xtype: "titlefield",
-                                value: _("Numbering")
-                            },
-
-                            {
-                                xtype: "textfield",
-                                name: "pnum",
-                                fieldLabel: _("Prevailing")
-                            },
-                            {
-                                xtype: "textfield",
-                                name: "anum",
-                                fieldLabel: _("Annual")
-                            },
-
-                            {
-                                xtype: "titlefield",
                                 value: _("Basic parameters")
                             },
 
                             {
                                 xtype: "textfield",
                                 name: "shortcut",
+                                allowBlank:false,
                                 fieldLabel: _("Shortcut")
                             },
                             {
@@ -58,7 +43,19 @@ Inprint.calendar.forms.Update = Ext.extend( Ext.form.FormPanel,
 
                             {
                                 xtype: "titlefield",
-                                value: _("Additional parameters")
+                                value: _("Additional parameters"),
+                                margin:10
+                            },
+
+                            {
+                                xtype: "textfield",
+                                name: "num",
+                                fieldLabel: _("Number")
+                            },
+                            {
+                                xtype: "textfield",
+                                name: "anum",
+                                fieldLabel: _("Annual number")
                             },
 
                             {
@@ -66,21 +63,7 @@ Inprint.calendar.forms.Update = Ext.extend( Ext.form.FormPanel,
                                 name: "circulation",
                                 fieldLabel: _("Circulation"),
                                 value: 0
-                            },
-
-                            Inprint.factory.Combo.create(
-                                "/calendar/combos/sources/", {
-                                    fieldLabel: _("Template"),
-                                    name: "layoutsource",
-                                    listeners: {
-                                        render: function(combo) {
-                                            combo.setValue("00000000-0000-0000-0000-000000000000", _("Defaults"));
-                                        },
-                                        beforequery: function(qe) {
-                                            delete qe.combo.lastQuery;
-                                        }
-                                    }
-                            })
+                            }
 
                         ]
                     },
@@ -95,65 +78,63 @@ Inprint.calendar.forms.Update = Ext.extend( Ext.form.FormPanel,
 
                             {
                                 xtype: "titlefield",
-                                value: _("Dates")
+                                value: _("Key dates")
                             },
 
                             {
+                                name: 'print_date',
                                 xtype: 'xdatefield',
-                                name: 'dateout',
                                 format:'F j, Y',
                                 submitFormat:'Y-m-d',
-                                fieldLabel: _("Publication")
+                                altFormats : "Y-m-d H:i:s",
+                                fieldLabel: _("Printing shop")
                             },
                             {
                                 xtype: 'xdatefield',
-                                name: 'dateprint',
+                                name: 'release_date',
                                 format:'F j, Y',
                                 submitFormat:'Y-m-d',
-                                fieldLabel: _("Printing")
+                                altFormats : "Y-m-d H:i:s",
+                                fieldLabel: _("Publication")
                             },
 
                             {
                                 xtype: "titlefield",
-                                value: _("Deadline")
+                                value: _("Deadline"),
+                                margin:10
                             },
 
                             {
                                 labelWidth: 20,
-                                xtype: "xdatefield",
-                                name: "datedoc",
+                                xtype: "xdatetime",
+                                name: "doc_date",
                                 format: "F j, Y",
-                                submitFormat: "Y-m-d",
-                                allowBlank:false,
+                                //submitFormat: "Y-m-d",
                                 fieldLabel: _("Documents")
                             },
                             {
-                                xtype: 'xdatefield',
-                                name: 'dateadv',
+                                xtype: "checkbox",
+                                name: "doc_enabled",
+                                fieldLabel: "",
+                                boxLabel: _("Enabled")
+                            },
+
+                            {
+                                xtype: "spacerfield"
+                            },
+
+                            {
+                                xtype: 'xdatetime',
+                                name: 'adv_date',
                                 format:'F j, Y',
-                                submitFormat:'Y-m-d',
-                                allowBlank:false,
+                                //submitFormat:'Y-m-d',
                                 fieldLabel: _("Advertisement")
                             },
-
                             {
-                                xtype: "radiogroup",
-                                fieldLabel: _("Documents"),
-                                items: [
-                                    { boxLabel: _("By date"),  name: "flagdoc", inputValue: "bydate", checked: true },
-                                    { boxLabel: _("Enabled"),  name: "flagdoc", inputValue: "enabled" },
-                                    { boxLabel: _("Disabled"), name: "flagdoc", inputValue: "disabled" },
-                                ]
-                            },
-
-                            {
-                                xtype: "radiogroup",
-                                fieldLabel: _("Advertisement"),
-                                items: [
-                                    { boxLabel: _("By date"),  name: "flagadv", inputValue: "bydate", checked: true },
-                                    { boxLabel: _("Enabled"),  name: "flagadv", inputValue: "enabled" },
-                                    { boxLabel: _("Disabled"), name: "flagadv", inputValue: "disabled" },
-                                ]
+                                xtype: "checkbox",
+                                name: "adv_enabled",
+                                fieldLabel: "",
+                                boxLabel: _("Enabled")
                             }
 
                         ]
@@ -165,18 +146,26 @@ Inprint.calendar.forms.Update = Ext.extend( Ext.form.FormPanel,
 
         Ext.apply(this,  {
             xtype: "form",
-            border:false,
-            labelWidth: 90
+            border:false
         });
 
-        Inprint.calendar.forms.Update.superclass.initComponent.apply(this, arguments);
-
+        Inprint.calendar.fascicles.Update.superclass.initComponent.apply(this, arguments);
     },
 
     onRender: function() {
+        Inprint.calendar.fascicles.Update.superclass.onRender.apply(this, arguments);
+        this.getForm().url = _source("fascicle.update");
+    },
 
-        Inprint.calendar.forms.Update.superclass.onRender.apply(this, arguments);
-
+    cmpFill: function (id) {
+        this.load({
+            scope:this,
+            params: { id: id },
+            url: _source("fascicle.read"),
+            failure: function(form, action) {
+                Ext.Msg.alert("Load failed", action.result.errorMessage);
+            }
+        });
     }
 
 });

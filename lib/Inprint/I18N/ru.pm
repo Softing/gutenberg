@@ -59,6 +59,9 @@ our %Lexicon = (
     "Adding an advertiser"
  => "",
 
+    "Adding attachment"
+ => "",
+
     "Adding issue"
  => "Добавление выпуска",
 
@@ -119,6 +122,9 @@ our %Lexicon = (
     "Annual"
  => "Годовой",
 
+    "Annual number"
+ => "",
+
     "Another employee %1 captured this issue!"
  => "Сотрудник %1 захватил этот выпуск!",
 
@@ -132,7 +138,7 @@ our %Lexicon = (
  => "Утверждено",
 
     "Archival documents"
- => "",
+ => "Архивные материалы",
 
     "Archive"
  => "Архив",
@@ -142,6 +148,12 @@ our %Lexicon = (
 
     "Archive of requests"
  => "Архив заявок",
+
+    "Archive the specified item?"
+ => "",
+
+    "Archive the specified release?"
+ => "",
 
     "Are you want to logout?"
  => "",
@@ -159,10 +171,10 @@ our %Lexicon = (
  => "Автор",
 
     "Available"
- => "",
+ => "Доступные",
 
     "Available documents"
- => "",
+ => "Доступные материалы",
 
     "BIK"
  => "БИК",
@@ -285,7 +297,7 @@ our %Lexicon = (
  => "",
 
     "Create attachment"
- => "",
+ => "Создать вложение",
 
     "Create document"
  => "Создать материал",
@@ -318,7 +330,7 @@ our %Lexicon = (
  => "Даты",
 
     "Deadline"
- => "Дедлайн",
+ => "Сроки",
 
     "Default destination"
  => "Назначение по умолчанию",
@@ -330,10 +342,16 @@ our %Lexicon = (
  => "Удалить",
 
     "Delete attachment"
- => "",
+ => "Удалить вложение",
 
     "Delete file"
  => "Удалить файл",
+
+    "Delete the specified issue?"
+ => "",
+
+    "Delete the specified item?"
+ => "Удалить указанные объекты?",
 
     "Deleting a category"
  => "Удалить рубрику?",
@@ -349,6 +367,12 @@ our %Lexicon = (
 
     "Description"
  => "Описание",
+
+    "Disable"
+ => "Выключить",
+
+    "Disable the specified item?"
+ => "Выключить указанные объекты?",
 
     "Disabled"
  => "Выключено",
@@ -399,7 +423,7 @@ our %Lexicon = (
  => "Редактировать текст",
 
     "Edit attachment"
- => "",
+ => "Редактировать вложение",
 
     "Edit category"
  => "",
@@ -414,6 +438,15 @@ our %Lexicon = (
  => "",
 
     "Edit text"
+ => "",
+
+    "Editing attachment"
+ => "",
+
+    "Editing deadline"
+ => "",
+
+    "Editing issue"
  => "",
 
     "Editing of the Module"
@@ -466,6 +499,12 @@ our %Lexicon = (
 
     "Empoyees online"
  => "",
+
+    "Enable"
+ => "Включить",
+
+    "Enable the specified item?"
+ => "Включить указанные объекты?",
 
     "Enabled"
  => "Включено",
@@ -530,6 +569,12 @@ our %Lexicon = (
     "Flash mode"
  => "",
 
+    "Format"
+ => "Форматировать",
+
+    "Formatting"
+ => "",
+
     "General information"
  => "",
 
@@ -590,6 +635,9 @@ our %Lexicon = (
     "Images"
  => "Иллюстрации",
 
+    "Important event"
+ => "Важное событие",
+
     "Index"
  => "Рубрикатор",
 
@@ -619,6 +667,9 @@ our %Lexicon = (
 
     "KS"
  => "КС",
+
+    "Key dates"
+ => "",
 
     "Label"
  => "",
@@ -655,6 +706,9 @@ our %Lexicon = (
 
     "Logs"
  => "Логи",
+
+    "Make template"
+ => "Создать шаблон",
 
     "Management"
  => "",
@@ -737,6 +791,9 @@ our %Lexicon = (
     "Not set"
  => "",
 
+    "Number"
+ => "Номер",
+
     "Numbering"
  => "Нумерация",
 
@@ -744,7 +801,7 @@ our %Lexicon = (
  => "",
 
     "Open issues"
- => "",
+ => "Открытые выпуски",
 
     "OpenOffice.org (ods)"
  => "",
@@ -825,10 +882,13 @@ our %Lexicon = (
  => "",
 
     "Print date"
- => "",
+ => "Дата печати",
 
     "Printing"
  => "Печать",
+
+    "Printing shop"
+ => "",
 
     "Probably someone has entered in Inprint with your login on other computer. <br/> push F5 what to pass to authorization page"
  => "",
@@ -877,6 +937,9 @@ our %Lexicon = (
 
     "Release addition"
  => "",
+
+    "Release date"
+ => "Дата выпуска",
 
     "Reload"
  => "Обновить",
@@ -946,6 +1009,9 @@ our %Lexicon = (
 
     "Save"
  => "Сохранить",
+
+    "Save as template?"
+ => "Сохранить как шаблон?",
 
     "Save recursive"
  => "",
@@ -1082,6 +1148,9 @@ our %Lexicon = (
     "Unable to save text"
  => "",
 
+    "Unarchive the specified release?"
+ => "",
+
     "Unknown department"
  => "",
 
@@ -1131,10 +1200,10 @@ our %Lexicon = (
  => "Посмотреть",
 
     "View composer"
- => "",
+ => "Смотреть планирование",
 
     "View plan"
- => "",
+ => "Смотреть план",
 
     "View text"
  => "Смотреть текст",

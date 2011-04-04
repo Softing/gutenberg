@@ -3,6 +3,10 @@
 // licensing@softing.ru
 // http://softing.ru/license
 
+Ext.form.FormPanel.prototype.cmpSetValue = function (field, value) {
+    this.getForm().findField(field).setValue(value);
+}
+
 _FLD_HDN_ID = {
     xtype: "hidden",
     name: "id",

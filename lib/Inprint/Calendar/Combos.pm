@@ -64,6 +64,35 @@ sub parents {
     $c->render_json( { data => $result } );
 }
 
+sub childrens {
+    my $c = shift;
+
+    my @errors;
+
+    my $i_parent = $c->get_uuid(\@errors, "parent");
+
+    my @data;
+    my $sql = "
+        SELECT
+            id, shortcut as title, shortcut, description
+        FROM editions
+        WHERE 1=1
+    ";
+
+    #push @data, $i_parent;
+
+    my $access = $c->objectBindings("editions.calendar.manage");
+    $sql .= " AND id = ANY(?) ";
+    push @data, $access;
+
+    my $result = $c->Q("
+        $sql
+        ORDER BY shortcut
+    ", \@data)->Hashes;
+
+    $c->smart_render( \@errors, $result );
+}
+
 sub sources {
     my $c = shift;
 

@@ -127,18 +127,28 @@ sub startup {
     $sessionBridge->route("/advertising/requests/delete/")      ->to("advertising-requests#delete");
 
     # Calendar routes
-    $sessionBridge->route("/calendar/create/")                  ->to("calendar#create");
-    $sessionBridge->route("/calendar/read/")                    ->to("calendar#read");
-    $sessionBridge->route("/calendar/update/")                  ->to("calendar#update");
-    $sessionBridge->route("/calendar/delete/")                  ->to("calendar#delete");
     $sessionBridge->route("/calendar/list/")                    ->to("calendar#list");
     $sessionBridge->route("/calendar/tree/")                    ->to("calendar#tree");
-    $sessionBridge->route("/calendar/enable/")                  ->to("calendar#enable");
-    $sessionBridge->route("/calendar/disable/")                 ->to("calendar#disable");
+
+    $sessionBridge->route("/calendar/fascicle/read/")           ->to("calendar-fascicle#read");
+    $sessionBridge->route("/calendar/fascicle/create/")         ->to("calendar-fascicle#create");
+    $sessionBridge->route("/calendar/fascicle/update/")         ->to("calendar-fascicle#update");
+    $sessionBridge->route("/calendar/fascicle/remove/")         ->to("calendar-fascicle#remove");
+    $sessionBridge->route("/calendar/fascicle/archive/")        ->to("calendar-fascicle#archive");
+    $sessionBridge->route("/calendar/fascicle/unarchive/")      ->to("calendar-fascicle#unarchive");
+    $sessionBridge->route("/calendar/fascicle/enable/")         ->to("calendar-fascicle#enable");
+    $sessionBridge->route("/calendar/fascicle/disable/")        ->to("calendar-fascicle#disable");
+    $sessionBridge->route("/calendar/fascicle/deadline/")       ->to("calendar-fascicle#deadline");
+
+    $sessionBridge->route("/calendar/attachment/read/")         ->to("calendar-attachment#read");
+    $sessionBridge->route("/calendar/attachment/create/")       ->to("calendar-attachment#create");
+    $sessionBridge->route("/calendar/attachment/update/")       ->to("calendar-attachment#update");
+    $sessionBridge->route("/calendar/attachment/remove/")       ->to("calendar-attachment#remove");
 
     # Calendar combos
     $sessionBridge->route('/calendar/combos/editions/')         ->to('calendar-combos#editions');
     $sessionBridge->route('/calendar/combos/parents/')          ->to('calendar-combos#parents');
+    $sessionBridge->route('/calendar/combos/childrens/')        ->to('calendar-combos#childrens');
     $sessionBridge->route('/calendar/combos/sources/')          ->to('calendar-combos#sources');
 
     # Catalog routes

@@ -6,7 +6,9 @@
 Inprint.Menu = Ext.extend(Ext.Toolbar,{
 
     initComponent: function(){
-        Ext.apply(this, {});
+        Ext.apply(this, {
+            height:26
+        });
         Inprint.Menu.superclass.initComponent.apply(this, arguments);
     },
 

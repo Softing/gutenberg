@@ -28,6 +28,12 @@ Inprint.factory.Combo = function() {
             fieldLabel: _("Issue"),
             emptyText: _("Select issue") + "..."
         },
+        "/calendar/combos/childrens/": {
+            hiddenName: "edition",
+            icon: "blue-folders",
+            fieldLabel: _("Edition"),
+            emptyText: _("Select") + "..."
+        },
 
         // Catalog
         "/catalog/combos/editions/": {
@@ -286,7 +292,7 @@ Inprint.factory.Combo = function() {
                 store: {
                     url: url,
                     root: "data",
-                    params: { },
+                    baseParams: {  },
                     idProperty: "id",
                     autoDestroy: true,
                     xtype: "jsonstore",
@@ -302,7 +308,7 @@ Inprint.factory.Combo = function() {
             // Add store configuration
             if (storeconfig) Ext.apply(combo.store, storeconfig);
             // Add baseparams to store configuration
-            if (comboconfig.baseParams)  Ext.apply(combo.store, comboconfig.baseParams);
+            if (comboconfig.baseParams)  Ext.apply(combo.store.baseParams, comboconfig.baseParams);
 
             return combo;
         },

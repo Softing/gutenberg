@@ -11,21 +11,34 @@ use warnings;
 sub create {
     my $c = shift;
 
-    my ($id, $edition, $parent, $fastype, $variation,
+    my ($edition, $template,
         $shortcut, $description,
-        $circulation, $pnum, $anum, $manager, $enabled, $archived, $flagdoc,
-        $flagadv, $datedoc, $dateadv, $dateprint, $dateout) = @_;
+        $num, $anum, $circulation,
+        $print_date, $release_date,
+        $adv_date, $doc_date,
+        $adv_enabled, $doc_enabled ) = @_;
+
+    my $id = $c->uuid;
+    my $variation = $c->uuid;
 
     $c->Do("
         INSERT INTO fascicles(
-            id, edition, parent, fastype, variation, shortcut, description,
-            circulation, pnum, anum, manager, enabled, archived, flagdoc,
-            flagadv, datedoc, dateadv, dateprint, dateout, created, updated)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
+            id,
+            edition, parent,
+            fastype, variation,
+            shortcut, description,
+            circulation, num, anum, manager, enabled, archived,
+            doc_enabled, adv_enabled, doc_date, adv_date, print_date, release_date, created, updated)
+        VALUES (
+            ?,
+            ?, ?,
+            'issue', ?,
+            ?, ?,
+            ?, ?, ?, null, true, false, ?, ?, ?, ?, ?, ?, now(), now());
 
-    ", [ $id, $edition, $parent, $fastype, $variation, $shortcut, $description,
-        $circulation, $pnum, $anum, $manager, $enabled, $archived, $flagdoc,
-        $flagadv, $datedoc, $dateadv, $dateprint, $dateout ]);
+    ", [ $id, $edition, $edition, $variation, $shortcut, $description,
+        $circulation, $num, $anum,
+        $doc_enabled, $adv_enabled, $doc_date, $adv_date, $print_date, $release_date ]);
 
     return $c;
 }
@@ -38,15 +51,15 @@ sub read {
         SELECT
             id, edition, parent, fastype, variation,
             shortcut, description,
-            circulation, pnum, anum,
+            circulation, num, anum,
             manager,
             enabled, archived,
-            flagdoc, flagadv,
+            doc_enabled, adv_enabled,
 
-            to_char(datedoc, 'YYYY-MM-DD HH24:MI:SS')   as datedoc,
-            to_char(dateadv, 'YYYY-MM-DD HH24:MI:SS')   as dateadv,
-            to_char(dateprint, 'YYYY-MM-DD HH24:MI:SS')   as dateprint,
-            to_char(dateout, 'YYYY-MM-DD HH24:MI:SS')   as dateout,
+            to_char(doc_date,     'YYYY-MM-DD HH24:MI:SS') as doc_date,
+            to_char(adv_date,     'YYYY-MM-DD HH24:MI:SS') as adv_date,
+            to_char(print_date,   'YYYY-MM-DD HH24:MI:SS') as print_date,
+            to_char(release_date, 'YYYY-MM-DD HH24:MI:SS') as release_date,
 
             to_char(created, 'YYYY-MM-DD HH24:MI:SS') as created,
             to_char(updated, 'YYYY-MM-DD HH24:MI:SS') as updated
@@ -58,40 +71,79 @@ sub read {
 }
 
 sub update {
-    my $c = shift;
 
-    my ($id, $enabled, $title, $shortcut,
-        $description, $deadline, $advertisement ) = @_;
+    my ($c, $id,
+        $shortcut, $description,
+        $num, $anum, $circulation,
+        $print_date, $release_date,
+        $adv_date, $doc_date,
+        $adv_enabled, $doc_enabled ) = @_;
 
     $c->Do("
         UPDATE fascicles
-            SET enabled=?, title=?, shortcut=?, description=?, deadline=?, advert_deadline=?
+            SET shortcut =?, description =?,
+                num =?, anum =?, circulation =?,
+                print_date =?, release_date =?,
+                adv_date =?,  doc_date =?,
+                adv_enabled =?, doc_enabled =?
         WHERE id =?;
-    ", [ $enabled, $title, $shortcut, $deadline, $deadline, $advertisement, $id ]);
+    ", [    $shortcut, $description,
+            $num, $anum, $circulation,
+            $print_date, $release_date,
+            $adv_date, $doc_date,
+            $adv_enabled, $doc_enabled,
+        $id ]);
 
     return $c;
 }
 
-sub delete {
-    my $c  = shift;
-    my $id = shift;
+sub deadline {
 
-    $c->Do(" DELETE FROM fascicles_requests WHERE fascicle=? ", [ $id ]);
+    my ($c, $id,
+        $print_date, $release_date,
+        $adv_date, $doc_date,
+        $adv_enabled, $doc_enabled ) = @_;
 
-    $c->Do(" DELETE FROM fascicles_modules WHERE fascicle=? ", [ $id ]);
-    $c->Do(" DELETE FROM fascicles_options WHERE fascicle=? ", [ $id ]);
-    $c->Do(" DELETE FROM fascicles_pages WHERE fascicle=? ", [ $id ]);
 
-    $c->Do(" DELETE FROM fascicles_indx_rubrics WHERE fascicle=? ", [ $id ]);
-    $c->Do(" DELETE FROM fascicles_indx_headlines WHERE fascicle=? ", [ $id ]);
+    $c->Do("
+        UPDATE fascicles
+            SET print_date =?, release_date =?,
+                adv_date =?,  doc_date =?,
+                adv_enabled =?, doc_enabled =?
+        WHERE id =?;
+    ", [    $print_date, $release_date,
+            $adv_date, $doc_date,
+            $adv_enabled, $doc_enabled,
+        $id ]);
 
-    $c->Do(" DELETE FROM fascicles_tmpl_index WHERE fascicle=? ", [ $id ]);
-    $c->Do(" DELETE FROM fascicles_tmpl_modules WHERE fascicle=? ", [ $id ]);
-    $c->Do(" DELETE FROM fascicles_tmpl_pages WHERE fascicle=? ", [ $id ]);
-    $c->Do(" DELETE FROM fascicles_tmpl_places WHERE fascicle=? ", [ $id ]);
+    return $c;
+}
 
-    $c->Do(" DELETE FROM fascicles WHERE id=? ", [ $id ]);
+sub remove {
+    my ($c, $id) = @_;
+    $c->Do(" UPDATE fascicles SET deleted = true WHERE id=? ", [ $id ]);
+    return $c;
+}
 
+sub enable {
+    my ($c, $id) = @_;
+    $c->Do(" UPDATE fascicles SET enabled = true WHERE id=? ", [ $id ]);
+    return $c;
+}
+sub disable {
+    my ($c, $id) = @_;
+    $c->Do(" UPDATE fascicles SET enabled = false WHERE id=? ", [ $id ]);
+    return $c;
+}
+
+sub archive {
+    my ($c, $id) = @_;
+    $c->Do(" UPDATE fascicles SET archived = true WHERE id=? ", [ $id ]);
+    return $c;
+}
+sub unarchive {
+    my ($c, $id) = @_;
+    $c->Do(" UPDATE fascicles SET archived = false WHERE id=? ", [ $id ]);
     return $c;
 }
 
