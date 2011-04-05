@@ -324,7 +324,7 @@ sub search {
         # Get files list
         my $folder = Inprint::Store::Embedded::getFolderPath($c, "documents", $document->{created}, $document->{copygroup}, 1);
         my $files  = Inprint::Store::Cache::getRecordsByPath($c, $folder, "all", [ 'doc', 'rtf', 'odt', 'txt' ]);
-
+        
         foreach my $file (@$files) {
             push @{ $document->{links} }, {
                 id => $file->{id},
@@ -332,7 +332,7 @@ sub search {
             };
         }
 
-        ## Fix filepath
+        # Fix filepath
         my $relativePath = Inprint::Store::Embedded::getRelativePath($c, "documents", $document->{created}, $document->{id}, 1);
         $c->Do("UPDATE documents SET filepath=? WHERE copygroup=?", [ $relativePath, $document->{copygroup} ]);
 

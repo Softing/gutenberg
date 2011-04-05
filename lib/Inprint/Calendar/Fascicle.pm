@@ -146,31 +146,29 @@ sub remove {
 sub archive {
     my $c = shift;
 
-    my $result;
     my @errors;
 
     my $i_id           = $c->get_uuid(\@errors, "id");
 
     unless (@errors) {
-        $result = Inprint::Models::Fascicle::archive($c, $i_id);
+        Inprint::Models::Fascicle::archive($c, $i_id);
     }
 
-    $c->smart_render(\@errors, $result);
+    $c->smart_render(\@errors);
 }
 
 sub unarchive {
     my $c = shift;
 
-    my $result;
     my @errors;
 
     my $i_id           = $c->get_uuid(\@errors, "id");
 
     unless (@errors) {
-        $result = Inprint::Models::Fascicle::unarchive($c, $i_id);
+        Inprint::Models::Fascicle::unarchive($c, $i_id);
     }
 
-    $c->smart_render(\@errors, $result);
+    $c->smart_render(\@errors);
 }
 
 sub enable {

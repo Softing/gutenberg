@@ -8,6 +8,8 @@ package Inprint::Models::Fascicle;
 use strict;
 use warnings;
 
+use Inprint::Models::Attachment;
+
 sub create {
     my $c = shift;
 
@@ -138,12 +140,73 @@ sub disable {
 
 sub archive {
     my ($c, $id) = @_;
-    $c->Do(" UPDATE fascicles SET archived = true WHERE id=? ", [ $id ]);
+
+    $c->txBegin;
+
+    my $fascicles = $c->Q(" SELECT id FROM fascicles WHERE parent=\$1 OR id=\$1 ", $id)->Values;
+
+    $c->Do("
+        UPDATE fascicles SET
+            archived = true,
+            enabled = false
+        WHERE id= ANY(?) ", [ $fascicles ]);
+
+    # Move linked documents to Archive
+    $c->Do("
+        UPDATE documents SET
+            isopen=false
+        WHERE 1=1
+            AND fascicle = ANY(\$1)
+            AND EXISTS(
+                SELECT true
+                FROM fascicles_map_documents as fasmap
+                WHERE 1=1
+                    AND fasmap.fascicle=documents.fascicle
+                    AND fasmap.entity = documents.id)", [ $fascicles ]);
+
+    # Move unlinked documents to Briefcase
+    $c->Do("
+        UPDATE documents SET
+            isopen=true,
+            fascicle = \$1,
+            fascicle_shortcut = \$2
+        WHERE 1=1
+            AND fascicle = ANY(\$3)
+            AND NOT EXISTS(
+                SELECT true
+                FROM fascicles_map_documents as fasmap
+                WHERE 1=1
+                    AND fasmap.fascicle=documents.fascicle
+                    AND fasmap.entity = documents.id)",
+        [ '00000000-0000-0000-0000-000000000000', $c->l("Briefcase"), $fascicles ]);
+
+    $c->txCommit;
+
     return $c;
 }
+
 sub unarchive {
     my ($c, $id) = @_;
-    $c->Do(" UPDATE fascicles SET archived = false WHERE id=? ", [ $id ]);
+
+    $c->txBegin;
+
+    my $fascicles = $c->Q(" SELECT id FROM fascicles WHERE parent=\$1 OR id=\$1 ", $id)->Values;
+
+    $c->Do("
+        UPDATE fascicles SET
+            archived = false,
+            enabled = true
+        WHERE id= ANY(?) ", [ $fascicles ]);
+
+    # Move linked documents to Archive
+    $c->Do("
+        UPDATE documents SET
+            isopen=true
+        WHERE 1=1
+            AND fascicle = ANY(\$1)", [ $fascicles ]);
+
+    $c->txCommit;
+
     return $c;
 }
 

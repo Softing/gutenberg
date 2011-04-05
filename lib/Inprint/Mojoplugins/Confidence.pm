@@ -331,43 +331,43 @@ sub register {
             return \@result;
         } );
 
-    $app->helper(
-        objectChildrens => sub {
-
-            my ($c, $terms, $member) = @_;
-
-            my $result = [];
-
-            unless ($member) {
-                $member = $c->getSessionValue("member.id");
-            }
-
-            my @rules;
-
-            if (ref $terms eq "ARRAY") {
-                @rules = @$terms;
-            } else {
-                push @rules, $terms;
-            }
-
-            for (my $i=0; $i <= $#rules; $i++) {
-                my ($term, $area) = split /:/, $rules[$i];
-                if ($area eq "*") {
-                    splice @rules, $i, $i, "$term:member", "$term:group";
-                }
-            }
-
-            my %seen;
-            @rules = grep { ! $seen{$_}++ } @rules;
-
-            if (@rules && $member) {
-                $result = $c->sql->Q("
-                    SELECT childrens FROM cache_visibility WHERE member=? AND term = ANY(?)
-                ", [ $member, \@rules ])->Value();
-            }
-
-            return $result || [];
-        } );
+    #$app->helper(
+    #    objectChildrens => sub {
+    #
+    #        my ($c, $terms, $member) = @_;
+    #
+    #        my $result = [];
+    #
+    #        unless ($member) {
+    #            $member = $c->getSessionValue("member.id");
+    #        }
+    #
+    #        my @rules;
+    #
+    #        if (ref $terms eq "ARRAY") {
+    #            @rules = @$terms;
+    #        } else {
+    #            push @rules, $terms;
+    #        }
+    #
+    #        for (my $i=0; $i <= $#rules; $i++) {
+    #            my ($term, $area) = split /:/, $rules[$i];
+    #            if ($area eq "*") {
+    #                splice @rules, $i, $i, "$term:member", "$term:group";
+    #            }
+    #        }
+    #
+    #        my %seen;
+    #        @rules = grep { ! $seen{$_}++ } @rules;
+    #
+    #        if (@rules && $member) {
+    #            $result = $c->sql->Q("
+    #                SELECT childrens FROM cache_visibility WHERE member=? AND term = ANY(?)
+    #            ", [ $member, \@rules ])->Value();
+    #        }
+    #
+    #        return $result || [];
+    #    } );
 }
 
 1;

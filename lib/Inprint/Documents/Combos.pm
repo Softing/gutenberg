@@ -46,11 +46,11 @@ sub managers {
         $sql .= " AND ( 1=1 ";
 
         # Filter by rules
-        my $create_bindings = $c->objectChildrens("catalog.documents.create:*");
+        my $create_bindings = $c->objectBindings("catalog.documents.create:*");
         $sql .= " OR t2.catalog = ANY(?) ";
         push @params, $create_bindings;
 
-        my $assign_bindings = $c->objectChildrens("catalog.documents.assign:*");
+        my $assign_bindings = $c->objectBindings("catalog.documents.assign:*");
         $sql .= " OR  t2.catalog = ANY(?) ";
         push @params, $assign_bindings;
 
@@ -99,7 +99,10 @@ sub fascicles {
 
         my @params;
         my $sql = "
-                SELECT t1.id, t2.shortcut ||'/'|| t1.shortcut as title, t1.description
+                SELECT
+                    t1.id,
+                    'blue-folder' as icon,
+                    t2.shortcut ||'/'|| t1.shortcut as title
                 FROM fascicles t1, editions t2
                 WHERE
                     t1.edition = t2.id
@@ -109,7 +112,7 @@ sub fascicles {
         ";
 
         if ($i_term) {
-            my $bindings = $c->objectChildrens($i_term);
+            my $bindings = $c->objectBindings($i_term);
             $sql .= " AND t1.edition = ANY(?) ";
             push @params, $bindings;
         }
@@ -118,15 +121,14 @@ sub fascicles {
         $sql .= " AND t1.edition = ANY(?) ";
         push @params, $editions;
 
-        $result = $c->Q(" $sql ORDER BY t1.dateout DESC, t2.shortcut, t1.shortcut ", \@params)->Hashes;
+        $result = $c->Q(" $sql ORDER BY t1.release_date ASC, t2.shortcut, t1.shortcut ", \@params)->Hashes;
 
         if ($c->objectAccess($i_term, $i_edition)) {
             unshift @$result, {
                 id => "00000000-0000-0000-0000-000000000000",
                 icon => "briefcase",
                 bold => $c->json->true,
-                title => $c->l("Briefcase"),
-                description => $c->l("Briefcase for reserved documents")
+                title => $c->l("Briefcase")
             };
         }
     }
