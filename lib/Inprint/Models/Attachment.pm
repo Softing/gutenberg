@@ -24,7 +24,7 @@ sub create {
             INSERT INTO fascicles(
                 id,
                 edition, parent,
-                template, template_shortcut,
+                tmpl, tmpl_shortcut,
                 fastype, variation,
                 shortcut, description,
                 circulation, num, anum,

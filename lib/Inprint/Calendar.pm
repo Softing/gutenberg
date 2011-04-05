@@ -106,7 +106,7 @@ sub list {
             t2.id as edition, t2.shortcut as edition_shortcut,
             t1.parent, t1.fastype, t1.variation,
             t1.shortcut, t1.description,
-            t1.template, t1.template_shortcut,
+            t1.tmpl, t1.tmpl_shortcut,
             t1.circulation, t1.num, t1.anum,
             t1.manager,
             t1.enabled, t1.archived,

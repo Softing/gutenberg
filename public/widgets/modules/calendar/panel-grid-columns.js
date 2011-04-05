@@ -9,7 +9,7 @@ Inprint.calendar.GridColumns = {
 
     template: {
         header: _("Template"),
-        dataIndex: 'template_shortcut',
+        dataIndex: 'tmpl_shortcut',
         width: 100
     },
 
