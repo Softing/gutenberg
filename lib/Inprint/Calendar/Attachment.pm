@@ -8,6 +8,7 @@ package Inprint::Calendar::Attachment;
 use strict;
 use warnings;
 
+use Inprint::Calendar::Copy;
 use Inprint::Models::Attachment;
 
 use base 'Mojolicious::Controller';
@@ -42,11 +43,17 @@ sub create {
     my $template = $c->check_record(\@errors, "fascicles", "template", $i_template);
 
     unless (@errors) {
+
+        my $id = $c->uuid;
+
         Inprint::Models::Attachment::create(
-            $c,
+            $c, $id,
             $edition, $fascicle, $template,
             $i_circulation
         );
+
+        Inprint::Calendar::Copy::copy($c, $id, $template->{id});
+
     }
 
     $c->smart_render(\@errors);

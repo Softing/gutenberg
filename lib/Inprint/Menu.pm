@@ -93,6 +93,7 @@ sub index
             AND t1.fastype = 'issue'
             AND t1.enabled = true
             AND t1.archived = false
+            AND deleted = false
         ORDER BY t1.release_date, t2.shortcut, t1.shortcut
     ")->Hashes;
 
@@ -103,10 +104,10 @@ sub index
             FROM fascicles t1, editions t2
             WHERE
                 t1.edition = t2.id
-
                 AND t1.fastype = 'attachment'
                 AND t1.enabled = true
                 AND t1.archived = false
+                AND deleted = false
                 AND t1.parent = ?
             ORDER BY t1.release_date, t2.shortcut, t1.shortcut
         ", [ $item->{id} ])->Hashes;

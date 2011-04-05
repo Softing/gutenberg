@@ -53,14 +53,18 @@ sub create {
     my $i_doc_enabled  = $c->get_flag(\@errors, "doc_enabled", 1) || 0;
 
     unless (@errors) {
+
+        my $id = $c->uuid;
+
         Inprint::Models::Fascicle::create(
-            $c,
+            $c, $id,
             $i_edition, $i_template,
             $i_shortcut, $i_description,
             $i_num, $i_anum, $i_circulation,
             $i_print_date, $i_release_date,
             $i_adv_date, $i_doc_date,
             $i_adv_enabled, $i_doc_enabled);
+        
     }
 
     $c->smart_render(\@errors);

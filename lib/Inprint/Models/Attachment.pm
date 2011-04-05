@@ -10,9 +10,8 @@ use warnings;
 
 sub create {
 
-    my ( $c, $edition, $fascicle, $template, $circulation ) = @_;
+    my ( $c, $id, $edition, $fascicle, $template, $circulation ) = @_;
 
-    my $id = $c->uuid;
     my $variation = $c->uuid;
 
     if ($template->{id} eq "00000000-0000-0000-0000-000000000000") {
@@ -56,7 +55,7 @@ sub create {
             $fascicle->{print_date}, $fascicle->{release_date} ]);
     }
 
-    return $c;
+    return $id;
 }
 
 sub read {
