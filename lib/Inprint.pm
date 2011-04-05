@@ -151,6 +151,9 @@ sub startup {
     $sessionBridge->route('/calendar/combos/childrens/')        ->to('calendar-combos#childrens');
     $sessionBridge->route('/calendar/combos/sources/')          ->to('calendar-combos#sources');
 
+    # Calendar trees
+    $sessionBridge->route('/calendar/trees/editions/')          ->to('calendar-trees#editions');
+
     # Catalog routes
     $sessionBridge->route("/catalog/combos/editions/")          ->to("catalog-combos#creeditionsate");
     $sessionBridge->route("/catalog/combos/groups/")            ->to("catalog-combos#groups");

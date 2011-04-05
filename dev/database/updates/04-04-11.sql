@@ -56,3 +56,10 @@ ALTER TABLE fascicles RENAME COLUMN datedoc   TO doc_date;
 ALTER TABLE fascicles RENAME COLUMN dateadv   TO adv_date;
 ALTER TABLE fascicles RENAME COLUMN dateprint TO print_date;
 ALTER TABLE fascicles RENAME COLUMN dateout   TO release_date;
+
+--
+
+
+ALTER TABLE fascicles ADD COLUMN "template" uuid;
+ALTER TABLE fascicles ADD COLUMN template_shortcut character varying;
+ALTER TABLE fascicles ALTER COLUMN template_shortcut SET DEFAULT ''::character varying;

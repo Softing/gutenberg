@@ -7,10 +7,10 @@ Inprint.calendar.GridColumns = {
         tpl: new Ext.XTemplate('<tpl if="!enabled"><s></tpl>{shortcut}<tpl if="!enabled"></s></tpl>')
     },
 
-    description: {
-        header: _("Description"),
-        dataIndex: 'description',
-        width: 200
+    template: {
+        header: _("Template"),
+        dataIndex: 'template_shortcut',
+        width: 100
     },
 
     num: {

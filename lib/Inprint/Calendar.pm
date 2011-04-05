@@ -106,6 +106,7 @@ sub list {
             t2.id as edition, t2.shortcut as edition_shortcut,
             t1.parent, t1.fastype, t1.variation,
             t1.shortcut, t1.description,
+            t1.template, t1.template_shortcut,
             t1.circulation, t1.num, t1.anum,
             t1.manager,
             t1.enabled, t1.archived,
@@ -140,6 +141,7 @@ sub list {
     foreach my $node (@{ $result }) {
 
         $node->{leaf} = $c->json->true;
+        $node->{expanded} = $c->json->true;
         $node->{icon} = "/icons/blue-folder-small-horizontal.png";
 
         my $sql_childrens = $sql;

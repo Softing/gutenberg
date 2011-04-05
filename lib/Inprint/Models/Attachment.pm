@@ -9,36 +9,52 @@ use strict;
 use warnings;
 
 sub create {
-    my $c = shift;
 
-    my ($edition, $template,
-        $shortcut, $description,
-        $num, $anum, $circulation,
-        $print_date, $release_date,
-        $adv_date, $doc_date,
-        $adv_enabled, $doc_enabled ) = @_;
+    my ( $c, $edition, $fascicle, $template, $circulation ) = @_;
 
     my $id = $c->uuid;
     my $variation = $c->uuid;
 
-    $c->Do("
-        INSERT INTO fascicles(
-            id,
-            edition, parent,
-            fastype, variation,
-            shortcut, description,
-            circulation, num, anum, manager, enabled, archived,
-            doc_enabled, adv_enabled, doc_date, adv_date, print_date, release_date, created, updated)
-        VALUES (
-            ?,
-            ?, ?,
-            'issue', ?,
-            ?, ?,
-            ?, ?, ?, null, true, false, ?, ?, ?, ?, ?, ?, now(), now());
+    if ($template->{id} eq "00000000-0000-0000-0000-000000000000") {
+        $template->{shortcut} = $c->l("Default");
+    }
 
-    ", [ $id, $edition, $edition, $variation, $shortcut, $description,
-        $circulation, $num, $anum,
-        $doc_enabled, $adv_enabled, $doc_date, $adv_date, $print_date, $release_date ]);
+    if ($fascicle->{id}) {
+        $c->Do("
+            INSERT INTO fascicles(
+                id,
+                edition, parent,
+                template, template_shortcut,
+                fastype, variation,
+                shortcut, description,
+                circulation, num, anum,
+                manager, enabled, archived,
+                doc_enabled, adv_enabled,
+                doc_date, adv_date,
+                print_date, release_date,
+                created, updated)
+            VALUES (
+                ?,
+                ?, ?,
+                ?, ?,
+                ?, ?,
+                ?, ?,
+                ?, ?, ?,
+                null, true, false,
+                false, false,
+                ?, ?,
+                ?, ?,
+                now(), now());
+
+        ", [ $id,
+            $edition->{id},          $fascicle->{id},
+            $template->{id},         $template->{shortcut},
+            "attachment",            $variation,
+            $fascicle->{shortcut},   $fascicle->{description},
+            $circulation,            $fascicle->{num},          $fascicle->{anum},
+            $fascicle->{doc_date},   $fascicle->{adv_date},
+            $fascicle->{print_date}, $fascicle->{release_date} ]);
+    }
 
     return $c;
 }

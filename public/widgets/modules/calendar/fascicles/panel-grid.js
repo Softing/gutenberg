@@ -12,108 +12,103 @@ Inprint.calendar.fascicles.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
         this.tbar = [
 
             {
-                id: 'create',
-                disabled: true,
-                text: _("Create"),
-                ref: "../btnCreate",
-                cls: 'x-btn-text-icon',
-                icon: _ico("blue-folder--plus"),
-                scope: this,
-                handler: this.cmpCreate
+                xtype: 'buttongroup',
+                columns: 1,
+                defaults: {
+                    scale: 'small'
+                },
+                items: [
+                    {
+                        id: 'create',
+                        disabled: true,
+                        text: _("Create issue"),
+                        ref: "../../btnCreate",
+                        cls: 'x-btn-text-icon',
+                        icon: _ico("blue-folder--plus"),
+                        scope: this,
+                        handler: this.cmpCreate
+                    },
+                    {
+                        id: 'createAttachment',
+                        disabled: true,
+                        text: _("Create attachment"),
+                        ref: "../../btnCreateAttachment",
+                        cls: 'x-btn-text-icon',
+                        icon: _ico("folder--plus"),
+                        scope: this,
+                        handler: this.cmpCreateAttachment
+                    }
+                ]
             },
 
             {
-                id: 'update',
-                disabled: true,
-                text: _("Edit"),
-                ref: "../btnUpdate",
-                icon: _ico("blue-folder--pencil"),
-                cls: 'x-btn-text-icon',
-                scope: this,
-                handler: this.cmpUpdate
-            },
-
-            {
-                id: 'delete',
-                text: _("Delete"),
-                disabled: true,
-                icon: _ico("blue-folder--minus"),
-                cls: 'x-btn-text-icon',
-                ref: "../btnDelete",
-                scope: this,
-                handler: this.cmpRemove
-            },
-
-            "-",
-
-            {
-                id: 'deadline',
-                disabled: true,
-                text: _("Deadline"),
-                ref: "../btnDeadline",
-                icon: _ico("clock-select"),
-                cls: 'x-btn-text-icon',
-                scope: this,
-                handler: this.cmpDeadline
-            },
-
-            "-",
-
-            {
-                id: "enable",
-                disabled: true,
-                ref: "../btnEnable",
-                icon: _ico("plug-connect"),
-                cls: 'x-btn-text-icon',
-                text    : _('Enable'),
-                scope: this,
-                handler : this.cmpEnable
-            },
-
-            {
-                id: "disable",
-                disabled: true,
-                ref: "../btnDisable",
-                icon: _ico("plug-disconnect"),
-                cls: 'x-btn-text-icon',
-                text    : _('Disable'),
-                scope: this,
-                handler : this.cmpDisable
-            },
-
-            "-",
-
-            {
-                id: 'archive',
-                disabled: true,
-                text: _("Archive"),
-                ref: "../btnArchive",
-                icon: _ico("gear"),
-                cls: 'x-btn-text-icon',
-                scope: this,
-                handler: this.cmpArchive
-            },
-
-            {
-                id: 'template',
-                disabled: true,
-                text: _("Make template"),
-                ref: "../btnTemplate",
-                icon: _ico("puzzle"),
-                cls: 'x-btn-text-icon',
-                scope: this,
-                handler: this.cmpTemplate
-            },
-
-            {
-                id: 'format',
-                disabled: true,
-                text: _("Format"),
-                ref: "../btnFormat",
-                icon: _ico("eraser"),
-                cls: 'x-btn-text-icon',
-                scope: this,
-                handler: this.cmpFormat
+                xtype: 'buttongroup',
+                columns: 3,
+                defaults: {
+                    scale: 'small'
+                },
+                items: [
+                    {
+                        id: 'deadline',
+                        disabled: true,
+                        text: _("Deadline"),
+                        ref: "../../btnDeadline",
+                        icon: _ico("clock-select"),
+                        cls: 'x-btn-text-icon',
+                        scope: this,
+                        handler: this.cmpDeadline
+                    },
+                    {
+                        id: "enable",
+                        disabled: true,
+                        ref: "../../btnEnable",
+                        icon: _ico("plug-connect"),
+                        cls: 'x-btn-text-icon',
+                        text    : _('Enable'),
+                        scope: this,
+                        handler : this.cmpEnable
+                    },
+                    {
+                        id: 'template',
+                        disabled: true,
+                        text: _("Make template"),
+                        ref: "../../btnTemplate",
+                        icon: _ico("puzzle"),
+                        cls: 'x-btn-text-icon',
+                        scope: this,
+                        handler: this.cmpTemplate
+                    },
+                    {
+                        id: 'archive',
+                        disabled: true,
+                        text: _("Archive"),
+                        ref: "../../btnArchive",
+                        icon: _ico("gear"),
+                        cls: 'x-btn-text-icon',
+                        scope: this,
+                        handler: this.cmpArchive
+                    },
+                    {
+                        id: "disable",
+                        disabled: true,
+                        ref: "../../btnDisable",
+                        icon: _ico("plug-disconnect"),
+                        cls: 'x-btn-text-icon',
+                        text    : _('Disable'),
+                        scope: this,
+                        handler : this.cmpDisable
+                    },
+                    {
+                        id: 'format',
+                        disabled: true,
+                        text: _("Format"),
+                        ref: "../../btnFormat",
+                        icon: _ico("eraser"),
+                        cls: 'x-btn-text-icon',
+                        scope: this,
+                        handler: this.cmpFormat
+                    }
+                ]
             }
 
         ];
@@ -122,6 +117,7 @@ Inprint.calendar.fascicles.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
             Inprint.calendar.GridColumns.shortcut,
             Inprint.calendar.GridColumns.num,
             Inprint.calendar.GridColumns.circulation,
+            Inprint.calendar.GridColumns.template,
             Inprint.calendar.GridColumns.docdate,
             Inprint.calendar.GridColumns.advdate,
             Inprint.calendar.GridColumns.printdate,
@@ -222,7 +218,7 @@ Inprint.calendar.fascicles.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
 
         var form = new Inprint.calendar.attachments.Create();
 
-        form.cmpSetValue("parent", this.cmpGetSelectedNode().id);
+        form.cmpSetValue("edition", this.currentEdition);
 
         var wndw = this.cmpCreateWindow(
             360,350, form, _("Adding attachment"), [ _BTN_WNDW_ADD, _BTN_WNDW_CLOSE ]
@@ -259,10 +255,11 @@ Inprint.calendar.fascicles.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
 
     cmpDeadline: function() {
 
-        var id = this.cmpGetSelectedNode().id;
+        var node    = this.cmpGetSelectedNode();
+        var id      = this.cmpGetSelectedNode().id;
+        var fastype = this.cmpGetSelectedNode().fastype;
 
-        var form = new Inprint.calendar.Deadline();
-        form.cmpFill(id);
+        var form = new Inprint.calendar.Deadline().cmpInit(node);
 
         var wndw = this.cmpCreateWindow(
             360,320, form, _("Editing deadline"), [ _BTN_WNDW_SAVE, _BTN_WNDW_CLOSE ]

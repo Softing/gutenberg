@@ -123,7 +123,7 @@ our %Lexicon = (
  => "Годовой",
 
     "Annual number"
- => "",
+ => "Годовой номер",
 
     "Another employee %1 captured this issue!"
  => "Сотрудник %1 захватил этот выпуск!",
@@ -301,6 +301,9 @@ our %Lexicon = (
 
     "Create document"
  => "Создать материал",
+
+    "Create issue"
+ => "Создать выпуск",
 
     "Create request"
  => "",
@@ -888,7 +891,7 @@ our %Lexicon = (
  => "Печать",
 
     "Printing shop"
- => "",
+ => "Типография",
 
     "Probably someone has entered in Inprint with your login on other computer. <br/> push F5 what to pass to authorization page"
  => "",

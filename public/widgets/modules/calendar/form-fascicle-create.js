@@ -118,15 +118,16 @@ Inprint.calendar.fascicles.Create = Ext.extend( Ext.form.FormPanel,
 
                             {
                                 labelWidth: 20,
-                                xtype: "xdatefield",
+                                xtype: "xdatetime",
                                 name: "doc_date",
                                 format: "F j, Y",
-                                submitFormat: "Y-m-d",
+                                //submitFormat: "Y-m-d",
                                 fieldLabel: _("Documents")
                             },
                             {
                                 xtype: "checkbox",
                                 name: "doc_enabled",
+                                checked: true,
                                 fieldLabel: "",
                                 boxLabel: _("Enabled")
                             },
@@ -136,15 +137,16 @@ Inprint.calendar.fascicles.Create = Ext.extend( Ext.form.FormPanel,
                             },
 
                             {
-                                xtype: 'xdatefield',
+                                xtype: 'xdatetime',
                                 name: 'adv_date',
                                 format:'F j, Y',
-                                submitFormat:'Y-m-d',
+                                //submitFormat:'Y-m-d',
                                 fieldLabel: _("Advertisement")
                             },
                             {
                                 xtype: "checkbox",
                                 name: "adv_enabled",
+                                checked: true,
                                 fieldLabel: "",
                                 boxLabel: _("Enabled")
                             }

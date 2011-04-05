@@ -8,6 +8,7 @@ Inprint.calendar.fascicles.Interaction = function(parent, panels) {
         if (node && node.id) {
 
             grid.enable();
+
             grid.currentEdition = node.id;
 
             _disable(grid.btnUpdate, grid.btnDelete, grid.btnArchive, grid.btnDeadline, grid.btnTemplate, grid.btnFormat);
@@ -16,6 +17,9 @@ Inprint.calendar.fascicles.Interaction = function(parent, panels) {
 
                 (access["editions.calendar.manage"] === true) ?
                     _enable(grid.btnCreate) : _disable(grid.btnCreate) ;
+
+                (access["editions.calendar.manage"] === true) ?
+                    _enable(grid.btnCreateAttachment) : _disable(grid.btnCreateAttachment) ;
 
                 grid.cmpLoad({
                     archive: "false",
@@ -32,12 +36,20 @@ Inprint.calendar.fascicles.Interaction = function(parent, panels) {
 
     // Grid
     grid.getSelectionModel().on("selectionchange", function(sm, node) {
-        _disable(grid.btnUpdate, grid.btnDelete, grid.btnEnable, grid.btnDisable,
+
+        _disable(grid.btnEnable, grid.btnDisable,
             grid.btnArchive, grid.btnDeadline, grid.btnTemplate, grid.btnFormat);
+
         if (node && node.attributes.fastype == "issue") {
-            _enable(grid.btnUpdate, grid.btnDelete, grid.btnEnable, grid.btnDisable,
+            _enable(grid.btnEnable, grid.btnDisable,
                 grid.btnArchive, grid.btnDeadline, grid.btnTemplate, grid.btnFormat);
         }
+
+        if (node && node.attributes.fastype == "attachment") {
+            _enable(grid.btnEnable, grid.btnDisable,
+                grid.btnDeadline, grid.btnTemplate, grid.btnFormat);
+        }
+
     });
 
 };

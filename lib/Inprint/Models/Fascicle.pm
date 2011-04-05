@@ -106,6 +106,7 @@ sub deadline {
         $adv_date, $doc_date,
         $adv_enabled, $doc_enabled ) = @_;
 
+    $c->txBegin;
 
     $c->Do("
         UPDATE fascicles
@@ -117,6 +118,30 @@ sub deadline {
             $adv_date, $doc_date,
             $adv_enabled, $doc_enabled,
         $id ]);
+
+    my $fascicles = $c->Q(" SELECT id FROM fascicles WHERE parent=\$1", $id)->Values;
+
+    $c->Do("
+        UPDATE fascicles SET print_date =?
+        WHERE print_date is null AND id =ANY(?);
+    ", [ $print_date, $fascicles ]);
+
+    $c->Do("
+        UPDATE fascicles SET release_date =?
+        WHERE release_date is null AND id =ANY(?);
+    ", [ $release_date, $fascicles ]);
+
+    $c->Do("
+        UPDATE fascicles SET adv_date =?
+        WHERE adv_date is null AND id =ANY(?);
+    ", [ $adv_date, $fascicles ]);
+
+    $c->Do("
+        UPDATE fascicles SET doc_date =?
+        WHERE doc_date is null AND id =ANY(?);
+    ", [ $doc_date, $fascicles ]);
+
+    $c->txCommit;
 
     return $c;
 }

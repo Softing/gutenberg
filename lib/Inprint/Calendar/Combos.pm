@@ -10,28 +10,28 @@ use warnings;
 
 use base 'Mojolicious::Controller';
 
-sub editions {
-    my $c = shift;
-
-    my $filter = $c->param("parent");
-
-    my @params;
-    my $sql = "
-        SELECT t1.id, t1.shortcut as title, nlevel(path) as nlevel, description,
-            array_to_string( ARRAY( SELECT shortcut FROM editions WHERE path @> t1.path ORDER BY nlevel(path) ), '.') as title_path
-        FROM editions t1 WHERE 1=1
-    ";
-
-    if ($filter) {
-        $sql .= " AND t1.path ~ ('*.' || replace(?, '-', '')::text || '.*')::lquery ";
-        push @params, $filter;
-    }
-
-    $sql .= " ORDER BY title_path ";
-
-    my $result = $c->Q($sql, \@params)->Hashes;
-    $c->render_json( { data => $result } );
-}
+#sub editions {
+#    my $c = shift;
+#
+#    my $filter = $c->param("parent");
+#
+#    my @params;
+#    my $sql = "
+#        SELECT t1.id, t1.shortcut as title, nlevel(path) as nlevel, description,
+#            array_to_string( ARRAY( SELECT shortcut FROM editions WHERE path @> t1.path ORDER BY nlevel(path) ), '.') as title_path
+#        FROM editions t1 WHERE 1=1
+#    ";
+#
+#    if ($filter) {
+#        $sql .= " AND t1.path ~ ('*.' || replace(?, '-', '')::text || '.*')::lquery ";
+#        push @params, $filter;
+#    }
+#
+#    $sql .= " ORDER BY title_path ";
+#
+#    my $result = $c->Q($sql, \@params)->Hashes;
+#    $c->render_json( { data => $result } );
+#}
 
 sub parents {
     my $c = shift;
@@ -46,8 +46,11 @@ sub parents {
         FROM fascicles t1, editions t2
         WHERE
             ( t1.id <> '00000000-0000-0000-0000-000000000000' AND t1.id <> '99999999-9999-9999-9999-999999999999')
+
             AND t1.edition = t1.parent
             AND t1.fastype = 'issue'
+            AND t1.enabled = true
+            AND t1.archived = false
             AND t2.id = t1.edition
     ";
 
@@ -64,34 +67,34 @@ sub parents {
     $c->render_json( { data => $result } );
 }
 
-sub childrens {
-    my $c = shift;
-
-    my @errors;
-
-    my $i_parent = $c->get_uuid(\@errors, "parent");
-
-    my @data;
-    my $sql = "
-        SELECT
-            id, shortcut as title, shortcut, description
-        FROM editions
-        WHERE 1=1
-    ";
-
-    #push @data, $i_parent;
-
-    my $access = $c->objectBindings("editions.calendar.manage:*");
-    $sql .= " AND id = ANY(?) ";
-    push @data, $access;
-
-    my $result = $c->Q("
-        $sql
-        ORDER BY shortcut
-    ", \@data)->Hashes;
-
-    $c->smart_render( \@errors, $result );
-}
+#sub childrens {
+#    my $c = shift;
+#
+#    my @errors;
+#
+#    my $i_parent = $c->get_uuid(\@errors, "parent");
+#
+#    my @data;
+#    my $sql = "
+#        SELECT
+#            id, shortcut as title, shortcut, description
+#        FROM editions
+#        WHERE 1=1
+#    ";
+#
+#    #push @data, $i_parent;
+#
+#    my $access = $c->objectBindings("editions.calendar.manage:*");
+#    $sql .= " AND id = ANY(?) ";
+#    push @data, $access;
+#
+#    my $result = $c->Q("
+#        $sql
+#        ORDER BY shortcut
+#    ", \@data)->Hashes;
+#
+#    $c->smart_render( \@errors, $result );
+#}
 
 sub sources {
     my $c = shift;
@@ -102,7 +105,8 @@ sub sources {
     my @data;
     my $sql = "
         SELECT
-            t1.id, t2.shortcut || '/' || t1.shortcut as title, t1.shortcut, t1.description
+            t1.id, t2.shortcut || '/' || t1.shortcut as title,
+            'puzzle' as icon
         FROM fascicles t1, editions t2
         WHERE
             ( t1.id <> '00000000-0000-0000-0000-000000000000' AND t1.id <> '99999999-9999-9999-9999-999999999999')
@@ -119,13 +123,12 @@ sub sources {
         ORDER BY t2.shortcut, t1.shortcut
     ", \@data)->Hashes;
 
-    #unshift @$result, {
-    #    id=> "00000000-0000-0000-0000-000000000000",
-    #    icon => "marker",
-    #    title=> $c->l("Defaults"),
-    #    shortcut=> $c->l("Get defaults"),
-    #    description=> $c->l("Copy from defaults"),
-    #};
+    unshift @$result, {
+        id=> "00000000-0000-0000-0000-000000000000",
+        icon => "puzzle",
+        title=> $c->l("Defaults"),
+        shortcut=> $c->l("Get defaults")
+    };
 
     $success = $c->json->true unless (@errors);
     $c->render_json( { data => $result } );

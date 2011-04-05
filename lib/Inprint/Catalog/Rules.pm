@@ -66,17 +66,17 @@ sub clear {
                 ) ",
             [ $i_member, $i_section, $i_binding ]);
 
-        $c->Do("
-            DELETE FROM cache_access WHERE
-                member=?
-                AND type=?
-                AND binding = ANY (
-                    ARRAY(
-                        SELECT id FROM $i_section WHERE path ~
-                        ('*.' || replace(?, '-', '') || '.*')::lquery
-                    )
-                ) ",
-            [ $i_member, $i_section, $i_binding ]);
+        #$c->Do("
+        #    DELETE FROM cache_access WHERE
+        #        member=?
+        #        AND type=?
+        #        AND binding = ANY (
+        #            ARRAY(
+        #                SELECT id FROM $i_section WHERE path ~
+        #                ('*.' || replace(?, '-', '') || '.*')::lquery
+        #            )
+        #        ) ",
+        #    [ $i_member, $i_section, $i_binding ]);
     }
 
     $c->render_json( { success => $c->json->true } );

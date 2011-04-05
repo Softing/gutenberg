@@ -15,16 +15,22 @@ Inprint.calendar.fascicles.Context = function(parent, panels) {
 
         if (fastype == "issue") {
             items.push({
-                icon: _ico("folder--plus"),
+                icon: _ico("blue-folder--pencil"),
                 cls: 'x-btn-text-icon',
-                text    : _('Create attachment'),
+                text: _("Edit issue"),
+                scope: this,
+                handler: this.cmpUpdate
+            });
+            items.push({
+                icon: _ico("blue-folder--minus"),
+                cls: 'x-btn-text-icon',
+                text    : _('Delete issue'),
                 scope:this,
-                handler: this.cmpCreateAttachment
+                handler: this.cmpRemove
             });
         }
 
         if (fastype == "attachment") {
-
             items.push({
                 icon: _ico("folder--pencil"),
                 cls: 'x-btn-text-icon',
@@ -32,35 +38,12 @@ Inprint.calendar.fascicles.Context = function(parent, panels) {
                 scope:this,
                 handler : this.cmpUpdateAttachment
             });
-
             items.push({
                 icon: _ico("folder--minus"),
                 cls: 'x-btn-text-icon',
                 text    : _('Delete attachment'),
                 scope:this,
                 handler: this.cmpRemove
-            });
-
-            items.push("-", {
-                icon: _ico("clock-select"),
-                cls: 'x-btn-text-icon',
-                text: _("Deadline"),
-                scope: this,
-                handler: this.cmpDeadline
-            });
-
-            items.push("-", {
-                icon: _ico("plug-connect"),
-                cls: 'x-btn-text-icon',
-                text    : _('Enable'),
-                scope: this,
-                handler : this.cmpEnable
-            }, {
-                icon: _ico("plug-disconnect"),
-                cls: 'x-btn-text-icon',
-                text    : _('Disable'),
-                scope: this,
-                handler : this.cmpDisable
             });
         }
 
@@ -80,14 +63,6 @@ Inprint.calendar.fascicles.Context = function(parent, panels) {
             handler : function() {
                 Inprint.ObjectResolver.resolve({ aid:'fascicle-planner', oid: node.id, text: node.text });
             }
-        });
-
-        items.push('-', {
-            text: _("Format"),
-            icon: _ico("eraser"),
-            cls: 'x-btn-text-icon',
-            scope: this,
-            handler: this.cmpFormat
         });
 
         items.push('-', {

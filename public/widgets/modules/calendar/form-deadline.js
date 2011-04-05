@@ -9,6 +9,7 @@ Inprint.calendar.Deadline = Ext.extend( Ext.form.FormPanel,
             _FLD_HDN_ID,
 
             {
+                id: "title1",
                 xtype: "titlefield",
                 value: _("Key dates")
             },
@@ -87,6 +88,27 @@ Inprint.calendar.Deadline = Ext.extend( Ext.form.FormPanel,
     onRender: function() {
         Inprint.calendar.Deadline.superclass.onRender.apply(this, arguments);
         this.getForm().url = _source("fascicle.deadline");
+    },
+
+    cmpInit: function(node) {
+
+        var form = this.getForm();
+
+        this.cmpFill(node.id);
+
+        if (node.attributes.fastype == "issue") {
+            this.findById("title1").hidden = false;
+            form.findField("print_date").hidden = false;
+            form.findField("release_date").hidden = false;
+        }
+
+        if (node.attributes.fastype == "attachment") {
+            this.findById("title1").hidden = true;
+            form.findField("print_date").hidden = true;
+            form.findField("release_date").hidden = true;
+        }
+
+        return this;
     },
 
     cmpFill: function (id) {
