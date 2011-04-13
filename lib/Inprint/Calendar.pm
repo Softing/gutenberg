@@ -173,9 +173,12 @@ sub list {
     my $children = $c->Q($sql_childrens, [ $edition->{id} ])->Hashes;
 
     foreach my $node (@$children) {
+
+        my $parent = $c->Q(" SELECT * FROM fascicles WHERE id=?", $node->{parent}) ->Hash;
+
         $node->{icon} = "/icons/folder-small-horizontal.png";
         $node->{leaf} = $c->json->true;
-        $node->{shortcut} = $node->{edition_shortcut};
+        $node->{shortcut} = $parent->{shortcut} ."/". $node->{edition_shortcut};
         push @$result, $node;
     }
 
