@@ -26,6 +26,7 @@ sub parents {
             AND t1.edition = t1.parent
             AND t1.fastype = 'issue'
             AND t1.enabled = true
+            AND t1.deleted = false
             AND t1.archived = false
             AND t2.id = t1.edition
     ";

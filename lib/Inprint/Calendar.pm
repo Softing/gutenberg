@@ -117,7 +117,9 @@ sub list {
             to_char(t1.updated, 'YYYY-MM-DD HH24:MI:SS') as updated
 
         FROM fascicles t1, editions t2
-        WHERE t1.deleted = false AND t2.id=t1.edition
+        WHERE 1=1
+            AND t1.deleted = false
+            AND t2.id=t1.edition
     ";
 
     # Parent query
@@ -160,6 +162,7 @@ sub list {
     my $sql_childrens = $sql;
 
     $sql_childrens .= " AND edition=? ";
+
     $sql_childrens .= " AND t1.fastype='attachment' ";
 
     $sql_childrens .= " AND t1.archived = true "      if ($i_archive eq "true");
