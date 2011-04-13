@@ -9,7 +9,7 @@ Inprint.sources = {
     "fascicle.read":            "/calendar/fascicle/read/",
     "fascicle.create":          "/calendar/fascicle/create/",
     "fascicle.update":          "/calendar/fascicle/update/",
-    "fascicle.delete":          "/calendar/fascicle/delete/",
+    "fascicle.remove":          "/calendar/fascicle/remove/",
     "fascicle.deadline":        "/calendar/fascicle/deadline/",
     "fascicle.archive":         "/calendar/fascicle/archive/",
     "fascicle.unarchive":       "/calendar/fascicle/unarchive/",

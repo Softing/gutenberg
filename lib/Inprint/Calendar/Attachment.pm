@@ -52,7 +52,9 @@ sub create {
             $i_circulation
         );
 
-        Inprint::Calendar::Copy::copy($c, $id, $template->{id});
+        if ($i_template eq "00000000-0000-0000-0000-000000000000") {
+            Inprint::Calendar::Copy::copyFromDefaults($c, $id);
+        }
 
     }
 

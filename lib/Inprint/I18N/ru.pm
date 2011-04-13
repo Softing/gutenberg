@@ -348,7 +348,7 @@ our %Lexicon = (
  => "Удалить файл",
 
     "Delete issue"
- => "",
+ => "Удалить выпуск",
 
     "Delete the specified issue?"
  => "",
@@ -435,7 +435,7 @@ our %Lexicon = (
  => "",
 
     "Edit issue"
- => "",
+ => "Редактировать выпуск",
 
     "Edit profile"
  => "Редактировать профиль",

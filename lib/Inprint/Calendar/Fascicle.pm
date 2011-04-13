@@ -57,6 +57,8 @@ sub create {
 
         my $id = $c->uuid;
 
+        $c->txBegin();
+
         Inprint::Models::Fascicle::create(
             $c, $id,
             $i_edition, $i_template,
@@ -65,6 +67,12 @@ sub create {
             $i_print_date, $i_release_date,
             $i_adv_date, $i_doc_date,
             $i_adv_enabled, $i_doc_enabled);
+
+        if ($i_template eq "00000000-0000-0000-0000-000000000000") {
+            Inprint::Calendar::Copy::copyFromDefaults($c, $id);
+        }
+
+        $c->txCommit();
 
     }
 

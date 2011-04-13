@@ -410,30 +410,28 @@ Inprint.calendar.fascicles.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
 
     },
 
-    cmpRemove: function(btn) {
+    cmpRemove: function(id) {
 
-        if (btn != 'yes' && btn != 'no') {
-            Ext.MessageBox.show({
-                scope: this,
-                title: _("Important event"),
-                msg: _("Delete the specified item?"),
-                fn: this.cmpRemove,
-                buttons: Ext.Msg.YESNO,
-                icon: Ext.MessageBox.WARNING
-            });
-            return;
-        }
+        Ext.MessageBox.show({
+            scope: this,
+            title: _("Important event"),
+            msg: _("Delete the specified item?"),
+            fn: function (btn) {
+                if (btn == 'yes') {
+                    Ext.Ajax.request({
+                        url: _source("fascicle.remove"),
+                        params: { id: id },
+                        scope: this,
+                        success: this.cmpReloadWithMenu
+                    });
+                }
+            },
+            buttons: Ext.Msg.YESNO,
+            icon: Ext.MessageBox.WARNING
+        });
 
-        if (btn == 'yes') {
-            Ext.Ajax.request({
-                url: _source("fascicle.delete"),
-                params: {
-                    id: this.cmpGetSelectedNode().id
-                },
-                scope: this,
-                success: this.cmpReloadWithMenu
-            });
-        }
+
+
 
     }
 
