@@ -30,7 +30,7 @@ Inprint.catalog.indexes.Panel = Ext.extend(Ext.Panel, {
                     flex:1,
                     layout:"fit",
                     margins: "3 0 3 3",
-                    width: 130,
+                    width: 200,
                     collapsible: false,
                     split: true,
                     items: this.panels.editions

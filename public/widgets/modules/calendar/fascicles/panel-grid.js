@@ -21,7 +21,7 @@ Inprint.calendar.fascicles.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
                         cls: 'x-btn-text-icon',
                         icon: _ico("blue-folder--plus"),
                         scope: this,
-                        handler: this.cmpCreate
+                        handler: this.cmpCreateFascicle
                     },
                     {
                         id: 'createAttachment',
@@ -132,6 +132,8 @@ Inprint.calendar.fascicles.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
         Inprint.calendar.fascicles.Grid.superclass.onRender.apply(this, arguments);
     },
 
+    /* Getters */
+
     getAccess: function(id) {
         return this.access[id];
     },
@@ -139,6 +141,7 @@ Inprint.calendar.fascicles.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
         this.access[id] = value;
     },
 
+    /* Functions */
     cmpGetSelectedNode: function() {
         return this.getSelectionModel().getSelectedNode();
     },
@@ -174,7 +177,7 @@ Inprint.calendar.fascicles.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
 
     /* -------------- */
 
-    cmpCreate: function() {
+    cmpCreateFascicle: function() {
 
         var form = new Inprint.calendar.fascicles.Create({
             parent: this,
@@ -196,9 +199,9 @@ Inprint.calendar.fascicles.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
 
     },
 
-    cmpUpdate: function() {
+    cmpUpdateFascicle: function(id) {
 
-        var id = this.cmpGetSelectedNode().id;
+        if (!id) id = this.cmpGetSelectedNode().id;
 
         var form = new Inprint.calendar.fascicles.Update();
         form.cmpFill(id);
@@ -235,9 +238,9 @@ Inprint.calendar.fascicles.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
 
     },
 
-    cmpUpdateAttachment: function() {
+    cmpUpdateAttachment: function(id) {
 
-        var id = this.cmpGetSelectedNode().id;
+        if (!id) id = this.cmpGetSelectedNode().id;
 
         var form = new Inprint.calendar.attachments.Update();
         form.cmpFill(id);

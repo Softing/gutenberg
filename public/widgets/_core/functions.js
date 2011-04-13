@@ -119,14 +119,14 @@ function _disable() {
 }
 
 /* Access functions */
-function _a(terms, binding, accessfunction) {
+function _a(terms, binding, accessfunction, scope) {
     Ext.Ajax.request({
         url: _url("/access/"),
         params: {
             term: terms,
             binding: binding
         },
-        scope: this,
+        scope: scope,
         success: function(result) {
             var data = Ext.util.JSON.decode(result.responseText);
             accessfunction(data.result);
