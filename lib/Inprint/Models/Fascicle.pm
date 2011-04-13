@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 sub create {
-    
+
     my ($c, $id,
         $edition, $template,
         $shortcut, $description,
@@ -145,7 +145,10 @@ sub deadline {
 
 sub remove {
     my ($c, $id) = @_;
+
     $c->Do(" UPDATE fascicles SET deleted = true WHERE id=? ", [ $id ]);
+    $c->Do(" UPDATE fascicles SET deleted = true WHERE parent=? ", [ $id ]);
+    
     return $c;
 }
 
