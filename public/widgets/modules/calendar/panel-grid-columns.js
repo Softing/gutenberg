@@ -68,6 +68,28 @@ Inprint.calendar.GridColumns = {
                 return _fmtDate(date, 'F j, H:i');
             }
         })
+    },
+
+    created: {
+        header: _("Created"),
+        dataIndex: 'created',
+        width: 120,
+        tpl: new Ext.XTemplate('{created:this.formatDate}', {
+            formatDate: function(date) {
+                return _fmtDate(date, 'F j, H:i');
+            }
+        })
+    },
+
+    updated: {
+        header: _("Updated"),
+        dataIndex: 'updated',
+        width: 120,
+        tpl: new Ext.XTemplate('{updated:this.formatDate}', {
+            formatDate: function(date) {
+                return _fmtDate(date, 'F j, H:i');
+            }
+        })
     }
 
 };

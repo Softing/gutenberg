@@ -45,6 +45,7 @@ Inprint.catalog.organization.Panel = Ext.extend(Ext.Panel, {
                     maxSize: 600,
                     layout:"fit",
                     collapseMode: 'mini',
+                    collapsed: true,
                     items: this.panels.help
                 }
             ]

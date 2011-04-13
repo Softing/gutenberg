@@ -15,6 +15,8 @@ sub index
 {
     my $c = shift;
 
+    my $accessViewSettings = $c->objectAccess("domain.configuration.view");
+
     # About programm
     my $AboutSection = {
         id => "core",
@@ -55,21 +57,22 @@ sub index
     # Advertising
     ############################################################################
 
+    my $accessAdvertEditions = $c->objectAccess("editions.advert.view:*");
     my $AdvertisingSection = {
         id => "advertising"
     };
-    push @{ $AdvertisingSection->{menu} }, { id => "advert-advertisers" };
-    push @{ $AdvertisingSection->{menu} }, "-";
-    push @{ $AdvertisingSection->{menu} }, { id => "advert-modules" };
-    push @{ $AdvertisingSection->{menu} }, { id => "advert-index" };
+    if ($accessAdvertEditions) {
+        push @{ $AdvertisingSection->{menu} }, { id => "advert-advertisers" };
+        push @{ $AdvertisingSection->{menu} }, "-";
+        push @{ $AdvertisingSection->{menu} }, { id => "advert-modules" };
+        push @{ $AdvertisingSection->{menu} }, { id => "advert-index" };
+    }
 
     ############################################################################
     # Editions
     ############################################################################
 
     my $accessCalendarEditions = $c->objectAccess("editions.calendar.view:*");
-    my $accessLayoutEditions   = $c->objectBindings("editions.layouts.view:*");
-
     my $CalendarSection = {
         id => "fascicles"
     };
@@ -115,26 +118,34 @@ sub index
 
     foreach my $fascicle (@{ $fascicles }) {
 
-        my $menuItem = $c->fascicleHadler($fascicle);
+        my $menuItem = $c->fascicleHadler($fascicle, "fascicle");
 
         my $accessFascicleView = $c->objectAccess(
-            "editions.layouts.view:*", $fascicle->{edition});
+            "editions.fascicle.view:*", $fascicle->{edition});
 
         # Attachments
-        if( @{ $menuItem->{menu} } && @{ $fascicle->{attachments} }) {
-            push @{ $menuItem->{menu} }, "-";
-        }
+
+        my $first = 0;
 
         foreach my $attachment (@{ $fascicle->{attachments} }) {
-            my $menuSubitem = $c->fascicleHadler($attachment);
+
+            my $menuSubitem = $c->fascicleHadler($attachment, "attachment");
 
             my $accessAttachmentView = $c->objectAccess(
-                "editions.layouts.view:*", $attachment->{edition});
+                "editions.attachment.view:*", $attachment->{edition});
 
             if ($accessAttachmentView) {
+
                 $accessFascicleView = 1;
+
+                unless ($first) {
+                    push @{ $menuItem->{menu} }, "-";
+                    $first++;
+                }
+
                 push @{ $menuItem->{menu} }, $menuSubitem;
             }
+
         }
 
         if ($accessFascicleView) {
@@ -235,12 +246,16 @@ sub index
     push @result, "-";
 
     push @result, $DocumentsSection;
-    push @result, "-";
 
-    push @result, $AdvertisingSection;
-    push @result, "-";
+    if ( $accessAdvertEditions ) {
+        push @result, "-";
+        push @result, $AdvertisingSection;
+    }
 
-    push @result, $CalendarSection if $accessCalendarEditions;
+    if ( $accessCalendarEditions ) {
+        push @result, "-";
+        push @result, $CalendarSection
+    }
 
     foreach my $item (@FasciclesSection) {
         push @result, $item;
@@ -249,58 +264,72 @@ sub index
     push @result, '->';
 
     push @result, $EmployeeSection;
-    push @result, $SettingsSection if $accessViewSettings;
+
+    if ( $accessViewSettings ) {
+        push @result, $SettingsSection;
+    }
 
     $c->smart_render([], \@result);
 }
 
 sub fascicleHadler {
 
-    my ($c, $fascicle) = @_;
+    my ($c, $fascicle, $fastype) = @_;
 
-    my $accessLayoutView   = $c->objectAccess("editions.layouts.view:*",   $fascicle->{edition});
-    my $accessLayoutManage = $c->objectAccess("editions.layouts.manage:*", $fascicle->{edition});
-    my $accessAdvertManage = $c->objectAccess("editions.advert.manage:*",  $fascicle->{edition});
+    my $accessLayoutView   = $c->objectAccess("editions.$fastype.view:*",   $fascicle->{edition});
+    my $accessLayoutManage = $c->objectAccess("editions.$fastype.manage:*", $fascicle->{edition});
+    my $accessAdvertManage = $c->objectAccess("editions.advert.manage:*",   $fascicle->{edition});
 
     my $fascicle_menu = {
-        id   => "fascicle",
+        id   => $fastype,
         text => $fascicle->{edition_shortcut} . '/'. $fascicle->{shortcut},
         menu => []
     };
 
-    push @{ $fascicle_menu->{menu} }, {
-        id   => "fascicle-plan",
-        oid  => $fascicle->{id},
-        description => $fascicle->{shortcut}
-    } if ($accessLayoutView);
+    if ($accessLayoutView) {
 
-    push @{ $fascicle_menu->{menu} }, {
-        id   => "fascicle-planner",
-        oid  => $fascicle->{id},
-        description => $fascicle->{shortcut}
-    } if $accessLayoutManage;
+        push @{ $fascicle_menu->{menu} },
+            {
+                id   => "fascicle-plan",
+                oid  => $fascicle->{id},
+                description => $fascicle->{shortcut}
+            };
 
-    if ($accessLayoutView && $accessLayoutManage) {
-        push @{ $fascicle_menu->{menu} }, "-";
     }
 
-    push @{ $fascicle_menu->{menu} }, {
-        id  => "fascicle-index",
-        oid => $fascicle->{id},
-        description => $fascicle->{shortcut}
-    } if $accessLayoutManage;
+    if ($accessLayoutManage) {
 
-    push @{ $fascicle_menu->{menu} }, {
-        id  => "fascicle-templates",
-        oid => $fascicle->{id},
-        description => $fascicle->{shortcut}
-    } if $accessLayoutManage;
+        push @{ $fascicle_menu->{menu} },
+            {
+                id   => "fascicle-planner",
+                oid  => $fascicle->{id},
+                description => $fascicle->{shortcut}
+            };
 
-    push @{ $fascicle_menu->{menu} }, {
-        id  => "fascicle-places",
-        oid => $fascicle->{id},
-        description => $fascicle->{shortcut}
-    } if $accessLayoutManage;
+        push @{ $fascicle_menu->{menu} }, "-";
+
+        push @{ $fascicle_menu->{menu} },
+            {
+                id  => "fascicle-index",
+                oid => $fascicle->{id},
+                description => $fascicle->{shortcut}
+            };
+
+        push @{ $fascicle_menu->{menu} },
+            {
+                id  => "fascicle-templates",
+                oid => $fascicle->{id},
+                description => $fascicle->{shortcut}
+            };
+
+        push @{ $fascicle_menu->{menu} },
+            {
+                id  => "fascicle-places",
+                oid => $fascicle->{id},
+                description => $fascicle->{shortcut}
+            };
+
+    }
 
     return $fascicle_menu;
 

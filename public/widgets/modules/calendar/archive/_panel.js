@@ -16,16 +16,14 @@ Inprint.calendar.archive.Main = Ext.extend(Ext.Panel, {
             },
             items: [
                 {
-                    region: "center",
                     layout:"fit",
-                    border:false,
+                    region: "center",
                     margins: "3 3 3 0",
                     items: this.panels.grid
                 },
                 {
-                    region:"west",
                     layout:"fit",
-                    border:false,
+                    region:"west",
                     margins: "3 0 3 3",
                     width: 200,
                     items: this.panels.tree

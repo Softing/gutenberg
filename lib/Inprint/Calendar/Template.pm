@@ -1,4 +1,4 @@
-package Inprint::Calendar::Fascicle;
+package Inprint::Calendar::Template;
 
 # Inprint Content 5.0
 # Copyright(c) 2001-2011, Softing, LLC.
@@ -8,7 +8,6 @@ package Inprint::Calendar::Fascicle;
 use strict;
 use warnings;
 
-use Inprint::Calendar::Copy;
 use Inprint::Models::Fascicle;
 
 use base 'Mojolicious::Controller';
@@ -102,38 +101,6 @@ sub update {
             $i_print_date, $i_release_date,
             $i_adv_date, $i_doc_date,
             $i_adv_enabled, $i_doc_enabled);
-    }
-
-    $c->smart_render(\@errors);
-}
-
-sub template {
-
-    my $c = shift;
-
-    my @errors;
-
-    my $i_id = $c->get_uuid(\@errors, "id");
-
-    my $template_id = $c->uuid();
-
-    my $source = $c->check_record(\@errors, "fascicles", "fascicle", $i_id);
-
-    Inprint::Calendar::Copy::copyFascicle($c, $source->{id}, $template_id, {
-        fastype => "template"
-    });
-
-    my $destination = $c->check_record(\@errors, "fascicles", "fascicle", $template_id);
-
-    my $attachments = $c->Q(" SELECT id FROM fascicles WHERE parent=? ", $source->{id})->Values;
-    foreach my $id (@$attachments) {
-
-        my $attachment_id = $c->uuid();
-
-        Inprint::Calendar::Copy::copyFascicle($c, $id, $attachment_id, {
-            parent => $destination->{id}
-        });
-
     }
 
     $c->smart_render(\@errors);

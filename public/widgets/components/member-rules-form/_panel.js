@@ -35,10 +35,10 @@ Inprint.cmp.memberRulesForm.Window = Ext.extend(Ext.Window, {
         }];
 
         Ext.apply(this, {
-            title: _("Access rights management"),
+            title: _("Rights management"),
             layout: "fit",
             modal:true,
-            width:800, height:400,
+            width:800, height:480,
             items: this.panels.tabs
         });
 
@@ -165,8 +165,6 @@ Inprint.cmp.memberRulesForm.Window = Ext.extend(Ext.Window, {
 
                     if (record) {
 
-                        record.set("icon", result.data[i].icon);
-
                         if (result.data[i].type == "obtained") {
                             grid.getSelectionModel().selectRecords([ record ], true);
                         }
@@ -177,7 +175,7 @@ Inprint.cmp.memberRulesForm.Window = Ext.extend(Ext.Window, {
                         }
 
                         if (mode == 'editions') {
-                            record.set("limit", _("Editions"));
+                            record.set("limit", _("Group"));
                             record.set("selection", "editions");
                         }
 

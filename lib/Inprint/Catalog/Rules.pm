@@ -26,19 +26,19 @@ sub list {
                     t1.section ||'.'|| t1.term ||'.'|| t1.subsection as term,
                     t1.icon, t1.title, t1.description, t1.subsection as groupby
                 FROM rules t1
-                WHERE t1.section=?
+                WHERE t1.section=\$1
                 ORDER BY t1.sortorder, t1.title
-            ) UNION (
+            ) UNION ALL (
                 SELECT
                     t2.id,
                     t2.rule_section ||'.'|| t2.rule_term ||'.'|| t2.rule_subsection as term,
                     t2.rule_icon, t2.rule_title, t2.rule_description,
                     t2.rule_subsection as groupby
                 FROM plugins.rules t2
-                WHERE t2.rule_section=?
+                WHERE t2.rule_section=\$1
                 ORDER BY t2.plugin, t2.rule_sortorder, t2.rule_title
             )
-        ", [ $i_section, $i_section ])->Hashes;
+        ", [ $i_section ])->Hashes;
     }
 
     $c->render_json( { data => $result } );

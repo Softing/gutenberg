@@ -2,12 +2,7 @@ Inprint.calendar.fascicles.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
 
     initComponent: function() {
 
-        this.url = {
-            'remove':  _url('/calendar/fascicle/remove/'),
-            'enable':  _url('/calendar/fascicle/enable/'),
-            'disable': _url('/calendar/fascicle/disable/'),
-            'archive':  _url('/calendar/fascicle/archive/')
-        };
+        this.access = {};
 
         this.tbar = [
 
@@ -127,7 +122,7 @@ Inprint.calendar.fascicles.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
         Ext.apply(this, {
             border:false,
             disabled:true,
-            dataUrl: _url('/calendar/list/')
+            dataUrl: _source("fascicle.list")
         });
 
         Inprint.calendar.fascicles.Grid.superclass.initComponent.apply(this, arguments);
@@ -135,6 +130,13 @@ Inprint.calendar.fascicles.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
 
     onRender: function() {
         Inprint.calendar.fascicles.Grid.superclass.onRender.apply(this, arguments);
+    },
+
+    getAccess: function(id) {
+        return this.access[id];
+    },
+    setAccess: function(id, value) {
+        this.access[id] = value;
     },
 
     cmpGetSelectedNode: function() {
@@ -176,7 +178,7 @@ Inprint.calendar.fascicles.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
 
         var form = new Inprint.calendar.fascicles.Create({
             parent: this,
-            url: this.url.create
+            url: _source("fascicle.create")
         });
 
         form.cmpSetValue("edition", this.currentEdition);
@@ -221,7 +223,7 @@ Inprint.calendar.fascicles.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
         form.cmpSetValue("edition", this.currentEdition);
 
         var wndw = this.cmpCreateWindow(
-            360,350, form, _("Adding attachment"), [ _BTN_WNDW_ADD, _BTN_WNDW_CLOSE ]
+            360,250, form, _("Adding attachment"), [ _BTN_WNDW_ADD, _BTN_WNDW_CLOSE ]
         ).show();
 
         form.on('actioncomplete', function(form, action) {
@@ -283,7 +285,7 @@ Inprint.calendar.fascicles.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
                 scope: this,
                 title: _("Important event"),
                 msg: _("Save as template?"),
-                fn: this.cmpDelete,
+                fn: this.cmpTemplate,
                 buttons: Ext.Msg.YESNO,
                 icon: Ext.MessageBox.WARNING
             });
@@ -292,43 +294,35 @@ Inprint.calendar.fascicles.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
 
         if (btn == 'yes') {
             Ext.Ajax.request({
-                url: this.url["archive"],
+                url: _source("fascicle.template"),
                 params: {
                     id: this.cmpGetSelectedNode().id
                 },
                 scope: this,
-                success: this.cmpReloadWithMenu,
-                failure: this.failure
+                success: this.cmpReloadWithMenu
             });
         }
 
     },
 
-    cmpFormat: function(btn) {
+    cmpFormat: function() {
 
-        if (btn != 'yes' && btn != 'no') {
-            Ext.MessageBox.show({
-                scope: this,
-                title: _("Important event"),
-                msg: _("Save as template?"),
-                fn: this.cmpDelete,
-                buttons: Ext.Msg.YESNO,
-                icon: Ext.MessageBox.WARNING
-            });
-            return;
-        }
+        var form = new Inprint.calendar.fascicles.Format({
+            parent: this
+        });
 
-        if (btn == 'yes') {
-            Ext.Ajax.request({
-                url: this.url["archive"],
-                params: {
-                    id: this.cmpGetSelectedNode().id
-                },
-                scope: this,
-                success: this.cmpReloadWithMenu,
-                failure: this.failure
-            });
-        }
+        //form.cmpSetValue("edition", this.currentEdition);
+
+        var wndw = this.cmpCreateWindow(
+            300, 140, form, _("Format issue"), [ _BTN_WNDW_OK, _BTN_WNDW_CLOSE ]
+        ).show();
+
+        form.on('actioncomplete', function(form, action) {
+            if (action.type == "submit") {
+                wndw.close();
+                this.cmpReload();
+            }
+        }, this);
 
     },
 
@@ -353,8 +347,7 @@ Inprint.calendar.fascicles.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
                     id: this.cmpGetSelectedNode().id
                 },
                 scope: this,
-                success: this.cmpReloadWithMenu,
-                failure: this.failure
+                success: this.cmpReloadWithMenu
             });
         }
 
@@ -381,8 +374,7 @@ Inprint.calendar.fascicles.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
                     id: this.cmpGetSelectedNode().id
                 },
                 scope: this,
-                success: this.cmpReloadWithMenu,
-                failure: this.failure
+                success: this.cmpReloadWithMenu
             });
         }
 
@@ -409,8 +401,7 @@ Inprint.calendar.fascicles.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
                     id: this.cmpGetSelectedNode().id
                 },
                 scope: this,
-                success: this.cmpReloadWithMenu,
-                failure: this.failure
+                success: this.cmpReloadWithMenu
             });
         }
 
@@ -432,13 +423,12 @@ Inprint.calendar.fascicles.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
 
         if (btn == 'yes') {
             Ext.Ajax.request({
-                url: this.url.remove,
+                url: _source("fascicle.delete"),
                 params: {
                     id: this.cmpGetSelectedNode().id
                 },
                 scope: this,
-                success: this.cmpReloadWithMenu,
-                failure: this.failure
+                success: this.cmpReloadWithMenu
             });
         }
 

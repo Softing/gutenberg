@@ -19,53 +19,49 @@ sub tree {
 
     my $c = shift;
 
-    my $i_node = $c->param("node");
-    $i_node = '00000000-0000-0000-0000-000000000000' unless ($i_node);
-    $i_node = '00000000-0000-0000-0000-000000000000' if ($i_node eq "root-node");
-
     my @errors;
-    my $success = $c->json->false;
+    my @result;
+
+    my $i_node = $c->param("node");
+
+    if ($i_node eq "root-node") {
+        $i_node = '00000000-0000-0000-0000-000000000000';
+    }
 
     $c->check_uuid( \@errors, "id", $i_node);
-
-    my @result;
 
     unless (@errors) {
 
         my $sql;
         my @data;
 
-        my $bindings = $c->objectBindings(["editions.calendar.manage:*", "editions.calendar.work:*"]);
+        # Get editions with grant
+        my $bindings = $c->objectBindings([
+            "editions.fascicle.manage:*", "editions.attachment.manage:*" ]);
 
-        if ($i_node eq "00000000-0000-0000-0000-000000000000") {
-            $sql = "
-                SELECT t1.*,
-                    ( SELECT count(*) FROM editions c2 WHERE c2.path ~ ('*.' || t1.path::text || '.*{1}')::lquery ) as have_childs
-                FROM editions t1
-                WHERE
-                    t1.id <> '00000000-0000-0000-0000-000000000000'
-                    AND t1.id = ANY(?)
-            ";
-            push @data, $bindings;
-        }
+        my $paths = $c->Q("
+            SELECT id FROM editions
+            WHERE path @> ARRAY(
+                SELECT path FROM editions WHERE id = ANY(\$1)
+            )", [ $bindings ])->Values;
 
-        if ($i_node ne "00000000-0000-0000-0000-000000000000") {
-            $sql .= "
-                SELECT t1.*,
-                    ( SELECT count(*) FROM editions c2 WHERE c2.path ~ ('*.' || t1.path::text || '.*{1}')::lquery ) as have_childs
-                FROM editions t1
-                WHERE
-                    t1.id <> '00000000-0000-0000-0000-000000000000'
-                    AND subpath(t1.path, nlevel(t1.path) - 2, 1)::text = replace(?, '-', '')::text
-                    AND t1.id = ANY(?)
-                ";
-            push @data, $i_node;
-            push @data, $bindings;
-        }
+        $sql = "
+            SELECT
+                t1.*,
+                ( SELECT count(*) FROM editions c2 WHERE c2.path ~ ('*.' || t1.path::text || '.*{1}')::lquery ) as have_childs
+            FROM editions t1
+            WHERE 1=1
+                AND t1.path ~ ('*.' || replace(\$1, '-', '') || '.*{1}')::lquery
+                AND t1.id = ANY(\$2)
+            ORDER BY shortcut
+        ";
+        push @data, $i_node;
+        push @data, $paths;
 
-        my $data = $c->Q("$sql ORDER BY shortcut", \@data)->Hashes;
+        my $data = $c->Q($sql, \@data)->Hashes;
 
         foreach my $item (@$data) {
+
             my $record = {
                 id   => $item->{id},
                 text => $item->{shortcut},
@@ -73,14 +69,14 @@ sub tree {
                 icon => "blue-folders",
                 data => $item
             };
+
             if ( $item->{have_childs} ) {
                 $record->{leaf} = $c->json->false;
             }
+
             push @result, $record;
         }
     }
-
-    $success = $c->json->true unless (@errors);
 
     $c->render_json( \@result );
 }
@@ -158,6 +154,26 @@ sub list {
             $subnode->{shortcut} = $subnode->{edition_shortcut};
         }
 
+    }
+
+
+    my $sql_childrens = $sql;
+
+    $sql_childrens .= " AND edition=? ";
+    $sql_childrens .= " AND t1.fastype='attachment' ";
+
+    $sql_childrens .= " AND t1.archived = true "      if ($i_archive eq "true");
+    $sql_childrens .= " AND t1.archived = false "     if ($i_archive eq "false");
+
+    $sql_childrens .= " ORDER BY t1.release_date DESC ";
+
+    my $children = $c->Q($sql_childrens, [ $edition->{id} ])->Hashes;
+
+    foreach my $node (@$children) {
+        $node->{icon} = "/icons/folder-small-horizontal.png";
+        $node->{leaf} = $c->json->true;
+        $node->{shortcut} = $node->{edition_shortcut};
+        push @$result, $node;
     }
 
     $c->render_json( $result );

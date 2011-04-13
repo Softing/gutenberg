@@ -8,7 +8,7 @@ Inprint.cmp.memberRulesForm.Organization = Ext.extend(Ext.Panel, {
 
         Ext.apply(this, {
             border:false,
-            title: _("Organization"),
+            title: _("Departments"),
             layout: "border",
             defaults: {
                 collapsible: false,

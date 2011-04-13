@@ -13,24 +13,22 @@ use base 'Mojolicious::Controller';
 sub editions {
     my $c = shift;
 
-    my $i_term = $c->param("term");
-    my $i_node = $c->param("node");
+    my $i_node = $c->param("node") || "00000000-0000-0000-0000-000000000000";
 
     my @result;
     my @errors;
-    my $success = $c->json->false;
-
-    $i_node = "00000000-0000-0000-0000-000000000000" if $i_node eq "all";
 
     $c->check_uuid( \@errors, "node", $i_node);
-    $c->check_rule( \@errors, "term", $i_term);
 
     unless (@errors) {
 
         my $sql;
         my @data;
 
-        my $bindings = $c->objectBindings($i_term);
+        my $bindings = $c->objectBindings("editions.attachment.manage:*");
+
+        die @$bindings;
+
 
         if ($i_node eq "00000000-0000-0000-0000-000000000000") {
 
@@ -76,8 +74,6 @@ sub editions {
             push @result, $record;
         }
     }
-
-    $success = $c->json->true unless (@errors);
 
     $c->render_json( \@result );
 }

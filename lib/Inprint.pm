@@ -134,6 +134,7 @@ sub startup {
     $sessionBridge->route("/calendar/fascicle/create/")         ->to("calendar-fascicle#create");
     $sessionBridge->route("/calendar/fascicle/update/")         ->to("calendar-fascicle#update");
     $sessionBridge->route("/calendar/fascicle/remove/")         ->to("calendar-fascicle#remove");
+    $sessionBridge->route("/calendar/fascicle/template/")       ->to("calendar-fascicle#template");
     $sessionBridge->route("/calendar/fascicle/archive/")        ->to("calendar-fascicle#archive");
     $sessionBridge->route("/calendar/fascicle/unarchive/")      ->to("calendar-fascicle#unarchive");
     $sessionBridge->route("/calendar/fascicle/enable/")         ->to("calendar-fascicle#enable");

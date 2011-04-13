@@ -13,12 +13,12 @@ Inprint.calendar.fascicles.Interaction = function(parent, panels) {
 
             _disable(grid.btnUpdate, grid.btnDelete, grid.btnArchive, grid.btnDeadline, grid.btnTemplate, grid.btnFormat);
 
-            _a(["editions.calendar.manage:*"], grid.currentEdition, function(access) {
+            _a(["editions.fascicle.manage:*", "editions.attachment.manage:*"], grid.currentEdition, function(access) {
 
-                (access["editions.calendar.manage"] === true) ?
+                (access["editions.fascicle.manage"] === true) ?
                     _enable(grid.btnCreate) : _disable(grid.btnCreate) ;
 
-                (access["editions.calendar.manage"] === true) ?
+                (access["editions.attachment.manage"] === true) ?
                     _enable(grid.btnCreateAttachment) : _disable(grid.btnCreateAttachment) ;
 
                 grid.cmpLoad({
@@ -40,15 +40,21 @@ Inprint.calendar.fascicles.Interaction = function(parent, panels) {
         _disable(grid.btnEnable, grid.btnDisable,
             grid.btnArchive, grid.btnDeadline, grid.btnTemplate, grid.btnFormat);
 
-        if (node && node.attributes.fastype == "issue") {
-            _enable(grid.btnEnable, grid.btnDisable,
-                grid.btnArchive, grid.btnDeadline, grid.btnTemplate, grid.btnFormat);
-        }
+        if (!node) return;
 
-        if (node && node.attributes.fastype == "attachment") {
-            _enable(grid.btnEnable, grid.btnDisable,
-                grid.btnDeadline, grid.btnTemplate, grid.btnFormat);
-        }
+        _a(["editions.fascicle.manage:*", "editions.attachment.manage:*"], node.attributes.edition, function(access) {
+
+            if (access["editions.fascicle.manage"] && node.attributes.fastype == "issue") {
+                _enable(grid.btnEnable, grid.btnDisable,
+                    grid.btnArchive, grid.btnDeadline, grid.btnTemplate, grid.btnFormat);
+            }
+
+            if (access["editions.attachment.manage"] && node.attributes.fastype == "attachment") {
+                _enable(grid.btnEnable, grid.btnDisable,
+                    grid.btnDeadline, grid.btnTemplate, grid.btnFormat);
+            }
+
+        });
 
     });
 

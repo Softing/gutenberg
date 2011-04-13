@@ -46,7 +46,7 @@ Inprint.cmp.memberRulesForm.Editions.Restrictions = Ext.extend(Ext.grid.EditorGr
                         fields: ['id', 'name'],
                         data: [
                             [ 'edition', _("Edition")],
-                            [ 'editions', _("Editions")]
+                            [ 'editions', _("Group")]
                         ]
                     }),
                     mode: 'local',
@@ -62,7 +62,7 @@ Inprint.cmp.memberRulesForm.Editions.Restrictions = Ext.extend(Ext.grid.EditorGr
                             store.removeAll();
                             store.loadData([
                                 [ 'edition', _("Edition")],
-                                [ 'editions', _("Editions")]
+                                [ 'editions', _("Group")]
                             ]);
                         }
                     }

@@ -23,9 +23,6 @@ our %Lexicon = (
     "Access"
  => "Доступ",
 
-    "Access rights management"
- => "",
-
     "Account removal"
  => "",
 
@@ -143,9 +140,6 @@ our %Lexicon = (
     "Archive"
  => "Архив",
 
-    "Archive issues"
- => "",
-
     "Archive of requests"
  => "Архив заявок",
 
@@ -197,9 +191,6 @@ our %Lexicon = (
     "Briefcase"
  => "Портфель",
 
-    "Briefcase for reserved documents"
- => "",
-
     "Briefcase index"
  => "Рубрикатор портфеля",
 
@@ -246,7 +237,7 @@ our %Lexicon = (
  => "Тираж",
 
     "Clear rights"
- => "",
+ => "Очистить права",
 
     "Close"
  => "Закрыть",
@@ -265,6 +256,9 @@ our %Lexicon = (
 
     "Communication error"
  => "Комментарий",
+
+    "Company"
+ => "Компания",
 
     "Company news"
  => "Новости компании",
@@ -335,6 +329,9 @@ our %Lexicon = (
     "Deadline"
  => "Сроки",
 
+    "Default"
+ => "",
+
     "Default destination"
  => "Назначение по умолчанию",
 
@@ -349,6 +346,9 @@ our %Lexicon = (
 
     "Delete file"
  => "Удалить файл",
+
+    "Delete issue"
+ => "",
 
     "Delete the specified issue?"
  => "",
@@ -432,6 +432,9 @@ our %Lexicon = (
  => "",
 
     "Edit headline"
+ => "",
+
+    "Edit issue"
  => "",
 
     "Edit profile"
@@ -575,9 +578,6 @@ our %Lexicon = (
     "Format"
  => "Форматировать",
 
-    "Formatting"
- => "",
-
     "General information"
  => "",
 
@@ -713,9 +713,6 @@ our %Lexicon = (
     "Make template"
  => "Создать шаблон",
 
-    "Management"
- => "",
-
     "Manager"
  => "Редактор",
 
@@ -791,9 +788,6 @@ our %Lexicon = (
     "Not implemented"
  => "",
 
-    "Not set"
- => "",
-
     "Number"
  => "Номер",
 
@@ -820,9 +814,6 @@ our %Lexicon = (
 
     "Original file"
  => "Оригинал",
-
-    "Out date"
- => "",
 
     "Page"
  => "Полоса",
@@ -986,6 +977,9 @@ our %Lexicon = (
     "Rights"
  => "Правила",
 
+    "Rights management"
+ => "Управление правами",
+
     "Role"
  => "Роль",
 
@@ -1032,9 +1026,6 @@ our %Lexicon = (
  => "",
 
     "Select a request status"
- => "",
-
-    "Select a type"
  => "",
 
     "Select a willingness"
@@ -1109,9 +1100,6 @@ our %Lexicon = (
     "Termination of membership"
  => "",
 
-    "Text editing"
- => "",
-
     "Text editor"
  => "",
 
@@ -1152,6 +1140,9 @@ our %Lexicon = (
  => "",
 
     "Unarchive the specified release?"
+ => "",
+
+    "Unknown attachment"
  => "",
 
     "Unknown department"

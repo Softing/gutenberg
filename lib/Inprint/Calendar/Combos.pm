@@ -10,29 +10,6 @@ use warnings;
 
 use base 'Mojolicious::Controller';
 
-#sub editions {
-#    my $c = shift;
-#
-#    my $filter = $c->param("parent");
-#
-#    my @params;
-#    my $sql = "
-#        SELECT t1.id, t1.shortcut as title, nlevel(path) as nlevel, description,
-#            array_to_string( ARRAY( SELECT shortcut FROM editions WHERE path @> t1.path ORDER BY nlevel(path) ), '.') as title_path
-#        FROM editions t1 WHERE 1=1
-#    ";
-#
-#    if ($filter) {
-#        $sql .= " AND t1.path ~ ('*.' || replace(?, '-', '')::text || '.*')::lquery ";
-#        push @params, $filter;
-#    }
-#
-#    $sql .= " ORDER BY title_path ";
-#
-#    my $result = $c->Q($sql, \@params)->Hashes;
-#    $c->render_json( { data => $result } );
-#}
-
 sub parents {
     my $c = shift;
 
@@ -46,7 +23,6 @@ sub parents {
         FROM fascicles t1, editions t2
         WHERE
             ( t1.id <> '00000000-0000-0000-0000-000000000000' AND t1.id <> '99999999-9999-9999-9999-999999999999')
-
             AND t1.edition = t1.parent
             AND t1.fastype = 'issue'
             AND t1.enabled = true
@@ -54,9 +30,17 @@ sub parents {
             AND t2.id = t1.edition
     ";
 
-    my $access = $c->objectBindings("editions.calendar.manage:*");
+    my $bindings = $c->objectBindings([
+        "editions.attachment.manage:*" ]);
+
+    my $paths = $c->Q("
+        SELECT id FROM editions
+        WHERE path @> ARRAY(
+            SELECT path FROM editions WHERE id = ANY(\$1)
+        )", [ $bindings ])->Values;
+
     $sql .= " AND edition = ANY(?) ";
-    push @data, $access;
+    push @data, $paths;
 
     my $result = $c->Q("
         $sql
@@ -66,35 +50,6 @@ sub parents {
     $success = $c->json->true unless (@errors);
     $c->render_json( { data => $result } );
 }
-
-#sub childrens {
-#    my $c = shift;
-#
-#    my @errors;
-#
-#    my $i_parent = $c->get_uuid(\@errors, "parent");
-#
-#    my @data;
-#    my $sql = "
-#        SELECT
-#            id, shortcut as title, shortcut, description
-#        FROM editions
-#        WHERE 1=1
-#    ";
-#
-#    #push @data, $i_parent;
-#
-#    my $access = $c->objectBindings("editions.calendar.manage:*");
-#    $sql .= " AND id = ANY(?) ";
-#    push @data, $access;
-#
-#    my $result = $c->Q("
-#        $sql
-#        ORDER BY shortcut
-#    ", \@data)->Hashes;
-#
-#    $c->smart_render( \@errors, $result );
-#}
 
 sub sources {
     my $c = shift;
@@ -114,7 +69,7 @@ sub sources {
             AND t1.fastype = 'template'
     ";
 
-    my $access = $c->objectBindings("editions.calendar.manage:*");
+    my $access = $c->objectBindings("editions.fascicle.manage:*");
     $sql .= " AND edition = ANY(?) ";
     push @data, $access;
 

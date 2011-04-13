@@ -6,6 +6,8 @@ Inprint.calendar.attachments.Create = Ext.extend( Ext.form.FormPanel,
 
         this.items = [
 
+            _FLD_HDN_EDITION,
+
             {
                 xtype: "titlefield",
                 value: _("Basic parameters")
@@ -25,26 +27,6 @@ Inprint.calendar.attachments.Create = Ext.extend( Ext.form.FormPanel,
                     }
                 }
             ),
-
-            {
-                hiddenName: "edition",
-                xtype: "treecombo",
-                emptyText: _("Select..."),
-                fieldLabel: _("Attachment"),
-                minListWidth: 250,
-                url: _url('/calendar/trees/editions/'),
-                baseParams: {
-                    term: 'editions.documents.work:*'
-                },
-                rootVisible: false,
-                root: {
-                    id:'all',
-                    nodeType: 'async',
-                    expanded: true,
-                    icon: _ico("book"),
-                    text: _("All editions")
-                }
-            },
 
             Inprint.factory.Combo.create(
                     "/calendar/combos/sources/", {

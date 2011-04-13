@@ -5,6 +5,7 @@
 
 Inprint.sources = {
 
+    "fascicle.list":            "/calendar/list/",
     "fascicle.read":            "/calendar/fascicle/read/",
     "fascicle.create":          "/calendar/fascicle/create/",
     "fascicle.update":          "/calendar/fascicle/update/",
@@ -14,6 +15,8 @@ Inprint.sources = {
     "fascicle.unarchive":       "/calendar/fascicle/unarchive/",
     "fascicle.enable":          "/calendar/fascicle/enable/",
     "fascicle.disable":         "/calendar/fascicle/disable/",
+
+    "fascicle.template":        "/calendar/fascicle/template/",
 
     "attachment.read":          "/calendar/attachment/read/",
     "attachment.create":        "/calendar/attachment/create/",

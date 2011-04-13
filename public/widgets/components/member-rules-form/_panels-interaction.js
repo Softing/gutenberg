@@ -20,7 +20,6 @@ Inprint.cmp.memberRulesForm.Interaction = function(main, panels) {
     main.panels.organization.cmpGetGrid().btnClear.on("click", handlerClear);
 
     // Domain
-
     domainPanel.on("activate", function() {
         main.cmpFill(
             domainPanel.cmpGetGrid()
@@ -28,7 +27,6 @@ Inprint.cmp.memberRulesForm.Interaction = function(main, panels) {
     });
 
     // Editions
-
     editionsPanel.cmpGetTree().getSelectionModel().on("selectionchange", function(sm, node) {
         var grid = editionsPanel.cmpGetGrid();
         grid.enable();
@@ -37,7 +35,6 @@ Inprint.cmp.memberRulesForm.Interaction = function(main, panels) {
     });
 
     // Catalog
-
     organizationPanel.cmpGetTree().getSelectionModel().on("selectionchange", function(sm, node) {
         var grid = organizationPanel.cmpGetGrid();
         grid.enable();

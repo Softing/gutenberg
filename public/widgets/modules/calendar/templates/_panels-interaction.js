@@ -9,17 +9,12 @@ Inprint.calendar.templates.Interaction = function(parent, panels) {
 
             grid.enable();
             grid.currentEdition = node.id;
+            _disable(grid.btnCreateFascicle, grid.btnCreateAttachment);
 
-            _disable(grid.btnCreate, grid.btnUpdate, grid.btnDelete);
+            _a(["editions.template.manage:*"], grid.currentEdition, function(access) {
 
-            _a(["editions.calendar.manage:*"], grid.currentEdition, function(access) {
-
-                if (access["editions.calendar.manage"] === true) {
-                    managed = true;
-                    _enable(grid.btnCreate);
-                } else {
-                    managed = false;
-                    _disable(grid.btnCreate);
+                if (access["editions.template.manage"] === true) {
+                    _enable(grid.btnCreateFascicle, grid.btnCreateAttachment);
                 }
 
                 grid.cmpLoad({
@@ -37,10 +32,7 @@ Inprint.calendar.templates.Interaction = function(parent, panels) {
 
     // Grid
     grid.getSelectionModel().on("selectionchange", function(sm, node) {
-        _disable(grid.btnUpdate, grid.btnDelete, grid.btnArchive);
-        if (node && managed) {
-            _enable(grid.btnUpdate, grid.btnDelete, grid.btnArchive);
-        }
+
     });
 
 };

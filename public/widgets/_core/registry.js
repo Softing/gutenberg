@@ -25,10 +25,12 @@ Inprint.registry = {
         text: _("Documents"),
         icon: "document-word"
     },
+
     "advertising": {
         text: _("Advertising"),
         icon: "document-excel"
     },
+
     "composition": {
         text:  _("Composition"),
         icon: "newspapers"
@@ -36,8 +38,14 @@ Inprint.registry = {
 
     "fascicle": {
         text: _("Unknown fascicle"),
-        icon: "blue-folder-open-document-text"
+        icon: "blue-folder-horizontal"
     },
+
+    "attachment": {
+        text: _("Unknown attachment"),
+        icon: "folder-horizontal"
+    },
+
     "fascicles": {
         text: _("Fascicles"),
         icon: "blue-folders-stack"
@@ -52,6 +60,7 @@ Inprint.registry = {
         text: _("Employee"),
         icon: "dummy"
     },
+
     "employee-logout": {
         text: _("Logout"),
         icon: "door-open",

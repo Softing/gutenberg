@@ -124,9 +124,9 @@ sub getRootPath {
     my $path = $c->config->get("store.path");
 
     die "Can't find configuration of datastore folder" unless $path;
-    die "Can't find datastore folder in filesystem" unless -e $path;
-    die "Can't read datastore folder" unless -r $path;
-    die "Can't write to datastore folder" unless -w $path;
+    die "Can't find datastore folder <$path> in filesystem" unless -e $path;
+    die "Can't read datastore folder <$path>" unless -r $path;
+    die "Can't write to datastore folder <$path>" unless -w $path;
 
     return $path;
 }

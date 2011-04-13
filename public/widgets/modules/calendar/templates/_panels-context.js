@@ -11,46 +11,46 @@ Inprint.calendar.templates.Context = function(parent, panels) {
 
         var edition = node.attributes.edition;
         var parent  = node.attributes.parent;
+        var fastype = node.attributes.fastype;
 
-        items.push({
-            icon: _ico("blueprint--plus"),
-            cls: 'x-btn-text-icon',
-            text    : _('Create attachment'),
-            scope:this,
-            handler: this.cmpCreateAttachment
-        });
+        if (fastype == "issue") {
+            items.push({
+                icon: _ico("blue-folder--pencil"),
+                cls: 'x-btn-text-icon',
+                text: _("Edit issue"),
+                scope: this,
+                handler: this.cmpUpdate
+            });
+            items.push({
+                icon: _ico("blue-folder--minus"),
+                cls: 'x-btn-text-icon',
+                text    : _('Delete issue'),
+                scope:this,
+                handler: this.cmpRemove
+            });
+        }
 
-        items.push({
-            icon: _ico("blueprint--pencil"),
-            cls: 'x-btn-text-icon',
-            text    : _('Edit attachment'),
-            scope:this,
-            handler : this.cmpUpdateAttachment
-        });
-
-        items.push({
-            icon: _ico("blueprint--minus"),
-            cls: 'x-btn-text-icon',
-            text    : _('Delete attachment'),
-            scope:this,
-            handler: this.cmpDeleteAttachment
-        });
-
-        items.push("-");
-
-        items.push({
-            icon: _ico("table"),
-            cls: 'x-btn-text-icon',
-            text    : _('View plan'),
-            handler : function() {
-                Inprint.ObjectResolver.resolve({ aid:'fascicle-plan', oid: node.id, text: node.text });
-            }
-        });
+        if (fastype == "attachment") {
+            items.push({
+                icon: _ico("folder--pencil"),
+                cls: 'x-btn-text-icon',
+                text    : _('Edit attachment'),
+                scope:this,
+                handler : this.cmpUpdateAttachment
+            });
+            items.push({
+                icon: _ico("folder--minus"),
+                cls: 'x-btn-text-icon',
+                text    : _('Delete attachment'),
+                scope:this,
+                handler: this.cmpRemove
+            });
+        }
 
         items.push({
             icon: _ico("clock"),
             cls: 'x-btn-text-icon',
-            text    : _('View composer'),
+            text    : _('Composer'),
             handler : function() {
                 Inprint.ObjectResolver.resolve({ aid:'fascicle-planner', oid: node.id, text: node.text });
             }

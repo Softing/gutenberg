@@ -9,9 +9,9 @@ Inprint.calendar.archive.Tree = Ext.extend(Ext.tree.TreePanel, {
         };
 
         Ext.apply(this, {
+            border:false,
             autoScroll:true,
             dataUrl: this.urls.tree,
-            border:false,
             rootVisible: false,
             root: {
                 id:'root-node',

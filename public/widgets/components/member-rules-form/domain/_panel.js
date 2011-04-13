@@ -8,7 +8,7 @@ Inprint.cmp.memberRulesForm.Domain = Ext.extend(Ext.Panel, {
         Ext.apply(this, {
             border:false,
             layout: "fit",
-            title: _("Domain"),
+            title: _("Company"),
             items: this.panels.grid
         });
         Inprint.cmp.memberRulesForm.Domain.superclass.initComponent.apply(this, arguments);
