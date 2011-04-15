@@ -1,1 +1,1 @@
-Ext.ns("Inprint.advert.advertisers");
+Ext.ns("Inprint.advertising.advertisers");

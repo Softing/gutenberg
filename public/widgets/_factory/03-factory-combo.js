@@ -305,8 +305,10 @@ Inprint.factory.Combo = function() {
 
             // Add custom configuration
             if (comboconfig) Ext.apply(combo, comboconfig);
+
             // Add store configuration
             if (storeconfig) Ext.apply(combo.store, storeconfig);
+
             // Add baseparams to store configuration
             if (comboconfig && comboconfig.baseParams)  Ext.apply(combo.store.baseParams, comboconfig.baseParams);
 

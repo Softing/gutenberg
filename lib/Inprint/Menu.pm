@@ -15,9 +15,10 @@ sub index
 {
     my $c = shift;
 
-    my $accessViewSettings = $c->objectAccess("domain.configuration.view");
+    ############################################################################
+    # About menu items
+    ############################################################################
 
-    # About programm
     my $AboutSection = {
         id => "core",
         menu => [
@@ -57,16 +58,29 @@ sub index
     # Advertising
     ############################################################################
 
-    my $accessAdvertEditions = $c->objectAccess("editions.advert.view:*");
-    my $AdvertisingSection = {
-        id => "advertising"
-    };
+    my @advertMenu;
+
+    my $accessAdvertDomains  = $c->objectAccess("domain.editions.manage");
+    my $accessAdvertEditions = $c->objectAccess("editions.advert.manage:*");
+
     if ($accessAdvertEditions) {
-        push @{ $AdvertisingSection->{menu} }, { id => "advert-advertisers" };
-        push @{ $AdvertisingSection->{menu} }, "-";
-        push @{ $AdvertisingSection->{menu} }, { id => "advert-modules" };
-        push @{ $AdvertisingSection->{menu} }, { id => "advert-index" };
+        push @advertMenu, { id => "advert-advertisers" };
     }
+
+    if ($accessAdvertDomains) {
+
+        if ( @advertMenu ) {
+            push @advertMenu, "-";
+        }
+
+        push @advertMenu, { id => "advert-modules" };
+        push @advertMenu, { id => "advert-index" };
+    }
+
+    my $AdvertisingSection = {
+        id => "advertising",
+        menu => \@advertMenu
+    };
 
     ############################################################################
     # Editions
@@ -247,7 +261,7 @@ sub index
 
     push @result, $DocumentsSection;
 
-    if ( $accessAdvertEditions ) {
+    if ( $accessAdvertDomains || $accessAdvertEditions ) {
         push @result, "-";
         push @result, $AdvertisingSection;
     }
@@ -280,6 +294,9 @@ sub fascicleHadler {
     my $accessLayoutManage = $c->objectAccess("editions.$fastype.manage:*", $fascicle->{edition});
     my $accessAdvertManage = $c->objectAccess("editions.advert.manage:*",   $fascicle->{edition});
 
+    my $oid = $fascicle->{id};
+    my $edition = $fascicle->{edition};
+
     my $fascicle_menu = {
         id   => $fastype,
         text => $fascicle->{edition_shortcut} . '/'. $fascicle->{shortcut},
@@ -290,8 +307,8 @@ sub fascicleHadler {
 
         push @{ $fascicle_menu->{menu} },
             {
-                id   => "fascicle-plan",
-                oid  => $fascicle->{id},
+                oid => $oid,
+                id  => "fascicle-plan",
                 description => $fascicle->{shortcut}
             };
 
@@ -301,8 +318,8 @@ sub fascicleHadler {
 
         push @{ $fascicle_menu->{menu} },
             {
-                id   => "fascicle-planner",
-                oid  => $fascicle->{id},
+                oid => $oid,
+                id  => "fascicle-planner",
                 description => $fascicle->{shortcut}
             };
 
@@ -310,22 +327,22 @@ sub fascicleHadler {
 
         push @{ $fascicle_menu->{menu} },
             {
+                oid => $oid,
                 id  => "fascicle-index",
-                oid => $fascicle->{id},
                 description => $fascicle->{shortcut}
             };
 
         push @{ $fascicle_menu->{menu} },
             {
+                oid => $oid,
                 id  => "fascicle-templates",
-                oid => $fascicle->{id},
                 description => $fascicle->{shortcut}
             };
 
         push @{ $fascicle_menu->{menu} },
             {
+                oid => $oid,
                 id  => "fascicle-places",
-                oid => $fascicle->{id},
                 description => $fascicle->{shortcut}
             };
 

@@ -197,8 +197,8 @@ Inprint.fascicle.planner.Requests = Ext.extend(Ext.grid.GridPanel, {
 
     cmpCreate: function() {
 
-        var pages = this.parent.panels.pages;
-
+        var pages     = this.parent.panels.pages;
+        var fascicle  = this.oid;
         var selection = pages.cmpGetSelected();
 
         if (selection.length > 2) {

@@ -5,7 +5,8 @@ Inprint.cmp.Adverta = Ext.extend(Ext.Window, {
         this.panels = {};
 
         this.panels.request   = new Inprint.cmp.adverta.Request({
-            parent: this, fascicle: this.fascicle
+            parent: this,
+            fascicle: this.fascicle
         });
 
         this.items = [];
@@ -31,7 +32,7 @@ Inprint.cmp.Adverta = Ext.extend(Ext.Window, {
             this.items.push(this.panels.flash);
         }
 
-        var winWidth = (this.selection.length*300) + 600;
+        var winWidth = (this.selection.length*260) + 600;
 
         var title;
         var btn;

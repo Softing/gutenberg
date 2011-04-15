@@ -5,8 +5,7 @@
 
 Inprint.store.Columns = {
 
-    advertising: {
-
+    advertisers: {
         list:       [
             "id", "serialnum",
             "edition", "edition_shortcut",
@@ -16,7 +15,10 @@ Inprint.store.Columns = {
             "rs", "ks", "bik",
             { name: "created", type: "date", dateFormat: "c" },
             { name: "updated", type: "date", dateFormat: "c" }
-        ],
+        ]
+    },
+
+    advertising: {
 
         modules: [
             "id", "edition", "page", "title", "shortcut", "description", "amount", "area", "x", "y", "w", "h",

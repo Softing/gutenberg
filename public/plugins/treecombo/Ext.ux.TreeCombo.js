@@ -186,9 +186,11 @@ Ext.ux.form.TreeCombo = Ext.extend(Ext.form.TriggerField, {
     },
 
     onTreeNodeClick: function(node, e) {
-        this.setValue(node.id, node.text);
-        this.fireEvent('select', this, node);
-        this.collapse();
+        if(!node.attributes.disabled) {
+            this.setValue(node.id, node.text);
+            this.fireEvent('select', this, node);
+            this.collapse();
+        }
     }
 
 });

@@ -27,9 +27,6 @@ sub editions {
 
         my $bindings = $c->objectBindings("editions.attachment.manage:*");
 
-        die @$bindings;
-
-
         if ($i_node eq "00000000-0000-0000-0000-000000000000") {
 
             $sql = "

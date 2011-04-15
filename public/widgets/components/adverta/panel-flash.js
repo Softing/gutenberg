@@ -30,7 +30,7 @@ Inprint.cmp.adverta.Flash = Ext.extend(Ext.Panel, {
 
         selLength = selection.length;
 
-        var flashWidth = 300 * selLength;
+        var flashWidth = 260 * selLength;
 
         this.flashid = Ext.id();
         var flash =  {

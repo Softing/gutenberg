@@ -79,6 +79,13 @@ sub startup {
     # Access Framework
     $sessionBridge->route('/access/')                           ->to('access#index');
 
+    # Advertisers
+    $sessionBridge->route("/advertisers/list/")                 ->to("advertising-advertisers#list");
+    $sessionBridge->route("/advertisers/create/")               ->to("advertising-advertisers#create");
+    $sessionBridge->route("/advertisers/read/")                 ->to("advertising-advertisers#read");
+    $sessionBridge->route("/advertisers/update/")               ->to("advertising-advertisers#update");
+    $sessionBridge->route("/advertisers/delete/")               ->to("advertising-advertisers#delete");
+
     # Advertising
     $sessionBridge->route("/advertising/archive/list/")         ->to("advertising-archive#list");
 
@@ -230,6 +237,17 @@ sub startup {
     $sessionBridge->route('/common/transfer/branches/')         ->to('common-transfer#branches');
     $sessionBridge->route('/common/transfer/editions/')         ->to('common-transfer#editions');
     $sessionBridge->route('/common/transfer/list/')             ->to('common-transfer#list');
+
+    $sessionBridge->route('/common/combo/stages/')              ->to('common-combos#stages');
+    $sessionBridge->route('/common/combo/assignments/')         ->to('common-combos#assignments');
+    $sessionBridge->route('/common/combo/managers/')            ->to('common-combos#managers');
+    $sessionBridge->route('/common/combo/fascicles/')           ->to('common-combos#fascicles');
+    $sessionBridge->route('/common/combo/headlines/')           ->to('common-combos#headlines');
+    $sessionBridge->route('/common/combo/rubrics/')             ->to('common-combos#rubrics');
+
+    $sessionBridge->route('/common/tree/editions/')             ->to('common-trees#editions');
+    $sessionBridge->route('/common/tree/workgroups/')           ->to('common-trees#workgroups');
+    $sessionBridge->route('/common/tree/fascicles/')            ->to('common-trees#fascicles');
 
     # Documents routes
     $sessionBridge->route('/documents/array/')                  ->to('documents#array');

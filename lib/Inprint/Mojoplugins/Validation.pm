@@ -45,8 +45,10 @@ sub register {
         check_record => sub {
             my ($c, $errors, $table, $title, $id) = @_;
             undef my $item;
+
             $item = $c->Q(" SELECT * FROM $table WHERE id=? ", [ $id ])->Hash unless (@$errors);
             push @$errors, { id => $title, msg => "Can't find record"} unless ($item->{id});
+
             return $item;
         });
 

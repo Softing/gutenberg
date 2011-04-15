@@ -6,6 +6,9 @@
 Inprint.factory.StoreMappings = {
 
     // Advertising
+
+    "/advertisers/list/":                   Inprint.store.Columns.advertisers.list,
+
     "/advertising/advertisers/list/":       Inprint.store.Columns.advertising.list,
     "/advertising/modules/list/":           Inprint.store.Columns.advertising.modules,
     "/advertising/pages/list/":             Inprint.store.Columns.advertising.pages,

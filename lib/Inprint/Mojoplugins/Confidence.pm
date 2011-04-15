@@ -11,65 +11,150 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 our $VERSION = '0.01';
 
+sub _parseTerms {
+
+    my ($c, $input) = @_;
+
+    my @rules;
+
+    if (ref $input eq "ARRAY") {
+        @rules = @$input;
+    } else {
+        push @rules, $input;
+    }
+
+    my $terms = [];
+
+    for (my $i=0; $i <= $#rules; $i++) {
+
+        my ($terstring, $area) = split /:/, $rules[$i];
+
+        my ($section, $subsection, $term) = split /\./, $terstring;
+
+        if ($section eq "domain") {
+            push @$terms, "$terstring:domain";
+        }
+
+        if ($section eq "editions") {
+            if ($area eq "*") {
+                push @$terms, "$terstring:edition";
+                push @$terms, "$terstring:editions";
+            } else {
+                push @$terms, "$terstring:$area";
+            }
+        }
+
+        if ($section eq "catalog") {
+            if ($area eq "*") {
+                push @$terms, "$terstring:member";
+                push @$terms, "$terstring:group";
+            } else {
+                push @$terms, "$terstring:$area";
+            }
+        }
+
+    }
+
+    my %seen;
+    @$terms = grep { ! $seen{$_}++ } @$terms;
+
+    return $terms;
+}
+
+sub _getNodes {
+
+    my ($c, $terms, $member) = @_;
+
+    my $result = [];
+
+    foreach my $rule (@$terms) {
+
+        my $bindings = [];
+
+        my ($rulestring, $area) = split /:/, $rule;
+        my ($section, $subsection, $term) = split /\./, $rulestring;
+
+        $c->dbh()->{pg_placeholder_dollaronly} = 1;
+
+        # Editions
+        if ($section eq "editions") {
+
+            if ($area eq "edition") {
+                $bindings = $c->Q("
+                    SELECT binding FROM map_member_to_rule as mapper WHERE 1=1
+                        AND mapper.termkey = \$1
+                        AND member = \$2 "
+                , [ $rule, $member ] )->Values;
+
+            }
+
+            if ($area eq "editions") {
+                $bindings = $c->Q("
+                    SELECT id FROM editions WHERE path ? ARRAY(
+                        SELECT ('*.' || replace(binding::text, '-', '')::text ||'.*')::lquery
+                        FROM map_member_to_rule as mapper WHERE 1=1
+                            AND mapper.termkey = \$1 AND member = \$2 ) "
+                , [ $rule, $member ] )->Values;
+
+            }
+
+        }
+
+        # Catalog
+        if ($section eq "catalog") {
+                $bindings = $c->Q("
+                    SELECT id FROM catalog WHERE path ? ARRAY(
+                        SELECT ('*.' || replace(binding::text, '-', '')::text ||'.*')::lquery
+                        FROM map_member_to_rule as mapper WHERE 1=1
+                            AND mapper.termkey = \$1 AND member = \$2 ) "
+                , [ $rule, $member ] )->Values;
+        }
+
+        $c->dbh()->{pg_placeholder_dollaronly} = 0;
+
+
+        foreach (@$bindings) {
+            push @$result, $_;
+        }
+
+    }
+
+    my %seen;
+    @$result = grep { ! $seen{$_}++ } @$result;
+
+    return $result;
+}
+
 sub register {
     my ( $self, $app, $conf ) = @_;
 
     # Plugin config
     $conf ||= {};
 
+   $app->helper(
+        objectBindings => sub {
+            my ($c, $input, $member) = @_;
+            unless ($member) {
+                $member = $c->getSessionValue("member.id");
+            }
+            my $terms  = _parseTerms($c, $input);
+            my $nodes = _getNodes($c, $terms, $member);
+            return $nodes;
+        } );
+
     $app->helper(
 
         objectAccess => sub {
-            my ($c, $terms, $binding, $member) = @_;
+
+            my ($c, $input, $binding, $member) = @_;
 
             unless ($member) {
                 $member = $c->getSessionValue("member.id");
             }
 
-            my @rules;
+            my $terms = _parseTerms($c, $input);
 
-            if (ref $terms eq "ARRAY") {
-                @rules = @$terms;
-            } else {
-                push @rules, $terms;
-            }
-
-            my @terms;
-
-            for (my $i=0; $i <= $#rules; $i++) {
-
-                my ($terstring, $area) = split /:/, $rules[$i];
-
-                my ($section, $subsection, $term) = split /\./, $terstring;
-
-                if ($section eq "domain") {
-                    push @terms, "$terstring:domain";
-                }
-
-                if ($section eq "editions") {
-                    if ($area eq "*") {
-                        push @terms, "$terstring:edition";
-                        push @terms, "$terstring:editions";
-                    } else {
-                        push @terms, "$terstring:$area";
-                    }
-                }
-
-                if ($section eq "catalog") {
-                    if ($area eq "*") {
-                        push @terms, "$terstring:member";
-                        push @terms, "$terstring:group";
-                    } else {
-                        push @terms, "$terstring:$area";
-                    }
-                }
-
-            }
-
-            my %seen;
-            @terms = grep { ! $seen{$_}++ } @terms;
-
-            foreach my $rule (@terms) {
+            foreach my $rule (@$terms) {
 
                 my ($rulestring, $area) = split /:/, $rule;
                 my ($section, $subsection, $term) = split /\./, $rulestring;
@@ -161,116 +246,25 @@ sub register {
         } );
 
     $app->helper(
+        objectChildren => sub {
 
-        objectBindings => sub {
-
-            my ($c, $terms, $member) = @_;
-
-            my @result;
+            my ($c, $input, $table, $node, $member) = @_;
 
             unless ($member) {
                 $member = $c->getSessionValue("member.id");
             }
 
-            my @rules;
+            my $terms = _parseTerms($c, $input);
+            my $nodes = _getNodes($c, $terms, $member);
 
-            if (ref $terms eq "ARRAY") {
-                @rules = @$terms;
-            } else {
-                push @rules, $terms;
-            }
+            my $result = $c->Q("
+                    SELECT id FROM $table
+                    WHERE 1=1
+                        AND path @> ARRAY( SELECT path FROM editions WHERE id = \$1 )
+                        AND id = ANY(\$2) ",
+                [ $node, $nodes ])->Values;
 
-            my @terms;
-
-            for (my $i=0; $i <= $#rules; $i++) {
-
-                my ($terstring, $area) = split /:/, $rules[$i];
-
-                my ($section, $subsection, $term) = split /\./, $terstring;
-
-                if ($section eq "domain") {
-                    push @terms, "$terstring:domain";
-                }
-
-                if ($section eq "editions") {
-                    if ($area eq "*") {
-                        push @terms, "$terstring:edition";
-                        push @terms, "$terstring:editions";
-                    } else {
-                        push @terms, "$terstring:$area";
-                    }
-                }
-
-                if ($section eq "catalog") {
-                    if ($area eq "*") {
-                        push @terms, "$terstring:member";
-                        push @terms, "$terstring:group";
-                    } else {
-                        push @terms, "$terstring:$area";
-                    }
-                }
-
-            }
-
-            my %seen;
-            @terms = grep { ! $seen{$_}++ } @terms;
-
-            foreach my $rule (@terms) {
-
-                my $bindings = [];
-
-                my ($rulestring, $area) = split /:/, $rule;
-                my ($section, $subsection, $term) = split /\./, $rulestring;
-
-                $c->dbh()->{pg_placeholder_dollaronly} = 1;
-
-                # Editions
-                if ($section eq "editions") {
-
-                    if ($area eq "edition") {
-                        $bindings = $c->Q("
-                            SELECT binding FROM map_member_to_rule as mapper WHERE 1=1
-                                AND mapper.termkey = \$1
-                                AND member = \$2 "
-                        , [ $rule, $member ] )->Values;
-
-                    }
-
-                    if ($area eq "editions") {
-                        $bindings = $c->Q("
-                            SELECT id FROM editions WHERE path ? ARRAY(
-                                SELECT ('*.' || replace(binding::text, '-', '')::text ||'.*')::lquery
-                                FROM map_member_to_rule as mapper WHERE 1=1
-                                    AND mapper.termkey = \$1 AND member = \$2 ) "
-                        , [ $rule, $member ] )->Values;
-
-                    }
-
-                }
-
-                # Catalog
-                if ($section eq "catalog") {
-                        $bindings = $c->Q("
-                            SELECT id FROM catalog WHERE path ? ARRAY(
-                                SELECT ('*.' || replace(binding::text, '-', '')::text ||'.*')::lquery
-                                FROM map_member_to_rule as mapper WHERE 1=1
-                                    AND mapper.termkey = \$1 AND member = \$2 ) "
-                        , [ $rule, $member ] )->Values;
-                }
-
-                $c->dbh()->{pg_placeholder_dollaronly} = 0;
-
-
-                foreach (@$bindings) {
-                    push @result, $_;
-                }
-
-            }
-
-            my %seen2;
-            @result = grep { ! $seen2{$_}++ } @result;
-
-            return \@result;
+            return $result;
         } );
 
 }

@@ -19,7 +19,7 @@ sub register {
 
     $app->helper(
         smart_render => sub {
-            my ($c, $errors, $data) = @_;
+            my ($c, $errors, $data, $total) = @_;
 
             my $success = $c->json->false;
 
@@ -34,6 +34,10 @@ sub register {
 
             if ($data) {
                 $result->{data} = $data;
+            }
+
+            if ($total) {
+                $result->{total} = $total;
             }
 
             $c->render_json($result);

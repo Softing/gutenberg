@@ -5,6 +5,12 @@
 
 Inprint.sources = {
 
+    "advertisers.list":         "/advertisers/list/",
+    "advertisers.create":       "/advertisers/create/",
+    "advertisers.read":         "/advertisers/read/",
+    "advertisers.update":       "/advertisers/update/",
+    "advertisers.delete":       "/advertisers/delete/",
+
     "fascicle.list":            "/calendar/list/",
     "fascicle.read":            "/calendar/fascicle/read/",
     "fascicle.create":          "/calendar/fascicle/create/",
@@ -28,7 +34,7 @@ Inprint.sources = {
 
 _source = function (key) {
     if (!Inprint.sources[key]) {
-        alert("Can't find "+ key);
+        alert("Can't find url "+ key);
         return "404";
     }
     return _url(Inprint.sources[key]);

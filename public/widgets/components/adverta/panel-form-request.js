@@ -19,7 +19,11 @@ Inprint.cmp.adverta.Request = Ext.extend(Ext.FormPanel, {
                 editable:true,
                 typeAhead: true,
                 minChars: 2,
+                minListWidth: 570,
                 allowBlank:false,
+                baseParams: {
+                    fascicle: this.fascicle
+                },
                 listeners: {
                     scope: this,
                     beforequery: function(qe) {
@@ -95,7 +99,7 @@ Inprint.cmp.adverta.Request = Ext.extend(Ext.FormPanel, {
 
         Ext.apply(this, {
             flex:1,
-            width: 200,
+            width: 280,
             labelWidth: 90,
             defaults: {
                 anchor: "100%",
