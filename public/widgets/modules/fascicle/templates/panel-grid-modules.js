@@ -37,6 +37,32 @@ Inprint.fascicle.templates.Modules = Ext.extend(Ext.grid.GridPanel, {
                 sortable: true,
                 dataIndex: "description"
             },
+
+            {
+                id:"width",
+                header: _("Width"),
+                sortable: true,
+                dataIndex: "width"
+            },
+            {
+                id:"height",
+                header: _("Height"),
+                sortable: true,
+                dataIndex: "height"
+            },
+            {
+                id:"float_width",
+                header: _("Float width"),
+                sortable: true,
+                dataIndex: "width_float"
+            },
+            {
+                id:"float_height",
+                header: _("Float height"),
+                sortable: true,
+                dataIndex: "height_float"
+            },
+
             {
                 id:"amount",
                 header: _("Amount"),
@@ -228,6 +254,48 @@ Inprint.fascicle.templates.Modules = Ext.extend(Ext.grid.GridPanel, {
             },
             _FLD_TITLE,
             _FLD_DESCRIPTION,
+
+            {
+                xtype: "titlefield",
+                value: _("Module dimensions")
+            },
+            {
+                xtype: "numberfield",
+                value: 0,
+                minValue: 1,
+                name: "width",
+                allowBlank:true,
+                allowDecimals:true,
+                fieldLabel: _("Width")
+            },
+            {
+                xtype: "numberfield",
+                value: 0,
+                minValue: 1,
+                name: "height",
+                allowBlank:true,
+                allowDecimals:true,
+                fieldLabel: _("Height")
+            },
+            {
+                xtype: "numberfield",
+                value: 0,
+                minValue: 1,
+                name: "floatwidth",
+                allowBlank:true,
+                allowDecimals:true,
+                fieldLabel: _("Float width")
+            },
+            {
+                xtype: "numberfield",
+                value: 0,
+                minValue: 1,
+                name: "floatheight",
+                allowBlank:true,
+                allowDecimals:true,
+                fieldLabel: _("Float height")
+            },
+
             {
                 xtype: "titlefield",
                 value: _("More options")

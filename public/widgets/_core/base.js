@@ -5,6 +5,8 @@
 
 Ext.ns('Inprint');
 Ext.ns('Inprint.documents');
+Ext.ns("Inprint.panel.tree");
+Ext.ns("Inprint.grid.columns");
 
 Ext.BLANK_IMAGE_URL = '/ext-3.3.2/resources/images/default/s.gif';
 

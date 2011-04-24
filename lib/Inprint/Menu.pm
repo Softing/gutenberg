@@ -65,6 +65,7 @@ sub index
 
     if ($accessAdvertEditions) {
         push @advertMenu, { id => "advert-advertisers" };
+        push @advertMenu, { id => "advert-downloads" };
     }
 
     if ($accessAdvertDomains) {

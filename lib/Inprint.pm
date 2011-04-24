@@ -128,10 +128,19 @@ sub startup {
     $sessionBridge->route("/advertising/places/delete/")        ->to("advertising-places#delete");
 
     $sessionBridge->route("/advertising/requests/list/")        ->to("advertising-requests#list");
+    $sessionBridge->route("/advertising/requests/summary/")     ->to("advertising-requests#summary");
     $sessionBridge->route("/advertising/requests/create/")      ->to("advertising-requests#create");
     $sessionBridge->route("/advertising/requests/read/")        ->to("advertising-requests#read");
     $sessionBridge->route("/advertising/requests/update/")      ->to("advertising-requests#update");
     $sessionBridge->route("/advertising/requests/delete/")      ->to("advertising-requests#delete");
+    $sessionBridge->route("/advertising/requests/status/")      ->to("advertising-requests#status");
+
+    $sessionBridge->route("/advertising/requests/files/list/")          ->to("advertising-requests-files#list");
+    $sessionBridge->route("/advertising/requests/files/upload/")        ->to("advertising-requests-files#upload");
+    $sessionBridge->route("/advertising/requests/files/publish/")       ->to("advertising-requests-files#publish");
+    $sessionBridge->route("/advertising/requests/files/unpublish/")     ->to("advertising-requests-files#unpublish");
+    $sessionBridge->route("/advertising/requests/files/description/")   ->to("advertising-requests-files#description");
+    $sessionBridge->route("/advertising/requests/files/delete/")        ->to("advertising-requests-files#delete");
 
     # Calendar routes
     $sessionBridge->route("/calendar/list/")                    ->to("calendar#list");

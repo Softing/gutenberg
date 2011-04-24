@@ -21,98 +21,28 @@ Inprint.fascicle.planner.Requests = Ext.extend(Ext.grid.GridPanel, {
 
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
 
-        this.columns = [
-            this.selectionModel,
-            {
-                id:"searial",
-                header: _("#"),
-                width: 30,
+        var  columns  = Inprint.grid.columns.Request();
+        this.colModel = new Ext.grid.ColumnModel({
+            defaults: {
                 sortable: true,
-                dataIndex: "serialnum"
+                menuDisabled:true
             },
-            {
-                id:"advertiser",
-                header: _("Advertiser"),
-                width: 120,
-                sortable: true,
-                dataIndex: "advertiser_shortcut"
-            },
-            {
-                id:"manager",
-                header: _("Manager"),
-                width: 120,
-                sortable: true,
-                dataIndex: "manager_shortcut"
-            },
-            {
-                id:"title",
-                header: _("Title"),
-                width: 350,
-                sortable: true,
-                dataIndex: "shortcut"
-            },
-
-            {
-                id:"position",
-                header: _("Place"),
-                width: 100,
-                sortable: true,
-                dataIndex: "place_shortcut"
-            },
-            {
-                id:"template",
-                header: _("Template"),
-                width: 100,
-                sortable: true,
-                dataIndex: "origin_shortcut"
-            },
-            {
-                id:"module",
-                header: _("Module"),
-                width: 100,
-                sortable: true,
-                dataIndex: "module_shortcut"
-            },
-            {
-                id:"pages",
-                header: _("Pages"),
-                width: 60,
-                sortable: true,
-                dataIndex: "pages"
-            },
-            {
-                id:"status",
-                header: _("Status"),
-                width: 70,
-                sortable: true,
-                dataIndex: "status"
-            },
-            {
-                id:"payment",
-                header: _("Payment"),
-                width: 60,
-                sortable: true,
-                dataIndex: "payment"
-            },
-            {
-                id:"readiness",
-                header: _("Readiness"),
-                width: 80,
-                sortable: true,
-                dataIndex: "readiness"
-            },
-
-            {
-                id:"modified",
-                header: _("Modified"),
-                width: 110,
-                sortable: true,
-                xtype: 'datecolumn',
-                format: "Y-m-d H:i",
-                dataIndex: "updated"
-            }
-
-        ];
+            columns: [
+                this.selectionModel,
+                columns.serial,
+                columns.advertiser,
+                columns.manager,
+                columns.title,
+                columns.position,
+                columns.template,
+                columns.module,
+                columns.pages,
+                columns.status,
+                columns.payment,
+                columns.readiness,
+                columns.modified
+            ]
+        });
 
         this.tbar = [
             {

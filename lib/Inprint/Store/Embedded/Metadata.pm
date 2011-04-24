@@ -19,7 +19,6 @@ sub getDigest {
     return digest_file_hex($filepath, "MD5");
 }
 
-
 sub getFileCreateDate {
     my $c = shift;
     my $filepath = shift;

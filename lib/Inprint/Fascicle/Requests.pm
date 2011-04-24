@@ -9,7 +9,6 @@ use utf8;
 use strict;
 use warnings;
 
-
 use Inprint::Models::Fascicle::Request;
 
 use base 'Mojolicious::Controller';
@@ -116,7 +115,7 @@ sub create {
 
     my $fascicle   = $c->check_record(\@errors, "fascicles", "fascicle", $i_fascicle);
     my $advertiser = $c->check_record(\@errors, "ad_advertisers", "advertiser", $i_advertiser);
-    
+
     #push @errors, { id => "access", msg => "Not enough permissions"}
     #    unless ($c->objectAccess("domain.roles.manage"));
 

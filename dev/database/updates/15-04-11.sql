@@ -1,1 +1,1 @@
-ALTER TABLE ad_advertisers ALTER COLUMN title SET NOT NULL;
+ALTER TABLE ad_advertisers ALTER COLUMN title DROP NOT NULL;

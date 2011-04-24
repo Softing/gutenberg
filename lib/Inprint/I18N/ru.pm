@@ -71,6 +71,9 @@ our %Lexicon = (
     "Address"
  => "Адрес",
 
+    "Advanced options"
+ => "",
+
     "Advertisement"
  => "Реклама",
 
@@ -113,6 +116,9 @@ our %Lexicon = (
     "All fascicles"
  => "Все выпуски",
 
+    "All requests"
+ => "Все заявки",
+
     "Amount"
  => "Количество",
 
@@ -124,6 +130,12 @@ our %Lexicon = (
 
     "Another employee %1 captured this issue!"
  => "Сотрудник %1 захватил этот выпуск!",
+
+    "Another"
+ => "Чужой",
+
+    "Another's"
+ => "Чужие",
 
     "Apply to enclosed"
  => "",
@@ -177,6 +189,9 @@ our %Lexicon = (
  => "Банк",
 
     "Banking details"
+ => "",
+
+    "Banking options"
  => "",
 
     "Basic options"
@@ -233,6 +248,9 @@ our %Lexicon = (
     "Characters"
  => "Знаки",
 
+    "Checked"
+ => "",
+
     "Circulation"
  => "Тираж",
 
@@ -263,11 +281,17 @@ our %Lexicon = (
     "Company news"
  => "Новости компании",
 
+    "Composer"
+ => "",
+
     "Composition"
  => "",
 
     "Contact"
  => "Контакт",
+
+    "Contains errors"
+ => "",
 
     "Copy"
  => "Копировать",
@@ -328,6 +352,9 @@ our %Lexicon = (
 
     "Deadline"
  => "Сроки",
+
+    "Debt"
+ => "Долг",
 
     "Default"
  => "",
@@ -403,6 +430,9 @@ our %Lexicon = (
 
     "Domain"
  => "Домен",
+
+    "Download"
+ => "Загрузка",
 
     "Download file"
  => "Скачать файл",
@@ -575,8 +605,17 @@ our %Lexicon = (
     "Flash mode"
  => "",
 
+    "Float height"
+ => "",
+
+    "Float width"
+ => "",
+
     "Format"
  => "Форматировать",
+
+    "Format issue"
+ => "",
 
     "General information"
  => "",
@@ -614,6 +653,9 @@ our %Lexicon = (
     "Headlines"
  => "Разделы",
 
+    "Height"
+ => "",
+
     "Help"
  => "Справка",
 
@@ -641,6 +683,9 @@ our %Lexicon = (
     "Important event"
  => "Важное событие",
 
+    "Imposed"
+ => "Сверстано",
+
     "Index"
  => "Рубрикатор",
 
@@ -655,6 +700,18 @@ our %Lexicon = (
 
     "Irrevocable action!"
  => "",
+
+    "Is another's"
+ => "Чужой",
+
+    "Is imposed"
+ => "Сверстано",
+
+    "Isn't another's"
+ => "Не чужой",
+
+    "Isn't imposed"
+ => "Не сверстано",
 
     "Issue"
  => "Выпуск",
@@ -737,6 +794,9 @@ our %Lexicon = (
     "Module"
  => "Модуль",
 
+    "Module dimensions"
+ => "",
+
     "Module size"
  => "",
 
@@ -763,6 +823,9 @@ our %Lexicon = (
 
     "My alerts"
  => "Мои события",
+
+    "NN"
+ => "",
 
     "Name"
  => "Имя",
@@ -917,6 +980,9 @@ our %Lexicon = (
     "Readiness"
  => "Готовность",
 
+    "Ready"
+ => "Готово",
+
     "Record date"
  => "",
 
@@ -958,6 +1024,12 @@ our %Lexicon = (
 
     "Request"
  => "Заявка",
+
+    "Requests"
+ => "Заявки",
+
+    "Requires verification"
+ => "",
 
     "Reservation"
  => "Резерв",
@@ -1002,7 +1074,7 @@ our %Lexicon = (
  => "Правила",
 
     "Safe download"
- => "",
+ => "Безопасная загрузка",
 
     "Save"
  => "Сохранить",
@@ -1073,6 +1145,9 @@ our %Lexicon = (
     "Suitable data is not found"
  => "Подходящие данные не найдены",
 
+    "Summary"
+ => "Итог",
+
     "System Information"
  => "",
 
@@ -1121,8 +1196,17 @@ our %Lexicon = (
     "Title"
  => "Название",
 
+    "To check"
+ => "На проверку",
+
+    "To test"
+ => "",
+
     "Todo"
  => "В работе",
+
+    "Total requests"
+ => "Всех заявок",
 
     "Transfer"
  => "Передача",
@@ -1213,6 +1297,15 @@ our %Lexicon = (
 
     "Where"
  => "",
+
+    "Width"
+ => "",
+
+    "With error"
+ => "",
+
+    "With errors"
+ => "С ошибками",
 
     "Without conversion"
  => "",

@@ -21,7 +21,11 @@ Inprint.store.Columns = {
     advertising: {
 
         modules: [
-            "id", "edition", "page", "title", "shortcut", "description", "amount", "area", "x", "y", "w", "h",
+            "id",
+            "edition", "page",
+            "title", "shortcut", "description",
+            "width", "height", "width_float", "height_float",
+            "amount", "area", "x", "y", "w", "h",
             { name: "created", type: "date", dateFormat: "c" },
             { name: "updated", type: "date", dateFormat: "c" }
         ],
@@ -40,6 +44,7 @@ Inprint.store.Columns = {
             "place", "place_shortcut",
             "manager", "manager_shortcut",
             "x", "y", "h", "w", "seqnum",
+            "check_status", "anothers_layout", "imposed",
             { name: "created", type: "date", dateFormat: "c" },
             { name: "updated", type: "date", dateFormat: "c" }
         ],
@@ -177,7 +182,8 @@ Inprint.store.Columns = {
 
         modules: [
             "id",
-            "fascicle", "page", "place", "place_title", "title", "description", "amount", "area", "x", "y", "w", "h",
+            "fascicle", "page", "place", "place_title",
+            "title", "description", "amount", "area", "x", "y", "w", "h",
             { name: "created", type: "date", dateFormat: "c" },
             { name: "updated", type: "date", dateFormat: "c" }
         ],

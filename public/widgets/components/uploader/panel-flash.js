@@ -13,9 +13,16 @@ Inprint.cmp.uploader.Flash = Ext.extend(AwesomeUploader, {
         });
 
         this.initialConfig.extraPostData = {
-            sid: Session,
-            document: this.config.document
+            sid: Session
         };
+
+        if (this.config.pkey) {
+            this.initialConfig.extraPostData.id = this.config.pkey;
+        }
+
+        if (this.config.document) {
+            this.initialConfig.extraPostData.document = this.config.document;
+        }
 
         this.initialConfig.awesomeUploaderRoot = "/plugins/uploader/";
         this.initialConfig.xhrUploadUrl      = this.config.uploadUrl;

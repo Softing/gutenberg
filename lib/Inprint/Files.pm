@@ -295,25 +295,18 @@ sub _generatePreviewFile {
     $thumbnailFolder = __adaptPath($c, $thumbnailFolder);
     $thumbnailFile   = __adaptPath($c, $thumbnailFile);
 
-    if ( lc($filextenOriginal) ~~ ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff']) {
-
+    if ( lc($filextenOriginal) ~~ [ "jpg", "jpeg", "png", "gif", "bmp", "tif", "tiff" ]) {
         if (-w $thumbnailFolder) {
-
             my $image = Image::Magick->new;
             my $x = $image->Read($filepathOriginal);
-            die "$x" if "$x";
-
+            warn "$x" if "$x";
             if ($size > 0) {
                 $x = $image->AdaptiveResize(geometry=>$size);
                 die "$x" if "$x";
             }
-
             $x = $image->Write($thumbnailFile);
-
             die "$x" if "$x";
-
         }
-
     }
 
     if (lc($filextenOriginal) ~~ ['doc', 'docx', 'txt', 'rtf', 'odt', 'xls', 'xlsx', 'odp', 'ods' ]) {

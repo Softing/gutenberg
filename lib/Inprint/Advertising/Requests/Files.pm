@@ -1,4 +1,4 @@
-package Inprint::Plugins::Rss::Files;
+package Inprint::Advertising::Requests::Files;
 
 # Inprint Content 5.0
 # Copyright(c) 2001-2011, Softing, LLC.
@@ -15,57 +15,40 @@ use base 'Mojolicious::Controller';
 sub list {
     my $c = shift;
 
-    my $i_document = $c->param("document");
-
     my @errors;
-    my $success = $c->json->false;
+    my $i_request = $c->get_uuid(\@errors, "request");
 
-    $c->check_uuid( \@errors, "document", $i_document);
-    my $document = $c->check_record(\@errors, "documents", "document", $i_document);
-
-    my $feed = $c->Q(" SELECT * FROM plugins_rss.rss WHERE entity=? ", [ $i_document ])->Hash;
+    my $request = $c->check_record(\@errors, "fascicles_requests", "request", $i_request);
 
     #push @errors, { id => "feed", msg => "Can't find object"}
     #    unless ($feed->{id});
 
     my $result;
     unless (@errors) {
-
-        if ($feed->{id}) {
-            my $folder = Inprint::Store::Embedded::getFolderPath($c, "rss-plugin", $feed->{created}, $feed->{id}, 1);
-            Inprint::Store::Embedded::updateCache($c, $folder);
-            $result = Inprint::Store::Cache::getRecordsByPath($c, $folder, "all", ['png', 'jpg', 'jpeg', 'gif', 'wma', 'wmv', 'mpeg', 'mp3']);
-        }
-
+        my $folder = Inprint::Store::Embedded::getFolderPath($c, "requests", $request->{created}, $request->{id}, 1);
+        Inprint::Store::Embedded::updateCache($c, $folder);
+        $result = Inprint::Store::Cache::getRecordsByPath($c, $folder, "all", ["tiff", "tif", "eps"]);
     }
 
-    $success = $c->json->true unless (@errors);
-    $c->render_json({ success => $success, errors => \@errors, data => \@$result });
+    $c->smart_render(\@errors, $result);
 }
 
 sub upload {
     my $c = shift;
 
-    my $i_document = $c->param("document");
+    my @errors;
+    my $i_id = $c->get_uuid(\@errors, "id");
     my $i_filename = $c->param("Filename");
 
-    my @errors;
-    my $success = $c->json->false;
-
-    $c->check_uuid( \@errors, "document", $i_document);
-    my $document = $c->check_record(\@errors, "documents", "document", $i_document);
-
-    my $feed = $c->Q(" SELECT * FROM plugins_rss.rss WHERE entity=? ", [ $i_document ])->Hash;
-    push @errors, { id => "feed", msg => "Can't find object"} unless ($feed->{id});
+    my $request = $c->check_record(\@errors, "fascicles_requests", "request", $i_id);
 
     unless (@errors) {
         my $upload = $c->req->upload("Filedata");
-        my $folder = Inprint::Store::Embedded::getFolderPath($c, "rss-plugin", $feed->{created}, $feed->{id}, 1);
+        my $folder = Inprint::Store::Embedded::getFolderPath($c, "requests", $request->{created}, $request->{id}, 1);
         Inprint::Store::Embedded::fileUpload($c, $folder, $upload);
     }
 
-    $success = $c->json->true unless (@errors);
-    $c->render_json({ success => $success, errors => \@errors });
+    $c->smart_render(\@errors);
 }
 
 sub publish {
