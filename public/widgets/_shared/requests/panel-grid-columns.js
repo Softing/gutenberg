@@ -55,6 +55,20 @@ Inprint.grid.columns.Request = function() {
             }
         },
 
+        edition: {
+            id:"edition",
+            width: 80,
+            header: _("Edition"),
+            dataIndex: "edition_shortcut"
+        },
+
+        fascicle: {
+            id:"fascicle",
+            width: 80,
+            header: _("Fascicle"),
+            dataIndex: "fascicle_shortcut"
+        },
+
         title: {
             id:"title",
             width: 350,

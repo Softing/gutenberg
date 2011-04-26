@@ -18,7 +18,14 @@ sub search {
     my $sql_query = "
         SELECT
 
-            rq.id, rq.serialnum, rq.edition, rq.fascicle,
+            rq.id, rq.serialnum,
+
+            ed.id as edition,
+            ed.shortcut as edition_shortcut,
+
+            fs.id as fascicle,
+            fs.shortcut as fascicle_shortcut,
+
             rq.advertiser, rq.advertiser_shortcut,
             rq.place, rq.place_shortcut,
             rq.manager, rq.manager_shortcut,
@@ -33,8 +40,14 @@ sub search {
 
             to_char(rq.created, 'YYYY-MM-DD HH24:MI:SS') as created,
             to_char(rq.updated, 'YYYY-MM-DD HH24:MI:SS') as updated
-        FROM fascicles_requests rq LEFT JOIN fascicles_modules t2 ON rq.module = t2.id
+        FROM
+            editions ed,
+            fascicles fs,
+            fascicles_requests rq
+            LEFT JOIN fascicles_modules t2 ON rq.module = t2.id
         WHERE 1=1
+            AND ed.id = rq.edition
+            AND fs.id = rq.fascicle
     ";
 
     if ($filter->{flt_fascicle}) {

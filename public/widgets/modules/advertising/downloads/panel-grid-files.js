@@ -9,6 +9,9 @@ Inprint.advertising.downloads.Files = Ext.extend(Ext.grid.GridPanel, {
             url: _source("requests.files.list"),
             fields: [
                 "id", "document", "name", "description", "mime", "extension",
+                "cmwidth", "cmheight", "imagesize", "xunits", "yunits",
+                "colormodel", "colorspace", "xresolution", "yresolution", "software",
+                "cm_error", "dpi_error",
                 "published", "size", "length",
                 { name: "created", type: "date", dateFormat: "c" },
                 { name: "updated", type: "date", dateFormat: "c" }
@@ -23,10 +26,32 @@ Inprint.advertising.downloads.Files = Ext.extend(Ext.grid.GridPanel, {
                 menuDisabled:true
             },
             columns: [
+
                 this.selectionModel,
                 columns.published,
                 columns.preview,
-                columns.name,
+                { id:"name", width:200, header: _("Name"), dataIndex: "name", renderer: function(v, p, r) {
+                        return String.format('<div><h1>{0}</h1></div><div>{1}</div>', r.get("name"), r.get("software"));
+                    } },
+                { id:"colormodel", width:80, header: _("Color Model"), dataIndex: "colormodel", renderer: function(v, p, r) {
+                        var string = "{0}";
+                        if (r.get("cm_error")) {
+                            string = "<span style=\"color:red;\">{0}</span>";
+                        }
+                        return String.format(string, r.get("colormodel") );
+                    } },
+                { id:"resolution", width:80,  header: _("Resolution"), dataIndex: "imagesize" },
+                { id:"imagesize", width: 120, header: _("Size"), dataIndex: "imagesize", renderer: function(v, p, r) {
+                        return String.format('{0}x{1} mm', r.get("cmwidth"), r.get("cmheight"));
+                    } },
+                { id:"dpi", width: 60, header: _("DPI"), dataIndex: "imagesize", renderer: function(v, p, r) {
+                        var string = "{0}x{1}";
+                        if (r.get("dpi_error")) {
+                            string = "<span style=\"color:red;\">{0}x{1}</span>";
+                        }
+                        return String.format(string, r.get("xresolution"), r.get("yresolution") );
+                    } },
+
                 columns.created,
                 columns.updated,
             ]

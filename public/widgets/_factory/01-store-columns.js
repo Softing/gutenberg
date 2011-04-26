@@ -37,7 +37,8 @@ Inprint.store.Columns = {
         ],
 
         requests: [
-            "id", "serialnum", "title", "shortcut", "status", "payment", "readiness",
+            "id",
+            "serialnum", "title", "shortcut", "status", "payment", "readiness",
             "edition", "edition_shortcut",
             "fascicle", "fascicle_shortcut",
             "advertiser", "advertiser_shortcut",

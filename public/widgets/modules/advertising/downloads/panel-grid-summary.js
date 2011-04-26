@@ -13,7 +13,7 @@ Inprint.advertising.downloads.Summary = Ext.extend(Ext.grid.GridPanel, {
             autoDestroy: true,
             url: _source("requests.summary"),
             baseParams: { fascicle: this.fascicle },
-            fields: [ "id", "shortcut", "edition", "edition_shortcut", "total", "check", "error", "ready", "anothers", "debt", "imposed" ]
+            fields: [ "id", "shortcut", "edition", "edition_shortcut", "total", "check", "error", "ready", "anothers", "imposed" ]
         });
 
         this.colModel = new Ext.grid.ColumnModel({
@@ -30,35 +30,45 @@ Inprint.advertising.downloads.Summary = Ext.extend(Ext.grid.GridPanel, {
                     header: _("Fascicle"),
                     dataIndex: "shortcut"
                 },
-
                 {   id:"total",
                     header: _("Total requests"),
-                    dataIndex: "total"
+                    scope:this,
+                    dataIndex: "total",
+                    renderer: function(v, p, r) {
+                        return String.format("<a id=\"total-{1}\" href=\"javascript:void(0);\">{0}</a>", r.get("total"), r.get("id"));
+                    }
                 },
-                {   id:"uploaded",
+                {   id:"check",
                     header: _("To check"),
-                    dataIndex: "check"
+                    dataIndex: "check",
+                    renderer: function(v, p, r) {
+                        return String.format("<a id=\"check-{1}\" href=\"javascript:void(0);\">{0}</a>", r.get("check"), r.get("id"));
+                    }
                 },
-                {   id:"updated",
+                {   id:"error",
                     header: _("With errors"),
-                    dataIndex: "error"
+                    dataIndex: "error",
+                    renderer: function(v, p, r) {
+                        return String.format("<a id=\"error-{1}\" href=\"javascript:void(0);\">{0}</a>", r.get("error"), r.get("id"));
+                    }
                 },
-                {   id:"mariage",
+                {   id:"ready",
                     header: _("Ready"),
-                    dataIndex: "ready"
+                    dataIndex: "ready",
+                    renderer: function(v, p, r) {
+                        return String.format("<a id=\"ready-{1}\" href=\"javascript:void(0);\">{0}</a>", r.get("ready"), r.get("id"));
+                    }
                 },
-
-                {   id:"foreign",
+                {   id:"imposed",
+                    header: _("Imposed"),
+                    dataIndex: "imposed",
+                    renderer: function(v, p, r) {
+                        return String.format("<a id=\"imposed-{1}\" href=\"javascript:void(0);\">{0}</a>", r.get("imposed"), r.get("id"));
+                    }
+                },
+                {   id:"anothers",
                     header: _("Another's"),
                     dataIndex: "anothers"
-                },
-                {   id:"debt",
-                    header: _("Debt"),
-                    dataIndex: "debt"
-                },
-                {   id:"maked",
-                    header: _("Imposed"),
-                    dataIndex: "imposed"
                 }
             ]
         });
@@ -76,6 +86,33 @@ Inprint.advertising.downloads.Summary = Ext.extend(Ext.grid.GridPanel, {
 
     onRender: function() {
         Inprint.advertising.downloads.Summary.superclass.onRender.apply(this, arguments);
+
+        this.on("rowclick", function(grid, ri, e) {
+
+                var filter;
+                var record = grid.getStore().getAt(ri);
+
+                if(e.within_el('total-'+record.get("id"))) {
+                    filter = "all";
+                }
+                if(e.within_el('check-'+record.get("id"))) {
+                    filter = "check";
+                }
+                if(e.within_el('error-'+record.get("id"))) {
+                    filter = "error";
+                }
+                if(e.within_el('ready-'+record.get("id"))) {
+                    filter = "ready";
+                }
+                if(e.within_el('imposed-'+record.get("id"))) {
+                    filter = "imposed";
+                }
+
+                if (filter) {
+                    this.parent.cmpShowRequests(record.get("id"), filter);
+                }
+
+            });
     },
 
     setFascicle: function(fascicle) {

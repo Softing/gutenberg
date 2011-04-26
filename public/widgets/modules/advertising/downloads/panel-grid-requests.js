@@ -26,6 +26,7 @@ Inprint.advertising.downloads.Requests = Ext.extend(Ext.grid.GridPanel, {
                 this.sm,
                 columns.serial,
                 columns.check,
+                columns.edition,
                 columns.advertiser,
                 columns.title,
                 columns.another,

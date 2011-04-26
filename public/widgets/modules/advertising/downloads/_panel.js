@@ -33,7 +33,7 @@ Inprint.advertising.downloads.Main = Ext.extend(Ext.Panel, {
 
         };
 
-        var tabs = new Ext.TabPanel({
+        this.tabs = new Ext.TabPanel({
             border:false,
             activeTab: 0,
             items:[
@@ -103,7 +103,7 @@ Inprint.advertising.downloads.Main = Ext.extend(Ext.Panel, {
                     layout: "fit",
                     border:false,
                     margins: "3 3 3 0",
-                    items: tabs
+                    items: this.tabs
                 }
 
             ]
@@ -116,6 +116,11 @@ Inprint.advertising.downloads.Main = Ext.extend(Ext.Panel, {
     onRender: function() {
         Inprint.advertising.downloads.Main.superclass.onRender.apply(this, arguments);
         Inprint.advertising.downloads.Interaction(this, this.panels);
+    },
+
+    cmpShowRequests: function(fascicle, filter) {
+        this.tabs.activate(1);
+        this.panels.requests.cmpLoad({ flt_fascicle:fascicle, flt_checked: filter });
     }
 
 });

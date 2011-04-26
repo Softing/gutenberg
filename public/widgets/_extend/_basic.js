@@ -42,3 +42,15 @@ Array.prototype.contains = function(obj) {
     }
     return false;
 };
+
+Ext.apply(Ext.EventObject, {
+    within_el:function(el) {
+        el = Ext.get(el);
+        if(!el)
+            return false;
+        var evt_xy = this.getXY();
+        var evt_x = evt_xy[0];
+        var evt_y = evt_xy[1];
+        return (evt_x > el.getLeft() && evt_x < el.getRight() && evt_y > el.getTop() && evt_y < el.getBottom());
+    }
+});

@@ -87,7 +87,7 @@ sub summary {
     unless (@errors) {
 
         my $fascicle = $c->Q("
-                SELECT t1.id, t1.shortcut, t2.id as edition_id, t2.shortcut as edition_shortcut
+                SELECT t1.id, t1.shortcut, t2.id as edition, t2.shortcut as edition_shortcut
                 FROM fascicles t1, editions t2
                 WHERE 1=1
                     AND t1.edition  = t2.id
@@ -97,7 +97,7 @@ sub summary {
                     AND t1.id=?", $i_fascicle )->Hash;
 
         my $children = $c->Q("
-                SELECT t1.id, t1.shortcut, t2.id as edition_id, t2.shortcut as edition_shortcut
+                SELECT t1.id, t1.shortcut, t2.id as edition, t2.shortcut as edition_shortcut
                 FROM fascicles t1, editions t2
                 WHERE 1=1
                     AND t1.edition  = t2.id
@@ -117,14 +117,12 @@ sub summary {
             my $error    = $c->Q(" SELECT count(*) FROM fascicles_requests WHERE fascicle=? AND check_status='error' ", $item->{id})->Value;
             my $ready    = $c->Q(" SELECT count(*) FROM fascicles_requests WHERE fascicle=? AND check_status='ready' ", $item->{id})->Value;
             my $anothers = $c->Q(" SELECT count(*) FROM fascicles_requests WHERE fascicle=? AND anothers_layout=true ", $item->{id})->Value;
-            my $debt     = $total - $check - $error;
-            my $imposed  = $c->Q(" SELECT count(*) FROM fascicles_requests WHERE fascicle=? AND imposed=true ", $item->{id})->Value;
+            my $imposed  = $c->Q(" SELECT count(*) FROM fascicles_requests WHERE fascicle=? AND check_status='imposed' ", $item->{id})->Value;
             $item->{total}    = $total;
             $item->{check}    = $check;
             $item->{error}    = $error;
             $item->{ready}    = $ready;
             $item->{anothers} = $anothers;
-            $item->{debt}     = $debt;
             $item->{imposed}  = $imposed;
         }
 
