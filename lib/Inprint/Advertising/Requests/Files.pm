@@ -27,7 +27,7 @@ sub list {
     unless (@errors) {
         my $folder = Inprint::Store::Embedded::getFolderPath($c, "requests", $request->{created}, $request->{id}, 1);
         Inprint::Store::Embedded::updateCache($c, $folder);
-        $result = Inprint::Store::Cache::getRecordsByPath($c, $folder, "all", ["tiff", "tif", "eps"]);
+        $result = Inprint::Store::Cache::getRecordsByPath($c, $folder, "all", [ "tiff", "tif", "eps", "pdf" ]);
     }
 
     $c->smart_render(\@errors, $result);

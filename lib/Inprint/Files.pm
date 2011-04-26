@@ -17,8 +17,6 @@ use LWP::UserAgent;
 use Image::Magick;
 use Digest::file qw(digest_file_hex);
 
-
-
 use base 'Mojolicious::Controller';
 
 sub view {
@@ -210,7 +208,6 @@ sub preview {
         $c->res->content->asset(Mojo::Asset::File->new(path => $thumbnailsSrc ));
         $c->render_static();
     }
-
     else {
         if (-r "$ENV{DOCUMENT_ROOT}/images/st.gif") {
             $c->tx->res->headers->content_type('image/gif');
@@ -295,18 +292,43 @@ sub _generatePreviewFile {
     $thumbnailFolder = __adaptPath($c, $thumbnailFolder);
     $thumbnailFile   = __adaptPath($c, $thumbnailFile);
 
-    if ( lc($filextenOriginal) ~~ [ "jpg", "jpeg", "png", "gif", "bmp", "tif", "tiff" ]) {
-        if (-w $thumbnailFolder) {
+    return unless (-w $thumbnailFolder);
+
+    if ( lc($filextenOriginal) ~~ [ "eps" ]) {
+
+        system "epstool --quiet --page-number 0 --dpi 300 --ignore-warnings --extract-preview \"$filepathOriginal\" \"$thumbnailFile\" ";
+
+        if (-r $thumbnailFile) {
             my $image = Image::Magick->new;
-            my $x = $image->Read($filepathOriginal);
+            my $x = $image->Read($thumbnailFile);
             warn "$x" if "$x";
+
             if ($size > 0) {
                 $x = $image->AdaptiveResize(geometry=>$size);
                 die "$x" if "$x";
+                $x = $image->Normalize();
+                die "$x" if "$x";
             }
+
             $x = $image->Write($thumbnailFile);
             die "$x" if "$x";
         }
+    }
+
+    if ( lc($filextenOriginal) ~~ [ "jpg", "jpeg", "png", "gif", "bmp", "tif", "tiff", "pdf" ]) {
+        my $image = Image::Magick->new;
+        my $x = $image->Read($filepathOriginal);
+        warn "$x" if "$x";
+
+        if ($size > 0) {
+            $x = $image->AdaptiveResize(geometry=>$size);
+            die "$x" if "$x";
+            $x = $image->Normalize();
+            die "$x" if "$x";
+        }
+
+        $x = $image->Write($thumbnailFile);
+        die "$x" if "$x";
     }
 
     if (lc($filextenOriginal) ~~ ['doc', 'docx', 'txt', 'rtf', 'odt', 'xls', 'xlsx', 'odp', 'ods' ]) {
@@ -323,29 +345,26 @@ sub _generatePreviewFile {
 
         # Crete thumbnail
 
-        if (-w $thumbnailFolder) {
+        if (-r $pdfPath) {
 
-            if (-r $pdfPath) {
+            my $image = Image::Magick->new;
+            my $x = $image->Read($pdfPath);
+            die "$x" if "$x";
 
-                my $image = Image::Magick->new;
-                my $x = $image->Read($pdfPath);
+            my $image2 = $image->[0];
+
+            $x = $image2->Normalize();
+            die "$x" if "$x";
+
+            if ($size > 0) {
+                $x = $image2->AdaptiveResize(geometry=>$size);
                 die "$x" if "$x";
-
-                my $image2 = $image->[0];
-
-                $x = $image2->Normalize();
-                die "$x" if "$x";
-
-                if ($size > 0) {
-                    $x = $image2->AdaptiveResize(geometry=>$size);
-                    die "$x" if "$x";
-                }
-
-                $x = $image2->Write($thumbnailFile );
-                die "$x" if "$x";
-
-                unlink $pdfPath;
             }
+
+            $x = $image2->Write($thumbnailFile );
+            die "$x" if "$x";
+
+            unlink $pdfPath;
         }
     }
 
