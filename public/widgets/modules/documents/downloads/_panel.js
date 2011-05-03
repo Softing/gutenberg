@@ -12,7 +12,7 @@ Inprint.documents.downloads.Main = Ext.extend(Ext.grid.GridPanel, {
             root: "data",
             autoLoad: true,
             baseParams: { pictures: true },
-            url: _url("/downloads/list/"),
+            url: _source("documents.downloads.list"),
             fields: [
                 "id", "downloaded",
                 "edition", "edition_shortcut",
@@ -65,21 +65,21 @@ Inprint.documents.downloads.Main = Ext.extend(Ext.grid.GridPanel, {
         this.tbar = [
 
             {
-                id: "save",
+                id: "download",
                 scope:this,
                 disabled: true,
-                ref: "../btnSave",
-                handler: this.cmpSave,
+                ref: "../btnDownload",
+                handler: this.cmpDownload,
                 cls: "x-btn-text-icon",
                 text: _("Get archive"),
                 icon: _ico("arrow-transition-090")
             },
             {
-                id: "savesafe",
+                id: "safedownload",
                 scope:this,
                 disabled: true,
-                ref: "../btnSaveSafe",
-                handler: this.cmpSaveSafe,
+                ref: "../btnSafeDownload",
+                handler: this.cmpSafeDownload,
                 cls: "x-btn-text-icon",
                 text: _("Safe download"),
                 icon: _ico("arrow-transition-090")
@@ -188,13 +188,13 @@ Inprint.documents.downloads.Main = Ext.extend(Ext.grid.GridPanel, {
         Inprint.documents.downloads.Main.superclass.onRender.apply(this, arguments);
 
         this.getSelectionModel().on("selectionchange", function(sm) {
-            sm.getCount() == 0 ? this.btnSave.disable() : this.btnSave.enable();
-            sm.getCount() == 0 ? this.btnSaveSafe.disable() : this.btnSaveSafe.enable();
+            sm.getCount() == 0 ? this.btnDownload.disable() : this.btnDownload.enable();
+            sm.getCount() == 0 ? this.btnSafeDownload.disable() : this.btnSafeDownload.enable();
         }, this);
 
     },
 
-    cmpSave: function (params) {
+    cmpDownload: function (params) {
 
         // generate a new unique id
         var frameid = Ext.id();
@@ -222,7 +222,7 @@ Inprint.documents.downloads.Main = Ext.extend(Ext.grid.GridPanel, {
         var form = Ext.DomHelper.append(document.body, {
             tag: "form",
             method: "post",
-            action: "/downloads/download/",
+            action: _source("documents.downloads.download"),
             target: frameid
         });
 
@@ -247,8 +247,8 @@ Inprint.documents.downloads.Main = Ext.extend(Ext.grid.GridPanel, {
         form.submit();
     },
 
-    cmpSaveSafe: function() {
-        this.cmpSave({
+    cmpSafeDownload: function() {
+        this.cmpDownload({
             translitEnabled: true
         });
     }

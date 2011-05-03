@@ -1061,9 +1061,9 @@ sub duplicate {
 
                 # Datastore
 
-                my $storePath    = $c->config->get("store.path");
-                my $old_path = Inprint::Utils::Files::ProcessFilePath($c, "$storePath/documents/$document->{filepath}");
-                my $new_path = Inprint::Utils::Files::ProcessFilePath($c, "$storePath/documents/$filepath");
+                my $storePath = $c->config->get("store.path");
+                my $old_path  = __FS_ProcessPath($c, "$storePath/documents/$document->{filepath}");
+                my $new_path  = __FS_ProcessPath($c, "$storePath/documents/$filepath");
 
                 if (-w $storePath) {
                     if (-r $old_path) {

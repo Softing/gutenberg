@@ -10,10 +10,7 @@ use warnings;
 
 use File::Copy::Recursive qw(fcopy rcopy dircopy fmove rmove dirmove);
 
-
-
 use Inprint::Utils;
-use Inprint::Utils::Files;
 
 use Inprint::Models::Tag;
 use Inprint::Models::Fascicle::Headline;
@@ -324,7 +321,7 @@ sub search {
         # Get files list
         my $folder = Inprint::Store::Embedded::getFolderPath($c, "documents", $document->{created}, $document->{copygroup}, 1);
         my $files  = Inprint::Store::Cache::getRecordsByPath($c, $folder, "all", [ 'doc', 'rtf', 'odt', 'txt' ]);
-        
+
         foreach my $file (@$files) {
             push @{ $document->{links} }, {
                 id => $file->{id},

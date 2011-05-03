@@ -8,8 +8,16 @@ package Inprint::Advertising::Requests::Files;
 use strict;
 use warnings;
 
+use POSIX;
 use Image::ExifTool qw(:Public);
 
+use Encode;
+use File::Path;
+use File::Basename;
+use File::stat;
+use Text::Unidecode;
+
+use Inprint::Utils::Files;
 use Inprint::Store::Embedded;
 
 use base 'Mojolicious::Controller';
@@ -44,15 +52,17 @@ sub list {
 
         my $info = ImageInfo($file_path);
 
-        $item->{cmwidth}       = 0;
-        $item->{cmheight}      = 0;
+        $item->{object}      = $request->{id};
+
+        $item->{cmwidth}     = 0;
+        $item->{cmheight}    = 0;
         $item->{imagesize}   = $info->{ImageSize}                   || "0x0";
         $item->{xunits}      = $info->{DisplayedUnitsX}             || "undef";
         $item->{yunits}      = $info->{DisplayedUnitsY}             || "undef";
         $item->{colormodel}  = $info->{PhotometricInterpretation}   || "";
         $item->{colorspace}  = $info->{ColorSpace}                  || "";
-        $item->{xresolution} = $info->{XResolution}                 || 0;
-        $item->{yresolution} = $info->{YResolution}                 || 0;
+        $item->{xresolution} = ceil $info->{XResolution}           || 0;
+        $item->{yresolution} = ceil $info->{YResolution}           || 0;
         $item->{software}    = $info->{Software}                    || "";
 
         $item->{cm_error} = $c->json->false;
@@ -76,19 +86,15 @@ sub list {
 
             # Calculate image size
             if ($info->{ImageWidth} > 0 && $info->{XResolution} > 0) {
-                $item->{cmwidth}  = $info->{ImageWidth} / $info->{XResolution};
+                $item->{cmwidth}  = $info->{ImageWidth} * 25.4 / $item->{xresolution};
             }
 
             if ($info->{ImageHeight} > 0 && $info->{YResolution} > 0) {
-                $item->{cmheight} = $info->{ImageHeight} / $info->{YResolution};
+                $item->{cmheight} = $info->{ImageHeight} * 25.4 / $item->{yresolution};
             }
 
-            if ($item->{cmwidth} > 0 && $item->{xunits} eq "inches") {
-                $item->{cmwidth} = sprintf("%.2f", $item->{cmwidth} * 2.5 * 100);
-            }
-            if ($item->{cmheight} > 0 && $item->{yunits} eq "inches") {
-                $item->{cmheight} = sprintf("%.2f", $item->{cmheight} * 2.5 * 100);
-            }
+            $item->{cmwidth}  = sprintf "%.0f", $item->{cmwidth};
+            $item->{cmheight} = sprintf "%.0f", $item->{cmheight};
 
         }
 
@@ -110,6 +116,8 @@ sub upload {
         my $upload = $c->req->upload("Filedata");
         my $folder = Inprint::Store::Embedded::getFolderPath($c, "requests", $request->{created}, $request->{id}, 1);
         Inprint::Store::Embedded::fileUpload($c, $folder, $upload);
+
+        $c->Do("UPDATE fascicles_requests SET check_status='check' WHERE id=?", [ $request->{id} ]);
     }
 
     $c->smart_render(\@errors);
@@ -202,6 +210,89 @@ sub delete {
     }
 
     $c->render_json({});
+}
+
+sub download {
+
+    my $c = shift;
+
+    my @errors;
+
+    my @i_files     = $c->param("file[]");
+    my $i_safemode  = $c->param("safemode");
+
+    my $temp        = $c->uuid;
+    my $rootPath    = $c->config->get("store.path");
+    my $tempPath    = "/tmp";
+    my $tempFolder  = "$tempPath/inprint-$temp";
+    my $tempArchive = "$tempPath/inprint-$temp.7z";
+
+    mkdir $tempFolder;
+
+    die "Can't create temporary folder $tempFolder" unless (-e -w $tempFolder);
+
+    my $fileListString;
+
+    my $currentMember = $c->getSessionValue("member.id");
+
+    foreach my $item (@i_files) {
+
+        my ($objectid, $fileid) = split "::", $item;
+
+        next unless ($fileid);
+        next unless ($objectid);
+
+        my $file   = $c->check_record(\@errors, "cache_files", "request", $fileid);
+        my $object = $c->check_record(\@errors, "fascicles_requests", "request", $objectid);
+
+        next unless ($file->{id});
+        next unless ($object->{id});
+
+        my $pathSource  = $rootPath   ."/". $file->{file_path}  ."/".  $file->{file_name};
+        my $pathSymlink = $tempFolder ."/". $object->{shortcut} ."__". $file->{file_name};
+
+        if ($i_safemode eq 'true') {
+            $pathSymlink = unidecode($pathSymlink);
+            $pathSymlink =~ s/[^\w|\d|\\|\/|\.|-]//g;
+            $pathSymlink =~ s/\s+/_/g;
+        }
+
+        $pathSource  = __FS_ProcessPath($c, $pathSource);
+        $pathSymlink = __FS_ProcessPath($c, $pathSymlink);
+
+        next unless (-e -r $pathSource);
+
+        symlink $pathSource, $pathSymlink;
+
+        die "Can't read symlink $pathSymlink" unless (-e -r $pathSymlink);
+
+        $fileListString .= ' "'. $pathSymlink .'" ';
+    }
+
+    __FS_CreateTempArchive($c, $tempArchive, $fileListString);
+
+    rmtree($tempFolder);
+
+    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+
+    $year += 1900; $mon++;
+
+    my $archname = "Downloads_for_${year}_${mon}_${mday}_${hour}${min}${sec}";
+
+    $c->res->content->asset(Mojo::Asset::File->new(path => $tempArchive));
+
+    my $headers = Mojo::Headers->new;
+    $headers->add("Content-Type", "application/x-7z-compressed;name=$archname.7z");
+    $headers->add("Content-Disposition", "attachment;filename=$archname.7z");
+    $headers->add("Content-Description", "7z");
+    $headers->add("Content-Length", -s $tempArchive);
+    $c->res->content->headers($headers);
+
+    $c->on_finish(sub {
+        unlink $tempArchive;
+    });
+
+    $c->render_static($tempArchive);
 }
 
 1;

@@ -129,14 +129,19 @@ sub startup {
 
     $sessionBridge->route("/advertising/requests/list/")        ->to("advertising-requests#list");
     $sessionBridge->route("/advertising/requests/summary/")     ->to("advertising-requests#summary");
+    $sessionBridge->route("/advertising/requests/download/")    ->to("advertising-requests#download");
     $sessionBridge->route("/advertising/requests/create/")      ->to("advertising-requests#create");
     $sessionBridge->route("/advertising/requests/read/")        ->to("advertising-requests#read");
     $sessionBridge->route("/advertising/requests/update/")      ->to("advertising-requests#update");
     $sessionBridge->route("/advertising/requests/delete/")      ->to("advertising-requests#delete");
     $sessionBridge->route("/advertising/requests/status/")      ->to("advertising-requests#status");
+    
+    $sessionBridge->route("/advertising/requests/comments/list/")       ->to("advertising-requests-comments#list");
+    $sessionBridge->route("/advertising/requests/comments/save/")       ->to("advertising-requests-comments#save");
 
     $sessionBridge->route("/advertising/requests/files/list/")          ->to("advertising-requests-files#list");
     $sessionBridge->route("/advertising/requests/files/upload/")        ->to("advertising-requests-files#upload");
+    $sessionBridge->route("/advertising/requests/files/download/")      ->to("advertising-requests-files#download");
     $sessionBridge->route("/advertising/requests/files/publish/")       ->to("advertising-requests-files#publish");
     $sessionBridge->route("/advertising/requests/files/unpublish/")     ->to("advertising-requests-files#unpublish");
     $sessionBridge->route("/advertising/requests/files/description/")   ->to("advertising-requests-files#description");
@@ -308,14 +313,11 @@ sub startup {
     $sessionBridge->route('/documents/filters/managers/')       ->to('documents-filters#managers');
     $sessionBridge->route('/documents/filters/progress/')       ->to('documents-filters#progress');
 
-    # Document profile
     $sessionBridge->route('/documents/profile/read/')           ->to('documents-profile#read');
 
-    # Document editor
     $sessionBridge->route('/documents/text/get/')               ->to('documents-text#get');
     $sessionBridge->route('/documents/text/set/')               ->to('documents-text#set');
 
-    # Document files
     $sessionBridge->route('/documents/files/list/')             ->to('documents-files#list');
     $sessionBridge->route('/documents/files/create/')           ->to('documents-files#create');
     $sessionBridge->route('/documents/files/upload/')           ->to('documents-files#upload');
@@ -326,9 +328,8 @@ sub startup {
     $sessionBridge->route('/documents/files/unpublish/')        ->to('documents-files#unpublish');
     $sessionBridge->route('/documents/files/description/')      ->to('documents-files#description');
 
-    # Downloads
-    $sessionBridge->route('/downloads/list/')                   ->to('downloads#list');
-    $sessionBridge->route('/downloads/download/')               ->to('downloads#download');
+    $sessionBridge->route('/documents/downloads/list/')         ->to('documents-downloads#list');
+    $sessionBridge->route('/documents/downloads/download/')     ->to('documents-downloads#download');
 
     # Fascicles routes
     $sessionBridge->route('/fascicle/seance/')                  ->to('fascicle#seance');

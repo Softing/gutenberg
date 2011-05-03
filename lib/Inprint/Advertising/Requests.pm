@@ -8,6 +8,14 @@ use utf8;
 use strict;
 use warnings;
 
+use Encode;
+use File::Path;
+use File::Basename;
+use File::stat;
+use Text::Unidecode;
+
+use Inprint::Utils::Files;
+use Inprint::Store::Embedded;
 use Inprint::Models::Fascicle::Request;
 
 use base 'Mojolicious::Controller';
@@ -474,6 +482,93 @@ sub move {
 
     $success = $c->json->true unless (@errors);
     $c->render_json({ success => $success, errors => \@errors });
+}
+
+sub download {
+
+    my $c = shift;
+
+    my @errors;
+
+    my @i_requests  = $c->param("request[]");
+    my $i_safemode  = $c->param("safemode");
+
+    my $temp        = $c->uuid;
+    my $rootPath    = $c->config->get("store.path");
+    my $tempPath    = "/tmp";
+    my $tempFolder  = "$tempPath/inprint-$temp";
+    my $tempArchive = "$tempPath/inprint-$temp.7z";
+
+    mkdir $tempFolder;
+
+    die "Can't create temporary folder $tempFolder" unless (-e -w $tempFolder);
+
+    my $fileListString;
+
+    my $currentMember = $c->getSessionValue("member.id");
+
+    foreach my $id (@i_requests) {
+
+        my $object = $c->check_record(\@errors, "fascicles_requests", "request", $id);
+        next unless ($object->{id});
+
+        my $folder = Inprint::Store::Embedded::getFolderPath($c, "requests", $object->{created}, $object->{id}, 1);
+
+        opendir(my $dh, $folder) || die "can't opendir $folder: $!";
+        my @files = readdir($dh);
+        closedir $dh;
+
+        foreach my $file_name (@files) {
+
+            my $file_ext = __FS_GetExtension($c, $file_name);
+            next unless $file_ext ~~ ["tif", "tiff", "eps", "pdf"];
+
+            my $pathSource  = $folder ."/".  $file_name;
+            my $pathSymlink = $tempFolder ."/". $object->{shortcut} ."__". $file_name;
+
+            if ($i_safemode eq 'true') {
+                $pathSymlink = unidecode($pathSymlink);
+                $pathSymlink =~ s/[^\w|\d|\\|\/|\.|-]//g;
+                $pathSymlink =~ s/\s+/_/g;
+            }
+
+            $pathSource  = __FS_ProcessPath($c, $pathSource);
+            $pathSymlink = __FS_ProcessPath($c, $pathSymlink);
+
+            next unless (-e -r $pathSource);
+
+            symlink $pathSource, $pathSymlink;
+
+            die "Can't read symlink $pathSymlink" unless (-e -r $pathSymlink);
+
+            $fileListString .= ' "'. $pathSymlink .'" ';
+        }
+    }
+
+    __FS_CreateTempArchive($c, $tempArchive, $fileListString);
+
+    rmtree($tempFolder);
+
+    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+
+    $year += 1900; $mon++;
+
+    my $archname = "Downloads_for_${year}_${mon}_${mday}_${hour}${min}${sec}";
+
+    $c->res->content->asset(Mojo::Asset::File->new(path => $tempArchive));
+
+    my $headers = Mojo::Headers->new;
+    $headers->add("Content-Type", "application/x-7z-compressed;name=$archname.7z");
+    $headers->add("Content-Disposition", "attachment;filename=$archname.7z");
+    $headers->add("Content-Description", "7z");
+    $headers->add("Content-Length", -s $tempArchive);
+    $c->res->content->headers($headers);
+
+    $c->on_finish(sub {
+        unlink $tempArchive;
+    });
+
+    $c->render_static($tempArchive);
 }
 
 sub delete {

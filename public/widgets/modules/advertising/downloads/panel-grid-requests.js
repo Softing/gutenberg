@@ -179,14 +179,14 @@ Inprint.advertising.downloads.Requests = Ext.extend(Ext.grid.GridPanel, {
                     cls: "x-btn-text-icon",
                     text: _("Download"),
                     scope:this,
-                    handler: this.cmpSave
+                    handler: this.cmpDownload
                 });
                 rowCtxMenuItems.push({
                     icon: _ico("arrow-transition-090"),
                     cls: "x-btn-text-icon",
                     text: _("Safe download"),
                     scope:this,
-                    handler: this.cmpSaveSafe
+                    handler: this.cmpSafeDownload
                 });
 
                 thisGrid.rowCtxMenu = new Ext.menu.Menu({
@@ -214,7 +214,7 @@ Inprint.advertising.downloads.Requests = Ext.extend(Ext.grid.GridPanel, {
         });
     },
 
-    cmpSave: function (params) {
+    cmpDownload: function (params) {
 
         // generate a new unique id
         var frameid = Ext.id();
@@ -242,7 +242,7 @@ Inprint.advertising.downloads.Requests = Ext.extend(Ext.grid.GridPanel, {
         var form = Ext.DomHelper.append(document.body, {
             tag: "form",
             method: "post",
-            action: "/downloads/download/",
+            action: _source("requests.download"),
             target: frameid
         });
 
@@ -257,8 +257,8 @@ Inprint.advertising.downloads.Requests = Ext.extend(Ext.grid.GridPanel, {
         Ext.each(this.getSelectionModel().getSelections(), function(record) {
             var hidden = document.createElement("input");
             hidden.type = "hidden";
-            hidden.name = "file[]";
-            hidden.value = record.get("document") +"::"+ record.get("id");
+            hidden.name = "request[]";
+            hidden.value = record.get("id");
             form.appendChild(hidden);
         });
 
@@ -267,8 +267,8 @@ Inprint.advertising.downloads.Requests = Ext.extend(Ext.grid.GridPanel, {
         form.submit();
     },
 
-    cmpSaveSafe: function() {
-        this.cmpSave({
+    cmpSafeDownload: function() {
+        this.cmpDownload({
             translitEnabled: true
         });
     }

@@ -28,6 +28,8 @@ Inprint.advertising.downloads.Main = Ext.extend(Ext.Panel, {
                 parent: this }),
 
             comments: new Inprint.panel.Comments({
+                urlList: _source("requests.comments.list"),
+                urlSave: _source("requests.comments.save"),
                 disabled: true,
                 parent: this })
 
@@ -79,7 +81,10 @@ Inprint.advertising.downloads.Main = Ext.extend(Ext.Panel, {
                                 }
                             ]
                         }
-                    ]
+                    ],
+                    cmpReload: function () {
+                        this.items.get(0).items.get(0).cmpReload();
+                    }
                 }
             ]
         });
@@ -121,6 +126,13 @@ Inprint.advertising.downloads.Main = Ext.extend(Ext.Panel, {
     cmpShowRequests: function(fascicle, filter) {
         this.tabs.activate(1);
         this.panels.requests.cmpLoad({ flt_fascicle:fascicle, flt_checked: filter });
+    },
+
+    cmpReload: function() {
+        var tab = this.tabs.getActiveTab();
+        if (tab && tab.cmpReload) {
+            tab.cmpReload();
+        }
     }
 
 });

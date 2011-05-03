@@ -32,13 +32,13 @@ Inprint.advertising.downloads.Interaction = function(parent, panels) {
         files.enable();
         files.setPkey(record.get("id"));
         files.btnUpload.enable();
-
-        comments.enable();
-        comments.btnSay.enable();
-
         files.cmpLoad({
             request: record.get("id")
             });
+
+        comments.enable();
+        comments.btnSay.enable();
+        comments.cmpLoad(record.get("id"));
 
     });
 

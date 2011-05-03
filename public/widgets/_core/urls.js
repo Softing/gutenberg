@@ -17,16 +17,19 @@ Inprint.sources = {
 
     "requests.list":                    "/advertising/requests/list/",
     "requests.summary":                 "/advertising/requests/summary/",
-
-    "requests.files.list":              "/advertising/requests/files/list/",
-    "requests.files.upload":            "/advertising/requests/files/upload/",
-    "requests.files.delete":            "/advertising/requests/files/delete/",
-
+    "requests.comments.list":           "/advertising/requests/comments/list/",
+    "requests.comments.save":           "/advertising/requests/comments/save/",
+    "requests.download":                "/advertising/requests/download/",
     "requests.create":                  "/advertising/requests/create/",
     "requests.read":                    "/advertising/requests/read/",
     "requests.update":                  "/advertising/requests/update/",
     "requests.delete":                  "/advertising/requests/delete/",
     "requests.status":                  "/advertising/requests/status/",
+
+    "requests.files.list":              "/advertising/requests/files/list/",
+    "requests.files.upload":            "/advertising/requests/files/upload/",
+    "requests.files.download":          "/advertising/requests/files/download/",
+    "requests.files.delete":            "/advertising/requests/files/delete/",
 
     "fascicle.list":                    "/calendar/list/",
     "fascicle.read":                    "/calendar/fascicle/read/",
@@ -44,6 +47,9 @@ Inprint.sources = {
     "attachment.create":                "/calendar/attachment/create/",
     "attachment.update":                "/calendar/attachment/update/",
     "attachment.delete":                "/calendar/attachment/delete/",
+
+    "documents.downloads.list":         "/documents/downloads/list/",
+    "documents.downloads.download":     "/documents/downloads/download/",
 
     "":""
 };
