@@ -66,17 +66,6 @@ sub clear {
                 ) ",
             [ $i_member, $i_section, $i_binding ]);
 
-        #$c->Do("
-        #    DELETE FROM cache_access WHERE
-        #        member=?
-        #        AND type=?
-        #        AND binding = ANY (
-        #            ARRAY(
-        #                SELECT id FROM $i_section WHERE path ~
-        #                ('*.' || replace(?, '-', '') || '.*')::lquery
-        #            )
-        #        ) ",
-        #    [ $i_member, $i_section, $i_binding ]);
     }
 
     $c->render_json( { success => $c->json->true } );
@@ -100,21 +89,17 @@ sub map {
 
         foreach my $string (@i_rules) {
 
-            my ($rule, $mode) = split "::", $string;
-            if ($rule && $mode) {
+            my ($ruleid, $area) = split "::", $string;
+            if ($ruleid && $area) {
+
+                my $rule = $c->Q("SELECT * FROM view_rules WHERE id=?", $ruleid)->Hash;
+
+                next unless $rule->{termkey};
 
                 $c->Do("
-                    INSERT INTO map_member_to_rule(member, section, binding, area, term )
-                        VALUES (?, ?, ?, ?, ?) ",
-                    [$i_member, $i_section, $i_binding, $mode, $rule]);
-
-                $c->Do("
-                    UPDATE map_member_to_rule set termkey =
-                        (   SELECT rules.section ||'.'|| rules.subsection ||'.'|| rules.term || ':' || mapper.area
-                            FROM map_member_to_rule as mapper, rules
-                            WHERE mapper.term = rules.id AND mapper.id = map_member_to_rule.id)
-
-                ");
+                    INSERT INTO map_member_to_rule(member, section, binding, area, term, termkey )
+                        VALUES (?, ?, ?, ?, ?, ?) ",
+                    [ $i_member, $i_section, $i_binding, $area, $ruleid, $rule->{termkey} . ":$area" ]);
 
             }
         }

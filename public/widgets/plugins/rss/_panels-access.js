@@ -7,10 +7,11 @@ Inprint.plugins.rss.Access = function(parent, panels) {
     grid.getSelectionModel().on("selectionchange", function(sm) {
 
         var records = grid.getSelectionModel().getSelections();
-        var access = _arrayAccessCheck(records, ['rss']);
+        var access = _arrayAccessCheck(records, ['manage']);
 
         _disable(grid.btnPublish, grid.btnUnpublish);
-        if (access.rss == 'enabled') {
+
+        if (access.manage == 'enabled') {
             _enable(grid.btnPublish, grid.btnUnpublish);
         }
 

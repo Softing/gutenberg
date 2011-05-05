@@ -99,7 +99,10 @@ sub feed {
             to_char(t1.updated, 'Dy, DD Mon YYYY HH:MI:SS +0300') as updated,
             t2.headline, t2, rubric, t2.author
         FROM plugins_rss.rss t1, documents t2
-        WHERE t2.id = t1.entity
+        WHERE 1=1
+            AND t2.id = t1.entity
+            AND t1.published = true
+            AND t2.fascicle <> '99999999-9999-9999-9999-999999999999'
     ";
 
     my @filters;
@@ -150,6 +153,8 @@ sub feed {
             my $files = Inprint::Store::Cache::getRecordsByPath($c, $folder, "all", [ "png","jpg","jpeg","gif","wmv","wma","mpeg","mp3" ]);
 
             foreach my $file (@$files) {
+
+                next unless $file->{published};
 
                 $rss_feed .= "\n";
                 my $fileurl  = "$siteurl/files/view/". $file->{id} .".". $file->{extension};

@@ -11,11 +11,12 @@ Inprint.plugins.rss.Interaction = function(parent, panels) {
     profile.panels.form.on("actioncomplete", function (form, action) {
         if (action.type == "submit") {
             this.getStore().reload();
-            new Ext.ux.Notification({
-                iconCls: 'event',
-                title: _("System event"),
-                html: _("Changes have been saved")
-            }).show(document);
+
+            AlertBox.show(
+                _("System event"),
+                _("Changes have been saved"),
+                'success', {timeout: 1});
+
         }
     }, grid);
 

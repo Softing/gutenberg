@@ -48,25 +48,37 @@ sub list {
         WHERE dcm.fascicle <> '99999999-9999-9999-9999-999999999999'
     ";
 
+    my $sql_filter;
+
+    # Set view restrictions
+    my $editions    = $c->objectBindings("editions.documents.work:*");
+    my $departments = $c->objectBindings("catalog.documents.view:*");
+
+    $sql_filter .= " AND ( ";
+    $sql_filter .= "    dcm.edition = ANY(?) ";
+    $sql_filter .= "    AND ";
+    $sql_filter .= "    dcm.workgroup = ANY(?) ";
+    $sql_filter .= " ) ";
+    push @params, $editions;
+    push @params, $departments;
+
     # Filters
 
     if ($i_filter eq "show-all") {
+
     }
 
     if ($i_filter eq "only-rss") {
-        $sql_query .= " AND rss.id is not null AND rss.published=true";
-        $sql_total .= " AND rss.id is not null AND rss.published=true";
+        $sql_filter .= " AND rss.id is not null AND rss.published=true";
     }
 
     if ($i_filter eq "without-rss") {
-        $sql_query .= " AND rss.id is null";
-        $sql_total .= " AND rss.id is null";
+        $sql_filter .= " AND rss.id is null";
     }
 
     if ($i_filter =~ m/^[a-z|0-9]{8}(-[a-z|0-9]{4}){3}-[a-z|0-9]{12}+$/) {
 
-        $sql_query .= " AND rss.id is not null AND rss.published=true";
-        $sql_total .= " AND rss.id is not null AND rss.published=true";
+        $sql_filter .= " AND rss.id is not null AND rss.published=true";
 
         my $index = $c->Q("
             SELECT tag, nature FROM plugins_rss.rss_feeds_mapping t1 WHERE feed=?
@@ -97,10 +109,12 @@ sub list {
         }
 
         if (@filters) {
-            $sql_query .= " AND ( ". join(" OR ", @filters) ." ) ";
-            $sql_total .= " AND ( ". join(" OR ", @filters) ." ) ";
+            $sql_filter .= " AND ( ". join(" OR ", @filters) ." ) ";
         }
     }
+
+    $sql_total .= $sql_filter;
+    $sql_query .= $sql_filter;
 
     # Get total
     my $total  = $c->Q($sql_total, \@params)->Value;
@@ -124,18 +138,15 @@ sub list {
 
     my $result = $c->Q($sql_query, \@params)->Hashes;
 
-
     foreach my $item (@$result) {
         $item->{access} = {
-            rss => $c->json->false,
+            manage => $c->json->false,
             upload => $c->json->false,
         };
         if ($item->{workgroup}) {
             if ( $c->check_access( \@errors, "catalog.documents.rss:*", $item->{workgroup})) {
-                $item->{access}->{rss} = $c->json->true;
-                if ($item->{id}) {
-                    $item->{access}->{upload} = $c->json->true;
-                }
+                $item->{access}->{manage} = $c->json->true;
+                $item->{access}->{upload} = $c->json->true if ($item->{id});
             }
         }
     }
@@ -164,14 +175,15 @@ sub read {
             [ $document->{id} ])->Hash;
 
         $result->{access} = {
-            rss => $c->json->false,
+            manage => $c->json->false,
             upload => $c->json->false,
         };
 
         if ($document->{workgroup} && $c->objectAccess("catalog.documents.rss:*", $document->{workgroup})) {
-            $result->{access}->{rss}    = $c->json->true;
+            $result->{access}->{manage} = $c->json->true;
             $result->{access}->{upload} = $c->json->true if ($result->{id});
         }
+
     }
 
     $c->smart_render(\@errors, $result);

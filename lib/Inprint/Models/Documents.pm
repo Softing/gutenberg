@@ -171,17 +171,16 @@ sub search {
     my $sql_filters = " ";
 
     # Set view restrictions
-    my $editions = $c->objectBindings("editions.documents.work:*");
+    my $editions    = $c->objectBindings("editions.documents.work:*");
     my $departments = $c->objectBindings("catalog.documents.view:*");
 
     $sql_filters .= " AND ( ";
     $sql_filters .= "    dcm.edition = ANY(?) ";
     $sql_filters .= "    AND ";
     $sql_filters .= "    dcm.workgroup = ANY(?) ";
+    $sql_filters .= " ) ";
     push @params, $editions;
     push @params, $departments;
-
-    $sql_filters .= " ) ";
 
     # Set Filters
 
