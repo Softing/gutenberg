@@ -95,7 +95,7 @@ sub feed {
 
     my @params; my $sql = "
         SELECT
-            t1.id, t1.entity, t1.sitelink, t1.title, t1.description, t1.fulltext, t1.published, t1.created,
+            t1.id, t1.entity, t1.sitelink, t1.title, t1.description, t1.fulltext, t1.published, t1.priority, t1.created,
             to_char(t1.updated, 'Dy, DD Mon YYYY HH:MI:SS +0300') as updated,
             t2.headline, t2, rubric, t2.author
         FROM plugins_rss.rss t1, documents t2
@@ -126,7 +126,7 @@ sub feed {
         $sql .= " AND ( ". join(" OR ", @filters) ." ) ";
     }
 
-    $sql .= " ORDER BY t1.priority DESC ";
+    $sql .= " ORDER BY t1.priority::integer DESC ";
 
     my $rss_data = $c->Q($sql, \@params)->Hashes;
 

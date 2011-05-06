@@ -8,8 +8,6 @@ package Inprint::Plugins::Rss::Control;
 use strict;
 use warnings;
 
-
-
 use base 'Mojolicious::Controller';
 
 sub tree {
@@ -189,7 +187,6 @@ sub update {
     $c->check_url(  \@errors, "url", $i_url);
     $c->check_text( \@errors, "title", $i_title);
     $c->check_text( \@errors, "description", $i_description, 1);
-    #$c->check_access( \@errors,  "");
 
     push @errors, { id => "id", msg => "Incorrectly filled field"}
         if ($i_id eq "00000000-0000-0000-0000-000000000000");

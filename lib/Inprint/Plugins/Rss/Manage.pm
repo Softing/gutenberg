@@ -8,8 +8,6 @@ package Inprint::Plugins::Rss::Manage;
 use strict;
 use warnings;
 
-
-
 use base 'Mojolicious::Controller';
 
 sub list {
@@ -78,7 +76,8 @@ sub list {
 
     if ($i_filter =~ m/^[a-z|0-9]{8}(-[a-z|0-9]{4}){3}-[a-z|0-9]{12}+$/) {
 
-        $sql_filter .= " AND rss.id is not null AND rss.published=true";
+        #$sql_filter .= " AND rss.id is not null ";
+        #$sql_filter .= " AND rss.published=true ";
 
         my $index = $c->Q("
             SELECT tag, nature FROM plugins_rss.rss_feeds_mapping t1 WHERE feed=?
@@ -207,7 +206,7 @@ sub update {
 
     unless (@errors) {
 
-        my $enabled; $i_published eq "on" ? $enabled = 1 : $enabled = 0;
+        my $enabled; $i_published eq "on" ? $enabled = 1 : $enabled = 1;
 
         # Get record
         my $record = $c->Q("
@@ -221,10 +220,10 @@ sub update {
         if ($record->{id}) {
             $c->Do("
                 UPDATE plugins_rss.rss
-                    SET sitelink=?, title=?, description=?, fulltext=?,  published=?,
+                    SET sitelink=?, title=?, description=?, fulltext=?,
                         updated=now()
                     WHERE id=?; ",
-                [ $i_link, $i_title, $i_description, $i_fulltext, $enabled, $record->{id} ]);
+                [ $i_link, $i_title, $i_description, $i_fulltext, $record->{id} ]);
         }
 
         # Create record
@@ -232,9 +231,9 @@ sub update {
             $c->Do("
                 INSERT
                     INTO plugins_rss.rss (id, entity, sitelink, title, description, fulltext,
-                        published, created,  updated)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, now(), now()); ",
-                [ $c->uuid, $document->{id}, $i_link, $i_title, $i_description, $i_fulltext, $enabled ]);
+                        created,  updated)
+                    VALUES (?, ?, ?, ?, ?, ?, now(), now()); ",
+                [ $c->uuid, $document->{id}, $i_link, $i_title, $i_description, $i_fulltext ]);
         }
     }
 
