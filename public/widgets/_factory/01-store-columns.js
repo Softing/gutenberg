@@ -215,28 +215,28 @@ Inprint.store.Columns = {
 
     tfascicle: {
         // Fascicle templates
-        templates_pages: [
+        pages: [
             "id",
             "fascicle", "title", "shortcut", "description", "w", "h",
             { name: "created", type: "date", dateFormat: "c" },
             { name: "updated", type: "date", dateFormat: "c" }
         ],
 
-        templates_modules: [
+        modules: [
             "id",
             "fascicle", "page", "place", "place_title", "title", "description", "amount", "area", "x", "y", "w", "h",
             { name: "created", type: "date", dateFormat: "c" },
             { name: "updated", type: "date", dateFormat: "c" }
         ],
 
-        templates_index_headlines: [
+        index_headlines: [
             "id",
             "selected", "title", "shortcut", "description",
             { name: "created", type: "date", dateFormat: "c" },
             { name: "updated", type: "date", dateFormat: "c" }
         ],
 
-        templates_index_modules: [
+        index_modules: [
             "id",
             "selected", "title", "shortcut", "description", "page", "page_shortcut", "amount", "area", "x", "y", "w", "h",
             { name: "created", type: "date", dateFormat: "c" },
