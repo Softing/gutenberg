@@ -114,3 +114,5 @@ INSERT INTO map_member_to_rule VALUES ('57f60583-1fb6-4e4f-8c16-4b3c13c7500d', '
 INSERT INTO map_member_to_rule VALUES ('d1c6f391-2ede-403c-8dc9-af5987993645', '39d40812-fc54-4342-9b98-e1c1f4222d22', 'catalog',  'member',  '00000000-0000-0000-0000-000000000000', 'b7adafe9-2d5b-44f3-aa87-681fd48466fa');
 INSERT INTO map_member_to_rule VALUES ('66c7862c-1e65-4042-abad-bfbf52d60225', '39d40812-fc54-4342-9b98-e1c1f4222d22', 'catalog',  'member',  '00000000-0000-0000-0000-000000000000', '6d590a90-58a1-447f-b5ad-e3c62f80a2ef');
 INSERT INTO map_member_to_rule VALUES ('4c134f39-ebbb-4fd4-99cf-522ca5fc38b2', '39d40812-fc54-4342-9b98-e1c1f4222d22', 'catalog',  'member',  '00000000-0000-0000-0000-000000000000', '6d590a90-58a1-447f-b5ad-b0582b64571a');
+
+UPDATE map_member_to_rule SET termkey = ( SELECT termkey FROM view_rules WHERE view_rules.id = map_member_to_rule.term) || ':' || area;
