@@ -40,6 +40,13 @@ sub list {
         $result = Inprint::Store::Cache::getRecordsByPath($c, $folder, "all", [ "tiff", "tif", "eps", "pdf" ]);
     }
 
+    my $module = {};
+    unless (@errors) {
+        if ($request->{module}) {
+            $module = $c->Q(" SELECT * FROM fascicles_modules WHERE id=? ", $request->{module})->Hash;
+        }
+    }
+
     my $rootpath = $c->config->get("store.path");
 
     foreach my $item (@$result) {
@@ -65,8 +72,9 @@ sub list {
         $item->{yresolution} = ceil $info->{YResolution}           || 0;
         $item->{software}    = $info->{Software}                    || "";
 
-        $item->{cm_error} = $c->json->false;
-        $item->{dpi_error} = $c->json->false;
+        $item->{size_error}  = $c->json->false;
+        $item->{cm_error}    = $c->json->false;
+        $item->{dpi_error}   = $c->json->false;
 
         if ( lc($info->{FileType}) ~~ ["tif", "tiff"]) {
 
@@ -95,6 +103,23 @@ sub list {
 
             $item->{cmwidth}  = sprintf "%.0f", $item->{cmwidth};
             $item->{cmheight} = sprintf "%.0f", $item->{cmheight};
+
+            #Check image size
+            if ($module && $module->{width}) {
+                if ($module->{width} > $item->{cmwidth} + 5 || $module->{width} < $item->{cmwidth} - 5) {
+                    if ($module->{fwidth} > $item->{cmwidth} + 5 || $module->{fwidth} < $item->{cmwidth} - 5) {
+                        $item->{size_error} = $c->json->true;
+                    }
+                }
+            }
+
+            if ($module && $module->{height}) {
+                if ($module->{height} > $item->{cmheight} + 5 || $module->{height} < $item->{cmheight} - 5) {
+                    if ($module->{fheight} > $item->{cmheight} + 5 || $module->{fheight} < $item->{cmheight} - 5) {
+                        $item->{size_error} = $c->json->true;
+                    }
+                }
+            }
 
         }
 

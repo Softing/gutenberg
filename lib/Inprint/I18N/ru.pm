@@ -128,11 +128,11 @@ our %Lexicon = (
     "Annual number"
  => "Годовой номер",
 
-    "Another employee %1 captured this issue!"
- => "Сотрудник %1 захватил этот выпуск!",
-
     "Another"
  => "Чужой",
+
+    "Another employee %1 captured this issue!"
+ => "Сотрудник %1 захватил этот выпуск!",
 
     "Another's"
  => "Чужие",
@@ -342,6 +342,9 @@ our %Lexicon = (
  => "",
 
     "Creating a new module"
+ => "",
+
+    "DPI"
  => "",
 
     "Date"
@@ -606,10 +609,10 @@ our %Lexicon = (
  => "",
 
     "Float height"
- => "",
+ => "Плавающая высота",
 
     "Float width"
- => "",
+ => "Плавающая длина",
 
     "Format"
  => "Форматировать",
@@ -654,7 +657,7 @@ our %Lexicon = (
  => "Разделы",
 
     "Height"
- => "",
+ => "Высота",
 
     "Help"
  => "Справка",
@@ -769,6 +772,9 @@ our %Lexicon = (
 
     "Make template"
  => "Создать шаблон",
+
+    "Management"
+ => "",
 
     "Manager"
  => "Редактор",
@@ -1037,6 +1043,9 @@ our %Lexicon = (
     "Reset"
  => "",
 
+    "Resolution"
+ => "",
+
     "Restore"
  => "Восстановить",
 
@@ -1299,7 +1308,7 @@ our %Lexicon = (
  => "",
 
     "Width"
- => "",
+ => "Длина",
 
     "With error"
  => "",

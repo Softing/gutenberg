@@ -24,7 +24,7 @@ Inprint.store.Columns = {
             "id",
             "edition", "page",
             "title", "shortcut", "description",
-            "width", "height", "width_float", "height_float",
+            "width", "height", "fwidth", "fheight",
             "amount", "area", "x", "y", "w", "h",
             { name: "created", type: "date", dateFormat: "c" },
             { name: "updated", type: "date", dateFormat: "c" }
@@ -43,8 +43,9 @@ Inprint.store.Columns = {
             "fascicle", "fascicle_shortcut",
             "advertiser", "advertiser_shortcut",
             "place", "place_shortcut",
+            "module", "module_shortcut",
             "manager", "manager_shortcut",
-            "x", "y", "h", "w", "seqnum",
+            "x", "y", "h", "w", "seqnum", "pages",
             "check_status", "anothers_layout", "imposed",
             { name: "created", type: "date", dateFormat: "c" },
             { name: "updated", type: "date", dateFormat: "c" }
@@ -184,11 +185,13 @@ Inprint.store.Columns = {
         modules: [
             "id",
             "fascicle", "page", "place", "place_title",
-            "title", "description", "amount", "area", "x", "y", "w", "h",
+            "title", "description",
+            "amount", "area",
+            "x", "y", "w", "h",
+            "width", "height", "fwidth", "fheight",
             { name: "created", type: "date", dateFormat: "c" },
             { name: "updated", type: "date", dateFormat: "c" }
         ],
-
 
         requests: [
                 "id",
@@ -213,8 +216,9 @@ Inprint.store.Columns = {
 
     },
 
+    // Fascicle templates
     tfascicle: {
-        // Fascicle templates
+
         pages: [
             "id",
             "fascicle", "title", "shortcut", "description", "w", "h",
@@ -224,7 +228,11 @@ Inprint.store.Columns = {
 
         modules: [
             "id",
-            "fascicle", "page", "place", "place_title", "title", "description", "amount", "area", "x", "y", "w", "h",
+            "fascicle", "page", "place", "place_title",
+            "title", "description",
+            "amount", "area",
+            "x", "y", "w", "h",
+            "width", "height", "fwidth", "fheight",
             { name: "created", type: "date", dateFormat: "c" },
             { name: "updated", type: "date", dateFormat: "c" }
         ],

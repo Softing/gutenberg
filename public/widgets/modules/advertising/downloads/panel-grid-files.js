@@ -11,7 +11,7 @@ Inprint.advertising.downloads.Files = Ext.extend(Ext.grid.GridPanel, {
                 "id", "object", "name", "description", "mime", "extension",
                 "cmwidth", "cmheight", "imagesize", "xunits", "yunits",
                 "colormodel", "colorspace", "xresolution", "yresolution", "software",
-                "cm_error", "dpi_error",
+                "cm_error", "dpi_error", "size_error",
                 "published", "size", "length",
                 { name: "created", type: "date", dateFormat: "c" },
                 { name: "updated", type: "date", dateFormat: "c" }
@@ -49,8 +49,13 @@ Inprint.advertising.downloads.Files = Ext.extend(Ext.grid.GridPanel, {
                     } },
 
                 { id:"imagesize", width: 80, header: _("Size"), dataIndex: "imagesize", renderer: function(v, p, r) {
-                        return String.format('{0}x{1} mm', r.get("cmwidth"), r.get("cmheight"));
+                        var string = "{0}x{1}";
+                        if (r.get("size_error")) {
+                            string = "<span style=\"color:red;\">{0}x{1}</span>";
+                        }
+                        return String.format(string, r.get("cmwidth"), r.get("cmheight") );
                     } },
+
                 { id:"resolution", width:80,  header: _("Resolution"), dataIndex: "imagesize" },
 
 

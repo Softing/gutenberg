@@ -25,7 +25,13 @@ sub read {
 
     unless (@errors) {
         $result = $c->Q("
-            SELECT id, edition, page, title, description, amount, area, x, y, w, h, created, updated
+            SELECT
+                id, edition, page,
+                title, description,
+                amount, area,
+                x, y, w, h,
+                width, height, fwidth, fheight,
+                created, updated
             FROM ad_modules
             WHERE id=?;
         ", [ $i_id ])->Hash;
@@ -69,7 +75,13 @@ sub list {
 
     unless (@errors) {
         $sql = "
-            SELECT id, edition, page, title, description, amount, round(area::numeric, 2) as area, x, y, w, h, created, updated
+            SELECT
+                id, edition, page,
+                title, description,
+                amount, round(area::numeric, 2) as area,
+                x, y, w, h,
+                width, height, fwidth, fheight,
+                created, updated
             FROM ad_modules
             WHERE page=?
             ORDER BY title
@@ -98,13 +110,17 @@ sub create {
     my $i_title       = $c->param("title");
     my $i_description = $c->param("description");
 
-    my $i_amount      = $c->param("amount") // 1;
+    my $i_amount      = $c->param("amount")  // 1;
 
-    my $i_x           = $c->param("x") // "1/1";
-    my $i_y           = $c->param("y") // "1/1";
+    my $i_x           = $c->param("x")       // "1/1";
+    my $i_y           = $c->param("y")       // "1/1";
+    my $i_w           = $c->param("w")       // "1/1";
+    my $i_h           = $c->param("h")       // "1/1";
 
-    my $i_w           = $c->param("w") // "1/1";
-    my $i_h           = $c->param("h") // "1/1";
+    my $i_width       = $c->param("width")   // 0;
+    my $i_height      = $c->param("height")  // 0;
+    my $i_fwidth      = $c->param("fwidth")  // 0;
+    my $i_fheight     = $c->param("fheight") // 0;
 
     my @errors;
     my $success = $c->json->false;
@@ -167,12 +183,20 @@ sub create {
 
     unless (@errors) {
         $c->Do("
-            INSERT INTO ad_modules(id, edition, page, title, description, amount, area, x, y, w, h, created, updated)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
+            INSERT INTO ad_modules
+                (
+                    id, edition, page,
+                    title, description,
+                    amount, area,
+                    x, y, w, h,
+                    width, height, fwidth, fheight,
+                    created, updated)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
         ", [
             $id, $edition->{id}, $page->{id},
             $i_title, $i_description,
-            $i_amount, $area, $i_x, $i_y, $i_w, $i_h
+            $i_amount, $area, $i_x, $i_y, $i_w, $i_h,
+            $i_width, $i_height, $i_fwidth, $i_fheight
         ]);
     }
 
@@ -187,13 +211,17 @@ sub update {
     my $i_title       = $c->param("title");
     my $i_description = $c->param("description");
 
-    my $i_amount      = $c->param("amount") // 1;
+    my $i_amount      = $c->param("amount")  // 1;
 
-    my $i_x           = $c->param("x") // "1/1";
-    my $i_y           = $c->param("y") // "1/1";
+    my $i_x           = $c->param("x")       // "1/1";
+    my $i_y           = $c->param("y")       // "1/1";
+    my $i_w           = $c->param("w")       // "1/1";
+    my $i_h           = $c->param("h")       // "1/1";
 
-    my $i_w           = $c->param("w") // "1/1";
-    my $i_h           = $c->param("h") // "1/1";
+    my $i_width       = $c->param("width")   // 0;
+    my $i_height      = $c->param("height")  // 0;
+    my $i_fwidth      = $c->param("fwidth")  // 0;
+    my $i_fheight     = $c->param("fheight") // 0;
 
     my @errors;
     my $success = $c->json->false;
@@ -247,10 +275,19 @@ sub update {
 
     unless (@errors) {
         $c->Do("
-            UPDATE ad_modules
-                SET title=?, description=?, amount=?, area=?, x=?, y=?, w=?, h=?, updated=now()
+            UPDATE ad_modules SET
+                title=?, description=?,
+                amount=?, area=?,
+                x=?, y=?, w=?, h=?,
+                width=?, height=?, fwidth=?, fheight=?,
+                updated=now()
             WHERE id =?;
-        ", [ $i_title, $i_description, $i_amount, $area, $i_x, $i_y, $i_w, $i_h, $i_id ]);
+        ", [
+                $i_title, $i_description,
+                $i_amount, $area,
+                $i_x, $i_y, $i_w, $i_h,
+                $i_width, $i_height, $i_fwidth, $i_fheight,
+                $i_id ]);
     }
 
     $success = $c->json->true unless (@errors);

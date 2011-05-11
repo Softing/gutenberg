@@ -19,6 +19,7 @@ apt-get -y install libtext-unidecode-perl
 apt-get -y install libtest-mockmodule-perl
 apt-get -y install libwww-perl
 apt-get -y install libyaml-perl
+apt-get -y install libimage-exiftool-perl
 
 apt-get -y install apache2
 apt-get -y install ghostscript

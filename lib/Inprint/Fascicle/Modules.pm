@@ -145,8 +145,12 @@ sub create {
             SELECT
                 t1.id,
                 t2.place as place,
-                t1.origin, t1.fascicle, t1.page, t1.title, t1.description,
-                t1.amount, t1.area, t1.x, t1.y, t1.w, t1.h, t1.created, t1.updated
+                t1.origin, t1.fascicle, t1.page,
+                t1.title, t1.description,
+                t1.amount, t1.area,
+                t1.x, t1.y, t1.w, t1.h,
+                t1.width, t1.height, t1.fwidth, t1.fheight,
+                t1.created, t1.updated
             FROM fascicles_tmpl_modules t1, fascicles_tmpl_index t2
             WHERE t1.id=t2.entity AND t2.id=?
         ", [ $map ])->Hash;
@@ -186,14 +190,22 @@ sub create {
             my $module_id = $c->uuid;
 
             $c->Do("
-                INSERT INTO fascicles_modules(id, edition, fascicle, place, origin, title, description, amount, area, w, h,  created, updated)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
+                INSERT INTO fascicles_modules
+                    (
+                        id, edition, fascicle, place, origin,
+                        title, description,
+                        amount, area,
+                        w, h,
+                        width, height, fwidth, fheight,
+                        created, updated)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
             ", [
                 $module_id, $fascicle->{edition}, $fascicle->{id},
                 $module->{place},
                 $module->{id}, $module->{title}, $module->{description},
                 $module->{amount}, $module->{area},
-                $module->{w}, $module->{h}
+                $module->{w}, $module->{h},
+                $module->{width}, $module->{height}, $module->{fwidth}, $module->{fheight}
             ]);
 
             foreach my $page (@pages) {

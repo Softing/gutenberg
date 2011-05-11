@@ -89,18 +89,36 @@ sub copyFromDefaults {
         ", [ $page_id, $page->{id}, $id, $page->{title}, $page->{description}, $page->{bydefault}, $page->{w}, $page->{h} ]);
 
         my $tmpl_modules = $c->Q("
-            SELECT id, edition, page, title, description, amount, area, x, y, w, h, created, updated
+            SELECT
+                id, edition, page,
+                title, description,
+                amount, area,
+                x, y, w, h,
+                width, height, fwidth, fheight,
+                created, updated
             FROM ad_modules WHERE page=? ", [ $page->{id} ])->Hashes;
 
-        foreach my $module (@$tmpl_modules) {
+        foreach my $tmpl_module (@$tmpl_modules) {
 
             my $module_id = $c->uuid();
-            $cache{ $module->{id} } = $module_id;
+            $cache{ $tmpl_module->{id} } = $module_id;
 
             $c->Do("
-                INSERT INTO fascicles_tmpl_modules(id, origin, fascicle, page, title, description, amount, area, x, y, w, h, created, updated)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
-            ", [ $module_id, $module->{id},  $id, $page_id, $module->{title}, $module->{description}, $module->{amount}, $module->{area}, $module->{x}, $module->{y}, $module->{w}, $module->{h} ]);
+                INSERT INTO fascicles_tmpl_modules
+                    (
+                        id, origin, fascicle, page,
+                        title, description,
+                        amount, area,
+                        x, y, w, h,
+                        width, height, fwidth, fheight,
+                        created, updated)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now()); ",
+                [
+                    $module_id, $tmpl_module->{id}, $id, $page_id,
+                    $tmpl_module->{title}, $tmpl_module->{description},
+                    $tmpl_module->{amount}, $tmpl_module->{area},
+                    $tmpl_module->{x}, $tmpl_module->{y}, $tmpl_module->{w}, $tmpl_module->{h},
+                    $tmpl_module->{width}, $tmpl_module->{height}, $tmpl_module->{fwidth}, $tmpl_module->{fheight} ]);
 
         }
 
@@ -325,7 +343,13 @@ sub copyFascicleTemplates {
         # Get module templates
 
         my $src_modules = $c->Q("
-                SELECT id, page, title, description, amount, area, x, y, w, h, created, updated
+                SELECT
+                    id, page,
+                    title, description,
+                    amount, area,
+                    x, y, w, h,
+                    width, height, fwidth, fheight,
+                    created, updated
                 FROM fascicles_tmpl_modules
                 WHERE fascicle=? AND page=? ",
             [ $source->{id}, $src_pages->{id} ])->Hashes;
@@ -339,11 +363,19 @@ sub copyFascicleTemplates {
 
             $c->Do("
                 INSERT INTO fascicles_tmpl_modules
-                    (id, fascicle, origin, page, title, description, amount, area, x, y, w, h, created, updated)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now()); ",
+                    (
+                        id, fascicle, origin, page,
+                        title, description,
+                        amount, area,
+                        x, y, w, h,
+                        created, updated)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now()); ",
                 [
                     $module_id, $destination->{id}, $src_module->{id}, $page_id,
-                    $src_module->{title}, $src_module->{description}, $src_module->{amount}, $src_module->{area}, $src_module->{x}, $src_module->{y}, $src_module->{w}, $src_module->{h} ]);
+                    $src_module->{title}, $src_module->{description},
+                    $src_module->{amount}, $src_module->{area},
+                    $src_module->{x}, $src_module->{y}, $src_module->{w}, $src_module->{h},
+                    $src_module->{width}, $src_module->{height}, $src_module->{fwidth}, $src_module->{fheight} ]);
 
         }
 

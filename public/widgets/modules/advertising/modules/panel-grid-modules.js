@@ -53,13 +53,13 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
                 id:"float_width",
                 header: _("Float width"),
                 sortable: true,
-                dataIndex: "width_float"
+                dataIndex: "fwidth"
             },
             {
                 id:"float_height",
                 header: _("Float height"),
                 sortable: true,
-                dataIndex: "height_float"
+                dataIndex: "fheight"
             },
 
             {
@@ -261,36 +261,32 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
             {
                 xtype: "numberfield",
                 value: 0,
-                minValue: 1,
+                minValue: 0,
                 name: "width",
-                allowBlank:true,
                 allowDecimals:true,
                 fieldLabel: _("Width")
             },
             {
                 xtype: "numberfield",
                 value: 0,
-                minValue: 1,
+                minValue: 0,
                 name: "height",
-                allowBlank:true,
                 allowDecimals:true,
                 fieldLabel: _("Height")
             },
             {
                 xtype: "numberfield",
                 value: 0,
-                minValue: 1,
-                name: "floatwidth",
-                allowBlank:true,
+                minValue: 0,
+                name: "fwidth",
                 allowDecimals:true,
                 fieldLabel: _("Float width")
             },
             {
                 xtype: "numberfield",
                 value: 0,
-                minValue: 1,
-                name: "floatheight",
-                allowBlank:true,
+                minValue: 0,
+                name: "fheight",
                 allowDecimals:true,
                 fieldLabel: _("Float height")
             },
