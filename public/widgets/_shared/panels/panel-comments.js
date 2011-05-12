@@ -37,6 +37,7 @@ Inprint.panel.Comments = Ext.extend(Ext.Panel, {
         ];
 
         Ext.apply(this, {
+            autoScroll:true,
             border: false,
             items: {
                 border:false,

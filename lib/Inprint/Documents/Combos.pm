@@ -107,6 +107,8 @@ sub fascicles {
                 WHERE
                     t1.edition = t2.id
                     AND t1.enabled = true
+                    AND t1.deleted = false
+                    AND t1.archived = false
                     AND t1.id <> '99999999-9999-9999-9999-999999999999'
                     AND t1.id <> '00000000-0000-0000-0000-000000000000'
         ";
