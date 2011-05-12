@@ -13,35 +13,11 @@ Inprint.catalog.editions.Context = function(parent, panels) {
             disabled = false;
         }
 
-        items.push({
-            icon: _ico("blue-folder--plus"),
-            cls: "x-btn-text-icon",
-            text: _("Create"),
-            disabled: disabled,
-            ref: "../btnCreate",
-            scope:this,
-            handler: function() { this.cmpCreate(node); }
-        });
+        items.push( Inprint.getAction("edition.create", this, { disabled: disabled }) );
 
         if (node.id != NULLID) {
-            items.push({
-                icon: _ico("blue-folder--pencil"),
-                cls: "x-btn-text-icon",
-                text: _("Edit"),
-                disabled: disabled,
-                ref: "../btnEdit",
-                scope:this,
-                handler: function() { this.cmpUpdate(node); }
-            });
-            items.push({
-                icon: _ico("blue-folder--minus"),
-                cls: "x-btn-text-icon",
-                text: _("Remove"),
-                disabled: disabled,
-                ref: "../btnRemove",
-                scope:this,
-                handler: function() { this.cmpDelete(node); }
-            });
+            items.push( Inprint.getAction("edition.update", this, { disabled: disabled }) );
+            items.push( Inprint.getAction("edition.delete", this, { disabled: disabled }) );
         }
 
         items.push('-', {

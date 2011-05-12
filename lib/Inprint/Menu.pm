@@ -198,6 +198,10 @@ sub index
         #push @{ $SettingsSection->{menu} }, { id => "settings-roles" };
         push @{ $SettingsSection->{menu} }, { id => "settings-readiness" };
         push @{ $SettingsSection->{menu} }, { id => "settings-index" };
+
+        push @{ $SettingsSection->{menu} }, "-";
+        push @{ $SettingsSection->{menu} }, { id => "system-settings" };
+        push @{ $SettingsSection->{menu} }, { id => "system-logs" };
     }
 
     ############################################################################

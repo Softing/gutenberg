@@ -1,85 +1,63 @@
-Inprint.system.logs.Panel = Ext.extend(Ext.grid.GridPanel, {
+Inprint.system.logs.Main = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
 
-        this.store = Inprint.factory.Store.json("/system/logservice/");
+        this.panels = {
+            tree: new Inprint.panel.tree.Editions(),
+            grid: new Inprint.system.logs.Grid(),
+            help: new Inprint.panels.Help({ hid: this.xtype })
+        };
 
         Ext.apply(this, {
-            stripeRows: true,
-            autoExpandColumn: 'message',
-            columns: [
-                {   id:'edition',
-                    header: _("Edition"),
-                    width: 160,
-                    dataIndex: 'edition',
-                    renderer: function(value) {
-                        if (value === null) {
-                            return _("Not defined");
-                        }
-                        return value;
-                    }
-                },
-                {   id:'initiator',
-                    header: _("Employee"),
-                    width: 160,
-                    dataIndex: 'initiator',
-                    renderer: function(value) {
-                        if (value === null) {
-                            return _("Not defined");
-                        }
-                        return value;
-                    }
-                },
 
-                {   id:'group',
-                    header: _("Event type"),
-                    width: 160,
-                    dataIndex: 'event'
-                },
+            layout: "border",
 
-                {   id:'date',
-                    header: _("Record date"),
-                    width: 140,
-                    sortable: true,
-                    renderer: Ext.util.Format.dateRenderer('<b>D j M Y</b> H:i'),
-                    dataIndex: 'created'
+            defaults: {
+                collapsible: false,
+                split: true
+            },
+
+            items: [
+                {
+                    region: "center",
+                    layout:"fit",
+                    margins: "3 0 3 0",
+                    items: this.panels.grid
                 },
-                {   id:'message',
-                    header: _("Event"),
-                    width: 75,
-                    sortable: true,
-                    dataIndex: 'message'
+                {
+                    region:"west",
+                    margins: "3 0 3 3",
+                    width: 200,
+                    minSize: 200,
+                    maxSize: 600,
+                    layout:"fit",
+                    items: this.panels.tree
+                },
+                {
+                    region:"east",
+                    margins: "3 3 3 0",
+                    width: 400,
+                    minSize: 200,
+                    maxSize: 600,
+                    collapseMode: 'mini',
+                    layout:"fit",
+                    items: this.panels.help
                 }
-            ],
-
-            //            tbar: [
-            //                this.filterEdition, " ", this.filterEmployee,
-            //                new Ext.Button({ text:_("Find"), cls: 'x-btn-text-icon', icon: _ico("control.png") })
-            //            ],
-
-            bbar: new Ext.PagingToolbar({
-                pageSize: 25,
-                store: this.store
-            })
+            ]
         });
 
-        Inprint.system.logs.Panel.superclass.initComponent.apply(this, arguments);
-
+        Inprint.system.logs.Main.superclass.initComponent.apply(this, arguments);
     },
 
     onRender: function() {
-        Inprint.system.logs.Panel.superclass.onRender.apply(this, arguments);
-        this.store.load();
-    },
-
-    reload: function() {
-        this.store.reload();
+        Inprint.system.logs.Main.superclass.onRender.apply(this, arguments);
     }
 
 });
 
-Inprint.registry.register("core-logs", {
-    icon: "lifebuoy",
+Inprint.registry.register("system-logs", {
+    icon: "quill",
     text: _("Logs"),
-    xobject: Inprint.system.logs.Panel
+    description: _("Inprint logs"),
+    xobject: Inprint.system.logs.Main
 });

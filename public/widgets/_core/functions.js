@@ -153,3 +153,28 @@ function _arrayAccessCheck(records, fields) {
     }
     return result;
 }
+
+// Actions manager
+Ext.namespace("Inprint.actions");
+Inprint.actions.manager = new function () {
+    var functions = {};
+    return {
+        set: function(name, fnct) {
+            functions[name] = fnct;
+        },
+        get: function(name, scope, params) {
+            var result = functions[name];
+            Ext.apply(result, { scope: scope });
+            Ext.apply(result, params);
+            return result;
+        }
+    }
+};
+
+Inprint.setAction = function (name, fnct) {
+    return Inprint.actions.manager.set(name, fnct);
+}
+
+Inprint.getAction = function (name, scope, params) {
+    return Inprint.actions.manager.get(name, scope, params);
+}

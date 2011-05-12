@@ -18,9 +18,9 @@ Inprint.catalog.editions.Interaction = function(parent, panels) {
     });
 
     // Stages
-    grid.btnCreateStage.on("click", grid.actions.createStage.createDelegate(this));
-    grid.btnChangeStage.on("click", grid.actions.changeStage.createDelegate(this));
-    grid.btnRemoveStage.on("click", grid.actions.removeStage.createDelegate(this));
-    grid.btnManagePrincipals.on("click", grid.actions.managePrincipals.createDelegate(this));
+    //grid.btnCreateStage.on("click", grid.actions.createStage.createDelegate(this));
+    //grid.btnChangeStage.on("click", grid.actions.changeStage.createDelegate(this));
+    //grid.btnRemoveStage.on("click", grid.actions.removeStage.createDelegate(this));
+    //grid.btnManagePrincipals.on("click", grid.actions.managePrincipals.createDelegate(this));
 
 };

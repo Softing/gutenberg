@@ -60,48 +60,11 @@ Inprint.catalog.editions.Grid = Ext.extend(Ext.grid.GridPanel, {
         ];
 
         this.tbar = [
-            {
-                xtype: 'buttongroup',
-                title: 'Ступеньки',
-                defaults: {
-                    scale: 'small'
-                },
-                items: [
-                    {   icon: _ico("plus-button"),
-                        cls: "x-btn-text-icon",
-                        text: _("Add"),
-                        disabled:true,
-                        ref: "../../btnCreateStage"
-                    },
-                    {   icon: _ico("pencil"),
-                        cls: "x-btn-text-icon",
-                        text: _("Change"),
-                        disabled:true,
-                        ref: "../../btnChangeStage"
-                    },
-                    {   icon: _ico("minus-button"),
-                        cls: "x-btn-text-icon",
-                        text: _("Remove"),
-                        disabled:true,
-                        ref: "../../btnRemoveStage"
-                    }
-                ]
-            },
-            {
-                xtype: 'buttongroup',
-                title: 'Сотрудники',
-                defaults: {
-                    scale: 'small'
-                },
-                items: [
-                    {   disabled:true,
-                        icon: _ico("users"),
-                        cls: "x-btn-text-icon",
-                        text: _("Select employees"),
-                        ref: "../../btnManagePrincipals"
-                    }
-                ]
-            }
+            Inprint.getAction("stages.create", this, { disabled: true }),
+            Inprint.getAction("stages.update", this, { disabled: true }),
+            Inprint.getAction("stages.delete", this, { disabled: true }),
+            "-",
+            Inprint.getAction("stages.principals", this, { disabled: true })
         ];
 
         Ext.apply(this, {

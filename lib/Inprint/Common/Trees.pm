@@ -17,10 +17,9 @@ sub editions {
     my $result;
     my @errors;
 
-    my $i_term      = $c->param("term");
-    my $i_node      = $c->param("node");
+    my $i_node = $c->param("node");
+    my $i_term = $c->param("term") // undef;
 
-    my $type = "editions";
     my $root = "00000000-0000-0000-0000-000000000000";
 
     if ($i_node ~~ ["all", "root"]) {
@@ -28,83 +27,92 @@ sub editions {
     }
 
     $c->check_uuid( \@errors, "node", $i_node);
-    $c->check_rule( \@errors, "term", $i_term);
+    $c->check_rule( \@errors, "term", $i_term, 1);
 
     unless (@errors) {
 
-        my $bindings = $c->objectBindings($i_term);
+        my $sql = "
+            SELECT
+                t1.*
+            FROM editions t1
+            WHERE 1=1
+                AND t1.path ~ ('*.' || replace(\$1, '-', '') || '.*{1}')::lquery
 
-        if ($type eq "editions") {
+            ";
 
+        my $bindings;
+        my @params = ( $i_node );
+
+        if ($i_term) {
+
+            $bindings = $c->objectBindings($i_term);
             my $nodes = $c->Q("
                 SELECT id FROM editions
                 WHERE path @> ARRAY(
                     SELECT path FROM editions WHERE id = ANY(\$1)
                 )", [ $bindings ])->Values;
 
-            my $sql = "
-                SELECT
-                    t1.*
-                FROM editions t1
-                WHERE 1=1
-                    AND t1.path ~ ('*.' || replace(\$1, '-', '') || '.*{1}')::lquery
-                    AND t1.id = ANY(\$2)
-                ORDER BY shortcut
-            ";
+            $sql .= " AND t1.id = ANY(\$2) ";
+            push @params, $nodes;
 
-            my $data = $c->Q($sql, [ $i_node, $nodes ])->Hashes;
+        }
 
-            foreach my $item (@$data) {
+        $sql .= " ORDER BY shortcut ";
 
-                my $id       = $item->{id};
-                my $icon     = "blue-folders";
-                my $text     = $item->{shortcut};
-                my $leaf     = $c->json->true;
-                my $disabled = $c->json->true;
+        my $data = $c->Q($sql, \@params)->Hashes;
 
-                my $have_children = $c->Q("
-                    SELECT count(*) FROM editions WHERE path ~ ('*.' || ? || '.*{1}')::lquery
-                    ", $item->{path})->Value;
+        foreach my $item (@$data) {
 
-                if ( $id ~~ @$bindings ) {
+            my $id       = $item->{id};
+            my $icon     = "blue-folders";
+            my $text     = $item->{shortcut};
+            my $leaf     = $c->json->true;
+            my $disabled = $c->json->false;
+
+            my $have_children = $c->Q("
+                SELECT count(*) FROM editions WHERE path ~ ('*.' || ? || '.*{1}')::lquery
+                ", $item->{path})->Value;
+
+            if ($i_term) {
+                unless ( $id ~~ @$bindings ) {
                     $disabled = $c->json->false;
                 }
-
-                if ( $have_children ) {
-                    $leaf = $c->json->false;
-                }
-
-                push @$result, {
-                    id       => $id,
-                    type     => "edition",
-                    text     => $text,
-                    icon     => $icon,
-                    leaf     => $leaf,
-                    disabled => $disabled
-                };
-
             }
 
-            if ($i_node eq $root) {
+            if ( $have_children ) {
+                $leaf = $c->json->false;
+            }
 
-                my $sql = "
-                    SELECT count(*)
-                    FROM editions
-                    WHERE 1=1
-                        AND path ~ ('*.' || replace(\$1, '-', '') || '.*{2}')::lquery
-                        AND id = ANY(\$2) ";
+            push @$result, {
+                id       => $id,
+                type     => "edition",
+                text     => $text,
+                icon     => $icon,
+                leaf     => $leaf,
+                disabled => $disabled
+            };
 
-                my $count = $c->Q($sql, [ $i_node, $nodes ])->Value;
+        }
 
-                if ($count < 30) {
-                    foreach my $item (@$result) {
-                        if ($item->{type} eq "edition") {
-                            $item->{expanded} = $c->json->true;
-                        }
+        if ($i_node eq $root) {
+
+            my $sql = "
+                SELECT count(*)
+                FROM editions
+                WHERE path ~ ('*.' || replace(\$1, '-', '') || '.*{2}')::lquery ";
+
+            if ($i_term) {
+                $sql .= " AND id = ANY(\$2) "; }
+
+            my $count = $c->Q($sql, \@params)->Value;
+
+            if ($count < 30) {
+                foreach my $item (@$result) {
+                    if ($item->{type} eq "edition") {
+                        $item->{expanded} = $c->json->true;
                     }
                 }
             }
-
         }
 
     }
