@@ -83,6 +83,7 @@ Inprint.documents.Profile = Ext.extend(Ext.Panel, {
                     if (response.data.access["discuss"] === true) {
                         this.panels.comments.btnSay.enable();
                     }
+                    this.panels.files.cmpAccess(response.data.access);
                 }
             }
         });
