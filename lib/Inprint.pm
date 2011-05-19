@@ -135,7 +135,7 @@ sub startup {
     $sessionBridge->route("/advertising/requests/update/")      ->to("advertising-requests#update");
     $sessionBridge->route("/advertising/requests/delete/")      ->to("advertising-requests#delete");
     $sessionBridge->route("/advertising/requests/status/")      ->to("advertising-requests#status");
-    
+
     $sessionBridge->route("/advertising/requests/comments/list/")       ->to("advertising-requests-comments#list");
     $sessionBridge->route("/advertising/requests/comments/save/")       ->to("advertising-requests-comments#save");
 
@@ -276,9 +276,11 @@ sub startup {
     $sessionBridge->route('/documents/read/')                   ->to('documents#read');
     $sessionBridge->route('/documents/recycle/')                ->to('documents#recycle');
     $sessionBridge->route('/documents/restore/')                ->to('documents#restore');
-    $sessionBridge->route('/documents/say/')                    ->to('documents#say');
     $sessionBridge->route('/documents/transfer/')               ->to('documents#transfer');
     $sessionBridge->route('/documents/update/')                 ->to('documents#update');
+
+    $sessionBridge->route('/documents/comments/list/')          ->to('documents-comments#list');
+    $sessionBridge->route('/documents/comments/save/')          ->to('documents-comments#save');
 
     $sessionBridge->route('/documents/hotsave/list/')           ->to('documents-hotsave#list');
     $sessionBridge->route('/documents/hotsave/read/')           ->to('documents-hotsave#read');

@@ -20,17 +20,24 @@ sub fascicles {
 
     my $sql = "
         SELECT
-            t1.id,
-            t2.id as edition, t2.shortcut as edition_shortcut,
-            t1.parent, t1.title, t1.shortcut, t1.description, t1.manager, t1.variation,
-            to_char(t1.datedoc, 'YYYY-MM-DD HH24:MI:SS') as datedoc,
-            to_char(t1.dateadv, 'YYYY-MM-DD HH24:MI:SS') as dateadv,
-            t1.created, t1.updated
-        FROM fascicles t1, editions t2 WHERE t2.id=t1.edition AND t1.enabled = true
+            fascicles.id,
+            editions.id as edition, editions.shortcut as edition_shortcut,
+            fascicles.parent, fascicles.shortcut, fascicles.description,
+            fascicles.manager, fascicles.variation, fascicles.fastype,
+            to_char(fascicles.doc_date, 'YYYY-MM-DD HH24:MI:SS') as datedoc,
+            to_char(fascicles.adv_date, 'YYYY-MM-DD HH24:MI:SS') as dateadv,
+            fascicles.created, fascicles.updated
+        FROM
+            fascicles, editions
+        WHERE 1=1
+            AND editions.id=fascicles.edition
+            AND fascicles.enabled = true
+            AND fascicles.archived = false
+            AND fascicles.deleted  = false
     ";
 
     my $editions = $c->objectBindings("editions.documents.work:*");
-    $sql .= " AND t1.edition = ANY(?) ";
+    $sql .= " AND fascicles.edition = ANY(?) ";
     push @params, $editions;
 
     if ($edition) {
@@ -39,7 +46,7 @@ sub fascicles {
     }
 
 
-    $sql .= " ORDER BY t1.dateout DESC ";
+    $sql .= " ORDER BY fascicles.release_date DESC ";
 
     my $result = $c->Q($sql, \@params)->Hashes;
 

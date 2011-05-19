@@ -26,8 +26,8 @@ Inprint.cmp.MoveDocument.Form = Ext.extend(Ext.FormPanel, {
                             hiddenName: "edition",
                             fieldLabel: _("Edition"),
                             emptyText: _("Edition") + "...",
-                            minListWidth: 250,
-                            url: _url('/documents/trees/editions/'),
+                            minListWidth: 300,
+                            url: _url('/common/tree/editions/'),
                             baseParams: {
                                 term: 'editions.documents.work:*'
                             },
@@ -50,32 +50,62 @@ Inprint.cmp.MoveDocument.Form = Ext.extend(Ext.FormPanel, {
                                     }
                                     this.getForm().findField("fascicle").enable();
                                 },
+                                //select: function(field) {
+                                //    this.getForm().findField("fascicle").enable();
+                                //    this.getForm().findField("fascicle").reset();
+                                //},
                                 select: function(field) {
                                     this.getForm().findField("fascicle").enable();
-                                    this.getForm().findField("fascicle").reset();
+                                    this.getForm().findField("fascicle").reload({
+                                            edition: field.getValue()
+                                        });
                                 }
                             }
                         },
-
-                        xc.getConfig("/documents/combos/fascicles/", {
-                            disabled: true,
-                            baseParams: { term: 'editions.documents.assign:*' },
-                            listeners: {
-                                scope: this,
-                                render: function(combo) {
-
-                                    this.getForm().findField("edition").on("select", function() {
-                                        combo.enable();
-                                        combo.reset();
-                                    }, this);
-
-                                },
-                                beforequery: function(qe) {
-                                    delete qe.combo.lastQuery;
-                                    qe.combo.getStore().baseParams.flt_edition  = this.getForm().findField("edition").getValue();
-                                }
+                        
+                        {
+                            columnWidth:.125,
+                            xtype: "treecombo",
+                            name: "fascicle-shortcut",
+                            hiddenName: "fascicle",
+                            fieldLabel: _("Fascicle"),
+                            emptyText: _("Fascicle") + "...",
+                            minListWidth: 300,
+                            url: _url('/common/tree/fascicles/'),
+                            baseParams: {
+                                briefcase: true,
+                                term: 'editions.documents.work:*',
+                                edition: Inprint.session.options["default.edition"]
+                            },
+                            root: {
+                                id: '00000000-0000-0000-0000-000000000000',
+                                nodeType: 'async',
+                                expanded: true,
+                                draggable: false,
+                                icon: _ico("blue-folder-open-document-text"),
+                                text: _("All fascicles")
                             }
-                        })
+                        }
+
+                        //xc.getConfig("/documents/combos/fascicles/", {
+                        //    disabled: true,
+                        //    baseParams: { term: 'editions.documents.assign:*' },
+                        //    listeners: {
+                        //        scope: this,
+                        //        render: function(combo) {
+                        //
+                        //            this.getForm().findField("edition").on("select", function() {
+                        //                combo.enable();
+                        //                combo.reset();
+                        //            }, this);
+                        //
+                        //        },
+                        //        beforequery: function(qe) {
+                        //            delete qe.combo.lastQuery;
+                        //            qe.combo.getStore().baseParams.flt_edition  = this.getForm().findField("edition").getValue();
+                        //        }
+                        //    }
+                        //})
 
                     ]
                 },

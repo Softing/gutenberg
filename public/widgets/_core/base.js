@@ -34,7 +34,9 @@ Ext.onReady(function() {
         stateProvider
     );
 
-    Inprint.session = {};
+    Inprint.session = {
+        options: {}
+        };
 
     // Start session manager
     Inprint.updateSession = function(async, defer) {

@@ -234,7 +234,8 @@ sub search {
     }
 
     if ($group && $group ne "all") {
-        $sql_filters .= " AND ? = ANY(dcm.inworkgroups) ";
+        #$sql_filters .= " AND ? = ANY(dcm.inworkgroups) ";
+        $sql_filters .= " AND dcm.maingroup = ? ";
         push @params, $group;
     }
 
@@ -370,21 +371,6 @@ sub search {
     }
 
     return { "result" => $result, "total" => $total };
-}
-
-
-sub say {
-
-    my ($c, $id, $stage, $stage_shortcut, $color, $member, $member_shortcut, $text) = @_;
-
-    $c->Do("
-            INSERT INTO comments(
-                path, entity, member, member_shortcut, stage, stage_shortcut, stage_color, fulltext, created, updated)
-            VALUES (null, ?, ?, ?, ?, ?, ?, ?, now(), now() ) ", [
-            $id, $member, $member_shortcut, $stage, $stage_shortcut, $color, $text
-        ]);
-
-    return;
 }
 
 1;

@@ -87,19 +87,19 @@ sub read {
 
     }
 
-    unless (@errors) {
-        my $relativePath = Inprint::Store::Embedded::getRelativePath($c, "documents", $document->{created}, $document->{id}, 1);
-
-        # Update images count
-        my @images = ("jpg", "jpeg", "png", "gif", "bmp", "tiff" );
-        my $imgCount = $c->Q(" SELECT count(*) FROM cache_files WHERE file_path=? AND file_exists = true AND file_extension=ANY(?) ", [ $relativePath, \@images ])->Value;
-        $c->Do("UPDATE documents SET images=? WHERE filepath=? ", [ $imgCount || 0, $relativePath ]);
-
-        # Update rsize count
-        my @documents = ("doc", "docx", "odt", "rtf", "txt" );
-        my $lengthCount = $c->Q(" SELECT sum(file_length) FROM cache_files WHERE file_path=? AND file_exists = true AND file_extension=ANY(?) ", [ $relativePath, \@documents ])->Value;
-        $c->Do("UPDATE documents SET rsize=? WHERE filepath=? ", [ $lengthCount || 0, $relativePath ]);
-    }
+    #unless (@errors) {
+    #    my $relativePath = Inprint::Store::Embedded::getRelativePath($c, "documents", $document->{created}, $document->{id}, 1);
+    #
+    #    # Update images count
+    #    my @images = ("jpg", "jpeg", "png", "gif", "bmp", "tiff" );
+    #    my $imgCount = $c->Q(" SELECT count(*) FROM cache_files WHERE file_path=? AND file_exists = true AND file_extension=ANY(?) ", [ $relativePath, \@images ])->Value;
+    #    $c->Do("UPDATE documents SET images=? WHERE filepath=? ", [ $imgCount || 0, $relativePath ]);
+    #
+    #    # Update rsize count
+    #    my @documents = ("doc", "docx", "odt", "rtf", "txt" );
+    #    my $lengthCount = $c->Q(" SELECT sum(file_length) FROM cache_files WHERE file_path=? AND file_exists = true AND file_extension=ANY(?) ", [ $relativePath, \@documents ])->Value;
+    #    $c->Do("UPDATE documents SET rsize=? WHERE filepath=? ", [ $lengthCount || 0, $relativePath ]);
+    #}
 
     # Get history
     unless (@errors) {
@@ -126,17 +126,6 @@ sub read {
         ", [ $document->{copygroup} ])->Hashes;
     }
 
-    # Get comments
-    unless (@errors) {
-        $document->{comments} = $c->Q("
-            SELECT
-                id, entity, path,
-                member, member_shortcut,
-                stage, stage_shortcut, stage_color,
-                fulltext, to_char(created, 'YYYY-MM-DD HH24:MI:SS') as created
-            FROM comments WHERE entity = ? ORDER BY created DESC
-        ", [ $document->{id} ])->Hashes;
-    }
 
     $success = $c->json->true unless (@errors);
     $c->render_json({ success => $success, errors => \@errors, data => $document || {} });

@@ -4,9 +4,20 @@ Inprint.documents.editor.Form = Ext.extend(Ext.form.HtmlEditor,
     initComponent: function()
     {
 
-        var clsFontFamily = 'font-family-times';
-        var clsFontSize   = 'font-size-14';
-        var clsFontMargin = 'text-margin-4';
+        var options = Inprint.session.options;
+
+        var fontSizeTitles = {
+                "small":  "1em",
+                "medium": "1.2em",
+                "large":  "1.4em"
+            };
+
+        var fontStyleTitles = {
+                "times new roman": "Times New Roman"
+            };
+
+        var fontStyle  = fontStyleTitles[ options["default.font.style"] ] || "times new roman";
+        var fontSize   = fontSizeTitles [ options["default.font.size"] ] || "1.2em";
 
         Ext.apply(this, {
             border: false,
@@ -17,10 +28,10 @@ Inprint.documents.editor.Form = Ext.extend(Ext.form.HtmlEditor,
             enableFontSize: false,
             enableAlignments: false,
             fontFamilies: ['Times New Roman'],
-            defaultFont: 'times new roman',
+            style: 'font-family:"'+ fontStyle +'";font-size:'+ fontSize +';',
             plugins: [
                 new Ext.ux.form.HtmlEditor.RemoveFormat(),
-                new Ext.ux.form.HtmlEditor.Word(),
+                //new Ext.ux.form.HtmlEditor.Word(),
                 new Ext.ux.form.HtmlEditor.UndoRedo(),
                 new Ext.ux.form.HtmlEditor.Divider(),
                 new Ext.ux.form.HtmlEditor.SpecialCharacters(),

@@ -1,11 +1,12 @@
-package Inprint::Store::Embedded::Editor;
-
 # Inprint Content 5.0
 # Copyright(c) 2001-2011, Softing, LLC.
 # licensing@softing.ru
 # http://softing.ru/license
 
+package Inprint::Store::Embedded::Editor;
+
 use Encode;
+use Storable qw(store retrieve);
 
 use strict;
 use utf8;
@@ -181,52 +182,79 @@ sub createHotSave {
 
 sub getMetadata {
 
-    my ($c, $filepath) = @_;
+    my ($c, $filepath, $digest) = @_;
 
     my ($basename, $basepath, $extension) = fileparse($filepath, qr/(\.[^.]+){1}?/);
     $extension =~ s/^.//g;
 
     my $metadata = {};
 
-    if ($extension ~~ ["doc", "docx", "odt", "rtf", "txt"]) {
+    my $cacheFolderPath = "$basepath/.metacache";
+    my $cacheFlePath    = "$basepath/.metacache/$basename.$extension.cache";
 
-        my $ooHost    = $c->config->get("openoffice.host");
-        my $ooPort    = $c->config->get("openoffice.port");
-        my $ooTimeout = $c->config->get("openoffice.timeout");
+    unless (-e $cacheFolderPath) {
+        mkdir $cacheFolderPath;
+    }
 
-        die "Cant read configuration <openoffice.host>" unless $ooHost;
-        die "Cant read configuration <openoffice.port>" unless $ooPort;
-        die "Cant read configuration <openoffice.timeout>" unless $ooTimeout;
+    my $cache = {};
 
-        my $ooUrl = "http://$ooHost:$ooPort/api/query/";
+    if(-r $cacheFlePath) {
+        $cache = retrieve($cacheFlePath);
+    }
 
-        my $ooUagent = LWP::UserAgent->new();
-        $ooUagent->timeout( $ooTimeout );
+    unless ($cache->{digest} eq $digest ) {
 
-        my $ooRequest = HTTP::Request->new();
-        $ooRequest->method("POST");
-        $ooRequest->uri( $ooUrl );
+        if ($extension ~~ ["doc", "docx", "odt", "rtf", "txt"]) {
 
-        $ooRequest->header("InputFormat", $extension);
-        $ooRequest->header("Content-type", "application/octet-stream");
+            my $ooHost    = $c->config->get("openoffice.host");
+            my $ooPort    = $c->config->get("openoffice.port");
+            my $ooTimeout = $c->config->get("openoffice.timeout");
 
-        my $fileContent;
-        open my $INPUT, "<", $filepath || die "Can't open <$filepath> : $!";
-        binmode $INPUT;
-        while ( read($INPUT, my $buf, 60*57)) {
-            $fileContent .= $buf;
+            die "Cant read configuration <openoffice.host>" unless $ooHost;
+            die "Cant read configuration <openoffice.port>" unless $ooPort;
+            die "Cant read configuration <openoffice.timeout>" unless $ooTimeout;
+
+            my $ooUrl = "http://$ooHost:$ooPort/api/query/";
+
+            my $ooUagent = LWP::UserAgent->new();
+            $ooUagent->timeout( $ooTimeout );
+
+            my $ooRequest = HTTP::Request->new();
+            $ooRequest->method("POST");
+            $ooRequest->uri( $ooUrl );
+
+            $ooRequest->header("InputFormat", $extension);
+            $ooRequest->header("Content-type", "application/octet-stream");
+
+            my $fileContent;
+            open my $INPUT, "<", $filepath || die "Can't open <$filepath> : $!";
+            binmode $INPUT;
+            while ( read($INPUT, my $buf, 60*57)) {
+                $fileContent .= $buf;
+            }
+            close $INPUT;
+
+            $fileContent = encode_base64($fileContent);
+
+            $ooRequest->content( $fileContent );
+
+            $metadata = __processResponce($c, $ooUagent->request($ooRequest));
+
+            $cache = {
+                "digest"         => $digest,
+                "text"           => $metadata->{text},
+                "CharacterCount" => $metadata->{CharacterCount},
+                "WordCount"      => $metadata->{WordCount},
+                "ParagraphCount" => $metadata->{ParagraphCount},
+                };
+
+            store($cache, $cacheFlePath) || die "Cant store metacache in $cacheFlePath";
+
         }
-        close $INPUT;
-
-        $fileContent = encode_base64($fileContent);
-
-        $ooRequest->content( $fileContent );
-
-        $metadata = __processResponce($c, $ooUagent->request($ooRequest));
 
     }
 
-    return $metadata;
+    return $cache;
 }
 
 
@@ -383,7 +411,7 @@ sub __clearHtml {
     $html =~ s/\r+/ /g;
 
     $html =~ s/<table/<table border=1/ig;
-    
+
     #use HTML::Clean;
     #my $h = new HTML::Clean(\$html);
     #

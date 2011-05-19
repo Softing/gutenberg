@@ -66,8 +66,8 @@ Inprint.cmp.UpdateDocument.Form = Ext.extend(Ext.FormPanel, {
                     hiddenName: "maingroup",
                     fieldLabel: _("Department"),
                     emptyText: _("Department") + "...",
-                    minListWidth: 250,
-                    url: _url('/documents/trees/workgroups/'),
+                    minListWidth: 300,
+                    url: _url('/common/tree/workgroups/'),
                     baseParams: {
                         term: 'catalog.documents.assign:*'
                     },

@@ -5,7 +5,7 @@ Inprint.cmp.ExcahngeBrowser.TreeEditions = Ext.extend(Ext.tree.TreePanel, {
         this.components = {};
 
         this.urls = {
-            "tree":    _url("/common/transfer/editions/")
+            "tree":    _url("/common/tree/editions/")
         };
 
         Ext.apply(this, {

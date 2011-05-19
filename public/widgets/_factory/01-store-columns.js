@@ -107,7 +107,7 @@ Inprint.store.Columns = {
         ],
 
         fascicles: [
-            "id", "edition", "edition_shortcut", "title", "shortcut", 'description', "headline", "headline_shortcut", "rubric", "rubric_shortcut"
+            "id", "edition", "edition_shortcut", "shortcut", 'description', "fastype", "headline", "headline_shortcut", "rubric", "rubric_shortcut"
         ],
 
         files: [

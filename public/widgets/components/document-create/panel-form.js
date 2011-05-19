@@ -71,6 +71,8 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                             },
                             defaultType: 'textfield',
                             items :[
+                                
+                                
                                 {
                                     allowBlank:false,
                                     xtype: "treecombo",
@@ -78,8 +80,8 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                     hiddenName: "edition",
                                     fieldLabel: _("Edition"),
                                     emptyText: _("Edition") + "...",
-                                    minListWidth: 250,
-                                    url: _url('/documents/trees/editions/'),
+                                    minListWidth: 300,
+                                    url: _url('/common/tree/editions/'),
                                     baseParams: {
                                         term: 'editions.documents.work:*'
                                     },
@@ -101,7 +103,9 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                             }
                                         },
                                         select: function(field) {
-                                            this.getForm().findField("fascicle").getTree().getRootNode().reload();
+                                            this.getForm().findField("fascicle").reload({
+                                                    edition: field.getValue()
+                                                });
                                         }
                                     }
                                 },
@@ -113,8 +117,8 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                     hiddenName: "workgroup",
                                     fieldLabel: _("Department"),
                                     emptyText: _("Department") + "...",
-                                    minListWidth: 250,
-                                    url: _url('/documents/trees/workgroups/'),
+                                    minListWidth: 300,
+                                    url: _url('/common/tree/workgroups/'),
                                     baseParams: {
                                         term: 'catalog.documents.view:*'
                                     },
@@ -189,10 +193,12 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                     hiddenName: "fascicle",
                                     fieldLabel: _("Fascicle"),
                                     emptyText: _("Fascicle") + "...",
-                                    minListWidth: 250,
-                                    url: _url('/documents/trees/fascicles/'),
+                                    minListWidth: 300,
+                                    url: _url('/common/tree/fascicles/'),
                                     baseParams: {
-                                        term: 'editions.documents.work:*'
+                                        briefcase: true,
+                                        term: 'editions.documents.work:*',
+                                        edition: Inprint.session.options["default.edition"]
                                     },
                                     root: {
                                         id: '00000000-0000-0000-0000-000000000000',

@@ -30,6 +30,8 @@ Inprint.documents.briefcase.Panel = Ext.extend(Inprint.documents.Grid, {
         this.btnRestore.hide();
         this.btnDelete.hide();
 
+        this.btnCreate.enable();
+
         this.getSelectionModel().on("selectionchange", function(sm) {
 
             var records = this.getSelectionModel().getSelections();

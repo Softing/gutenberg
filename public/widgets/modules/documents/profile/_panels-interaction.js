@@ -7,7 +7,7 @@ Inprint.documents.Profile.Interaction = function(parent, panels) {
     var comments = panels.comments;
 
     parent.on("render", function() {
-        parent.cmpReload();
+        parent.cmpLoad();
     });
 
 };

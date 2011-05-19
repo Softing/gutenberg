@@ -17,12 +17,15 @@ sub get {
     my ($c, $id) = @_;
 
     my $document = $c->Q(" SELECT * FROM documents WHERE id=? ", [ $id ])->Hash;
+    my $fascicle = $c->Q(" SELECT * FROM fascicles WHERE id=? ", [ $document->{fascicle} ])->Hash;
 
     my %access = ();
     my $current_member = $c->getSessionValue("member.id");
     my @rules = qw( update capture move transfer briefcase delete recover discuss fadd fdelete fedit );
 
     foreach (@rules) {
+
+        next if ( $fascicle->{archived} );
 
         if ($document->{holder} eq $current_member) {
             if ($c->objectAccess(["catalog.documents.$_:*"], $document->{workgroup})) {

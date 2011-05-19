@@ -30,24 +30,15 @@
 </head>
 <body>
     <script type="text/javascript" src="/scripts/wallpaper.js"></script>
-    <!-- Loading mask element -->
     <div id="loading-mask" style=""></div>
     <div id="loading">
         <img  id="loading-indicator" src="/images/ajax-loader.gif"/>
         Inprint Content 5.0
     </div>
-
-    <script>
-        //alert (document.getElementById("loading-mask"));
-    </script>
-
-    <!-- Fields required for history management -->
     <form id="history-form" class="x-hidden">
         <input type="hidden" id="x-history-field" />
         <iframe id="x-history-frame"></iframe>
     </form>
-
-    <!-- div class="footer">inprint.content 5.0.0</div -->
 </body>
 </html>
 

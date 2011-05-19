@@ -65,7 +65,7 @@ sub updateCache {
         }
 
         # Update length
-        my $metadata = Inprint::Store::Embedded::Editor::getMetadata($c, $filepath);
+        my $metadata = Inprint::Store::Embedded::Editor::getMetadata($c, $filepath, $digest);
 
         if ($metadata->{CharacterCount} > 0) {
             $c->Do("
@@ -91,7 +91,7 @@ sub updateCache {
     }
     closedir DIR;
 
-    ## Clear cache
+    # Clear cache
     my $folderpath = Inprint::Store::Embedded::Utils::doDecode($c, $path);
     Inprint::Store::Cache::cleanup($c, $folderpath);
 

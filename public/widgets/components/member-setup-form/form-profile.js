@@ -80,8 +80,8 @@ Inprint.cmp.memberSetupWindow.Form = Ext.extend(Ext.FormPanel, {
                                     hiddenName: "edition",
                                     fieldLabel: _("Edition"),
                                     emptyText: _("Edition") + "...",
-                                    minListWidth: 250,
-                                    url: _url('/documents/trees/editions/'),
+                                    minListWidth: 300,
+                                    url: _url('/common/tree/editions/'),
                                     baseParams: {
                                         term: 'editions.documents.work:*'
                                     },
@@ -100,8 +100,8 @@ Inprint.cmp.memberSetupWindow.Form = Ext.extend(Ext.FormPanel, {
                                     hiddenName: "workgroup",
                                     fieldLabel: _("Group"),
                                     emptyText: _("Group") + "...",
-                                    minListWidth: 250,
-                                    url: _url('/documents/trees/workgroups/'),
+                                    minListWidth: 300,
+                                    url: _url('/common/tree/workgroups/'),
                                     baseParams: {
                                         term: 'catalog.documents.view:*'
                                     },

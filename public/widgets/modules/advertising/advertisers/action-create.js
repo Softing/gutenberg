@@ -20,6 +20,7 @@ Inprint.advertising.advertisers.actionCreate = function() {
                             allowBlank:true
                         },
                         items: [
+                            
                             {
                                 xtype: "titlefield",
                                 value: _("Basic options")
@@ -41,23 +42,6 @@ Inprint.advertising.advertisers.actionCreate = function() {
                                     expanded: true
                                 }
                             },
-
-                            //{
-                            //    xtype: "treecombo",
-                            //    allowBlank:false,
-                            //    hiddenName: "fascicle",
-                            //    fieldLabel: _("Fascicle"),
-                            //    emptyText: _("Select..."),
-                            //    url: _url('/common/tree/fascicles/'),
-                            //    baseParams: {
-                            //        term: 'editions.fascicle.manage:*'
-                            //    },
-                            //    root: {
-                            //        id:'root',
-                            //        nodeType: 'async',
-                            //        expanded: true
-                            //    }
-                            //},
 
                             _FLD_SHORTCUT,
 

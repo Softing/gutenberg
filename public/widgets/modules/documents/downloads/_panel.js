@@ -93,8 +93,8 @@ Inprint.documents.downloads.Main = Ext.extend(Ext.grid.GridPanel, {
                 name: "edition",
                 fieldLabel: _("Edition"),
                 emptyText: _("Edition") + "...",
-                minListWidth: 250,
-                url: _url('/documents/trees/editions/'),
+                minListWidth: 300,
+                url: _url('/common/tree/editions/'),
                 baseParams: {
                     term: 'editions.documents.work:*'
                 },
@@ -121,8 +121,8 @@ Inprint.documents.downloads.Main = Ext.extend(Ext.grid.GridPanel, {
                 name: "fascicle",
                 fieldLabel: _("Fascicle"),
                 emptyText: _("Fascicle") + "...",
-                minListWidth: 250,
-                url: _url('/documents/trees/fascicles/'),
+                minListWidth: 300,
+                url: _url('/common/tree/fascicles/'),
                 baseParams: {
                     term: 'editions.documents.work:*'
                 },

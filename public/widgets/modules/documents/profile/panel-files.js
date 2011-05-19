@@ -26,7 +26,7 @@ Inprint.documents.Profile.Files = Ext.extend(Ext.grid.GridPanel, {
 
         this.store = new Ext.data.JsonStore({
             root: "data",
-            autoLoad:false,
+            autoLoad: true,
             url: _url("/documents/files/list/"),
             baseParams: { document: this.config.document },
             fields: [

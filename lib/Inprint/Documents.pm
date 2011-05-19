@@ -1081,32 +1081,6 @@ sub duplicate {
     $c->render_json( { success => $success, errors => \@errors } );
 }
 
-sub say {
-
-    my $c = shift;
-    my $i_id = $c->param("id");
-    my $i_text = $c->param("text");
-
-    my @errors;
-    my $success = $c->json->false;
-
-    $c->check_uuid( \@errors, "id", $i_id);
-    $c->check_text( \@errors, "text", $i_text);
-
-    my $document  = $c->check_record(\@errors, "documents", "document", $i_id);
-    my $principal = $c->check_record(\@errors, "view_principals", "principal", $c->getSessionValue("member.id"));
-
-    unless (@errors) {
-        Inprint::Models::Documents::say($c,
-            $document->{id}, $document->{stage}, $document->{stage_shortcut}, $document->{color},
-            $principal->{id}, $principal->{shortcut}, $i_text
-        );
-    }
-
-    $success = $c->json->true unless (@errors);
-    $c->render_json( { success => $success, errors => \@errors } );
-}
-
 sub recycle {
 
     my $c = shift;

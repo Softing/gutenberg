@@ -1,14 +1,18 @@
-package Inprint::Common::Trees;
-
 # Inprint Content 5.0
 # Copyright(c) 2001-2011, Softing, LLC.
 # licensing@softing.ru
 # http://softing.ru/license
 
+package Inprint::Common::Trees;
+
 use strict;
 use warnings;
 
 use base 'Mojolicious::Controller';
+
+# Function returns a tree of editions by an access rule
+# Params:
+#   uuid term - Access rule
 
 sub editions {
 
@@ -17,32 +21,35 @@ sub editions {
     my $result;
     my @errors;
 
+    # Get variables from POST
     my $i_node = $c->param("node");
     my $i_term = $c->param("term") // undef;
 
+    # Process root value
     my $root = "00000000-0000-0000-0000-000000000000";
 
     if ($i_node ~~ ["all", "root"]) {
         $i_node = $root;
     }
 
+    # Check variables
     $c->check_uuid( \@errors, "node", $i_node);
     $c->check_rule( \@errors, "term", $i_term, 1);
 
+    # Do something
     unless (@errors) {
 
+        # Create SQL query
         my $sql = "
-            SELECT
-                t1.*
+            SELECT t1.*
             FROM editions t1
             WHERE 1=1
-                AND t1.path ~ ('*.' || replace(\$1, '-', '') || '.*{1}')::lquery
-
-            ";
+                AND t1.path ~ ('*.' || replace(\$1, '-', '') || '.*{1}')::lquery ";
 
         my $bindings;
         my @params = ( $i_node );
 
+        # There is some rule
         if ($i_term) {
 
             $bindings = $c->objectBindings($i_term);
@@ -59,8 +66,10 @@ sub editions {
 
         $sql .= " ORDER BY shortcut ";
 
+        # Do SQL query
         my $data = $c->Q($sql, \@params)->Hashes;
 
+        # Process SQL query result
         foreach my $item (@$data) {
 
             my $id       = $item->{id};
@@ -70,22 +79,21 @@ sub editions {
             my $disabled = $c->json->false;
 
             my $have_children = $c->Q("
-                SELECT count(*) FROM editions WHERE path ~ ('*.' || ? || '.*{1}')::lquery
-                ", $item->{path})->Value;
-
-            if ($i_term) {
-                unless ( $id ~~ @$bindings ) {
-                    $disabled = $c->json->false;
-                }
-            }
+                SELECT count(*) FROM editions WHERE path ~ ('*.' || ? || '.*{1}')::lquery ",
+                $item->{path})->Value;
 
             if ( $have_children ) {
                 $leaf = $c->json->false;
             }
 
+            if ($i_term) {
+                unless ( $id ~~ @$bindings ) {
+                    $disabled = $c->json->true;
+                }
+            }
+
             push @$result, {
                 id       => $id,
-                type     => "edition",
                 text     => $text,
                 icon     => $icon,
                 leaf     => $leaf,
@@ -94,6 +102,7 @@ sub editions {
 
         }
 
+        # Autoexpand node if it is a root
         if ($i_node eq $root) {
 
             my $sql = "
@@ -108,11 +117,10 @@ sub editions {
 
             if ($count < 30) {
                 foreach my $item (@$result) {
-                    if ($item->{type} eq "edition") {
-                        $item->{expanded} = $c->json->true;
-                    }
+                    $item->{expanded} = $c->json->true;
                 }
             }
+
         }
 
     }
@@ -120,81 +128,137 @@ sub editions {
     $c->render_json( \@$result );
 }
 
+# Function returns a tree of fascicles by an access rule
+# Params:
+#   uuid term - Access rule
+#   uuid edition - Filter by edition
+#   bool briefcase  - Flag of show of a Briefcase
+#   bool trashcan   - Flag of show of a Recycle Bin
+
 sub fascicles {
     my $c = shift;
 
     my $result;
     my @errors;
 
-    my $i_term = $c->param("term");
-    my $i_node = $c->param("node");
+    # Get variables from POST
+    my $i_term      = $c->param("term");
+    my $i_node      = $c->param("node");
 
+    my $i_edition   = $c->param("edition");
+    my $i_briefcase = $c->param("briefcase");
+    my $i_trashcan  = $c->param("trashcan");
+
+    # Process root value
     my $root = "00000000-0000-0000-0000-000000000000";
 
     if ($i_node ~~ ["all", "root"]) {
         $i_node = $root;
     }
 
+    # Check variables
     $c->check_uuid( \@errors, "node", $i_node);
-    $c->check_rule( \@errors, "term", $i_term);
+    $c->check_rule( \@errors, "term", $i_term, 1);
+    $c->check_uuid( \@errors, "edition", $i_edition, 1);
+    $c->check_flag( \@errors, "briefcase", $i_briefcase, 1);
+    $c->check_flag( \@errors, "trashcan", $i_trashcan, 1);
 
+    # Do something
     unless (@errors) {
-
-        my $bindings = $c->objectBindings($i_term);
-
-        my $nodes = $c->Q("
-            SELECT id FROM editions
-            WHERE path @> ARRAY(
-                SELECT path FROM editions WHERE id = ANY(\$1)
-            )", [ $bindings ])->Values;
 
         my $sql = "
             SELECT
-                fascicles.id, fascicles.edition, fascicles.shortcut, fascicles.fastype,
-                editions.shortcut as edition_shortcut,
-                ( SELECT count(*) FROM fascicles children WHERE children.parent = fascicles.id ) as childrens
+                fascicles.id, fascicles.shortcut, fascicles.fastype,
+                editions.id as edition, editions.shortcut as edition_shortcut
             FROM fascicles, editions
             WHERE 1=1
                 AND editions.id = fascicles.edition
                 AND fascicles.enabled  = true
                 AND fascicles.archived = false
-                AND fascicles.deleted  = false
-                AND fascicles.edition  = ANY(\$1)
-        ";
+                AND fascicles.deleted  = false ";
 
         my $icon;
-        my @data;
-        push @data, $nodes;
+        my $bindings;
 
+        my @params;
+        my @params_count;
+
+        # Filter by edition
+        if ($i_edition) {
+            my $nodes = $c->Q("
+                SELECT id FROM editions WHERE
+                    path @> (
+                        SELECT path FROM editions WHERE id = ? )
+                    OR
+                    path <@ (
+                        SELECT path FROM editions WHERE id = ? )",
+                [ $i_edition, $i_edition ])->Values;
+
+            $sql .= " AND fascicles.edition  = ANY(?) ";
+            push @params, $nodes;
+        }
+
+        # There is some rule
+        if ($i_term) {
+
+            $bindings = $c->objectBindings($i_term);
+
+            my $nodes = $c->Q("
+                SELECT id FROM editions
+                WHERE path @> ARRAY(
+                    SELECT path FROM editions WHERE id = ANY(?)
+                )", [ $bindings ])->Values;
+
+            $sql .= " AND fascicles.edition  = ANY(?) ";
+            push @params, $nodes;
+
+        }
+
+        # This is root node, show Fascicles
         if ($i_node eq $root) {
-            $icon = "blue-folder-horizontal";
             $sql .= " AND fascicles.fastype  = 'issue' ";
         }
 
+        # This is fascicle node, show Attahments
         if ($i_node ne $root) {
-            $icon = "folder-horizontal";
             $sql .= " AND fascicles.fastype  = 'attachment' ";
-            $sql .= " AND fascicles.parent   = \$2 ";
-            push @data, $i_node;
+            $sql .= " AND fascicles.parent   = ? ";
+            push @params, $i_node;
         }
 
         $sql .= " ORDER BY fascicles.shortcut ";
 
-        my $data = $c->Q($sql, \@data)->Hashes;
+        # Do SQL query
+        my $data = $c->Q($sql, \@params)->Hashes;
 
+        # Process SQL query result
         foreach my $item (@$data) {
 
             my $id       = $item->{id};
-            my $text = $item->{edition_shortcut} ." &ndash; ". $item->{shortcut};
+            my $text     = $item->{edition_shortcut} ." / ". $item->{shortcut};
             my $leaf     = $c->json->true;
-            my $disabled = $c->json->true;
+            my $disabled = $c->json->false;
 
-            if ( $item->{edition} ~~ @$bindings ) {
-                $disabled = $c->json->false;
+            if ($item->{fastype} eq "issue") {
+                $icon = "blue-folder-horizontal";
             }
 
-            if ( $item->{childrens} ) {
+            if ($item->{fastype} eq "attachment") {
+                $icon = "folder-horizontal";
+            }
+
+            my $have_children = $c->Q("
+                SELECT count(id) FROM fascicles WHERE parent = ?  ",
+                $item->{id})->Value;
+
+            if ( $have_children ) {
                 $leaf = $c->json->false;
+            }
+
+            if ($i_term) {
+                unless ( $item->{edition} ~~ @$bindings ) {
+                    $disabled = $c->json->true;
+                }
             }
 
             push @$result, {
@@ -207,22 +271,31 @@ sub fascicles {
 
         }
 
+        # Autoexpand node if it is a root
         if ($i_node eq $root) {
 
-            my $sql = "
-                SELECT count(*)
-                FROM fascicles
-                WHERE 1=1
-                    AND parent = \$1
-                    AND edition = ANY(\$2) ";
-
-            my $count = $c->Q($sql, [ $i_node, $nodes ])->Value;
-
-            if ($count < 30) {
-                foreach my $item (@$result) {
-                    $item->{expanded} = $c->json->true;
-                }
+            foreach my $item (@$result) {
+                $item->{expanded} = $c->json->true;
             }
+
+            # Show predefined items
+            if ($i_briefcase eq "true") {
+                unshift @$result, {
+                    id => "00000000-0000-0000-0000-000000000000",
+                    icon => "briefcase",
+                    text => $c->l("Briefcase"),
+                    leaf => $c->json->true
+                };
+            }
+            if ($i_trashcan  eq "true") {
+                unshift @$result, {
+                    id => "00000000-0000-0000-0000-000000000000",
+                    icon => "bin",
+                    text => $c->l("Recycle Bin"),
+                    leaf => $c->json->true
+                };
+            }
+
         }
 
     }
@@ -230,75 +303,122 @@ sub fascicles {
     $c->render_json( \@$result );
 }
 
+# Function returns a tree of workgroups by an access rule
+# Params:
+#   uuid term - Access rule
+
 sub workgroups {
+
     my $c = shift;
 
-    my $i_term = $c->param("term");
-    my $i_node = $c->param("node");
-
-    my @result;
+    my $result;
     my @errors;
-    my $success = $c->json->false;
 
-    $i_node = "00000000-0000-0000-0000-000000000000" if $i_node eq "all";
+    # Get variables from POST
+    my $i_node = $c->param("node");
+    my $i_term = $c->param("term") // undef;
 
-    $c->check_uuid( \@errors, "node", $i_node);
-    $c->check_rule( \@errors, "node", $i_term);
+    # Process root value
+    my $root = "00000000-0000-0000-0000-000000000000";
 
-    my $bindings = $c->objectBindings($i_term);
-
-    unless (@errors) {
-
-        my $sql;
-        my @data;
-
-        if ($i_node eq "00000000-0000-0000-0000-000000000000") {
-            $sql = "
-                SELECT t1.*,
-                    ( SELECT count(*) FROM catalog c2 WHERE c2.path ~ ('*.' || t1.path::text || '.*{1}')::lquery ) as have_childs
-                FROM catalog t1
-                WHERE
-                    t1.id <> '00000000-0000-0000-0000-000000000000'
-                    AND t1.id = ANY(?)
-            ";
-            push @data, $bindings;
-        }
-
-        if ($i_node ne "00000000-0000-0000-0000-000000000000") {
-            $sql .= "
-                SELECT t1.*,
-                    ( SELECT count(*) FROM catalog c2 WHERE c2.path ~ ('*.' || t1.path::text || '.*{1}')::lquery ) as have_childs
-                FROM catalog t1
-                WHERE
-                    t1.id <> '00000000-0000-0000-0000-000000000000'
-                    AND subpath(t1.path, nlevel(t1.path) - 2, 1)::text = replace(?, '-', '')::text
-                    AND t1.id = ANY(?)
-                ";
-            push @data, $i_node;
-            push @data, $bindings;
-        }
-
-        my $data = $c->Q("$sql ORDER BY shortcut", \@data)->Hashes;
-
-        foreach my $item (@$data) {
-            my $record = {
-                id   => $item->{id},
-                icon => "xfn-friend",
-                text => $item->{shortcut},
-                leaf => $c->json->true,
-                data => $item
-            };
-            if ( $item->{have_childs} ) {
-                $record->{leaf} = $c->json->false;
-            }
-            push @result, $record;
-        }
+    if ($i_node ~~ ["all", "root"]) {
+        $i_node = $root;
     }
 
-    $success = $c->json->true unless (@errors);
+    # Check variables
+    $c->check_uuid( \@errors, "node", $i_node);
+    $c->check_rule( \@errors, "term", $i_term, 1);
 
-    $c->render_json( \@result );
+    # Do something
+    unless (@errors) {
+
+        # Create SQL query
+        my $sql = "
+            SELECT t1.*
+            FROM catalog t1
+            WHERE 1=1
+                AND t1.path ~ ('*.' || replace(\$1, '-', '') || '.*{1}')::lquery ";
+
+        my $bindings;
+        my @params = ( $i_node );
+
+        # There is some rule
+        if ($i_term) {
+
+            $bindings = $c->objectBindings($i_term);
+            my $nodes = $c->Q("
+                SELECT id FROM catalog
+                WHERE path @> ARRAY(
+                    SELECT path FROM catalog WHERE id = ANY(\$1)
+                )", [ $bindings ])->Values;
+
+            $sql .= " AND t1.id = ANY(\$2) ";
+            push @params, $nodes;
+
+        }
+
+        $sql .= " ORDER BY shortcut ";
+
+        # Do SQL query
+        my $data = $c->Q($sql, \@params)->Hashes;
+
+        # Process SQL query result
+        foreach my $item (@$data) {
+
+            my $id       = $item->{id};
+            my $icon     = "xfn-friend";
+            my $text     = $item->{shortcut};
+            my $leaf     = $c->json->true;
+            my $disabled = $c->json->false;
+
+            my $have_children = $c->Q("
+                SELECT count(*) FROM catalog WHERE path ~ ('*.' || ? || '.*{1}')::lquery ",
+                $item->{path})->Value;
+
+            if ( $have_children ) {
+                $leaf = $c->json->false;
+            }
+
+            if ($i_term) {
+                unless ( $id ~~ @$bindings ) {
+                    $disabled = $c->json->true;
+                }
+            }
+
+            push @$result, {
+                id       => $id,
+                text     => $text,
+                icon     => $icon,
+                leaf     => $leaf,
+                disabled => $disabled
+            };
+
+        }
+
+        # Autoexpand node if it is a root
+        if ($i_node eq $root) {
+
+            my $sql = "
+                SELECT count(*)
+                FROM catalog
+                WHERE path ~ ('*.' || replace(\$1, '-', '') || '.*{2}')::lquery ";
+
+            if ($i_term) {
+                $sql .= " AND id = ANY(\$2) "; }
+
+            my $count = $c->Q($sql, \@params)->Value;
+
+            if ($count < 30) {
+                foreach my $item (@$result) {
+                    $item->{expanded} = $c->json->true;
+                }
+            }
+
+        }
+
+    }
+
+    $c->render_json( \@$result );
 }
-
 
 1;

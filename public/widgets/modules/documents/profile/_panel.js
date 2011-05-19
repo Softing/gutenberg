@@ -69,7 +69,8 @@ Inprint.documents.Profile = Ext.extend(Ext.Panel, {
         return this.oid;
     },
 
-    cmpReload: function() {
+    cmpLoad: function() {
+
         Ext.Ajax.request({
             url: "/documents/profile/read/",
             scope:this,
@@ -79,14 +80,18 @@ Inprint.documents.Profile = Ext.extend(Ext.Panel, {
                 if (response.data) {
                     this.document = response.data.id;
                     this.panels.profile.cmpFill(response.data);
-                    this.panels.files.cmpFill(response.data);
-                    this.panels.comments.cmpFill(response.data);
+                    if (response.data.access["discuss"] === true) {
+                        this.panels.comments.btnSay.enable();
+                    }
                 }
             }
         });
+        this.panels.comments.cmpLoad(this.oid);
+    },
 
-        this.panels.files.cmpReload();
-
+    cmpReload: function() {
+        this.cmpLoad();
+        this.panels.files.cmpReload(this.oid);
     }
 
 });

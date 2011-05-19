@@ -41,6 +41,7 @@ sub list {
             dcm.edition_shortcut, dcm.fascicle, dcm.fascicle_shortcut,
             fls.file_path, fls.file_name, fls.file_description, fls.file_mime,
             fls.file_extension, fls.file_published, fls.file_size, fls.file_length,
+
             EXISTS (
                 SELECT id
                 FROM cache_downloads cache
@@ -50,8 +51,14 @@ sub list {
             to_char(fls.created, 'YYYY-MM-DD HH24:MI:SS') as created,
             to_char(fls.updated, 'YYYY-MM-DD HH24:MI:SS') as updated
 
-        FROM documents dcm, cache_files fls
-        WHERE dcm.filepath = fls.file_path AND dcm.fascicle <> '99999999-9999-9999-9999-999999999999'
+        FROM documents dcm, cache_files fls, fascicles fsc
+        WHERE 1=1
+            AND dcm.filepath = fls.file_path
+            AND dcm.fascicle <> fsc.id
+            AND fsc.id <> '99999999-9999-9999-9999-999999999999'
+            AND fsc.enabled  = true
+            AND fsc.archived = false
+            AND fsc.deleted  = false
     ";
 
     push @params, $currentMember;

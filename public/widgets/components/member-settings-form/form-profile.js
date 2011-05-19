@@ -9,11 +9,15 @@ Inprint.cmp.memberSettingsForm.Form = Ext.extend(Ext.FormPanel, {
             autoScroll:true,
             layout: "fit",
             items: {
+
                 xtype:'tabpanel',
+                border:false,
+                deferredRender: false,
                 activeTab: 0,
                 defaults:{
                     bodyStyle:'padding:10px'
                 },
+
                 items:[
                     {
                         title: _("Exchange"),
@@ -26,12 +30,11 @@ Inprint.cmp.memberSettingsForm.Form = Ext.extend(Ext.FormPanel, {
                         items: [
                             {
                                 xtype: "treecombo",
-                                name: "edition-shortcut",
                                 hiddenName: "edition",
                                 fieldLabel: _("Edition"),
-                                emptyText: _("Edition") + "...",
-                                minListWidth: 250,
-                                url: _url('/documents/trees/editions/'),
+                                emptyText: _("Select main edition..."),
+                                minListWidth: 300,
+                                url: _url('/common/tree/editions/'),
                                 baseParams: {
                                     term: 'editions.documents.work:*'
                                 },
@@ -46,12 +49,11 @@ Inprint.cmp.memberSettingsForm.Form = Ext.extend(Ext.FormPanel, {
                             },
                             {
                                 xtype: "treecombo",
-                                name: "workgroup-shortcut",
                                 hiddenName: "workgroup",
                                 fieldLabel: _("Group"),
-                                emptyText: _("Group") + "...",
-                                minListWidth: 250,
-                                url: _url('/documents/trees/workgroups/'),
+                                emptyText: _("Select main department..."),
+                                minListWidth: 300,
+                                url: _url('/common/tree/workgroups/'),
                                 baseParams: {
                                     term: 'catalog.documents.view:*'
                                 },
@@ -64,6 +66,55 @@ Inprint.cmp.memberSettingsForm.Form = Ext.extend(Ext.FormPanel, {
                                     text: _("All departments")
                                 }
                             }
+                        ]
+                    },
+                    {
+                        title: _("Text editor"),
+                        layout:'form',
+                        labelWidth: 120,
+                        defaults: {
+                            width: 230
+                        },
+                        defaultType: 'textfield',
+                        items: [
+                            new Ext.form.ComboBox({
+                                hiddenName: "font-style",
+                                fieldLabel: _("Font style"),
+                                store: new Ext.data.ArrayStore({
+                                    fields: ['id', 'title'],
+                                    data : [
+                                        ["times new roman",  _("Times New Roman") ],
+                                    ]
+                                }),
+                                mode: 'local',
+                                editable: false,
+                                typeAhead: true,
+                                valueField:'id',
+                                displayField:'title',
+                                forceSelection: true,
+                                triggerAction: 'all',
+                                emptyText: _("Select a font style...")
+                            }),
+                             new Ext.form.ComboBox({
+                                hiddenName: "font-size",
+                                fieldLabel: _("Font size"),
+                                store: new Ext.data.ArrayStore({
+                                    fields: ['id', 'title'],
+                                    data : [
+                                        ["small",  _("Small size") ],
+                                        ["medium", _("Medium size") ],
+                                        ["large",  _("Large size") ]
+                                    ]
+                                }),
+                                mode: 'local',
+                                editable: false,
+                                typeAhead: true,
+                                valueField:'id',
+                                displayField:'title',
+                                forceSelection: true,
+                                triggerAction: 'all',
+                                emptyText: _("Select a font size...")
+                            })
                         ]
                     }
                 ]
@@ -83,10 +134,52 @@ Inprint.cmp.memberSettingsForm.Form = Ext.extend(Ext.FormPanel, {
         var form = this.getForm();
         var options = Inprint.session.options;
 
-        //if (options && options["default.edition"])
-            //form.findField("edition-shortcut").on("render", function(field) { field.setValue(options["default.edition"], options["default.edition.name"]); });
-        //if (options && options["default.workgroup"])
-            //form.findField("workgroup-shortcut").on("render", function(field) { field.setValue(options["default.workgroup"], options["default.workgroup.name"]); });
+        var editionId    = options["default.edition"];
+        var editionTitle = options["default.edition.name"];
+        if (editionId && editionTitle) {
+            form.findField("edition").on("render", function(field) {
+                field.setValue( editionId, editionTitle );
+            });
+        }
+
+        var workgroupId    = options["default.workgroup"];
+        var workgroupTitle = options["default.workgroup.name"];
+        if (workgroupId && workgroupTitle) {
+            form.findField("workgroup").on("render", function(field) {
+                field.setValue( workgroupId, workgroupTitle );
+            });
+        }
+
+        var fontSizeTitles = {
+                "small":  _("Small size"),
+                "medium": _("Medium size"),
+                "large":  _("Large size")
+            };
+
+        var fontSize      = options["default.font.size"] || "medium";
+        var fontSizeTitle = fontSizeTitles[ fontSize ] || _("Medium size");
+
+        if (fontSize && fontSizeTitle) {
+            form.findField("font-size").on("render", function(field) {
+                field.setValue( fontSize, fontSizeTitle );
+            });
+        }
+
+        var fontStyleTitles = {
+                "times new roman": "Times New Roman"
+            };
+
+        var fontStyle      = options["default.font.style"] || "times new roman";
+        var fontStyleTitle = fontStyleTitles[ fontStyle ] || "Times New Roman";
+
+        if (fontStyle && fontStyleTitle) {
+            form.findField("font-style").on("render", function(field) {
+                field.setValue( fontStyle, fontStyleTitle );
+                field.setRawValue( fontStyle, fontStyleTitle );
+            });
+        }
+
+
     }
 
 });
