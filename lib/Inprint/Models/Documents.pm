@@ -318,6 +318,7 @@ sub search {
 
     foreach my $document (@$result) {
 
+
         # Get files list
         my $folder = Inprint::Store::Embedded::getFolderPath($c, "documents", $document->{created}, $document->{copygroup}, 1);
         my $files  = Inprint::Store::Cache::getRecordsByPath($c, $folder, "all", [ 'doc', 'rtf', 'odt', 'txt' ]);
@@ -330,18 +331,18 @@ sub search {
         }
 
         # Fix filepath
-        my $relativePath = Inprint::Store::Embedded::getRelativePath($c, "documents", $document->{created}, $document->{id}, 1);
-        $c->Do("UPDATE documents SET filepath=? WHERE copygroup=?", [ $relativePath, $document->{copygroup} ]);
+        # my $relativePath = Inprint::Store::Embedded::getRelativePath($c, "documents", $document->{created}, $document->{id}, 1);
+        # $c->Do("UPDATE documents SET filepath=? WHERE copygroup=?", [ $relativePath, $document->{copygroup} ]);
 
         # Update images count
-        my @images = ("jpg", "jpeg", "png", "gif", "bmp", "tiff" );
-        my $imgCount = $c->Q(" SELECT count(*) FROM cache_files WHERE file_path=? AND file_exists = true AND file_extension=ANY(?) ", [ $relativePath, \@images ])->Value;
-        $c->Do("UPDATE documents SET images=? WHERE filepath=? ", [ $imgCount || 0, $relativePath ]);
+        # my @images = ("jpg", "jpeg", "png", "gif", "bmp", "tiff" );
+        # my $imgCount = $c->Q(" SELECT count(*) FROM cache_files WHERE file_path=? AND file_exists = true AND file_extension=ANY(?) ", [ $relativePath, \@images ])->Value;
+        # $c->Do("UPDATE documents SET images=? WHERE filepath=? ", [ $imgCount || 0, $relativePath ]);
 
         # Update rsize count
-        my @documents = ("doc", "docx", "odt", "rtf", "txt" );
-        my $lengthCount = $c->Q(" SELECT sum(file_length) FROM cache_files WHERE file_path=? AND file_exists = true AND file_extension=ANY(?) ", [ $relativePath, \@documents ])->Value;
-        $c->Do("UPDATE documents SET rsize=? WHERE filepath=? ", [ $lengthCount || 0, $relativePath ]);
+        # my @documents = ("doc", "docx", "odt", "rtf", "txt" );
+        # my $lengthCount = $c->Q(" SELECT sum(file_length) FROM cache_files WHERE file_path=? AND file_exists = true AND file_extension=ANY(?) ", [ $relativePath, \@documents ])->Value;
+        # $c->Do("UPDATE documents SET rsize=? WHERE filepath=? ", [ $lengthCount || 0, $relativePath ]);
 
         # Get document pages
         $document->{pages} = Inprint::Utils::CollapsePagesToString($document->{pages});
@@ -356,16 +357,21 @@ sub search {
         my @rules = qw(update capture move transfer briefcase delete recover fupload fedit fdelete);
 
         foreach (@rules) {
+
+        	undef my $access;
+
             if ($document->{holder} eq $current_member) {
-                if ($c->objectAccess(["catalog.documents.$_:*"], $document->{workgroup})) {
-                    $document->{access}->{$_} = $c->json->true;
-                }
+            	$access = $c->objectAccess2(["catalog.documents.$_:*"], $document->{workgroup});
             }
+
             if ($document->{holder} ne $current_member) {
-                if ($c->objectAccess("catalog.documents.$_:group", $document->{workgroup})) {
-                    $document->{access}->{$_} = $c->json->true;
-                }
+            	$access = $c->objectAccess2("catalog.documents.$_:*", $document->{workgroup});
             }
+
+            if ($access) {
+				$document->{access}->{$_} = $c->json->true;
+            }
+
         }
 
     }
