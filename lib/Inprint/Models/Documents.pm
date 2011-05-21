@@ -316,8 +316,9 @@ sub search {
 
     my $result = $c->Q($sql_query, \@params)->Hashes;
 
-    foreach my $document (@$result) {
+    my $cacheAccess = {};
 
+    foreach my $document (@$result) {
 
         # Get files list
         my $folder = Inprint::Store::Embedded::getFolderPath($c, "documents", $document->{created}, $document->{copygroup}, 1);
@@ -358,19 +359,28 @@ sub search {
 
         foreach (@rules) {
 
-            undef my $access;
+            undef my $term;
 
             if ($document->{holder} eq $current_member) {
-                $access = $c->objectAccess2(["catalog.documents.$_:*"], $document->{workgroup});
+                $term = "catalog.documents.$_:*";
             }
 
             if ($document->{holder} ne $current_member) {
-                $access = $c->objectAccess2("catalog.documents.$_:*", $document->{workgroup});
+                $term = "catalog.documents.$_:group";
+            }
+            
+            if ( defined $cacheAccess->{$term ."::". $document->{workgroup}} ) {
+                $document->{access}->{$_} = $cacheAccess->{$term ."::". $document->{workgroup}};
+                next;
             }
 
+            my $access = $c->objectAccess2($term, $document->{workgroup});
+
             if ($access) {
+                $cacheAccess->{$term ."::". $document->{workgroup}} = $c->json->true;
                 $document->{access}->{$_} = $c->json->true;
             } else {
+                $cacheAccess->{$term ."::". $document->{workgroup}} = $c->json->false;
                 $document->{access}->{$_} = $c->json->false;
             }
 
