@@ -34,25 +34,38 @@ sub register {
 
             my ($c, $input, $binding, $member) = @_;
 
+            undef my $granted;
+
             unless ($member) {
                 $member = $c->getSessionValue("member.id");
             }
 
-            my $terms = _parseTerms($c, $input);
+            my $terms = _prepareTerms($c, $input);
 
-            foreach my $rule (@$terms) {
+            # Get rules from cache
+            foreach my $term (@$terms) {
+                $granted = getCacheRecord($c, $member, $binding, $term);
+                if ($granted == 1 || $granted == 0) {
+                    return $granted;
+                }
+            }
+
+            $granted = 0;
+
+            my $rules = _parseTerms($c, $terms);
+
+            foreach my $rule (@$rules) {
 
                 my ($rulestring, $area) = split /:/, $rule;
                 my ($section, $subsection, $term) = split /\./, $rulestring;
 
-                #die "$section, $subsection, $term $area";
-
-                #$c->dbh()->{pg_placeholder_dollaronly} = 1;
-                #$c->dbh()->{pg_placeholder_dollaronly} = 0;
+                $c->dbh()->{pg_placeholder_dollaronly} = 1;
 
                 my $sql = "SELECT binding FROM map_member_to_rule as mapper WHERE 1=1
                     AND mapper.termkey = \$1 AND member = \$2";
                 my @params = ($rule, $member);
+
+                $c->dbh()->{pg_placeholder_dollaronly} = 0;
 
                 if ($binding) {
                     $sql .= " AND binding=\$3 ";
@@ -61,83 +74,33 @@ sub register {
 
                 my $bindings = $c->Q($sql, \@params)->Values;
 
-                ## Domain
-                #if ($section eq "domain") {
-                #    return 1 if @$bindings;
-                #}
-
-                # Editions
-                if ($section eq "editions") {
-
-                #    if ($area eq "edition") {
-                #        return 1 if @$bindings;
-                #    }
-
-                #    if ($area eq "editions") {
-
-                #        $c->dbh()->{pg_placeholder_dollaronly} = 1;
-                #
-                #        my $subsql = "
-                #            SELECT EXISTS (
-                #                SELECT true FROM editions WHERE path ? ARRAY(
-                #                    SELECT ('*.' || replace(binding::text, '-', '')::text ||'.*')::lquery
-                #                    FROM map_member_to_rule as mapper WHERE 1=1
-                #                        AND mapper.termkey = \$1 AND member = \$2 ) ";
-                #
-                #        my @subparams = ( $rule, $member );
-                #
-                #        if ($binding) {
-                #            $subsql .= " AND path ~ ('*.' || replace(\$3, '-', '')::text ||'.*')::lquery ";
-                #            push @subparams, $binding;
-                #        }
-
-                #        $subsql .= " ) ";
-
-                #        my $exists = $c->Q($subsql, \@subparams)->Value;
-                #        $c->dbh()->{pg_placeholder_dollaronly} = 0;
-                #
-                #        return 1 if $exists;
-                #    }
+                # Domain
+                if ($section eq "domain") {
+                    if (@$bindings) {
+                        $granted = 1;
+                        last;
+                    }
                 }
 
-                # Catalog
-                if ($section eq "catalog") {
-
-                    # Select all catalog items for this binding
-
-                    my $bindobj = $c->Q("
-                         SELECT * FROM catalog WHERE id = ? ",
-                         [ $binding ])->Hash;
-
-                    my $routes = $c->Q("
-                        SELECT * FROM catalog
-                        WHERE
-                            path @> ? OR  path <@ ?"
-                        , [ $bindobj->{path}, $bindobj->{path} ])->Values;
-
-                    foreach (@$routes) {
-                        setCacheRecord($c, $member, $_, $rule, 0);
+                # Editions
+                if ($section eq "editions" && $area eq "edition") {
+                    if (@$bindings) {
+                        $granted = 1;
+                        last;
                     }
+                }
+
+                # Editions recursive
+                if ($section eq "editions" && $area eq "editions") {
 
                     $c->dbh()->{pg_placeholder_dollaronly} = 1;
 
-                    my $subsql;
-
-                    if ($area eq "member") {
-                        $subsql = "
-                            SELECT catalog.id FROM catalog, map_member_to_rule as mapper
-                            WHERE 1=1
-                                AND catalog.id = mapper.binding
-                                AND mapper.termkey = \$1 AND member = \$2 ";
-                    }
-
-                    if ($area eq "group") {
-                        $subsql = "
-                            SELECT id FROM catalog WHERE path ? ARRAY(
+                    my $subsql = "
+                        SELECT EXISTS (
+                            SELECT true FROM editions WHERE path ? ARRAY(
                                 SELECT ('*.' || replace(binding::text, '-', '')::text ||'.*')::lquery
                                 FROM map_member_to_rule as mapper WHERE 1=1
                                     AND mapper.termkey = \$1 AND member = \$2 ) ";
-                    }
 
                     my @subparams = ( $rule, $member );
 
@@ -146,20 +109,56 @@ sub register {
                         push @subparams, $binding;
                     }
 
-                    my $items = $c->Q($subsql, \@subparams)->Values;
+                    $subsql .= " ) ";
 
+                    my $exists = $c->Q($subsql, \@subparams)->Value;
                     $c->dbh()->{pg_placeholder_dollaronly} = 0;
 
-                    foreach (@$items) {
-                        setCacheRecord($c, $member, $_, $rule, 1);
+                    if (@$bindings) {
+                        $granted = 1;
+                        last;
+                    }
+                }
+
+                # Catalog
+                if ($section eq "catalog") {
+
+                    $c->dbh()->{pg_placeholder_dollaronly} = 1;
+
+                    my $subsql = "
+                        SELECT EXISTS (
+                            SELECT true FROM catalog WHERE path ? ARRAY(
+                                SELECT ('*.' || replace(binding::text, '-', '')::text ||'.*')::lquery
+                                FROM map_member_to_rule as mapper WHERE 1=1
+                                    AND mapper.termkey = \$1 AND member = \$2 ) ";
+
+                    my @subparams = ( $rule, $member );
+
+                    if ($binding) {
+                        $subsql .= " AND path ~ ('*.' || replace(\$3, '-', '')::text ||'.*')::lquery ";
+                        push @subparams, $binding;
                     }
 
-                    return 1 if (@$items);
+                    $subsql .= " ) ";
+
+                    my $exists = $c->Q($subsql, \@subparams)->Value;
+                    $c->dbh()->{pg_placeholder_dollaronly} = 0;
+
+                    if ($exists) {
+                        $granted = 1 ;
+                        last;
+                    }
+
                 }
 
             }
 
-            return 0;
+            # Save rules to cache
+            foreach my $term (@$terms) {
+                setCacheRecord($c, $member, $binding, $term, $granted);
+            }
+
+            return $granted;
         } );
 
     $app->helper(
@@ -291,6 +290,59 @@ sub register {
 
 # The additional Functions
 
+
+sub setCacheRecord {
+    my ($c, $member, $binding, $termkey, $enabled) = @_;
+
+    $c->Do("
+           DELETE FROM cache_access WHERE member=? AND binding =? AND termkey=? ",
+           [ $member, $binding, $termkey ]);
+
+    $c->Do("
+           INSERT INTO cache_access (member, binding, termkey, enabled)
+           VALUES (?,?,?,?)",
+           [ $member, $binding, $termkey, $enabled ]);
+
+}
+
+sub getCacheRecord {
+    my ($c, $member, $binding, $termkey) = @_;
+
+    my $granted = $c->Q("
+           SELECT enabled FROM cache_access WHERE member=? AND binding=? AND termkey=? ",
+           [ $member, $binding, $termkey ])->Value;
+
+    unless (defined $granted) {
+        $granted = -1;
+    }
+
+    return $granted;
+}
+
+sub delCacheRecord {
+    my ($c, $member, $binding) = @_;
+
+    $c->Do("
+           DELETE FROM cache_access WHERE member=? AND binding=? ",
+           [ $member, $binding ]);
+
+    return 0;
+}
+
+sub _prepareTerms {
+   my ($c, $input) = @_;
+
+    my @rules;
+
+    if (ref $input eq "ARRAY") {
+        @rules = @$input;
+    } else {
+        push @rules, $input;
+    }
+
+    return \@rules;
+}
+
 sub _parseTerms {
 
     my ($c, $input) = @_;
@@ -339,28 +391,6 @@ sub _parseTerms {
     @$terms = grep { ! $seen{$_}++ } @$terms;
 
     return $terms;
-}
-
-sub setCacheRecord {
-    my ($c, $member, $binding, $termkey, $enabled) = @_;
-
-    $c->Do("
-           DELETE FROM cache_access WHERE member=? AND binding =? AND termkey=? ",
-           [ $member, $binding, $termkey ]);
-
-    $c->Do("
-           INSERT INTO cache_access (member, binding, termkey, enabled)
-           VALUES (?,?,?,?)",
-           [ $member, $binding, $termkey, $enabled ]);
-
-}
-
-sub getCacheRecord {
-    my ($c, $rule, $binding, $member);
-}
-
-sub delCacheRecord {
-    my ($c, $rule, $binding, $member);
 }
 
 sub _getNodes {

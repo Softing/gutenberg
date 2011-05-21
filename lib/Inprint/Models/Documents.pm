@@ -358,18 +358,20 @@ sub search {
 
         foreach (@rules) {
 
-        	undef my $access;
+            undef my $access;
 
             if ($document->{holder} eq $current_member) {
-            	$access = $c->objectAccess2(["catalog.documents.$_:*"], $document->{workgroup});
+                $access = $c->objectAccess(["catalog.documents.$_:*"], $document->{workgroup});
             }
 
             if ($document->{holder} ne $current_member) {
-            	$access = $c->objectAccess2("catalog.documents.$_:*", $document->{workgroup});
+                $access = $c->objectAccess("catalog.documents.$_:*", $document->{workgroup});
             }
 
             if ($access) {
-				$document->{access}->{$_} = $c->json->true;
+                $document->{access}->{$_} = $c->json->true;
+            } else {
+                $document->{access}->{$_} = $c->json->false;
             }
 
         }

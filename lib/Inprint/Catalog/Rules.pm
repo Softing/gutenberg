@@ -122,6 +122,12 @@ sub mapping {
 
     if ($i_section ~~ [ "domain", "editions", "catalog" ]) {
 
+        # Clear access cache
+
+        $c->Do("
+           DELETE FROM cache_access WHERE member=? ",
+           [ $i_member ]);
+
         my $sql = "
             SELECT member, section, area, term FROM map_member_to_rule WHERE member=? AND section=?
         ";
