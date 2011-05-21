@@ -361,11 +361,11 @@ sub search {
             undef my $access;
 
             if ($document->{holder} eq $current_member) {
-                $access = $c->objectAccess(["catalog.documents.$_:*"], $document->{workgroup});
+                $access = $c->objectAccess2(["catalog.documents.$_:*"], $document->{workgroup});
             }
 
             if ($document->{holder} ne $current_member) {
-                $access = $c->objectAccess("catalog.documents.$_:*", $document->{workgroup});
+                $access = $c->objectAccess2("catalog.documents.$_:*", $document->{workgroup});
             }
 
             if ($access) {
