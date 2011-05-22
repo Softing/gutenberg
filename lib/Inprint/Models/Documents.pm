@@ -315,11 +315,10 @@ sub search {
     }
 
     # Do sql query
-    die join '"},{"', @{ $params[0] };
     my $result = $c->Q($sql_query, \@params)->Hashes;
 
+    # Postprocess query
     my $cacheAccess = {};
-
     foreach my $document (@$result) {
 
         # Get files list
