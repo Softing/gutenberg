@@ -62,14 +62,15 @@ Inprint.cmp.ExcahngeBrowser = Ext.extend(Ext.Window, {
                 }
             ]
         });
+
         Inprint.cmp.ExcahngeBrowser.superclass.initComponent.apply(this, arguments);
-        Inprint.cmp.ExcahngeBrowser.Interaction(this, this.panels);
 
         this.addEvents('complete');
     },
 
     onRender: function() {
         Inprint.cmp.ExcahngeBrowser.superclass.onRender.apply(this, arguments);
+        Inprint.cmp.ExcahngeBrowser.Interaction(this, this.panels);
     }
 
 });
