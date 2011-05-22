@@ -144,18 +144,18 @@ sub search {
 
             dcm.islooked, dcm.isopen,
             dcm.branch, dcm.branch_shortcut,
-            dcm.stage, stage_shortcut,
+            dcm.stage, dcm.stage_shortcut,
             dcm.color, dcm.progress,
             dcm.title, dcm.author,
             dcm.pages,
-            to_char(dcm.pdate, 'YYYY-MM-DD HH24:MI:SS') as pdate,
-            to_char(dcm.fdate, 'YYYY-MM-DD HH24:MI:SS') as fdate,
-            dcm.psize, dcm.rsize,
+            to_char(dcm.pdate,    'YYYY-MM-DD HH24:MI:SS') as pdate,
+            to_char(dcm.fdate,    'YYYY-MM-DD HH24:MI:SS') as fdate,
+            dcm.psize,  dcm.rsize,
             dcm.images, dcm.files,
-            to_char(dcm.created, 'YYYY-MM-DD HH24:MI:SS') as created,
-            to_char(dcm.updated, 'YYYY-MM-DD HH24:MI:SS') as updated,
+            to_char(dcm.created,  'YYYY-MM-DD HH24:MI:SS') as created,
+            to_char(dcm.updated,  'YYYY-MM-DD HH24:MI:SS') as updated,
             to_char(dcm.uploaded, 'YYYY-MM-DD HH24:MI:SS') as uploaded,
-            to_char(dcm.moved, 'YYYY-MM-DD HH24:MI:SS') as moved
+            to_char(dcm.moved,    'YYYY-MM-DD HH24:MI:SS') as moved
 
         FROM documents dcm, fascicles fsc
         WHERE fsc.id = dcm.fascicle
@@ -163,7 +163,7 @@ sub search {
     ";
 
     my $sql_total = "
-        SELECT count(*)
+        SELECT count(dcm.id)
         FROM documents dcm, fascicles fsc
         WHERE fsc.id = dcm.fascicle
     ";
