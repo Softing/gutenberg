@@ -14,6 +14,12 @@ var EXTJS_VERSION   = "3.3.2";
 var EXTJS_PATH      = "/ext-3.3.2";
 var NULLID          = "00000000-0000-0000-0000-000000000000";
 
+Inprint.log = function() {
+    if(console) {
+         console.log.apply(console, arguments);
+    }
+}
+
 Ext.onReady(function() {
 
     Ext.QuickTips.init();
@@ -22,6 +28,7 @@ Ext.onReady(function() {
 
     var stateProvider = new Ext.ux.state.HttpProvider({
         url:'/state/',
+        autoRead:false,
         readBaseParams: {
             cmd: 'read'
         },
@@ -29,40 +36,15 @@ Ext.onReady(function() {
             cmd: 'save'
         }
     });
-
     Ext.state.Manager.setProvider(
         stateProvider
     );
 
     Inprint.session = {
         options: {}
-        };
-
-    // Start session manager
-    Inprint.updateSession = function(async, defer) {
-        Ext.Ajax.request({
-            async: async,
-            url: '/workspace/appsession/',
-            scope: this,
-            success: function(response) {
-                Inprint.session = Ext.util.JSON.decode( response.responseText );
-                if (Inprint.session && Inprint.session.member && Inprint.session.member.id ){
-                    Inprint.checkSettings();
-                    if (defer) {
-                        Inprint.updateSession.defer( 90000, this, [ true, true ]);
-                    }
-                } else {
-                    Ext.MessageBox.alert(
-                    _("Your session is closed"),
-                    _("Probably someone has entered in Inprint with your login on other computer. <br/> push F5 what to pass to authorization page"),
-                    function() {});
-                }
-            }
-        });
     };
 
     Inprint.checkInProgress = false;
-
     Inprint.checkSettings = function() {
 
         if (Inprint.checkInProgress) {
@@ -91,26 +73,73 @@ Ext.onReady(function() {
 
     };
 
-    Inprint.updateSession(true, true);
+    // Start session manager
+    Inprint.startSession = function(defer) {
+        Ext.Ajax.request({
+            url: '/workspace/startsession/',
+            scope: this,
+            success: function(response) {
 
-    // Enable layout
-    Inprint.layout   = new Inprint.Workspace();
+                Inprint.session = Ext.util.JSON.decode( response.responseText );
+                // Restore state data
 
-    // Resolve url
-    var params = Ext.urlDecode( window.location.search.substring( 1 ) );
+                var stateProvider = Ext.state.Manager.getProvider();
 
-    if (Inprint.registry[ params.aid ]){
-        Inprint.ObjectResolver.resolve({
-            aid: params.aid,
-            oid: params.oid,
-            pid: params.pid,
-            text: params.text,
-            description: params.description
+                Ext.each(Inprint.session.state, function(item) {
+                    stateProvider.state[item.name] = stateProvider.decodeValue(item.value);
+                }, this);
+
+                // Enable layout
+                Inprint.layout   = new Inprint.Workspace();
+
+                // Remove loading mask
+                Ext.get('loading').remove();
+                Ext.get('loading-mask').fadeOut({remove:true});
+
+                // Resolve url
+                var params = Ext.urlDecode( window.location.search.substring( 1 ) );
+
+                if (Inprint.registry[ params.aid ]){
+                    Inprint.ObjectResolver.resolve({
+                        aid: params.aid,
+                        oid: params.oid,
+                        pid: params.pid,
+                        text: params.text,
+                        description: params.description
+                    });
+                }
+
+                Inprint.checkSettings();
+
+                Inprint.updateSession.defer( 90000, this, [ true ]);
+
+            }
         });
-    }
+    };
 
-    // Remove loading mask
-    Ext.get('loading').remove();
-    Ext.get('loading-mask').fadeOut({remove:true});
+    Inprint.updateSession = function(defer) {
+        Ext.Ajax.request({
+            url: '/workspace/updatesession/',
+            scope: this,
+            success: function(response) {
+
+                Inprint.session = Ext.util.JSON.decode( response.responseText );
+
+                if (Inprint.session && Inprint.session.member.id ){
+                    if (defer) {
+                        Inprint.updateSession.defer( 90000, this, [ true ]);
+                    }
+                    return;
+                }
+
+                Ext.MessageBox.alert(
+                    _("Your session is closed"),
+                    _("Probably someone has entered in Inprint with your login on other computer. <br/> push F5 what to pass to authorization page"),
+                    function() {});
+            }
+        });
+    };
+
+    Inprint.startSession(true);
 
 });

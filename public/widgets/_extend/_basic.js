@@ -11,7 +11,7 @@ Ext.Ajax.on('beforerequest', function(conn, options) {
     options.extraParams = {
         ajax:true
     };
-}, this);
+});
 
 Ext.Ajax.on('requestexception', function(conn, response, options) {
 
@@ -23,15 +23,9 @@ Ext.Ajax.on('requestexception', function(conn, response, options) {
         errorText = errorText.replace(/%br%/g, "<br/>");
     }
 
-    Ext.Msg.show({
-        title:_("Communication error"),
-        minWidth:900,
-        maxWidth:900,
-        msg: errorText,
-        buttons: Ext.Msg.OK
-    });
+    Inprint.log(errorText);
 
-}, this);
+});
 
 Array.prototype.contains = function(obj) {
     var i = this.length;
