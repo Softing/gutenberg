@@ -10,8 +10,6 @@ use warnings;
 
 use base 'Mojolicious::Controller';
 
-use Inprint::Store::Embedded;
-
 sub get {
 
     my ($c, $id) = @_;
@@ -25,21 +23,24 @@ sub get {
 
     foreach (@rules) {
 
-        next if ( $fascicle->{archived} );
+        if ( $fascicle->{archived} && $_ ne "move ") {
+            $access{$_} = $c->json->false;
+            next;
+        }
 
         if ($document->{holder} eq $current_member) {
             if ($c->objectAccess(["catalog.documents.$_:*"], $document->{workgroup})) {
-                $access{$_} = 1;
+                $access{$_} = $c->json->true;
             } else {
-                $access{$_} = 0;
+                $access{$_} = $c->json->false;
             }
         }
 
         if ($document->{holder} ne $current_member) {
             if ($c->objectAccess("catalog.documents.$_:group", $document->{workgroup})) {
-                $access{$_} = 1;
+                $access{$_} = $c->json->true;
             } else {
-                $access{$_} = 0;
+                $access{$_} = $c->json->false;
             }
         }
 

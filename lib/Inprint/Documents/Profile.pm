@@ -11,6 +11,7 @@ use warnings;
 use base 'Mojolicious::Controller';
 
 use Inprint::Store::Embedded;
+use Inprint::Documents::Access;
 
 sub read {
 
@@ -62,28 +63,30 @@ sub read {
             $c->Do("UPDATE documents SET islooked=true WHERE id=?", $document->{id});
         }
 
-        # Get document rules
-        my @rules = qw( update capture move transfer briefcase delete recover discuss fadd fedit fdelete );
+        $document->{access} = Inprint::Documents::Access::get($c, $document->{id});
 
-        foreach (@rules) {
-
-            if ($document->{holder} eq $current_member) {
-                if ($c->objectAccess(["catalog.documents.$_:*"], $document->{workgroup})) {
-                    $document->{access}->{$_} = $c->json->true;
-                } else {
-                    $document->{access}->{$_} = $c->json->false;
-                }
-            }
-
-            if ($document->{holder} ne $current_member) {
-                if ($c->objectAccess("catalog.documents.$_:group", $document->{workgroup})) {
-                    $document->{access}->{$_} = $c->json->true;
-                } else {
-                    $document->{access}->{$_} = $c->json->false;
-                }
-            }
-
-        }
+        ## Get document rules
+        #my @rules = qw( update capture move transfer briefcase delete recover discuss fadd fedit fdelete );
+        #
+        #foreach (@rules) {
+        #
+        #    if ($document->{holder} eq $current_member) {
+        #        if ($c->objectAccess(["catalog.documents.$_:*"], $document->{workgroup})) {
+        #            $document->{access}->{$_} = $c->json->true;
+        #        } else {
+        #            $document->{access}->{$_} = $c->json->false;
+        #        }
+        #    }
+        #
+        #    if ($document->{holder} ne $current_member) {
+        #        if ($c->objectAccess("catalog.documents.$_:group", $document->{workgroup})) {
+        #            $document->{access}->{$_} = $c->json->true;
+        #        } else {
+        #            $document->{access}->{$_} = $c->json->false;
+        #        }
+        #    }
+        #
+        #}
 
     }
 
