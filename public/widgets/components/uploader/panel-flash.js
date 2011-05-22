@@ -28,7 +28,7 @@ Inprint.cmp.uploader.Flash = Ext.extend(AwesomeUploader, {
         this.initialConfig.xhrUploadUrl      = this.config.uploadUrl;
         this.initialConfig.flashUploadUrl    = this.config.uploadUrl;
         this.initialConfig.standardUploadUrl = this.config.uploadUrl;
-        this.initialConfig.maxFileSizeBytes  = 50 * 1024 * 1024;
+        this.initialConfig.maxFileSizeBytes  = 200 * 1024 * 1024;
 
         this.initialConfig.gridWidth = 490;
         this.initialConfig.gridHeight = 175;
