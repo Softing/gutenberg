@@ -4,7 +4,13 @@ Inprint.documents.Editor = Ext.extend(Ext.Panel, {
 
         this.panels = {};
 
-        this.panels.form     = new Inprint.documents.editor.FormPanel({
+        //this.panels.form     = new Inprint.documents.editor.FormPanel({
+        //    parent: this,
+        //    file: this.oid,
+        //    document: this.pid
+        //});
+
+        this.panels.form     = new Inprint.documents.editor.FormTinyMce({
             parent: this,
             file: this.oid,
             document: this.pid
