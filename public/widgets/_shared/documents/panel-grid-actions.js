@@ -44,15 +44,44 @@ Inprint.documents.GridActions = function() {
 
         // Move document(s) to another user
         Transfer: function() {
-            var panel = new Inprint.cmp.ExcahngeBrowser().show();
+
+            var params = {};
+
+            var editions = this.getValues("edition");
+            var stages   = this.getValues("stage");
+
+            for (var c=0; c < editions.length; c++) {
+                if (params.edition && params.edition != editions[c]) {
+                    params.edition = null;
+                    break;
+                }
+                params.edition = editions[c];
+            }
+
+            for (var c=0; c < stages.length; c++) {
+                if (params.stage && params.stage != stages[c]) {
+                    params.stage = null;
+                    break;
+                }
+                params.stage = stages[c];
+            }
+
+            var panel = new Inprint.cmp.ExcahngeBrowser(params).show();
+
             panel.on("complete", function(id){
+
                 Ext.Ajax.request({
                     url: _url("/documents/transfer/"),
                     scope:this,
                     success: this.cmpReload,
-                    params: { id: this.getValues("id"), transfer: id }
+                    params: {
+                        id: this.getValues("id"),
+                        transfer: id
+                    }
                 });
+
             }, this);
+
         },
 
         // Move document(s) to briefcase

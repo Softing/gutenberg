@@ -178,9 +178,17 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
 
     doClear: function() {
         var form = this.getForm();
+
         form.reset();
-        this.saveFilterState();
-        this.fireEvent('filter', this, {});
+
+        form.findField("edition").setValue("all", _("All editions"));
+        form.findField("fascicle").setValue("all", _("All fascicles"));
+        form.findField("group").setValue("all", _("All departments"));
+
+        this.doSearch();
+
+        //this.saveFilterState();
+        //this.fireEvent('filter', this, {});
     },
 
     getFilterParams: function() {
@@ -200,29 +208,48 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
     },
 
     saveFilterState: function() {
+        var state = {};
         var form = this.getForm();
-        var params = {};
-        params.edition    = { id: form.findField("edition").hiddenField.value, text: form.findField("edition").getRawValue()  };
-        params.group     = { id: form.findField("group").hiddenField.value,    text: form.findField("group").getRawValue()    };
-        params.fascicle  = { id: form.findField("fascicle").hiddenField.value, text: form.findField("fascicle").getRawValue() };
-        Ext.state.Manager.set(this.stateId + "-filter", params);
+
+        var edition           = form.findField("edition").hiddenField.value;
+        var edition_shortcut  = form.findField("edition").getRawValue();
+        var group             = form.findField("group").hiddenField.value;
+        var group_shortcut    = form.findField("group").getRawValue();
+        var fascicle          = form.findField("fascicle").hiddenField.value;
+        var fascicle_shortcut = form.findField("fascicle").getRawValue();
+
+        if (edition && edition_shortcut) {
+            state.edition    = { id: edition, text: edition_shortcut  };
+        }
+
+        if (group && group_shortcut) {
+            state.group    = { id: group, text: group_shortcut  };
+        }
+
+        if (fascicle && fascicle_shortcut) {
+            state.fascicle = { id: fascicle, text: fascicle_shortcut  };
+        }
+
+        Ext.state.Manager.set(this.stateId + "-filter", state);
     },
 
     restoreFilterState: function() {
-        var form = this.getForm();
+
         var params = {};
+        var form = this.getForm();
+
         var state = Ext.state.Manager.get(this.stateId + "-filter", {});
 
-        if (state.fascicle && state.fascicle.id != "clear") {
+        if (state.fascicle && state.fascicle.id != "all") {
             form.findField("headline").enable();
         }
 
-        if (state.headline && state.headline.id != "clear") {
+        if (state.headline && state.headline.id != "all") {
             form.findField("rubric").enable();
         }
 
         for (var i in state) {
-            if (state[i].id && state[i].id != "clear") {
+            if (state[i].id && state[i].id != "all") {
                 var field = form.findField(i);
                 if (field) {
                     params["flt_"+i] = state[i].id;
