@@ -35,8 +35,10 @@ sub get {
         $result->{access} = Inprint::Documents::Access::get($c, $document->{id});
     }
 
-    $c->smart_render(\@errors, $result);
+    $result ->{text} =~ s/<p[^>]*>//g;
+    $result ->{text} =~ s/<\/p>/<br \/>/g;
 
+    $c->smart_render(\@errors, $result);
 }
 
 sub set {

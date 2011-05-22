@@ -355,7 +355,7 @@ sub __clearHtml {
 
     my $html = shift;
 
-    my $scrubber = HTML::Scrubber->new( allow => [ qw[ p b i u ol ul li sub sup table col tr td th tbody ] ]);
+    my $scrubber = HTML::Scrubber->new( allow => [ qw[ p br b i u ol ul li sub sup table col tr td th tbody ] ]);
     $scrubber->rules(
 
         table =>{
@@ -406,32 +406,14 @@ sub __clearHtml {
 
     $html = $scrubber->scrub($html);
 
-    ## постпроцессинг
-    $html =~ s/\n+/ /g;
-    $html =~ s/\r+/ /g;
+    #$html =~ s/\r+//g;
+    #$html =~  s/\n.*//s;
+
+    $html =~ s/^\s+|\s+$//g;
+    $html =~ s/<font><font>//g;
+    $html =~ s/<\/font><\/font>//g;
 
     $html =~ s/<table/<table border=1/ig;
-
-    #use HTML::Clean;
-    #my $h = new HTML::Clean(\$html);
-    #
-    #$h->compat();
-    #$h->strip();
-    #my $data = $h->data();
-    #die $$data;
-
-    #$data =~ s/(<br>)+/<br>/ig;
-    #$data =~ s/<p><br>\s+<\/p>/ /ig;
-    #
-    #$data =~ s/<b>\s+<\/b>/ /ig;
-    #
-    #$data =~ s/<font>\n+<\/font>/ /ig;
-    #$data =~ s/<font>\s+<\/font>/ /ig;
-    #
-    #$data =~ s/<td>\s+<\/td>/<td>&nbsp;<\/td>/ig;
-    #
-    #$data =~ s/<font>(.*?)<\/font>/$1/ig;
-    #$data =~ s/<font \w+="#\w+"> <\/font>/ /isg;
 
     $html =~ s/\t+/ /ig;
     $html =~ s/\s+/ /ig;

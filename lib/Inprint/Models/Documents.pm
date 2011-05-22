@@ -362,6 +362,8 @@ sub search {
 
             undef my $term;
 
+            next if ( $fascicle->{archived} );
+
             if ($document->{holder} eq $current_member) {
                 $term = "catalog.documents.$_:*";
             }
