@@ -12,4 +12,5 @@ perl -MCPAN -e "install HTML::Scrubber"
 perl -MCPAN -e "install GD::Text"
 perl -MCPAN -e "install Text::Unidecode"
 perl -MCPAN -e "install Image::Magick"
+perl -MCPAN -e "install Image::ExifTool"
 
