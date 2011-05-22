@@ -18,7 +18,7 @@ Please visit http://mojolicious.org for detailed installation instructions.
 EOF
 
 #$ENV{MOJO_TMPDIR} = 'tmp/upload';
-$ENV{MOJO_MAX_MESSAGE_SIZE} = 50 * 1024 * 1024; # 50 MB
+$ENV{MOJO_MAX_MESSAGE_SIZE} = 200 * 1024 * 1024; # 50 MB
 
 # Application
 $ENV{MOJO_APP} ||= 'Inprint';
