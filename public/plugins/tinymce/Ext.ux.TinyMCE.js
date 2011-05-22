@@ -1,13 +1,13 @@
 /** ************************************************************
 	Ext.ux.TinyMCE v0.8.5
 	ExtJS form field containing TinyMCE v3.
-	
+
 	Author: Andrew Mayorov et al.
 	http://blogs.byte-force.com/xor
-	
+
 	Copyright (c)2008-2010 BYTE-force
 	www.byte-force.com
-	
+
 	License: LGPLv2.1 or later
 */
 
@@ -99,7 +99,7 @@
 			//this.el.dom.style.border = '0 none';
 			this.el.dom.setAttribute('tabIndex', -1);
 			this.el.addClass('x-hidden');
-			
+
 			// Wrap textarea into DIV
 			this.textareaEl = this.el;
 			var wrapElStyle = { overflow: "hidden" };
@@ -110,12 +110,12 @@
 			this.wrapEl = this.el.wrap({ style: wrapElStyle });
 			this.actionMode = "wrapEl"; // Set action element to the new wrapper
 			this.positionEl = this.wrapEl;
-			
+
 			var id = this.getId();
 
 			// Create TinyMCE editor.
 			this.ed = new tinymce.Editor(id, this.tinymceSettings);
-			
+
 			// Validate value onKeyPress
 			var validateContentTask = new Ext.util.DelayedTask( this.validate, this );
 			this.ed.onKeyPress.add(function(ed, controlManager) {
@@ -142,7 +142,7 @@
 							, true )
 						.appendChild(tbars);
 				}
-				
+
 				// Change window manager
 				ed.windowManager = new WindowManager({
 					editor: this.ed,
@@ -175,20 +175,21 @@
 			// Render the editor
 			this.ed.render();
 			tinyMCE.add(this.ed);
-			
+
 			// Fix editor size when control will be visible
 			(function fixEditorSize() {
-			
+
 				// If element is not visible yet, wait.
 				if( !this.isVisible() ) {
 					arguments.callee.defer( 50, this );
 					return;
 				}
-				
+
 				var size = this.getSize();
 				this.withEd( function() {
+
 					this._setEditorSize( size.width, size.height );
-					
+
 					// Indicate that editor is created
 					this.fireEvent("editorcreated");
 				});
@@ -221,7 +222,7 @@
 					this.setValue(this.value);
 				}
 				else {
-					var v = this.textareaEl.value; 
+					var v = this.textareaEl.value;
 					if ( v )
 						this.setValue( v );
 				}
@@ -242,7 +243,7 @@
 
 			if( !this.rendered || !this.ed.initialized )
 				return Ext.value( this.value, '' );
-				
+
 			var v = this.ed.getContent();
 			if(v === this.emptyText){
 				v = '';
@@ -356,28 +357,28 @@
 				this.withEd(function() { this._setEditorSize( aw, ah ); });
 			}
 		},
-		
+
 		/** ----------------------------------------------------------
 			Sets control size to the given width and height
 		*/
 		_setEditorSize: function( width, height ) {
-		
+
 			// We currently support only advanced theme resize
 			if( !this.ed.theme.AdvancedTheme ) return;
-		
+
 			// Minimal width and height for advanced theme
 			if( width < 100 ) width = 100;
 			if( height < 129 ) height = 129;
-			
+
 			// Set toolbar div width
-			var edTable = Ext.get(this.ed.id + "_tbl"), 
+			var edTable = Ext.get(this.ed.id + "_tbl"),
 				edIframe = Ext.get(this.ed.id + "_ifr"),
 				edToolbar = Ext.get(this.ed.id + "_xtbar");
-			
+
 			var toolbarWidth = width;
-			if( edTable ) 
-				toolbarWidth = width - edTable.getFrameWidth( "lr" );		
-			
+			if( edTable )
+				toolbarWidth = width - edTable.getFrameWidth( "lr" );
+
 			var toolbarHeight = 0;
 			if( edToolbar ) {
 				toolbarHeight = edToolbar.getHeight();
@@ -385,21 +386,21 @@
 				toolbarHeight += toolbarTd.getFrameWidth( "tb" );
 				edToolbar.setWidth( toolbarWidth );
 			}
-			
+
 			var edStatusbarTd = edTable.child( ".mceStatusbar" );
 			var statusbarHeight = 0;
 			if( edStatusbarTd ) {
 				statusbarHeight += edStatusbarTd.getHeight();
 			}
-			
+
 			var iframeHeight = height - toolbarHeight - statusbarHeight;
 			var iframeTd = edIframe.findParent( "td", 5, true );
 			if( iframeTd )
 				iframeHeight -= iframeTd.getFrameWidth( "tb" );
-				
+
 			// Resize iframe and container
-			edTable.setSize( width, height );
-			edIframe.setSize( toolbarWidth, iframeHeight );
+			edTable.setSize( width, height-37 );
+			edIframe.setSize( toolbarWidth, iframeHeight-37 );
 		},
 
 		/** ----------------------------------------------------------
@@ -425,7 +426,7 @@
 		processValue : function( value ){
 			return Ext.util.Format.stripTags( value );
 		},
-		
+
 		/** ----------------------------------------------------------
 		*/
 		validateValue: function( value ) {
@@ -452,7 +453,7 @@
 			if(value.length > this.maxLength){
 				this.markInvalid(String.format(this.maxLengthText, this.maxLength));
 				return false;
-			}	
+			}
 			if(this.vtype){
 				var vt = Ext.form.VTypes;
 				if(!vt[this.vtype](value, this)){
@@ -657,7 +658,7 @@
 						var w = Ext.getCmp(id);
 						if (w) w.setActive(true);
 					}
-					
+
 				});
 
 				/** ----------------------------------------------------------
