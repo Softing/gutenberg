@@ -314,6 +314,8 @@ sub search {
         push @params, $start;
     }
 
+    # Do sql query
+    die join '"},{"', @{ $params[0] };
     my $result = $c->Q($sql_query, \@params)->Hashes;
 
     my $cacheAccess = {};
@@ -368,7 +370,7 @@ sub search {
             if ($document->{holder} ne $current_member) {
                 $term = "catalog.documents.$_:group";
             }
-            
+
             if ( defined $cacheAccess->{$term ."::". $document->{workgroup}} ) {
                 $document->{access}->{$_} = $cacheAccess->{$term ."::". $document->{workgroup}};
                 next;

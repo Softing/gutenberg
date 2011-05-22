@@ -11,10 +11,10 @@ Inprint.documents.GridColumns = function() {
             id : 'viewed',
             fixed : true,
             header : '&nbsp;',
-            width : 26,
+            width : 23,
             renderer : function(value, p, record) {
                 if (!record.data.islooked) {
-                    return '<img title="Материал был просмотрен текущим владельцем" src="'+ _ico("flag") +'">';
+                    return '<img title="" src="'+ _ico("flag") +'">';
                 }
                 return '';
             }
@@ -193,7 +193,7 @@ Inprint.documents.GridColumns = function() {
             id:"images",
             dataIndex: "images",
             header : '<img src="'+ _ico("camera") +'">',
-            width:30
+            width:23
         },
 
         size: {

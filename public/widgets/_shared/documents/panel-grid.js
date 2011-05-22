@@ -53,7 +53,7 @@ Inprint.documents.Grid = Ext.extend(Inprint.grid.GridPanel, {
         var tbar = {
             xtype    : 'container',
             layout   : 'anchor',
-            height   : 28 +25,
+            height   : 28 +28,
             defaults : { anchor : '100%' },
             items    : [
                 {
@@ -168,7 +168,6 @@ Inprint.documents.Grid = Ext.extend(Inprint.grid.GridPanel, {
                 },
                 {
                     xtype: "toolbar",
-                    height : 25,
                     items : filter
                 }
             ]
@@ -231,12 +230,14 @@ Inprint.documents.Grid = Ext.extend(Inprint.grid.GridPanel, {
 
         Inprint.documents.Grid.superclass.onRender.apply(this, arguments);
 
-        this.filter.on("filter", function(filter, params) {
-            this.cmpLoad(params);
+        this.filter.on("restore", function(filter, params) {
+            this.on("viewready", function(grid) {
+                    this.cmpLoad({ params: Ext.apply({start:0, limit:60}, params) }, true);
+                });
         }, this);
 
-        this.filter.on("restore", function(filter, params) {
-            this.cmpLoad({ params: Ext.apply({start:0, limit:60}, params) }, true);
+        this.filter.on("filter", function(filter, params) {
+            this.cmpLoad(params);
         }, this);
 
         this.on("rowdblclick", function(grid, index, e){

@@ -44,8 +44,8 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                 columnWidth:.125,
                 xtype: "treecombo",
                 name: "group",
-                fieldLabel: _("Group"),
-                emptyText: _("Group") + "...",
+                fieldLabel: _("Department"),
+                emptyText: _("Department") + "...",
                 minListWidth: 300,
                 url: _url('/common/tree/workgroups/'),
                 baseParams: {
@@ -147,6 +147,13 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                 cls: 'x-btn-icon',
                 scope:this,
                 handler: this.doSearch
+            },
+            {
+                xtype: 'button',
+                icon: _ico('cross'),
+                cls: 'x-btn-icon',
+                scope:this,
+                handler: this.doClear
             }
 
         ];
@@ -167,6 +174,13 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
         var params = this.getFilterParams();
         this.saveFilterState();
         this.fireEvent('filter', this, params);
+    },
+
+    doClear: function() {
+        var form = this.getForm();
+        form.reset();
+        this.saveFilterState();
+        this.fireEvent('filter', this, {});
     },
 
     getFilterParams: function() {
