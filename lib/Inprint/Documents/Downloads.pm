@@ -54,7 +54,7 @@ sub list {
         FROM documents dcm, cache_files fls, fascicles fsc
         WHERE 1=1
             AND dcm.filepath = fls.file_path
-            AND dcm.fascicle <> fsc.id
+            AND dcm.fascicle = fsc.id
             AND fsc.id <> '99999999-9999-9999-9999-999999999999'
             AND fsc.enabled  = true
             AND fsc.archived = false
