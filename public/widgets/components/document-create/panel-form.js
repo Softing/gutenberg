@@ -71,8 +71,8 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                             },
                             defaultType: 'textfield',
                             items :[
-                                
-                                
+
+
                                 {
                                     allowBlank:false,
                                     xtype: "treecombo",
@@ -83,7 +83,8 @@ Inprint.cmp.CreateDocument.Form = Ext.extend(Ext.FormPanel, {
                                     minListWidth: 300,
                                     url: _url('/common/tree/editions/'),
                                     baseParams: {
-                                        term: 'editions.documents.work:*'
+                                        //term: 'editions.documents.work:*',
+                                        term: 'editions.documents.assign:*'
                                     },
                                     root: {
                                         id:'00000000-0000-0000-0000-000000000000',
