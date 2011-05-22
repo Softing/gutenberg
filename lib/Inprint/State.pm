@@ -38,8 +38,8 @@ sub read {
     };
 
     $result->{data} = $c->Q("
-        SELECT param as name, value FROM state WHERE member = ?
-    ", [ $sid ])->Hashes;
+        SELECT param as name, value FROM state WHERE member = ? ",
+        [ $sid ])->Hashes;
 
     return $result;
 }

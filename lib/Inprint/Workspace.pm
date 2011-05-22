@@ -88,7 +88,49 @@ sub index
     );
 }
 
-sub appsession {
+sub startsession {
+
+    my $c = shift;
+
+    my $result = {};
+
+    # Get state data
+
+    my $sid = $c->session("sid");
+    $result->{state} = $c->Q("
+        SELECT param as name, value FROM state WHERE member = ? ",
+        [ $sid ])->Hashes || [];
+
+    # Get member data
+    my $member = $c->Q("
+        SELECT t2.id, t2.login, t3.title, t3.shortcut, t3.job_position as position
+        FROM sessions t1, members t2 LEFT JOIN profiles t3 ON (t3.id = t2.id) WHERE t1.id=? AND t1.member = t2.id ",
+        [ $c->session("sid") ])->Hash || {};
+
+    $result->{member} = $member;
+
+    $c->setSessionValue("member.id",  $result->{member}->{id});
+
+    my $options = $c->Q(" SELECT option_name, option_value FROM options WHERE member=? ", [ $member->{id} ])->Hashes || [];
+    foreach my $item (@$options) {
+        $result->{options}->{$item->{option_name}} = $item->{option_value};
+        $c->setSessionValue("options.". $item->{option_name}, $item->{option_value});
+    }
+
+    my $edition   = $c->Q(" SELECT id, shortcut FROM editions WHERE id=? ", [$result->{options}->{"default.edition"}])->Hash;
+
+    $result->{options}->{"default.edition"} = $edition->{id};
+    $result->{options}->{"default.edition.name"} = $edition->{shortcut};
+
+    my $workgroup = $c->Q(" SELECT id, shortcut FROM catalog WHERE id=? ", [$result->{options}->{"default.workgroup"}])->Hash;
+
+    $result->{options}->{"default.workgroup"} = $workgroup->{id};
+    $result->{options}->{"default.workgroup.name"} = $workgroup->{shortcut};
+
+    $c->render_json($result);
+}
+
+sub updatesession {
 
     my $c = shift;
 

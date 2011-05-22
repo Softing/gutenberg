@@ -470,7 +470,8 @@ sub startup {
     $sessionBridge->route('/workspace/')                    ->to('workspace#index');
     $sessionBridge->route('/workspace/access/')             ->to('workspace#access');
     $sessionBridge->route('/workspace/state/')              ->to('workspace#state');
-    $sessionBridge->route('/workspace/appsession/')         ->to('workspace#appsession');
+    $sessionBridge->route('/workspace/startsession/')       ->to('workspace#startsession');
+    $sessionBridge->route('/workspace/updatesession/')      ->to('workspace#updatesession');
     $sessionBridge->route('/workspace/logout/')             ->to('session#logout');
 
     # Main route
