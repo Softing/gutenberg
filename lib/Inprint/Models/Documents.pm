@@ -375,7 +375,7 @@ sub search {
                 next;
             }
 
-            my $access = $c->objectAccess2($term, $document->{workgroup});
+            my $access = $c->objectAccess($term, $document->{workgroup});
 
             if ($access) {
                 $cacheAccess->{$term ."::". $document->{workgroup}} = $c->json->true;

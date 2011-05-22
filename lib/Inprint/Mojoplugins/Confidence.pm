@@ -9,7 +9,7 @@ use warnings;
 use strict;
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub register {
     my ( $self, $app, $conf ) = @_;
@@ -30,7 +30,7 @@ sub register {
 
     $app->helper(
 
-        objectAccess2 => sub {
+        objectAccess => sub {
 
             my ($c, $input, $binding, $member) = @_;
 
@@ -163,7 +163,7 @@ sub register {
 
     $app->helper(
 
-        objectAccess => sub {
+        objectAccessOld => sub {
 
             my ($c, $input, $binding, $member) = @_;
 
@@ -294,6 +294,10 @@ sub register {
 sub setCacheRecord {
     my ($c, $member, $binding, $termkey, $enabled) = @_;
 
+    unless ($binding) {
+        $binding = '00000000-0000-0000-0000-000000000000';
+    }
+
     $c->Do("
            DELETE FROM cache_access WHERE member=? AND binding =? AND termkey=? ",
            [ $member, $binding, $termkey ]);
@@ -307,6 +311,10 @@ sub setCacheRecord {
 
 sub getCacheRecord {
     my ($c, $member, $binding, $termkey) = @_;
+
+    unless ($binding) {
+        $binding = '00000000-0000-0000-0000-000000000000';
+    }
 
     my $granted = $c->Q("
            SELECT enabled FROM cache_access WHERE member=? AND binding=? AND termkey=? ",
