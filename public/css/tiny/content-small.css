@@ -1,0 +1,9 @@
+body, td, pre {
+    color:#000;
+    font-family: "Times New Roman", Georgia, Serif;
+    font-size:12px;
+    margin:8px;
+}
+br {
+    margin-bottom:20px;
+}
