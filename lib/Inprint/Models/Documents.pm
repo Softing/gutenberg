@@ -148,10 +148,13 @@ sub search {
             dcm.color, dcm.progress,
             dcm.title, dcm.author,
             dcm.pages,
+
             to_char(dcm.pdate,    'YYYY-MM-DD HH24:MI:SS') as pdate,
             to_char(dcm.fdate,    'YYYY-MM-DD HH24:MI:SS') as fdate,
+
             dcm.psize,  dcm.rsize,
             dcm.images, dcm.files,
+
             to_char(dcm.created,  'YYYY-MM-DD HH24:MI:SS') as created,
             to_char(dcm.updated,  'YYYY-MM-DD HH24:MI:SS') as updated,
             to_char(dcm.uploaded, 'YYYY-MM-DD HH24:MI:SS') as uploaded,
@@ -362,7 +365,7 @@ sub search {
 
             undef my $term;
 
-            next if ( $fascicle->{archived} );
+            #next if ( $fascicle->{archived} );
 
             if ($document->{holder} eq $current_member) {
                 $term = "catalog.documents.$_:*";

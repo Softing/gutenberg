@@ -15,6 +15,9 @@ sub index
 {
     my $c = shift;
 
+    my $accessFascicleView = $c->objectAccess(
+            "editions.fascicle.view:*", '57ea720b-39fb-4e96-bcb6-ae3ebf6d474b');
+
     ############################################################################
     # About menu items
     ############################################################################
@@ -114,6 +117,7 @@ sub index
             AND deleted = false
         ORDER BY t1.release_date, t2.shortcut, t1.shortcut
     ")->Hashes;
+    
 
     foreach my $item (@$fascicles) {
         $item->{attachments} = $c->Q("

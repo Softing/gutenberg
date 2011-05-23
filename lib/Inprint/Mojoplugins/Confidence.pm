@@ -45,6 +45,11 @@ sub register {
             # Get rules from cache
             foreach my $term (@$terms) {
                 $granted = getCacheRecord($c, $member, $binding, $term);
+
+                #if ($member = '39d40812-fc54-4342-9b98-e1c1f4222d22') {
+                #    next;
+                #}
+
                 if ($granted == 1 || $granted == 0) {
                     return $granted;
                 }
@@ -114,7 +119,7 @@ sub register {
                     my $exists = $c->Q($subsql, \@subparams)->Value;
                     $c->dbh()->{pg_placeholder_dollaronly} = 0;
 
-                    if (@$bindings) {
+                    if ($exists) {
                         $granted = 1;
                         last;
                     }
