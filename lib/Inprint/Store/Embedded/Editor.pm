@@ -379,7 +379,7 @@ sub __clearHtml {
 
     my $html = shift;
 
-    my $scrubber = HTML::Scrubber->new( allow => [ qw[ p br b i u ol ul li sub sup table col tr td th tbody ] ]);
+    my $scrubber = HTML::Scrubber->new( allow => [ qw[ p br b i u ol strong em span ul li sub sup table col tr td th tbody ] ]);
     $scrubber->rules(
 
         table =>{
@@ -414,6 +414,10 @@ sub __clearHtml {
         {
             align => 0,
             '*'   => 0
+        },
+
+        span => {
+            style => 1
         },
 
         font =>
