@@ -98,8 +98,8 @@ sub __adaptPath {
 sub __decodePath {
     my ($c, $string) = @_;
     $string = Encode::decode("cp1251", $string) if ($^O eq "MSWin32");
-    $string = Encode::decode("utf8", $string)   if ($^O eq "darwin");
-    $string = Encode::decode("utf8", $string)   if ($^O eq "linux");
+    #$string = Encode::decode("utf8", $string)   if ($^O eq "darwin");
+    #$string = Encode::decode("utf8", $string)   if ($^O eq "linux");
     return $string;
 }
 

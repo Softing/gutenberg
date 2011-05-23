@@ -115,10 +115,21 @@ Inprint.advertising.downloads.Files = Ext.extend(Ext.grid.GridPanel, {
 
             evtObj.stopEvent();
 
-            var rowCtxMenuItems = [];
-
             var record = thisGrid.getStore().getAt(rowIndex);
             var selCount = thisGrid.getSelectionModel().getCount();
+
+            var rowCtxMenuItems = [];
+
+            //if (this.access["fdelete"]  === true) {
+                //rowCtxMenuItems.push("-");
+                rowCtxMenuItems.push({
+                    icon: _ico("document-shred"),
+                    cls: "x-btn-text-icon",
+                    text: _("Delete file"),
+                    scope:this,
+                    handler : this.cmpDelete
+                });
+            //}
 
             thisGrid.rowCtxMenu = new Ext.menu.Menu({
                 items : rowCtxMenuItems
@@ -213,6 +224,24 @@ Inprint.advertising.downloads.Files = Ext.extend(Ext.grid.GridPanel, {
         this.cmpDownload({
             translitEnabled: true
         });
+    },
+
+    cmpDelete: function() {
+        Ext.MessageBox.confirm(
+            _("Irrevocable action!"),
+            _("Remove selected files?"),
+            function(btn) {
+                if (btn == "yes") {
+                    Ext.Ajax.request({
+                        url: _source("requests.files.delete"),
+                        scope:this,
+                        success: this.cmpReload,
+                        params: {
+                            "pkey": this.pkey,
+                            "file[]": this.getValues("id") }
+                    });
+                }
+            }, this).setIcon(Ext.MessageBox.WARNING);
     }
 
 });

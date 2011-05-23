@@ -214,33 +214,52 @@ sub preview {
 
             my $convertSrc;
 
-            if ( lc($fileExt) ~~ [ "jpg", "jpeg", "png", "gif", "bmp", "tif", "tiff", "pdf", "eps" ]) {
+            if ( lc($fileExt) ~~ [ "eps" ]) {
+                system "epstool --quiet --page-number 0 --dpi 300 --ignore-warnings --extract-preview \"$fileSrc\" \"$thumbSrc\" ";
+                if (-r $thumbSrc) {
 
-                if ( lc($fileExt) ~~ [ "eps" ]) {
-                    system "epstool --quiet --page-number 0 --dpi 300 --ignore-warnings --extract-preview \"$fileSrc\" \"$thumbSrc\" ";
-                    $convertSrc = $thumbSrc;
-                }
-
-                if ( lc($fileExt) ~~ [ "jpg", "jpeg", "png", "gif", "bmp", "tif", "tiff", "pdf" ]) {
-                    $convertSrc = $fileSrc;
-                }
-
-                if (-r $convertSrc) {
                     my $image = Image::Magick->new;
-                    my $x = $image->Read($convertSrc);
+                    my $x = $image->Read($thumbSrcOrig);
                     warn "$x" if "$x";
 
                     if ($size > 0) {
+
                         $x = $image->AdaptiveResize(geometry=>$size);
                         die "$x" if "$x";
                         $x = $image->Normalize();
+                        die "$x" if "$x";
+                        $x = $image->Strip();
                         die "$x" if "$x";
                     }
 
                     $x = $image->Write($thumbSrcOrig);
                     die "$x" if "$x";
-                }
 
+                }
+            }
+
+            if ( lc($fileExt) ~~ [ "jpg", "jpeg", "png", "gif", "bmp", "tif", "tiff", "pdf" ]) {
+
+                if (-r $fileSrc) {
+
+                    my $image = Image::Magick->new;
+                    my $x = $image->Read($fileSrcOrig);
+                    warn "$x" if "$x";
+
+                    if ($size > 0) {
+
+                        $x = $image->AdaptiveResize(geometry=>$size);
+                        die "$x" if "$x";
+                        $x = $image->Normalize();
+                        die "$x" if "$x";
+                        $x = $image->Strip();
+                        die "$x" if "$x";
+                    }
+
+                    $x = $image->Write($thumbSrcOrig);
+                    die "$x" if "$x";
+
+                }
             }
 
             if (lc($fileExt) ~~ ['doc', 'docx', 'txt', 'rtf', 'odt', 'xls', 'xlsx', 'odp', 'ods' ]) {
@@ -265,6 +284,8 @@ sub preview {
                         $x = $image2->AdaptiveResize(geometry=>$size);
                         die "$x" if "$x";
                         $x = $image2->Normalize();
+                        die "$x" if "$x";
+                        $x = $image->Strip();
                         die "$x" if "$x";
                     }
 
@@ -304,6 +325,14 @@ sub __adaptPath {
     $string =~ s/\/+/\//g   if ($^O eq "darwin");
     $string =~ s/\\/\//g    if ($^O eq "linux");
     $string =~ s/\/+/\//g   if ($^O eq "linux");
+    return $string;
+}
+
+sub __decodePath {
+    my ($c, $string) = @_;
+    $string = Encode::decode("cp1251", $string) if ($^O eq "MSWin32");
+    #$string = Encode::decode("utf8", $string)   if ($^O eq "darwin");
+    #$string = Encode::decode("utf8", $string)   if ($^O eq "linux");
     return $string;
 }
 

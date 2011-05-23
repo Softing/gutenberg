@@ -8,7 +8,6 @@ package Inprint::Documents::Text;
 use strict;
 use warnings;
 
-
 use Inprint::Documents::Access;
 use Inprint::Store::Embedded;
 

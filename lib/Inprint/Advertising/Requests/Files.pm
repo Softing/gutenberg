@@ -218,14 +218,13 @@ sub description {
 sub delete {
     my $c = shift;
 
-    my $i_document = $c->param("document");
-    my @i_files = $c->param("file");
+    my $i_pkey  = $c->param("pkey");
+    my @i_files = $c->param("file[]");
 
     my @errors;
-    my $success = $c->json->false;
 
-    $c->check_uuid( \@errors, "document", $i_document);
-    my $document = $c->check_record(\@errors, "documents", "document", $i_document);
+    $c->check_uuid( \@errors, "request", $i_pkey);
+    my $object = $c->check_record(\@errors, "fascicles_requests", "request", $i_pkey);
 
     unless (@errors) {
         foreach my $file(@i_files) {
@@ -234,7 +233,7 @@ sub delete {
         }
     }
 
-    $c->render_json({});
+    $c->smart_render(\@errors);
 }
 
 sub download {
