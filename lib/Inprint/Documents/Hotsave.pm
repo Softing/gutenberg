@@ -12,8 +12,6 @@ use warnings;
 
 use HTML::Scrubber;
 
-
-
 use base 'Mojolicious::Controller';
 
 sub list {
@@ -63,16 +61,17 @@ sub read {
     my $basepath = $c->config->get("store.path");
     my $filepath = "$basepath/$cacheRecord";
 
-    if ( -r $filepath ) {
+    $filepath = __adaptPath($c, $filepath);
+    $filepath = __encodePath($c, $filepath);
 
+    if ( -r $filepath ) {
         open my $INPUT, "<", $filepath || die "Can't open <$filepath> : $!";
         binmode $INPUT;
         while (<$INPUT>) { $fileContent .= $_; }
         close $INPUT;
-
     }
     else {
-        $fileContent = "file not found";
+        $fileContent = "File not found!";
     }
 
     $success = $c->json->true unless (@errors);
@@ -85,11 +84,38 @@ sub read {
 }
 
 
+sub __adaptPath {
+    my ($c, $string) = @_;
+    $string =~ s/\//\\/g    if ($^O eq "MSWin32");
+    $string =~ s/\\+/\\/g   if ($^O eq "MSWin32");
+    $string =~ s/\\/\//g    if ($^O eq "darwin");
+    $string =~ s/\/+/\//g   if ($^O eq "darwin");
+    $string =~ s/\\/\//g    if ($^O eq "linux");
+    $string =~ s/\/+/\//g   if ($^O eq "linux");
+    return $string;
+}
+
+sub __decodePath {
+    my ($c, $string) = @_;
+    $string = Encode::decode("cp1251", $string) if ($^O eq "MSWin32");
+    $string = Encode::decode("utf8", $string)   if ($^O eq "darwin");
+    $string = Encode::decode("utf8", $string)   if ($^O eq "linux");
+    return $string;
+}
+
+sub __encodePath {
+    my ($c, $string) = @_;
+    $string = Encode::encode("cp1251", $string) if ($^O eq "MSWin32");
+    $string = Encode::encode("utf8", $string)   if ($^O eq "darwin");
+    $string = Encode::encode("utf8", $string)   if ($^O eq "linux");
+    return $string;
+}
+
 sub __clearHtml {
 
     my $html = shift;
 
-    my $scrubber = HTML::Scrubber->new( allow => [ qw[ p b i u ol ul li sub sup table col tr td th tbody ] ]);
+    my $scrubber = HTML::Scrubber->new( allow => [ qw[ p br b i u ol ul li sub sup table col tr td th tbody ] ]);
     $scrubber->rules(
 
         table =>{
@@ -136,11 +162,13 @@ sub __clearHtml {
 
     );
 
+    $html =~ s/<title>(.*?)<\/title>//ig;
+
     $html = $scrubber->scrub($html);
 
-    ## постпроцессинг
-    $html =~ s/\n+/ /g;
-    $html =~ s/\r+/ /g;
+    $html =~ s/^\s+|\s+$//g;
+    $html =~ s/<font><font>//g;
+    $html =~ s/<\/font><\/font>//g;
 
     $html =~ s/<table/<table border=1/ig;
 

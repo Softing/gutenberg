@@ -42,6 +42,13 @@ sub register {
         } );
 
     $app->helper(
+        hash => sub {
+            my $c = shift;
+            my $value = shift;
+            return $UUID->create_from_name_str("NameSpace_OID", $value);
+        } );
+
+    $app->helper(
         redirect_to => sub {
             my $c = shift;
 
