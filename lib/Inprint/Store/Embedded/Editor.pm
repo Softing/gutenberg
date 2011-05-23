@@ -67,13 +67,12 @@ sub writeFile {
     $basepath =~ s/\/$//;
 
     if ($extension ~~ ["odt"]) {
-        my $response = convert($c, $hotSaveFilePath, "html", $extension);
 
+        my $response = convert($c, $hotSaveFilePath, "html", $extension);
         open my $FILE, ">", "$filepath.$extension" || die "Can't open <$filepath> : $!";
         binmode $FILE;
             print $FILE $response->{text};
         close $FILE;
-
     }
 
     if ($extension ~~ ["doc", "docx", "rtf", "txt"]) {
@@ -81,6 +80,7 @@ sub writeFile {
         # create tmp odt file
         my $tmpFolderPath = __clearPath($c, "$basepath/.hotsave");
         my $tmpFilePath   = __clearPath($c, "$basepath/.hotsave/$basename.$extension~". time() .".odt");
+
         mkdir $tmpFolderPath unless (-e $tmpFolderPath) ;
         die "Can't find hot save folder <$tmpFolderPath>" unless -e $tmpFolderPath;
         die "Can't write to hot save folder <$tmpFolderPath>" unless -w $tmpFolderPath;
@@ -101,11 +101,17 @@ sub writeFile {
             print $FILE $response2->{text};
         close $FILE;
 
-        my $relativePath = Inprint::Store::Embedded::Utils::getRelativePath($c, $basepath);
+        my $file_path = Inprint::Store::Embedded::Utils::getRelativePath($c, $basepath);
+        $file_path = __adaptPath($c,  $file_path);
+        $file_path = __encodePath($c, $file_path);
+        
+        my $file_name = "$basename.$extension";
+        $file_name = __adaptPath($c,  $file_name);
+        $file_name = __encodePath($c, $file_name);
 
         $c->Do(
             "UPDATE cache_files SET file_length=? WHERE file_path=? AND file_name=?",
-            [ $response2->{"CharacterCount"}, $relativePath, "$basename.$extension" ]);
+            [ $response2->{"CharacterCount"}, $file_path, $file_name ]);
 
         unlink $tmpFilePath;
 
@@ -170,6 +176,12 @@ sub createHotSave {
         $history->{color} = "FFFFFF";
     }
 
+    my $hotsave_origin = __adaptPath($c, "$relativePath/$basename");
+       $hotsave_origin = __encodePath($c, $hotsave_origin);
+
+    my $hotsave_path   = __adaptPath($c, "$relativePath/.hotsave/$hotSaveFileName");
+       $hotsave_path   = __encodePath($c, $hotsave_path);
+
     $c->Do("
         INSERT INTO cache_hotsave(
             hotsave_origin, hotsave_path,
@@ -178,7 +190,7 @@ sub createHotSave {
             hotsave_color, hotsave_creator, hotsave_creator_shortcut, created)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, now());
         ", [
-            "$relativePath/$basename", "$relativePath/.hotsave/$hotSaveFileName",
+            $hotsave_origin, $hotsave_path,
             $history->{branch}, $history->{branch_shortcut},
             $history->{stage}, $history->{stage_shortcut},
             $history->{color}, $member->{id}, $member->{shortcut}
@@ -339,6 +351,25 @@ sub __getExtension {
     $suffix =~ s/^.//g;
 
     return $suffix;
+}
+
+sub __adaptPath {
+    my ($c, $string) = @_;
+    $string =~ s/\//\\/g    if ($^O eq "MSWin32");
+    $string =~ s/\\+/\\/g   if ($^O eq "MSWin32");
+    $string =~ s/\\/\//g    if ($^O eq "darwin");
+    $string =~ s/\/+/\//g   if ($^O eq "darwin");
+    $string =~ s/\\/\//g    if ($^O eq "linux");
+    $string =~ s/\/+/\//g   if ($^O eq "linux");
+    return $string;
+}
+
+sub __encodePath {
+    my ($c, $string) = @_;
+    $string = Encode::encode("cp1251", $string) if ($^O eq "MSWin32");
+    $string = Encode::encode("utf8", $string)   if ($^O eq "darwin");
+    $string = Encode::encode("utf8", $string)   if ($^O eq "linux");
+    return $string;
 }
 
 sub __clearPath {
