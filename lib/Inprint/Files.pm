@@ -11,6 +11,8 @@ use warnings;
 
 use Encode;
 use File::Basename;
+use File::Temp qw/ tempfile tempdir /;
+
 use MIME::Base64;
 use HTTP::Request;
 use LWP::UserAgent;
@@ -80,9 +82,9 @@ sub view {
         $filepath .= "/". $cacheRecord->{file_name};
 
         $filepath  = __adaptPath($c, $filepath);
-        $filename  = __adaptPath($c, $filename);
-
         $filepath  = __encodePath($c, $filepath);
+
+        $filename  = __adaptPath($c, $filename);
         $filename  = __encodePath($c, $filename);
 
         $filename =~ s/\s+/_/g;
@@ -165,6 +167,7 @@ sub download {
     $c->view({
         disposition => 1
     });
+
     $c->render_json({  });
 }
 
@@ -180,32 +183,106 @@ sub preview {
     my $success = $c->json->false;
 
     my $rootpath = $c->config->get("store.path");
+
     my $sqlfilepath = $c->Q("SELECT id, file_path, file_name, file_extension, file_thumbnail FROM cache_files WHERE id=?", [ $id ])->Hash;
 
     my $folderOriginal   = $sqlfilepath->{file_path};
     my $filenameOriginal = $sqlfilepath->{file_name};
+    my $filextenOriginal = $sqlfilepath->{file_extension};
 
-    my $filepath = "$rootpath/$folderOriginal/$filenameOriginal";
-    my $thumbnailsSrc = "$rootpath/$folderOriginal/.thumbnails/$filenameOriginal-$size.png";
+    my $fileExtOrig  = $filextenOriginal;
+    my $fileSrcOrig  = "$rootpath/$folderOriginal/$filenameOriginal";
+    my $thumbSrcOrig = "$rootpath/$folderOriginal/.thumbnails/$filenameOriginal-$size.png";
 
-    $filepath       = __adaptPath($c, $filepath);
-    $thumbnailsSrc  = __adaptPath($c, $thumbnailsSrc);
+    my $fileExt  = $filextenOriginal;
 
-    $filepath       = __encodePath($c, $filepath);
-    $thumbnailsSrc  = __encodePath($c, $thumbnailsSrc);
+    my $fileSrc  = __adaptPath($c, $fileSrcOrig);
+    $fileSrc     = __encodePath($c, $fileSrc);
+
+    my $thumbSrc = __adaptPath($c, $thumbSrcOrig);
+    $thumbSrc    = __encodePath($c, $thumbSrc);
 
     # Generate preview
-    if (-r $filepath) {
-        my $digest = digest_file_hex($filepath, "MD5");
-        if ($digest ne $sqlfilepath->{file_thumbnail} || !$sqlfilepath->{file_thumbnail} || ! -r $thumbnailsSrc) {
-            _generatePreviewFile( $c, $size, $rootpath, $sqlfilepath->{file_path}, $sqlfilepath->{file_name}, $sqlfilepath->{file_extension} );
+    if (-r $fileSrc) {
+
+        my $digest = digest_file_hex($fileSrc, "MD5");
+
+        if (
+            $digest ne $sqlfilepath->{file_thumbnail}
+            || !$sqlfilepath->{file_thumbnail}
+            || ! -r $thumbSrc) {
+
+            my $convertSrc;
+
+            if ( lc($fileExt) ~~ [ "jpg", "jpeg", "png", "gif", "bmp", "tif", "tiff", "pdf", "eps" ]) {
+
+                if ( lc($fileExt) ~~ [ "eps" ]) {
+                    system "epstool --quiet --page-number 0 --dpi 300 --ignore-warnings --extract-preview \"$fileSrc\" \"$thumbSrc\" ";
+                    $convertSrc = $thumbSrc;
+                }
+
+                if ( lc($fileExt) ~~ [ "jpg", "jpeg", "png", "gif", "bmp", "tif", "tiff", "pdf" ]) {
+                    $convertSrc = $fileSrc;
+                }
+
+                if (-r $convertSrc) {
+                    my $image = Image::Magick->new;
+                    my $x = $image->Read($convertSrc);
+                    warn "$x" if "$x";
+
+                    if ($size > 0) {
+                        $x = $image->AdaptiveResize(geometry=>$size);
+                        die "$x" if "$x";
+                        $x = $image->Normalize();
+                        die "$x" if "$x";
+                    }
+
+                    $x = $image->Write($thumbSrcOrig);
+                    die "$x" if "$x";
+                }
+
+            }
+
+            if (lc($fileExt) ~~ ['doc', 'docx', 'txt', 'rtf', 'odt', 'xls', 'xlsx', 'odp', 'ods' ]) {
+
+                my $pdfPath = $thumbSrc .".pdf";
+
+                my $response = __convert($c, $fileSrc, $fileExt, "pdf");
+                open my $FILE, ">", $pdfPath || die "Can't open <$pdfPath> : $!";
+                binmode $FILE;
+                    print $FILE $response->{responseBody};
+                close $FILE;
+
+                if (-r $pdfPath) {
+
+                    my $image = Image::Magick->new;
+                    my $x = $image->Read($pdfPath);
+                    die "$x" if "$x";
+
+                    my $image2 = $image->[0];
+
+                    if ($size > 0) {
+                        $x = $image2->AdaptiveResize(geometry=>$size);
+                        die "$x" if "$x";
+                        $x = $image2->Normalize();
+                        die "$x" if "$x";
+                    }
+
+                    $x = $image2->Write($thumbSrcOrig);
+                    die "$x" if "$x";
+
+                    unlink $pdfPath;
+                }
+
+            }
+
             $c->Do("UPDATE cache_files SET file_thumbnail=? WHERE id=?", [ $digest, $id ]);
         }
     }
 
-    if (-r $thumbnailsSrc) {
+    if (-r $thumbSrc) {
         $c->tx->res->headers->content_type('image/png');
-        $c->res->content->asset(Mojo::Asset::File->new(path => $thumbnailsSrc ));
+        $c->res->content->asset(Mojo::Asset::File->new(path => $thumbSrc ));
         $c->render_static();
     }
     else {
@@ -217,157 +294,6 @@ sub preview {
     }
 
     $c->render_json({  });
-}
-
-sub _generatePreviewFile {
-
-    my ($c, $size, $rootpath, $path, $file, $extension) = @_;
-
-    my $filepathEncoded;
-    my $filepathOriginal = $rootpath ."/" . $path . "/". $file;
-
-    my $folderOriginal   = $path;
-    my $filenameOriginal = $file;
-    my $filextenOriginal = $extension;
-
-    $folderOriginal = "$rootpath/$folderOriginal";
-    $folderOriginal =~ s/\//\\/g;
-    $folderOriginal =~ s/\\+/\\/g;
-
-    my $folderEncoded   = $path;
-    my $filenameEncoded = $file;
-    my $filextenEncoded = $extension;
-
-    if ($^O eq "MSWin32") {
-
-        $rootpath = Encode::encode("cp1251", $rootpath);
-        $folderEncoded   = Encode::encode("cp1251", $folderEncoded);
-        $filenameEncoded = Encode::encode("cp1251", $filenameEncoded);
-        $filextenEncoded = Encode::encode("cp1251", $filextenEncoded);
-
-        $folderEncoded = "$rootpath/$folderEncoded";
-        $folderEncoded =~ s/\//\\/g;
-        $folderEncoded =~ s/\\+/\\/g;
-
-        $filepathEncoded = "$folderEncoded/$filenameEncoded";
-        $filepathEncoded =~ s/\//\\/g;
-        $filepathEncoded =~ s/\\+/\\/g;
-    }
-
-    if ($^O eq "darwin") {
-
-        $rootpath = Encode::encode("utf8", $rootpath);
-        $folderEncoded   = Encode::encode("utf8", $folderEncoded);
-        $filenameEncoded = Encode::encode("utf8", $filenameEncoded);
-        $filextenEncoded = Encode::encode("utf8", $filextenEncoded);
-
-        $folderEncoded = "$rootpath/$folderEncoded";
-        $folderEncoded =~ s/\//\\/g;
-        $folderEncoded =~ s/\\+/\\/g;
-
-        $filepathEncoded = "$folderEncoded/$filenameEncoded";
-        $filepathEncoded =~ s/\\/\//g;
-        $filepathEncoded =~ s/\/+/\//g;
-    }
-
-    if ($^O eq "linux") {
-
-        $rootpath = Encode::encode("utf8", $rootpath);
-        $folderEncoded   = Encode::encode("utf8", $folderEncoded);
-        $filenameEncoded = Encode::encode("utf8", $filenameEncoded);
-        $filextenEncoded = Encode::encode("utf8", $filextenEncoded);
-
-        $folderEncoded = "$rootpath/$folderEncoded";
-        $folderEncoded =~ s/\//\\/g;
-        $folderEncoded =~ s/\\+/\\/g;
-
-        $filepathEncoded = "$folderEncoded/$filenameEncoded";
-        $filepathEncoded =~ s/\\/\//g;
-        $filepathEncoded =~ s/\/+/\//g;
-    }
-
-    my $thumbnailFolder = "$folderEncoded/.thumbnails";
-    my $thumbnailFile   = "$folderOriginal/.thumbnails/$filenameOriginal-$size.png";
-
-    $thumbnailFolder = __adaptPath($c, $thumbnailFolder);
-    $thumbnailFile   = __adaptPath($c, $thumbnailFile);
-
-    return unless (-w $thumbnailFolder);
-
-    if ( lc($filextenOriginal) ~~ [ "eps" ]) {
-
-        system "epstool --quiet --page-number 0 --dpi 300 --ignore-warnings --extract-preview \"$filepathOriginal\" \"$thumbnailFile\" ";
-
-        if (-r $thumbnailFile) {
-            my $image = Image::Magick->new;
-            my $x = $image->Read($thumbnailFile);
-            warn "$x" if "$x";
-
-            if ($size > 0) {
-                $x = $image->AdaptiveResize(geometry=>$size);
-                die "$x" if "$x";
-                $x = $image->Normalize();
-                die "$x" if "$x";
-            }
-
-            $x = $image->Write($thumbnailFile);
-            die "$x" if "$x";
-        }
-    }
-
-    if ( lc($filextenOriginal) ~~ [ "jpg", "jpeg", "png", "gif", "bmp", "tif", "tiff", "pdf" ]) {
-        my $image = Image::Magick->new;
-        my $x = $image->Read($filepathOriginal);
-        warn "$x" if "$x";
-
-        if ($size > 0) {
-            $x = $image->AdaptiveResize(geometry=>$size);
-            die "$x" if "$x";
-            $x = $image->Normalize();
-            die "$x" if "$x";
-        }
-
-        $x = $image->Write($thumbnailFile);
-        die "$x" if "$x";
-    }
-
-    if (lc($filextenOriginal) ~~ ['doc', 'docx', 'txt', 'rtf', 'odt', 'xls', 'xlsx', 'odp', 'ods' ]) {
-
-        my $pdfPath = "$folderEncoded/.thumbnails/$filenameEncoded.pdf";
-
-        $pdfPath = __adaptPath($c, $pdfPath);
-
-        my $response = __convert($c, $filepathEncoded, $extension, "pdf");
-        open my $FILE, ">", $pdfPath || die "Can't open <$pdfPath> : $!";
-        binmode $FILE;
-            print $FILE $response->{responseBody};
-        close $FILE;
-
-        # Crete thumbnail
-
-        if (-r $pdfPath) {
-
-            my $image = Image::Magick->new;
-            my $x = $image->Read($pdfPath);
-            die "$x" if "$x";
-
-            my $image2 = $image->[0];
-
-            $x = $image2->Normalize();
-            die "$x" if "$x";
-
-            if ($size > 0) {
-                $x = $image2->AdaptiveResize(geometry=>$size);
-                die "$x" if "$x";
-            }
-
-            $x = $image2->Write($thumbnailFile );
-            die "$x" if "$x";
-
-            unlink $pdfPath;
-        }
-    }
-
 }
 
 sub __adaptPath {
