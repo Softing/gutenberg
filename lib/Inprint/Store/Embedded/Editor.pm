@@ -67,7 +67,6 @@ sub writeFile {
     $basepath =~ s/\/$//;
 
     if ($extension ~~ ["odt"]) {
-
         my $response = convert($c, $hotSaveFilePath, "html", $extension);
 
         open my $FILE, ">", "$filepath.$extension" || die "Can't open <$filepath> : $!";
@@ -162,6 +161,14 @@ sub createHotSave {
     my $member  = $c->Q("SELECT * FROM profiles WHERE id=?", [ $cmember ])->Hash;
     my $copyid  = $c->Q("SELECT copygroup FROM documents WHERE filepath=?", [ $relativePath ])->Value;
     my $history = $c->Q("SELECT * FROM history WHERE entity=? ORDER BY created LIMIT 1", [ $copyid ])->Hash;
+
+    unless ($history) {
+        $history->{branch} = "00000000-0000-0000-0000-000000000000";
+        $history->{branch_shortcut} = "Default";
+        $history->{stage} = "00000000-0000-0000-0000-000000000000";
+        $history->{stage_shortcut} = "Default";
+        $history->{color} = "FFFFFF";
+    }
 
     $c->Do("
         INSERT INTO cache_hotsave(
