@@ -34,7 +34,7 @@ sub list {
         if ($feed->{id}) {
             my $folder = Inprint::Store::Embedded::getFolderPath($c, "rss-plugin", $feed->{created}, $feed->{id}, 1);
             Inprint::Store::Embedded::updateCache($c, $folder);
-            $result = Inprint::Store::Cache::getRecordsByPath($c, $folder, "all", ['png', 'jpg', 'jpeg', 'gif', 'wma', 'wmv', 'mpeg', 'mp3']);
+            $result = Inprint::Store::Cache::getRecordsByPath($c, $folder, "all", [ "png","jpg","jpeg","gif","wmv","wma","mpeg","mp3", "mp4" ]);
         }
 
     }

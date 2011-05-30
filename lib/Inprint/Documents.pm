@@ -259,7 +259,7 @@ sub create {
         push @data, $c->getSessionValue("member.shortcut") || "<Unknown>";
     }
 
-    my $holder = $c->check_record(\@errors, "view_principals", "principal", $i_manager);
+    my $holder = $c->check_record(\@errors, "view_principals", "principal", $manager);
 
     unless ( @errors ) {
         push @fields, "manager";

@@ -150,7 +150,7 @@ sub feed {
 
             my $folder = Inprint::Store::Embedded::getFolderPath($c, "rss-plugin", $item->{created}, $item->{id}, 1);
             Inprint::Store::Embedded::updateCache($c, $folder);
-            my $files = Inprint::Store::Cache::getRecordsByPath($c, $folder, "all", [ "png","jpg","jpeg","gif","wmv","wma","mpeg","mp3" ]);
+            my $files = Inprint::Store::Cache::getRecordsByPath($c, $folder, "all", [ "png","jpg","jpeg","gif","wmv","wma","mpeg","mp3", "mp4" ]);
 
             foreach my $file (@$files) {
 
