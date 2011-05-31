@@ -15,7 +15,6 @@ use MIME::Base64;
 use HTTP::Request;
 use LWP::UserAgent;
 use File::Basename;
-use HTML::Scrubber;
 
 use Inprint::Store::Embedded::Utils;
 
@@ -50,7 +49,7 @@ sub readFile {
         $responce->{text} =~ s/\r?\n/<br>/g;
     }
 
-    $responce->{text} = __clearHtml($responce->{text});
+    #$responce->{text} = __clearHtml($responce->{text});
 
     return $responce;
 }
@@ -134,7 +133,7 @@ sub createHotSave {
     # Create hotsave
 
     my $hotSaveText = $text;
-    $hotSaveText = __clearHtml($hotSaveText);
+    #$hotSaveText = __clearHtml($hotSaveText);
 
     $hotSaveText = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
     <HTML>
@@ -373,77 +372,6 @@ sub __encodePath {
     $string = Encode::encode("utf8", $string)   if ($^O eq "darwin");
     $string = Encode::encode("utf8", $string)   if ($^O eq "linux");
     return $string;
-}
-
-sub __clearHtml {
-
-    my $html = shift;
-
-    my $scrubber = HTML::Scrubber->new( allow => [ qw[ p br b i u ol strong em span ul li sub sup table col tr td th tbody ] ]);
-    $scrubber->rules(
-
-        table =>{
-            border => 1,
-            width => 1,
-            bordercolor => 1,
-            cellspacing => 1,
-            cellpadding => 1,
-            '*' => 0
-        },
-
-        tr => {
-            valign => 1,
-            '*'    => 0
-        },
-
-        col =>
-        {
-            width => 1,
-            '*'   => 0
-        },
-
-        td =>
-        {
-            width   => 1,
-            colspan => 1,
-            rowspan => 1,
-            '*'     => 0
-        },
-
-        p =>
-        {
-            align => 0,
-            '*'   => 0
-        },
-
-        span => {
-            style => 1
-        },
-
-        font =>
-        {
-            size  => 0,
-            color => 1,
-            style => 0,
-            '*'   => 0,
-        }
-
-    );
-
-    $html =~ s/<title>(.*?)<\/title>//ig;
-
-    $html = $scrubber->scrub($html);
-
-    $html =~ s/^\s+|\s+$//g;
-    $html =~ s/<font><font>//g;
-    $html =~ s/<\/font><\/font>//g;
-
-    $html =~ s/<table/<table border=1/ig;
-
-    $html =~ s/\t+/ /ig;
-    $html =~ s/\s+/ /ig;
-
-  return $html;
 }
 
 1;

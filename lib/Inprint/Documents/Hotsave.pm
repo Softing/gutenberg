@@ -76,9 +76,26 @@ sub read {
 
     $success = $c->json->true unless (@errors);
 
+    $fileContent = Encode::decode("utf8", $fileContent);
+
     $fileContent = __clearHtml($fileContent);
 
-    $fileContent = Encode::decode("utf8", $fileContent);
+    $fileContent =~ s/^\s+|\s+$//ig;
+    $fileContent =~ s/<font><font>//ig;
+    $fileContent =~ s/<\/font><\/font>//ig;
+
+    $fileContent =~ s/<table/<table border=1/ig;
+
+    $fileContent =~ s/\t+/ /ig;
+    $fileContent =~ s/\s+/ /ig;
+
+    $fileContent =~ s/<p[^>]*>/<br \/>/ig;
+    $fileContent =~ s/<\/p>//ig;
+
+    $fileContent =~ s/<br>/<br \/>/ig;
+    $fileContent =~ s/(<br \/>)+/<br \/>/ig;
+    $fileContent =~ s/^(<br \/>)+//ig;
+    $fileContent =~ s/(<br \/>)+$//ig;
 
     $c->render( text => "$fileContent" );
 }
@@ -115,7 +132,10 @@ sub __clearHtml {
 
     my $html = shift;
 
-    my $scrubber = HTML::Scrubber->new( allow => [ qw[ p br b i u ol ul li sub sup table col tr td th tbody ] ]);
+    my $scrubber = HTML::Scrubber->new(
+        allow => [
+         qw[ p br b i u ol strong em ul li sub sup table col tr td th tbody ]
+        ]);
     $scrubber->rules(
 
         table =>{
@@ -149,7 +169,7 @@ sub __clearHtml {
         p =>
         {
             align => 0,
-            '*'   => 0
+            '*'   => 1
         },
 
         font =>
@@ -163,19 +183,9 @@ sub __clearHtml {
     );
 
     $html =~ s/<title>(.*?)<\/title>//ig;
-
     $html = $scrubber->scrub($html);
 
-    $html =~ s/^\s+|\s+$//g;
-    $html =~ s/<font><font>//g;
-    $html =~ s/<\/font><\/font>//g;
-
-    $html =~ s/<table/<table border=1/ig;
-
-    $html =~ s/\t+/ /ig;
-    $html =~ s/\s+/ /ig;
-
-  return $html;
+    return $html;
 }
 
 1;
