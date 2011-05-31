@@ -91,18 +91,17 @@ sub create {
     my $i_readiness   = $c->param("readiness");
     my $i_weight      = $c->param("weight");
 
-    my $i_title       = $c->param("title");
+    my $i_title       = $c->param("shortcut");
     my $i_shortcut    = $c->param("shortcut");
     my $i_description = $c->param("description");
 
     my @errors;
     my $success = $c->json->false;
 
-    $c->check_uuid( \@errors, "branch", $i_edition);
-    $c->check_uuid( \@errors, "readiness", $i_readiness);
-    $c->check_int( \@errors, "weight", $i_weight);
-    $c->check_text( \@errors, "title", $i_title);
-    $c->check_text( \@errors, "shortcut", $i_shortcut);
+    $c->check_uuid( \@errors, "branch",     $i_edition);
+    $c->check_uuid( \@errors, "readiness",  $i_readiness);
+    $c->check_int ( \@errors, "weight",     $i_weight);
+    $c->check_text( \@errors, "shortcut",   $i_shortcut);
 
     $c->check_access( \@errors, "domain.exchange.manage");
 
@@ -143,18 +142,17 @@ sub update {
     my $i_readiness   = $c->param("readiness");
     my $i_weight      = $c->param("weight");
 
-    my $i_title       = $c->param("title");
+    my $i_title       = $c->param("shortcut");
     my $i_shortcut    = $c->param("shortcut");
     my $i_description = $c->param("description");
 
     my @errors;
     my $success = $c->json->false;
 
-    $c->check_uuid( \@errors, "id", $i_id);
-    $c->check_uuid( \@errors, "readiness", $i_readiness);
-    $c->check_int( \@errors, "weight", $i_weight);
-    $c->check_text( \@errors, "title", $i_title);
-    $c->check_text( \@errors, "shortcut", $i_shortcut);
+    $c->check_uuid( \@errors, "id",         $i_id);
+    $c->check_uuid( \@errors, "readiness",  $i_readiness);
+    $c->check_int ( \@errors, "weight",     $i_weight);
+    $c->check_text( \@errors, "shortcut",   $i_shortcut);
 
     $c->check_access( \@errors, "domain.exchange.manage");
 

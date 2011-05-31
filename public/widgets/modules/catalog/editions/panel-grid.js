@@ -60,14 +60,15 @@ Inprint.catalog.editions.Grid = Ext.extend(Ext.grid.GridPanel, {
         ];
 
         this.tbar = [
-            Inprint.getAction("stages.create", this, { disabled: true }),
-            Inprint.getAction("stages.update", this, { disabled: true }),
-            Inprint.getAction("stages.delete", this, { disabled: true }),
+            Inprint.getButton("create.item"),
+            Inprint.getButton("update.item"),
+            Inprint.getButton("delete.item"),
             "-",
-            Inprint.getAction("stages.principals", this, { disabled: true })
+            Inprint.getButton("select.principals"),
         ];
 
         Ext.apply(this, {
+            title: _("Stages"),
             border:false,
             stripeRows: true,
             columnLines: true,

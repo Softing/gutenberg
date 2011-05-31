@@ -13,14 +13,25 @@ Inprint.catalog.editions.Context = function(parent, panels) {
             disabled = false;
         }
 
-        items.push( Inprint.getAction("edition.create", this, { disabled: disabled }) );
+        var btnCreate = Inprint.getButton("create.item");
+        btnCreate.handler = Inprint.getAction("edition.create").createDelegate(parent, [tree]);
+
+        items.push( btnCreate );
 
         if (node.id != NULLID) {
-            items.push( Inprint.getAction("edition.update", this, { disabled: disabled }) );
-            items.push( Inprint.getAction("edition.delete", this, { disabled: disabled }) );
+
+            var btnUpdate = Inprint.getButton("update.item");
+            btnUpdate.handler = Inprint.getAction("edition.update").createDelegate(parent, [tree]);
+            items.push( btnUpdate );
+
+            var btnDelete = Inprint.getButton("delete.item");
+            btnDelete.handler = Inprint.getAction("edition.delete").createDelegate(parent, [tree]);
+            items.push( btnDelete );
+
         }
 
-        items.push('-', {
+        items.push('-');
+        items.push({
             icon: _ico("arrow-circle-double"),
             cls: "x-btn-text-icon",
             text: _("Reload"),

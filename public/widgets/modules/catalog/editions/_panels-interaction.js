@@ -17,10 +17,10 @@ Inprint.catalog.editions.Interaction = function(parent, panels) {
         }
     });
 
-    // Stages
-    //grid.btnCreateStage.on("click", grid.actions.createStage.createDelegate(this));
-    //grid.btnChangeStage.on("click", grid.actions.changeStage.createDelegate(this));
-    //grid.btnRemoveStage.on("click", grid.actions.removeStage.createDelegate(this));
-    //grid.btnManagePrincipals.on("click", grid.actions.managePrincipals.createDelegate(this));
+    // Set actions
+    grid.btnCreateItem      .on("click", Inprint.getAction("stages.create")     .createDelegate(parent, [tree, grid]));
+    grid.btnUpdateItem      .on("click", Inprint.getAction("stages.update")     .createDelegate(parent, [tree, grid]));
+    grid.btnDeleteItem      .on("click", Inprint.getAction("stages.delete")     .createDelegate(parent, [tree, grid]));
+    grid.btnSelectPrincipals.on("click", Inprint.getAction("stages.principals") .createDelegate(parent, [tree, grid]));
 
 };
