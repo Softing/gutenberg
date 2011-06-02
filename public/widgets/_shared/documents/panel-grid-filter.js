@@ -70,7 +70,8 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                 minListWidth: 300,
                 url: _url('/common/tree/fascicles/'),
                 baseParams: {
-                    term: 'editions.documents.work:*'
+                    term: 'editions.documents.work:*',
+                    briefcase: true
                 },
                 rootVisible:true,
                 root: {

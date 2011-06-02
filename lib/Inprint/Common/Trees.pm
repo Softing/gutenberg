@@ -53,6 +53,7 @@ sub editions {
         if ($i_term) {
 
             $bindings = $c->objectBindings($i_term);
+
             my $nodes = $c->Q("
                 SELECT id FROM editions
                 WHERE path @> ARRAY(
