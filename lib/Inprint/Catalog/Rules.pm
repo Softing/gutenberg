@@ -55,6 +55,10 @@ sub clear {
     if ($i_section ~~ [ "editions", "catalog" ]) {
 
         $c->Do("
+           DELETE FROM cache_access WHERE member=? ",
+           [ $i_member ]);
+
+        $c->Do("
             DELETE FROM map_member_to_rule WHERE
                 member=?
                 AND section=?
