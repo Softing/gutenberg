@@ -74,4 +74,4 @@ UPDATE rules SET title = 'Может захватывать материалы'	
 UPDATE rules SET title = 'Может передавать материалы' 		WHERE id = 'b946bd84-93fc-4a70-b325-d23c2804b2e9';
 UPDATE rules SET title = 'Может перемещать материалы' 		WHERE id = 'b7adafe9-2d5b-44f3-aa87-681fd48466fa';
 UPDATE rules SET title = 'Может перемещать в портфель' 		WHERE id = '6d590a90-58a1-447f-b5ad-e3c62f80a2ef';
-UPDATE rules SET title = 'Может учавствовать в обсуждении' 	WHERE id = '6d590a90-58a1-447f-b5ad-b0582b64571a';
+UPDATE rules SET title = 'Может участвовать в обсуждении' 	WHERE id = '6d590a90-58a1-447f-b5ad-b0582b64571a';
