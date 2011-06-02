@@ -2,16 +2,14 @@ Inprint.cmp.ExcahngeBrowser.TreeEditions = Ext.extend(Ext.tree.TreePanel, {
 
     initComponent: function() {
 
-        this.components = {};
-
-        this.urls = {
-            "tree":    _url("/common/tree/editions/")
-        };
+        this.loader = new Ext.tree.TreeLoader({
+            url: _url("/common/tree/editions/"),
+            baseParams:{ term: 'editions.documents.work:*' }
+            });
 
         Ext.apply(this, {
             title:_("Editions"),
             autoScroll:true,
-            dataUrl: this.urls.tree,
             border:false,
             rootVisible: false,
             root: {
