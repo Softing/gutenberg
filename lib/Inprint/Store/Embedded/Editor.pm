@@ -104,7 +104,7 @@ sub writeFile {
         $file_path = __decodePath($c, $file_path);
 
         my $file_name = "$basename.$extension";
-        $file_name = __decodePath($c, $file_name);
+        #$file_name = __decodePath($c, $file_name);
 
         $c->Do(
             "UPDATE cache_files SET file_length=? WHERE file_path=? AND file_name=?",
@@ -173,8 +173,11 @@ sub createHotSave {
         $history->{color} = "FFFFFF";
     }
 
-    my $hotsave_origin = __decodePath($c, "$relativePath/$basename");
-    my $hotsave_path   = __decodePath($c, "$relativePath/.hotsave/$hotSaveFileName");
+    #my $hotsave_origin = __decodePath($c, "$relativePath/$basename");
+    #my $hotsave_path   = __decodePath($c, "$relativePath/.hotsave/$hotSaveFileName");
+
+    my $hotsave_origin = "$relativePath/$basename";
+    my $hotsave_path   = "$relativePath/.hotsave/$hotSaveFileName";
 
     $c->Do("
         INSERT INTO cache_hotsave(
