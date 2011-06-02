@@ -24,7 +24,9 @@ sub register {
                 $member = $c->getSessionValue("member.id");
             }
             my $terms  = _parseTerms($c, $input);
+
             my $nodes = _getNodes($c, $terms, $member);
+
             return $nodes;
         } );
 
@@ -164,109 +166,6 @@ sub register {
             }
 
             return $granted;
-        } );
-
-    $app->helper(
-
-        objectAccessOld => sub {
-
-            my ($c, $input, $binding, $member) = @_;
-
-            unless ($member) {
-                $member = $c->getSessionValue("member.id");
-            }
-
-            my $terms = _parseTerms($c, $input);
-
-            foreach my $rule (@$terms) {
-
-                my ($rulestring, $area) = split /:/, $rule;
-                my ($section, $subsection, $term) = split /\./, $rulestring;
-
-                $c->dbh()->{pg_placeholder_dollaronly} = 1;
-
-                my $sql = "SELECT binding FROM map_member_to_rule as mapper WHERE 1=1
-                    AND mapper.termkey = \$1 AND member = \$2";
-                my @params = ($rule, $member);
-
-                $c->dbh()->{pg_placeholder_dollaronly} = 0;
-
-                if ($binding) {
-                    $sql .= " AND binding=\$3 ";
-                    push @params, $binding;
-                }
-
-                my $bindings = $c->Q($sql, \@params)->Values;
-
-                # Domain
-                if ($section eq "domain") {
-                    return 1 if @$bindings;
-                }
-
-                # Editions
-                if ($section eq "editions") {
-
-                    if ($area eq "edition") {
-                        return 1 if @$bindings;
-                    }
-
-                    if ($area eq "editions") {
-
-                        $c->dbh()->{pg_placeholder_dollaronly} = 1;
-
-                        my $subsql = "
-                            SELECT EXISTS (
-                                SELECT true FROM editions WHERE path ? ARRAY(
-                                    SELECT ('*.' || replace(binding::text, '-', '')::text ||'.*')::lquery
-                                    FROM map_member_to_rule as mapper WHERE 1=1
-                                        AND mapper.termkey = \$1 AND member = \$2 ) ";
-
-                        my @subparams = ( $rule, $member );
-
-                        if ($binding) {
-                            $subsql .= " AND path ~ ('*.' || replace(\$3, '-', '')::text ||'.*')::lquery ";
-                            push @subparams, $binding;
-                        }
-
-                        $subsql .= " ) ";
-
-                        my $exists = $c->Q($subsql, \@subparams)->Value;
-                        $c->dbh()->{pg_placeholder_dollaronly} = 0;
-
-                        return 1 if $exists;
-                    }
-                }
-
-                # Catalog
-                if ($section eq "catalog") {
-
-                    $c->dbh()->{pg_placeholder_dollaronly} = 1;
-
-                    my $subsql = "
-                        SELECT EXISTS (
-                            SELECT true FROM catalog WHERE path ? ARRAY(
-                                SELECT ('*.' || replace(binding::text, '-', '')::text ||'.*')::lquery
-                                FROM map_member_to_rule as mapper WHERE 1=1
-                                    AND mapper.termkey = \$1 AND member = \$2 ) ";
-
-                    my @subparams = ( $rule, $member );
-
-                    if ($binding) {
-                        $subsql .= " AND path ~ ('*.' || replace(\$3, '-', '')::text ||'.*')::lquery ";
-                        push @subparams, $binding;
-                    }
-
-                    $subsql .= " ) ";
-
-                    my $exists = $c->Q($subsql, \@subparams)->Value;
-                    $c->dbh()->{pg_placeholder_dollaronly} = 0;
-
-                    return 1 if ($exists);
-                }
-
-            }
-
-            return 0;
         } );
 
     $app->helper(
@@ -425,6 +324,7 @@ sub _getNodes {
         if ($section eq "editions") {
 
             if ($area eq "edition") {
+
                 $bindings = $c->Q("
                     SELECT binding FROM map_member_to_rule as mapper WHERE 1=1
                         AND mapper.termkey = \$1
@@ -434,6 +334,7 @@ sub _getNodes {
             }
 
             if ($area eq "editions") {
+
                 $bindings = $c->Q("
                     SELECT id FROM editions WHERE path ? ARRAY(
                         SELECT ('*.' || replace(binding::text, '-', '')::text ||'.*')::lquery
