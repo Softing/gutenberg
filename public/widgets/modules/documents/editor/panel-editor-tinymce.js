@@ -117,7 +117,7 @@ Inprint.documents.editor.FormTinyMce = Ext.extend( Ext.form.FormPanel,
         // Before save
         this.on('beforeaction', function() {
             this.body.mask(_("Saving text") + '...');
-            this.btnSave.disable();
+            //this.btnSave.disable();
         }, this);
 
         // Callback
