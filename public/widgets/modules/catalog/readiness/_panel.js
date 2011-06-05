@@ -2,10 +2,10 @@ Inprint.catalog.readiness.Panel = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
 
-        this.panels = {};
-
-        this.panels.grid = new Inprint.catalog.readiness.Grid();
-        this.panels.help = new Inprint.panels.Help({ hid: this.xtype });
+        this.panels = {
+            grid: new Inprint.catalog.readiness.Grid(),
+            help: new Inprint.panels.Help({ hid: this.xtype })
+        };
 
         Ext.apply(this, {
             layout: "border",
@@ -38,14 +38,12 @@ Inprint.catalog.readiness.Panel = Ext.extend(Ext.Panel, {
 
     onRender: function() {
         Inprint.catalog.readiness.Panel.superclass.onRender.apply(this, arguments);
-
-        Inprint.catalog.readiness.Access(this, this.panels);
         Inprint.catalog.readiness.Interaction(this, this.panels);
     },
 
-    getRow: function() {
-        return this.panels.grid.getSelectionModel().getSelected().data;
-    },
+    //getRow: function() {
+    //    return this.panels.grid.getSelectionModel().getSelected().data;
+    //},
 
     cmpReload:function() {
         this.panels.grid.cmpReload();

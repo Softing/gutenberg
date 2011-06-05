@@ -13,16 +13,12 @@ use base 'Mojolicious::Controller';
 
 sub read {
     my $c = shift;
-    my $i_id = $c->param("id");
-    
-    my @errors;
-    my $success = $c->json->false;
 
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_id));
-    
+    my @errors;
     my $result = [];
-    
+
+    my $i_id = $c->get_uuid(\@errors, "id");
+
     unless (@errors) {
         $result = $c->Q("
             SELECT id, color, weight as percent, title, shortcut, description, created, updated
@@ -30,53 +26,38 @@ sub read {
             WHERE id=?
         ", [ $i_id ])->Hash;
     }
-    
-    $success = $c->json->true unless (@errors);
-    
-    $c->render_json( { success => $success, errors => \@errors, data => $result } );
+
+    $c->smart_render( \@errors, $result );
 }
 
 sub list {
     my $c = shift;
+
+    my @errors;
+
     my $result = $c->Q("
         SELECT id, color, weight as percent, title, shortcut, description, created, updated
         FROM readiness ORDER BY weight, shortcut;
     ")->Hashes;
-    $c->render_json( { data => $result } );
+
+    $c->smart_render( \@errors, $result );
 }
 
 sub create {
     my $c = shift;
 
+    my @errors;
+
     my $id            = $c->uuid();
 
-    my $i_title       = $c->param("title");
-    my $i_shortcut    = $c->param("shortcut");
-    my $i_description = $c->param("description");
-    my $i_color       = $c->param("color");
-    my $i_percent     = $c->param("percent");
+    my $i_title       = $c->get_text(\@errors, "shortcut");
+    my $i_shortcut    = $c->get_text(\@errors, "shortcut");
+    my $i_description = $c->get_text(\@errors, "description", 1);
+    my $i_color       = $c->get_text(\@errors, "color");
+    my $i_percent     = $c->get_int(\@errors, "percent");
 
-    my @errors;
-    my $success = $c->json->false;
-    
-    push @errors, { id => "title", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_title));
-        
-    push @errors, { id => "shortcut", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_shortcut));
-        
-    push @errors, { id => "description", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_description));
+    $c->check_access( \@errors, "domain.readiness.manage");
 
-    push @errors, { id => "color", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_color));
-        
-    push @errors, { id => "percent", msg => "Incorrectly filled field"}
-        unless ($c->is_int($i_percent));
-    
-    push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->objectAccess("domain.readiness.manage"));
-    
     unless (@errors) {
         $c->Do("
             INSERT INTO readiness (
@@ -84,79 +65,54 @@ sub create {
             VALUES (?, ?, ?, ?, ?, ?, now(), now());
         ", [ $id, $i_color, $i_percent, $i_title, $i_shortcut, $i_description ]);
     }
-    
-    $success = $c->json->true unless (@errors);
-    
-    $c->render_json({ success => $success, errors => \@errors });
+
+    $c->smart_render(\@errors);
 }
 
 sub update {
     my $c = shift;
 
-    my $i_id          = $c->param("id");
-    my $i_title       = $c->param("title");
-    my $i_shortcut    = $c->param("shortcut");
-    my $i_description = $c->param("description");
-    my $i_color       = $c->param("color");
-    my $i_percent     = $c->param("percent");
-
     my @errors;
-    my $success = $c->json->false;
-    
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_id));
-    
-    push @errors, { id => "title", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_title));
-        
-    push @errors, { id => "shortcut", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_shortcut));
-        
-    push @errors, { id => "description", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_description));
 
-    push @errors, { id => "color", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_color));
-        
-    push @errors, { id => "percent", msg => "Incorrectly filled field"}
-        unless ($c->is_int($i_percent));
-    
-    push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->objectAccess("domain.readiness.manage"));
-    
+    my $i_id          = $c->get_uuid(\@errors, "id");
+    my $i_title       = $c->get_text(\@errors, "shortcut");
+    my $i_shortcut    = $c->get_text(\@errors, "shortcut");
+    my $i_description = $c->get_text(\@errors, "description", 1);
+    my $i_color       = $c->get_text(\@errors, "color");
+    my $i_percent     = $c->get_int(\@errors, "percent");
+
+    $c->check_access( \@errors, "domain.readiness.manage");
+
     unless (@errors) {
         $c->Do("
             UPDATE readiness SET color=?, weight=?, title=?, shortcut=?, description=?
             WHERE id=? ",
         [ $i_color, $i_percent, $i_title, $i_shortcut, $i_description, $i_id ]);
     }
-    
-    $success = $c->json->true unless (@errors);
-    
-    $c->render_json({ success => $success, errors => \@errors });
+
+    $c->smart_render(\@errors);
 }
 
 sub delete {
     my $c = shift;
-    my @i_ids = $c->param("id");
 
     my @errors;
-    my $success = $c->json->false;
 
-    push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->objectAccess("domain.readiness.manage"));
+    my @i_ids = $c->param("id");
+
+    foreach (@i_ids) {
+        $c->check_uuid(\@errors, "id", $_);
+    }
+
+    $c->check_access( \@errors, "domain.readiness.manage");
 
     unless (@errors) {
         foreach my $id (@i_ids) {
-            if ($c->is_uuid($id)) {
-                $c->Do(" DELETE FROM readiness WHERE id =? ", [ $id ]);
-            }
+            $c->Do(" DELETE FROM readiness WHERE id =? ", [ $id ]);
         }
     }
 
-    $success = $c->json->true unless (@errors);
-    
-    $c->render_json({ success => $success, errors => \@errors });
+    $c->smart_render(\@errors);
 }
 
 1;
