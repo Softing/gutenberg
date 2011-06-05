@@ -53,14 +53,14 @@ Inprint.catalog.editions.Panel = Ext.extend(Ext.Panel, {
 
     onRender: function() {
         Inprint.catalog.editions.Panel.superclass.onRender.apply(this, arguments);
-        Inprint.catalog.editions.Access(this, this.panels);
+        //Inprint.catalog.editions.Access(this, this.panels);
         Inprint.catalog.editions.Interaction(this, this.panels);
-        Inprint.catalog.editions.Context(this, this.panels);
+        //Inprint.catalog.editions.Context(this, this.panels);
     },
 
-    getRow: function() {
-        return this.panels.grid.getSelectionModel().getSelected().data;
-    },
+    //getRow: function() {
+    //    return this.panels.grid.getSelectionModel().getSelected().data;
+    //},
 
     cmpReload:function() {
         this.panels.grid.cmpReload();

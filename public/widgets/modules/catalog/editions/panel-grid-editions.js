@@ -2,7 +2,7 @@ Inprint.catalog.editions.Grid = Ext.extend(Ext.grid.GridPanel, {
 
     initComponent: function() {
 
-        this.components = {};
+        this.edition = null;
 
         this.store = Inprint.factory.Store.json("/catalog/stages/list/");
         this.selectionModel = new Ext.grid.CheckboxSelectionModel();
@@ -82,6 +82,14 @@ Inprint.catalog.editions.Grid = Ext.extend(Ext.grid.GridPanel, {
 
     onRender: function() {
         Inprint.catalog.editions.Grid.superclass.onRender.apply(this, arguments);
+    },
+
+    getEdition: function() {
+        return this.edition;
+    },
+
+    setEdition: function(id) {
+        this.edition = id;
     }
 
 });

@@ -1,4 +1,4 @@
-Inprint.catalog.editions.ChangeStagePanel = function () {
+Inprint.setAction("stage.update", function(grid) {
 
     var url = _url("/catalog/stages/update/");
 
@@ -24,7 +24,6 @@ Inprint.catalog.editions.ChangeStagePanel = function () {
                 incrementValue: 5,
                 accelerate: true
             },
-            _FLD_TITLE,
             _FLD_SHORTCUT,
             _FLD_DESCRIPTION
         ],
@@ -32,16 +31,25 @@ Inprint.catalog.editions.ChangeStagePanel = function () {
         buttons: [ _BTN_SAVE,_BTN_CLOSE ]
     });
 
-    var win = new Ext.Window({
-        title: _("Change stage"),
-        layout: "fit",
-        closeAction: "hide",
-        width:400, height:260,
-        modal:true,
-        items: form
+    form.on("actioncomplete", function (form, action) {
+        if (action.type == "submit") {
+            win.hide();
+            grid.cmpReload();
+        }
     });
 
-    win.relayEvents(form, ["actioncomplete"]);
+    form.load({
+        url: _url("/catalog/stages/read/"),
+        params: { id: grid.getValue("id") },
+        success: function(form, action) {
+            win.body.unmask();
+        }
+    });
 
-    return win;
-};
+    var win = Inprint.factory.windows.create(
+        "Update stage", 400, 260, form
+    ).show();
+
+    win.body.mask();
+
+});

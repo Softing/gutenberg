@@ -1,63 +1,4 @@
-Inprint.setAction("edition.create", function(tree) {
-
-    var node = tree.selection;
-
-    var win = new Ext.Window({
-        title: _("Adding a new edition"),
-        layout: "fit",
-        width:400,
-        height:230,
-        items: form
-    });
-
-    var form = new Ext.FormPanel({
-
-        url: _url("/catalog/editions/create/"),
-
-        frame:false,
-        border:false,
-
-        labelWidth: 75,
-        defaults: {
-            anchor: "100%",
-            allowBlank:false
-        },
-        bodyStyle: "padding:5px 5px",
-        items: [
-            _FLD_HDN_PATH,
-            _FLD_TITLE,
-            _FLD_SHORTCUT,
-            _FLD_DESCRIPTION
-        ],
-        keys: [ _KEY_ENTER_SUBMIT ],
-        buttons: [ _BTN_ADD,_BTN_CLOSE ]
-    });
-
-    form.on("actioncomplete", function (form, action) {
-        if (action.type == "submit") {
-            win.hide();
-            node.reload();
-        }
-    }, this);
-
-    form.getForm().findField("path").setValue(node.id);
-
-    win.add(form);
-    win.show();
-
-});
-
-Inprint.setAction("edition.update", function(tree) {
-
-    var node = tree.selection;
-
-    var win = new Ext.Window({
-        title: _("Catalog item creation"),
-        layout: "fit",
-        width:400,
-        height:300,
-        items: form
-    });
+Inprint.setAction("edition.update", function(node) {
 
     var form = new Ext.FormPanel({
         url: _url("/catalog/editions/update/"),
@@ -114,12 +55,17 @@ Inprint.setAction("edition.update", function(tree) {
 
     form.on("actioncomplete", function (form, action) {
         if (action.type == "submit") {
+
             win.hide();
+
             if (node.parentNode) {
                 node.parentNode.reload();
-            } else {
+            }
+
+            else {
                 node.reload();
             }
+
         }
     }, this);
 
@@ -149,30 +95,10 @@ Inprint.setAction("edition.update", function(tree) {
         }
     });
 
-    win.add(form);
-    win.show();
-    win.body.mask(_("Loading..."));
+    var win = Inprint.factory.windows.create(
+        "Update edition", 400, 300, form
+    ).show();
 
-});
-
-Inprint.setAction("edition.delete", function(tree) {
-
-    var node  = tree.selection;
-
-    Ext.MessageBox.confirm(
-        _("Delete ") +" ["+ node.attributes.shortcut +"]",
-        _("You really wish to do this?"),
-        function(btn) {
-            if (btn == "yes") {
-                Ext.Ajax.request({
-                    url: _url("/catalog/editions/delete/"),
-                    scope:this,
-                    success: function() {
-                        node.parentNode.reload();
-                    },
-                    params: { id: node.id }
-                });
-            }
-        }, this).setIcon(Ext.MessageBox.WARNING);
+    win.body.mask();
 
 });

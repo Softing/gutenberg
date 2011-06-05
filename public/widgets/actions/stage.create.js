@@ -1,6 +1,7 @@
-Inprint.catalog.editions.CreateStagePanel = function () {
+Inprint.setAction("stage.create", function (grid) {
 
     var url = _url("/catalog/stages/create/");
+    var edition = grid.getEdition();
 
     var form = new Ext.FormPanel({
         xtype:"form",
@@ -17,7 +18,8 @@ Inprint.catalog.editions.CreateStagePanel = function () {
             {
                 name: "branch",
                 xtype: "hidden",
-                allowBlank:false
+                allowBlank:false,
+                value: edition
             },
             Inprint.factory.Combo.getConfig("/catalog/combos/readiness/"),
             {   xtype: 'spinnerfield',
@@ -28,7 +30,6 @@ Inprint.catalog.editions.CreateStagePanel = function () {
                 incrementValue: 5,
                 accelerate: true
             },
-            _FLD_TITLE,
             _FLD_SHORTCUT,
             _FLD_DESCRIPTION
         ],
@@ -36,16 +37,15 @@ Inprint.catalog.editions.CreateStagePanel = function () {
         buttons: [ _BTN_SAVE, _BTN_CLOSE ]
     });
 
-    var win = new Ext.Window({
-        title: _("Create stage"),
-        layout: "fit",
-        closeAction: "hide",
-        width:400, height:260,
-        modal:true,
-        items: form
+    form.on("actioncomplete", function (form, action) {
+        if (action.type == "submit") {
+            win.hide();
+            grid.cmpReload();
+        }
     });
 
-    win.relayEvents(form, ["actioncomplete"]);
+    var win = Inprint.factory.windows.create(
+        "Create stage", 400, 260, form
+    ).show();
 
-    return win;
-};
+});
