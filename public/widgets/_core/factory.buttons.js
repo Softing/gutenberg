@@ -13,23 +13,34 @@ Inprint.factory.buttons.manager = new function () {
             items[name] = item;
         },
 
-        get: function(name, params) {
+        get: function(name, icon, tooltip, params) {
 
             var item = items[name];
-            if (item) {
-                if (params) {
-                    Ext.apply(item, params);
-                }
-            } else {
-                item = {
+
+            if (!item) {
+                return {
                     text: name,
-                    icon: _ico("question-button")
+                    icon: _ico("question-button"),
+                    cls: "x-btn-text-icon",
+                    tooltip: item.ref
                 };
             }
 
+            item.disabled = true;
             item.cls = "x-btn-text-icon";
-
             item.tooltip = item.ref;
+
+            if (icon) {
+                item.icon = _ico(icon);
+            }
+
+            if (tooltip) {
+                item.tooltip = _(tooltip);
+            }
+
+            if (params) {
+                Ext.apply(item, params);
+            }
 
             return item;
         }

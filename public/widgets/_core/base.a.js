@@ -8,6 +8,11 @@ Ext.ns("Inprint.documents");
 Ext.ns("Inprint.panel.tree");
 Ext.ns("Inprint.grid.columns");
 
+// Catalog
+Ext.namespace("Inprint.catalog.editions");
+Ext.namespace("Inprint.catalog.indexes");
+Ext.namespace("Inprint.catalog.readiness");
+
 Ext.BLANK_IMAGE_URL = '/ext-3.3.2/resources/images/default/s.gif';
 
 var EXTJS_VERSION   = "3.3.2";

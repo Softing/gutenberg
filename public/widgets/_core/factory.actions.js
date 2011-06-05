@@ -12,13 +12,22 @@ Inprint.factory.actions.manager = new function () {
             items[name] = item;
         },
         get: function(name, scope, params) {
+
             var item = items[name];
+
+            if (!item) {
+                return function() {
+                    alert("Action "+name+" not found!");
+                }
+            }
+
             if (scope) {
                 Ext.apply(item, { scope: scope });
             }
             if (params) {
                 Ext.apply(item, params);
             }
+
             return item;
         }
     }
