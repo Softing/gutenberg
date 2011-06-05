@@ -90,7 +90,9 @@ Inprint.documents.editor.FormTinyMce = Ext.extend( Ext.form.FormPanel,
                         cls : 'x-btn-text-icon',
                         icon: _ico("disk-black"),
                         handler : function() {
-                            this.getForm().submit();
+                            this.getForm().submit({
+                                timeout : 120000
+                            });
                         }
                     },
                     '->',
