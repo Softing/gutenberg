@@ -2,26 +2,24 @@ Inprint.panel.tree.Editions = Ext.extend(Ext.tree.TreePanel, {
 
     initComponent: function() {
 
-        this.components = {};
-
         this.loader = new Ext.tree.TreeLoader({
-                dataUrl: _source("common.tree.editions"),
-                baseParams: this.baseParams
-            });
+            dataUrl: _source("common.tree.editions"),
+            baseParams: this.baseParams
+        });
 
         this.root = {
-                id:'00000000-0000-0000-0000-000000000000',
-                nodeType: 'async',
-                expanded: true,
-                draggable: false,
-                icon: _ico("book"),
-                text: _("Editions")
-            };
+            id:'00000000-0000-0000-0000-000000000000',
+            nodeType: 'async',
+            expanded: true,
+            draggable: false,
+            icon: _ico("book"),
+            text: _("Editions")
+        };
 
         Ext.apply(this, {
                 title:_("Editions"),
-                autoScroll:true,
                 border:false,
+                autoScroll:true,
                 rootVisible: false
             });
 
