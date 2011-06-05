@@ -10,46 +10,33 @@ use warnings;
 
 use Inprint::Models::Headline;
 
-
 use base 'Mojolicious::Controller';
 
 sub read {
     my $c = shift;
-    my $i_id = $c->param("id");
 
     my @errors;
-    my $success = $c->json->false;
-
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_id));
-
     my $result = [];
+
+    my $i_id = $c->get_uuid(\@errors, "id");
 
     unless (@errors) {
         $result = Inprint::Models::Headline::read($c, $i_id);
     }
 
-    $success = $c->json->true unless (@errors);
-    $c->render_json( { success => $success, errors => \@errors, data => $result } );
+    $c->smart_render( \@errors, $result );
 }
 
 sub tree {
-
     my $c = shift;
 
-    my $i_edition = $c->param("node");
-
     my @errors;
-    my $success = $c->json->false;
-
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_edition));
-
-    my $edition = $c->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
-    push @errors, { id => "edition", msg => "Incorrectly filled field"}
-        unless ($edition->{id});
-
     my @result;
+
+    my $i_edition = $c->get_uuid(\@errors, "node");
+
+    my $edition = $c->check_record(\@errors, "editions", "edition", $i_edition);
+
     unless (@errors) {
 
         my $sql;
@@ -92,88 +79,67 @@ sub tree {
         }
     }
 
-    $success = $c->json->true unless (@errors);
     $c->render_json( \@result );
 }
 
 sub create {
     my $c = shift;
 
+    my @errors;
+
     my $id            = $c->uuid();
 
-    my $i_edition     = $c->param("edition");
-    my $i_title       = $c->param("title");
-    my $i_description = $c->param("description");
+    my $i_edition     = $c->get_uuid(\@errors, "edition");
+    my $i_title       = $c->get_text(\@errors, "title");
+    my $i_description = $c->get_text(\@errors, "description", 1);
     my $i_bydefault   = $c->param("bydefault");
 
-    my @errors;
-    my $success = $c->json->false;
-
-    $c->check_uuid( \@errors, "edition", $i_edition);
-    $c->check_text( \@errors, "title", $i_title);
-    $c->check_text( \@errors, "description", $i_description);
     $c->check_access( \@errors, "domain.index.manage");
 
-    my $edition = $c->Q(" SELECT * FROM editions WHERE id=? ", [ $i_edition ])->Hash;
-    push @errors, { id => "edition", msg => "Incorrectly filled field"}
-        unless ($edition->{id});
+    my $edition = $c->check_record(\@errors, "editions", "edition", $i_edition);
 
     unless (@errors) {
         Inprint::Models::Headline::create($c, $id, $edition->{id}, $i_bydefault, $i_title, $i_description);
     }
 
-    $success = $c->json->true unless (@errors);
-    $c->render_json({ success => $success, errors => \@errors });
+    $c->smart_render(\@errors);
 }
 
 sub update {
     my $c = shift;
 
-    my $i_id          = $c->param("id");
-    my $i_title       = $c->param("title");
-    my $i_description = $c->param("description");
+    my @errors;
+
+    my $i_id          = $c->get_uuid(\@errors, "id");
+    my $i_title       = $c->get_text(\@errors, "title");
+    my $i_description = $c->get_text(\@errors, "description", 1);
     my $i_bydefault   = $c->param("bydefault");
 
-    my @errors;
-    my $success = $c->json->false;
-
-    $c->check_uuid( \@errors, "id", $i_id);
-    $c->check_text( \@errors, "title", $i_title);
-    $c->check_text( \@errors, "description", $i_description);
     $c->check_access( \@errors, "domain.index.manage");
 
-    my $headline = Inprint::Models::Headline::read($c, $i_id);
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($headline->{id});
+    my $headline = $c->check_record(\@errors, "indx_headlines", "headline", $i_id);
 
     unless (@errors) {
         Inprint::Models::Headline::update($c, $i_id, $headline->{edition}, $i_bydefault, $i_title, $i_description);
     }
 
-    $success = $c->json->true unless (@errors);
-    $c->render_json({ success => $success, errors => \@errors });
+    $c->smart_render(\@errors);
 }
 
 sub delete {
     my $c = shift;
-    my $i_id = $c->param("id");
 
     my @errors;
-    my $success = $c->json->false;
 
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_id));
+    my $i_id = $c->get_uuid(\@errors, "id");
 
-    push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->objectAccess("domain.index.manage"));
+    $c->check_access( \@errors, "domain.index.manage");
 
     unless (@errors) {
         Inprint::Models::Headline::delete($c, $i_id);
     }
 
-    $success = $c->json->true unless (@errors);
-    $c->render_json({ success => $success, errors => \@errors });
-
+    $c->smart_render(\@errors);
 }
 
 1;

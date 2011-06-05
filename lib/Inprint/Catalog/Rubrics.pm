@@ -14,36 +14,27 @@ use base 'Mojolicious::Controller';
 
 sub read {
     my $c = shift;
-    my $i_id = $c->param("id");
 
     my @errors;
-    my $success = $c->json->false;
-
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_id));
-
     my $result = [];
+
+    my $i_id = $c->get_uuid(\@errors, "id");
 
     unless (@errors) {
         $result = Inprint::Models::Rubric::read($c, $i_id);
     }
 
-    $success = $c->json->true unless (@errors);
-    $c->render_json( { success => $success, errors => \@errors, data => $result } );
+    $c->smart_render( \@errors, $result );
 }
 
 sub list {
     my $c = shift;
 
-    my $i_headline = $c->param("headline");
-
     my @errors;
-    my $success = $c->json->false;
-
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_headline));
-
     my $result;
+
+    my $i_headline = $c->get_uuid(\@errors, "headline");
+
     unless (@errors) {
         $result = $c->Q("
             SELECT id, tag, title, description
@@ -52,102 +43,67 @@ sub list {
             [ $i_headline ] )->Hashes;
     }
 
-    $success = $c->json->true unless (@errors);
-    $c->render_json( { success => $success, errors => \@errors, data => $result || [] } );
+    $c->smart_render( \@errors, $result );
 }
 
 sub create {
     my $c = shift;
 
+    my @errors;
+
     my $id            = $c->uuid();
 
+    my $i_headline    = $c->get_uuid(\@errors, "headline");
+    my $i_title       = $c->get_text(\@errors, "title");
+    my $i_description = $c->get_text(\@errors, "description", 1);
     my $i_bydefault   = $c->param("bydefault");
-    my $i_headline    = $c->param("headline");
-    my $i_title       = $c->param("title");
-    my $i_description = $c->param("description");
 
-    my @errors;
-    my $success = $c->json->false;
+    $c->check_access( \@errors, "domain.index.manage");
 
-    push @errors, { id => "headline", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_headline));
-
-    push @errors, { id => "title", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_title));
-
-    push @errors, { id => "description", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_description));
-
-    push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->objectAccess("domain.index.manage"));
-
-    my $headline = $c->Q(" SELECT * FROM indx_headlines WHERE id=? ", [ $i_headline ])->Hash;
-    push @errors, { id => "headline", msg => "Incorrectly filled field"}
-        unless ($headline->{id});
+    my $headline = $c->check_record(\@errors, "indx_headlines", "headline", $i_headline);
 
     unless (@errors) {
         Inprint::Models::Rubric::create($c, $id, $headline->{edition}, $headline->{id}, $i_bydefault, $i_title, $i_description);
     }
 
-    $success = $c->json->true unless (@errors);
-    $c->render_json({ success => $success, errors => \@errors });
+    $c->smart_render(\@errors);
 }
 
 sub update {
     my $c = shift;
 
-    my $i_id          = $c->param("id");
-    my $i_title       = $c->param("title");
-    my $i_description = $c->param("description");
+    my @errors;
+
+    my $i_id          = $c->get_uuid(\@errors, "id");
+    my $i_title       = $c->get_text(\@errors, "title");
+    my $i_description = $c->get_text(\@errors, "description", 1);
     my $i_bydefault   = $c->param("bydefault");
 
-    my @errors;
-    my $success = $c->json->false;
+    $c->check_access( \@errors, "domain.index.manage");
 
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_id));
-
-    push @errors, { id => "title", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_title));
-
-    push @errors, { id => "description", msg => "Incorrectly filled field"}
-        unless ($c->is_text($i_description));
-
-    push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->objectAccess("domain.index.manage"));
-
-    my $rubric = Inprint::Models::Rubric::read($c, $i_id);
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($rubric->{id});
+    my $rubric = $c->check_record(\@errors, "indx_rubrics", "rubric", $i_id);
 
     unless (@errors) {
         Inprint::Models::Rubric::update($c, $rubric->{id}, $rubric->{edition}, $rubric->{headline}, $i_bydefault, $i_title, $i_description);
     }
 
-    $success = $c->json->true unless (@errors);
-    $c->render_json({ success => $success, errors => \@errors });
+    $c->smart_render(\@errors);
 }
 
 sub delete {
     my $c = shift;
-    my $i_id = $c->param("id");
 
     my @errors;
-    my $success = $c->json->false;
 
-    push @errors, { id => "id", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_id));
+    my $i_id = $c->get_uuid(\@errors, "id");
 
-    push @errors, { id => "access", msg => "Not enough permissions"}
-        unless ($c->objectAccess("domain.index.manage"));
+    $c->check_access( \@errors, "domain.index.manage");
 
     unless (@errors) {
         Inprint::Models::Rubric::delete($c, $i_id);
     }
 
-    $success = $c->json->true unless (@errors);
-    $c->render_json({ success => $success, errors => \@errors });
-
+    $c->smart_render(\@errors);
 }
 
 1;
