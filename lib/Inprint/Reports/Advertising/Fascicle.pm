@@ -8,11 +8,10 @@ package Inprint::Reports::Advertising::Fascicle;
 use strict;
 use warnings;
 
+use utf8;
 use Encode;
 
 use Spreadsheet::WriteExcel;
-
-use utf8;
 
 use base 'Mojolicious::Controller';
 
@@ -20,21 +19,22 @@ sub index {
 
     my $c = shift;
 
-    my $i_fascicle = $c->param("fascicle") || undef;
-
     my @errors;
 
+    my $i_fascicle = $c->param("fascicle") || undef;
+
     $c->check_uuid( \@errors, "fascicle", $i_fascicle);
+
     my $fascicle = $c->check_record(\@errors, "fascicles", "fascicle", $i_fascicle);
     my $edition  = $c->check_record(\@errors, "editions", "edition", $fascicle->{edition});
 
-    my $filename = "отчет по рекламе ". $edition->{shortcut} ."-". $fascicle->{shortcut} .".xls";
+    my $tempdir  = File::Spec->tmpdir();
+    my $tempfile = $c->uuid();
+    $tempfile =~ s/-//g;
 
-    my $filepath  = "/tmp/excel.xls";
-    my $mimetype  = "application/excel";
-    my $extension = "xls";
+    my $temppath = "$tempdir/$tempfile.xls";
 
-    my $workbook = Spreadsheet::WriteExcel->new($filepath);
+    my $workbook = Spreadsheet::WriteExcel->new($temppath);
 
     unless (@errors) {
 
@@ -76,7 +76,8 @@ sub index {
             FROM fascicles_requests requests
                 LEFT OUTER JOIN fascicles_modules modules ON modules.id = requests.module
             WHERE requests.fascicle=?
-            ", $fascicle->{id})->Hashes;
+            ORDER BY firstpage ", 
+            $fascicle->{id})->Hashes;
 
         my $fmtBody = $workbook->add_format();
         $fmtBody->set_border();
@@ -91,7 +92,6 @@ sub index {
             $worksheet->write($rowCounter, 2, $item->{serialnum}, $fmtBody);
             $worksheet->write($rowCounter, 3, $item->{module_description}, $fmtBody);
             $worksheet->write($rowCounter, 4, $item->{module_title}, $fmtBody);
-
             $worksheet->write($rowCounter, 5, $item->{shortcut}, $fmtBody);
             $rowCounter++;
         }
@@ -100,21 +100,23 @@ sub index {
 
     $workbook->close();
 
-    $c->tx->res->headers->content_type($mimetype);
-    $c->res->content->asset(Mojo::Asset::File->new(path => $filepath));
-
-    $filename = encode("utf8", $filename);
+    my $filename = "Отчет-реклама-". $edition->{shortcut} ."-". $fascicle->{shortcut} .".xls";
     $filename =~ s/\s+/_/g;
+    $filename = encode("utf8", $filename);
 
     my $headers = Mojo::Headers->new;
-    $headers->add("Content-Type", "$mimetype;name=$filename");
+    $headers->add("Content-Type", "application/excel;name=$filename");
     $headers->add("Content-Disposition", "attachment;filename=$filename");
-    $headers->add("Content-Description", $extension);
+    $headers->add("Content-Description", "xls");
     $c->res->content->headers($headers);
+    $c->res->content->asset(Mojo::Asset::File->new(path => $temppath ));
+
+    $c->on_finish(sub {
+        unlink $temppath;
+    });
 
     $c->render_static();
 
 }
-
 
 1;
