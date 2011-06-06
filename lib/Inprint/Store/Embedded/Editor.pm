@@ -100,11 +100,13 @@ sub writeFile {
             print $FILE $response2->{text};
         close $FILE;
 
+
+
         my $file_path = Inprint::Store::Embedded::Utils::getRelativePath($c, $basepath);
         $file_path = __decodePath($c, $file_path);
 
         my $file_name = "$basename.$extension";
-        #$file_name = __decodePath($c, $file_name);
+        $file_name = __decodePath($c, $file_name);
 
         $c->Do(
             "UPDATE cache_files SET file_length=? WHERE file_path=? AND file_name=?",
@@ -173,11 +175,11 @@ sub createHotSave {
         $history->{color} = "FFFFFF";
     }
 
-    #my $hotsave_origin = __decodePath($c, "$relativePath/$basename");
-    #my $hotsave_path   = __decodePath($c, "$relativePath/.hotsave/$hotSaveFileName");
+    my $hotsave_origin = __decodePath($c, "$relativePath/$basename");
+    my $hotsave_path   = __decodePath($c, "$relativePath/.hotsave/$hotSaveFileName");
 
-    my $hotsave_origin = "$relativePath/$basename";
-    my $hotsave_path   = "$relativePath/.hotsave/$hotSaveFileName";
+    #my $hotsave_origin = "$relativePath/$basename";
+    #my $hotsave_path   = "$relativePath/.hotsave/$hotSaveFileName";
 
     $c->Do("
         INSERT INTO cache_hotsave(
@@ -364,8 +366,8 @@ sub __adaptPath {
 sub __decodePath {
     my ($c, $string) = @_;
     $string = Encode::decode("cp1251", $string) if ($^O eq "MSWin32");
-    $string = Encode::decode("utf8", $string)   if ($^O eq "darwin");
-    $string = Encode::decode("utf8", $string)   if ($^O eq "linux");
+    #$string = Encode::decode("utf8", $string)   if ($^O eq "darwin");
+    #$string = Encode::decode("utf8", $string)   if ($^O eq "linux");
     return $string;
 }
 
