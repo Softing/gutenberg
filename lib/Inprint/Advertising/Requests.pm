@@ -495,7 +495,7 @@ sub download {
 
     my $temp        = $c->uuid;
     my $rootPath    = $c->config->get("store.path");
-    my $tempPath    = "/tmp";
+    my $tempPath    = File::Spec->tmpdir();
     my $tempFolder  = "$tempPath/inprint-$temp";
     my $tempArchive = "$tempPath/inprint-$temp.7z";
 
@@ -519,6 +519,9 @@ sub download {
         closedir $dh;
 
         foreach my $file_name (@files) {
+
+            next if ($file_name eq ".");
+            next if ($file_name eq "..");
 
             my $file_ext = __FS_GetExtension($c, $file_name);
             next unless $file_ext ~~ ["tif", "tiff", "eps", "pdf"];
