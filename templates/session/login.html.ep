@@ -11,8 +11,8 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
     <meta HTTP-EQUIV="Pragma" CONTENT="no-cache"></meta>
     <link type="text/css" rel="stylesheet" href="/styles/login-page.css">
-    <link type="text/css" rel="stylesheet" href="/ext-3.3.2/resources/css/ext-all.css">
-    <link type="text/css" rel="stylesheet" href="/ext-3.3.2/resources/css/xtheme-gray.css">
+    <link type="text/css" rel="stylesheet" href="/ext-3.4.0/resources/css/ext-all.css">
+    <link type="text/css" rel="stylesheet" href="/ext-3.4.0/resources/css/xtheme-gray.css">
 
     <!-- Ext 3.3.0 -->
     <script type="text/javascript" src="/ext-3.3.2/adapter/ext/ext-base.js"></script>

@@ -14,8 +14,8 @@
 
     <link href="/favicon.ico" rel="icon" type="image/x-icon" />
 
-    <link type="text/css" rel="stylesheet" href="/ext-3.3.2/resources/css/ext-all.css">
-    <link type="text/css" rel="stylesheet" href="/ext-3.3.2/resources/css/xtheme-gray.css">
+    <link type="text/css" rel="stylesheet" href="/ext-3.4.0/resources/css/ext-all.css">
+    <link type="text/css" rel="stylesheet" href="/ext-3.4.0/resources/css/xtheme-gray.css">
 
     <% foreach (@$css) { %>
     <link type="text/css" rel="stylesheet" href="<%= $_ %>"/><% } %>
@@ -28,11 +28,11 @@
 
     <!-- Ext 3.3.0 -->
     <!-- script type="text/javascript" src="/ext-3.3.2/adapter/ext/ext-base.js"></script -->
-    <script type="text/javascript" src="/ext-3.3.2/adapter/jquery/ext-jquery-adapter.js"></script>
-    <script type="text/javascript" src="/ext-3.3.2/ext-all.js"></script>
+    <script type="text/javascript" src="/ext-3.4.0/adapter/jquery/ext-jquery-adapter.js"></script>
+    <script type="text/javascript" src="/ext-3.4.0/ext-all.js"></script>
 
     <!-- Locale support -->
-    <script type="text/javascript" src="/ext-3.3.2/src/locale/ext-lang-ru.js"></script>
+    <script type="text/javascript" src="/ext-3.4.0/src/locale/ext-lang-ru.js"></script>
 
 </head>
 <body>
