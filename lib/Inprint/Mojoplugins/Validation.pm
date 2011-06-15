@@ -42,9 +42,23 @@ sub register {
     # NEW DB CHECK
 
     $app->helper(
-        check_record => sub {
-            my ($c, $errors, $table, $title, $id) = @_;
+        get_record => sub {
+            my ($c, $table, $id, $ifexists) = @_;
             undef my $item;
+
+            $item = $c->Q(" SELECT * FROM $table WHERE id=? ", [ $id ])->Hash;
+
+            return $item;
+        });
+
+    $app->helper(
+        check_record => sub {
+            my ($c, $errors, $table, $title, $id, $ifexists) = @_;
+            undef my $item;
+
+            if ($ifexists && (!$id)) {
+                return;
+            }
 
             $item = $c->Q(" SELECT * FROM $table WHERE id=? ", [ $id ])->Hash unless (@$errors);
             push @$errors, { id => $title, msg => "Can't find record"} unless ($item->{id});
@@ -116,10 +130,6 @@ sub register {
             my $value = $c->param($field);
             return $c->check_path($errors, $field, $value, $ifexists);
         });
-
-
-
-
 
     # NEW CHECK RULES
 

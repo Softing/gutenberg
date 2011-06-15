@@ -264,20 +264,20 @@ sub startup {
     $sessionBridge->route('/common/tree/fascicles/')            ->to('common-trees#fascicles');
 
     # Documents routes
-    $sessionBridge->route('/documents/array/')                  ->to('documents#array');
-    $sessionBridge->route('/documents/briefcase/')              ->to('documents#briefcase');
-    $sessionBridge->route('/documents/capture/')                ->to('documents#capture');
-    $sessionBridge->route('/documents/copy/')                   ->to('documents#copy');
-    $sessionBridge->route('/documents/create/')                 ->to('documents#create');
-    $sessionBridge->route('/documents/delete/')                 ->to('documents#delete');
-    $sessionBridge->route('/documents/duplicate/')              ->to('documents#duplicate');
-    $sessionBridge->route('/documents/list/')                   ->to('documents#list');
-    $sessionBridge->route('/documents/move/')                   ->to('documents#move');
-    $sessionBridge->route('/documents/read/')                   ->to('documents#read');
-    $sessionBridge->route('/documents/recycle/')                ->to('documents#recycle');
-    $sessionBridge->route('/documents/restore/')                ->to('documents#restore');
-    $sessionBridge->route('/documents/transfer/')               ->to('documents#transfer');
-    $sessionBridge->route('/documents/update/')                 ->to('documents#update');
+    $sessionBridge->route('/documents/array/')                  ->to("controllers-documents#array");
+    $sessionBridge->route('/documents/briefcase/')              ->to("controllers-documents#briefcase");
+    $sessionBridge->route('/documents/capture/')                ->to("controllers-documents#capture");
+    $sessionBridge->route('/documents/copy/')                   ->to("controllers-documents#copy");
+    $sessionBridge->route('/documents/create/')                 ->to("controllers-documents#create");
+    $sessionBridge->route('/documents/delete/')                 ->to("controllers-documents#delete");
+    $sessionBridge->route('/documents/duplicate/')              ->to("controllers-documents#duplicate");
+    $sessionBridge->route('/documents/list/')                   ->to("controllers-documents#list");
+    $sessionBridge->route('/documents/move/')                   ->to("controllers-documents#move");
+    $sessionBridge->route('/documents/read/')                   ->to("controllers-documents#read");
+    $sessionBridge->route('/documents/recycle/')                ->to("controllers-documents#recycle");
+    $sessionBridge->route('/documents/restore/')                ->to("controllers-documents#restore");
+    $sessionBridge->route('/documents/transfer/')               ->to("controllers-documents#transfer");
+    $sessionBridge->route('/documents/update/')                 ->to("controllers-documents#update");
 
     $sessionBridge->route('/documents/comments/list/')          ->to('documents-comments#list');
     $sessionBridge->route('/documents/comments/save/')          ->to('documents-comments#save');

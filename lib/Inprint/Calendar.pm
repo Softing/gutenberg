@@ -8,7 +8,6 @@ package Inprint::Calendar;
 use strict;
 use warnings;
 
-use Inprint::Utils::Documents;
 use Inprint::Models::Fascicle;
 use Inprint::Models::Fascicle::Template;
 use Inprint::Models::Fascicle::Attachment;

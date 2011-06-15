@@ -14,7 +14,7 @@ use Inprint::Fascicle::Utils;
 use Inprint::Models::Fascicle::Page;
 use Inprint::Models::Fascicle::Pages;
 
-use Inprint::Utils::Pages;
+use Inprint::Fascicle::Utils;
 
 use base 'Mojolicious::Controller';
 
@@ -92,9 +92,8 @@ sub create {
 
     unless (@errors) {
 
-        my $pages = Inprint::Utils::Pages::UncompressString($c, $i_string);
-
-        my $chunks = Inprint::Utils::Pages::GetChunks($c, $pages);
+        my $pages  = Inprint::Fascicle::Utils::UncompressString($c, $i_string);
+        my $chunks = Inprint::Fascicle::Utils::GetChunks($c, $pages);
 
         my $composition = $c->Q("
             SELECT id, edition, fascicle, headline, seqnum, w, h, created, updated

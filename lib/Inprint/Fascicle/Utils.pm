@@ -28,7 +28,6 @@ sub updateDocumentsPagesCache {
     return 1;
 }
 
-
 sub compressString {
 
     my $c = shift;
@@ -140,7 +139,6 @@ sub getChunks {
             push @result, [ $curr ];
             next;
         }
-
 
     }
 

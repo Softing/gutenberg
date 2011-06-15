@@ -8,7 +8,6 @@ package Inprint::Models::Fascicle::Pages;
 use strict;
 use warnings;
 
-use Inprint::Utils::Pages;
 use Inprint::Models::Fascicle::Page;
 
 use base 'Mojolicious::Controller';

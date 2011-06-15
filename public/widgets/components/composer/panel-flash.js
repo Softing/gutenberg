@@ -2,10 +2,7 @@ Inprint.cmp.composer.Flash = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
 
-        this.params = {};
-        this.components = {};
-
-        this.saveCounter = 0;
+        this.modcache = {};
 
         this.urls = {
             "init":   _url("/fascicle/composer/initialize/"),
@@ -20,7 +17,6 @@ Inprint.cmp.composer.Flash = Ext.extend(Ext.Panel, {
             var array2 = b.split("::");
             return array1[1] - array2[1];
         });
-
 
         this.pages = [];
         for (var c = 1; c < selection.length+1; c++) {
@@ -106,6 +102,8 @@ Inprint.cmp.composer.Flash = Ext.extend(Ext.Panel, {
             return;
         }
 
+        this.modcache = {};
+
         var init = function() {
             if (flash.reset) {
 
@@ -117,6 +115,7 @@ Inprint.cmp.composer.Flash = Ext.extend(Ext.Panel, {
                 }, this);
 
                 Ext.each(responce.data.modules, function(c) {
+                    this.modcache[c.id] = c;
                     flash.setBlock(c.page, c.id, c.title, c.x, c.y, c.w, c.h );
                 }, this);
 
@@ -150,12 +149,28 @@ Inprint.cmp.composer.Flash = Ext.extend(Ext.Panel, {
         var data = [];
 
         for (var p=0;p<records.length;p++) {
+
             var modules = records[p].arr;
+
             for (var m=0;m<modules.length;m++) {
+
                 var module = modules[m];
-                var string = module.fid +'::'+ module.id +'::'+ module.x  +'::'+ module.y  +'::'+ module.w  +'::'+ module.h;
-                data.push(string);
+
+                var id = module.id;
+
+                var oldpage = this.modcache[module.id].page;
+                var newpage = module.fid;
+
+                var x = module.x;
+                var y = module.y;
+                var w = module.w;
+                var h = module.h;
+
+                data.push(
+                    id +'::'+ oldpage +'::'+ newpage +'::'+ x +'::'+ y +'::'+ w +'::'+ h
+                );
             }
+
         }
 
         Ext.Ajax.request({

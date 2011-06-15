@@ -65,44 +65,7 @@ sub read {
 
         $document->{access} = Inprint::Documents::Access::get($c, $document->{id});
 
-        ## Get document rules
-        #my @rules = qw( update capture move transfer briefcase delete recover discuss fadd fedit fdelete );
-        #
-        #foreach (@rules) {
-        #
-        #    if ($document->{holder} eq $current_member) {
-        #        if ($c->objectAccess(["catalog.documents.$_:*"], $document->{workgroup})) {
-        #            $document->{access}->{$_} = $c->json->true;
-        #        } else {
-        #            $document->{access}->{$_} = $c->json->false;
-        #        }
-        #    }
-        #
-        #    if ($document->{holder} ne $current_member) {
-        #        if ($c->objectAccess("catalog.documents.$_:group", $document->{workgroup})) {
-        #            $document->{access}->{$_} = $c->json->true;
-        #        } else {
-        #            $document->{access}->{$_} = $c->json->false;
-        #        }
-        #    }
-        #
-        #}
-
     }
-
-    #unless (@errors) {
-    #    my $relativePath = Inprint::Store::Embedded::getRelativePath($c, "documents", $document->{created}, $document->{id}, 1);
-    #
-    #    # Update images count
-    #    my @images = ("jpg", "jpeg", "png", "gif", "bmp", "tiff" );
-    #    my $imgCount = $c->Q(" SELECT count(*) FROM cache_files WHERE file_path=? AND file_exists = true AND file_extension=ANY(?) ", [ $relativePath, \@images ])->Value;
-    #    $c->Do("UPDATE documents SET images=? WHERE filepath=? ", [ $imgCount || 0, $relativePath ]);
-    #
-    #    # Update rsize count
-    #    my @documents = ("doc", "docx", "odt", "rtf", "txt" );
-    #    my $lengthCount = $c->Q(" SELECT sum(file_length) FROM cache_files WHERE file_path=? AND file_exists = true AND file_extension=ANY(?) ", [ $relativePath, \@documents ])->Value;
-    #    $c->Do("UPDATE documents SET rsize=? WHERE filepath=? ", [ $lengthCount || 0, $relativePath ]);
-    #}
 
     # Get history
     unless (@errors) {
@@ -124,7 +87,10 @@ sub read {
                 dcm.fascicle, dcm.fascicle_shortcut,
                 dcm.headline, dcm.headline_shortcut,
                 dcm.rubric, dcm.rubric_shortcut
-            FROM documents dcm WHERE dcm.copygroup=?
+            FROM documents dcm
+            WHERE 1=1
+                AND dcm.copygroup=?
+                AND dcm.fascicle <> '99999999-9999-9999-9999-999999999999'
             ORDER BY edition_shortcut, fascicle_shortcut
         ", [ $document->{copygroup} ])->Hashes;
     }

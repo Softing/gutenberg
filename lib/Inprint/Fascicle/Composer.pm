@@ -8,8 +8,6 @@ package Inprint::Fascicle::Composer;
 use strict;
 use warnings;
 
-use Inprint::Utils::Pages;
-
 use base 'Mojolicious::Controller';
 
 sub initialize {
@@ -47,29 +45,31 @@ sub save {
 
     my $c = shift;
 
-    my @i_modules  = $c->param("modules");
-
     my @errors;
-    my $success = $c->json->false;
+
+    my @i_modules  = $c->param("modules");
 
     unless (@errors) {
 
         foreach my $string (@i_modules) {
 
-            my ($pageid, $moduleid, $x, $y, $w, $h) = split "::", $string;
+            my ($id, $oldpage, $newpage, $x, $y, $w, $h) = split "::", $string;
 
             my $placed = 1;
 
+            my $mapping = $c->Q("
+                SELECT * FROM fascicles_map_modules WHERE page=? AND module=? ",
+                [ $oldpage, $id ])->Hash;
+
+            next unless $mapping->{id};
+
             $c->Do("
-                UPDATE fascicles_map_modules SET placed=?, x=?, y=? WHERE page=? AND module=? ",
-                [ $placed, $x, $y, $pageid, $moduleid ]);
-
+                UPDATE fascicles_map_modules SET page=?, placed=?, x=?, y=? WHERE id=? ",
+                [ $newpage, $placed, $x, $y, $mapping->{id} ]);
         }
-
     }
 
-    $success = $c->json->true unless (@errors);
-    $c->render_json({ success => $success, errors => \@errors });
+    $c->smart_render( \@errors );
 }
 
 sub templates {

@@ -92,48 +92,60 @@ sub summary {
 
     my $i_fascicle = $c->get_uuid(\@errors, "flt_fascicle");
 
-    unless (@errors) {
+    $c->smart_render( \@errors ) if @errors;
 
-        my $fascicle = $c->Q("
-                SELECT t1.id, t1.shortcut, t2.id as edition, t2.shortcut as edition_shortcut
-                FROM fascicles t1, editions t2
-                WHERE 1=1
-                    AND t1.edition  = t2.id
-                    AND t1.enabled  = true
-                    AND t1.archived = false
-                    AND t1.deleted  = false
-                    AND t1.id=?", $i_fascicle )->Hash;
+    my $bindings = $c->objectBindings([
+        "editions.advert.manage:*",
+        "editions.advert.view:*" ]);
 
-        my $children = $c->Q("
-                SELECT t1.id, t1.shortcut, t2.id as edition, t2.shortcut as edition_shortcut
-                FROM fascicles t1, editions t2
-                WHERE 1=1
-                    AND t1.edition  = t2.id
-                    AND t1.enabled  = true
-                    AND t1.archived = false
-                    AND t1.deleted  = false
-                    AND t1.parent=? ORDER BY t1.shortcut ", $i_fascicle )->Hashes;
+    my $fascicle = $c->Q("
+            SELECT t1.id, t1.shortcut, t2.id as edition, t2.shortcut as edition_shortcut
+            FROM fascicles t1, editions t2
+            WHERE 1=1
+                AND t1.id=?
+                AND t1.edition = ANY(?)
+                AND t1.edition  = t2.id
+                AND t1.enabled  = true
+                AND t1.archived = false
+                AND t1.deleted  = false ",
+        [ $i_fascicle, $bindings ])->Hash;
 
+    my $children = $c->Q("
+            SELECT t1.id, t1.shortcut, t2.id as edition, t2.shortcut as edition_shortcut
+            FROM fascicles t1, editions t2
+            WHERE 1=1
+                AND t1.parent=?
+                AND t1.edition = ANY(?)
+                AND t1.edition  = t2.id
+                AND t1.enabled  = true
+                AND t1.archived = false
+                AND t1.deleted  = false
+            ORDER BY t1.shortcut ",
+        [ $i_fascicle, $bindings ])->Hashes;
+
+    if ($fascicle->{id}) {
         push @result, $fascicle;
-        foreach my $item (@$children) {
-            push @result, $item;
-        }
+    }
 
-        foreach my $item (@result) {
-            my $total   = $c->Q(" SELECT count(*) FROM fascicles_requests WHERE fascicle=?", $item->{id})->Value;
-            my $check    = $c->Q(" SELECT count(*) FROM fascicles_requests WHERE fascicle=? AND check_status='check' ", $item->{id})->Value;
-            my $error    = $c->Q(" SELECT count(*) FROM fascicles_requests WHERE fascicle=? AND check_status='error' ", $item->{id})->Value;
-            my $ready    = $c->Q(" SELECT count(*) FROM fascicles_requests WHERE fascicle=? AND check_status='ready' ", $item->{id})->Value;
-            my $anothers = $c->Q(" SELECT count(*) FROM fascicles_requests WHERE fascicle=? AND anothers_layout=true ", $item->{id})->Value;
-            my $imposed  = $c->Q(" SELECT count(*) FROM fascicles_requests WHERE fascicle=? AND check_status='imposed' ", $item->{id})->Value;
-            $item->{total}    = $total;
-            $item->{check}    = $check;
-            $item->{error}    = $error;
-            $item->{ready}    = $ready;
-            $item->{anothers} = $anothers;
-            $item->{imposed}  = $imposed;
+    foreach (@$children) {
+        if ($_->{id}) {
+            push @result, $_;
         }
+    }
 
+    foreach my $item (@result) {
+        my $total    = $c->Q(" SELECT count(*) FROM fascicles_requests WHERE fascicle=?", $item->{id})->Value;
+        my $check    = $c->Q(" SELECT count(*) FROM fascicles_requests WHERE fascicle=? AND check_status='check' ", $item->{id})->Value;
+        my $error    = $c->Q(" SELECT count(*) FROM fascicles_requests WHERE fascicle=? AND check_status='error' ", $item->{id})->Value;
+        my $ready    = $c->Q(" SELECT count(*) FROM fascicles_requests WHERE fascicle=? AND check_status='ready' ", $item->{id})->Value;
+        my $anothers = $c->Q(" SELECT count(*) FROM fascicles_requests WHERE fascicle=? AND anothers_layout=true ", $item->{id})->Value;
+        my $imposed  = $c->Q(" SELECT count(*) FROM fascicles_requests WHERE fascicle=? AND check_status='imposed' ", $item->{id})->Value;
+        $item->{total}    = $total;
+        $item->{check}    = $check;
+        $item->{error}    = $error;
+        $item->{ready}    = $ready;
+        $item->{anothers} = $anothers;
+        $item->{imposed}  = $imposed;
     }
 
     $c->smart_render( \@errors, \@result );

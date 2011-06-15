@@ -8,8 +8,6 @@ package Inprint::Fascicle;
 use strict;
 use warnings;
 
-use Inprint::Utils::Pages;
-
 use Inprint::Fascicle::Utils;
 
 use Inprint::Models::Documents;
