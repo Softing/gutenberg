@@ -218,6 +218,15 @@ var _BTN_WNDW_FORM_CANCEL = {
 
 /* Buttons for Form  */
 
+var _BTN_OK = {
+    text: _("Ok"),
+    handler: function() {
+        this.findParentByType('form').getForm().submit({
+            submitEmptyText: false
+        });
+    }
+};
+
 var _BTN_ADD = {
     text: _("Add"),
     handler: function() {

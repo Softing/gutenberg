@@ -50,5 +50,4 @@ Inprint.setAction("rubric.create", function(grid) {
         "Create rubric", 400, 260, form
     ).show();
 
-
 });

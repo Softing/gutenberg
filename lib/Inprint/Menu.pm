@@ -117,7 +117,7 @@ sub index
             AND deleted = false
         ORDER BY t1.release_date, t2.shortcut, t1.shortcut
     ")->Hashes;
-    
+
 
     foreach my $item (@$fascicles) {
         $item->{attachments} = $c->Q("
@@ -199,10 +199,8 @@ sub index
     if ($accessViewSettings) {
         push @{ $SettingsSection->{menu} }, { id => "settings-organization" };
         push @{ $SettingsSection->{menu} }, { id => "settings-editions" };
-        #push @{ $SettingsSection->{menu} }, { id => "settings-roles" };
         push @{ $SettingsSection->{menu} }, { id => "settings-readiness" };
         push @{ $SettingsSection->{menu} }, { id => "settings-index" };
-
         push @{ $SettingsSection->{menu} }, "-";
         push @{ $SettingsSection->{menu} }, { id => "system-settings" };
         push @{ $SettingsSection->{menu} }, { id => "system-logs" };
@@ -329,6 +327,12 @@ sub fascicleHadler {
             {
                 oid => $oid,
                 id  => "fascicle-planner",
+                description => $fascicle->{shortcut}
+            };
+        push @{ $fascicle_menu->{menu} },
+            {
+                oid => $oid,
+                id  => "fascicle-adverter",
                 description => $fascicle->{shortcut}
             };
 

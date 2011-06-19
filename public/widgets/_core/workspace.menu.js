@@ -22,10 +22,10 @@ Inprint.Menu = Ext.extend(Ext.Toolbar,{
             run: function() {
                 var clock = Ext.fly("menu-clock");
                 if (clock) {
-                    clock.update(new Date().format('g:i:s A'));
+                    clock.update(new Date().format('g:i A'));
                 }
             },
-            interval: 1000 //1 second
+            interval: 60000 //60 second
         };
 
         var runner = new Ext.util.TaskRunner();
@@ -58,7 +58,7 @@ Inprint.Menu = Ext.extend(Ext.Toolbar,{
             }
         }, this);
         this.add("-");
-        var clock = this.add({ id: "menu-clock", xtype: 'tbtext', text: '00:00:00 --' });
+        var clock = this.add({ id: "menu-clock", xtype: 'tbtext', text: new Date().format('g:i A') });
         this.doLayout();
     },
 

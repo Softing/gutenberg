@@ -4,6 +4,7 @@
 // http://softing.ru/license
 
 Ext.ns("Inprint");
+Ext.ns("Inprint.cmp");
 Ext.ns("Inprint.documents");
 Ext.ns("Inprint.panel.tree");
 Ext.ns("Inprint.grid.columns");

@@ -11,8 +11,6 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
 
                     var items = values[0];
 
-
-
                     var string = '<div class="inprint-plan">';
                     string += '<div class="inprint-plan-block">';
 
@@ -164,7 +162,7 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
         Ext.apply(this, {
             autoWidth:true,
             autoHeight:true,
-            simpleSelect: false,
+            simpleSelect: true,
             multiSelect: true,
             loadingText:'Загрузка',
             emptyText: 'Полосы не найдены',

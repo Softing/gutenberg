@@ -19,27 +19,17 @@ sub seance {
 
     my $c = shift;
 
-    my $i_fascicle = $c->param("fascicle");
+    my @errors;
 
+    my $i_fascicle     = $c->get_uuid(\@errors, "fascicle");
     my $current_member = $c->getSessionValue("member.id");
 
-    my @errors;
-    my $success = $c->json->false;
-
-    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_fascicle));
-
-    my $fascicle;
     my $pages;
     my $documents;
     my $requests;
     my $summary;
 
-    unless (@errors) {
-        $fascicle = $c->Q(" SELECT * FROM fascicles WHERE id =? ", [ $i_fascicle ])->Hash;
-        push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
-            unless $fascicle;
-    }
+    my $fascicle = $c->check_record(\@errors, "fascicles", "fascicle", $i_fascicle);
 
     unless (@errors) {
 
@@ -49,15 +39,17 @@ sub seance {
         $summary   = $c->getSummary($fascicle->{id});
 
         if ($fascicle->{manager}) {
-            $fascicle->{manager_shortcut} = $c->Q(" SELECT shortcut FROM profiles WHERE id=?", [$fascicle->{manager}])->Value;
+            $fascicle->{manager_shortcut} = $c->Q("
+                SELECT shortcut FROM profiles WHERE id=?",
+                [$fascicle->{manager}])->Value;
         }
 
         $fascicle->{access} = {
-            open => $c->json->true,
+            open    => $c->json->true,
             capture => $c->json->false,
-            close => $c->json->false,
-            save => $c->json->false,
-            manage => $c->json->false
+            close   => $c->json->false,
+            save    => $c->json->false,
+            manage  => $c->json->false
         };
 
         if ($fascicle->{manager}) {
@@ -79,13 +71,22 @@ sub seance {
             }
         }
 
-        my $statusbar_all = $c->Q(" SELECT count(*) FROM fascicles_pages WHERE fascicle=? AND seqnum is not null ", [ $fascicle->{id} ])->Value;
+        my $statusbar_all = $c->Q("
+                SELECT count(*)
+                FROM fascicles_pages
+                WHERE fascicle=? AND seqnum is not null ",
+            [ $fascicle->{id} ])->Value;
 
         my $statusbar_adv = $c->Q("
                 SELECT sum(t1.area)
-                FROM fascicles_modules t1, fascicles_map_modules t2, fascicles_pages t3
-                WHERE
-                    t2.module = t1.id AND t2.page = t3.id AND t3.fascicle=?
+                FROM
+                    fascicles_requests t1,
+                    fascicles_map_requests t2,
+                    fascicles_pages t3
+                WHERE 1=1
+                    AND t1.id = t2.request
+                    AND t3.id = t2.page
+                    AND t3.fascicle=?
             ", [ $fascicle->{id} ]
         )->Value;
 
@@ -108,13 +109,9 @@ sub seance {
         $fascicle->{dav} = sprintf "%.2f", $statusbar_doc_average || 0;
         $fascicle->{aav} = sprintf "%.2f", $statusbar_adv_average || 0;
 
-
     }
 
-    $success = $c->json->true unless (@errors);
-
     $c->render_json({
-        success     => $success,
         errors      => \@errors,
         fascicle    => $fascicle || {},
         pages       => [ $pages ],
@@ -446,57 +443,57 @@ sub getPages {
         }
     }
 
-    my $holes;
-
-    my $dbholes = $c->Q("
-        SELECT t1.id, t1.title, t1.w, t1.h, t2.page, t2.x, t2.y
-        FROM fascicles_modules t1, fascicles_map_modules t2
-        WHERE t1.fascicle = ? AND t2.module=t1.id AND t2.placed=false
-    ", [ $fascicle ])->Hashes;
-
-    foreach my $item (@$dbholes) {
-        $index->{$item->{id}} = $idcounter++;
-
-        $holes->{$index->{$item->{id}}} = {
-            id => $item->{id},
-            title => $item->{title}
-        };
-
-        my $pageindex = $index->{$item->{page}};
-        if ($pageindex) {
-            push @{ $pages->{$pageindex}->{holes} }, $index->{$item->{id}};
-        }
-    }
-
-    my $requests;
-
-    my $dbrequests = $c->Q("
-        SELECT t1.id, t1.shortcut, t2.page
-        FROM fascicles_requests t1, fascicles_map_modules t2
-        WHERE t1.fascicle = ? AND t1.module=t2.module AND t2.placed=false
-    ", [ $fascicle ])->Hashes;
-
-    foreach my $item (@$dbrequests) {
-
-        $index->{$item->{id}} = $idcounter++;
-
-        $requests->{$index->{$item->{id}}} = {
-            id => $item->{id},
-            title => $item->{shortcut}
-        };
-
-        my $pageindex = $index->{$item->{page}};
-
-        if ($pageindex) {
-            push @{ $pages->{$pageindex}->{requests} }, $index->{$item->{id}};
-        }
-
-    }
+    #my $holes;
+    #
+    #my $dbholes = $c->Q("
+    #        SELECT t1.id, t1.title, t1.w, t1.h, t2.page, t2.x, t2.y
+    #        FROM fascicles_modules t1, fascicles_map_modules t2
+    #        WHERE t1.fascicle = ? AND t2.module=t1.id AND t2.placed=false ",
+    #    [ $fascicle ])->Hashes;
+    #
+    #foreach my $item (@$dbholes) {
+    #    $index->{$item->{id}} = $idcounter++;
+    #
+    #    $holes->{$index->{$item->{id}}} = {
+    #        id => $item->{id},
+    #        title => $item->{title}
+    #    };
+    #
+    #    my $pageindex = $index->{$item->{page}};
+    #    if ($pageindex) {
+    #        push @{ $pages->{$pageindex}->{holes} }, $index->{$item->{id}};
+    #    }
+    #}
+    #
+    #my $requests;
+    #
+    #my $dbrequests = $c->Q("
+    #        SELECT t1.id, t1.shortcut, t2.page
+    #        FROM fascicles_requests t1, fascicles_map_modules t2
+    #        WHERE t1.fascicle = ? AND t1.module=t2.module AND t2.placed=false ",
+    #    [ $fascicle ])->Hashes;
+    #
+    #foreach my $item (@$dbrequests) {
+    #
+    #    $index->{$item->{id}} = $idcounter++;
+    #
+    #    $requests->{$index->{$item->{id}}} = {
+    #        id => $item->{id},
+    #        title => $item->{shortcut}
+    #    };
+    #
+    #    my $pageindex = $index->{$item->{page}};
+    #
+    #    if ($pageindex) {
+    #        push @{ $pages->{$pageindex}->{requests} }, $index->{$item->{id}};
+    #    }
+    #
+    #}
 
     $data->{pages}      = $pages;
     $data->{documents}  = $documents;
-    $data->{holes}      = $holes;
-    $data->{requests}   = $requests;
+    #$data->{holes}      = $holes;
+    #$data->{requests}   = $requests;
     $data->{pageorder}  = \@pageorder;
 
     return $data ;
@@ -544,48 +541,75 @@ sub getSummary {
 
     my $data;
 
-    # Get adv places
+    # Select advertising places
     my $places = $c->Q("
-        SELECT id, fascicle, title, description, created, updated
-        FROM fascicles_tmpl_places WHERE fascicle = ? ORDER BY title
-    ", [ $fascicle ])->Hashes;
+            SELECT id, fascicle, title, description, created, updated
+            FROM fascicles_tmpl_places
+            WHERE fascicle = ? ORDER BY title ",
+        [ $fascicle ])->Hashes;
 
     foreach my $place (@$places) {
 
-        # Get adv modules for place
+        # Get advertising modules for place
         my $tmpl_modules = $c->Q("
-            SELECT
-                t1.id, t1.origin, t1.fascicle, t1.page, t1.title,
-                t1.description, t1.amount, t1.area, t1.x, t1.y, t1.w, t1.h,
-                t1.created, t1.updated
-            FROM fascicles_tmpl_modules t1, fascicles_tmpl_index t2
-            WHERE t1.fascicle=? AND t2.entity=t1.id AND t2.place=?
-        ", [ $fascicle, $place->{id} ])->Hashes;
+                SELECT
+                    t1.id, t1.origin, t1.fascicle, t1.page, t1.title,
+                    t1.description, t1.amount, t1.area, t1.x, t1.y, t1.w, t1.h,
+                    t1.created, t1.updated
+                FROM fascicles_tmpl_modules t1, fascicles_tmpl_index t2
+                WHERE t1.fascicle=? AND t2.entity=t1.id AND t2.place=?
+                ORDER BY area DESC ",
+            [ $fascicle, $place->{id} ])->Hashes;
 
         foreach my $tmpl_module (@$tmpl_modules) {
 
-            my $pages = $c->Q("
-                    SELECT t3.seqnum
-                    FROM fascicles_modules t1, fascicles_map_modules t2, fascicles_pages t3
-                    WHERE t2.module=t1.id AND t2.page=t3.id
-                        AND t1.fascicle=? AND t1.place=? AND t1.origin=?
-                    ORDER BY t3.seqnum
-                ", [ $fascicle, $place->{id}, $tmpl_module->{id} ])->Values;
+            my $pages    = [];
+            my $holes    = 0;
+            my $requests = 0;
+
+            # Get pages for this module
+            $pages = $c->Q("
+                    SELECT DISTINCT page.seqnum
+                    FROM
+                        fascicles_requests request,
+                        fascicles_map_requests mapping,
+                        fascicles_pages page
+                    WHERE 1=1
+                        AND request.id = mapping.request
+                        AND page.id = mapping.page
+                        AND request.fascicle=?
+                        AND request.place=?
+                        AND request.tmpl_module=?
+                    ORDER BY page.seqnum ",
+                [ $fascicle, $place->{id}, $tmpl_module->{id} ])->Values || [];
 
             $pages = join ", ", @$pages;
 
-            my $modules = $c->Q("
+            # Get all holes
+            $holes = $c->Q("
                     SELECT count(*)
-                    FROM fascicles_modules t1
-                    WHERE t1.fascicle=? AND t1.place=? AND t1.origin=?
-                ", [ $fascicle, $place->{id}, $tmpl_module->{id} ])->Value || 0;
+                    FROM fascicles_requests
+                    WHERE 1=1
+                        AND fascicle=?
+                        AND place=?
+                        AND tmpl_module=? ",
+                [ $fascicle, $place->{id}, $tmpl_module->{id} ])->Value || 0;
 
-            my $requests = $c->Q("
-                SELECT count(*) FROM fascicles_requests WHERE fascicle=? AND place=? AND origin=?
-            ", [ $fascicle, $place->{id}, $tmpl_module->{id} ])->Value || 0;
+            # Get all holes with requests
+            $requests = $c->Q("
+                    SELECT count(*)
+                    FROM fascicles_requests
+                    WHERE 1=1
+                        AND advertiser <> '00000000-0000-0000-0000-000000000000'
+                        AND fascicle=?
+                        AND place=?
+                        AND tmpl_module=? ",
+                [ $fascicle, $place->{id}, $tmpl_module->{id} ])->Value || 0;
 
-            my $freespace = $modules - $requests;
+            # Get free holes
+            my $freespace = $holes - $requests;
 
+            # create result
             push @$data, {
                 id              => $place->{id} ."::". $tmpl_module->{id},
                 shortcut        => $tmpl_module->{title},
@@ -593,7 +617,7 @@ sub getSummary {
                 place           => $place->{id},
                 place_shortcut  => $place->{title},
                 pages           => $pages,
-                holes           => $modules,
+                holes           => $holes,
                 requests        => $requests,
                 free            => $freespace
             }

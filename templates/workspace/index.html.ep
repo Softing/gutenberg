@@ -28,8 +28,8 @@
 
     <!-- Ext 3.3.0 -->
     <!-- script type="text/javascript" src="/ext-3.3.2/adapter/ext/ext-base.js"></script -->
-    <script type="text/javascript" src="/ext-3.4.0/adapter/jquery/ext-jquery-adapter.js"></script>
-    <script type="text/javascript" src="/ext-3.4.0/ext-all.js"></script>
+    <script type="text/javascript" src="/ext-3.4.0/adapter/jquery/ext-jquery-adapter-debug.js"></script>
+    <script type="text/javascript" src="/ext-3.4.0/ext-all-debug.js"></script>
 
     <!-- Locale support -->
     <script type="text/javascript" src="/ext-3.4.0/src/locale/ext-lang-ru.js"></script>

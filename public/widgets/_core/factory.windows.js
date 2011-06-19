@@ -5,15 +5,21 @@
 
 Ext.namespace("Inprint.factory.windows");
 
-Inprint.factory.windows.create = function (title, width, height, item) {
+Inprint.factory.windows.create = function (title, width, height, item, btns) {
 
-    var wn = new Ext.Window({
+    var wnconfig = {
         title: _(title),
         layout: "fit",
         width: width,
         height: height,
         modal:true
-    });
+    };
+
+    if (btns) {
+        wnconfig.buttons = btns;
+    }
+
+    var wn = new Ext.Window(wnconfig);
 
     wn.add(item);
 
