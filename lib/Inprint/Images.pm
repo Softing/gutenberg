@@ -64,29 +64,22 @@ sub fascicle_page {
     $c->draw_page($img, $grid, $page->{w}, $page->{h});
 
     my $modules = $c->Q("
-            SELECT DISTINCT
-                request.id,
-                request.shortcut,
-                request.place,
-                request.tmpl_module as module,
-                request.tmpl_module_shortcut as module_shortcut,
-                request.w,
-                request.h,
-                mapping.x,
-                mapping.y,
-                place.id as place,
-                place.title as place_title
+        SELECT DISTINCT
+                t1.id, t1.title, t1.place, t1.w, t1.h, t2.placed, t2.x, t2.y,
+                t3.id as place, t3.title as place_title
             FROM
-                fascicles_requests request
-                LEFT JOIN fascicles_tmpl_places place ON ( request.place = place.id ),
-                fascicles_map_requests mapping
-
-            WHERE 1=1
-                AND mapping.request = request.id
-                AND mapping.page = ? ",
-        [ $i_page ])->Hashes;
+                fascicles_modules t1
+                    LEFT JOIN fascicles_tmpl_places t3 ON ( t1.place = t3.id ),
+                fascicles_map_modules t2
+            WHERE t2.module=t1.id AND t2.page = ?
+    ", [ $i_page ])->Hashes;
 
     foreach my $module (@$modules) {
+
+        $module->{requets} = $c->Q("
+            SELECT id, shortcut
+            FROM fascicles_requests WHERE module=?
+        ", [ $module->{id} ])->Hashes;
 
         $module->{bg_color} = $gray;
         $module->{brd_color} = $black;
@@ -144,6 +137,7 @@ sub draw_module {
 
     return unless $module->{x};
     return unless $module->{y};
+    return unless $module->{placed};
 
     my ($xl1,$xl2) = split '/', $module->{x};
     my ($yl1,$yl2) = split '/', $module->{y};
@@ -175,7 +169,7 @@ sub draw_module {
     my $fontsize;
     my $fontheight;
     if ($^O eq "MSWin32") {
-        $font = 'C:\Windows\Fonts\consola.TTF';
+        $font = 'C:\Windows\Fonts\ARIALUNI.TTF';
         $fontsize = 8;
         $fontheight = 5;
     }
@@ -190,7 +184,12 @@ sub draw_module {
         $fontsize = 8;
     }
 
-    my $text = $module->{module_shortcut} . "\n" . $module->{shortcut};
+    my $text = $module->{title};
+
+    if ($module->{requets}) {
+        my $request = ${ $module->{requets} }[0];
+        $text .= "\n" . $request->{shortcut};
+    }
 
     my $wrapbox = GD::Text::Wrap->new( $img,
         line_space  => 0,

@@ -21,7 +21,8 @@ Inprint.factory.buttons.manager = new function () {
                 return {
                     text: name,
                     icon: _ico("question-button"),
-                    cls: "x-btn-text-icon"
+                    cls: "x-btn-text-icon",
+                    tooltip: item.ref
                 };
             }
 
@@ -72,25 +73,6 @@ Inprint.setButton("delete.item", {
     icon: _ico("minus-button"),
     ref: "../btnDeleteItem"
 });
-
-Inprint.setButton("move.item", {
-    text: _("Move"),
-    icon: _ico("navigation-000-button"),
-    ref: "../btnMoveItem"
-});
-
-Inprint.setButton("layout.item", {
-    text: _("Layout"),
-    icon: _ico("layout-design"),
-    ref: "../btnLayoutItem"
-});
-
-Inprint.setButton("placing.item", {
-    text: _("Placing"),
-    icon: _ico("layout-select-content"),
-    ref: "../btnPlacingItem"
-});
-
 
 Inprint.setButton("select.principals", {
     text: _("Select employees"),

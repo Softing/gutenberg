@@ -1,4 +1,4 @@
-Inprint.fascicle.adverter.Pages = Ext.extend(Ext.Panel, {
+Inprint.fascicle.adverta.Pages = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
 
@@ -28,12 +28,12 @@ Inprint.fascicle.adverter.Pages = Ext.extend(Ext.Panel, {
             items: this.view
         });
 
-        Inprint.fascicle.adverter.Pages.superclass.initComponent.apply(this, arguments);
+        Inprint.fascicle.adverta.Pages.superclass.initComponent.apply(this, arguments);
 
     },
 
     onRender: function() {
-        Inprint.fascicle.adverter.Pages.superclass.onRender.apply(this, arguments);
+        Inprint.fascicle.adverta.Pages.superclass.onRender.apply(this, arguments);
     },
 
     getView: function() {
@@ -109,9 +109,6 @@ Inprint.fascicle.adverter.Pages = Ext.extend(Ext.Panel, {
                                 fascicle: this.oid
                             },
                             listeners: {
-                                render: function(combo) {
-                                    combo.setValue("00000000-0000-0000-0000-000000000000", _("Defaults"));
-                                },
                                 beforequery: function(qe) {
                                     delete qe.combo.lastQuery;
                                 }
@@ -229,7 +226,6 @@ Inprint.fascicle.adverter.Pages = Ext.extend(Ext.Panel, {
         });
 
         wndw.on("actioncomplete", function() {
-            wndw.hide();
             this.parent.cmpReload();
         }, this);
 
@@ -394,6 +390,87 @@ Inprint.fascicle.adverter.Pages = Ext.extend(Ext.Panel, {
         form.reset();
         form.baseParams.page = this.cmpGetSelected();
         wndw.show();
+    },
+
+    // разверстать
+    cmpPageResize: function() {
+
+        var wndw = this.components.resize;
+
+        if (!wndw) {
+
+            wndw = new Ext.Window({
+                title: 'Разверстка полос',
+                width:320,
+                height:240,
+                modal:true,
+                draggable:true,
+                layout: "fit",
+                closeAction: "hide",
+                items: {
+                    xtype: "form",
+                    border: false,
+                    url: this.urls.resize,
+                    baseParams: {
+                        fascicle: this.oid
+                    },
+                    labelWidth: 100,
+                    defaultType: 'checkbox',
+                    defaults: { anchor: '100%' },
+                    bodyStyle: 'padding:5px 5px 0;',
+                    listeners: {
+                        scope:this,
+                        actioncomplete: function() {
+                            wndw.hide();
+                            this.parent.cmpReload();
+                        }
+                    },
+                    items: [
+                        {
+                            xtype: 'box',
+                            autoEl: {tag:'div', html: 'Пример: 1, 2, 5-8, 9:10 (9:10 добавит 10 полос после полосы 9).' },
+                            cls: 'inprint-form-helpbox'
+                        },
+                        {
+                            xtype: 'textfield',
+                            name: 'page',
+                            itemCls: 'required',
+                            fieldLabel: 'На полосы'
+                        }
+                        //{
+                        //    xtype: 'checkbox',
+                        //    name: 'documents',
+                        //    checked:true,
+                        //    inputValue: 'true',
+                        //    fieldLabel: 'Скопировать',
+                        //    labelSeparator: ':',
+                        //    boxLabel: 'Материалы'
+                        //},
+                        //{
+                        //    xtype: 'checkbox',
+                        //    name: 'advertisements',
+                        //    checked:false,
+                        //    inputValue: 'true',
+                        //    fieldLabel: '',
+                        //    labelSeparator: '',
+                        //    boxLabel: 'Рекламу'
+                        //}
+                    ]
+                },
+                buttons: [
+                    _BTN_WNDW_OK,
+                    _BTN_WNDW_CANCEL
+                ]
+            });
+
+            this.components.resize = wndw;
+        }
+
+        var form = wndw.findByType("form")[0].getForm();
+        form.reset();
+        form.baseParams.page = this.cmpGetSelected();
+        wndw.show();
+
     },
 
     //Удалить

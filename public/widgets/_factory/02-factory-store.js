@@ -42,8 +42,6 @@ Inprint.factory.StoreMappings = {
     // Fascicles
     "/fascicle/composer/templates/":        Inprint.store.Columns.fascicle.composer_templates,
     "/fascicle/composer/modules/":          Inprint.store.Columns.fascicle.composer_modules,
-    "/fascicle/composer/pages/":            Inprint.store.Columns.fascicle.composer_modules,
-
     "/fascicle/documents/list/":            Inprint.store.Columns.documents.list,
     "/fascicle/modules/list/":              Inprint.store.Columns.fascicle.modules,
     "/fascicle/requests/list/":             Inprint.store.Columns.fascicle.requests,

@@ -1,4 +1,4 @@
-Inprint.fascicle.adverter.Summary = Ext.extend(Ext.grid.EditorGridPanel, {
+Inprint.fascicle.adverta.Summary = Ext.extend(Ext.grid.EditorGridPanel, {
 
     initComponent: function() {
 
@@ -78,11 +78,11 @@ Inprint.fascicle.adverter.Summary = Ext.extend(Ext.grid.EditorGridPanel, {
             columns: this.columns
         });
 
-        Inprint.fascicle.adverter.Summary.superclass.initComponent.apply(this, arguments);
+        Inprint.fascicle.planner.Summary.superclass.initComponent.apply(this, arguments);
 
     },
 
     onRender: function() {
-        Inprint.fascicle.adverter.Summary.superclass.onRender.apply(this, arguments);
+        Inprint.fascicle.planner.Summary.superclass.onRender.apply(this, arguments);
     }
 });

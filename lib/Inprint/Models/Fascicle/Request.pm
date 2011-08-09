@@ -16,80 +16,55 @@ sub search {
 
     # Query headers
     my $sql_query = "
-
         SELECT
-            request.id,
-            request.serialnum,
-            edition.id as edition,
-            edition.shortcut as edition_shortcut,
-            fascicle.id as fascicle,
-            fascicle.shortcut as fascicle_shortcut,
-            request.shortcut,
-            request.description,
-            request.advertiser,
-            request.advertiser_shortcut,
-            request.place,
-            request.place_shortcut,
-            request.manager,
-            request.manager_shortcut,
-            request.tmpl_module as module,
-            request.tmpl_module_shortcut as module_shortcut,
-            request.page,
-            request.pages,
-            request.status,
-            request.payment,
-            request.readiness,
-            request.squib,
-            request.check_status,
-            request.anothers_layout,
-            request.imposed,
-            request.amount,
-            request.area,
-            request.w,
-            request.h,
-            request.width,
-            request.height,
-            request.fwidth,
-            request.fheight,
-            to_char(request.created, 'YYYY-MM-DD HH24:MI:SS') as created,
-            to_char(request.updated, 'YYYY-MM-DD HH24:MI:SS') as updated
+
+            rq.id, rq.serialnum,
+
+            ed.id as edition,
+            ed.shortcut as edition_shortcut,
+
+            fs.id as fascicle,
+            fs.shortcut as fascicle_shortcut,
+
+            rq.advertiser, rq.advertiser_shortcut,
+            rq.place, rq.place_shortcut,
+            rq.manager, rq.manager_shortcut,
+            rq.origin, rq.origin_shortcut, rq.origin_area,
+            rq.origin_x, rq.origin_y, rq.origin_w, rq.origin_h,
+            rq.pages, rq.firstpage,
+            rq.amount, rq.shortcut, rq.description, rq.status, rq.payment, rq.readiness,
+
+            rq.check_status, anothers_layout, imposed,
+
+            t2.id as module, t2.title as module_shortcut,
+
+            to_char(rq.created, 'YYYY-MM-DD HH24:MI:SS') as created,
+            to_char(rq.updated, 'YYYY-MM-DD HH24:MI:SS') as updated
         FROM
-            editions edition,
-            fascicles fascicle,
-            fascicles_requests request
+            editions ed,
+            fascicles fs,
+            fascicles_requests rq
+            LEFT JOIN fascicles_modules t2 ON rq.module = t2.id
         WHERE 1=1
-            AND edition.id  = request.edition
-            AND fascicle.id = request.fascicle
+            AND ed.id = rq.edition
+            AND fs.id = rq.fascicle
     ";
 
     if ($filter->{flt_fascicle}) {
-        $sql_query .= " AND request.fascicle=? ";
+        $sql_query .= " AND rq.fascicle=? ";
         push @params, $filter->{flt_fascicle};
     }
 
     if ($filter->{flt_checked} && $filter->{flt_checked} ne "all") {
-        $sql_query .= " AND request.check_status=? ";
+        $sql_query .= " AND rq.check_status=? ";
         push @params, $filter->{flt_checked};
     }
 
     my @sortModes = qw(ASC DESC asc desc);
     my @sortColumns= qw(
-        serialnum
-        advertiser_shortcut
-        place_shortcut
-        manager_shortcut
-        amount
-        shortcut
-        description
-        status
-        payment
-        readiness
-        pages
-        origin_shortcut
-        module_shortcut
-        check_status
-        anothers_layout
-        is_maked
+        serialnum advertiser_shortcut place_shortcut manager_shortcut
+        amount shortcut description status payment readiness
+        pages origin_shortcut module_shortcut check_status anothers_layout is_maked
     );
 
     if ( $sorting->{dir} ~~ @sortModes ) {
@@ -97,7 +72,7 @@ sub search {
             if ($sorting->{column} eq "pages") {
                 $sorting->{column} = "firstpage";
             }
-            $sql_query .=  " ORDER BY request.". $sorting->{column} ." ". $sorting->{dir};
+            $sql_query .=  " ORDER BY rq.". $sorting->{column} ." ". $sorting->{dir};
         }
     }
 

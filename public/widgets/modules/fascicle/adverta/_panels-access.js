@@ -1,16 +1,13 @@
-Inprint.fascicle.adverter.Access = function(parent, panels, access) {
+Inprint.fascicle.adverta.Access = function(parent, panels, access) {
 
     parent.access = access;
 
-    var pages     = panels.pages;
-    var documents = panels.documents;
-    var requests  = panels.requests;
+    var pages = panels.pages;
+    var requests = panels.requests;
 
     //Seance
     _hide(parent.btnCaptureSession, parent.btnBeginSession, parent.btnEndSession);
-
-    _disable(parent.btnCaptureSession, parent.btnBeginSession,
-        parent.btnEndSession, parent.btnSave);
+    _disable(parent.btnCaptureSession, parent.btnBeginSession, parent.btnEndSession, parent.btnSave);
 
     if (access.open) {
         parent.btnBeginSession.show();
@@ -33,11 +30,14 @@ Inprint.fascicle.adverter.Access = function(parent, panels, access) {
     }
 
     //Pages
-    if (access.manage) {
-        parent.btnPageCreate.enable();
-        requests.btnCreateItem.enable();
-    } else {
-        _disable(requests.btnCreate, requests.btnUpdate, requests.btnMove, requests.btnDelete);
-    }
+    //if (access.manage) {
+    //    //parent.btnPageCreate.enable();
+    //} else {
+    //    //parent.btnPageCreate.disable();
+    //}
+
+    //requests.getSelectionModel().on("selectionchange", function(sm) {
+    //
+    //});
 
 };

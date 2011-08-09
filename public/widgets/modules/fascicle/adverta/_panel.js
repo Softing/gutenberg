@@ -1,4 +1,4 @@
-Inprint.fascicle.adverter.Panel = Ext.extend(Ext.Panel, {
+Inprint.fascicle.adverta.Panel = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
 
@@ -10,93 +10,21 @@ Inprint.fascicle.adverter.Panel = Ext.extend(Ext.Panel, {
         this.fascicle = this.oid;
 
         this.panels = {
-            pages: new Inprint.fascicle.adverter.Pages({
+            pages: new Inprint.fascicle.adverta.Pages({
                 parent: this,
                 oid: this.oid
             }),
-            requests: new Inprint.fascicle.adverter.Requests({
+            requests: new Inprint.fascicle.adverta.Requests({
                 parent: this,
                 oid: this.oid
             }),
-            summary: new Inprint.fascicle.adverter.Summary({
+            summary: new Inprint.fascicle.adverta.Summary({
                 parent: this,
                 oid: this.oid
             })
         };
 
         this.tbar = [
-            {
-                ref: "../btnPageCreate",
-                disabled:true,
-                text: "Добавить полосу",
-                tooltip: 'Добавить новые полосы в этот выпуск',
-                icon: _ico("plus-button"),
-                cls: 'x-btn-text-icon',
-                scope: this.panels.pages,
-                handler: this.panels.pages.cmpPageCreate
-            },
-            {
-                ref: "../btnPageUpdate",
-                disabled:true,
-                text:'Редактировать',
-                icon: _ico("pencil"),
-                cls: 'x-btn-text-icon',
-                scope: this.panels.pages,
-                handler: this.panels.pages.cmpPageUpdate
-            },
-            "-",
-            {
-                ref: "../btnPageMoveLeft",
-                disabled:true,
-                text:'Сместить влево',
-                tooltip: 'Перенести отмеченные полосы',
-                icon: _ico("arrow-stop-180"),
-                cls: 'x-btn-text-icon',
-                scope:this.panels.pages,
-                handler: this.panels.pages.cmpPageMoveLeft
-            },
-            {
-                ref: "../btnPageMoveRight",
-                disabled:true,
-                text:'Сместить вправо',
-                tooltip: 'Перенести отмеченные полосы',
-                icon: _ico("arrow-stop"),
-                cls: 'x-btn-text-icon',
-                scope:this.panels.pages,
-                handler: this.panels.pages.cmpPageMoveRight
-            },
-            {
-                ref: "../btnPageMove",
-                disabled:true,
-                text:'Перенести',
-                tooltip: 'Перенести отмеченные полосы',
-                icon: _ico("navigation-000-button"),
-                cls: 'x-btn-text-icon',
-                scope:this.panels.pages,
-                handler: this.panels.pages.cmpPageMove
-            },
-            "-",
-            {
-                ref: "../btnPageClean",
-                disabled:true,
-                text: 'Очистить',
-                tooltip: 'Очистить содержимое полос',
-                icon: _ico("eraser"),
-                cls: 'x-btn-text-icon',
-                scope:this.panels.pages,
-                handler: this.panels.pages.cmpPageClean
-            },
-            "-",
-            {
-                ref: "../btnPageDelete",
-                disabled:true,
-                text: 'Удалить',
-                tooltip: 'Удалить полосы',
-                icon: _ico("minus-button"),
-                cls: 'x-btn-text-icon',
-                scope:this.panels.pages,
-                handler: this.panels.pages.cmpPageDelete
-            },
             '->',
             {
                 ref: "../btnSave",
@@ -141,21 +69,22 @@ Inprint.fascicle.adverter.Panel = Ext.extend(Ext.Panel, {
             },
             "-",
             {
-                text: _("Reports"),
+                text: 'Печать А4',
                 icon: _ico("printer"),
                 cls: 'x-btn-text-icon',
                 scope:this,
-                menu: [
-                    {
-                        text: _("Advertising"),
-                        icon: _ico("printer"),
-                        cls: 'x-btn-text-icon',
-                        scope:this,
-                        handler: function() {
-                            window.location = "/reports/advertising/fascicle/"+ this.oid;
-                        }
-                    }
-                ]
+                handler: function() {
+
+                }
+            },
+            {
+                text: 'Печать А3',
+                icon: _ico("printer"),
+                cls: 'x-btn-text-icon',
+                scope:this,
+                handler: function() {
+
+                }
             }
         ];
 
@@ -184,14 +113,13 @@ Inprint.fascicle.adverter.Panel = Ext.extend(Ext.Panel, {
                         },
                         {
                             region:"south",
-                            height: 400,
+                            height: 200,
                             minSize: 100,
                             maxSize: 800,
-                            layout:"card",
-                            activeItem: 0,
+                            layout:"fit",
                             collapseMode: 'mini',
                             items: this.panels.requests,
-                            stateId: 'fasicles.planner.documents'
+                            stateId: 'fasicles.planner.adverta'
                         }
                     ]
                 },
@@ -209,24 +137,22 @@ Inprint.fascicle.adverter.Panel = Ext.extend(Ext.Panel, {
             ]
         });
 
-        Inprint.fascicle.adverter.Panel.superclass.initComponent.apply(this, arguments);
+        Inprint.fascicle.adverta.Panel.superclass.initComponent.apply(this, arguments);
 
     },
 
     onRender: function() {
-        Inprint.fascicle.adverter.Panel.superclass.onRender.apply(this, arguments);
+        Inprint.fascicle.adverta.Panel.superclass.onRender.apply(this, arguments);
 
-        Inprint.fascicle.adverter.Context(this, this.panels);
-        Inprint.fascicle.adverter.Interaction(this, this.panels);
+        Inprint.fascicle.adverta.Context(this, this.panels);
+        Inprint.fascicle.adverta.Interaction(this, this.panels);
 
-        this.cmpInitSession(true);
+        this.cmpInitSession();
 
     },
 
-    cmpInitSession: function (check) {
-
+    cmpInitSession: function () {
         this.body.mask("Обновление данных...");
-
         Ext.Ajax.request({
             url: _url("/fascicle/seance/"),
             scope: this,
@@ -260,17 +186,15 @@ Inprint.fascicle.adverter.Panel = Ext.extend(Ext.Panel, {
                 this.panels.requests.getStore().loadData({ data: rsp.requests });
                 this.panels.summary.getStore().loadData({ data: rsp.summary });
 
-                Inprint.fascicle.adverter.Access(this, this.panels, rsp.fascicle.access);
+                Inprint.fascicle.adverta.Access(this, this.panels, rsp.fascicle.access);
 
-                if(check) {
-                    this.cmpCheckSession.defer( 3000, this);
-                }
+                this.cmpCheckSession.defer( 50000, this);
             }
         });
     },
 
     cmpReload: function() {
-        this.cmpInitSession(false);
+        this.cmpInitSession();
     },
 
     cmpCheckSession: function () {
@@ -283,12 +207,12 @@ Inprint.fascicle.adverter.Panel = Ext.extend(Ext.Panel, {
             success: function(response) {
                 var rsp = Ext.util.JSON.decode(response.responseText);
 
-                Inprint.fascicle.adverter.Access(this, this.panels, rsp.fascicle.access);
+                Inprint.fascicle.adverta.Access(this, this.panels, rsp.fascicle.access);
 
                 if (this.manager && this.manager != rsp.fascicle.manager) {
-                    Ext.MessageBox.alert(_("Error"), _("Another employee %1 captured this issue!", [ rsp.fascicle.manager_shortcut ]));
+                    Ext.MessageBox.alert(_("Error"), _("Another employee %1 captured this issue!", [1]));
                 } else {
-                    this.cmpCheckSession.defer( 3000, this);
+                    this.cmpCheckSession.defer( 50000, this);
                 }
             }
         });
@@ -357,29 +281,19 @@ Inprint.fascicle.adverter.Panel = Ext.extend(Ext.Panel, {
 
     cmpSave: function() {
 
-        var pages     = this.panels.pages;
-        var documents = this.panels.documents;
-        var modules   = this.panels.summary;
+        var pages = this.panels.pages;
+        var requests = this.panels.requests;
 
-        // get documents changes
-        var data1 = [];
-        var records1 = documents.getStore().getModifiedRecords();
-        if(records1.length) {
-            Ext.each(records1, function(r, i) {
+        var data = [];
+
+        // get requests changes
+
+        var records = requests.getStore().getModifiedRecords();
+        if(records.length) {
+            Ext.each(records, function(r, i) {
                 var document = r.get('id');
                 var pages = r.get('pages');
-                data1.push(document +'::'+ pages);
-            }, this);
-        }
-
-        // get modules changes
-        var data2 = [];
-        var records2 = modules.getStore().getModifiedRecords();
-        if(records2.length) {
-            Ext.each(records2, function(r, i) {
-                var place = r.get('id');
-                var pages = r.get('pages');
-                data2.push(place +'::'+ pages);
+                data.push(document +'::'+ pages);
             }, this);
         }
 
@@ -389,12 +303,11 @@ Inprint.fascicle.adverter.Panel = Ext.extend(Ext.Panel, {
             url: _url("/fascicle/save/"),
             params:{
                 fascicle: this.oid,
-                document: data1,
-                module: data2
+                document: data
             },
             scope:this,
             success: function () {
-                documents.getStore().commitChanges();
+                requests.getStore().commitChanges();
                 this.cmpReload();
             }
         };
@@ -427,8 +340,8 @@ Inprint.fascicle.adverter.Panel = Ext.extend(Ext.Panel, {
 
 });
 
-Inprint.registry.register("fascicle-adverter", {
-    icon: "moneys",
-    text: _("Advertizing control"),
-    xobject: Inprint.fascicle.adverter.Panel
+Inprint.registry.register("fascicle-adverta", {
+    icon: "money",
+    text: _("Advertising requests"),
+    xobject: Inprint.fascicle.adverta.Panel
 });
