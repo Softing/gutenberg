@@ -492,6 +492,11 @@ sub startup {
         }
     }
 
+    $self->hook(after_dispatch => sub {
+        my $tx = shift;
+        $tx->res->headers->expires("Thu, 01 Dec 1994 16:00:00 GMT");
+        $tx->res->headers->cache_control("max-age=1, no-cache, no-store");
+    });
     return $self;
 }
 
