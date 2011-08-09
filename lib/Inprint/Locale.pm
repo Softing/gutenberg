@@ -25,10 +25,10 @@ sub index {
 
     my $json   = Mojo::JSON->new;
 
-    unless ($c->stash->{i18n}->{_handle}->can('getAll')) {
-        $Strings->{failcode} = $c->stash->{i18n}->{_handle}->{fail};
+    unless ($c->stash->{i18n}->{handle}->can('getAll')) {
+        $Strings->{failcode} = $c->stash->{i18n}->{handle}->{fail};
     } else {
-        my $hash = $c->stash->{i18n}->{_handle}->getAll;
+        my $hash = $c->stash->{i18n}->{handle}->getAll;
         while (my ($k,$v) = each %$hash) {
             if ( $v or ! $Strings->{$k}) {
                 $Strings->{$k} = $v;

@@ -23,7 +23,7 @@ sub register {
             my $input = shift;
             my @vars = @_;
 
-            my $output = $c->stash->{i18n}->{_handle}->get($input);
+            my $output = $c->stash->{i18n}->{handle}->get($input);
 
             if ($input eq $output) {
                 $output = $c->Q("
