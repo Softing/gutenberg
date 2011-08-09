@@ -95,9 +95,11 @@ sub search {
     $sql_filters .= " AND ( ";
     $sql_filters .= "    dcm.edition = ANY(?) ";
     $sql_filters .= "    AND ";
-    $sql_filters .= "    dcm.workgroup = ANY(?) ";
+    #$sql_filters .= "    dcm.workgroup = ANY(?) ";
+    $sql_filters .= "    ( dcm.workgroup = ANY(?) OR dcm.maingroup = ANY(?) )";
     $sql_filters .= " ) ";
     push @params, $editions;
+    push @params, $departments;
     push @params, $departments;
 
     # Set Filters
