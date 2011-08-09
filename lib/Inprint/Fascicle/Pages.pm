@@ -92,8 +92,8 @@ sub create {
 
     unless (@errors) {
 
-        my $pages  = Inprint::Fascicle::Utils::UncompressString($c, $i_string);
-        my $chunks = Inprint::Fascicle::Utils::GetChunks($c, $pages);
+        my $pages  = Inprint::Fascicle::Utils::uncompressString($c, $i_string);
+        my $chunks = Inprint::Fascicle::Utils::getChunks($c, $pages);
 
         my $composition = $c->Q("
             SELECT id, edition, fascicle, headline, seqnum, w, h, created, updated

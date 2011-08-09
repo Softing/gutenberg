@@ -44,12 +44,16 @@ sub seance {
     unless (@errors) {
 
         $pages     = $c->getPages($fascicle->{id});
+
         $documents = $c->getDocumens($fascicle->{id});
+
         $requests  = $c->getRequests($fascicle->{id});
+
         $summary   = $c->getSummary($fascicle->{id});
 
         if ($fascicle->{manager}) {
-            $fascicle->{manager_shortcut} = $c->Q(" SELECT shortcut FROM profiles WHERE id=?", [$fascicle->{manager}])->Value;
+            $fascicle->{manager_shortcut} = $c->Q("
+                SELECT shortcut FROM profiles WHERE id=?", $fascicle->{manager})->Value;
         }
 
         $fascicle->{access} = {
