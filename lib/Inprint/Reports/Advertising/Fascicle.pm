@@ -28,9 +28,10 @@ sub index {
     my $fascicle = $c->check_record(\@errors, "fascicles", "fascicle", $i_fascicle);
     my $edition  = $c->check_record(\@errors, "editions", "edition", $fascicle->{edition});
 
-    my $tempdir  = File::Spec->tmpdir();
+    my $tempdir = $c->config->get("store.temp");
+
     my $tempfile = $c->uuid();
-    $tempfile =~ s/-//g;
+       $tempfile =~ s/-//g;
 
     my $temppath = "$tempdir/$tempfile.xls";
 
@@ -76,7 +77,7 @@ sub index {
             FROM fascicles_requests requests
                 LEFT OUTER JOIN fascicles_modules modules ON modules.id = requests.module
             WHERE requests.fascicle=?
-            ORDER BY firstpage ", 
+            ORDER BY firstpage ",
             $fascicle->{id})->Hashes;
 
         my $fmtBody = $workbook->add_format();
@@ -104,19 +105,19 @@ sub index {
     $filename =~ s/\s+/_/g;
     $filename = encode("utf8", $filename);
 
-    my $headers = Mojo::Headers->new;
-    $headers->add("Content-Type", "application/excel;name=$filename");
-    $headers->add("Content-Disposition", "attachment;filename=$filename");
-    $headers->add("Content-Description", "xls");
-    $c->res->content->headers($headers);
-    $c->res->content->asset(Mojo::Asset::File->new(path => $temppath ));
-
     $c->on_finish(sub {
         unlink $temppath;
     });
 
-    $c->render_static();
+    $c->res->code(200);
 
+    $c->tx->res->headers->header("content-type" => "binary/octet-stream;name=$filename");
+    $c->tx->res->headers->header("content-disposition" => "attachment;filename=$filename");
+    $c->tx->res->headers->header("content-description" => "xls");
+
+    $c->res->content->asset(Mojo::Asset::File->new(path => $temppath ));
+
+    $c->rendered();
 }
 
 1;
