@@ -35,7 +35,7 @@ sub feeds {
     $html .= "<ul>";
 
     foreach (@$feeds) {
-        $html .= "<li><a href=\"$$_{url}.xml\">$$_{url}.xml</li>";
+        $html .= "<li><a href=\"./feeds/$$_{url}.xml\">$$_{url}.xml</li>";
     }
 
     $html .= "</ul>";

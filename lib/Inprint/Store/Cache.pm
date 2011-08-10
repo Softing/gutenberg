@@ -195,6 +195,8 @@ sub extractMimeType {
 
     my ($c, $suffix) = @_;
 
+    $suffix = lc $suffix;
+
     my $MimeTypes = {
         "323" => "text/h323",
         "acx" => "application/internet-property-stream",
@@ -282,6 +284,7 @@ sub extractMimeType {
         "movie" => "video/x-sgi-movie",
         "mp2" => "video/mpeg",
         "mp3" => "audio/mpeg",
+        "mp4" => "video/mp4",
         "mpa" => "video/mpeg",
         "mpe" => "video/mpeg",
         "mpeg" => "video/mpeg",
