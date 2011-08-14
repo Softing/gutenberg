@@ -37,7 +37,9 @@ Inprint.calendar.fascicles.Interaction = function(parent, panels) {
     // Grid
     grid.getSelectionModel().on("selectionchange", function(sm, node) {
 
-        _disable(grid.btnEnable, grid.btnDisable,
+        _disable(
+            grid.btnEnable, grid.btnDisable,
+            grid.btnDoApproval, grid.btnDoWorking, grid.btnDoArchive,
             grid.btnArchive, grid.btnDeadline, grid.btnTemplate, grid.btnFormat);
 
         if (!node) return;
@@ -45,12 +47,16 @@ Inprint.calendar.fascicles.Interaction = function(parent, panels) {
         _a(["editions.fascicle.manage:*", "editions.attachment.manage:*"], node.attributes.edition, function(access) {
 
             if (access["editions.fascicle.manage"] && node.attributes.fastype == "issue") {
-                _enable(grid.btnEnable, grid.btnDisable,
+                _enable(
+                    grid.btnEnable, grid.btnDisable,
+                    grid.btnDoApproval, grid.btnDoWorking, grid.btnDoArchive,
                     grid.btnArchive, grid.btnDeadline, grid.btnTemplate, grid.btnFormat);
             }
 
             if (access["editions.attachment.manage"] && node.attributes.fastype == "attachment") {
-                _enable(grid.btnEnable, grid.btnDisable,
+                _enable(
+                    grid.btnEnable, grid.btnDisable,
+                    grid.btnDoApproval, grid.btnDoWorking, grid.btnDoArchive,
                     grid.btnDeadline, grid.btnTemplate, grid.btnFormat);
             }
 

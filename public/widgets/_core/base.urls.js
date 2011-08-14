@@ -5,6 +5,8 @@
 
 Inprint.sources = {
 
+    "calendar.layout.format":           "/calendar/layout/format/",
+
     "common.tree.editions":             "/common/tree/editions/",
     "common.tree.fascicles":            "/common/tree/fascicles/",
     "common.tree.departments":          "/common/tree/departments/",

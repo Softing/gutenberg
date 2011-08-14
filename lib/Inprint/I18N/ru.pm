@@ -1,4 +1,4 @@
-package Inprint::I18N::ru;
+    package Inprint::I18N::ru;
 
 # Inprint Content 4.5
 # Copyright(c) 2001-2010, Softing, LLC.
@@ -142,6 +142,9 @@ our %Lexicon = (
 
     "Appointment"
  => "Назначение",
+
+    "Approval"
+ => "Утверждение",
 
     "Approved"
  => "Утверждено",
@@ -908,6 +911,9 @@ our %Lexicon = (
     "Payment"
  => "Оплата",
 
+    "Pause"
+ => "Пауза",
+
     "Percent"
  => "",
 
@@ -952,6 +958,12 @@ our %Lexicon = (
 
     "Printing shop"
  => "Типография",
+
+    "Production calendar"
+ => "Производственный календарь",
+
+    "Production cycle"
+ => "Производственный цикл",
 
     "Probably someone has entered in Inprint with your login on other computer. <br/> push F5 what to pass to authorization page"
  => "",
@@ -1208,6 +1220,9 @@ our %Lexicon = (
     "To check"
  => "На проверку",
 
+    "Tools"
+ => "Инструменты",
+
     "To test"
  => "",
 
@@ -1321,6 +1336,9 @@ our %Lexicon = (
 
     "Workgroup"
  => "",
+
+    "Working"
+ => "Работа",
 
     "Wrong password"
  => "Пароль не подошел",

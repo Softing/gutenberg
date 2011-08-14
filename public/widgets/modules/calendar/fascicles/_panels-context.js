@@ -35,6 +35,19 @@ Inprint.calendar.fascicles.Context = function(parent, panels) {
 
         }
 
+        if (access["editions.attachment.manage"] && fastype == "issue") {
+            if (items.length) items.push('-');
+            items.push({
+                icon: _ico("folder--plus"),
+                cls: 'x-btn-text-icon',
+                text: _("Create attachment"),
+                scope: grid,
+                handler: function() {
+                    grid.cmpCreateAttachment(id);
+                }
+            });
+        }
+
         if (access["editions.attachment.manage"] && fastype == "attachment") {
 
             items.push({

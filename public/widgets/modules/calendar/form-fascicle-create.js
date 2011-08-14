@@ -9,19 +9,15 @@ Inprint.calendar.fascicles.Create = Ext.extend( Ext.form.FormPanel,
             _FLD_HDN_EDITION,
 
             {
-                border:false,
                 layout:'column',
-                defaults:{
-                    bodyStyle:'padding:10px'
-                },
+                baseCls: 'x-plain',
                 items:[
                     {
                         border:false,
-                        columnWidth:.5,
+                        columnWidth:.58,
                         layout: 'form',
-                        defaults:{
-                            anchor:'100%'
-                        },
+                        defaults:{ anchor:'98%' },
+                        baseCls: 'x-plain',
                         items: [
 
                             {
@@ -56,12 +52,6 @@ Inprint.calendar.fascicles.Create = Ext.extend( Ext.form.FormPanel,
                             }),
 
                             {
-                                xtype: "titlefield",
-                                value: _("Additional parameters"),
-                                margin:10
-                            },
-
-                            {
                                 xtype: "textfield",
                                 name: "num",
                                 fieldLabel: _("Number")
@@ -81,18 +71,18 @@ Inprint.calendar.fascicles.Create = Ext.extend( Ext.form.FormPanel,
 
                         ]
                     },
+
                     {
                         border:false,
-                        columnWidth:.5,
+                        columnWidth:.42,
                         layout: 'form',
-                        defaults:{
-                            anchor:'100%'
-                        },
+                        baseCls: 'x-plain',
+                        defaults:{ anchor:'100%' },
                         items: [
 
                             {
                                 xtype: "titlefield",
-                                value: _("Key dates")
+                                value: _("Deadline")
                             },
 
                             {
@@ -108,12 +98,6 @@ Inprint.calendar.fascicles.Create = Ext.extend( Ext.form.FormPanel,
                                 format:'F j, Y',
                                 submitFormat:'Y-m-d',
                                 fieldLabel: _("Publication")
-                            },
-
-                            {
-                                xtype: "titlefield",
-                                value: _("Deadline"),
-                                margin:10
                             },
 
                             {
@@ -160,8 +144,9 @@ Inprint.calendar.fascicles.Create = Ext.extend( Ext.form.FormPanel,
         ];
 
         Ext.apply(this,  {
-            xtype: "form",
-            border:false
+            //xtype: "form",
+            //border:false,
+            baseCls: 'x-plain'
         });
 
         Inprint.calendar.fascicles.Create.superclass.initComponent.apply(this, arguments);

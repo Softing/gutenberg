@@ -6,18 +6,7 @@ Inprint.calendar.archive.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
             'unarchive':  _url('/calendar/fascicle/unarchive/')
         };
 
-        this.tbar = [
-            {
-                id: 'unarchive',
-                disabled: true,
-                text: _("Restore"),
-                ref: "../btnUnarchive",
-                icon: _ico("gear"),
-                cls: 'x-btn-text-icon',
-                scope: this,
-                handler: this.cmpUnarchive
-            }
-        ];
+        this.tbar = Inprint.calendar.archive.Toolbar(this);
 
         this.columns = [
             Inprint.calendar.GridColumns.shortcut,

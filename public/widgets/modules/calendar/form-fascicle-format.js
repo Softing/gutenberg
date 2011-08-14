@@ -4,15 +4,13 @@ Inprint.calendar.fascicles.Format = Ext.extend( Ext.form.FormPanel,
     initComponent: function()
     {
 
+        this.url = _source("calendar.layout.format");
+
         this.items = [
-
             _FLD_HDN_ID,
-
             Inprint.factory.Combo.create(
-                "/calendar/combos/parents/",
+                "/calendar/combos/templates/",
                 {
-                    name: "parent",
-                    title: _("Issue"),
                     allowBlank:false,
                     listeners: {
                         scope: this,
@@ -21,7 +19,13 @@ Inprint.calendar.fascicles.Format = Ext.extend( Ext.form.FormPanel,
                         }
                     }
                 }
-            )
+            ),
+            {
+                xtype: 'checkbox',
+                fieldLabel: _('Confirmation'),
+                boxLabel: _('I understand the importance'),
+                name: 'confirmation'
+            }
 
         ];
 
@@ -39,18 +43,7 @@ Inprint.calendar.fascicles.Format = Ext.extend( Ext.form.FormPanel,
 
     onRender: function() {
         Inprint.calendar.fascicles.Format.superclass.onRender.apply(this, arguments);
-        this.getForm().url = _source("fascicle.update");
-    },
-
-    cmpFill: function (id) {
-        this.load({
-            scope:this,
-            params: { id: id },
-            url: _source("fascicle.read"),
-            failure: function(form, action) {
-                Ext.Msg.alert("Load failed", action.result.errorMessage);
-            }
-        });
+        this.getForm().url = this.url;
     }
 
 });

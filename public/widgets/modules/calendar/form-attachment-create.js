@@ -8,16 +8,11 @@ Inprint.calendar.attachments.Create = Ext.extend( Ext.form.FormPanel,
 
             _FLD_HDN_EDITION,
 
-            {
-                xtype: "titlefield",
-                value: _("Basic parameters")
-            },
-
             Inprint.factory.Combo.create(
                 "/calendar/combos/parents/",
                 {
-                    name: "parent",
-                    title: _("Issue"),
+                    name: "edition",
+                    title: _("Edition"),
                     allowBlank:false,
                     listeners: {
                         scope: this,
@@ -52,13 +47,8 @@ Inprint.calendar.attachments.Create = Ext.extend( Ext.form.FormPanel,
         ];
 
         Ext.apply(this,  {
-            xtype: "form",
-            border:false,
-            layout: 'form',
-            bodyStyle:'padding:10px',
-            defaults:{
-                anchor:'100%'
-            }
+            baseCls: 'x-plain',
+            defaults:{ anchor:'100%' }
         });
 
         Inprint.calendar.attachments.Create.superclass.initComponent.apply(this, arguments);

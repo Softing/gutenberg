@@ -90,4 +90,44 @@ sub sources {
     $c->render_json( { data => $result } );
 }
 
+sub templates {
+    my $c = shift;
+
+    my @errors;
+    my $success = $c->json->false;
+
+    my @data;
+    my $result;
+
+    #my $sql = "
+    #    SELECT
+    #        t1.id, t2.shortcut || '/' || t1.shortcut as title,
+    #        'puzzle' as icon
+    #    FROM fascicles t1, editions t2
+    #    WHERE
+    #        ( t1.id <> '00000000-0000-0000-0000-000000000000' AND t1.id <> '99999999-9999-9999-9999-999999999999')
+    #        AND t2.id = t1.edition
+    #        AND t1.fastype = 'template'
+    #";
+    #
+    #my $access = $c->objectBindings("editions.fascicle.manage:*");
+    #$sql .= " AND edition = ANY(?) ";
+    #push @data, $access;
+    #
+    #$result = $c->Q("
+    #    $sql
+    #    ORDER BY t2.shortcut, t1.shortcut
+    #", \@data)->Hashes;
+
+    unshift @$result, {
+        id=> "00000000-0000-0000-0000-000000000000",
+        icon => "eraser",
+        title => $c->l("Clear"),
+        description => $c->l("Remove all pages")
+    };
+
+    $success = $c->json->true unless (@errors);
+    $c->render_json( { data => $result } );
+}
+
 1;

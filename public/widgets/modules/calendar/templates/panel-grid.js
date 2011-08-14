@@ -2,28 +2,7 @@ Inprint.calendar.templates.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
 
     initComponent: function() {
 
-        this.tbar = [
-            {
-                id: 'create',
-                disabled: true,
-                text: _("Create issue"),
-                ref: "../btnCreateFascicle",
-                cls: 'x-btn-text-icon',
-                icon: _ico("blue-folder--plus"),
-                scope: this,
-                handler: this.cmpCreate
-            },
-            {
-                id: 'createAttachment',
-                disabled: true,
-                text: _("Create attachment"),
-                ref: "../btnCreateAttachment",
-                cls: 'x-btn-text-icon',
-                icon: _ico("folder--plus"),
-                scope: this,
-                handler: this.cmpCreateAttachment
-            }
-        ];
+        this.tbar = Inprint.calendar.templates.Toolbar(this);
 
         this.columns = [
             Inprint.calendar.GridColumns.shortcut,

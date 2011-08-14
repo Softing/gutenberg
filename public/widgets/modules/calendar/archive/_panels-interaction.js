@@ -33,9 +33,9 @@ Inprint.calendar.archive.Interaction = function(parent, panels) {
 
     // Grid
     grid.getSelectionModel().on("selectionchange", function(sm, node) {
-        _disable(grid.btnUnarchive);
+        _disable(grid.btnDoApproval, grid.btnDoWorking, grid.btnDoArchive);
         if (node && node.attributes.fastype == "issue") {
-            _enable(grid.btnUnarchive);
+            _enable(grid.btnDoApproval, grid.btnDoWorking); 
         }
     });
 

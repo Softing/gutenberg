@@ -151,6 +151,8 @@ sub startup {
     $sessionBridge->route("/calendar/list/")                    ->to("calendar#list");
     $sessionBridge->route("/calendar/tree/")                    ->to("calendar#tree");
 
+    $sessionBridge->route("/calendar/layout/format/")           ->to("calendar-layout#format");
+
     $sessionBridge->route("/calendar/fascicle/read/")           ->to("calendar-fascicle#read");
     $sessionBridge->route("/calendar/fascicle/create/")         ->to("calendar-fascicle#create");
     $sessionBridge->route("/calendar/fascicle/update/")         ->to("calendar-fascicle#update");
@@ -172,6 +174,7 @@ sub startup {
     $sessionBridge->route('/calendar/combos/parents/')          ->to('calendar-combos#parents');
     $sessionBridge->route('/calendar/combos/childrens/')        ->to('calendar-combos#childrens');
     $sessionBridge->route('/calendar/combos/sources/')          ->to('calendar-combos#sources');
+    $sessionBridge->route('/calendar/combos/templates/')        ->to('calendar-combos#templates');
 
     # Calendar trees
     $sessionBridge->route('/calendar/trees/editions/')          ->to('calendar-trees#editions');

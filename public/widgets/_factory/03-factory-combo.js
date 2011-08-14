@@ -13,205 +13,176 @@ Inprint.factory.Combo = function() {
         "/calendar/combos/editions/": {
             hiddenName: "edition",
             icon: "blue-folders",
-            fieldLabel: _("Edition"),
-            emptyText: _("Select") + "..."
+            fieldLabel: _("Edition")
+        },
+        "/calendar/combos/templates/": {
+            hiddenName: "template",
+            icon: "puzzle",
+            fieldLabel: _("Template")
         },
         "/calendar/combos/sources/": {
             hiddenName: "template",
             icon: "building",
-            fieldLabel: _("Template"),
-            emptyText: _("Select") + "..."
+            fieldLabel: _("Template")
         },
         "/calendar/combos/parents/": {
             hiddenName: "parent",
             icon: "building",
-            fieldLabel: _("Issue"),
-            emptyText: _("Select issue") + "..."
+            fieldLabel: _("Issue")
         },
         "/calendar/combos/childrens/": {
             hiddenName: "edition",
             icon: "blue-folders",
-            fieldLabel: _("Edition"),
-            emptyText: _("Select") + "..."
+            fieldLabel: _("Edition")
         },
 
         // Catalog
         "/catalog/combos/editions/": {
             hiddenName: "edition",
             icon: "building",
-            fieldLabel: _("Edition"),
-            emptyText: _("Select") + "..."
+            fieldLabel: _("Edition")
         },
         "/catalog/combos/groups/": {
             hiddenName: "catalog",
             icon: "building",
-            fieldLabel: _("Group"),
-            emptyText: _("Select") + "..."
+            fieldLabel: _("Group")
         },
         "/catalog/combos/fascicles/": {
             hiddenName: "catalog",
             icon: "book",
-            fieldLabel: _("Fascic;e"),
-            emptyText: _("Select") + "..."
+            fieldLabel: _("Fascicle")
         },
         "/catalog/combos/readiness/": {
             hiddenName: "readiness",
-            fieldLabel: _("Readiness"),
-            emptyText: _("Select") + "..."
+            fieldLabel: _("Readiness")
         },
         "/catalog/combos/roles/": {
             hiddenName: "role",
-            fieldLabel: _("Role"),
-            emptyText: _("Select") + "..."
+            fieldLabel: _("Role")
         },
 
         // Advertising
         "/advertising/combo/managers/": {
             hiddenName: "manager",
-            fieldLabel: _("Manager"),
-            emptyText: _("Manager") + "..."
+            fieldLabel: _("Manager")
         },
         "/advertising/combo/advertisers/": {
             hiddenName: "advertiser",
-            fieldLabel: _("Advertiser"),
-            emptyText: _("Advertiser") + "..."
+            fieldLabel: _("Advertiser")
         },
         "/advertising/combo/fascicles/": {
             hiddenName: "fascicle",
-            fieldLabel: _("Fascicle"),
-            emptyText: _("Fascicle") + "..."
+            fieldLabel: _("Fascicle")
         },
         "/advertising/combo/places/": {
             hiddenName: "place",
-            fieldLabel: _("Place"),
-            emptyText: _("Place") + "..."
+            fieldLabel: _("Place")
         },
         "/advertising/combo/modules/": {
             hiddenName: "module",
-            fieldLabel: _("Module"),
-            emptyText: _("Module") + "..."
+            fieldLabel: _("Module")
         },
 
         // Fascicles
         "/fascicle/combos/templates/": {
             hiddenName: "template",
-            fieldLabel: _("Template"),
-            emptyText: _("Template") + "..."
+            fieldLabel: _("Template")
         },
         "/fascicle/combos/workgroups/": {
             hiddenName: "workgroup",
-            fieldLabel: _("Workgroup"),
-            emptyText: _("Workgroup") + "..."
+            fieldLabel: _("Workgroup")
         },
         "/fascicle/combos/headlines/": {
             hiddenName: "headline",
-            fieldLabel: _("Headline"),
-            emptyText: _("Headline") + "..."
+            fieldLabel: _("Headline")
         },
         "/fascicle/combos/rubrics/": {
             hiddenName: "rubric",
-            fieldLabel: _("Rubric"),
-            emptyText: _("Rubric") + "..."
+            fieldLabel: _("Rubric")
         },
 
         // Combos for documents dialogs
         "/documents/combos/editions/": {
             hiddenName: "edition",
             icon: "toggle-small",
-            fieldLabel: _("Edition"),
-            emptyText: _("Edition") + "..."
+            fieldLabel: _("Edition")
         },
         "/documents/combos/stages/": {
             hiddenName: "stage",
             icon: "toggle-small",
-            fieldLabel: _("Stage"),
-            emptyText: _("Stage") + "..."
+            fieldLabel: _("Stage")
         },
         "/documents/combos/assignments/": {
             hiddenName: "assignment",
             icon: "toggle-small",
-            fieldLabel: _("Assignment"),
-            emptyText: _("Assignment") + "..."
+            fieldLabel: _("Assignment")
         },
         "/documents/combos/managers/": {
             name: "manager-shortcut",
             hiddenName: "manager",
             icon: "user-business",
-            fieldLabel: _("Manager"),
-            emptyText: _("Manager") + "..."
+            fieldLabel: _("Manager")
         },
         "/documents/combos/fascicles/": {
             hiddenName: "fascicle",
             icon:"folder",
-            fieldLabel: _("Fascicle"),
-            emptyText: _("Fascicle") + "..."
+            fieldLabel: _("Fascicle")
         },
         "/documents/combos/headlines/": {
             hiddenName: "headline",
             icon: "tag-label",
-            fieldLabel: _("Headline"),
-            emptyText: _("Headline") + "..."
+            fieldLabel: _("Headline")
         },
         "/documents/combos/rubrics/": {
             hiddenName: "rubric",
             icon: "tag-label-pink",
-            fieldLabel: _("Rubric"),
-            emptyText: _("Rubric") + "..."
+            fieldLabel: _("Rubric")
         },
 
         // Combos for document grid filters
         "/documents/filters/editions/": {
             hiddenName: "edition",
             icon: "toggle-small",
-            fieldLabel: _("Edition"),
-            emptyText: _("Edition") + "..."
+            fieldLabel: _("Edition")
         },
         "/documents/filters/groups/": {
             hiddenName: "group",
             icon: "toggle-small",
-            fieldLabel: _("Group"),
-            emptyText: _("Group") + "..."
+            fieldLabel: _("Group")
         },
         "/documents/filters/fascicles/": {
             hiddenName: "fascicle",
             icon:"folder",
-            fieldLabel: _("Fascicle"),
-            emptyText: _("Fascicle") + "..."
+            fieldLabel: _("Fascicle")
         },
         "/documents/filters/headlines/": {
             hiddenName: "headline",
             icon: "marker",
-            fieldLabel: _("Headline"),
-            emptyText: _("Headline") + "..."
+            fieldLabel: _("Headline")
         },
         "/documents/filters/rubrics/": {
             hiddenName: "rubric",
             icon: "marker",
-            fieldLabel: _("Rubric"),
-            emptyText: _("Rubric") + "..."
+            fieldLabel: _("Rubric")
         },
         "/documents/filters/holders/": {
             hiddenName: "holder",
             icon: "user-business",
-            fieldLabel: _("Holder"),
-            emptyText: _("Holder") + "..."
+            fieldLabel: _("Holder")
         },
         "/documents/filters/managers/": {
             hiddenName: "manager",
             icon: "user-business",
-            fieldLabel: _("Manager"),
-            emptyText: _("Manager") + "..."
+            fieldLabel: _("Manager")
         },
         "/documents/filters/progress/": {
             hiddenName: "progress",
-            fieldLabel: _("Progress"),
-            emptyText: _("Progress") + "..."
+            fieldLabel: _("Progress")
         },
 
         "/options/combos/capture-destination/": {
             hiddenName: "capture.destination",
-            fieldLabel: _("Default destination"),
-            emptyText: _("Default destination") + "..."
+            fieldLabel: _("Default destination")
         }
 
     };
@@ -225,13 +196,13 @@ Inprint.factory.Combo = function() {
                     '<div class="x-combo-list-item" style="'+
                     '{[ this.haveIcon(values) ]}'+
                     '<tpl if="nlevel"> padding-left:{nlevel*10+8}px; </tpl>'+
-                    '<tpl if="!nlevel && !color"> padding-left:20px; </tpl>'+
+                    '<tpl if="!nlevel && !color"> padding-left:23px; </tpl>'+
                     '<tpl if="bold"> font-weight:bold;padding-top:4px;padding-bottom:4px;</tpl>'+
                     '<tpl if="spacer"> padding-bottom:8px;margin-bottom:4px;border-bottom:1px solid silver; </tpl>'+
                     '">'+
                         '<tpl if="color"><div style="width:10px;height:10px;margin:2px 5px 2px 3px;float:left;background:#{color};">&nbsp;</div></tpl>'+
                         '{title}'+
-                        '<tpl if="description"><br><small><i>{description}</i></small></tpl>'+
+                        '<tpl if="description"><div style="color:silver">{description}</div></tpl>'+
                     '</div>'+
                 '</tpl>',
                 {
@@ -239,7 +210,7 @@ Inprint.factory.Combo = function() {
 
                         var src = '';
                         var hpadding = 3;
-                        var vpadding = 1;
+                        var vpadding = 3;
 
                         if (combo.icon) {
                             src = _ico(combo.icon);
@@ -311,6 +282,10 @@ Inprint.factory.Combo = function() {
 
             // Add baseparams to store configuration
             if (comboconfig && comboconfig.baseParams)  Ext.apply(combo.store.baseParams, comboconfig.baseParams);
+
+            if (!combo.emptyText) {
+                combo.emptyText = _("Select...");
+            }
 
             return combo;
         },
