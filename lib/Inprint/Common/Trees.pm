@@ -143,12 +143,12 @@ sub fascicles {
     my @errors;
 
     # Get variables from POST
-    my $i_term      = $c->param("term");
-    my $i_node      = $c->param("node");
+    my $i_term      = $c->param("term")      // 0;
+    my $i_node      = $c->param("node")      // 0;
 
-    my $i_edition   = $c->param("edition");
-    my $i_briefcase = $c->param("briefcase");
-    my $i_trashcan  = $c->param("trashcan");
+    my $i_edition   = $c->param("edition")   // 0;
+    my $i_briefcase = $c->param("briefcase") // 0;
+    my $i_trashcan  = $c->param("trashcan")  // 0;
 
     # Process root value
     my $root = "00000000-0000-0000-0000-000000000000";
@@ -288,7 +288,8 @@ sub fascicles {
                     leaf => $c->json->true
                 };
             }
-            if ($i_trashcan  eq "true") {
+
+            if ($i_trashcan eq "true") {
                 unshift @$result, {
                     id => "00000000-0000-0000-0000-000000000000",
                     icon => "bin",
@@ -316,8 +317,8 @@ sub workgroups {
     my @errors;
 
     # Get variables from POST
-    my $i_node = $c->param("node");
-    my $i_term = $c->param("term") // undef;
+    my $i_node = $c->param("node") // 0;
+    my $i_term = $c->param("term") // 0;
 
     # Process root value
     my $root = "00000000-0000-0000-0000-000000000000";

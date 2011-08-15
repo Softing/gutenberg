@@ -76,10 +76,12 @@ sub search {
         }
     }
 
-    if ($pagination->{limit} > 0 && $pagination->{start} >= 0) {
-        $sql_query .= " LIMIT ? OFFSET ? ";
-        push @params, $pagination->{limit};
-        push @params, $pagination->{start};
+    if ($pagination) {
+        if ($pagination->{limit} > 0 && $pagination->{start} >= 0) {
+            $sql_query .= " LIMIT ? OFFSET ? ";
+            push @params, $pagination->{limit};
+            push @params, $pagination->{start};
+        }
     }
 
     return $c->Q($sql_query, \@params)->Hashes;

@@ -301,12 +301,34 @@ sub preview {
         }
     }
 
+
+
     if (-r $thumbSrc) {
+
+        #$c->tx->res->headers->content_type('image/png');
+
+        #$c->render_static($thumbSrc);
+
+        #my $static = Mojolicious::Static->new();
+        #$static->serve($c, $thumbSrc);
+        #$c->rendered;
+
+        #$c->app->static->serve($thumbSrc);
+        #$c->rendered;
+
+        #$c->res->content->asset(
+        #    Mojo::Asset::File->new(path => $thumbSrc )
+        #);
+        #$c->render_static();
+
         $c->tx->res->headers->content_type('image/png');
-        $c->res->content->asset(Mojo::Asset::File->new(path => $thumbSrc ));
-        $c->render_static();
+        open my $fh, '<', $thumbSrc || die 1;
+        local $/;
+        $c->render_data(<$fh>, format => 'png');
+
     }
     else {
+
         if (-r "$ENV{DOCUMENT_ROOT}/images/st.gif") {
             $c->tx->res->headers->content_type('image/gif');
             $c->res->content->asset(Mojo::Asset::File->new(path => "$ENV{DOCUMENT_ROOT}/images/st.gif" ));

@@ -91,7 +91,7 @@ sub seance {
                 WHERE
                     t2.module = t1.id AND t2.page = t3.id AND t3.fascicle=?
             ", [ $fascicle->{id} ]
-        )->Value;
+        )->Value || 0;
 
         my $statusbar_doc = $statusbar_all - $statusbar_adv;
 

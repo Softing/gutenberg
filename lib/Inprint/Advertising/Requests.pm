@@ -64,14 +64,17 @@ sub list {
     my @errors;
     my $success = $c->json->false;
 
+    my $flt_fascicle = $c->param("flt_fascicle");
+    my $flt_checked  = $c->param("flt_checked");
+
     my $filter = {
-        flt_fascicle => $c->param("flt_fascicle"),
-        flt_checked  => $c->param("flt_checked")
+        flt_fascicle => $flt_fascicle,
+        flt_checked  => $flt_checked,
     };
 
     my $sorting = {
         dir    => $c->param("dir") || "asc",
-        column => $c->param("sort") || "shortcut"
+        column => $c->param("sort") || "shortcut",
     };
 
     $c->check_uuid( \@errors, "id", $filter->{flt_fascicle});

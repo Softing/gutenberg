@@ -17,7 +17,7 @@ sub index
 {
     my $c = shift;
 
-    my $cacheable = $c->config->get("core.cached") || undef;
+    my $cacheable = $c->config->get("core.cached") || 0;
 
     my $path = $c->app->home->to_string;
 

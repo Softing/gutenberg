@@ -336,21 +336,26 @@ sub __collapsePagesToString {
 
     for ( my $i = 0; $i <= $#pages; $i++ ) {
 
-        my $cp = int( $pages[$i] );
-        my $pp = int( $pages[$i-1] );
-        my $fp = int( $pages[$i+1] );
+        my $currentPage = int( $pages[$i] );
 
-        next unless $cp;
+        next unless $currentPage;
 
-        if ( !$pp ) {
-                push @string, $cp;
-        } elsif (!$fp ) {
-                push @string, $cp;
-        } elsif ( $pp && $fp && $cp-1 == $pp && $cp+1 == $fp ) {
-                push @string, "-";
-        } else {
-                push @string, $cp;
+        if (! int( $pages[$i-1] ) ) {
+            push @string, $currentPage;
         }
+
+        elsif (! $pages[$i+1] ) {
+            push @string, $currentPage;
+        }
+
+        elsif ( int( $pages[$i-1] ) && $pages[$i+1] && $currentPage-1 == int( $pages[$i-1] ) && $currentPage+1 == $pages[$i+1] ) {
+            push @string, "-";
+        }
+
+        else {
+            push @string, $currentPage;
+        }
+
     };
 
     my $string = join (',',@string);
