@@ -9,17 +9,16 @@ Inprint.calendar.templates.Interaction = function(parent, panels) {
 
             grid.enable();
             grid.currentEdition = node.id;
-            _disable(grid.btnCreateFascicle, grid.btnCreateAttachment);
+
+            _disable(grid.btnCreateTemplate);
 
             _a(["editions.template.manage:*"], grid.currentEdition, function(access) {
 
                 if (access["editions.template.manage"] === true) {
-                    _enable(grid.btnCreateFascicle, grid.btnCreateAttachment);
+                    _enable(grid.btnCreateTemplate);
                 }
 
                 grid.cmpLoad({
-                    archive: "false",
-                    fastype: "issue",
                     edition: grid.currentEdition
                 });
 

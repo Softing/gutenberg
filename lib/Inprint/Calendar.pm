@@ -157,7 +157,6 @@ sub list {
 
     }
 
-
     my $sql_childrens = $sql;
 
     $sql_childrens .= " AND edition=? ";

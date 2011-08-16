@@ -7,45 +7,45 @@ Inprint.calendar.templates.Context = function(parent, panels) {
 
         var items = [];
 
-        node.select();
+        //node.select();
 
-        var edition = node.attributes.edition;
-        var parent  = node.attributes.parent;
-        var fastype = node.attributes.fastype;
+        //var edition = node.attributes.edition;
+        //var parent  = node.attributes.parent;
+        //var fastype = node.attributes.fastype;
 
-        if (fastype == "issue") {
-            items.push({
-                icon: _ico("blue-folder--pencil"),
-                cls: 'x-btn-text-icon',
-                text: _("Edit issue"),
-                scope: this,
-                handler: this.cmpUpdate
-            });
-            items.push({
-                icon: _ico("blue-folder--minus"),
-                cls: 'x-btn-text-icon',
-                text    : _('Delete issue'),
-                scope:this,
-                handler: this.cmpRemove
-            });
-        }
-
-        if (fastype == "attachment") {
-            items.push({
-                icon: _ico("folder--pencil"),
-                cls: 'x-btn-text-icon',
-                text    : _('Edit attachment'),
-                scope:this,
-                handler : this.cmpUpdateAttachment
-            });
-            items.push({
-                icon: _ico("folder--minus"),
-                cls: 'x-btn-text-icon',
-                text    : _('Delete attachment'),
-                scope:this,
-                handler: this.cmpRemove
-            });
-        }
+        //if (fastype == "issue") {
+        //    items.push({
+        //        icon: _ico("blue-folder--pencil"),
+        //        cls: 'x-btn-text-icon',
+        //        text: _("Edit issue"),
+        //        scope: this,
+        //        handler: this.cmpUpdate
+        //    });
+        //    items.push({
+        //        icon: _ico("blue-folder--minus"),
+        //        cls: 'x-btn-text-icon',
+        //        text    : _('Delete issue'),
+        //        scope:this,
+        //        handler: this.cmpRemove
+        //    });
+        //}
+        //
+        //if (fastype == "attachment") {
+        //    items.push({
+        //        icon: _ico("folder--pencil"),
+        //        cls: 'x-btn-text-icon',
+        //        text    : _('Edit attachment'),
+        //        scope:this,
+        //        handler : this.cmpUpdateAttachment
+        //    });
+        //    items.push({
+        //        icon: _ico("folder--minus"),
+        //        cls: 'x-btn-text-icon',
+        //        text    : _('Delete attachment'),
+        //        scope:this,
+        //        handler: this.cmpRemove
+        //    });
+        //}
 
         items.push({
             icon: _ico("clock"),

@@ -169,6 +169,12 @@ sub startup {
     $sessionBridge->route("/calendar/attachment/update/")       ->to("calendar-attachment#update");
     $sessionBridge->route("/calendar/attachment/remove/")       ->to("calendar-attachment#remove");
 
+    $sessionBridge->route("/calendar/template/list/")         ->to("calendar-template#list");
+    $sessionBridge->route("/calendar/template/read/")         ->to("calendar-template#read");
+    $sessionBridge->route("/calendar/template/create/")       ->to("calendar-template#create");
+    $sessionBridge->route("/calendar/template/update/")       ->to("calendar-template#update");
+    $sessionBridge->route("/calendar/template/remove/")       ->to("calendar-template#remove");
+
     # Calendar combos
     $sessionBridge->route('/calendar/combos/editions/')         ->to('calendar-combos#editions');
     $sessionBridge->route('/calendar/combos/parents/')          ->to('calendar-combos#parents');

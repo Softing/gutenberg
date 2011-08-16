@@ -305,7 +305,6 @@ sub preview {
 
     if (-r $thumbSrc) {
 
-        #$c->tx->res->headers->content_type('image/png');
 
         #$c->render_static($thumbSrc);
 
@@ -316,15 +315,16 @@ sub preview {
         #$c->app->static->serve($thumbSrc);
         #$c->rendered;
 
-        #$c->res->content->asset(
-        #    Mojo::Asset::File->new(path => $thumbSrc )
-        #);
-        #$c->render_static();
-
         $c->tx->res->headers->content_type('image/png');
-        open my $fh, '<', $thumbSrc || die 1;
-        local $/;
-        $c->render_data(<$fh>, format => 'png');
+        $c->res->content->asset(
+            Mojo::Asset::File->new(path => $thumbSrc )
+        );
+        $c->render_static();
+
+        #$c->tx->res->headers->content_type('image/png');
+        #open my $fh, '<', $thumbSrc || die 1;
+        #local $/;
+        #$c->render_data(<$fh>, format => 'png');
 
     }
     else {

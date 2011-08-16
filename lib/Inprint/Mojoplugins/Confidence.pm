@@ -169,31 +169,36 @@ sub register {
         } );
 
     $app->helper(
+
         objectChildren => sub {
 
-            my ($c, $input, $table, $node, $member) = @_;
+            my ($c, $table, $id, $term, $member) = @_;
 
             unless ($member) {
                 $member = $c->getSessionValue("member.id");
             }
 
-            my $terms = _parseTerms($c, $input);
-            my $nodes = _getNodes($c, $terms, $member);
+            my $sql = "
+                SELECT id FROM $table
+                WHERE path ~ ('*.' || replace(\$1, '-', '')::text ||'.*')::lquery  ";
 
-            my $result = $c->Q("
-                    SELECT id FROM $table
-                    WHERE 1=1
-                        AND path @> ARRAY( SELECT path FROM editions WHERE id = \$1 )
-                        AND id = ANY(\$2) ",
-                [ $node, $nodes ])->Values;
+            my @params = ( $id );
 
-            return $result;
+            my $childrens = $c->Q($sql, \@params)->Values;
+            my $nodes = $c->objectBindings("editions.template.manage:*");
+
+            my %isect;
+            my %inion;
+
+            foreach my $e (@$nodes, @$childrens) {$inion{$e}++ && $isect{$e}++;}
+            my @result = keys %isect;
+
+            return \@result;
         } );
 
 }
 
 # The additional Functions
-
 
 sub setCacheRecord {
     my ($c, $member, $binding, $termkey, $enabled) = @_;

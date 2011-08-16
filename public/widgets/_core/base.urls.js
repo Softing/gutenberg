@@ -50,6 +50,11 @@ Inprint.sources = {
     "attachment.update":                "/calendar/attachment/update/",
     "attachment.delete":                "/calendar/attachment/delete/",
 
+    "template.list":                    "/calendar/template/list/",
+    "template.create":                  "/calendar/template/create/",
+    "template.update":                  "/calendar/template/update/",
+    "template.remove":                  "/calendar/template/remove/",
+
     "documents.downloads.list":         "/documents/downloads/list/",
     "documents.downloads.download":     "/documents/downloads/download/",
 

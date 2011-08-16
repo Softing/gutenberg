@@ -13,11 +13,11 @@ Inprint.calendar.templates.Toolbar = function (scope) {
                     id: 'create',
                     disabled: true,
                     text: _("Template"),
-                    ref: "../../btnCreate",
+                    ref: "../../btnCreateTemplate",
                     cls: 'x-btn-text-icon',
                     icon: _ico("puzzle"),
                     scope: scope,
-                    handler: scope.cmpCreateFascicle
+                    handler: scope.cmpCreateTemplate
                 }
             ]
         }
