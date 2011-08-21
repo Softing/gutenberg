@@ -117,7 +117,7 @@ sub index
             AND deleted = false
         ORDER BY t1.release_date, t2.shortcut, t1.shortcut
     ")->Hashes;
-    
+
 
     foreach my $item (@$fascicles) {
         $item->{attachments} = $c->Q("
@@ -344,7 +344,7 @@ sub fascicleHadler {
         push @{ $fascicle_menu->{menu} },
             {
                 oid => $oid,
-                id  => "fascicle-templates",
+                id  => "fascicle-modules",
                 description => $fascicle->{shortcut}
             };
 

@@ -79,7 +79,7 @@ Inprint.calendar.fascicles.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
 
     cmpCreateFascicle: function() {
 
-        var form = new Inprint.calendar.fascicles.Create({
+        var form = new Inprint.calendar.fascicles.CreateFascicleForm({
             parent: this,
             url: _source("fascicle.create")
         });
@@ -105,7 +105,7 @@ Inprint.calendar.fascicles.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
 
         if (!id) id = this.cmpGetSelectedNode().id;
 
-        var form = new Inprint.calendar.fascicles.Update();
+        var form = new Inprint.calendar.fascicles.UpdateFascicleForm();
         form.cmpFill(id);
 
         var wndw = this.cmpCreateWindow(
@@ -125,10 +125,10 @@ Inprint.calendar.fascicles.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
 
     cmpCreateAttachment: function() {
 
-        var form = new Inprint.calendar.attachments.Create();
+        var form = new Inprint.calendar.fascicles.CreateFascicleFormAttachmentForm();
 
-        form.cmpSetValue("edition", this.currentEdition);
-
+        form.setParent(this.cmpGetSelectedNode().id);
+    
         var wndw = this.cmpCreateWindow(
             360, 180,
             form, _("New attachment"),
@@ -148,7 +148,7 @@ Inprint.calendar.fascicles.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
 
         if (!id) id = this.cmpGetSelectedNode().id;
 
-        var form = new Inprint.calendar.attachments.Update();
+        var form = new Inprint.calendar.fascicles.UpdateFascicleFormAttachmentForm();
         form.cmpFill(id);
 
         var wndw = this.cmpCreateWindow(
@@ -218,7 +218,7 @@ Inprint.calendar.fascicles.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
 
     cmpFormat: function() {
 
-        var form = new Inprint.calendar.fascicles.Format({
+        var form = new Inprint.calendar.fascicles.FormatForm({
             parent: this
         });
 
@@ -227,6 +227,10 @@ Inprint.calendar.fascicles.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
             form, _("Format issue"),
             [ _BTN_WNDW_OK, _BTN_WNDW_CLOSE ]
         ).show();
+
+        form.setId(
+            this.cmpGetSelectedNode().id
+        );
 
         form.on('actioncomplete', function(form, action) {
             if (action.type == "submit") {

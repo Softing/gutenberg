@@ -5,7 +5,7 @@
 
 Inprint.sources = {
 
-    "calendar.layout.format":           "/calendar/layout/format/",
+    "calendar.format":                  "/calendar/format/",
 
     "common.tree.editions":             "/common/tree/editions/",
     "common.tree.fascicles":            "/common/tree/fascicles/",
@@ -51,6 +51,7 @@ Inprint.sources = {
     "attachment.delete":                "/calendar/attachment/delete/",
 
     "template.list":                    "/calendar/template/list/",
+    "template.read":                    "/calendar/template/read/",
     "template.create":                  "/calendar/template/create/",
     "template.update":                  "/calendar/template/update/",
     "template.remove":                  "/calendar/template/remove/",

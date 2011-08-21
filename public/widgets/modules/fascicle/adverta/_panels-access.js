@@ -9,22 +9,22 @@ Inprint.fascicle.adverta.Access = function(parent, panels, access) {
     _hide(parent.btnCaptureSession, parent.btnBeginSession, parent.btnEndSession);
     _disable(parent.btnCaptureSession, parent.btnBeginSession, parent.btnEndSession, parent.btnSave);
 
-    if (access.open) {
+    if (access.open && parent.btnBeginSession) {
         parent.btnBeginSession.show();
         parent.btnBeginSession.enable();
     }
 
-    if (access.capture) {
+    if (access.capture && parent.btnCaptureSession) {
         parent.btnCaptureSession.show();
         parent.btnCaptureSession.enable();
     }
 
-    if (access.close) {
+    if (access.close && parent.btnEndSession) {
         parent.btnEndSession.show();
         parent.btnEndSession.enable();
     }
 
-    if (access.save) {
+    if (access.save && parent.btnSave) {
         parent.btnSave.show();
         parent.btnSave.enable();
     }

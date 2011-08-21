@@ -1,52 +1,38 @@
-Inprint.fascicle.templates.Interaction = function(parent, panels) {
+Inprint.fascicle.template.composer.Interaction = function(parent, panels) {
 
-    var pages   = panels.pages;
-    var modules = panels.modules;
+    var pages  = panels.pages;
 
-    //Grids
+    // Pages view
+    pages.view.on("selectionchange", function(view, data) {
 
-    pages.btnCreate.enable();
+        _disable(
+            parent.btnPageUpdate,
+            parent.btnPageDelete,
+            parent.btnPageMove,
+            parent.btnPageMoveLeft,
+            parent.btnPageMoveRight,
+            parent.btnPageResize);
 
-    pages.getSelectionModel().on("selectionchange", function(sm) {
+        if (parent.access.manage) {
 
-        _disable(modules.btnCreate, pages.btnUpdate, pages.btnDelete);
-
-        if (sm.getCount() === 0) {
-            modules.disable();
-        }
-
-        if (sm.getCount() == 1) {
-
-            modules.enable();
-
-            modules.pageId = pages.getValue("id");
-            modules.pageW  = pages.getValue("w");
-            modules.pageH  = pages.getValue("h");
-
-            if (modules.pageId && modules.pageW.length > 0 && modules.pageH.length > 0) {
-                modules.btnCreate.enable();
+            if (data.length == 1) {
+                _enable(
+                    parent.btnPageMoveLeft,
+                    parent.btnPageMoveRight
+                );
             }
 
-            modules.cmpLoad({ page: modules.pageId });
+            if (data.length >= 1) {
+                _enable(
+                    parent.btnPageUpdate,
+                    parent.btnPageDelete,
+                    parent.btnPageMove,
+                    parent.btnPageResize
+                );
+            }
         }
 
-        if (sm.getCount() == 1) {
-            _enable(pages.btnUpdate, pages.btnDelete);
-        } else if (sm.getCount() > 1) {
-            _enable(pages.btnDelete);
-        }
+    });
 
-    }, parent);
-
-    modules.getSelectionModel().on("selectionchange", function(sm) {
-
-        _disable(modules.btnUpdate, modules.btnDelete);
-
-        if (sm.getCount() == 1) {
-            _enable(modules.btnUpdate, modules.btnDelete);
-        } else if (sm.getCount() > 1) {
-            _enable(modules.btnDelete);
-        }
-    }, parent);
 
 };

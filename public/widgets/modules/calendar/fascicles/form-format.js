@@ -1,13 +1,15 @@
-Inprint.calendar.fascicles.Format = Ext.extend( Ext.form.FormPanel,
+Inprint.calendar.fascicles.FormatForm = Ext.extend( Ext.form.FormPanel,
 {
 
     initComponent: function()
     {
 
-        this.url = _source("calendar.layout.format");
+        this.url = _source("calendar.format");
 
         this.items = [
+
             _FLD_HDN_ID,
+
             Inprint.factory.Combo.create(
                 "/calendar/combos/templates/",
                 {
@@ -20,6 +22,7 @@ Inprint.calendar.fascicles.Format = Ext.extend( Ext.form.FormPanel,
                     }
                 }
             ),
+
             {
                 xtype: 'checkbox',
                 fieldLabel: _('Confirmation'),
@@ -38,12 +41,16 @@ Inprint.calendar.fascicles.Format = Ext.extend( Ext.form.FormPanel,
             }
         });
 
-        Inprint.calendar.fascicles.Format.superclass.initComponent.apply(this, arguments);
+        Inprint.calendar.fascicles.FormatForm.superclass.initComponent.apply(this, arguments);
     },
 
     onRender: function() {
-        Inprint.calendar.fascicles.Format.superclass.onRender.apply(this, arguments);
+        Inprint.calendar.fascicles.FormatForm.superclass.onRender.apply(this, arguments);
         this.getForm().url = this.url;
+    },
+
+    setId: function(id) {
+        this.cmpSetValue("id", id);
     }
 
 });

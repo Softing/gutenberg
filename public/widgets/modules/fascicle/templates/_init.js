@@ -1,1 +1,1 @@
-Ext.ns("Inprint.fascicle.templates");
+Ext.namespace("Inprint.fascicle.template.composer");

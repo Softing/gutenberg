@@ -7,6 +7,10 @@ Ext.form.FormPanel.prototype.cmpSetValue = function (field, value) {
     this.getForm().findField(field).setValue(value);
 }
 
+Ext.form.FormPanel.prototype.cmpGetValue = function (field) {
+    this.getForm().findField(field).getValue();
+}
+
 _FLD_HDN_ID = {
     xtype: "hidden",
     name: "id",

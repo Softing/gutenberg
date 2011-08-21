@@ -19,3 +19,20 @@ Inprint.factory.windows.create = function (title, width, height, item) {
 
     return wn;
 };
+
+Inprint.createModalWindow = function(width, height, title, form, btns) {
+    return new Ext.Window({
+        plain: true,
+        modal: true,
+        layout: "fit",
+        closeAction: "hide",
+        bodyStyle:'padding:5px 5px 5px 5px',
+
+        title: title,
+        width: width,
+        height: height,
+
+        items: form,
+        buttons: btns
+    });
+};

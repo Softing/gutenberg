@@ -3,68 +3,74 @@ Inprint.calendar.templates.Context = function(parent, panels) {
     var tree = panels.tree;
     var grid = panels.grid;
 
-    grid.on("contextmenu", function(node) {
+    grid.on("rowcontextmenu", function(thisGrid, rowIndex, evtObj) {
 
-        var items = [];
+        evtObj.stopEvent();
 
-        //node.select();
+        var rowCtxMenuItems = [];
 
-        //var edition = node.attributes.edition;
-        //var parent  = node.attributes.parent;
-        //var fastype = node.attributes.fastype;
+        var record   = thisGrid.getStore().getAt(rowIndex);
+        var selcount = thisGrid.getSelectionModel().getCount();
 
-        //if (fastype == "issue") {
-        //    items.push({
-        //        icon: _ico("blue-folder--pencil"),
-        //        cls: 'x-btn-text-icon',
-        //        text: _("Edit issue"),
-        //        scope: this,
-        //        handler: this.cmpUpdate
-        //    });
-        //    items.push({
-        //        icon: _ico("blue-folder--minus"),
-        //        cls: 'x-btn-text-icon',
-        //        text    : _('Delete issue'),
-        //        scope:this,
-        //        handler: this.cmpRemove
-        //    });
-        //}
-        //
-        //if (fastype == "attachment") {
-        //    items.push({
-        //        icon: _ico("folder--pencil"),
-        //        cls: 'x-btn-text-icon',
-        //        text    : _('Edit attachment'),
-        //        scope:this,
-        //        handler : this.cmpUpdateAttachment
-        //    });
-        //    items.push({
-        //        icon: _ico("folder--minus"),
-        //        cls: 'x-btn-text-icon',
-        //        text    : _('Delete attachment'),
-        //        scope:this,
-        //        handler: this.cmpRemove
-        //    });
-        //}
+        var fasid   = record.get("id");
+        var edition = record.get("edition");
+        var fasname = record.get("shortuct");
+        var fastype = record.get("fastype");
 
-        items.push({
-            icon: _ico("clock"),
-            cls: 'x-btn-text-icon',
-            text    : _('Composer'),
-            handler : function() {
-                Inprint.ObjectResolver.resolve({ aid:'fascicle-planner', oid: node.id, text: node.text });
-            }
+        thisGrid.body.mask(_("Loading..."));
+
+        _a(
+            "editions.templates.manage:*",
+            edition,
+            function(access) {
+
+                thisGrid.body.unmask();
+
+                rowCtxMenuItems.push({
+                    icon: _ico("puzzle--pencil"),
+                    cls: 'x-btn-text-icon',
+                    text: _("Edit template"),
+                    scope: thisGrid,
+                    handler: thisGrid.cmpUpdateTemplate
+                });
+
+                rowCtxMenuItems.push({
+                    icon: _ico("layout-design"),
+                    cls: 'x-btn-text-icon',
+                    text    : _('Compose template'),
+                    handler : function() {
+                        Inprint.ObjectResolver.resolve({
+                            aid:'fascicle-template-composer',
+                            oid: fasid,
+                            text: fasname });
+                    }
+                });
+
+                rowCtxMenuItems.push("-");
+
+                rowCtxMenuItems.push({
+                    icon: _ico("puzzle--minus"),
+                    cls: 'x-btn-text-icon',
+                    text    : _('Delete template'),
+                    scope: thisGrid,
+                    handler: thisGrid.cmpRemoveTemplate
+                });
+
+                rowCtxMenuItems.push('-', {
+                    icon: _ico("arrow-circle-double"),
+                    cls: "x-btn-text-icon",
+                    text: _("Reload"),
+                    scope: thisGrid,
+                    handler: thisGrid.cmpReload
+                });
+
+                thisGrid.rowCtxMenu = new Ext.menu.Menu({
+                    items : rowCtxMenuItems
+                });
+
+                thisGrid.rowCtxMenu.showAt(evtObj.getXY());
+
         });
-
-        items.push('-', {
-            icon: _ico("arrow-circle-double"),
-            cls: "x-btn-text-icon",
-            text: _("Reload"),
-            scope: this,
-            handler: this.cmpReload
-        });
-
-        new Ext.menu.Menu({ items : items }).show(node.ui.getAnchor());
 
     }, grid);
 

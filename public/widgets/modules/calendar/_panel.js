@@ -12,7 +12,7 @@ Inprint.calendar.Main = Ext.extend(Ext.Panel, {
 
         this.panels.tabs = new Ext.TabPanel({
             border:false,
-            activeTab: 2,
+            activeTab: 0,
             items:[
                 this.panels.fascicles,
                 this.panels.archive,

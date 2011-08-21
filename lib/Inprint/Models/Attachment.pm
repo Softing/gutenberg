@@ -8,56 +8,6 @@ package Inprint::Models::Attachment;
 use strict;
 use warnings;
 
-sub create {
-
-    my ( $c, $id, $edition, $fascicle, $template, $circulation ) = @_;
-
-    my $variation = $c->uuid;
-
-    if ($template->{id} eq "00000000-0000-0000-0000-000000000000") {
-        $template->{shortcut} = $c->l("Default");
-    }
-
-    if ($fascicle->{id}) {
-        $c->Do("
-            INSERT INTO fascicles(
-                id,
-                edition, parent,
-                tmpl, tmpl_shortcut,
-                fastype, variation,
-                shortcut, description,
-                circulation, num, anum,
-                manager, enabled, archived,
-                doc_enabled, adv_enabled,
-                doc_date, adv_date,
-                print_date, release_date,
-                created, updated)
-            VALUES (
-                ?,
-                ?, ?,
-                ?, ?,
-                ?, ?,
-                ?, ?,
-                ?, ?, ?,
-                null, true, false,
-                false, false,
-                ?, ?,
-                ?, ?,
-                now(), now());
-
-        ", [ $id,
-            $edition->{id},          $fascicle->{id},
-            $template->{id},         $template->{shortcut},
-            "attachment",            $variation,
-            $fascicle->{shortcut},   $fascicle->{description},
-            $circulation,            $fascicle->{num},          $fascicle->{anum},
-            $fascicle->{doc_date},   $fascicle->{adv_date},
-            $fascicle->{print_date}, $fascicle->{release_date} ]);
-    }
-
-    return $id;
-}
-
 sub read {
     my $c = shift;
     my $id = shift;
@@ -85,26 +35,98 @@ sub read {
     return $result;
 }
 
+sub create {
+
+    my ( $c, $id,
+        $edition, $parent,
+        $shortcut, $description,
+        $template, $template_shortcut,
+        $circulation, $num, $anum,
+        $doc_date, $adv_date,
+        $print_date, $release_date ) = @_;
+
+    my $variation = $c->uuid;
+
+    if ($template eq "00000000-0000-0000-0000-000000000000") {
+        $template_shortcut = $c->l("Default");
+    }
+
+    $c->Do("
+        INSERT INTO fascicles(
+            id,
+            edition, parent,
+            shortcut, description,
+            fastype, variation,
+            tmpl, tmpl_shortcut,
+            circulation, num, anum,
+            manager, enabled, archived,
+            doc_enabled, adv_enabled,
+            doc_date, adv_date,
+            print_date, release_date,
+            created, updated)
+        VALUES (
+            ?,
+            ?, ?,
+            ?, ?,
+            ?, ?,
+            ?, ?,
+            ?, ?, ?,
+            null, true, false,
+            false, false,
+            ?, ?,
+            ?, ?,
+            now(), now());
+
+    ", [ $id,
+        $edition, $parent,
+        $shortcut, $description,
+        "attachment", $variation,
+        $template, $template_shortcut,
+        $circulation, $num, $anum,
+        $doc_date,   $adv_date,
+        $print_date, $release_date ]);
+
+
+    return $id;
+}
+
 sub update {
 
+    #my ($c, $id,
+    #    $shortcut, $description,
+    #    $num, $anum, $circulation,
+    #    $print_date, $release_date,
+    #    $adv_date, $doc_date,
+    #    $adv_enabled, $doc_enabled ) = @_;
+    #
+    #$c->Do("
+    #    UPDATE fascicles
+    #        SET shortcut =?, description =?,
+    #            num =?, anum =?, circulation =?,
+    #            print_date =?, release_date =?,
+    #            adv_date =?,  doc_date =?,
+    #            adv_enabled =?, doc_enabled =?
+    #    WHERE id =?;
+    #", [    $shortcut, $description,
+    #        $num, $anum, $circulation,
+    #        $print_date, $release_date,
+    #        $adv_date, $doc_date,
+    #        $adv_enabled, $doc_enabled,
+    #    $id ]);
+
     my ($c, $id,
-        $shortcut, $description,
-        $num, $anum, $circulation,
-        $print_date, $release_date,
+        $circulation,
         $adv_date, $doc_date,
         $adv_enabled, $doc_enabled ) = @_;
 
     $c->Do("
         UPDATE fascicles
-            SET shortcut =?, description =?,
-                num =?, anum =?, circulation =?,
-                print_date =?, release_date =?,
+            SET
+                circulation =?,
                 adv_date =?,  doc_date =?,
                 adv_enabled =?, doc_enabled =?
         WHERE id =?;
-    ", [    $shortcut, $description,
-            $num, $anum, $circulation,
-            $print_date, $release_date,
+    ", [    $circulation,
             $adv_date, $doc_date,
             $adv_enabled, $doc_enabled,
         $id ]);

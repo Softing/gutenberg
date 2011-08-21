@@ -101,6 +101,48 @@ sub fascicle_page {
 
 }
 
+sub template_page {
+
+    my $c = shift;
+
+    my $body;
+
+    my $i_page = $c->param("id");
+
+    my $i_w = $c->param("w");
+    my $i_h = $c->param("h");
+
+    my $grid_w = $i_w || 110;
+    my $grid_h = $i_h || 140;
+
+    my $page = $c->Q("
+        SELECT id, edition, template, origin, headline, seqnum, width, height, created, updated
+        FROM template_page WHERE id=?
+    ", [ $i_page ])->Hash;
+
+    # create a new image
+    my $img = new GD::Image($grid_w, $grid_h);
+
+    my $white = $img->colorAllocate(255,255,255);
+    my $black = $img->colorAllocate(0,0,0);
+    my $red   = $img->colorAllocate(255,0,0);
+    my $blue  = $img->colorAllocate(0,0,255);
+
+    my $gray  = $img->colorAllocate(214,214,214);
+    my $darkgray  = $img->colorAllocate(227,227,227);
+
+    my $grid = {
+        color => $gray,
+        w => $grid_w,
+        h => $grid_h
+    };
+
+    $c->draw_page($img, $grid, $page->{width}, $page->{height});
+
+    $c->tx->res->headers->content_type('image/png');
+    $c->render_data($img->png);
+}
+
 sub draw_page {
 
     my $c = shift;

@@ -62,9 +62,9 @@ Inprint.factory.StoreMappings = {
     "/advertising/combo/places/":           Inprint.store.Columns.common.combo,
     "/advertising/combo/modules/":          Inprint.store.Columns.common.combo,
 
-    "/calendar/combos/editions/":           Inprint.store.Columns.common.combo,
+    //"/calendar/combos/editions/":           Inprint.store.Columns.common.combo,
     "/calendar/combos/parents/":            Inprint.store.Columns.common.combo,
-    "/calendar/combos/sources/":            Inprint.store.Columns.common.combo,
+    //"/calendar/combos/sources/":            Inprint.store.Columns.common.combo,
 
     "/catalog/combos/groups/":              Inprint.store.Columns.common.combo,
     "/catalog/combos/editions/":            Inprint.store.Columns.common.combo,

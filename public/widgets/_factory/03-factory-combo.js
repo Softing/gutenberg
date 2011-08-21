@@ -10,30 +10,35 @@ Inprint.factory.Combo = function() {
     var combos = {
 
         //Calendar
-        "/calendar/combos/editions/": {
-            hiddenName: "edition",
-            icon: "blue-folders",
-            fieldLabel: _("Edition")
-        },
-        "/calendar/combos/templates/": {
-            hiddenName: "template",
-            icon: "puzzle",
-            fieldLabel: _("Template")
-        },
-        "/calendar/combos/sources/": {
-            hiddenName: "template",
-            icon: "building",
-            fieldLabel: _("Template")
-        },
+        //"/calendar/combos/editions/": {
+        //    hiddenName: "edition",
+        //    icon: "blue-folders",
+        //    fieldLabel: _("Edition")
+        //},
+        //"/calendar/combos/sources/": {
+        //    hiddenName: "template",
+        //    icon: "building",
+        //    fieldLabel: _("Template")
+        //},
+        //"/calendar/combos/childrens/": {
+        //    hiddenName: "edition",
+        //    icon: "blue-folders",
+        //    fieldLabel: _("Edition")
+        //},
         "/calendar/combos/parents/": {
             hiddenName: "parent",
             icon: "building",
             fieldLabel: _("Issue")
         },
-        "/calendar/combos/childrens/": {
-            hiddenName: "edition",
-            icon: "blue-folders",
-            fieldLabel: _("Edition")
+        "/calendar/combos/copyfrom/": {
+            hiddenName: "copyfrom",
+            icon: "puzzle",
+            fieldLabel: _("Copy from")
+        },
+        "/calendar/combos/templates/": {
+            hiddenName: "template",
+            icon: "puzzle",
+            fieldLabel: _("Template")
         },
 
         // Catalog
@@ -88,15 +93,25 @@ Inprint.factory.Combo = function() {
             hiddenName: "template",
             fieldLabel: _("Template")
         },
-        "/fascicle/combos/workgroups/": {
-            hiddenName: "workgroup",
-            fieldLabel: _("Workgroup")
-        },
         "/fascicle/combos/headlines/": {
             hiddenName: "headline",
             fieldLabel: _("Headline")
         },
         "/fascicle/combos/rubrics/": {
+            hiddenName: "rubric",
+            fieldLabel: _("Rubric")
+        },
+
+        // Templates
+        "/template/combos/templates/": {
+            hiddenName: "template",
+            fieldLabel: _("Template")
+        },
+        "/template/combos/headlines/": {
+            hiddenName: "headline",
+            fieldLabel: _("Headline")
+        },
+        "/template/combos/rubrics/": {
             hiddenName: "rubric",
             fieldLabel: _("Rubric")
         },

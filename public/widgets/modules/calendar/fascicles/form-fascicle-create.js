@@ -1,4 +1,4 @@
-Inprint.calendar.fascicles.Create = Ext.extend( Ext.form.FormPanel,
+Inprint.calendar.fascicles.CreateFascicleForm = Ext.extend( Ext.form.FormPanel,
 {
 
     initComponent: function()
@@ -38,8 +38,8 @@ Inprint.calendar.fascicles.Create = Ext.extend( Ext.form.FormPanel,
                             },
 
                             Inprint.factory.Combo.create(
-                                "/calendar/combos/sources/", {
-                                    fieldLabel: _("Template"),
+                                "/calendar/combos/copyfrom/", {
+                                    fieldLabel: _("Copy from"),
                                     name: "source",
                                     listeners: {
                                         render: function(combo) {
@@ -144,16 +144,14 @@ Inprint.calendar.fascicles.Create = Ext.extend( Ext.form.FormPanel,
         ];
 
         Ext.apply(this,  {
-            //xtype: "form",
-            //border:false,
             baseCls: 'x-plain'
         });
 
-        Inprint.calendar.fascicles.Create.superclass.initComponent.apply(this, arguments);
+        Inprint.calendar.fascicles.CreateFascicleForm.superclass.initComponent.apply(this, arguments);
     },
 
     onRender: function() {
-        Inprint.calendar.fascicles.Create.superclass.onRender.apply(this, arguments);
+        Inprint.calendar.fascicles.CreateFascicleForm.superclass.onRender.apply(this, arguments);
 
         this.getForm().url = _source("fascicle.create");
 

@@ -12,6 +12,37 @@ use Inprint::Models::Fascicle;
 
 use base 'Mojolicious::Controller';
 
+sub read {
+    my $c = shift;
+
+    my @params;
+    my @errors;
+    my $result = [];
+
+    my $i_id = $c->get_uuid(\@errors, "id");
+
+    unless (@errors) {
+
+        my $sql = "
+            SELECT
+                t1.id,
+                t2.id as edition, t2.shortcut as edition_shortcut,
+                t1.shortcut, t1.description,
+                to_char(t1.created, 'YYYY-MM-DD HH24:MI:SS') as created,
+                to_char(t1.updated, 'YYYY-MM-DD HH24:MI:SS') as updated
+            FROM template t1, editions t2
+            WHERE 1=1
+                AND t1.id = ?
+        ";
+
+        push @params, $i_id;
+
+        $result = $c->Q($sql, \@params)->Hash;
+    }
+
+    $c->smart_render(\@errors, $result);
+}
+
 sub list {
     my $c = shift;
 
@@ -23,36 +54,18 @@ sub list {
 
     unless (@errors) {
 
-        # Common sql
         my $sql = "
             SELECT
-
                 t1.id,
                 t2.id as edition, t2.shortcut as edition_shortcut,
-                t1.parent, t1.fastype, t1.variation,
                 t1.shortcut, t1.description,
-                t1.tmpl, t1.tmpl_shortcut,
-                t1.circulation, t1.num, t1.anum,
-                t1.manager,
-                t1.enabled, t1.archived,
-                t1.doc_enabled, t1.adv_enabled,
-
-                to_char(t1.doc_date, 'YYYY-MM-DD HH24:MI:SS')     as doc_date,
-                to_char(t1.adv_date, 'YYYY-MM-DD HH24:MI:SS')     as adv_date,
-                to_char(t1.print_date, 'YYYY-MM-DD HH24:MI:SS')   as print_date,
-                to_char(t1.release_date, 'YYYY-MM-DD HH24:MI:SS') as release_date,
-
                 to_char(t1.created, 'YYYY-MM-DD HH24:MI:SS') as created,
                 to_char(t1.updated, 'YYYY-MM-DD HH24:MI:SS') as updated
-
-            FROM fascicles t1, editions t2
-
+            FROM template t1, editions t2
             WHERE 1=1
                 AND t2.id=t1.edition
                 AND t1.deleted = false
-                --AND t1.fastype = 'template'
                 AND t1.edition = ANY(?)
-
             ORDER BY t1.shortcut DESC
         ";
 
@@ -62,6 +75,89 @@ sub list {
 
         $result = $c->Q($sql, \@params)->Hashes;
 
+    }
+
+    $c->smart_render(\@errors, $result);
+}
+
+sub create {
+    my $c = shift;
+
+    my @params;
+    my @errors;
+    my $result = [];
+
+    my $i_edition     = $c->get_uuid(\@errors, "edition");
+    my $i_shortcut    = $c->get_text(\@errors, "shortcut");
+    my $i_description = $c->get_text(\@errors, "description", 1);
+
+    unless (@errors) {
+        my $sql = "
+            INSERT INTO template (
+                edition,
+                shortcut, description,
+                created, updated)
+            VALUES (
+                ?,
+                ?, ?,
+                now(), now()); ";
+
+        push @params, $i_edition;
+        push @params, $i_shortcut;
+        push @params, $i_description;
+
+        $result = $c->Do($sql, \@params);
+    }
+
+    $c->smart_render(\@errors, $result);
+}
+
+sub update {
+    my $c = shift;
+
+    my @params;
+    my @errors;
+    my $result = [];
+
+    my $i_id          = $c->get_uuid(\@errors, "id");
+    my $i_shortcut    = $c->get_text(\@errors, "shortcut");
+    my $i_description = $c->get_text(\@errors, "description", 1);
+
+    unless (@errors) {
+
+        my $sql = "
+            UPDATE template
+            SET shortcut=?, description=?
+            WHERE id=? ";
+
+        push @params, $i_shortcut;
+        push @params, $i_description;
+        push @params, $i_id;
+
+        $result = $c->Do($sql, \@params);
+    }
+
+    $c->smart_render(\@errors, $result);
+}
+
+
+sub remove {
+    my $c = shift;
+
+    my @params;
+    my @errors;
+    my $result = [];
+
+    my $i_id = $c->get_uuid(\@errors, "id");
+
+    unless (@errors) {
+        #my $sql = " UPDATE template SET deleted=true WHERE id=? ";
+        #push @params, $i_id;
+        #$result = $c->Do($sql, \@params);
+        
+        push @params, $i_id;
+        $result = $c->Do(" DELETE FROM template_page WHERE template=? ", \@params);
+        $result = $c->Do(" DELETE FROM template WHERE id=? ", \@params);
     }
 
     $c->smart_render(\@errors, $result);

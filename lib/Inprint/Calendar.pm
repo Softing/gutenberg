@@ -8,9 +8,7 @@ package Inprint::Calendar;
 use strict;
 use warnings;
 
-use Inprint::Models::Fascicle;
-use Inprint::Models::Fascicle::Template;
-use Inprint::Models::Fascicle::Attachment;
+use Inprint::Calendar::Copy;
 
 use base 'Mojolicious::Controller';
 
@@ -181,6 +179,25 @@ sub list {
     }
 
     $c->render_json( $result );
+}
+
+sub format {
+    my $c = shift;
+
+    my @errors;
+
+    my $i_id           = $c->get_uuid(\@errors, "id");
+    my $i_template     = $c->get_uuid(\@errors, "template");
+    my $i_confirmation = $c->get_text(\@errors, "confirmation");
+
+    push @errors, { id => "confirmation", msg => "Incorrectly filled field"}
+        unless ( $i_confirmation eq "on" );
+
+    unless (@errors) {
+        Inprint::Calendar::Copy::copyFromTemplate($c, $i_id, $i_template);
+    }
+
+    $c->smart_render(\@errors);
 }
 
 1;

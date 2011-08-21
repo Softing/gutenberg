@@ -1,4 +1,4 @@
-Inprint.calendar.attachments.Update = Ext.extend( Ext.form.FormPanel,
+Inprint.calendar.fascicles.UpdateFascicleFormAttachmentForm = Ext.extend( Ext.form.FormPanel,
 {
 
     initComponent: function()
@@ -71,13 +71,13 @@ Inprint.calendar.attachments.Update = Ext.extend( Ext.form.FormPanel,
             }
         });
 
-        Inprint.calendar.attachments.Update.superclass.initComponent.apply(this, arguments);
-        this.getForm().url = _source("attachment.create");
+        Inprint.calendar.fascicles.UpdateFascicleFormAttachmentForm.superclass.initComponent.apply(this, arguments);
+        this.getForm().url = _source("attachment.update");
     },
 
 
     onRender: function() {
-        Inprint.calendar.attachments.Update.superclass.onRender.apply(this, arguments);
+        Inprint.calendar.fascicles.UpdateFascicleFormAttachmentForm.superclass.onRender.apply(this, arguments);
     },
 
     cmpFill: function (id) {

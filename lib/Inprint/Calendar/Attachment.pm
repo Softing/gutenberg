@@ -39,8 +39,9 @@ sub create {
     my $i_circulation  = $c->get_int(\@errors, "circulation", 1) || 0;
 
     my $edition  = $c->check_record(\@errors, "editions", "edition", $i_edition);
+
     my $fascicle = $c->check_record(\@errors, "fascicles", "fascicle", $i_parent);
-    my $template = $c->check_record(\@errors, "fascicles", "template", $i_template);
+    my $template = $c->check_record(\@errors, "template", "template", $i_template);
 
     unless (@errors) {
 
@@ -48,12 +49,20 @@ sub create {
 
         Inprint::Models::Attachment::create(
             $c, $id,
-            $edition, $fascicle, $template,
-            $i_circulation
+            $edition->{id}, $fascicle->{id},
+            $fascicle->{shortcut}, $fascicle->{description},
+            $template->{id}, $template->{shortcut},
+            $i_circulation, $fascicle->{num}, $fascicle->{anum},
+            $fascicle->{doc_date}, $fascicle->{adv_date},
+            $fascicle->{print_date}, $fascicle->{release_date}
         );
 
-        if ($i_template eq "00000000-0000-0000-0000-000000000000") {
+        if ($i_template && $i_template eq "00000000-0000-0000-0000-000000000000") {
             Inprint::Calendar::Copy::copyFromDefaults($c, $id);
+        }
+
+        if ($i_template && $i_template ne "00000000-0000-0000-0000-000000000000") {
+            Inprint::Calendar::Copy::copyFromTemplate($c, $id, $i_template);
         }
 
     }
@@ -68,17 +77,17 @@ sub update {
 
     my $i_id           = $c->get_uuid(\@errors, "id");
 
-    my $i_shortcut     = $c->get_text(\@errors, "shortcut", 1);
-    my $i_description  = $c->get_text(\@errors, "description", 1) || "";
+    #my $i_shortcut     = $c->get_text(\@errors, "shortcut", 1);
+    #my $i_description  = $c->get_text(\@errors, "description", 1) || "";
 
-    my $i_num          = $c->get_int(\@errors, "num", 1) || 0;
-    my $i_anum         = $c->get_int(\@errors, "anum", 1) || 0;
+    #my $i_num          = $c->get_int(\@errors, "num", 1) || 0;
+    #my $i_anum         = $c->get_int(\@errors, "anum", 1) || 0;
+
+    #my $i_print_date   = $c->get_date(\@errors, "print_date", 1);
+    #my $i_release_date = $c->get_date(\@errors, "release_date", 1);
 
     my $i_circulation  = $c->get_int(\@errors, "circulation", 1) || 0;
 
-    my $i_print_date   = $c->get_date(\@errors, "print_date", 1);
-    my $i_release_date = $c->get_date(\@errors, "release_date", 1);
-
     my $i_adv_date     = $c->get_datetime(\@errors, "adv_date", 1);
     my $i_doc_date     = $c->get_datetime(\@errors, "doc_date", 1);
 
@@ -86,43 +95,23 @@ sub update {
     my $i_doc_enabled  = $c->get_flag(\@errors, "doc_enabled", 1) || 0;
 
     unless (@errors) {
-        Inprint::Models::Fascicle::update(
-            $c, $i_id, $i_shortcut, $i_description,
-            $i_num, $i_anum, $i_circulation,
-            $i_print_date, $i_release_date,
-            $i_adv_date, $i_doc_date,
-            $i_adv_enabled, $i_doc_enabled);
-    }
+        #Inprint::Models::Attachment::update(
+        #    $c, $i_id, $i_shortcut, $i_description,
+        #    $i_num, $i_anum, $i_circulation,
+        #    $i_print_date, $i_release_date,
+        #    $i_adv_date, $i_doc_date,
+        #    $i_adv_enabled, $i_doc_enabled);
 
-    $c->smart_render(\@errors);
-}
-
-sub deadline {
-    my $c = shift;
-
-    my @errors;
-
-    my $i_id           = $c->get_uuid(\@errors, "id");
-
-    my $i_print_date   = $c->get_date(\@errors, "print_date", 1);
-    my $i_release_date = $c->get_date(\@errors, "release_date", 1);
-
-    my $i_adv_date     = $c->get_datetime(\@errors, "adv_date", 1);
-    my $i_doc_date     = $c->get_datetime(\@errors, "doc_date", 1);
-
-    my $i_adv_enabled  = $c->get_flag(\@errors, "adv_enabled", 1) || 0;
-    my $i_doc_enabled  = $c->get_flag(\@errors, "doc_enabled", 1) || 0;
-
-    unless (@errors) {
-        Inprint::Models::Attachment::deadline(
+        Inprint::Models::Attachment::update(
             $c, $i_id,
-            $i_print_date, $i_release_date,
+            $i_circulation,
             $i_adv_date, $i_doc_date,
             $i_adv_enabled, $i_doc_enabled);
     }
 
     $c->smart_render(\@errors);
 }
+
 
 sub remove {
     my $c = shift;
