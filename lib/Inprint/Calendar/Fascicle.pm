@@ -99,9 +99,9 @@ sub create {
                 Inprint::Models::Attachment::create(
                     $c, $attachment_id,
                     $source_attachment->{edition}, $issue_id,
-                    $source_attachment->{shortcut}, $source_attachment->{description},
+                    $i_shortcut, $i_description,
                     $source_attachment->{tmpl}, $source_attachment->{tmpl_shortcut},
-                    $source_attachment->{circulation},
+                    0,
                     $i_num, $i_anum,
                     $i_doc_date, $i_adv_date,
                     $i_print_date, $i_release_date

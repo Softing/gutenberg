@@ -3,7 +3,7 @@ Inprint.cmp.composer.Templates = Ext.extend(Ext.grid.GridPanel, {
     initComponent: function() {
 
         this.urls = {
-            "list": "/fascicle/composer/templates/"
+            "list": this.parent.urls.templatesList
         };
 
         var selection = this.parent.selection;

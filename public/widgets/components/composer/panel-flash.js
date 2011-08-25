@@ -5,8 +5,8 @@ Inprint.cmp.composer.Flash = Ext.extend(Ext.Panel, {
         this.modcache = {};
 
         this.urls = {
-            "init":   _url("/fascicle/composer/initialize/"),
-            "save":   _url("/fascicle/composer/save/")
+            "init": this.parent.urls.flashInit,
+            "save": this.parent.urls.flashSave
         };
 
         var selection = this.parent.selection;
@@ -109,15 +109,19 @@ Inprint.cmp.composer.Flash = Ext.extend(Ext.Panel, {
 
                 flash.reset();
 
-                Ext.each(responce.data.pages, function(c) {
-                    flash.setField(c.id, "letter", 0, 0 );
-                    flash.setGrid(c.id, c.w, c.h);
-                }, this);
+                if (responce.data && responce.data.pages) {
+                    Ext.each(responce.data.pages, function(c) {
+                        flash.setField(c.id, "letter", 0, 0 );
+                        flash.setGrid(c.id, c.w, c.h);
+                    }, this);
+                }
 
-                Ext.each(responce.data.modules, function(c) {
-                    this.modcache[c.id] = c;
-                    flash.setBlock(c.page, c.id, c.title, c.x, c.y, c.w, c.h );
-                }, this);
+                if (responce.data && responce.data.modules) {
+                    Ext.each(responce.data.modules, function(c) {
+                        this.modcache[c.id] = c;
+                        flash.setBlock(c.page, c.id, c.title, c.x, c.y, c.w, c.h );
+                    }, this);
+                }
 
             } else {
                 init.defer(10, this);

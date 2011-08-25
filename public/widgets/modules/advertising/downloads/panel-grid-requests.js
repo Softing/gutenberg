@@ -37,51 +37,79 @@ Inprint.advertising.downloads.Requests = Ext.extend(Ext.grid.GridPanel, {
         });
 
         this.tbar = [
-            {
-                scope:this,
-                text: _("All requests"),
-                cls: "x-btn-text-icon",
-                icon: _ico("moneys"),
-                handler : function() {
-                    this.cmpLoad({ flt_checked: "all" });
+
+            new Ext.form.ComboBox({
+                store: new Ext.data.ArrayStore({
+                    fields: ['id', 'name'],
+                    data : [
+                        [ "all",     _("All requests") ],
+                        [ "check",   _("To check") ],
+                        [ "error",   _("With errors") ],
+                        [ "ready",   _("Ready") ],
+                        [ "imposed", _("Imposed") ]
+                    ]
+                }),
+                displayField:'name',
+                typeAhead: true,
+                mode: 'local',
+                editable:false,
+                forceSelection: true,
+                triggerAction: 'all',
+                emptyText: _('Select a filter...'),
+                listeners: {
+                    scope:this,
+                    select:function(combo, record, index) {
+                        this.cmpLoad({ flt_checked: record.get("id") });
+                    }
+
                 }
-            },
-            {
-                scope:this,
-                text: _("To check"),
-                cls: "x-btn-text-icon",
-                icon: _ico("exclamation-octagon"),
-                handler : function() {
-                    this.cmpLoad({ flt_checked: "check" });
-                }
-            },
-            {
-                scope:this,
-                text: _("With errors"),
-                cls: "x-btn-text-icon",
-                icon: _ico("exclamation-red"),
-                handler : function() {
-                    this.cmpLoad({ flt_checked: "error" });
-                }
-            },
-            {
-                scope:this,
-                text: _("Ready"),
-                cls: "x-btn-text-icon",
-                icon: _ico("tick-circle"),
-                handler : function() {
-                    this.cmpLoad({ flt_checked: "ready" });
-                }
-            },
-            {
-                scope:this,
-                text: _("Imposed"),
-                cls: "x-btn-text-icon",
-                icon: _ico("printer"),
-                handler : function() {
-                    this.cmpLoad({ flt_checked: "imposed" });
-                }
-            }
+            }),
+
+            //{
+            //    scope:this,
+            //    text: _("All requests"),
+            //    cls: "x-btn-text-icon",
+            //    icon: _ico("moneys"),
+            //    handler : function() {
+            //        this.cmpLoad({ flt_checked: "all" });
+            //    }
+            //},
+            //{
+            //    scope:this,
+            //    text: _("To check"),
+            //    cls: "x-btn-text-icon",
+            //    icon: _ico("exclamation-octagon"),
+            //    handler : function() {
+            //        this.cmpLoad({ flt_checked: "check" });
+            //    }
+            //},
+            //{
+            //    scope:this,
+            //    text: _("With errors"),
+            //    cls: "x-btn-text-icon",
+            //    icon: _ico("exclamation-red"),
+            //    handler : function() {
+            //        this.cmpLoad({ flt_checked: "error" });
+            //    }
+            //},
+            //{
+            //    scope:this,
+            //    text: _("Ready"),
+            //    cls: "x-btn-text-icon",
+            //    icon: _ico("tick-circle"),
+            //    handler : function() {
+            //        this.cmpLoad({ flt_checked: "ready" });
+            //    }
+            //},
+            //{
+            //    scope:this,
+            //    text: _("Imposed"),
+            //    cls: "x-btn-text-icon",
+            //    icon: _ico("printer"),
+            //    handler : function() {
+            //        this.cmpLoad({ flt_checked: "imposed" });
+            //    }
+            //}
         ];
 
         Ext.apply(this, {

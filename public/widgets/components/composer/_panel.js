@@ -2,6 +2,17 @@ Inprint.cmp.Composer = Ext.extend(Ext.Window, {
 
     initComponent: function() {
 
+        if (!this.urls) {
+            this.urls = {
+                "flashInit":     _url("/fascicle/composer/initialize/"),
+                "flashSave":     _url("/fascicle/composer/save/"),
+                "templatesList": "/fascicle/composer/templates/",
+                "modulesList":   "/fascicle/composer/modules/",
+                "modulesCreate": _url("/fascicle/modules/create/"),
+                "modulesDelete": _url("/fascicle/modules/delete/")
+            };
+        }
+
         this.panels = {};
 
         this.selLength = this.selection.length;
@@ -75,6 +86,10 @@ Inprint.cmp.Composer = Ext.extend(Ext.Window, {
     onRender: function() {
         Inprint.cmp.Composer.superclass.onRender.apply(this, arguments);
         Inprint.cmp.composer.Interaction(this, this.panels);
+    },
+
+    setUrls: function (urls) {
+        this.urls = urls;
     },
 
     cmpSave: function() {

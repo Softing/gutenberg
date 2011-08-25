@@ -48,6 +48,9 @@ Inprint.factory.StoreMappings = {
     "/fascicle/rubrics/list/":              Inprint.store.Columns.fascicle.rubrics,
     "/fascicle/summary/":                   Inprint.store.Columns.fascicle.summary,
 
+    "/template/template-list/":            Inprint.store.Columns.fascicle.composer_templates,
+    "/template/moudle-list/":              Inprint.store.Columns.fascicle.composer_modules,
+
     "/fascicle/templates/pages/list/":      Inprint.store.Columns.tfascicle.pages,
     "/fascicle/templates/modules/list/":    Inprint.store.Columns.tfascicle.modules,
     "/fascicle/templates/index/headlines/": Inprint.store.Columns.tfascicle.index_headlines,

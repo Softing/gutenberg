@@ -241,6 +241,8 @@ sub search {
     my $cacheAccess = {};
     foreach my $document (@$result) {
 
+        $document->{title} =~ s/"/&quot;/ig;
+
         # Get files list
         my $folder = Inprint::Store::Embedded::getFolderPath($c, "documents", $document->{created}, $document->{copygroup}, 1);
         my $files  = Inprint::Store::Cache::getRecordsByPath($c, $folder, "all", [ 'doc', 'rtf', 'odt', 'txt' ]);

@@ -26,8 +26,8 @@ sub fascicle_page {
     my $i_w = $c->param("w");
     my $i_h = $c->param("h");
 
-    my $grid_w = $i_w || 110;
-    my $grid_h = $i_h || 140;
+    my $grid_w = $i_w || 200;
+    my $grid_h = $i_h || 300;
 
     my $page = $c->Q("
         SELECT id, edition, fascicle, origin, headline, seqnum, w, h, created, updated
@@ -139,6 +139,40 @@ sub template_page {
 
     $c->draw_page($img, $grid, $page->{width}, $page->{height});
 
+    # Draw modules
+    my $modules = $c->Q("
+        SELECT DISTINCT
+                t1.id, t1.title, t1.place, t1.w, t1.h, t2.placed, t2.x, t2.y,
+                t3.id as place, t3.title as place_title
+            FROM
+                template_module t1
+                    LEFT JOIN ad_places t3 ON ( t1.place = t3.id ),
+                template_map_module t2
+            WHERE t2.module=t1.id AND t2.page = ?
+    ", [ $i_page ])->Hashes;
+
+    foreach my $module (@$modules) {
+
+        #$module->{requets} = $c->Q("
+        #    SELECT id, shortcut
+        #    FROM fascicles_requests WHERE module=?
+        #", [ $module->{id} ])->Hashes;
+
+        $module->{bg_color} = $gray;
+        $module->{brd_color} = $black;
+        $module->{txt_color} = $black;
+
+        unless ($module->{place}) {
+            $module->{brd_color} = $red;
+        }
+
+        unless ($module->{place} ~~ $page->{allowed_places}) {
+            $module->{brd_color} = $red;
+        }
+
+        $c->draw_module($img, $grid, $module);
+    }
+
     $c->tx->res->headers->content_type('image/png');
     $c->render_data($img->png);
 }
@@ -210,9 +244,10 @@ sub draw_module {
     my $font;
     my $fontsize;
     my $fontheight;
+
     if ($^O eq "MSWin32") {
-        $font = 'C:\Windows\Fonts\ARIALUNI.TTF';
-        $fontsize = 8;
+        $font = 'C:\Windows\Fonts\lucon.ttf';
+        $fontsize = 7;
         $fontheight = 5;
     }
 
@@ -239,12 +274,13 @@ sub draw_module {
         text        => $text
     );
 
-    $wrapbox->set_font(gdMediumBoldFont);
+    #$wrapbox->set_font(gdMediumBoldFont);
     $wrapbox->set_font($font, $fontsize);
+
     $wrapbox->set(align => 'center', width => $x2-$x1);
 
     my $txty = ($y2-$y1)/2;
-    $txty = $y1+$txty - $fontheight;
+    $txty = $y1+4;
 
     $wrapbox->draw( $x1, $txty);
 

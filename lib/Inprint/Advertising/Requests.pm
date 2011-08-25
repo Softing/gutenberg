@@ -510,9 +510,12 @@ sub download {
 
     my $temp        = $c->uuid;
     my $rootPath    = $c->config->get("store.path");
-    my $tempPath    = File::Spec->tmpdir();
+    my $tempPath    = $c->config->get("store.temp");
     my $tempFolder  = "$tempPath/inprint-$temp";
     my $tempArchive = "$tempPath/inprint-$temp.7z";
+
+    $tempFolder  = __FS_AdaptPath($c, $tempFolder);
+    $tempArchive = __FS_AdaptPath($c, $tempArchive);
 
     mkdir $tempFolder;
 
@@ -541,6 +544,8 @@ sub download {
             my $file_ext = __FS_GetExtension($c, $file_name);
             next unless $file_ext ~~ ["tif", "tiff", "eps", "pdf"];
 
+            $file_name = Encode::decode("utf8", $file_name);
+
             my $pathSource  = $folder ."/".  $file_name;
             my $pathSymlink = $tempFolder ."/". $object->{shortcut} ."__". $file_name;
 
@@ -550,8 +555,8 @@ sub download {
                 $pathSymlink =~ s/\s+/_/g;
             }
 
-            $pathSource  = __FS_ProcessPath($c, $pathSource);
-            $pathSymlink = __FS_ProcessPath($c, $pathSymlink);
+            #$pathSource  = __FS_ProcessPath($c, $pathSource);
+            #$pathSymlink = __FS_ProcessPath($c, $pathSymlink);
 
             next unless (-e -r $pathSource);
 
@@ -573,20 +578,19 @@ sub download {
 
     my $archname = "Downloads_for_${year}_${mon}_${mday}_${hour}${min}${sec}";
 
-    $c->res->content->asset(Mojo::Asset::File->new(path => $tempArchive));
-
-    my $headers = Mojo::Headers->new;
-    $headers->add("Content-Type", "application/x-7z-compressed;name=$archname.7z");
-    $headers->add("Content-Disposition", "attachment;filename=$archname.7z");
-    $headers->add("Content-Description", "7z");
-    $headers->add("Content-Length", -s $tempArchive);
-    $c->res->content->headers($headers);
-
     $c->on_finish(sub {
         unlink $tempArchive;
     });
 
-    $c->render_static($tempArchive);
+    $c->tx->res->headers->content_length(-s $tempArchive);
+    $c->tx->res->headers->content_disposition("attachment;name=$archname.7z");
+    $c->tx->res->headers->content_type("application/x-7z-compressed;name=$archname.7z");
+
+    $c->res->content->asset(
+        Mojo::Asset::File->new(path => $tempArchive )
+    );
+
+    $c->render();
 }
 
 sub delete {

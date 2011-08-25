@@ -71,26 +71,26 @@ Inprint.calendar.fascicles.Toolbar = function (scope) {
                 scale: 'small'
             },
             items: [
-                {
-                    id: "disable",
-                    disabled: true,
-                    ref: "../../btnDisable",
-                    icon: _ico("control-pause"),
-                    cls: 'x-btn-text-icon',
-                    text    : _('Pause'),
-                    scope: scope,
-                    handler : scope.cmpDisable
-                },
-                {
-                    id: "enable",
-                    disabled: true,
-                    ref: "../../btnEnable",
-                    icon: _ico("control"),
-                    cls: 'x-btn-text-icon',
-                    text    : _('Enable'),
-                    scope: scope,
-                    handler : scope.cmpEnable
-                },
+                //{
+                //    id: "disable",
+                //    disabled: true,
+                //    ref: "../../btnDisable",
+                //    icon: _ico("control-pause"),
+                //    cls: 'x-btn-text-icon',
+                //    text    : _('Pause'),
+                //    scope: scope,
+                //    handler : scope.cmpDisable
+                //},
+                //{
+                //    id: "enable",
+                //    disabled: true,
+                //    ref: "../../btnEnable",
+                //    icon: _ico("control"),
+                //    cls: 'x-btn-text-icon',
+                //    text    : _('Enable'),
+                //    scope: scope,
+                //    handler : scope.cmpEnable
+                //},
                 {
                     id: 'format',
                     disabled: true,
@@ -100,17 +100,17 @@ Inprint.calendar.fascicles.Toolbar = function (scope) {
                     cls: 'x-btn-text-icon',
                     scope: scope,
                     handler: scope.cmpFormat
-                },
-                {
-                    id: 'print',
-                    disabled: false,
-                    text: _("Production calendar"),
-                    ref: "../../btnPrintCalendar",
-                    icon: _ico("printer"),
-                    cls: 'x-btn-text-icon',
-                    scope: scope,
-                    handler: scope.cmpPrintCalendar
                 }
+                //{
+                //    id: 'print',
+                //    disabled: false,
+                //    text: _("Production calendar"),
+                //    ref: "../../btnPrintCalendar",
+                //    icon: _ico("printer"),
+                //    cls: 'x-btn-text-icon',
+                //    scope: scope,
+                //    handler: scope.cmpPrintCalendar
+                //}
             ]
         }
 

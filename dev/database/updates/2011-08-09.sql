@@ -47,6 +47,47 @@ CREATE TABLE "public"."template_page" (
 	CONSTRAINT "template_page_origin_fkey" FOREIGN KEY ("origin") REFERENCES "public"."ad_pages" ("id") ON DELETE RESTRICT ON UPDATE NO ACTION
 );
 
+CREATE TABLE "public"."template_module" (
+"id" uuid DEFAULT uuid_generate_v4() NOT NULL,
+"edition" uuid NOT NULL,
+"template" uuid NOT NULL,
+"place" uuid NOT NULL,
+"origin" uuid NOT NULL,
+"title" varchar NOT NULL,
+"description" varchar,
+"amount" int4 DEFAULT 1 NOT NULL,
+"w" varchar,
+"h" varchar,
+"area" float8 DEFAULT 0 NOT NULL,
+"created" timestamptz(6) DEFAULT now(),
+"updated" timestamptz(6) DEFAULT now(),
+"width" float4 DEFAULT 0 NOT NULL,
+"height" float4 DEFAULT 0 NOT NULL,
+"fwidth" float4 DEFAULT 0 NOT NULL,
+"fheight" float4 DEFAULT 0 NOT NULL,
+CONSTRAINT "template_module_pkey" PRIMARY KEY ("id"),
+CONSTRAINT "template_module_template_fkey" FOREIGN KEY ("template") REFERENCES "public"."template" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+CONSTRAINT "template_module_origin_fkey" FOREIGN KEY ("origin") REFERENCES "public"."ad_modules" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+CONSTRAINT "template_module_place_fkey" FOREIGN KEY ("place") REFERENCES "public"."ad_places" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+CREATE TABLE "public"."template_map_module" (
+"id" uuid DEFAULT uuid_generate_v4() NOT NULL,
+"edition" uuid NOT NULL,
+"template" uuid NOT NULL,
+"module" uuid NOT NULL,
+"page" uuid,
+"placed" bool DEFAULT false NOT NULL,
+"x" varchar,
+"y" varchar,
+"created" timestamptz(6) DEFAULT now(),
+"updated" timestamptz(6) DEFAULT now(),
+CONSTRAINT "template_map_module_pkey" PRIMARY KEY ("id"),
+CONSTRAINT "template_map_module_template_fkey" FOREIGN KEY ("template") REFERENCES "public"."template" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+CONSTRAINT "template_map_module_module_fkey" FOREIGN KEY ("module") REFERENCES "public"."template_module" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+CONSTRAINT "template_map_module_page_fkey" FOREIGN KEY ("page") REFERENCES "public"."template_page" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
 /*
 CREATE TABLE "public"."fascicles_ad" (
 	"id" uuid DEFAULT uuid_generate_v4() NOT NULL,

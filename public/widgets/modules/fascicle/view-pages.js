@@ -61,7 +61,7 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
                             string += '</div>';
 
                             string += '<div class="inprint-plan-page-body"'+
-                                ' style="background:url(/aimgs/fascicle/page/'+ page.id +'/105/129/?rnd='+ Math.random() +') no-repeat;">';
+                                ' style="background:url(/aimgs/fascicle/page/'+ page.id +'/200/240/?rnd='+ Math.random() +') no-repeat;">';
 
                             if (page.holes) {
                                 string += '<div style="clear:both"></div>';

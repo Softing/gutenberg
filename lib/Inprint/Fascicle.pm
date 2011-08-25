@@ -36,12 +36,24 @@ sub seance {
     my $summary;
 
     unless (@errors) {
-        $fascicle = $c->Q(" SELECT * FROM fascicles WHERE id =? ", [ $i_fascicle ])->Hash;
+        $fascicle = $c->Q("
+            -- SELECT * FROM fascicles WHERE id =?
+            SELECT
+                t1.*, t2.id as edition, t2.shortcut as edition_shortcut
+            FROM fascicles t1, editions t2
+            WHERE 1=1
+                AND t1.edition = t2.id
+                AND t1.id =?
+            ",
+            [ $i_fascicle ])->Hash;
+
         push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
             unless $fascicle;
     }
 
     unless (@errors) {
+
+        $fascicle->{shortcut} = "$fascicle->{edition_shortcut}/$fascicle->{shortcut}";
 
         $pages     = $c->getPages($fascicle->{id});
 
@@ -428,6 +440,8 @@ sub getPages {
     ", [ $fascicle ])->Hashes;
 
     foreach my $item (@$dbdocuments) {
+
+        $item->{title} =~ s/"/&quot;/ig;
 
         $index->{$item->{id}} = $idcounter++;
 

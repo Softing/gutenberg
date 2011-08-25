@@ -59,7 +59,17 @@ Inprint.fascicle.template.composer.View = Ext.extend(Ext.DataView, {
                             string += '</div>';
 
                             string += '<div class="inprint-plan-page-body"'+
-                                ' style="background:url(/aimgs/template/page/'+ page.id +'/105/129/?rnd='+ Math.random() +') no-repeat;">';
+                                ' style="background:url(/aimgs/template/page/'+ page.id +'/200/240/?rnd='+ Math.random() +') no-repeat;">';
+
+                            if (page.holes) {
+                                string += '<div style="clear:both"></div>';
+                                string += '<div class="inprint-plan-page-holes">';
+                                for (var d=0; d<page.holes.length; d++) {
+                                    var hole = items.holes[ page.holes[d] ];
+                                    string += '<div class="inprint-plan-page-hole">'+ hole.title +'</div>';
+                                }
+                                string += '</div>';
+                            }
 
                             string += '</div>';
 

@@ -217,7 +217,7 @@ sub copyFromIssue {
 
     }
 
-    # Import AD Pages && Modules
+    # Import templates for pages and modules
 
     my $tmpl_pages   = $c->Q("
             SELECT id, origin, title, description, bydefault, w, h, created, updated
@@ -292,7 +292,7 @@ sub copyFromIssue {
 
     }
 
-    # Import AD Index
+    # Import Index
 
     my $tmpl_places_index = $c->Q("
             SELECT id, edition, place, nature, entity, created, updated
@@ -317,6 +317,25 @@ sub copyFromIssue {
 
     }
 
+    # Import pages
+    my $source_pages = $c->Q("
+            SELECT id, edition, fascicle, origin, headline, seqnum, w, h
+            FROM fascicles_pages
+            WHERE fascicle = ? ",
+        [ $source->{id} ])->Hashes;
+
+    foreach my $page (@$source_pages) {
+
+        my $page_id = $c->uuid();
+
+        my $headline_id = $cache{ $page->{headline} };
+
+        $c->Do("
+            INSERT INTO fascicles_pages(id, edition, fascicle, origin, headline, seqnum, w, h, created, updated)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, now(), now());
+        ", [ $page_id, $edition->{id}, $fascicle->{id}, $page->{origin}, $headline_id, $page->{seqnum}, $page->{w}, $page->{h} ]);
+
+    }
 }
 
 sub clearFascicle {
@@ -352,6 +371,10 @@ sub copyFromTemplate {
         SELECT * FROM fascicles WHERE id=?;
         ", [ $to ])->Hash;
 
+    my $edition = $c->Q("
+        SELECT * FROM editions WHERE id=?; ",
+        [ $fascicle->{edition} ])->Hash;
+
     my $template = $c->Q("
         SELECT * FROM template WHERE id=?;
         ", [ $tmpl ])->Hash;
@@ -360,7 +383,7 @@ sub copyFromTemplate {
     return unless ($template->{id});
 
     clearFascicle($c, $to);
-    my $cache = copyFromDefaults($c, $to, $tmpl);
+    my $cache = copyFromDefaults($c, $to);
 
     # Import templates
 
@@ -378,7 +401,12 @@ sub copyFromTemplate {
 
     foreach my $page (@$pages) {
 
+        my $page_id = $c->uuid();
+
+        $cache{ $page->{id} } = $page_id;
+
         my $headline = $cache->{$page->{headline}};
+
         my $tmplpage = $c->Q("
             SELECT * FROM fascicles_tmpl_pages
             WHERE origin=?
@@ -386,18 +414,103 @@ sub copyFromTemplate {
 
         $c->Do("
             INSERT INTO fascicles_pages
-                ( edition, fascicle, origin, headline, seqnum, w, h, created, updated)
-                VALUES (?, ?, ?, ?, ?, ?, ?, now(), now()); ",
+                ( id, edition, fascicle, origin, headline, seqnum, w, h, created, updated)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, now(), now()); ",
             [
+                $page_id,
                 $fascicle->{edition},
                 $fascicle->{id},
                 $tmplpage->{id},
                 $headline,
                 $page->{seqnum},
-                $tmplpage->{width},
-                $tmplpage->{height}
+                $page->{width},
+                $page->{height}
             ]
         );
+    }
+
+    # Import modules
+
+    my $modules = $c->Q("
+        SELECT
+            id, edition, template, place, origin, title, description, amount,
+            w, h, area, created, updated, width, height, fwidth, fheight
+        FROM template_module
+        WHERE template = ? ",
+        [ $tmpl ])->Hashes;
+
+    foreach my $module (@$modules) {
+
+        my $module_id = $c->uuid();
+
+        my $place_id  = $cache->{$module->{place}};
+        my $origin_id = $cache->{$module->{origin}};
+
+        $c->Do("
+            INSERT INTO fascicles_modules
+                ( id, edition, fascicle, place, origin, title, description, amount,
+                    w, h, area, width, height, fwidth, fheight, created, updated )
+                VALUES (
+                    ?,
+                    ?, ?, ?, ?,
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                    now(), now()); ",
+            [
+
+                $module_id,
+
+                $fascicle->{edition},
+                $fascicle->{id},
+                $place_id,
+                $origin_id,
+
+                $module->{title},
+                $module->{description},
+                $module->{amount},
+                $module->{w},
+                $module->{h},
+                $module->{area},
+                $module->{width},
+                $module->{height},
+                $module->{fwidth},
+                $module->{fheight}
+            ]
+        );
+
+        my $maps = $c->Q("
+            SELECT
+                id, edition, template, module, page, placed, x, y, created, updated
+            FROM template_map_module
+            WHERE template = ? AND module=?",
+            [ $tmpl, $module->{id} ])->Hashes;
+
+        foreach my $map (@$maps) {
+
+            my $page_id = $cache{ $map->{page} };
+
+            $c->Do("
+                INSERT INTO fascicles_map_modules
+                    ( edition, fascicle, module, page, placed, x, y, created, updated )
+                    VALUES (
+                        ?, ?, ?, ?,
+                        ?, ?, ?,
+                        now(), now()); ",
+                [
+
+                    $fascicle->{edition},
+                    $fascicle->{id},
+
+                    $module_id,
+                    $page_id,
+
+                    $map->{placed},
+                    $map->{x},
+                    $map->{y}
+                ]
+            );
+
+        }
+
     }
 
 }

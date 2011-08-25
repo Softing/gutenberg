@@ -12,18 +12,23 @@
 }
 
 .inprint-plan-block {
+    width:422px;
+    height:270px;
+
     float:left;
     font-size:10px;
-    width:232px;height:160px;
     margin:10px 15px 0px 0px;
     background:#FAFAFA;
-    
 }
 
 .inprint-plan-page {
-    border: 2px solid silver;
     width:105px;
     height:150px;
+
+    width:200px;
+    height:260px;
+
+    border: 2px solid silver;
     padding:3px;
     background:white;
 }
@@ -52,6 +57,10 @@
 .inprint-plan-page-title {
     width:99px;
     height:12px;
+
+    width:194px;
+    height:12px;
+
     overflow:hidden;
     background:#D6D6D6;
     padding:3px;
@@ -62,8 +71,13 @@
 }
 
 .inprint-plan-page-body {
+
     width:99px;
     height:124px;
+
+    width:200px;
+    height:240px;
+
     overflow:hidden;
     padding:3px;
     -moz-border-radius: 2px;
@@ -74,21 +88,33 @@
 }
 .inprint-plan-page-document a {
     text-decoration:none;
-}
-.inprint-plan-page-document {
+
+    font-size:12px;
+    padding:6px;
     margin:2px;
     float:left;
-    padding:3px;
-    opacity: 0.7;
+    opacity: 0.3;
     background:#1B9BE0;
     border-radius: 2px;
     -moz-border-radius: 2px;
     -webkit-border-radius: 2px;
     line-height:9px;
+    color:white;
+
+}
+.inprint-plan-page-document a:hover {
+    opacity: 1;
+    background:#1B9BE0;
+    border-radius: 2px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+}
+.inprint-plan-page-document {
+
 }
 
 .inprint-plan-page-holes {
-    
+
 }
 .inprint-plan-page-hole {
     margin:2px;
@@ -102,7 +128,7 @@
 }
 
 .inprint-plan-page-requests {
-    
+
 }
 .inprint-plan-page-request {
     margin:2px;

@@ -6,9 +6,9 @@ Inprint.cmp.composer.Modules = Ext.extend(Ext.ux.tree.TreeGrid, {
         this.components = {};
 
         this.urls = {
-            "list":        "/fascicle/composer/modules/",
-            "create": _url("/fascicle/modules/create/"),
-            "delete": _url("/fascicle/modules/delete/")
+            "list":   this.parent.urls.modulesList,
+            "create": this.parent.urls.modulesCreate,
+            "delete": this.parent.urls.modulesDelete
         };
 
         this.columns = [

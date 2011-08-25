@@ -41,11 +41,14 @@ sub __FS_EncodePath {
 sub __FS_ProcessPath {
     my ($c, $string) = @_;
     $string =~ s/\//\\/g    if ($^O eq "MSWin32");
+
     $string =~ s/\\+/\\/g   if ($^O eq "MSWin32");
     $string =~ s/\\/\//g    if ($^O eq "darwin");
     $string =~ s/\/+/\//g   if ($^O eq "darwin");
+
     $string =~ s/\\/\//g    if ($^O eq "linux");
     $string =~ s/\/+/\//g   if ($^O eq "linux");
+
     $string = Encode::encode("cp1251", $string) if ($^O eq "MSWin32");
     $string = Encode::encode("utf8", $string)   if ($^O eq "darwin");
     $string = Encode::encode("utf8", $string)   if ($^O eq "linux");
@@ -58,17 +61,19 @@ sub __FS_CreateTempArchive {
 
     my $cmd;
 
+    $fileListString .= " *.none ";
+
     if ($^O eq "MSWin32") {
-        $cmd = " LANG=ru_RU.UTF-8 7z a -l -mx0 \"$tempArchive\" $fileListString >/dev/null 2>&1 ";
+        $cmd = '"C:\Program Files (x86)\7-Zip\7z"'. " a -mx0 \"$tempArchive\" $fileListString > null";
     }
     if ($^O eq "darwin") {
-        $cmd = " LANG=ru_RU.UTF-8 /opt/local/bin/7z a -l -mx0 \"$tempArchive\" $fileListString >/dev/null 2>&1 ";
+        $cmd = " LANG=ru_RU.UTF-8 /opt/local/bin/7z a -mx0 \"$tempArchive\" $fileListString > /dev/null 2>&1 ";
     }
     if ($^O eq "linux") {
-        $cmd = " LANG=ru_RU.UTF-8 7z a -l -mx0 \"$tempArchive\" $fileListString >/dev/null 2>&1 ";
+        $cmd = " LANG=ru_RU.UTF-8 7z a -mx0 \"$tempArchive\" $fileListString > /dev/null 2>&1 ";
     }
 
-    system($cmd) if $fileListString;
+    system($cmd);
 
     return $tempArchive;
 }

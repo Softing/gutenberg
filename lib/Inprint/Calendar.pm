@@ -91,6 +91,12 @@ sub list {
     my $edition  = $c->Q("SELECT * FROM editions WHERE id=?", [ $i_edition ])->Hash;
     my $editions = $c->objectBindings("editions.documents.work:*");
 
+    my $bindings = $c->objectBindings([
+        "editions.fascicle.view:*", "editions.attachment.manage:*" ]);
+
+    my $subbindings = $c->objectBindings([
+        "editions.attachment.view:*", "editions.attachment.manage:*" ]);
+
     # Common sql
     my $sql = "
         SELECT
@@ -120,8 +126,11 @@ sub list {
     ";
 
     # Parent query
-    my $sql_parent = $sql . " AND edition=? ";
+    my $sql_parent = $sql . " AND t1.edition=? ";
     push @params, $edition->{id};
+
+    $sql_parent .= " AND t1.edition = ANY(?) ";
+    push @params, $bindings;
 
     $sql_parent .= " AND t1.archived = true "      if ($i_archive eq "true");
     $sql_parent .= " AND t1.archived = false "     if ($i_archive eq "false");
@@ -139,12 +148,18 @@ sub list {
         $node->{expanded} = $c->json->true;
         $node->{icon} = "/icons/blue-folder-small-horizontal.png";
 
+        my @subparams;
         my $sql_childrens = $sql;
 
+        $sql_childrens .= " AND t1.edition = ANY(?) ";
+        push @subparams, $subbindings;
+
         $sql_childrens .= " AND t1.parent=? ";
+        push @subparams, $node->{id};
+
         $sql_childrens .= " ORDER BY t1.release_date DESC ";
 
-        $node->{children} = $c->Q($sql_childrens, [ $node->{id} ])->Hashes;
+        $node->{children} = $c->Q($sql_childrens, \@subparams)->Hashes;
 
         foreach my $subnode (@{ $node->{children} }) {
             $node->{leaf} = $c->json->false;
@@ -155,9 +170,14 @@ sub list {
 
     }
 
+    my @subparams;
     my $sql_childrens = $sql;
 
     $sql_childrens .= " AND edition=? ";
+    push @subparams, $edition->{id};
+
+    $sql_childrens .= " AND t2.id = ANY(?) ";
+    push @subparams, $subbindings;
 
     $sql_childrens .= " AND t1.fastype='attachment' ";
 
@@ -166,7 +186,7 @@ sub list {
 
     $sql_childrens .= " ORDER BY t1.release_date DESC ";
 
-    my $children = $c->Q($sql_childrens, [ $edition->{id} ])->Hashes;
+    my $children = $c->Q($sql_childrens, \@subparams)->Hashes;
 
     foreach my $node (@$children) {
 

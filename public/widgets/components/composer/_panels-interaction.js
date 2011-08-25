@@ -33,7 +33,7 @@ Inprint.cmp.composer.Interaction = function(parent, panels) {
     modules.on("templateDroped", function(mapping) {
 
         Ext.Ajax.request({
-            url: _url("/fascicle/modules/create/"),
+            url: parent.urls.modulesCreate,
             scope:this,
             params: {
                 fascicle: parent.fascicle,

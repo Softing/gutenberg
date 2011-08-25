@@ -235,7 +235,19 @@ Inprint.fascicle.template.composer.Pages = Ext.extend(Ext.Panel, {
 
         var wndw = new Inprint.cmp.Composer({
             fascicle: this.parent.fascicle,
-            selection: selection
+            selection: selection,
+            urls: {
+
+                "flashInit":     _url("/template/composer-init/"),
+                "flashSave":     _url("/template/composer-save/"),
+
+                "modulesList":   "/template/module-list/",
+                "modulesCreate": _url("/template/module-create/"),
+                "modulesDelete": _url("/template/module-delete/"),
+
+                "templatesList": "/template/template-list/"
+
+            }
         });
 
         wndw.on("actioncomplete", function() {
