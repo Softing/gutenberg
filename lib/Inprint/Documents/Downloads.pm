@@ -180,6 +180,7 @@ sub download {
         $c->Do(" INSERT INTO cache_downloads (member, document, file) VALUES (?,?,?) ", [ $currentMember, $document->{id}, $file->{id} ]);
 
         $fileListString .= ' "'. $pathSymlink .'" ';
+
     }
 
     my $cmd;
@@ -217,7 +218,10 @@ sub download {
         unlink $tempArchive;
     });
 
-    $c->render_static($tempArchive);
+    #$c->render_static($tempArchive);
+    #$c->render();
+
+    $c->smart_render([]);
 }
 
 1;

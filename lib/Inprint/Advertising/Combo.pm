@@ -76,7 +76,7 @@ sub advertisers {
         WHERE t1.edition = t2.id ";
 
     if ($edition_id) {
-        my $editions = $c->objectChildren("editions.advert.view:*", "editions",  $edition_id);
+        my $editions = $c->objectParents("editions", $edition_id, "editions.advert.view:*");
         $sql .= " AND t1.edition = ANY(?)";
         push @data, $editions;
     }

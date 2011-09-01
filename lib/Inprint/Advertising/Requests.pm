@@ -548,6 +548,7 @@ sub download {
 
             my $pathSource  = $folder ."/".  $file_name;
             my $pathSymlink = $tempFolder ."/". $object->{shortcut} ."__". $file_name;
+            my $pathSymlink = $tempFolder ."/__". $file_name;
 
             if ($i_safemode eq 'true') {
                 $pathSymlink = unidecode($pathSymlink);
@@ -565,9 +566,10 @@ sub download {
             die "Can't read symlink $pathSymlink" unless (-e -r $pathSymlink);
 
             $fileListString .= ' "'. $pathSymlink .'" ';
+
         }
     }
-
+    
     __FS_CreateTempArchive($c, $tempArchive, $fileListString);
 
     rmtree($tempFolder);

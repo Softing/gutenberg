@@ -196,6 +196,29 @@ sub register {
             return \@result;
         } );
 
+    $app->helper(
+
+        objectParents => sub {
+
+            my ($c, $table, $id, $term, $member) = @_;
+
+            unless ($member) {
+                $member = $c->getSessionValue("member.id");
+            }
+
+            my $terms = _parseTerms($c, $term);
+            my $nodes = _getNodes($c, $terms, $member);
+
+            my $result = $c->Q("
+                SELECT id FROM $table
+                WHERE 1=1
+                    AND path @> ARRAY( SELECT path FROM editions WHERE id = \$1 )
+                    AND id = ANY(\$2) ",
+                    [ $id, $nodes ])->Values;
+                    
+            return $result;
+        } );
+
 }
 
 # The additional Functions

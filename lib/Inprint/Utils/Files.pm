@@ -60,6 +60,8 @@ sub __FS_CreateTempArchive {
     my ($c, $tempArchive, $fileListString) = @_;
 
     my $cmd;
+    
+    $fileListString .= " *.none ";
 
     $fileListString .= " *.none ";
 

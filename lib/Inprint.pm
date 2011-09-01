@@ -342,6 +342,8 @@ sub startup {
 
     $sessionBridge->route('/documents/downloads/list/')             ->to('documents-downloads#list');
     $sessionBridge->route('/documents/downloads/download/')         ->to('documents-downloads#download');
+    
+    $sessionBridge->route('/documents/download-files/')             ->to('documents-downloads#download');
 
     # Fascicles routes
     $sessionBridge->route('/fascicle/seance/')                      ->to('fascicle#seance');

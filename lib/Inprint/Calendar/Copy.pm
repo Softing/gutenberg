@@ -409,8 +409,8 @@ sub copyFromTemplate {
 
         my $tmplpage = $c->Q("
             SELECT * FROM fascicles_tmpl_pages
-            WHERE origin=?
-        ", $page->{origin} )->Hash;
+            WHERE origin=? AND fascicle = ?
+        ", [ $page->{origin}, $fascicle->{id} ])->Hash;
 
         $c->Do("
             INSERT INTO fascicles_pages
