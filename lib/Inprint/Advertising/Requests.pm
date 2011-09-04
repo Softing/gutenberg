@@ -592,7 +592,8 @@ sub download {
         Mojo::Asset::File->new(path => $tempArchive )
     );
 
-    $c->render();
+    $c->smart_render([]);
+    #$c->render();
 }
 
 sub delete {
