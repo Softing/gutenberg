@@ -258,15 +258,15 @@ sub search {
         my $relativePath = Inprint::Store::Embedded::getRelativePath($c, "documents", $document->{created}, $document->{id}, 1);
         $c->Do("UPDATE documents SET filepath=? WHERE copygroup=?", [ $relativePath, $document->{copygroup} ]);
 
-        # Update images count
-        # my @images = ("jpg", "jpeg", "png", "gif", "bmp", "tiff" );
-        # my $imgCount = $c->Q(" SELECT count(*) FROM cache_files WHERE file_path=? AND file_exists = true AND file_extension=ANY(?) ", [ $relativePath, \@images ])->Value;
-        # $c->Do("UPDATE documents SET images=? WHERE filepath=? ", [ $imgCount || 0, $relativePath ]);
+        # TODO Update images count
+         my @images = ("jpg", "jpeg", "png", "gif", "bmp", "tiff" );
+         my $imgCount = $c->Q(" SELECT count(*) FROM cache_files WHERE file_path=? AND file_exists = true AND file_extension=ANY(?) ", [ $relativePath, \@images ])->Value;
+         $c->Do("UPDATE documents SET images=? WHERE filepath=? ", [ $imgCount || 0, $relativePath ]);
 
-        # Update rsize count
-        # my @documents = ("doc", "docx", "odt", "rtf", "txt" );
-        # my $lengthCount = $c->Q(" SELECT sum(file_length) FROM cache_files WHERE file_path=? AND file_exists = true AND file_extension=ANY(?) ", [ $relativePath, \@documents ])->Value;
-        # $c->Do("UPDATE documents SET rsize=? WHERE filepath=? ", [ $lengthCount || 0, $relativePath ]);
+        # TODO Update rsize count
+         my @documents = ("doc", "docx", "odt", "rtf", "txt" );
+         my $lengthCount = $c->Q(" SELECT sum(file_length) FROM cache_files WHERE file_path=? AND file_exists = true AND file_extension=ANY(?) ", [ $relativePath, \@documents ])->Value;
+         $c->Do("UPDATE documents SET rsize=? WHERE filepath=? ", [ $lengthCount || 0, $relativePath ]);
 
         # Get document pages
         $document->{pages} = __collapsePagesToString($document->{pages});
