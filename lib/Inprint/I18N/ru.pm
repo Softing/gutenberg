@@ -105,7 +105,7 @@ our %Lexicon = (
  => "Все",
 
     "All available"
- => "",
+ => "Все доступные",
 
     "All departments"
  => "Все отделы",
@@ -1038,7 +1038,7 @@ our %Lexicon = (
  => "",
 
     "Reports"
- => "",
+ => "Отчеты",
 
     "Request"
  => "Заявка",

@@ -108,7 +108,7 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
                                     }
 
                                     string += '<div  class="inprint-plan-page-document">'+
-                                        '<a href="#" onClick="Inprint.ObjectResolver.resolve({aid:\'document-profile\',oid:\''+ document.id +'\',text:\''+ document.title +'\'});return false;"">'+
+                                        '<a href="#" onClick="Inprint.ObjectResolver.resolve({aid:\'document-profile\',oid:\''+ document.id +'\',text:\''+ escape(document.title) +'\'});return false;"">'+
                                             title +
                                         '</a>'+
                                     '</div>';

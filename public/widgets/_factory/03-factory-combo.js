@@ -158,46 +158,55 @@ Inprint.factory.Combo = function() {
         "/documents/filters/editions/": {
             hiddenName: "edition",
             icon: "toggle-small",
-            fieldLabel: _("Edition")
+            fieldLabel: _("Edition"),
+            emptyText:  _("Edition...")
         },
         "/documents/filters/groups/": {
             hiddenName: "group",
             icon: "toggle-small",
-            fieldLabel: _("Group")
+            fieldLabel: _("Group"),
+            emptyText:  _("Group...")
         },
         "/documents/filters/fascicles/": {
             hiddenName: "fascicle",
             icon:"folder",
-            fieldLabel: _("Fascicle")
+            fieldLabel: _("Fascicle"),
+            emptyText:  _("Fascicle...")
         },
         "/documents/filters/headlines/": {
             hiddenName: "headline",
             icon: "marker",
-            fieldLabel: _("Headline")
+            fieldLabel: _("Headline"),
+            emptyText:  _("Headline...")
         },
         "/documents/filters/rubrics/": {
             hiddenName: "rubric",
             icon: "marker",
-            fieldLabel: _("Rubric")
+            fieldLabel: _("Rubric"),
+            emptyText:  _("Rubric...")
         },
         "/documents/filters/holders/": {
             hiddenName: "holder",
             icon: "user-business",
-            fieldLabel: _("Holder")
+            fieldLabel: _("Holder"),
+            emptyText:  _("Holder...")
         },
         "/documents/filters/managers/": {
             hiddenName: "manager",
             icon: "user-business",
-            fieldLabel: _("Manager")
+            fieldLabel: _("Manager"),
+            emptyText:  _("Manager...")
         },
         "/documents/filters/progress/": {
             hiddenName: "progress",
-            fieldLabel: _("Progress")
+            fieldLabel: _("Progress"),
+            emptyText:  _("Progress...")
         },
 
         "/options/combos/capture-destination/": {
             hiddenName: "capture.destination",
-            fieldLabel: _("Default destination")
+            fieldLabel: _("Default destination"),
+            emptyText:  _("Default destination...")
         }
 
     };

@@ -53,19 +53,56 @@ sub save {
 
         foreach my $string (@i_modules) {
 
-            my ($id, $oldpage, $newpage, $x, $y, $w, $h) = split "::", $string;
+            my ($module_id, $from_page_id, $to_page_id, $x, $y, $w, $h) = split "::", $string;
 
             my $placed = 1;
 
+            my $module = $c->Q("
+                SELECT *
+                FROM fascicles_modules
+                WHERE id=? ",
+                [ $module_id ])->Hash;
+
+            next unless ($module->{id});
+
+            my $from_page = $c->Q("
+                SELECT *
+                FROM fascicles_pages
+                WHERE id=? ",
+                [ $from_page_id ])->Hash;
+
+            next unless ($from_page->{id});
+
+            my $to_page = $c->Q("
+                SELECT *
+                FROM fascicles_pages
+                WHERE id=? ",
+                [ $to_page_id ])->Hash;
+
+            next unless ($to_page->{id});
+
+            next if ($from_page->{edition}  ne $to_page->{edition});
+            next if ($from_page->{fascicle} ne $to_page->{fascicle});
+
+            next if ($to_page->{edition}  ne $module->{edition});
+            next if ($to_page->{fascicle} ne $module->{fascicle});
+
+            # Get mapping
             my $mapping = $c->Q("
                 SELECT * FROM fascicles_map_modules WHERE page=? AND module=? ",
-                [ $oldpage, $id ])->Hash;
+                [ $from_page->{id}, $module->{id} ])->Hash;
 
-            next unless $mapping->{id};
+            if ( $mapping->{id} ) {
+                $c->Do("
+                    UPDATE fascicles_map_modules SET page=?, placed=?, x=?, y=? WHERE id=? ",
+                    [ $to_page->{id}, $placed, $x, $y, $mapping->{id} ]);
+            }
 
-            $c->Do("
-                UPDATE fascicles_map_modules SET page=?, placed=?, x=?, y=? WHERE id=? ",
-                [ $newpage, $placed, $x, $y, $mapping->{id} ]);
+            unless ( $mapping->{id} ) {
+                $c->Do("
+                    INSERT INTO fascicles_map_modules (edition, fascicle, page, placed, x, y)",
+                    [ $module->{edition}, $module->{fascicle}, $to_page->{id}, $placed, $x, $y]);
+            }
         }
     }
 
@@ -135,14 +172,18 @@ sub templates {
 }
 
 sub modules {
+
     my $c = shift;
 
-    my @i_pages    = $c->param("page");
-
-    my $result = [];
-
+    my @result;
     my @errors;
+
     my $success = $c->json->false;
+
+    my $i_filter = $c->param("filter");
+    my @i_pages  = $c->param("page");
+
+    my @filter = split /,\s+/, $i_filter;
 
     my $sql;
     my @params;
@@ -162,15 +203,33 @@ sub modules {
 
         $sql = "
             SELECT DISTINCT
-                t1.id as module, t1.title,
-                t1.description, t1.amount, t1.area, t1.created, t1.updated,
-                t3.id as place, t3.title as place_title,
-                ( SELECT count(*) FROM fascicles_map_modules WHERE module=t1.id ) as count
+                t1.id as module,
+                t1.title,
+                t1.description,
+                t1.amount,
+                t1.area,
+                t1.created,
+                t1.updated,
+                t3.id as place,
+                t3.title as place_title,
+                (
+                    SELECT count(*)
+                    FROM fascicles_map_modules
+                    WHERE 1=1
+                        AND placed = true
+                        AND module=t1.id ) as count,
+                (
+                    SELECT count(*)
+                    FROM fascicles_requests
+                    WHERE 1=1
+                        AND module=t1.id ) as modcount
             FROM
                 fascicles_modules t1
                     LEFT JOIN fascicles_tmpl_places t3 ON ( t1.place = t3.id ),
                 fascicles_map_modules t2
-            WHERE t2.module=t1.id AND t2.page = ANY(?)
+            WHERE 1=1
+                AND t2.module=t1.id
+                AND t2.page = ANY(?)
         ";
 
         push @params, \@pages;
@@ -179,9 +238,25 @@ sub modules {
 
     unless (@errors) {
 
-        $result = $c->Q(" $sql ", \@params)->Hashes;
+        my $nodes = $c->Q(" $sql ", \@params)->Hashes;
 
-        foreach my $node (@{ $result }) {
+        foreach my $node (@{ $nodes }) {
+
+            if ("unmapped" ~~ @filter) {
+                next if ($node->{count} > 0);
+            }
+
+            if ("mapped" ~~ @filter) {
+                next if ($node->{count} == 0);
+            }
+
+            if ("unrequested" ~~ @filter) {
+                next if ($node->{modcount} > 0);
+            }
+
+            if ("requested" ~~ @filter) {
+                next if ($node->{modcount} == 0);
+            }
 
             $node->{id} = $c->uuid;
 
@@ -225,10 +300,12 @@ sub modules {
 
             $node->{shortcut} = $node->{edition_shortcut} ."/". $node->{shortcut};
 
+            push @result, $node;
+
         }
     }
 
-    $c->render_json( $result );
+    $c->render_json( \@result );
 
 }
 

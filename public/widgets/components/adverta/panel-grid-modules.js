@@ -35,7 +35,8 @@ Inprint.cmp.adverta.GridModules = Ext.extend(Ext.ux.tree.TreeGrid, {
         this.loader  = new Ext.tree.TreeLoader({
             dataUrl: this.urls.list,
             baseParams: {
-                page: this.parent.selection
+                page: this.parent.selection,
+                filter: "unmapped, unrequested"
             }
         });
 

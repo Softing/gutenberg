@@ -11,6 +11,7 @@ perl -MCPAN -e "install File::Copy::Recursive"
 perl -MCPAN -e "install HTML::Scrubber"
 perl -MCPAN -e "install GD::Text"
 perl -MCPAN -e "install Text::Unidecode"
-perl -MCPAN -e "install Image::Magick"
 perl -MCPAN -e "install Image::ExifTool"
 perl -MCPAN -e "install Spreadsheet::WriteExcel"
+
+perl -MCPAN -e "install Image::Magick"

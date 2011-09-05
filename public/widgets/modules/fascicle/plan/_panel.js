@@ -19,7 +19,7 @@ Inprint.fascicle.plan.Panel = Ext.extend(Ext.Panel, {
                 cls: 'x-btn-text-icon',
                 scope:this,
                 handler: function() {
-                    window.location = '/fascicle/pages/print/?fascicle='+ this.fascicle +'&mode=landscape&size=a4';
+                    window.location = '/fascicle/print/?fascicle='+ this.fascicle +'&mode=landscape&size=a4';
                 }
             },
             {
@@ -28,7 +28,7 @@ Inprint.fascicle.plan.Panel = Ext.extend(Ext.Panel, {
                 cls: 'x-btn-text-icon',
                 scope:this,
                 handler: function() {
-                    window.location = '/fascicle/pages/print/?fascicle='+ this.fascicle +'&mode=landscape&size=a3';
+                    window.location = '/fascicle/print/?fascicle='+ this.fascicle +'&mode=landscape&size=a3';
                 }
             }
         ];

@@ -342,7 +342,7 @@ sub startup {
 
     $sessionBridge->route('/documents/downloads/list/')             ->to('documents-downloads#list');
     $sessionBridge->route('/documents/downloads/download/')         ->to('documents-downloads#download');
-    
+
     $sessionBridge->route('/documents/download-files/')             ->to('documents-downloads#download');
 
     # Fascicles routes
@@ -394,6 +394,8 @@ sub startup {
     $sessionBridge->route("/fascicle/pages/right/")                 ->to("fascicle-pages#right");
     $sessionBridge->route("/fascicle/pages/resize/")                ->to("fascicle-pages#resize");
     $sessionBridge->route("/fascicle/pages/clean/")                 ->to("fascicle-pages#clean");
+
+    $sessionBridge->route("/fascicle/print/")                       ->to("fascicle-print#print");
 
     $sessionBridge->route("/fascicle/requests/list/")               ->to("fascicle-requests#list");
     $sessionBridge->route("/fascicle/requests/create/")             ->to("fascicle-requests#create");

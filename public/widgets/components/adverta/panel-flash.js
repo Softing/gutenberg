@@ -153,7 +153,7 @@ Inprint.cmp.adverta.Flash = Ext.extend(Ext.Panel, {
             var modules = records[p].arr;
             for (var m=0;m<modules.length;m++) {
                 var module = modules[m];
-                var string = module.fid +'::'+ module.id +'::'+ module.x  +'::'+ module.y  +'::'+ module.w  +'::'+ module.h;
+                var string = module.id +'::'+ module.fid +'::'+ module.fid +'::'+ module.x  +'::'+ module.y  +'::'+ module.w  +'::'+ module.h;
                 data.push(string);
             }
         }

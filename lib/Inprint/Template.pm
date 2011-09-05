@@ -481,10 +481,18 @@ sub template_list {
     }
 
     # Get templates from pages
-    my $templates; unless (@errors) {
-        $templates = $c->Q(" SELECT DISTINCT origin FROM template_page WHERE id= ANY(?) ", [ \@i_pages ])->Values;
+    my $templates;
+    unless (@errors) {
+
+        $templates = $c->Q("
+            SELECT DISTINCT origin
+            FROM template_page
+            WHERE id= ANY(?) ",
+        [ \@i_pages ])->Hashes;
+
         push @errors, { id => "page", msg => "Can't find object!"}
             unless (@$templates);
+
     }
 
     my $sql;
@@ -493,14 +501,23 @@ sub template_list {
 
     unless (@errors) {
 
-        foreach my $tmpl_id (@$templates) {
+        foreach my $template (@$templates) {
 
             push @queries, "
                 SELECT
                     t2.id as id,
-                    t1.edition, t1.page, t1.title, t1.description,
-                    t1.amount, round(t1.area::numeric, 2) as area, t1.x, t1.y, t1.w, t1.h,
-                    t3.id as place, t3.title as place_title,
+                    t1.edition,
+                    t1.page,
+                    t1.title,
+                    t1.description,
+                    t1.amount,
+                    round(t1.area::numeric, 2) as area,
+                    t1.x,
+                    t1.y,
+                    t1.w,
+                    t1.h,
+                    t3.id as place,
+                    t3.title as place_title,
                     t1.created, t1.updated
                 FROM
                     ad_modules t1,
@@ -510,8 +527,9 @@ sub template_list {
                     t1.page=?
                     AND t1.amount=?
                     AND t2.entity = t1.id AND t2.place = t3.id
+                ORDER BY place_title, title
                 ";
-            push @params, $tmpl_id;
+            push @params, $template->{origin};
             push @params, $amount;
         }
 

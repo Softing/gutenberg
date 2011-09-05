@@ -181,26 +181,31 @@ sub templates {
         SELECT
             t1.id, t2.shortcut || '/' || t1.shortcut as title,
             'puzzle' as icon
-        FROM template t1, editions t2
+        FROM
+            template t1,
+            editions t2
         WHERE 1=1
+            AND t1.id <> '00000000-0000-0000-0000-000000000000'
             AND t1.deleted = false
             AND t2.id = t1.edition
     ";
 
-    my $access = $c->objectBindings("editions.template.manage:*");
-    $sql .= " AND edition = ANY(?) ";
+    my $access = $c->objectBindings(["editions.template.view:*", "editions.template.manage:*"]);
+
+    $sql .= " AND t1.edition = ANY(?) ";
     push @data, $access;
 
     $result = $c->Q("
         $sql ORDER BY t2.shortcut, t1.shortcut ",
-        \@data)->Hashes;
+        \@data
+        )->Hashes;
 
-    #unshift @$result, {
-    #    id=> "00000000-0000-0000-0000-000000000000",
-    #    icon => "eraser",
-    #    title => $c->l("Clear"),
-    #    description => $c->l("Remove all pages")
-    #};
+    unshift @$result, {
+        id=> "00000000-0000-0000-0000-000000000000",
+        icon => "leaf",
+        title => $c->l("Default"),
+        description => $c->l("Default template")
+    };
 
     $success = $c->json->true unless (@errors);
     $c->render_json( { data => $result } );

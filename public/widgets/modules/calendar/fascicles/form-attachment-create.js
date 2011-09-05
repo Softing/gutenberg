@@ -34,9 +34,6 @@ Inprint.calendar.fascicles.CreateFascicleFormAttachmentForm = Ext.extend( Ext.fo
                         fieldLabel: _("Template"),
                         name: "source",
                         listeners: {
-                            render: function(combo) {
-                                combo.setValue("00000000-0000-0000-0000-000000000000", _("Defaults"));
-                            },
                             beforequery: function(qe) {
                                 delete qe.combo.lastQuery;
                             }

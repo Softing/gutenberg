@@ -38,10 +38,9 @@ sub create {
     my $i_template     = $c->get_uuid(\@errors, "template");
     my $i_circulation  = $c->get_int(\@errors, "circulation", 1) || 0;
 
-    my $edition  = $c->check_record(\@errors, "editions", "edition", $i_edition);
-
+    my $edition  = $c->check_record(\@errors, "editions",  "edition", $i_edition);
     my $fascicle = $c->check_record(\@errors, "fascicles", "fascicle", $i_parent);
-    my $template = $c->check_record(\@errors, "template", "template", $i_template);
+    my $template = $c->check_record(\@errors, "template",  "template", $i_template);
 
     unless (@errors) {
 
