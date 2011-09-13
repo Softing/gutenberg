@@ -569,7 +569,7 @@ sub download {
 
         }
     }
-    
+
     __FS_CreateTempArchive($c, $tempArchive, $fileListString);
 
     rmtree($tempFolder);
