@@ -66,6 +66,7 @@ sub startup {
     $self->plugin("Inprint::Mojoplugins::Logger");
     $self->plugin("Inprint::Mojoplugins::Render");
     $self->plugin("Inprint::Mojoplugins::Session");
+    $self->plugin("Inprint::Mojoplugins::Utils");
     $self->plugin("Inprint::Mojoplugins::Validation");
 
     # Add routes

@@ -5,7 +5,11 @@ Inprint.catalog.editions.Panel = Ext.extend(Ext.Panel, {
         this.access = {};
         this.panels = {};
 
-        this.panels.tree = new Inprint.panel.tree.Editions();
+        this.panels.tree = new Inprint.panel.tree.Editions({
+            baseParams: {
+                options: "showRoot"
+            }
+        });
         this.panels.grid = new Inprint.catalog.editions.Grid();
         this.panels.help = new Inprint.panels.Help({ hid: this.xtype });
 
@@ -53,14 +57,9 @@ Inprint.catalog.editions.Panel = Ext.extend(Ext.Panel, {
 
     onRender: function() {
         Inprint.catalog.editions.Panel.superclass.onRender.apply(this, arguments);
-        //Inprint.catalog.editions.Access(this, this.panels);
-        Inprint.catalog.editions.Interaction(this, this.panels);
-        //Inprint.catalog.editions.Context(this, this.panels);
-    },
 
-    //getRow: function() {
-    //    return this.panels.grid.getSelectionModel().getSelected().data;
-    //},
+        Inprint.catalog.editions.Interaction(this, this.panels);
+    },
 
     cmpReload:function() {
         this.panels.grid.cmpReload();

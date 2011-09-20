@@ -31,6 +31,14 @@ Inprint.catalog.editions.Interaction = function(parent, panels) {
             disabled = false;
         }
 
+        if (edition && edition.id == NULLID) {
+            var btnCreate = Inprint.getButton("create.item");
+            btnCreate.handler = Inprint.getAction("edition.create").createDelegate(parent, [edition]);
+            btnCreate.disabled = disabled;
+            items.push( btnCreate );
+            new Ext.menu.Menu({ items : items }).show(edition.ui.getAnchor());
+        }
+
         if (edition && edition.id != NULLID) {
 
             var btnCreate = Inprint.getButton("create.item");

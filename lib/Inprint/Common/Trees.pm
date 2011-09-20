@@ -25,6 +25,9 @@ sub editions {
     my $i_node = $c->param("node");
     my $i_term = $c->param("term") // undef;
 
+    my $options = $c->optionalize(
+        $c->param("options"));
+
     # Process root value
     my $root = "00000000-0000-0000-0000-000000000000";
 
@@ -122,6 +125,17 @@ sub editions {
                 }
             }
 
+            if ($options->{showRoot}) {
+                $c->render_json( [{
+                    id          => $root,
+                    text        => $c->l("Publishing house"),
+                    leaf        => $c->json->false,
+                    expanded    => $c->json->true,
+                    icon        => "blue-folders",
+                    disabled    => $c->json->false,
+                    children    => $result
+                }] );
+            }
         }
 
     }
