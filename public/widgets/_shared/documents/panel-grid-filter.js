@@ -12,6 +12,8 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
 
         var xc = Inprint.factory.Combo;
 
+        var options = "mode::" + this.gridmode;
+
         this.items = [
             {
                 width:140,
@@ -28,6 +30,7 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                 minListWidth: 300,
                 url: _url('/common/tree/editions/'),
                 baseParams: {
+                    options: options,
                     term: 'editions.documents.work:*'
                 },
                 rootVisible:true,
@@ -49,6 +52,7 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                 minListWidth: 300,
                 url: _url('/common/tree/workgroups/'),
                 baseParams: {
+                    options: options,
                     term: 'catalog.documents.view:*'
                 },
                 rootVisible:true,
@@ -65,15 +69,16 @@ Inprint.documents.GridFilter = Ext.extend(Ext.FormPanel, {
                 columnWidth:.125,
                 xtype: "treecombo",
                 name: "fascicle",
+                rootVisible:true,
+                minListWidth: 300,
                 fieldLabel: _("Fascicle"),
                 emptyText: _("Fascicle") + "...",
-                minListWidth: 300,
                 url: _url('/common/tree/fascicles/'),
                 baseParams: {
+                    options: options,
                     term: 'editions.documents.work:*',
                     briefcase: true
                 },
-                rootVisible:true,
                 root: {
                     id:'all',
                     nodeType: 'async',

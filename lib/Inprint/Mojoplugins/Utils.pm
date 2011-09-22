@@ -29,9 +29,10 @@ sub register {
             my $result = {};
 
             my @items = split /[,|;]/, $options;
-            
+
             foreach (@items) {
-                $result->{$_} = 1;
+                my ($var, $val) = split "::", $_;
+                $result->{$var} = $val // 1;
             }
 
             return $result;

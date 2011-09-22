@@ -459,11 +459,10 @@ sub startup {
     $sessionBridge->route("/template/composer-init/")                ->to("template#composer_init");
     $sessionBridge->route("/template/composer-save/")                ->to("template#composer_save");
 
-    $sessionBridge->route("/template/module-list/")                 ->to("template#module_list");
+    $sessionBridge->route("/template/module-list/")                  ->to("template#module_list");
     $sessionBridge->route("/template/module-create/")                ->to("template#module_create");
     $sessionBridge->route("/template/module-delete/")                ->to("template#module_delete");
-
-    $sessionBridge->route("/template/template-list/")               ->to("template#template_list");
+    $sessionBridge->route("/template/template-list/")                ->to("template#template_list");
 
     # Files
     $self->routes->route('/files/preview/:id')                      ->to('files#preview');

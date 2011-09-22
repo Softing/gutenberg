@@ -485,7 +485,7 @@ sub template_list {
     unless (@errors) {
 
         $templates = $c->Q("
-            SELECT DISTINCT origin
+            SELECT *
             FROM template_page
             WHERE id= ANY(?) ",
         [ \@i_pages ])->Hashes;
@@ -495,15 +495,11 @@ sub template_list {
 
     }
 
-    my $sql;
-    my @queries;
-    my @params;
-
     unless (@errors) {
 
         foreach my $template (@$templates) {
 
-            push @queries, "
+            my $sql = "
                 SELECT
                     t2.id as id,
                     t1.edition,
@@ -523,23 +519,30 @@ sub template_list {
                     ad_modules t1,
                     ad_index t2,
                     ad_places t3
-                WHERE
-                    t1.page=?
-                    AND t1.amount=?
-                    AND t2.entity = t1.id AND t2.place = t3.id
-                ORDER BY place_title, title
-                ";
+                WHERE 1=1
+                    AND t1.page   =?
+                    AND t1.amount =?
+                    AND t2.entity = t1.id
+                    AND t2.place  = t3.id
+                    AND t2.edition = t1.edition
+                    AND t3.edition = t1.edition
+                ORDER BY place_title, title ";
+
+            my   @params;
             push @params, $template->{origin};
             push @params, $amount;
+
+            #die $template->{origin};
+            #die $amount;
+
+            my $modules = $c->Q($sql, \@params)->Hashes;
+
+            foreach (@$modules) {
+                push @$result, $_;
+            }
+
         }
 
-        $sql = join "\n INTERSECT \n", @queries;
-
-    }
-
-    unless (@errors) {
-        $result = $c->Q(" $sql ", \@params)->Hashes;
-        $c->render_json( { data => $result } );
     }
 
     $c->smart_render(\@errors, $result);

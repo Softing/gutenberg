@@ -164,6 +164,9 @@ sub fascicles {
     my $i_briefcase = $c->param("briefcase") // 0;
     my $i_trashcan  = $c->param("trashcan")  // 0;
 
+    my $options = $c->optionalize(
+        $c->param("options"));
+
     # Process root value
     my $root = "00000000-0000-0000-0000-000000000000";
 
@@ -187,10 +190,21 @@ sub fascicles {
                 editions.id as edition, editions.shortcut as edition_shortcut
             FROM fascicles, editions
             WHERE 1=1
-                AND editions.id = fascicles.edition
+                AND editions.id = fascicles.edition ";
+
+        if ($options->{mode} eq "archive")
+        {
+            $sql .= "
+                AND fascicles.archived = true
+                AND fascicles.deleted  = false ";
+        }
+        else
+        {
+            $sql .= "
                 AND fascicles.enabled  = true
                 AND fascicles.archived = false
                 AND fascicles.deleted  = false ";
+        }
 
         my $icon;
         my $bindings;
@@ -241,7 +255,14 @@ sub fascicles {
             push @params, $i_node;
         }
 
-        $sql .= " ORDER BY fascicles.shortcut ";
+        if ($options->{mode} eq "archive")
+        {
+            $sql .= " ORDER BY fascicles.shortcut DESC ";
+        }
+        else
+        {
+            $sql .= " ORDER BY fascicles.shortcut ASC ";
+        }
 
         # Do SQL query
         my $data = $c->Q($sql, \@params)->Hashes;
@@ -333,6 +354,9 @@ sub workgroups {
     # Get variables from POST
     my $i_node = $c->param("node") // 0;
     my $i_term = $c->param("term") // 0;
+
+    my $options = $c->optionalize(
+        $c->param("options"));
 
     # Process root value
     my $root = "00000000-0000-0000-0000-000000000000";

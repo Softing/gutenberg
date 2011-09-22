@@ -34,12 +34,10 @@ Inprint.documents.GridColumns = function() {
                 }
 
                 var header = String.format(
-                    '<a style="color:{2}" href="/workspace/?aid=document-profile&oid={0}&text={1}" '+
-                        'onClick="'+
-                            "Inprint.ObjectResolver.resolve({aid:'document-profile',oid:'{0}',text:'{1}'});"+
-                        'return false;">{1}'+
-                    '</a>',
-                    record.data.id, value, color
+                    "<a style=\"color:{3}\" href=\"/workspace/?aid=document-profile&oid={0}&text={1}\""+
+                        " onClick=\"Inprint.ObjectResolver.resolve({aid:'document-profile',oid:'{0}',text:'{1}'});return false;\">{2}"+
+                    "</a>",
+                    record.data.id, escape(value), value, color
                 );
 
                 var access = record.get("access");
