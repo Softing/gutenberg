@@ -189,10 +189,38 @@ sub unarchive {
 
     my @errors;
 
-    my $i_id           = $c->get_uuid(\@errors, "id");
+    my $i_id = $c->get_uuid(\@errors, "id");
 
     unless (@errors) {
         Inprint::Models::Fascicle::unarchive($c, $i_id);
+    }
+
+    $c->smart_render(\@errors);
+}
+
+sub approval {
+    my $c = shift;
+
+    my @errors;
+
+    my $i_id           = $c->get_uuid(\@errors, "id");
+
+    unless (@errors) {
+        Inprint::Models::Fascicle::approval($c, $i_id);
+    }
+
+    $c->smart_render(\@errors);
+}
+
+sub work {
+    my $c = shift;
+
+    my @errors;
+
+    my $i_id = $c->get_uuid(\@errors, "id");
+
+    unless (@errors) {
+        Inprint::Models::Fascicle::work($c, $i_id);
     }
 
     $c->smart_render(\@errors);

@@ -53,10 +53,15 @@ Inprint.Help = Ext.extend(Ext.Panel, {
 Inprint.Logout = function(btn) {
     if ( btn == 'yes' ) {
         window.location = '/logout/';
-    } else if ( btn == 'no' ) {
+    }
+    else if ( btn == 'no' ) {
         return;
-    } else {
-        Ext.MessageBox.confirm(_("Logout"), _("Are you want to logout?"), Inprint.Logout);
+    }
+    else {
+        Ext.MessageBox.confirm(
+            _("Quit"),
+            _("Do you want to quit?"),
+            Inprint.Logout);
     }
 };
 

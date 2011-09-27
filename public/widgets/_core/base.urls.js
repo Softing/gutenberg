@@ -41,6 +41,8 @@ Inprint.sources = {
     "fascicle.deadline":                "/calendar/fascicle/deadline/",
     "fascicle.archive":                 "/calendar/fascicle/archive/",
     "fascicle.unarchive":               "/calendar/fascicle/unarchive/",
+    "fascicle.work":                    "/calendar/fascicle/work/",
+    "fascicle.approval":               "/calendar/fascicle/approval/",
     "fascicle.enable":                  "/calendar/fascicle/enable/",
     "fascicle.disable":                 "/calendar/fascicle/disable/",
     "fascicle.template":                "/calendar/fascicle/template/",

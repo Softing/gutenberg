@@ -128,7 +128,7 @@ Inprint.calendar.fascicles.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
         var form = new Inprint.calendar.fascicles.CreateFascicleFormAttachmentForm();
 
         form.setParent(this.cmpGetSelectedNode().id);
-    
+
         var wndw = this.cmpCreateWindow(
             360, 180,
             form, _("New attachment"),
@@ -241,20 +241,63 @@ Inprint.calendar.fascicles.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
 
     },
 
-    cmpArchive: function(btn) {
-
-        if (btn != 'yes' && btn != 'no') {
+    cmpSendApproval: function(btn) {
+        if (btn instanceof Object) {
             Ext.MessageBox.show({
                 scope: this,
-                title: _("Important event"),
-                msg: _("Archive the specified item?"),
-                fn: this.cmpArchive,
+                fn: this.cmpSendApproval,
                 buttons: Ext.Msg.YESNO,
-                icon: Ext.MessageBox.WARNING
+                icon: Ext.MessageBox.WARNING,
+                title: _("Important event"),
+                msg: _("Send for approval?")
             });
-            return;
         }
+        if (btn == 'yes') {
+            Ext.Ajax.request({
+                url: _source("fascicle.approval"),
+                params: {
+                    id: this.cmpGetSelectedNode().id
+                },
+                scope: this,
+                success: this.cmpReloadWithMenu
+            });
+        }
+    },
 
+    cmpSendWork: function(btn) {
+        if (btn instanceof Object) {
+            Ext.MessageBox.show({
+                scope: this,
+                fn: this.cmpSendWork,
+                buttons: Ext.Msg.YESNO,
+                icon: Ext.MessageBox.WARNING,
+                title: _("Important event"),
+                msg: _("Begin work?")
+            });
+        }
+        if (btn == 'yes') {
+            Ext.Ajax.request({
+                url: _source("fascicle.work"),
+                params: {
+                    id: this.cmpGetSelectedNode().id
+                },
+                scope: this,
+                success: this.cmpReloadWithMenu
+            });
+        }
+    },
+
+    cmpSendArchive: function(btn) {
+        if (btn instanceof Object) {
+            Ext.MessageBox.show({
+                scope: this,
+                fn: this.cmpSendArchive,
+                buttons: Ext.Msg.YESNO,
+                icon: Ext.MessageBox.WARNING,
+                title: _("Important event"),
+                msg: _("Archive issue?")
+            });
+        }
         if (btn == 'yes') {
             Ext.Ajax.request({
                 url: _source("fascicle.archive"),
@@ -265,10 +308,9 @@ Inprint.calendar.fascicles.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
                 success: this.cmpReloadWithMenu
             });
         }
-
     },
 
-    cmpEnable: function(btn) {
+    cmpDoEnable: function(btn) {
         Ext.Ajax.request({
             url: _source("fascicle.enable"),
             params: {
@@ -279,7 +321,7 @@ Inprint.calendar.fascicles.Grid = Ext.extend(Ext.ux.tree.TreeGrid, {
         });
     },
 
-    cmpDisable: function(btn) {
+    cmpDoDisable: function(btn) {
         Ext.Ajax.request({
             url: _source("fascicle.disable"),
             params: {

@@ -25,7 +25,7 @@ sub index
     my $AboutSection = {
         id => "core",
         menu => [
-            { id=> "core-help" },
+            #{ id=> "core-help" },
             { id=> "core-about" }
         ]
     };
@@ -184,7 +184,7 @@ sub index
     push @{ $EmployeeSection->{menu} }, { id => "employee-settings" };
     push @{ $EmployeeSection->{menu} }, "-";
     push @{ $EmployeeSection->{menu} }, { id => "employee-access" };
-    push @{ $EmployeeSection->{menu} }, { id => "employee-logs" };
+    #push @{ $EmployeeSection->{menu} }, { id => "employee-logs" };
     push @{ $EmployeeSection->{menu} }, "-";
     push @{ $EmployeeSection->{menu} }, { id => "employee-logout" };
 
@@ -199,13 +199,12 @@ sub index
     if ($accessViewSettings) {
         push @{ $SettingsSection->{menu} }, { id => "settings-organization" };
         push @{ $SettingsSection->{menu} }, { id => "settings-editions" };
-        #push @{ $SettingsSection->{menu} }, { id => "settings-roles" };
         push @{ $SettingsSection->{menu} }, { id => "settings-readiness" };
         push @{ $SettingsSection->{menu} }, { id => "settings-index" };
 
-        push @{ $SettingsSection->{menu} }, "-";
-        push @{ $SettingsSection->{menu} }, { id => "system-settings" };
-        push @{ $SettingsSection->{menu} }, { id => "system-logs" };
+        #push @{ $SettingsSection->{menu} }, "-";
+        #push @{ $SettingsSection->{menu} }, { id => "system-settings" };
+        #push @{ $SettingsSection->{menu} }, { id => "system-logs" };
     }
 
     ############################################################################

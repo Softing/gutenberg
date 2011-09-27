@@ -38,7 +38,7 @@ Inprint.calendar.fascicles.Toolbar = function (scope) {
                     cls: 'x-btn-text-icon',
                     icon: _ico("arrow-join"),
                     scope: scope,
-                    handler: scope.cmpDoApproval
+                    handler: scope.cmpSendApproval
                 },
                 {
                     id: 'doWorking',
@@ -48,7 +48,7 @@ Inprint.calendar.fascicles.Toolbar = function (scope) {
                     cls: 'x-btn-text-icon',
                     icon: _ico("arrow"),
                     scope: scope,
-                    handler: scope.cmpDoWorking
+                    handler: scope.cmpSendWork
                 },
                 {
                     id: 'doArchive',
@@ -58,7 +58,7 @@ Inprint.calendar.fascicles.Toolbar = function (scope) {
                     cls: 'x-btn-text-icon',
                     icon: _ico("arrow-stop"),
                     scope: scope,
-                    handler: scope.cmpDoArchive
+                    handler: scope.cmpSendArchive
                 }
             ]
         },
@@ -71,26 +71,26 @@ Inprint.calendar.fascicles.Toolbar = function (scope) {
                 scale: 'small'
             },
             items: [
-                //{
-                //    id: "disable",
-                //    disabled: true,
-                //    ref: "../../btnDisable",
-                //    icon: _ico("control-pause"),
-                //    cls: 'x-btn-text-icon',
-                //    text    : _('Pause'),
-                //    scope: scope,
-                //    handler : scope.cmpDisable
-                //},
-                //{
-                //    id: "enable",
-                //    disabled: true,
-                //    ref: "../../btnEnable",
-                //    icon: _ico("control"),
-                //    cls: 'x-btn-text-icon',
-                //    text    : _('Enable'),
-                //    scope: scope,
-                //    handler : scope.cmpEnable
-                //},
+                {
+                    id: "disable",
+                    disabled: true,
+                    ref: "../../btnDisable",
+                    icon: _ico("control-pause"),
+                    cls: 'x-btn-text-icon',
+                    text    : _('Pause'),
+                    scope: scope,
+                    handler : scope.cmpDoDisable
+                },
+                {
+                    id: "enable",
+                    disabled: true,
+                    ref: "../../btnEnable",
+                    icon: _ico("control"),
+                    cls: 'x-btn-text-icon',
+                    text    : _('Enable'),
+                    scope: scope,
+                    handler : scope.cmpDoEnable
+                },
                 {
                     id: 'format',
                     disabled: true,

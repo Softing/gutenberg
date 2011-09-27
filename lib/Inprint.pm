@@ -152,7 +152,6 @@ sub startup {
     $sessionBridge->route("/calendar/list/")                        ->to("calendar#list");
     $sessionBridge->route("/calendar/tree/")                        ->to("calendar#tree");
     $sessionBridge->route("/calendar/format/")                      ->to("calendar#format");
-
     $sessionBridge->route("/calendar/fascicle/read/")               ->to("calendar-fascicle#read");
     $sessionBridge->route("/calendar/fascicle/create/")             ->to("calendar-fascicle#create");
     $sessionBridge->route("/calendar/fascicle/update/")             ->to("calendar-fascicle#update");
@@ -160,15 +159,15 @@ sub startup {
     $sessionBridge->route("/calendar/fascicle/template/")           ->to("calendar-fascicle#template");
     $sessionBridge->route("/calendar/fascicle/archive/")            ->to("calendar-fascicle#archive");
     $sessionBridge->route("/calendar/fascicle/unarchive/")          ->to("calendar-fascicle#unarchive");
+    $sessionBridge->route("/calendar/fascicle/work/")               ->to("calendar-fascicle#work");
+    $sessionBridge->route("/calendar/fascicle/approval/")           ->to("calendar-fascicle#approval");
     $sessionBridge->route("/calendar/fascicle/enable/")             ->to("calendar-fascicle#enable");
     $sessionBridge->route("/calendar/fascicle/disable/")            ->to("calendar-fascicle#disable");
     $sessionBridge->route("/calendar/fascicle/deadline/")           ->to("calendar-fascicle#deadline");
-
     $sessionBridge->route("/calendar/attachment/read/")             ->to("calendar-attachment#read");
     $sessionBridge->route("/calendar/attachment/create/")           ->to("calendar-attachment#create");
     $sessionBridge->route("/calendar/attachment/update/")           ->to("calendar-attachment#update");
     $sessionBridge->route("/calendar/attachment/remove/")           ->to("calendar-attachment#remove");
-
     $sessionBridge->route("/calendar/template/list/")               ->to("calendar-template#list");
     $sessionBridge->route("/calendar/template/read/")               ->to("calendar-template#read");
     $sessionBridge->route("/calendar/template/create/")             ->to("calendar-template#create");
