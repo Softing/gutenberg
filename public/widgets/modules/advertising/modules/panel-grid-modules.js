@@ -299,10 +299,17 @@ Inprint.advert.modules.Modules = Ext.extend(Ext.grid.GridPanel, {
                 xtype: "numberfield",
                 allowBlank:false,
                 allowDecimals:false,
-                minValue: 1,
+                minValue: 0,
                 name: "amount",
                 value: 1,
                 fieldLabel: _("Amount")
+            },
+            {
+                xtype: "checkbox",
+                allowBlank:true,
+                name: "amount0",
+                fieldLabel: _("Area"),
+                boxLabel: _("Not to consider the area")
             }
         ];
 

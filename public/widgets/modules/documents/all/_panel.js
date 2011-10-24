@@ -57,7 +57,6 @@ Inprint.documents.all.Panel = Ext.extend(Inprint.documents.Grid, {
                 if (access.update    == 'enabled') this.btnCapture.enable();
                 if (access.transfer  == 'enabled') this.btnTransfer.enable();
                 if (access.capture   == 'enabled') this.btnCapture.enable();
-                if (access.transfer  == 'enabled') this.btnTransfer.enable();
                 if (access.briefcase == 'enabled') this.btnBriefcase.enable();
                 if (access.move      == 'enabled') this.btnMove.enable();
                 if (access.move      == 'enabled') this.btnCopy.enable();

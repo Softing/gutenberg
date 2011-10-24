@@ -12,22 +12,16 @@ sub capture {
     my ($c, $document, $workgroup, $member) = @_;
 
     $document = $c->get_record("documents", $document)          unless ($document->{id});
-    $workgroup = $c->get_record("view_principals", $workgroup)  unless ($workgroup->{id});
+
+    # Move to member
     $member = $c->get_record("view_principals", $member)        unless ($member->{id});
-
-    my $workgroups = $c->Q("
-        SELECT ARRAY( select id from catalog where path @> ( select path from catalog where id = ? ) )
-    ", [ $workgroup->{id} ])->Array;
-
     $c->Do("
         UPDATE documents SET
             holder=?, holder_shortcut=?,
-            workgroup=?, workgroup_shortcut=?, inworkgroups=?,
             fdate=now()
         WHERE id=?
     ", [
         $member->{id}, $member->{shortcut},
-        $workgroup->{id}, $workgroup->{shortcut}, $workgroups,
         $document->{id}
     ]);
 
@@ -45,17 +39,51 @@ sub capture {
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now());
     ", [
         $document->{id}, "transfer",
-
         $document->{color}, $document->{progress},
         $document->{branch}, $document->{branch_shortcut},
         $document->{stage}, $document->{stage_shortcut},
-
         $document->{creator}, $document->{creator_shortcut},
         $document->{workgroup}, $document->{workgroup_shortcut},
-
         $member->{id}, $member->{shortcut},
-        $workgroup->{id}, $workgroup->{shortcut},
+        $document->{workgroup}, $document->{workgroup_shortcut},
     ]);
+
+    # Move to workgroup
+    #$workgroup = $c->get_record("view_principals", $workgroup)  unless ($workgroup->{id});
+    #my $workgroups = $c->Q("
+    #    SELECT ARRAY( select id from catalog where path @> ( select path from catalog where id = ? ) )
+    #", [ $workgroup->{id} ])->Array;
+    #$c->Do("
+    #    UPDATE documents SET
+    #        workgroup=?, workgroup_shortcut=?, inworkgroups=?,
+    #        fdate=now()
+    #    WHERE id=?
+    #", [
+    #    $workgroup->{id}, $workgroup->{shortcut}, $workgroups,
+    #    $document->{id}
+    #]);
+    #$c->Do("
+    #    INSERT INTO history(
+    #        entity, operation,
+    #        color, weight,
+    #        branch, branch_shortcut,
+    #        stage, stage_shortcut,
+    #        sender, sender_shortcut,
+    #        sender_catalog, sender_catalog_shortcut,
+    #        destination, destination_shortcut,
+    #        destination_catalog, destination_catalog_shortcut,
+    #        created)
+    #    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now());
+    #", [
+    #    $document->{id}, "transfer",
+    #    $document->{color}, $document->{progress},
+    #    $document->{branch}, $document->{branch_shortcut},
+    #    $document->{stage}, $document->{stage_shortcut},
+    #    $document->{creator}, $document->{creator_shortcut},
+    #    $document->{workgroup}, $document->{workgroup_shortcut},
+    #    $document->{holder}, $document->{holder_shortcut},
+    #    $workgroup->{id}, $workgroup->{shortcut},
+    #]);
 
     return 1;
 }

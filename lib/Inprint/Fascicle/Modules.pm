@@ -232,6 +232,7 @@ sub update {
     my $i_description = $c->param("description");
 
     my $i_amount      = $c->param("amount") // 1;
+    my $i_amount0     = $c->param("amount0") // 0;
 
     my $i_x           = $c->param("x") // "1/1";
     my $i_y           = $c->param("y") // "1/1";
@@ -287,7 +288,9 @@ sub update {
     $size_w = $w1/$w2;
     $size_h = $h1/$h2;
 
-    $area = $size_w * $size_h * $i_amount;
+    unless ($i_amount0) {
+        $area = $size_w * $size_h * $i_amount;
+    }
 
     unless (@errors) {
         $c->Do("
