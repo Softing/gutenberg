@@ -14,12 +14,12 @@ sub new {
     my $self  = {};
     $self     = bless {}, $class;
 
-    my $DBH    = shift;
+    my $dbh    = shift;
     my $query  = shift;
     my $value  = shift;
     my $trace  = shift;
 
-    $self->{conn}  = $DBH;
+    $self->{dbh}   = $dbh;
     $self->{query} = $query;
     $self->{value} = $value;
 
@@ -33,13 +33,9 @@ sub Value  {
     my $result;
 
     if ( $c->{value} ) {
-        $result = $c->conn->run(fixup => sub {
-            $_->selectrow_arrayref( $c->{query}, undef, @{ $c->{value} } );
-        });
+        $result = $c->{dbh}->selectrow_arrayref( $c->{query}, undef, @{ $c->{value} } );
     } else {
-        $result = $c->conn->run(fixup => sub {
-            $_->selectrow_arrayref( $c->{query}, undef );
-        });
+        $result = $c->{dbh}->selectrow_arrayref( $c->{query}, undef );
     }
 
     return @$result[0];
@@ -51,13 +47,9 @@ sub Values  {
     my $result;
 
     if ( $c->{value} ) {
-        $result = $c->conn->run(fixup => sub {
-            $_->selectcol_arrayref( $c->{query}, undef, @{ $c->{value} } );
-        });
+        $result = $c->{dbh}->selectcol_arrayref( $c->{query}, undef, @{ $c->{value} } );
     } else {
-        $result = $c->conn->run(fixup => sub {
-            $_->selectcol_arrayref( $c->{query}, undef );
-        });
+        $result = $c->{dbh}->selectcol_arrayref( $c->{query}, undef );
     }
 
     return $result;
@@ -69,13 +61,9 @@ sub Array {
     my $result;
 
     if ( $c->{value} ) {
-        $result = $c->conn->run(fixup => sub {
-            $_->selectrow_arrayref( $c->{query}, undef, @{ $c->{value} } );
-        });
+        $result = $c->{dbh}->selectrow_arrayref( $c->{query}, undef, @{ $c->{value} } );
     } else {
-        $result = $c->conn->run(fixup => sub {
-            $_->selectrow_arrayref( $c->{query}, undef );
-        });
+        $result = $c->{dbh}->selectrow_arrayref( $c->{query}, undef );
     }
 
     return $result;
@@ -87,13 +75,9 @@ sub Hash {
     my $result;
 
     if ( $c->{value} ) {
-        $result = $c->conn->run(fixup => sub {
-            $_->selectrow_hashref( $c->{query}, undef, @{ $c->{value} } );
-        });
+        $result = $c->{dbh}->selectrow_hashref( $c->{query}, undef, @{ $c->{value} } );
     } else {
-        $result = $c->conn->run(fixup => sub {
-            $_->selectrow_hashref( $c->{query}, undef);
-        });
+        $result = $c->{dbh}->selectrow_hashref( $c->{query}, undef);
     }
 
     return $result;
@@ -105,13 +89,9 @@ sub Arrays  {
     my $result;
 
     if ( $c->{value} ) {
-        $result = $c->conn->run(fixup => sub {
-            $_->selectall_arrayref( $c->{query}, undef, @{ $c->{value} } );
-        });
+        $result = $c->{dbh}->selectall_arrayref( $c->{query}, undef, @{ $c->{value} } );
     } else {
-        $result = $c->conn->run(fixup => sub {
-            $_->selectall_arrayref( $c->{query}, undef);
-        });
+        $result = $c->{dbh}->selectall_arrayref( $c->{query}, undef);
     }
 
     return $result;
@@ -123,21 +103,126 @@ sub Hashes  {
     my $result;
 
     if ( $c->{value} ) {
-        $result = $c->conn->run(fixup => sub {
-            $_->selectall_arrayref( $c->{query}, { Slice => {} }, @{ $c->{value} } );
-        });
+        $result = $c->{dbh}->selectall_arrayref( $c->{query}, { Slice => {} }, @{ $c->{value} } );
     } else {
-        $result = $c->conn->run(fixup => sub {
-            $_->selectall_arrayref( $c->{query}, { Slice => {} });
-        });
+        $result = $c->{dbh}->selectall_arrayref( $c->{query}, { Slice => {} });
     }
 
     return $result;
 }
 
-sub conn {
-    my $c = shift;
-    return $c->{conn};
-}
+
+#sub Value  {
+#    my $c = shift;
+#
+#    my $result;
+#
+#    if ( $c->{value} ) {
+#        $result = $c->conn->run(fixup => sub {
+#            $_->selectrow_arrayref( $c->{query}, undef, @{ $c->{value} } );
+#        });
+#    } else {
+#        $result = $c->conn->run(fixup => sub {
+#            $_->selectrow_arrayref( $c->{query}, undef );
+#        });
+#    }
+#
+#    return @$result[0];
+#}
+#
+#sub Values  {
+#    my $c = shift;
+#
+#    my $result;
+#
+#    if ( $c->{value} ) {
+#        $result = $c->conn->run(fixup => sub {
+#            $_->selectcol_arrayref( $c->{query}, undef, @{ $c->{value} } );
+#        });
+#    } else {
+#        $result = $c->conn->run(fixup => sub {
+#            $_->selectcol_arrayref( $c->{query}, undef );
+#        });
+#    }
+#
+#    return $result;
+#}
+#
+#sub Array {
+#    my $c = shift;
+#
+#    my $result;
+#
+#    if ( $c->{value} ) {
+#        $result = $c->conn->run(fixup => sub {
+#            $_->selectrow_arrayref( $c->{query}, undef, @{ $c->{value} } );
+#        });
+#    } else {
+#        $result = $c->conn->run(fixup => sub {
+#            $_->selectrow_arrayref( $c->{query}, undef );
+#        });
+#    }
+#
+#    return $result;
+#}
+#
+#sub Hash {
+#    my $c = shift;
+#
+#    my $result;
+#
+#    if ( $c->{value} ) {
+#        $result = $c->conn->run(fixup => sub {
+#            $_->selectrow_hashref( $c->{query}, undef, @{ $c->{value} } );
+#        });
+#    } else {
+#        $result = $c->conn->run(fixup => sub {
+#            $_->selectrow_hashref( $c->{query}, undef);
+#        });
+#    }
+#
+#    return $result;
+#}
+#
+#sub Arrays  {
+#    my $c = shift;
+#
+#    my $result;
+#
+#    if ( $c->{value} ) {
+#        $result = $c->conn->run(fixup => sub {
+#            $_->selectall_arrayref( $c->{query}, undef, @{ $c->{value} } );
+#        });
+#    } else {
+#        $result = $c->conn->run(fixup => sub {
+#            $_->selectall_arrayref( $c->{query}, undef);
+#        });
+#    }
+#
+#    return $result;
+#}
+#
+#sub Hashes  {
+#    my $c = shift;
+#
+#    my $result;
+#
+#    if ( $c->{value} ) {
+#        $result = $c->conn->run(fixup => sub {
+#            $_->selectall_arrayref( $c->{query}, { Slice => {} }, @{ $c->{value} } );
+#        });
+#    } else {
+#        $result = $c->conn->run(fixup => sub {
+#            $_->selectall_arrayref( $c->{query}, { Slice => {} });
+#        });
+#    }
+#
+#    return $result;
+#}
+#
+#sub conn {
+#    my $c = shift;
+#    return $c->{conn};
+#}
 
 1;

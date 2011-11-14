@@ -5,12 +5,17 @@ package Inprint::Fascicle::Print;
 # licensing@softing.ru
 # http://softing.ru/license
 
+use utf8;
 use strict;
 use warnings;
 
 use Encode qw(decode encode);
 use PDF::API2;
 use PDF::TextBlock;
+
+use Inprint::Database;
+
+use base 'Mojolicious::Controller';
 
 use constant mm => 25.4 / 72;
 use constant in => 1 / 72;
@@ -35,14 +40,13 @@ use constant A4 => {
     pcy     => 20,
 
     xcount  => 10,
-    ycount  => 5,
+    ycount  => 4,
 
-    padding => 5,
-    width   => 75,
-    height  => 100,
+    padding  => 10,
+    spadding => 3,
+    width    => 75,
+    height   => 100,
 };
-
-use base 'Mojolicious::Controller';
 
 sub print {
 
@@ -54,11 +58,9 @@ sub print {
 
     my @data, my @errors;
 
-    my $Cpage = A4;
-
-    if ($i_size eq "a3") {
-        $Cpage = A3;
-    }
+    my $Cpage;
+    if ($i_size eq "a3") { $Cpage = A3 };
+    if ($i_size eq "a4") { $Cpage = A4 };
 
     my ($x1, $y1, $PageWidth, $PageHeight) = PDF::API2::Util::page_size($Cpage->{name});
 
@@ -73,35 +75,13 @@ sub print {
 
     my $pdf = PDF::API2->new();
 
-    my $pages = $c->sql->Q("
-        SELECT id, seqnum as pagenum, seqnum as pagename, w as linex, h as liney
-        FROM fascicles_pages
-        WHERE fascicle = ?
-        ORDER BY pagenum
-    ", $i_fascicle)->Hashes;
-
-    foreach my $page (@$pages) {
-
-        $page->{modules} = $c->sql->Q("
-            SELECT t1.id, t1.title, t1.w, t1.h, t2.x, t2.y, rq.shortcut as request_title
-            FROM
-                fascicles_modules t1
-                    LEFT JOIN fascicles_requests rq ON rq.module = t1.id,
-                fascicles_map_modules t2
-            WHERE 1=1
-                AND t1.id = t2.module
-                AND t1.fascicle = ?
-                AND t2.page = ?
-                AND t2.placed = true
-
-        ", [ $i_fascicle, $page->{id} ])->Hashes;
-
-    }
+    my $fascicle = Inprint::Database::fascicle($c, $i_fascicle);
 
     my $page;
 
     my $itmcount  = 0;
     my $blkcount  = 0;
+    my $sblkcount = 0;
     my $rowcount  = 0;
 
     my $iteration = 0;
@@ -109,15 +89,16 @@ sub print {
 
     my $lastpage  = undef;
 
-    for my $record (@$pages) {
+    for my $record (@{ $fascicle->findPages }) {
 
         $iteration++;
 
         # make new row in flow
         if ($itmcount == $Cpage->{xcount}) {
             $rowcount++;
-            $blkcount = 0;
-            $itmcount = 0;
+            $blkcount  = -1;
+            $sblkcount = 0;
+            $itmcount  = 0;
         }
 
         # make new page in flow
@@ -129,7 +110,7 @@ sub print {
 
             my $font = $pdf->corefont( "Verdana", -encode=> "windows-1251" );
 
-            draw_header($page, $font, $Cpage, "ГЗР /2011-11");
+            draw_header($page, $font, $Cpage, $fascicle->findEdition->shortcut ."/". $fascicle->shortcut);
 
             $itmcount = 0;
             $rowcount = 0;
@@ -139,48 +120,59 @@ sub print {
 
         $itmcount++;
 
-        my $pagenum = $record->{pagenum};
-        my $pagemod = $record->{pagenum} %2;
+        my $pagenum = $record->seqnum;
+        my $pagemod = $record->seqnum %2;
 
-        # frstpage
+        # firstpage
         if ($pagenum %2 == 1 && !$lastpage) {
-            $itmcount++;
-        }
 
-        # block padding
-        if ($pagenum %2 == 0
-            || $pagenum %2 == 1 && $lastpage %2 == 1 && $itmcount > 1 ) {
-            $blkcount++
-        }
-
-        # empty pages
-        if ($pagenum %2 == 1 && $pagenum - $lastpage != 1
-            || $pagenum %2 == 0 && $pagenum - $lastpage != 1 ) {
-
-            my $x = ($itmcount * $Cpage->{width}) - $Cpage->{width};
-            $x = $x + ( $Cpage->{padding} *2* $blkcount ) + $Cpage->{padding};
+        my $x = ($itmcount * $Cpage->{width}) - $Cpage->{width};
+            $x = $x + ( $Cpage->{padding} * $blkcount ) + ( $Cpage->{spadding} * $sblkcount ) + $Cpage->{padding};
 
             my $y = 0 - ($rowcount * $Cpage->{height});
             $y = $y - ( ($Cpage->{padding}+20) * $rowcount );
 
-            draw_empty_page($page, $x, $y, $Cpage);
+            draw_empty_page($pdf, $page, $x, $y, $Cpage, $record);
+
+            $itmcount++;
+        }
+
+        # block padding
+        if ($pagenum %2 == 0 || $pagenum %2 == 1 && $lastpage %2 == 1 && $itmcount > 1 ) {
+            $blkcount++
+        } else {
+            $sblkcount++
+        }
+
+        # empty pages
+        if ($pagenum %2 == 1 && $pagenum - $lastpage != 1 || $pagenum %2 == 0 && $pagenum - $lastpage != 1 ) {
+
+            my $x = ($itmcount * $Cpage->{width}) - $Cpage->{width};
+            $x = $x + ( $Cpage->{padding} * $blkcount ) + ( $Cpage->{spadding} * $sblkcount ) + $Cpage->{padding};
+
+            my $y = 0 - ($rowcount * $Cpage->{height});
+            $y = $y - ( ($Cpage->{padding}+20) * $rowcount );
+
+            draw_empty_page($pdf, $page, $x, $y, $Cpage, $record);
 
             $itmcount++;
         }
 
         # draw page
         my $x = ($itmcount * $Cpage->{width}) - $Cpage->{width};
-        $x = $x + ( $Cpage->{padding} *2* $blkcount ) + $Cpage->{padding};
+        $x = $x + ( $Cpage->{padding} * $blkcount ) + ( $Cpage->{spadding} * $sblkcount ) + $Cpage->{padding};
 
         my $y = 0 - ($rowcount * $Cpage->{height});
         $y = $y - ( ($Cpage->{padding}+20) * $rowcount );
 
-        draw_page($pdf, $page, $x, $y, $Cpage, $record );# if ($record->{id} eq 'af33536a-de79-4410-a5d8-479ce6a58641');
+        draw_page($pdf, $page, $x, $y, $Cpage, $record);
 
         $lastpage = $pagenum;
     }
 
     my $tempPath = $c->config->get("store.temp");
+
+    die "Cant write to $tempPath" unless -w $tempPath;
 
     my $pdf_filename = "$tempPath/table.pdf";
 
@@ -203,16 +195,17 @@ sub draw_page {
     my $pdf       = shift;
 
     my $page      = shift;
+
     my $x         = shift;
     my $y         = shift;
     my $PF        = shift;
     my $record    = shift;
 
-    my $lines_x   = $record->{linex};
-    my $lines_y   = $record->{liney};
+    my $lines_x   = $record->w;
+    my $lines_y   = $record->h;
     my $documents = $record->{documents};
-    my $pagenum   = $record->{pagenum};
-    my $modules   = $record->{modules};
+    my $pagenum   = $record->seqnum;
+    my $modules   = $record->findModules;
 
     my $top    = $PF->{top};
     my $width  = $PF->{width};
@@ -230,8 +223,8 @@ sub draw_page {
 
     # Draw lines
     my $blue_box = $page->gfx;
-    $blue_box->strokecolor('black');
-    $blue_box->linewidth( 1 );
+    $blue_box->strokecolor('#C8C8C8');
+    $blue_box->linewidth( .1 );
     $blue_box->rect( $x, $y, $width, $height );
     $blue_box->stroke;
 
@@ -256,7 +249,7 @@ sub draw_page {
         my $ycord = $height - ($height * ($a/$b)) + $y;
 
         my $line = $page->gfx;
-        $line->strokecolor("black");
+
         $line->move( $x, $ycord );
         $line->line( $x+$width, $ycord );
         $line->stroke;
@@ -270,96 +263,124 @@ sub draw_page {
 
         $c++;
 
-        #next if $c == 1;
+        my $mw = $item->w;
+        my $mh = $item->h;
 
-        my $mx = $item->{x};
-        my $my = $item->{y};
-
-        my $mw = $item->{w};
-        my $mh = $item->{h};
+        my $mx = $item->findMapByPage($record->id)->x;
+        my $my = $item->findMapByPage($record->id)->y;
 
         my $modx = get_cord($mx);
         my $mody = get_cord($my);
         my $modw = get_cord($mw);
         my $modh = get_cord($mh);
 
-        my $modxcord = $x;
+        my $modxcord = $x + ($width * $modx);
         my $modycord = $y + ($height - ( ($height * $modh) + ($height * $mody) ) );
 
-        #die "$mx, $my, $mw, $mh > $modx, $mody, $modw, $modh ";
-
         my $modbox = $page->gfx;
-
-        $modbox->fillcolor('orange');
+        $modbox->fillcolor('#f5f5f5');
         $modbox->linewidth( .1 );
-
         $modbox->rect( $modxcord, $modycord, $width * $modw, $height * $modh );
-
         $modbox->fillstroke;
-
-        my $fs = 6/pt;
 
         my $tb  = PDF::TextBlock->new({
             pdf       => $pdf,
             fonts => {
                 default => PDF::TextBlock::Font->new({
-                     pdf => $pdf,
-                     fillcolor => 'black',
-                     size => $fs,
+                    pdf => $pdf,
+                    fillcolor => 'silver',
+                    size => 4/pt,
+                    font => $pdf->corefont( "Verdana", -encode=> "windows-1251" )
+                })
+            }
+        });
+        $tb->x($modxcord);
+        $tb->y( $modycord + (($height * $modh)/2));
+        $tb->w($width * $modw);
+        $tb->h($height * $modh);
+        $tb->align("center");
+        $tb->lead(4/pt);
+        $tb->page($page);
+        $tb->text( encode( "cp1251", $item->title ."\n". $item->findRequest->shortcut) );
+        $tb->apply;
+    }
+
+    # Draw documents
+    my $padding = 1;
+    my $doccount = 0;
+    foreach my $item (@{ $record->findDocuments }) {
+
+        $doccount++;
+
+        my $tb  = PDF::TextBlock->new({
+            pdf       => $pdf,
+            fonts => {
+                default => PDF::TextBlock::Font->new({
+                    pdf => $pdf,
+                    fillcolor => 'blue',
+                    size => 4/pt,
+                    font => $pdf->corefont( "Verdana", -encode=> "windows-1251" )
                 })
             }
         });
 
-        #$tb->x($modxcord + ($width * ($modw/2) ));
-        #$tb->y($modycord);
+        $tb->x($x+$padding);
+        $tb->y( $y + $height - $doccount* (4/pt + 2) );
+        $tb->w($width-$padding-$padding);
+        $tb->h(4/pt);
 
-        $tb->x($modxcord);
-        $tb->y($modycord + (($height * $modh)/2) - ($fs/2));
-
-        $tb->w($width * $modw);
-        $tb->h($height * $modh);
-
-        $tb->align("center");
-
-        $tb->lead(6/pt);
-
+        $tb->align("left");
+        $tb->lead(4/pt);
         $tb->page($page);
+        $tb->text( encode("cp1251", "[". $item->title ."]") );
+        $tb->apply;
+    }
 
-        $tb->text( "$item->{title} $item->{request_title}" );
+    ## Draw holes
+    foreach my $item (@{ $record->findHoles }) {
+
+        $doccount++;
+
+        my $tb  = PDF::TextBlock->new({
+            pdf       => $pdf,
+            fonts => {
+                default => PDF::TextBlock::Font->new({
+                    pdf => $pdf,
+                    fillcolor => 'black',
+                    size => 4/pt,
+                    font => $pdf->corefont( "Verdana", -encode=> "windows-1251" )
+                })
+            }
+        });
+
+        $tb->x($x+$padding);
+        $tb->y( $y + $height - $doccount* (4/pt + 2) );
+        $tb->w($width-$padding-$padding);
+        $tb->h(4/pt);
+
+        $tb->align("left");
+        $tb->lead(6/pt);
+        $tb->page($page);
+        $tb->text( encode("cp1251", "[". $item->w ."]") );
         $tb->apply;
 
     }
 
-    #die $c;
-
-    ## Draw documents
-    #my $doccount = 0;
-    #foreach my $item (@$documents) {
-    #
-    #    $doccount++;
-    #
-    #    my $padding = 4;
-    #
-    #    my $textbox = $page->gfx;
-    #    $textbox->fillcolor("#f5f5f5");
-    #    $textbox->rect( $x+$padding, $y + $height - $doccount*10, $width-$padding-$padding, 8 );
-    #    $textbox->fill;
-    #
-    #    my $font = $pdf->corefont( "Verdana", -encode=> "windows-1251" );
-    #    my $text = $page->text();
-    #    $text->font($font, 6);
-    #    $text->fillcolor("black");
-    #    $text->translate($x+5, $y + $height - $doccount*8 );
-    #    $text->text(encode( "cp1251", $item ));
-    #
-    #}
+    return;
 }
 
 sub draw_empty_page {
-    my $page = shift;
-    my $x    = shift;
-    my $y    = shift;
-    my $PF   = shift;
+    my $pdf       = shift;
+
+    my $page      = shift;
+
+    my $x         = shift;
+    my $y         = shift;
+    my $PF        = shift;
+    my $record    = shift;
+
+    my $lines_x   = $record->w;
+    my $lines_y   = $record->h;
 
     my $top    = $PF->{top};
     my $width  = $PF->{width};
@@ -368,11 +389,13 @@ sub draw_empty_page {
     $y = $y +$top;
 
     # Draw lines
-    my $empty_box = $page->gfx;
-    $empty_box->strokecolor("#F5F5F5");
-    $empty_box->linewidth( 1 );
-    $empty_box->rect( $x, $y, $width, $height );
-    $empty_box->stroke;
+    my $blue_box = $page->gfx;
+    $blue_box->strokecolor('#f5f5f5');
+    $blue_box->linewidth( 1 );
+    $blue_box->rect( $x, $y, $width, $height );
+    $blue_box->stroke;
+
+    $blue_box->linewidth( .1 );
 }
 
 sub draw_header {
@@ -382,6 +405,11 @@ sub draw_header {
     my $PF   = shift;
 
     my $string = shift;
+
+    my @abbr = qw( Январь Февраль Март Апрель Май Июнь Июль Август Сентябрь Октябрь Ноябрь Декабрь );
+    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+
+    $string .= ", $abbr[$mon] $mday, " . ($year + 1900) . " в $hour:$min";
 
     my $text = $page->text();
     $text->font($font, 12);

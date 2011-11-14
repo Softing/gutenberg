@@ -151,6 +151,24 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                 scope:this,
                 menu: [
                     {
+                        text: _("Fascicle") + "/A4",
+                        icon: _ico("printer"),
+                        cls: 'x-btn-text-icon',
+                        scope:this,
+                        handler: function() {
+                            window.location = "/fascicle/print/"+ this.oid +"/landscape/a4";
+                        }
+                    },
+                    {
+                        text: _("Fascicle") + "/A3",
+                        icon: _ico("printer"),
+                        cls: 'x-btn-text-icon',
+                        scope:this,
+                        handler: function() {
+                            window.location = "/fascicle/print/"+ this.oid +"/landscape/a3";
+                        }
+                    },
+                    {
                         text: _("Advertising"),
                         icon: _ico("printer"),
                         cls: 'x-btn-text-icon',

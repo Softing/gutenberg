@@ -16,16 +16,14 @@ sub new {
     $self     = bless {}, $class;
 
     $self->{DBH} = undef;
-    $self->{conn} = undef;
     $self->{trace} = undef;
 
     bless($self, $class);
     return $self;
 }
 
-sub SetConnection {
-    my $c = shift;
-    $c->{conn} = shift;
+sub dbh {
+    return shift->{DBH};
 }
 
 sub SetDBH {
@@ -44,7 +42,7 @@ sub Q {
         $value = [ $value ] if $value;
     }
 
-    return new Inprint::Frameworks::SQLQuery($c->{conn}, $query, $value, $trace);
+    return new Inprint::Frameworks::SQLQuery($c->{DBH}, $query, $value, $trace);
 }
 
 sub Do {
@@ -58,8 +56,8 @@ sub Do {
         $value = [ $value ] if $value;
     }
 
-    my $count = $c->{conn}->dbh->do($query, undef, @{$value});
-    say STDERR $c->{conn}->dbh->{Statement} if $trace;
+    my $count = $c->dbh->do($query, undef, @{$value});
+    say STDERR $c->dbh->{Statement} if $trace;
 
     return 0 if $count eq '0E0';
     return $count;
@@ -98,19 +96,19 @@ sub lock_table {
 sub bt{
     my $c = shift;
     say STDERR "BEGIN;" if ( $c->{trace} );
-    $c->{conn}->dbh->begin_work;
+    $c->{DBH}->begin_work;
 }
 
 sub rt {
     my $c = shift;
     say STDERR "ROLLBACK;" if ( $c->{trace} );
-    $c->{conn}->dbh->rollback;
+    $c->{DBH}->rollback;
 }
 
 sub et {
     my $c = shift;
     say STDERR "COMMIT;" if ( $c->{trace} );
-    $c->{conn}->dbh->commit;
+    $c->{DBH}->commit;
 }
 
 1;

@@ -20,7 +20,7 @@ sub register {
     $app->helper(
         dbh => sub {
             my $c = shift;
-            return $c->app->{sql}->{conn}->dbh;
+            return $c->app->{sql}->dbh;
         } );
 
     $app->helper(
