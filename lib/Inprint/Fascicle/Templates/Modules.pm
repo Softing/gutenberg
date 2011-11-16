@@ -40,63 +40,6 @@ sub read {
     $c->render_json( { success => $success, errors => \@errors, data => $result } );
 }
 
-sub list {
-    my $c = shift;
-
-    #my $i_fascicle = $c->param("fascicle");
-    my $i_page    = $c->param("page");
-
-    my $result = [];
-
-    my @errors;
-    my $success = $c->json->false;
-
-    #push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
-    #    unless ($c->is_uuid($i_fascicle));
-
-    push @errors, { id => "page", msg => "Incorrectly filled field"}
-        unless ($c->is_uuid($i_page));
-
-    #my $fascicle; unless (@errors) {
-    #    $fascicle  = $c->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
-    #    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
-    #        unless ($fascicle);
-    #}
-
-    my $page; unless (@errors) {
-        $page  = $c->Q(" SELECT * FROM fascicles_tmpl_pages WHERE id=?", [ $i_page ])->Hash;
-        push @errors, { id => "page", msg => "Incorrectly filled field"}
-            unless ($page);
-    }
-
-    my $sql;
-    my @params;
-
-    unless (@errors) {
-        $sql = "
-            SELECT
-                id, fascicle, page,
-                title, description,
-                amount, round(area::numeric, 2) as area,
-                x, y, w, h,
-                width, height, fwidth, fheight,
-                created, updated
-            FROM fascicles_tmpl_modules
-            WHERE page=?
-            ORDER BY title
-        ";
-        push @params, $page->{id};
-    }
-
-    unless (@errors) {
-        $result = $c->Q(" $sql ", \@params)->Hashes;
-        $c->render_json( { data => $result } );
-    }
-
-    $success = $c->json->true unless (@errors);
-    $c->render_json( { success => $success, errors => \@errors, data => $result } );
-}
-
 sub create {
 
     my $c = shift;
@@ -322,6 +265,117 @@ sub delete {
 
     $success = $c->json->true unless (@errors);
     $c->render_json({ success => $success, errors => \@errors });
+}
+
+sub list {
+    my $c = shift;
+
+    #my $i_fascicle = $c->param("fascicle");
+    my $i_page    = $c->param("page");
+
+    my $result = [];
+
+    my @errors;
+    my $success = $c->json->false;
+
+    #push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
+    #    unless ($c->is_uuid($i_fascicle));
+
+    push @errors, { id => "page", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_page));
+
+    #my $fascicle; unless (@errors) {
+    #    $fascicle  = $c->Q(" SELECT * FROM fascicles WHERE id=? ", [ $i_fascicle ])->Hash;
+    #    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
+    #        unless ($fascicle);
+    #}
+
+    my $page; unless (@errors) {
+        $page  = $c->Q(" SELECT * FROM fascicles_tmpl_pages WHERE id=?", [ $i_page ])->Hash;
+        push @errors, { id => "page", msg => "Incorrectly filled field"}
+            unless ($page);
+    }
+
+    my $sql;
+    my @params;
+
+    unless (@errors) {
+        $sql = "
+            SELECT
+                id, fascicle, page,
+                title, description,
+                amount, round(area::numeric, 2) as area,
+                x, y, w, h,
+                width, height, fwidth, fheight,
+                created, updated
+            FROM fascicles_tmpl_modules
+            WHERE page=?
+            ORDER BY title
+        ";
+        push @params, $page->{id};
+    }
+
+    unless (@errors) {
+        $result = $c->Q(" $sql ", \@params)->Hashes;
+        $c->render_json( { data => $result } );
+    }
+
+    $success = $c->json->true unless (@errors);
+    $c->render_json( { success => $success, errors => \@errors, data => $result } );
+}
+
+sub tree {
+
+    my $c = shift;
+
+    my $i_fascicle = $c->param("fascicle");
+
+    my @errors;
+    my $success = $c->json->false;
+
+    push @errors, { id => "id", msg => "Incorrectly filled field"}
+        unless ($c->is_uuid($i_fascicle));
+
+    my @result;
+
+    unless (@errors) {
+        my $sql;
+        my @data;
+
+        my $data = $c->Q("
+            SELECT
+                places.id,
+                places.title,
+                'place' as type,
+                'zone' as icon,
+                false as leaf
+            FROM fascicles_tmpl_places places
+            WHERE places.fascicle=?
+            ORDER BY places.title", $i_fascicle)->Hashes;
+
+        foreach my $item (@$data) {
+
+            $item->{children} = $c->Q("
+                SELECT
+                    modules.id,
+                    modules.title,
+                    'module' as type,
+                    'table-select-cells' as icon,
+                    true as leaf
+                FROM fascicles_tmpl_modules modules
+                    LEFT JOIN fascicles_tmpl_index maps ON maps.entity = modules.id
+                WHERE 1=1
+                    AND maps.fascicle=?
+                    AND maps.place=?
+                ORDER BY modules.title", [ $i_fascicle, $item->{id} ])->Hashes;
+
+            push @result, $item;
+        }
+    }
+
+    $success = $c->json->true unless (@errors);
+
+    $c->render_json( \@result );
 }
 
 1;

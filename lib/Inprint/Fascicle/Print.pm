@@ -9,6 +9,7 @@ use utf8;
 use strict;
 use warnings;
 
+use Data::Dumper;
 use Encode qw(decode encode);
 use PDF::API2;
 use PDF::TextBlock;
@@ -22,45 +23,47 @@ use constant in => 1 / 72;
 use constant pt => 1;
 
 use constant A3 => {
-    name    => "A3",
+    name        => "A3",
 
-    width   => 100,
-    height  => 140,
+    width       => 75,
+    height      => 100,
 
-    htop    => 820,
-    top     => 670,
-    ftop    => 200,
+    htop        => 815,
+    top         => 700,
+    ftop        => 200,
 
-    pcx     => 10,
-    pcy     => 20,
+    pcx         => 10,
+    pcy         => 20,
 
-    xcount  => 10,
-    ycount  => 4,
+    xcount      => 14,
+    ycount      => 9,
 
-    padding  => 10,
-    spadding => 3,
+    fontsize    => 6,
+
+    padding     => 14,
+    spadding    => 3,
 
 };
 
 use constant A4 => {
 
-    name    => "A4",
+    name        => "A4",
 
-    width    => 75,
-    height   => 100,
+    width       => 75,
+    height      => 100,
 
-    top     => 460,
-    htop    => 570,
-    ftop    => 20,
+    top         => 460,
+    htop        => 570,
+    ftop        => 20,
 
-    pcx     => 10,
-    pcy     => 20,
+    pcx         => 10,
+    pcy         => 20,
 
-    xcount  => 10,
-    ycount  => 4,
+    xcount      => 10,
+    ycount      => 4,
 
-    padding  => 10,
-    spadding => 3,
+    padding     => 10,
+    spadding    => 3,
 };
 
 sub print {
@@ -218,9 +221,12 @@ sub draw_page {
 
     my $lines_x   = $record->w;
     my $lines_y   = $record->h;
-    my $documents = $record->{documents};
     my $pagenum   = $record->seqnum;
+
     my $modules   = $record->findModules;
+    my $documents = $record->findDocuments;
+    my $holes     = $record->findHoles;
+    my $requests  = $record->findRequests;
 
     my $top    = $PF->{top};
     my $width  = $PF->{width};
@@ -237,38 +243,24 @@ sub draw_page {
     $text->text_center($pagenum);
 
     # Draw lines
-    my $blue_box = $page->gfx;
-    $blue_box->strokecolor('#C8C8C8');
-    $blue_box->linewidth( .1 );
-    $blue_box->rect( $x, $y, $width, $height );
-    $blue_box->stroke;
-
-    $blue_box->linewidth( .1 );
-
     foreach my $cord ( @$lines_x ) {
-
         my ($a,$b) = split '/', $cord;
-
         my $xcord = $x + ($width * ($a/$b));
-
         my $line = $page->gfx;
+        $line->strokecolor('#C8C8C8');
         $line->move( $xcord, $y );
         $line->line( $xcord, $y+$height );
         $line->stroke;
     }
 
     foreach my $cord ( @$lines_y ) {
-
         my ($a,$b) = split '/', $cord;
-
         my $ycord = $height - ($height * ($a/$b)) + $y;
-
         my $line = $page->gfx;
-
+        $line->strokecolor('#C8C8C8');
         $line->move( $x, $ycord );
         $line->line( $x+$width, $ycord );
         $line->stroke;
-
     }
 
     my $c = 0;
@@ -321,11 +313,18 @@ sub draw_page {
     }
 
     # Draw documents
+    my $box_color = "#C8C8C8";
+    my $box_progress = 100;
     my $padding = 1;
     my $doccount = 0;
-    foreach my $item (@{ $record->findDocuments }) {
+    foreach my $item (@$documents) {
 
         $doccount++;
+
+        if ($box_progress > $item->{progress}) {
+            $box_progress = $item->{progress};
+            $box_color = "#" . $item->{color};
+        }
 
         my $tb  = PDF::TextBlock->new({
             pdf       => $pdf,
@@ -347,12 +346,12 @@ sub draw_page {
         $tb->align("left");
         $tb->lead(4/pt);
         $tb->page($page);
-        $tb->text( encode("cp1251", "[". $item->title ."]") );
+        $tb->text( encode("cp1251", "[". $item->title ."/". $item->pages ."]") );
         $tb->apply;
     }
 
-    ## Draw holes
-    foreach my $item (@{ $record->findHoles }) {
+    # Draw holes
+    foreach my $item (@$holes) {
 
         $doccount++;
 
@@ -376,10 +375,47 @@ sub draw_page {
         $tb->align("left");
         $tb->lead(4/pt);
         $tb->page($page);
-        $tb->text( encode("cp1251", "[". $item->w ."]") );
+        $tb->text( encode("cp1251", "[". $item->title ."]") );
         $tb->apply;
 
     }
+
+    # Draw requests
+    foreach my $item (@$requests) {
+
+        $doccount++;
+
+        my $tb  = PDF::TextBlock->new({
+            pdf       => $pdf,
+            fonts => {
+                default => PDF::TextBlock::Font->new({
+                    pdf => $pdf,
+                    fillcolor => 'black',
+                    size => 4/pt,
+                    font => $pdf->corefont( "Verdana", -encode=> "windows-1251" )
+                })
+            }
+        });
+
+        $tb->x($x+$padding);
+        $tb->y( $y + $height - $doccount* (4/pt + 2) );
+        $tb->w($width-$padding-$padding);
+        $tb->h(4/pt);
+
+        $tb->align("left");
+        $tb->lead(4/pt);
+        $tb->page($page);
+        $tb->text( encode("cp1251", "[". $item->shortcut ."]") );
+        $tb->apply;
+
+    }
+
+    # Draw box
+    my $box = $page->gfx;
+    $box->strokecolor($box_color);
+    $box->linewidth( .1 );
+    $box->rect( $x, $y, $width, $height );
+    $box->stroke;
 
     return;
 }

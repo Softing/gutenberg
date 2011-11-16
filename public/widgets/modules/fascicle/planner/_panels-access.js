@@ -34,19 +34,23 @@ Inprint.fascicle.planner.Access = function(parent, panels, access) {
 
     //Pages
     if (access.manage) {
+
         parent.btnPageCreate.enable();
         documents.btnCreate.enable();
         documents.btnFromBriefcase.enable();
+
         requests.btnCreate.enable();
+
     } else {
 
-        _disable(documents.btnUpdate, documents.btnCapture, documents.btnTransfer,
-        documents.btnMove, documents.btnBriefcase, documents.btnCopy,
-        documents.btnDuplicate, documents.btnRecycle, documents.btnRestore,
-        documents.btnDelete);
+        requests.btnCreate.enable();
 
-        _disable(requests.btnCreate, requests.btnUpdate, requests.btnMove,
-        requests.btnDelete);
+        _disable(documents.btnUpdate, documents.btnCapture, documents.btnTransfer,
+            documents.btnMove, documents.btnBriefcase, documents.btnCopy,
+            documents.btnDuplicate, documents.btnRecycle, documents.btnRestore,
+            documents.btnDelete);
+
+        _disable(requests.btnUpdate, requests.btnMove, requests.btnDelete);
 
     }
 

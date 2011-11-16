@@ -407,6 +407,7 @@ sub startup {
     $sessionBridge->route("/fascicle/templates/modules/")               ->to("fascicle-templates#modules");
 
     $sessionBridge->route("/fascicle/templates/modules/list/")          ->to("fascicle-templates-modules#list");
+    $sessionBridge->route("/fascicle/templates/modules/tree/")          ->to("fascicle-templates-modules#tree");
     $sessionBridge->route("/fascicle/templates/modules/create/")        ->to("fascicle-templates-modules#create");
     $sessionBridge->route("/fascicle/templates/modules/read/")          ->to("fascicle-templates-modules#read");
     $sessionBridge->route("/fascicle/templates/modules/update/")        ->to("fascicle-templates-modules#update");
