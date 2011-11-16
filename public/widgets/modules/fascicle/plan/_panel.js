@@ -14,21 +14,30 @@ Inprint.fascicle.plan.Panel = Ext.extend(Ext.Panel, {
         this.tbar = [
             "->",
             {
-                text: 'Печать А4',
+                text: _("Fascicle") + "/A4",
                 icon: _ico("printer"),
                 cls: 'x-btn-text-icon',
                 scope:this,
                 handler: function() {
-                    window.location = '/fascicle/print/?fascicle='+ this.fascicle +'&mode=landscape&size=a4';
+                    window.location = "/fascicle/print/"+ this.oid +"/landscape/a4";
                 }
             },
             {
-                text: 'Печать А3',
+                text: _("Fascicle") + "/A3",
                 icon: _ico("printer"),
                 cls: 'x-btn-text-icon',
                 scope:this,
                 handler: function() {
-                    window.location = '/fascicle/print/?fascicle='+ this.fascicle +'&mode=landscape&size=a3';
+                    window.location = "/fascicle/print/"+ this.oid +"/landscape/a3";
+                }
+            },
+            {
+                text: _("Advertising"),
+                icon: _ico("printer"),
+                cls: 'x-btn-text-icon',
+                scope:this,
+                handler: function() {
+                    window.location = "/reports/advertising/fascicle/"+ this.oid;
                 }
             }
         ];

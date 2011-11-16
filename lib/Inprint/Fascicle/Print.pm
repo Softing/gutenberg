@@ -23,14 +23,31 @@ use constant pt => 1;
 
 use constant A3 => {
     name    => "A3",
-    top     => 800,
+
     width   => 100,
     height  => 140,
+
+    htop    => 820,
+    top     => 670,
+    ftop    => 200,
+
+    pcx     => 10,
+    pcy     => 20,
+
+    xcount  => 10,
+    ycount  => 4,
+
+    padding  => 10,
+    spadding => 3,
+
 };
 
 use constant A4 => {
 
     name    => "A4",
+
+    width    => 75,
+    height   => 100,
 
     top     => 460,
     htop    => 570,
@@ -44,8 +61,6 @@ use constant A4 => {
 
     padding  => 10,
     spadding => 3,
-    width    => 75,
-    height   => 100,
 };
 
 sub print {
@@ -359,7 +374,7 @@ sub draw_page {
         $tb->h(4/pt);
 
         $tb->align("left");
-        $tb->lead(6/pt);
+        $tb->lead(4/pt);
         $tb->page($page);
         $tb->text( encode("cp1251", "[". $item->w ."]") );
         $tb->apply;
