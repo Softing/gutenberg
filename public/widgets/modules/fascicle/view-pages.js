@@ -9,11 +9,11 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
             {
                 renderPages: function(values){
 
+                    var string = "";
+
                     var items = values[0];
 
-
-
-                    var string = '<div class="inprint-plan">';
+                    string += '<div class="inprint-plan">';
                     string += '<div class="inprint-plan-block">';
 
                     for (var c=0; c<items.pageorder.length; c++) {
@@ -153,12 +153,8 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
 
         this.store = new Ext.data.JsonStore({
             root: "data",
-            baseParams: {
-                fascicle: this.fascicle
-            },
-            fields: [
-                "index", "pageorder", "pages", "documents", "requests", "holes"
-            ]
+            baseParams: { fascicle: this.fascicle },
+            fields: [ "pageorder", "pages", "documents", "requests", "holes" ]
         });
 
         Ext.apply(this, {

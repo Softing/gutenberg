@@ -48,10 +48,6 @@ sub register {
             foreach my $term (@$terms) {
                 $granted = getCacheRecord($c, $member, $binding, $term);
 
-                #if ($member = '39d40812-fc54-4342-9b98-e1c1f4222d22') {
-                #    next;
-                #}
-
                 if ($granted == 1 || $granted == 0) {
                     return $granted;
                 }
@@ -215,7 +211,7 @@ sub register {
                     AND path @> ARRAY( SELECT path FROM editions WHERE id = \$1 )
                     AND id = ANY(\$2) ",
                     [ $id, $nodes ])->Values;
-                    
+
             return $result;
         } );
 

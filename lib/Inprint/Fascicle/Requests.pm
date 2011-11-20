@@ -79,24 +79,24 @@ sub list {
 sub create {
     my $c = shift;
 
-    my $id = $c->uuid();
-
-    my $i_shortcut    = $c->param("shortcut") || undef;
-    my $i_description = $c->param("description") || undef;
-
-    my $i_fascicle    = $c->param("fascicle") || undef;
-    my $i_advertiser  = $c->param("advertiser") || undef;
-
-    my $i_module      = $c->param("module") || undef;
-    my $i_template    = $c->param("template") || undef;
-
-    my $i_status      = $c->param("status") || undef;
-    my $i_squib       = $c->param("squib") || undef;
-    my $i_payment     = $c->param("payment") || undef;
-    my $i_readiness   = $c->param("readiness") || undef;
-
     my @errors;
     my $success = $c->json->false;
+    
+    my $id = $c->uuid();
+
+    my $i_shortcut    = $c->param("shortcut")       // undef;
+    my $i_description = $c->param("description")    // undef;
+
+    my $i_fascicle    = $c->param("fascicle")       // undef;
+    my $i_advertiser  = $c->param("advertiser")     // undef;
+
+    my $i_module      = $c->param("module")         // undef;
+    my $i_template    = $c->param("template")       // undef;
+
+    my $i_status      = $c->param("status")         // undef;
+    my $i_squib       = $c->param("squib")          // undef;
+    my $i_payment     = $c->param("payment")        // undef;
+    my $i_readiness   = $c->param("readiness")      // undef;
 
     $i_payment   = "no" unless ($i_payment);
     $i_readiness = "no" unless ($i_readiness);
@@ -115,9 +115,6 @@ sub create {
 
     my $fascicle   = $c->check_record(\@errors, "fascicles", "fascicle", $i_fascicle);
     my $advertiser = $c->check_record(\@errors, "ad_advertisers", "advertiser", $i_advertiser);
-
-    #push @errors, { id => "access", msg => "Not enough permissions"}
-    #    unless ($c->objectAccess("domain.roles.manage"));
 
     if ($i_module) {
 

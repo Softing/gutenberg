@@ -1,94 +1,107 @@
 package Inprint::Database::Model::Document;
 
+use Moose;
+
 use utf8;
 use strict;
 use warnings;
 
-use Moose;
-use MooseX::UndefTolerant;
 use Inprint::Utils::MooseUUID qw(UUID);
 
-extends "Inprint::Database::Base";
+use constant ID      => "documnent";
+use constant TABLE   => "documents";
+use constant COLUMNS => qw/
+    id edition fascicle title creator creator_shortcut holder holder_shortcut
+    manager manager_shortcut  edition edition_shortcut fascicle fascicle_shortcut
+    fascicle_blocked headline headline_shortcut readiness readiness_shortcut
+    rubric rubric_shortcut branch branch_shortcut stage stage_shortcut readiness
+    readiness_shortcut color progress author firstpage pages ineditions copygroup
+    movegroup maingroup maingroup_shortcut workgroup workgroup_shortcut inworkgroups
+    filepath pdate::date fdate::date ldate psize rsize images files islooked isopen
+    uploaded::date moved::date created::date updated::date /;
 
-has "sql"           => (isa => "Object",   is => "rw");
+use constant FIELDS => qw/  /;
 
-has 'id'            => (isa => UUID,    is => 'rw');
-has 'edition'       => (isa => UUID,    is => 'rw');
-has 'fascicle'      => (isa => UUID,    is => 'rw');
+extends "Inprint::Database::Model";
 
-has "title"         => (isa => 'Str',   is => 'rw');
+has "id"                        => (isa => UUID,    is => "rw");
+has "edition"                   => (isa => UUID,    is => "rw");
+has "fascicle"                  => (isa => UUID,    is => "rw");
 
-has "creator"                  => (isa => UUID,   is => 'rw');
-has "creator_shortcut"         => (isa => 'Str',   is => 'rw');
+has "title"                     => (isa => "Str",   is => "rw");
 
-has "holder"                  => (isa => UUID,   is => 'rw');
-has "holder_shortcut"         => (isa => 'Str',   is => 'rw');
+has "creator"                   => (isa => UUID,    is => "rw");
+has "creator_shortcut"          => (isa => "Str",   is => "rw");
 
-has "manager"                  => (isa => UUID,   is => 'rw');
-has "manager_shortcut"         => (isa => 'Str',   is => 'rw');
+has "holder"                    => (isa => UUID,    is => "rw");
+has "holder_shortcut"           => (isa => "Str",   is => "rw");
 
-has "edition"                  => (isa => UUID,   is => 'rw');
-has "edition_shortcut"         => (isa => 'Str',   is => 'rw');
+has "manager"                   => (isa => UUID,    is => "rw");
+has "manager_shortcut"          => (isa => "Str",   is => "rw");
 
-has "fascicle"                  => (isa => UUID,   is => 'rw');
-has "fascicle_shortcut"         => (isa => 'Str',   is => 'rw');
-has "fascicle_blocked"          => (isa => 'Bool',   is => 'rw');
+has "edition"                   => (isa => UUID,    is => "rw");
+has "edition_shortcut"          => (isa => "Str",   is => "rw");
 
-has "headline"                  => (isa => UUID,   is => 'rw');
-has "headline_shortcut"         => (isa => 'Str',   is => 'rw');
+has "fascicle"                  => (isa => UUID,    is => "rw");
+has "fascicle_shortcut"         => (isa => "Str",   is => "rw");
+has "fascicle_blocked"          => (isa => "Bool",  is => "rw");
 
-has "readiness"                 => (isa => UUID,   is => 'rw');
-has "readiness_shortcut"        => (isa => 'Str',   is => 'rw');
+has "headline"                  => (isa => UUID,    is => "rw");
+has "headline_shortcut"         => (isa => "Str",   is => "rw");
 
-has "rubric"                    => (isa => UUID,   is => 'rw');
-has "rubric_shortcut"           => (isa => 'Str',   is => 'rw');
+has "readiness"                 => (isa => UUID,    is => "rw");
+has "readiness_shortcut"        => (isa => "Str",   is => "rw");
 
-has "branch"                    => (isa => UUID,   is => 'rw');
-has "branch_shortcut"           => (isa => 'Str',   is => 'rw');
+has "rubric"                    => (isa => UUID,    is => "rw");
+has "rubric_shortcut"           => (isa => "Str",   is => "rw");
 
-has "stage"                     => (isa => UUID,   is => 'rw');
-has "stage_shortcut"            => (isa => 'Str',   is => 'rw');
+has "branch"                    => (isa => UUID,    is => "rw");
+has "branch_shortcut"           => (isa => "Str",   is => "rw");
 
-has "readiness"                 => (isa => UUID,   is => 'rw');
-has "readiness_shortcut"        => (isa => 'Str',   is => 'rw');
+has "stage"                     => (isa => UUID,    is => "rw");
+has "stage_shortcut"            => (isa => "Str",   is => "rw");
 
-has "color"                     => (isa => 'Str',   is => 'rw');
-has "progress"                  => (isa => 'Int',   is => 'rw');
+has "readiness"                 => (isa => UUID,    is => "rw");
+has "readiness_shortcut"        => (isa => "Str",   is => "rw");
 
-has "author"                    => (isa => 'Str',   is => 'rw');
+has "color"                     => (isa => "Str",   is => "rw");
+has "progress"                  => (isa => "Int",   is => "rw");
 
-has "firstpage"                 => (isa => 'Int',   is => 'rw');
-has "pages"                     => (isa => 'Str',   is => 'rw');
+has "author"                    => (isa => "Str",   is => "rw");
 
-#"ineditions" uuid[],
-#"copygroup" uuid,
-#"movegroup" uuid,
-#"maingroup" uuid NOT NULL,
-#"maingroup_shortcut" varchar NOT NULL,
-#"workgroup" uuid NOT NULL,
-#"workgroup_shortcut" varchar NOT NULL,
-#"inworkgroups" uuid[],
+has "firstpage"                 => (isa => "Int",   is => "rw");
+has "pages"                     => (isa => "Str",   is => "rw");
 
+has "ineditions"                => (isa => "Any",   is => "rw");
 
-#"filepath" varchar,
+has "copygroup"                 => (isa => UUID,    is => "rw");
+has "movegroup"                 => (isa => UUID,    is => "rw");
 
-#"pdate" timestamptz(6),
-#"fdate" timestamptz(6),
-#"ldate" timestamptz(6),
+has "maingroup"                 => (isa => UUID,    is => "rw");
+has "maingroup_shortcut"        => (isa => "Str",   is => "rw");
 
-#"psize" int4 DEFAULT 0,
-#"rsize" int4 DEFAULT 0,
-#"images" int4 DEFAULT 0,
-#"files" int4 DEFAULT 0,
+has "workgroup"                 => (isa => UUID,    is => "rw");
+has "workgroup_shortcut"        => (isa => "Str",   is => "rw");
 
-has "islooked"                  => (isa => 'Bool',   is => 'rw');
-has "isopen"                    => (isa => 'Bool',   is => 'rw');
+has "inworkgroups"              => (isa => "Any",   is => "rw");
 
-has "uploaded"                  => (isa => 'Str',   is => 'rw');
-has "moved"                     => (isa => 'Str',   is => 'rw');
-has "created"                   => (isa => 'Str',   is => 'rw');
-has "updated"                   => (isa => 'Str',   is => 'rw');
+has "filepath"                  => (isa => "Str",   is => "rw");
 
-#
+has "pdate"                     => (isa => "Str",   is => "rw");
+has "fdate"                     => (isa => "Str",   is => "rw");
+has "ldate"                     => (isa => "Str",   is => "rw");
+
+has "psize"                     => (isa => "Int",   is => "rw");
+has "rsize"                     => (isa => "Int",   is => "rw");
+has "images"                    => (isa => "Int",   is => "rw");
+has "files"                     => (isa => "Int",   is => "rw");
+
+has "islooked"                  => (isa => "Bool",  is => "rw");
+has "isopen"                    => (isa => "Bool",  is => "rw");
+
+has "uploaded"                  => (isa => "Str",   is => "rw");
+has "moved"                     => (isa => "Str",   is => "rw");
+has "created"                   => (isa => "Str",   is => "rw");
+has "updated"                   => (isa => "Str",   is => "rw");
 
 1;

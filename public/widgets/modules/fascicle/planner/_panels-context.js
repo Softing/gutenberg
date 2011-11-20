@@ -1,8 +1,11 @@
+"use strict";
 Inprint.fascicle.planner.Context = function(parent, panels) {
 
     var view  = panels.pages.getView();
 
     view.on("contextmenu", function( view, index, node, e) {
+
+        if (parent.access.save == false) return false;
 
         e.stopEvent();
 
@@ -130,7 +133,7 @@ Inprint.fascicle.planner.Context = function(parent, panels) {
             handler: this.cmpReload
         });
 
-        new Ext.menu.Menu({ items : items }).showAt( e.getXY() );
+        return new Ext.menu.Menu({ items : items }).showAt( e.getXY() );
 
     }, view);
 

@@ -23,6 +23,9 @@ sub startup {
     $self->log->level('info');
     $self->secret('passw0rd');
 
+    #$self->mode('production');
+    $self->mode('development');
+
     $self->sessions->cookie_name("inprint");
     $self->sessions->default_expiration(864000);
 
@@ -43,7 +46,7 @@ sub startup {
 
     # Create a connection.
     my $dbh = DBI->connect($dsn, $username, $password, $atr);
-    my $sql = new Inprint::Frameworks::SQL();
+    my $sql = new Inprint::Frameworks::SQL($self->app);
     $sql->SetDBH($dbh);
 
     $self->{sql} = $sql;
@@ -338,12 +341,13 @@ sub startup {
     $sessionBridge->route('/documents/download-files/')                 ->to('documents-downloads#download');
 
     # Fascicles routes
-    $sessionBridge->route('/fascicle/seance/')                          ->to('fascicle#seance');
-    $sessionBridge->route('/fascicle/check/')                           ->to('fascicle#check');
-    $sessionBridge->route('/fascicle/open/')                            ->to('fascicle#open');
-    $sessionBridge->route('/fascicle/close/')                           ->to('fascicle#close');
-    $sessionBridge->route('/fascicle/save/')                            ->to('fascicle#save');
-    $sessionBridge->route('/fascicle/capture/')                         ->to('fascicle#capture');
+    $sessionBridge->route('/fascicle/open/')                            ->to('fascicle-manager#open');
+    $sessionBridge->route('/fascicle/capture/')                         ->to('fascicle-manager#capture');
+    $sessionBridge->route('/fascicle/save/')                            ->to('fascicle-manager#save');
+    $sessionBridge->route('/fascicle/close/')                           ->to('fascicle-manager#close');
+
+    $sessionBridge->route('/fascicle/seance/')                          ->to('fascicle-session#seance');
+    $sessionBridge->route('/fascicle/check/')                           ->to('fascicle-session#check');
 
     $sessionBridge->route('/fascicle/combos/templates/')                ->to('fascicle-combos#templates');
     $sessionBridge->route('/fascicle/combos/headlines/')                ->to('fascicle-combos#headlines');

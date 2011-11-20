@@ -19,6 +19,10 @@ Inprint.fascicle.planner.Documents = Ext.extend(Ext.grid.EditorGridPanel, {
             groupField:'headline_shortcut',
             remoteGroup:true,
             remoteSort:true,
+            sortInfo: {
+                field: 'headline_shortcut',
+                direction: 'ASC'
+            },
             baseParams: {
                 gridmode: "all",
                 flt_fascicle: this.oid
@@ -170,41 +174,35 @@ Inprint.fascicle.planner.Documents = Ext.extend(Ext.grid.EditorGridPanel, {
     },
 
     cmpShowBriefcase: function() {
-
-        //if (!this.dlgShowBriefcase) {
-
-            this.dlgShowBriefcase = new Ext.Window({
-                title: 'Просмотр портфеля материалов',
-                width: 900, height: 600,
-                draggable:true,
-                layout: "fit",
-                items: new Inprint.fascicle.planner.Briefcase(),
-                buttons:[
-                {
-                    text: _("Add"),
-                    scope:this,
-                    handler: function() {
-                        var grid = this.dlgShowBriefcase.items.first();
-                        Ext.Ajax.request({
-                            url: _url("/documents/move/"),
-                            scope: this,
-                            params: {
-                                fascicle: this.oid,
-                                id: grid.getValues("id")
-                            },
-                            success: function(response, options) {
-                                this.parent.cmpReload();
-                                this.dlgShowBriefcase.hide();
-                            }
-                        });
-                    }
-                },
-                _BTN_WNDW_CANCEL
-            ]
-            });
-        //}
-
+        this.dlgShowBriefcase = new Ext.Window({
+            title: 'Просмотр портфеля материалов',
+            width: 900, height: 600,
+            draggable:true,
+            layout: "fit",
+            items: new Inprint.fascicle.planner.Briefcase(),
+            buttons:[
+            {
+                text: _("Add"),
+                scope:this,
+                handler: function() {
+                    var grid = this.dlgShowBriefcase.items.first();
+                    Ext.Ajax.request({
+                        url: _url("/documents/move/"),
+                        scope: this,
+                        params: {
+                            fascicle: this.oid,
+                            id: grid.getValues("id")
+                        },
+                        success: function(response, options) {
+                            this.parent.cmpReload();
+                            this.dlgShowBriefcase.hide();
+                        }
+                    });
+                }
+            },
+            _BTN_WNDW_CANCEL
+        ]
+        });
         this.dlgShowBriefcase.show();
-
     }
 });

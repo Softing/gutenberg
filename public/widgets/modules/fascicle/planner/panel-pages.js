@@ -40,6 +40,10 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
         return this.view;
     },
 
+    getStore: function() {
+        return this.view.getStore();
+    },
+
     getIdByNum: function(num) {
         var id = null;
         var nodes = this.view.getNodes();
@@ -49,10 +53,6 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
             }
         });
         return id;
-    },
-
-    getStore: function() {
-        return this.view.getStore();
     },
 
     cmpGetSelected: function () {

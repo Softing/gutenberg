@@ -9,8 +9,6 @@ use utf8;
 use strict;
 use warnings;
 
-
-
 use base 'Mojolicious::Controller';
 
 sub read {

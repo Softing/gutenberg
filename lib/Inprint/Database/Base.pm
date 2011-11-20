@@ -1,25 +1,33 @@
-package Inprint::Database::Base;
-
-use utf8;
-use strict;
-use warnings;
-
-use Moose;
-
-use Inprint::Database::Model::Edition;
-
-use Inprint::Database::Model::Document;
-
-use Inprint::Database::Model::Fascicle;
-use Inprint::Database::Model::FasciclePage;
-use Inprint::Database::Model::FascicleRequest;
-use Inprint::Database::Model::FascicleModule;
-use Inprint::Database::Model::FascicleModuleMapping;
-
-sub setSql {
-    my ($c, $sql) = @_;
-    $c->sql($sql);
-    return $c;
-}
-
-1;
+#package Inprint::Database::Base;
+#
+#use utf8;
+#use strict;
+#use warnings;
+#
+#use Moose;
+#
+#use Inprint::Utils::MooseUUID qw(UUID);
+#use MooseX::Storage; with Storage( 'format' => 'JSON' );
+#
+#has "app"   => (isa => "Object",   is => "rw", metaclass => 'DoNotSerialize',);
+#has "sql"   => (isa => "Object",   is => "rw", metaclass => 'DoNotSerialize',);
+#
+#sub BUILD {
+#    my ($self) = @_;
+#    $self->sql($self->app->sql);
+#    return $self;
+#}
+#
+#sub json {
+#    my ($self) = @_;
+#
+#    my $hash = {};
+#
+#    foreach my $column ($self->COLUMNS) {
+#        $hash->{$column} = $self->$column;
+#    }
+#
+#    return $hash;
+#}
+#
+#1;

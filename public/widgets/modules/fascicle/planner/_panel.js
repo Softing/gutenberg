@@ -12,19 +12,19 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
         this.panels = {
             pages: new Inprint.fascicle.planner.Pages({
                 parent: this,
-                oid: this.oid
+                oid: this.fascicle
             }),
             documents: new Inprint.fascicle.planner.Documents({
                 parent: this,
-                oid: this.oid
+                oid: this.fascicle
             }),
             requests: new Inprint.fascicle.planner.Requests({
                 parent: this,
-                oid: this.oid
+                oid: this.fascicle
             }),
             summary: new Inprint.fascicle.planner.Summary({
                 parent: this,
-                oid: this.oid
+                oid: this.fascicle
             })
         };
 
@@ -240,12 +240,13 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
 
     onRender: function() {
         Inprint.fascicle.planner.Panel.superclass.onRender.apply(this, arguments);
-
         Inprint.fascicle.planner.Context(this, this.panels);
         Inprint.fascicle.planner.Interaction(this, this.panels);
-
         this.cmpInitSession(true);
+    },
 
+    cmpReload: function() {
+        this.cmpInitSession(false);
     },
 
     cmpInitSession: function (check) {
@@ -255,69 +256,68 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
         Ext.Ajax.request({
             url: _url("/fascicle/seance/"),
             scope: this,
-            params: {
-                fascicle: this.oid
-            },
-            callback: function() {
-                this.body.unmask();
-            },
+            params: { fascicle: this.oid },
+            callback: function() { this.body.unmask(); },
             success: function(response) {
-
-                var rsp = Ext.util.JSON.decode(response.responseText);
-
-                this.version = rsp.fascicle.version;
-                this.manager = rsp.fascicle.manager;
-
-                var shortcut = rsp.fascicle.shortcut;
-                var description = "";
-
-                if (rsp.fascicle.manager) {
-                    description += '&nbsp;[<b>Работает '+ rsp.fascicle.manager_shortcut +'</b>]';
-                }
-
-                description += '&nbsp;[Полос&nbsp;'+ rsp.fascicle.pc +'='+ rsp.fascicle.dc +'+'+ rsp.fascicle.ac;
-                description += '&nbsp;|&nbsp;'+ rsp.fascicle.dav +'%/'+ rsp.fascicle.aav +'%]';
-
-                var title = Inprint.ObjectResolver.makeTitle(this.parent.aid, this.parent.oid, null, this.parent.icon, shortcut, description);
-                this.parent.setTitle(title);
-
-                this.panels.pages.getStore().loadData({ data: rsp.pages });
-                this.panels.documents.getStore().loadData({ data: rsp.documents });
-                this.panels.requests.getStore().loadData({ data: rsp.requests });
-                this.panels.summary.getStore().loadData({ data: rsp.summary });
-
-                Inprint.fascicle.planner.Access(this, this.panels, rsp.fascicle.access);
-
-                if(check) {
-                    this.cmpCheckSession.defer( 3000, this);
-                }
+                this.cmpUpdateSession(Ext.util.JSON.decode(response.responseText));
+                if(check) { this.cmpCheckSession.defer( 6000, this); }
             }
         });
-    },
-
-    cmpReload: function() {
-        this.cmpInitSession(false);
     },
 
     cmpCheckSession: function () {
         Ext.Ajax.request({
             url: _url("/fascicle/check/"),
             scope: this,
-            params: {
-                fascicle: this.oid
-            },
+            params: { fascicle: this.oid },
             success: function(response) {
-                var rsp = Ext.util.JSON.decode(response.responseText);
 
-                Inprint.fascicle.planner.Access(this, this.panels, rsp.fascicle.access);
+                var oldManager = this.access.manager;
 
-                if (this.manager && this.manager != rsp.fascicle.manager) {
-                    Ext.MessageBox.alert(_("Error"), _("Another employee %1 captured this issue!", [ rsp.fascicle.manager_shortcut ]));
+                this.cmpUpdateSession(Ext.util.JSON.decode(response.responseText));
+
+                if (oldManager && oldManager != this.access.manager) {
+                    Ext.MessageBox.alert(_("Error"), _("Another employee %1 captured this issue!", [ this.access.manager_shortcut ]));
                 } else {
-                    this.cmpCheckSession.defer( 3000, this);
+                    this.cmpCheckSession.defer( 6000, this);
                 }
+
             }
         });
+    },
+
+    cmpUpdateSession: function (rsp) {
+
+        var access      = rsp.data.access;
+        var fascicle    = rsp.data.fascicle;
+        var summary     = rsp.data.summary;
+
+        var advertising = rsp.data.advertising;
+        var composition = rsp.data.composition;
+        var documents   = rsp.data.documents;
+        var requests    = rsp.data.requests;
+
+        this.access = access;
+        //this.manager = rsp.data.access.manager;
+        //this.version = rsp.data.fascicle.version;
+
+        Inprint.fascicle.planner.Access(this, this.panels, access);
+
+        var shortcut = rsp.data.fascicle.shortcut;
+        var description = "";
+        if (this.access.manager) {
+            description += '&nbsp;[<b>Работает '+ this.access.manager_shortcut +'</b>]';
+        }
+        description += '&nbsp;[Полос&nbsp;'+ summary.pc +'='+ summary.dc +'+'+ summary.ac;
+        description += '&nbsp;|&nbsp;'+ summary.dav +'%/'+ summary.aav +'%]';
+        var title = Inprint.ObjectResolver.makeTitle(this.parent.aid, this.parent.oid, null, this.parent.icon, shortcut, description);
+        this.parent.setTitle(title);
+
+        if (composition) { this.panels.pages       .getStore().loadData({ data: composition }); }
+        if (documents)   { this.panels.documents   .getStore().loadData({ data: documents }); }
+        if (requests)    { this.panels.requests    .getStore().loadData({ data: requests }); }
+        if (advertising) { this.panels.summary     .getStore().loadData({ data: advertising }); }
+
     },
 
     captureSession: function() {
@@ -340,9 +340,7 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
     },
 
     beginEdit: function() {
-
         this.body.mask("Открываем выпуск...");
-
         Ext.Ajax.request({
             url: _url("/fascicle/open/"),
             scope: this,

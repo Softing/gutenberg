@@ -9,8 +9,14 @@ Inprint.fascicle.planner.Access = function(parent, panels, access) {
     //Seance
     _hide(parent.btnCaptureSession, parent.btnBeginSession, parent.btnEndSession);
 
-    _disable(parent.btnCaptureSession, parent.btnBeginSession,
-        parent.btnEndSession, parent.btnSave);
+    _disable(parent.btnCaptureSession, parent.btnBeginSession, parent.btnEndSession, parent.btnSave);
+
+    _disable(documents.btnUpdate, documents.btnCapture, documents.btnTransfer,
+        documents.btnMove, documents.btnBriefcase, documents.btnCopy,
+        documents.btnDuplicate, documents.btnRecycle, documents.btnRestore,
+        documents.btnDelete);
+
+    _disable(requests.btnCreate, requests.btnUpdate, requests.btnMove, requests.btnDelete);
 
     if (access.open) {
         parent.btnBeginSession.show();
@@ -27,31 +33,19 @@ Inprint.fascicle.planner.Access = function(parent, panels, access) {
         parent.btnEndSession.enable();
     }
 
-    if (access.save) {
-        parent.btnSave.show();
-        parent.btnSave.enable();
+    if (access.advert) {
+        requests.btnCreate.enable();
     }
 
-    //Pages
-    if (access.manage) {
+    if (access.save) {
+
+        parent.btnSave.show();
+        parent.btnSave.enable();
 
         parent.btnPageCreate.enable();
+
         documents.btnCreate.enable();
         documents.btnFromBriefcase.enable();
-
-        requests.btnCreate.enable();
-
-    } else {
-
-        requests.btnCreate.enable();
-
-        _disable(documents.btnUpdate, documents.btnCapture, documents.btnTransfer,
-            documents.btnMove, documents.btnBriefcase, documents.btnCopy,
-            documents.btnDuplicate, documents.btnRecycle, documents.btnRestore,
-            documents.btnDelete);
-
-        _disable(requests.btnUpdate, requests.btnMove, requests.btnDelete);
-
     }
 
 };

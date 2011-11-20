@@ -1,6 +1,6 @@
 Inprint.fascicle.planner.Interaction = function(parent, panels) {
 
-    var access = parent.access;
+    var access      = parent.access;
 
     var pages       = panels.pages;
     var documents   = panels.documents;
@@ -16,13 +16,18 @@ Inprint.fascicle.planner.Interaction = function(parent, panels) {
     };
 
     // Pages view
+
+    pages.view.on("beforeselect", function() {
+        return (parent.access.save == true) ? true : false;
+    });
+
     pages.view.on("selectionchange", function(view, data) {
 
         var requests = this.panels.requests;
 
         _disable(this.btnPageUpdate, this.btnPageDelete, this.btnPageMove, this.btnPageMoveLeft, this.btnPageMoveRight, this.btnPageClean, this.btnPageResize);
 
-        if (this.access.manage) {
+        if (this.access.save) {
 
             _disable(requests.btnMove);
 
@@ -54,9 +59,9 @@ Inprint.fascicle.planner.Interaction = function(parent, panels) {
         var doc_access = _arrayAccessCheck(records, ['delete', 'recover', 'update', 'capture', 'move', 'transfer', 'briefcase']);
 
         _disable(documents.btnUpdate, documents.btnCapture, documents.btnTransfer, documents.btnMove, documents.btnBriefcase, documents.btnCopy,
-                    documents.btnDuplicate, documents.btnRecycle, documents.btnRestore, documents.btnDelete);
+                documents.btnDuplicate, documents.btnRecycle, documents.btnRestore, documents.btnDelete);
 
-        if (this.access.manage) {
+        if (this.access.save) {
 
             if (sm.getCount() == 1) {
                 if (doc_access.update    == 'enabled') {
@@ -111,9 +116,11 @@ Inprint.fascicle.planner.Interaction = function(parent, panels) {
 
         _disable(requests.btnCreate, requests.btnUpdate, requests.btnMove, requests.btnDelete);
 
-        if (this.access.manage) {
-
+        if (this.access.advert) {
             requests.btnCreate.enable();
+        }
+
+        if (this.access.save) {
 
             if (sm.getCount() == 1) {
 

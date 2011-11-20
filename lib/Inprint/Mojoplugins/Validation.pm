@@ -21,21 +21,16 @@ sub register {
 
     $app->helper(
         check_access => sub {
-
             my ($c, $errors, $terms, $binding, $member) = @_;
-
             my @rules;
             my $result = 0;
-
             $result = $c->objectAccess($terms, $binding, $member);
-
             if ($errors) {
                 unless ($result) {
                     my $terms = join ', ', @rules;
                     push @$errors, { id => "access", msg => "Not enough permissions <$terms>"};
                 }
             }
-
             return $result;
         });
 
@@ -45,9 +40,7 @@ sub register {
         get_record => sub {
             my ($c, $table, $id, $ifexists) = @_;
             undef my $item;
-
             $item = $c->Q(" SELECT * FROM $table WHERE id=? ", [ $id ])->Hash;
-
             return $item;
         });
 
@@ -55,14 +48,11 @@ sub register {
         check_record => sub {
             my ($c, $errors, $table, $title, $id, $ifexists) = @_;
             undef my $item;
-
             if ($ifexists && (!$id)) {
                 return;
             }
-
             $item = $c->Q(" SELECT * FROM $table WHERE id=? ", [ $id ])->Hash unless (@$errors);
             push @$errors, { id => $title, msg => "Can't find record"} unless ($item->{id});
-
             return $item;
         });
 

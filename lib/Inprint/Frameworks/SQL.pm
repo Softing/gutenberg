@@ -15,7 +15,8 @@ sub new {
     my $self  = {};
     $self     = bless {}, $class;
 
-    $self->{DBH} = undef;
+    $self->{app} = shift;
+    $self->{dbh} = undef;
     $self->{trace} = undef;
 
     bless($self, $class);
@@ -23,16 +24,16 @@ sub new {
 }
 
 sub dbh {
-    return shift->{DBH};
+    return shift->{dbh};
 }
 
 sub SetDBH {
-    my $c = shift;
-    $c->{DBH} = shift;
+    my $self = shift;
+    $self->{dbh} = shift;
 }
 
 sub Q {
-    my $c = shift;
+    my $self = shift;
 
     my $query   = shift;
     my $value   = shift;
@@ -42,11 +43,11 @@ sub Q {
         $value = [ $value ] if $value;
     }
 
-    return new Inprint::Frameworks::SQLQuery($c->{DBH}, $query, $value, $trace);
+    return new Inprint::Frameworks::SQLQuery($self, $query, $value, $trace);
 }
 
 sub Do {
-    my $c = shift;
+    my $self = shift;
 
     my $query = shift;
     my $value = shift;
@@ -56,8 +57,8 @@ sub Do {
         $value = [ $value ] if $value;
     }
 
-    my $count = $c->dbh->do($query, undef, @{$value});
-    say STDERR $c->dbh->{Statement} if $trace;
+    my $count = $self->dbh->do($query, undef, @{$value});
+    say STDERR $self->dbh->{Statement} if $trace;
 
     return 0 if $count eq '0E0';
     return $count;
@@ -67,7 +68,7 @@ sub Do {
 
 sub ArrayToString
 {
-   my $class = shift;
+   my $self = shift;
    my $array = shift;
    my $string;
 
@@ -78,37 +79,37 @@ sub ArrayToString
 }
 
 sub trace {
-    my $c = shift;
+    my $self = shift;
     my $mode  = shift || 'on';
     say STDERR "SQL TRACE MODE $mode";
-    $c->{trace} = defined if lc($mode) eq 'on';
-    $c->{trace} = undef   if lc($mode) eq 'off';
+    $self->{trace} = defined if lc($mode) eq 'on';
+    $self->{trace} = undef   if lc($mode) eq 'off';
 }
 
 sub lock_table {
-    my $c  = shift;
+    my $self  = shift;
     my $table  = shift;
     my $access = shift || 'EXCLUSIVE MODE';
-    say STDERR "LOCK TABLE $table IN ACCESS $access;" if ( $c->{trace} );
-    $c->Do({ query => "LOCK TABLE $table IN ACCESS $access;" });
+    say STDERR "LOCK TABLE $table IN ACCESS $access;" if ( $self->{trace} );
+    $self->Do({ query => "LOCK TABLE $table IN ACCESS $access;" });
 }
 
 sub bt{
-    my $c = shift;
-    say STDERR "BEGIN;" if ( $c->{trace} );
-    $c->{DBH}->begin_work;
+    my $self = shift;
+    say STDERR "BEGIN;" if ( $self->{trace} );
+    $self->{dbh}->begin_work;
 }
 
 sub rt {
-    my $c = shift;
-    say STDERR "ROLLBACK;" if ( $c->{trace} );
-    $c->{DBH}->rollback;
+    my $self = shift;
+    say STDERR "ROLLBACK;" if ( $self->{trace} );
+    $self->{dbh}->rollback;
 }
 
 sub et {
-    my $c = shift;
-    say STDERR "COMMIT;" if ( $c->{trace} );
-    $c->{DBH}->commit;
+    my $self = shift;
+    say STDERR "COMMIT;" if ( $self->{trace} );
+    $self->{dbh}->commit;
 }
 
 1;
