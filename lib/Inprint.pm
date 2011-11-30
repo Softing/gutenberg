@@ -391,6 +391,12 @@ sub startup {
     $sessionBridge->route("/fascicle/pages/resize/")                    ->to("fascicle-pages#resize");
     $sessionBridge->route("/fascicle/pages/clean/")                     ->to("fascicle-pages#clean");
 
+    $sessionBridge->route('/fascicle/images/page/:fascicle/:page/:w/:h')        ->to('fascicle-images#fascicle_page');
+    $sessionBridge->route('/fascicle/images/template/:id/:w/:h')                ->to('fascicle-images#template_page');
+
+    #$sessionBridge->route('/aimgs/fascicle/template/:id/:w/:h')         ->to('images#fascicle_page');
+    #$sessionBridge->route('/aimgs/fascicle/module/:id/:w/:h')           ->to('images#fascicle_page');
+
     $sessionBridge->route("/fascicle/print/:fascicle/:mode/:size")      ->to("fascicle-print#print");
 
     $sessionBridge->route("/fascicle/requests/list/")                   ->to("fascicle-requests#list");
@@ -468,12 +474,6 @@ sub startup {
     $self->routes->route('/files/view/')                                ->to('files#view');
 
     # Images
-    $sessionBridge->route('/aimgs/fascicle/page/:id/:w/:h')             ->to('images#fascicle_page');
-    $sessionBridge->route('/aimgs/template/page/:id/:w/:h')             ->to('images#template_page');
-
-    $sessionBridge->route('/aimgs/fascicle/template/:id/:w/:h')         ->to('images#fascicle_page');
-    $sessionBridge->route('/aimgs/fascicle/module/:id/:w/:h')           ->to('images#fascicle_page');
-
     $sessionBridge->route('/aimgs/advert/page/:id/:w/:h')               ->to('images#fascicle_page');
     $sessionBridge->route('/aimgs/advert/template/:id/:w/:h')           ->to('images#fascicle_page');
     $sessionBridge->route('/aimgs/advert/module/:id/:w/:h')             ->to('images#fascicle_page');

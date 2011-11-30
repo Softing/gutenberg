@@ -6,7 +6,7 @@ use utf8;
 use strict;
 use warnings;
 
-use Inprint::Database::Model::FasciclePage;
+use Inprint::Database::Model::Page;
 
 extends "Inprint::Database::List";
 

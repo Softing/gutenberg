@@ -17,7 +17,7 @@ Inprint.fascicle.planner.Context = function(parent, panels) {
         var disabled2 = true;
         var items = [];
 
-        if (parent.access.manage) {
+        if (parent.access.save) {
 
             if (selLength == 1) {
                 disabled1 = false;

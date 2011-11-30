@@ -8,7 +8,7 @@ Inprint.cmp.composer.Interaction = function(parent, panels) {
         if (node) {
             if(node.leaf) {
                 flash.cmpMoveBlocks({
-                    module: node.attributes.module,
+                    module: node.attributes.mapping,
                     page: node.attributes.page
                 });
             }
@@ -30,7 +30,7 @@ Inprint.cmp.composer.Interaction = function(parent, panels) {
         new Ext.menu.Menu({ items : items }).show(node.ui.getAnchor());
     }, modules);
 
-    modules.on("templateDroped", function(mapping) {
+    modules.on("templateDroped", function(id) {
 
         Ext.Ajax.request({
             url: parent.urls.modulesCreate,
@@ -38,7 +38,7 @@ Inprint.cmp.composer.Interaction = function(parent, panels) {
             params: {
                 fascicle: parent.fascicle,
                 pages: parent.selection,
-                templates: mapping
+                template: id
             },
             success: function() {
                 flash.cmpInit();

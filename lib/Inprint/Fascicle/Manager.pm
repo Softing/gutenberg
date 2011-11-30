@@ -8,6 +8,9 @@ package Inprint::Fascicle::Manager;
 use strict;
 use warnings;
 
+use Inprint::Fascicle::Utils;
+use Inprint::Fascicle::Events;
+
 use base 'Mojolicious::Controller';
 
 sub open {
@@ -187,8 +190,8 @@ sub save {
 
         }
 
-        # Update documents' pages cache
-        Inprint::Fascicle::Utils::updateDocumentsPagesCache($c, $fascicle->{id});
+        # Create event
+        Inprint::Fascicle::Events::onCompositionChanged($c, $fascicle);
 
         $c->sql->et;
     }

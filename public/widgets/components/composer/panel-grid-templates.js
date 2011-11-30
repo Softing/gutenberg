@@ -1,75 +1,83 @@
-Inprint.cmp.composer.Templates = Ext.extend(Ext.grid.GridPanel, {
+Inprint.cmp.composer.Templates = Ext.extend(Ext.ux.tree.TreeGrid, {
 
     initComponent: function() {
 
+        this.params = {};
+        this.components = {};
+
         this.urls = {
-            "list": this.parent.urls.templatesList
+            "list": "/fascicle/templates/modules/tree/"
         };
 
-        var selection = this.parent.selection;
-        var selLength = this.parent.selLength;
-
-        var pages = [];
-        for (var c = 1; c < selection.length+1; c++) {
-            var array = selection[c-1].split("::");
-            pages.push(array[0]);
-        }
-
-        this.store = Inprint.factory.Store.json(this.urls.list, {
-            autoLoad:true,
-            baseParams: {
-                page: pages
-            }
-        });
-
-        this.selectionModel = new Ext.grid.CheckboxSelectionModel();
+        this.fascicle = this.parent.fascicle;
 
         this.columns = [
-            this.selectionModel,
             {
-                id:"place_shortcut",
-                header: _("Place"),
-                width: 100,
-                sortable: true,
-                dataIndex: "place_title"
-            },
-            {
-                id:"title",
+                id: "title",
                 header: _("Title"),
-                width: 100,
+                width: 280,
                 sortable: true,
                 dataIndex: "title"
-            },
-            {
-                id:"amount",
-                header: _("Amount"),
-                sortable: true,
-                dataIndex: "amount"
             }
         ];
 
+        this.loader  = new Ext.tree.TreeLoader({
+            dataUrl: this.urls.list,
+            baseParams: {
+                fascicle: this.fascicle,
+                page: this.parent.selection
+            }
+        });
+
         Ext.apply(this, {
 
+            flex:2,
+            margins: "0 3 0 3",
+
+            height:300,
+            layout:"fit",
+            region: "south",
             title: _("Templates"),
 
+            enableSort : false,
             enableDrag: true,
             ddGroup: 'TreeDD',
 
-            height:200,
-            layout:"fit",
-            region: "south",
-
-            stripeRows: true,
-            columnLines: true,
-            sm: this.selectionModel
+            singleExpand: true,
+            hideHeaders: true
 
         });
 
         Inprint.cmp.composer.Templates.superclass.initComponent.apply(this, arguments);
 
+        this.on("beforeappend", function(tree, parent, node) {
+            node.attributes.icon = _ico(node.attributes.icon);
+        });
+
+        this.getLoader().on("load", function (loader, node, responce) {
+            node.firstChild.expand();
+        });
+
+        this.getSelectionModel().on("beforeselect", function(model, node) {
+            if (node.attributes.type != "module") {
+                node.expand();
+                return false;
+            }
+            return true;
+        });
+
     },
 
     onRender: function() {
         Inprint.cmp.composer.Templates.superclass.onRender.apply(this, arguments);
+    },
+
+    cmpGetSelectedNode: function() {
+        return this.getSelectionModel().getSelectedNode();
+    },
+
+    cmpReload: function() {
+        this.getRootNode().reload();
     }
+
 });

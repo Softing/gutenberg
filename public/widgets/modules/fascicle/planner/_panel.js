@@ -305,8 +305,8 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
 
         var shortcut = rsp.data.fascicle.shortcut;
         var description = "";
-        if (this.access.manager) {
-            description += '&nbsp;[<b>Работает '+ this.access.manager_shortcut +'</b>]';
+        if (access.manager) {
+            description += '&nbsp;[<b>Работает '+ access.manager_shortcut +'</b>]';
         }
         description += '&nbsp;[Полос&nbsp;'+ summary.pc +'='+ summary.dc +'+'+ summary.ac;
         description += '&nbsp;|&nbsp;'+ summary.dav +'%/'+ summary.aav +'%]';

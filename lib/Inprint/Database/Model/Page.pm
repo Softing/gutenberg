@@ -1,4 +1,4 @@
-package Inprint::Database::Model::FasciclePage;
+package Inprint::Database::Model::Page;
 
 use Moose;
 

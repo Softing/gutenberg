@@ -329,6 +329,7 @@ sub tree {
     my $c = shift;
 
     my $i_fascicle = $c->param("fascicle");
+    my @i_pages    = $c->param("page");
 
     my @errors;
     my $success = $c->json->false;
@@ -355,9 +356,9 @@ sub tree {
 
         foreach my $item (@$data) {
 
-            $item->{children} = $c->Q("
+            my $sql = "
                 SELECT
-                    modules.id,
+                    maps.id,
                     modules.title,
                     'module' as type,
                     'table-select-cells' as icon,
@@ -367,9 +368,22 @@ sub tree {
                 WHERE 1=1
                     AND maps.fascicle=?
                     AND maps.place=?
-                ORDER BY modules.title", [ $i_fascicle, $item->{id} ])->Hashes;
+                 ";
 
-            push @result, $item;
+            my @params;
+            push @params, $i_fascicle;
+            push @params, $item->{id};
+
+            if (@i_pages) {
+                $sql .= " AND modules.amount <= ? ";
+                push @params, $#i_pages+1;
+            }
+
+            $sql .= " ORDER BY modules.title ";
+
+            $item->{children} = $c->Q($sql, \@params)->Hashes;
+
+            push @result, $item if @{ $item->{children} };
         }
     }
 

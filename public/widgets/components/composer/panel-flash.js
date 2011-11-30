@@ -2,11 +2,9 @@ Inprint.cmp.composer.Flash = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
 
-        this.modcache = {};
-
         this.urls = {
-            "init": this.parent.urls.flashInit,
-            "save": this.parent.urls.flashSave
+            "init": _url("/fascicle/composer/initialize/"),
+            "save": _url("/fascicle/composer/save/")
         };
 
         var selection = this.parent.selection;
@@ -26,7 +24,7 @@ Inprint.cmp.composer.Flash = Ext.extend(Ext.Panel, {
 
         selLength = selection.length;
 
-        var flashWidth = 300 * selLength;
+        var flashWidth = 260 * selLength;
 
         this.flashid = Ext.id();
         var flash =  {
@@ -49,7 +47,7 @@ Inprint.cmp.composer.Flash = Ext.extend(Ext.Panel, {
 
         Ext.apply(this, {
             region:"east",
-            margins: "3 3 3 0",
+            //margins: "3 3 3 0",
             width: flashWidth,
             minSize: 200,
             maxSize: 600,
@@ -102,26 +100,19 @@ Inprint.cmp.composer.Flash = Ext.extend(Ext.Panel, {
             return;
         }
 
-        this.modcache = {};
-
         var init = function() {
             if (flash.reset) {
 
                 flash.reset();
 
-                if (responce.data && responce.data.pages) {
-                    Ext.each(responce.data.pages, function(c) {
-                        flash.setField(c.id, "letter", 0, 0 );
-                        flash.setGrid(c.id, c.w, c.h);
-                    }, this);
-                }
+                Ext.each(responce.data.pages, function(c) {
+                    flash.setField(c.id, "letter", 0, 0 );
+                    flash.setGrid(c.id, c.w, c.h);
+                }, this);
 
-                if (responce.data && responce.data.modules) {
-                    Ext.each(responce.data.modules, function(c) {
-                        this.modcache[c.id] = c;
-                        flash.setBlock(c.page, c.id, c.title, c.x, c.y, c.w, c.h );
-                    }, this);
-                }
+                Ext.each(responce.data.modules, function(c) {
+                    flash.setBlock(c.page, c.id, c.title, c.x, c.y, c.w, c.h );
+                }, this);
 
             } else {
                 init.defer(10, this);
@@ -153,28 +144,12 @@ Inprint.cmp.composer.Flash = Ext.extend(Ext.Panel, {
         var data = [];
 
         for (var p=0;p<records.length;p++) {
-
             var modules = records[p].arr;
-
             for (var m=0;m<modules.length;m++) {
-
                 var module = modules[m];
-
-                var id = module.id;
-
-                var oldpage = this.modcache[module.id].page;
-                var newpage = module.fid;
-
-                var x = module.x;
-                var y = module.y;
-                var w = module.w;
-                var h = module.h;
-
-                data.push(
-                    id +'::'+ oldpage +'::'+ newpage +'::'+ x +'::'+ y +'::'+ w +'::'+ h
-                );
+                var string = module.id +'::'+ module.fid +'::'+ module.x  +'::'+ module.y  +'::'+ module.w  +'::'+ module.h;
+                data.push(string);
             }
-
         }
 
         Ext.Ajax.request({
@@ -185,7 +160,8 @@ Inprint.cmp.composer.Flash = Ext.extend(Ext.Panel, {
                 this.parent.fireEvent("actioncomplete", this);
             },
             params: {
-                modules: data
+                modules: data,
+                fascicle: this.parent.fascicle
             }
         });
 

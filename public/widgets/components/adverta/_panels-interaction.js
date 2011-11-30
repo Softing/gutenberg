@@ -14,7 +14,7 @@ Inprint.cmp.Adverta.Interaction = function(parent, panels) {
             if (node) {
                 if(node.leaf) {
                     flash.cmpMoveBlocks({
-                        module: node.attributes.module,
+                        module: node.attributes.mapping,
                         page: node.attributes.page
                     });
                 }
@@ -36,7 +36,7 @@ Inprint.cmp.Adverta.Interaction = function(parent, panels) {
             new Ext.menu.Menu({ items : items }).show(node.ui.getAnchor());
         }, gridModules);
 
-        gridModules.on("templateDroped", function(templates) {
+        gridModules.on("templateDroped", function(id) {
 
             Ext.Ajax.request({
                 url: _url("/fascicle/modules/create/"),
@@ -44,7 +44,7 @@ Inprint.cmp.Adverta.Interaction = function(parent, panels) {
                 params: {
                     fascicle: parent.fascicle,
                     pages: parent.selection,
-                    templates: templates
+                    template: id
                 },
                 success: function() {
                     flash.cmpInit();

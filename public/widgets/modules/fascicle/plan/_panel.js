@@ -74,23 +74,28 @@ Inprint.fascicle.plan.Panel = Ext.extend(Ext.Panel, {
 
                 var rsp = Ext.util.JSON.decode(response.responseText);
 
-                this.version = rsp.fascicle.version;
-                this.manager = rsp.fascicle.manager;
+                var access      = rsp.data.access;
+                var fascicle    = rsp.data.fascicle;
+                var summary     = rsp.data.summary;
 
-                var shortcut = rsp.fascicle.shortcut;
+                var advertising = rsp.data.advertising;
+                var composition = rsp.data.composition;
+                var documents   = rsp.data.documents;
+                var requests    = rsp.data.requests;
+
+                var shortcut = rsp.data.fascicle.shortcut;
                 var description = "";
 
-                if (rsp.fascicle.manager) {
-                    description += '&nbsp;[<b>Работает '+ rsp.fascicle.manager_shortcut +'</b>]';
+                if (access.manager) {
+                    description += '&nbsp;[<b>Работает '+ access.manager_shortcut +'</b>]';
                 }
 
-                description += '&nbsp;[Полос&nbsp;'+ rsp.fascicle.pc +'='+ rsp.fascicle.dc +'+'+ rsp.fascicle.ac;
-                description += '&nbsp;|&nbsp;'+ rsp.fascicle.dav +'%/'+ rsp.fascicle.aav +'%]';
-
+                description += '&nbsp;[Полос&nbsp;'+ summary.pc +'='+ summary.dc +'+'+ summary.ac;
+                description += '&nbsp;|&nbsp;'+ summary.dav +'%/'+ summary.aav +'%]';
                 var title = Inprint.ObjectResolver.makeTitle(this.parent.aid, this.parent.oid, null, this.parent.icon, shortcut, description);
                 this.parent.setTitle(title);
 
-                this.panels.pages.getStore().loadData({ data: rsp.pages });
+                if (composition) { this.panels.pages       .getStore().loadData({ data: composition }); }
 
             }
         });

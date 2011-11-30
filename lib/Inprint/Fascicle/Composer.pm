@@ -8,6 +8,8 @@ package Inprint::Fascicle::Composer;
 use strict;
 use warnings;
 
+use Inprint::Fascicle::Events;
+
 use base 'Mojolicious::Controller';
 
 sub initialize {
@@ -26,13 +28,17 @@ sub initialize {
 
         $data->{pages} = $c->Q("
             SELECT id, w, h, seqnum
-            FROM fascicles_pages WHERE id = ANY(?) ORDER BY seqnum ASC
+            FROM fascicles_pages
+            WHERE id = ANY(?)
+            ORDER BY seqnum ASC
         ", [ \@i_pages ])->Hashes;
 
         $data->{modules} = $c->Q("
-            SELECT t1.id, t1.title, t1.w, t1.h, t2.page, t2.x, t2.y
-            FROM fascicles_modules t1, fascicles_map_modules t2
-            WHERE page=ANY(?) AND t2.module=t1.id
+            SELECT maps.id, modules.title, modules.w, modules.h, maps.page, maps.x, maps.y
+            FROM fascicles_modules modules, fascicles_map_modules maps
+            WHERE 1=1
+                AND maps.module=modules.id
+                AND page=ANY(?)
         ", [ \@i_pages ])->Hashes;
 
     }
@@ -48,30 +54,35 @@ sub save {
     my @errors;
 
     my @i_modules  = $c->param("modules");
+    my $i_fascicle = $c->get_uuid(\@errors, "fascicle");
+
+    my $fascicle = $c->Q(" SELECT * FROM fascicles WHERE id =? ", $i_fascicle )->Hash;
+    push @errors, { id => "fascicle", msg => "Incorrectly filled field"} unless $fascicle;
 
     unless (@errors) {
 
+        $c->sql->bt;
         foreach my $string (@i_modules) {
 
-            my ($module_id, $from_page_id, $to_page_id, $x, $y, $w, $h) = split "::", $string;
+            my ($map_id, $to_page_id, $x, $y, $w, $h) = split "::", $string;
 
             my $placed = 1;
 
+            my $mapping = $c->Q("
+                    SELECT *
+                    FROM fascicles_map_modules
+                    WHERE id=? ",
+                [ $map_id ])->Hash;
+
+            next unless ($mapping->{id});
+
             my $module = $c->Q("
-                SELECT *
-                FROM fascicles_modules
-                WHERE id=? ",
-                [ $module_id ])->Hash;
+                    SELECT *
+                    FROM fascicles_modules
+                    WHERE id=? ",
+                [ $mapping->{module} ])->Hash;
 
             next unless ($module->{id});
-
-            my $from_page = $c->Q("
-                SELECT *
-                FROM fascicles_pages
-                WHERE id=? ",
-                [ $from_page_id ])->Hash;
-
-            next unless ($from_page->{id});
 
             my $to_page = $c->Q("
                 SELECT *
@@ -81,29 +92,19 @@ sub save {
 
             next unless ($to_page->{id});
 
-            next if ($from_page->{edition}  ne $to_page->{edition});
-            next if ($from_page->{fascicle} ne $to_page->{fascicle});
-
             next if ($to_page->{edition}  ne $module->{edition});
             next if ($to_page->{fascicle} ne $module->{fascicle});
 
-            # Get mapping
-            my $mapping = $c->Q("
-                SELECT * FROM fascicles_map_modules WHERE page=? AND module=? ",
-                [ $from_page->{id}, $module->{id} ])->Hash;
+            $c->Do("
+                UPDATE fascicles_map_modules SET page=?, placed=?, x=?, y=? WHERE id=? ",
+                [ $to_page->{id}, $placed, $x, $y, $mapping->{id} ]);
 
-            if ( $mapping->{id} ) {
-                $c->Do("
-                    UPDATE fascicles_map_modules SET page=?, placed=?, x=?, y=? WHERE id=? ",
-                    [ $to_page->{id}, $placed, $x, $y, $mapping->{id} ]);
-            }
-
-            unless ( $mapping->{id} ) {
-                $c->Do("
-                    INSERT INTO fascicles_map_modules (edition, fascicle, page, placed, x, y)",
-                    [ $module->{edition}, $module->{fascicle}, $to_page->{id}, $placed, $x, $y]);
-            }
         }
+
+        # Create event
+        Inprint::Fascicle::Events::onCompositionChanged($c, $fascicle);
+
+        $c->sql->et;
     }
 
     $c->smart_render( \@errors );
@@ -203,33 +204,35 @@ sub modules {
 
         $sql = "
             SELECT DISTINCT
-                t1.id as module,
-                t1.title,
-                t1.description,
-                t1.amount,
-                t1.area,
-                t1.created,
-                t1.updated,
-                t3.id as place,
-                t3.title as place_title,
+                maps.id as mapping,
+                modules.id as module,
+                modules.title,
+                modules.description,
+                modules.amount,
+                modules.area,
+                modules.created,
+                modules.updated,
+                requests.shortcut as request_shortcut,
+                places.id as place,
+                places.title as place_title,
                 (
                     SELECT count(*)
                     FROM fascicles_map_modules
                     WHERE 1=1
-                        AND placed = true
-                        AND module=t1.id ) as count,
+                        AND module = modules.id ) as mapcount,
                 (
                     SELECT count(*)
                     FROM fascicles_requests
                     WHERE 1=1
-                        AND module=t1.id ) as modcount
+                        AND module = modules.id ) as modcount
             FROM
-                fascicles_modules t1
-                    LEFT JOIN fascicles_tmpl_places t3 ON ( t1.place = t3.id ),
-                fascicles_map_modules t2
+                fascicles_modules modules
+                    LEFT JOIN fascicles_tmpl_places places ON ( modules.place = places.id )
+                    LEFT OUTER JOIN fascicles_requests requests ON ( modules.id = requests.module ),
+                fascicles_map_modules maps
             WHERE 1=1
-                AND t2.module=t1.id
-                AND t2.page = ANY(?)
+                AND maps.module = modules.id
+                AND maps.page = ANY(?)
         ";
 
         push @params, \@pages;
@@ -238,16 +241,16 @@ sub modules {
 
     unless (@errors) {
 
-        my $nodes = $c->Q(" $sql ", \@params)->Hashes;
+        my $nodes = $c->Q($sql, \@params)->Hashes;
 
         foreach my $node (@{ $nodes }) {
 
             if ("unmapped" ~~ @filter) {
-                next if ($node->{count} > 0);
+                #next if ($node->{mapcount} > 0);
             }
 
             if ("mapped" ~~ @filter) {
-                next if ($node->{count} == 0);
+                #next if ($node->{mapcount} == 0);
             }
 
             if ("unrequested" ~~ @filter) {
@@ -267,7 +270,7 @@ sub modules {
                 SELECT page FROM fascicles_map_modules WHERE module=?",
                 [ $node->{module} ])->Value;
 
-            if ($node->{count} > 1) {
+            if ($node->{mapcount} > 1) {
 
                 $node->{leaf} = $c->json->false;
                 $node->{expanded} = $c->json->true;
@@ -275,20 +278,27 @@ sub modules {
 
                 my $sql_childrens = "
                     SELECT
-                        t1.id as module, t1.title, t1.description, t1.amount,
-                        t2.page, t3.id as place, t3.seqnum as place_title
+                        maps.id as mapping,
+                        modules.id as module,
+                        modules.title,
+                        modules.description,
+                        modules.amount,
+                        maps.page,
+                        pages.id as place,
+                        pages.seqnum as place_title
                     FROM
-                        fascicles_modules t1,
-                        fascicles_map_modules t2,
-                        fascicles_pages t3
+                        fascicles_modules modules,
+                        fascicles_map_modules maps,
+                        fascicles_pages pages
                     WHERE
-                        t1.id=?
-                        AND t2.module=t1.id
-                        AND t2.page=t3.id
-                        AND t2.page=ANY(?)
+                        modules.id=?
+                        AND maps.page = pages.id
+                        AND maps.page = ANY(?)
+                        AND maps.module = modules.id
                 ";
 
                 $node->{children} = $c->Q($sql_childrens, [ $node->{module}, \@pages ])->Hashes;
+
                 foreach my $subnode (@{ $node->{children} }) {
                     $subnode->{id} = $c->uuid;
                     $subnode->{leaf} = $c->json->true;
@@ -308,6 +318,5 @@ sub modules {
     $c->render_json( \@result );
 
 }
-
 
 1;

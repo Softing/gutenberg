@@ -93,7 +93,7 @@ sub print {
 
     my $pdf = PDF::API2->new();
 
-    my $fascicle = Inprint::Database::fascicle($c, $i_fascicle);
+    my $fascicle = Inprint::Database::FascicleService($c)->load( id => $i_fascicle );
 
     my $page;
 
@@ -107,7 +107,7 @@ sub print {
 
     my $lastpage  = undef;
 
-    for my $record (@{ $fascicle->findPages }) {
+    for my $record (@{ $fascicle->Pages }) {
 
         $iteration++;
 
@@ -128,7 +128,7 @@ sub print {
 
             my $font = $pdf->corefont( "Verdana", -encode=> "windows-1251" );
 
-            draw_header($page, $font, $Cpage, $fascicle->findEdition->shortcut ."/". $fascicle->shortcut);
+            draw_header($page, $font, $Cpage, $fascicle->Edition->shortcut ."/". $fascicle->shortcut);
 
             $itmcount = 0;
             $rowcount = 0;
@@ -140,6 +140,7 @@ sub print {
 
         my $pagenum = $record->seqnum;
         my $pagemod = $record->seqnum %2;
+
 
         # firstpage
         if ($pagenum %2 == 1 && !$lastpage) {
@@ -186,10 +187,10 @@ sub print {
         draw_page($pdf, $page, $x, $y, $Cpage, $record);
 
         $lastpage = $pagenum;
+
     }
 
     my $tempPath = $c->config->get("store.temp");
-
     die "Cant write to $tempPath" unless -w $tempPath;
 
     my $pdf_filename = "$tempPath/table.pdf";
@@ -223,10 +224,10 @@ sub draw_page {
     my $lines_y   = $record->h;
     my $pagenum   = $record->seqnum;
 
-    my $modules   = $record->findModules;
-    my $documents = $record->findDocuments;
-    my $holes     = $record->findHoles;
-    my $requests  = $record->findRequests;
+    my $modules   = $record->Modules;
+    my $documents = $record->Documents;
+    my $holes     = $record->Holes;
+    my $requests  = $record->Requests;
 
     my $top    = $PF->{top};
     my $width  = $PF->{width};
@@ -273,8 +274,8 @@ sub draw_page {
         my $mw = $item->w;
         my $mh = $item->h;
 
-        my $mx = $item->findMapByPage($record->id)->x;
-        my $my = $item->findMapByPage($record->id)->y;
+        my $mx = $item->MapByPage($record->id)->x;
+        my $my = $item->MapByPage($record->id)->y;
 
         my $modx = get_cord($mx);
         my $mody = get_cord($my);
@@ -308,7 +309,7 @@ sub draw_page {
         $tb->align("center");
         $tb->lead(4/pt);
         $tb->page($page);
-        $tb->text( encode( "cp1251", $item->title ."\n". $item->findRequest->shortcut) );
+        $tb->text( encode( "cp1251", $item->title ."\n". $item->Request->shortcut) );
         $tb->apply;
     }
 

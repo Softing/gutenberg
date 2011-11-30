@@ -18,16 +18,16 @@ sub seance {
 
     my @errors;
 
-    my $fascicle  = Inprint::Database::Fascicle($c)->load( id => $c->param("fascicle") );
-    my $edition   = Inprint::Database::Edition($c)->load( id => $fascicle->edition );
+    my $fascicle  = Inprint::Database::FascicleService($c)->load( id => $c->param("fascicle") );
+    my $edition   = Inprint::Database::EditionService($c)->load( id => $fascicle->edition );
 
     $fascicle->{shortcut} = $edition->shortcut ."/". $fascicle->shortcut;
 
     # Statusbar
     $c->smart_render(\@errors, {
         fascicle    => $fascicle->json,
-        summary     => $fascicle->summary(),
-        access      => $fascicle->access(),
+        summary     => $fascicle->Summary(),
+        access      => $fascicle->Access(),
         composition => _createComposeIndex($c, $fascicle),
         documents   => _createDocumentsIndex($c, $fascicle),
         advertising => _createAdvertIndex($c, $fascicle),
@@ -42,78 +42,22 @@ sub check {
 
     my @errors;
 
-    my $fascicle  = Inprint::Database::Fascicle($c)->load( id => $c->param("fascicle") );
+    my $fascicle  = Inprint::Database::FascicleService($c)->load( id => $c->param("fascicle") );
     my $edition   = Inprint::Database::Edition($c)->load( id => $fascicle->edition );
 
     $fascicle->{shortcut} = $edition->shortcut ."/". $fascicle->shortcut;
 
-    # Statusbar
     $c->smart_render(\@errors, {
         fascicle    => $fascicle->json,
-        summary     => $fascicle->summary(),
-        access      => $fascicle->access(),
+        summary     => $fascicle->Summary(),
+        access      => $fascicle->Access(),
     });
 
-    #my $c = shift;
-    #my $i_fascicle = $c->param("fascicle");
-    #
-    #my @errors;
-    #my $success = $c->json->false;
-    #
-    #my $current_member = $c->getSessionValue("member.id");
-    #
-    #push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
-    #    unless ($c->is_uuid($i_fascicle));
-    #
-    #my $fascicle;
-    #unless (@errors) {
-    #    $fascicle = $c->Q(" SELECT * FROM fascicles WHERE id =? ", [ $i_fascicle ])->Hash;
-    #    push @errors, { id => "fascicle", msg => "Incorrectly filled field"}
-    #        unless $fascicle;
-    #}
-    #
-    #unless (@errors) {
-    #
-    #    if ($fascicle->{manager}) {
-    #        $fascicle->{manager_shortcut} = $c->Q(" SELECT shortcut FROM profiles WHERE id=?", [$fascicle->{manager}])->Value;
-    #    }
-    #
-    #    $fascicle->{access} = {
-    #        open => $c->json->true,
-    #        capture => $c->json->false,
-    #        close => $c->json->false,
-    #        save => $c->json->false,
-    #        manage => $c->json->false
-    #    };
-    #
-    #    if ($fascicle->{manager}) {
-    #
-    #        if ($fascicle->{manager} eq $current_member) {
-    #            $fascicle->{access}->{open}    = $c->json->false;
-    #            $fascicle->{access}->{capture} = $c->json->false;
-    #            $fascicle->{access}->{close}   = $c->json->true;
-    #            $fascicle->{access}->{save}    = $c->json->true;
-    #            $fascicle->{access}->{manage}  = $c->json->true;
-    #        }
-    #
-    #        if ($fascicle->{manager} ne $current_member) {
-    #            $fascicle->{access}->{open}    = $c->json->false;
-    #            $fascicle->{access}->{capture} = $c->json->true;
-    #            $fascicle->{access}->{close}   = $c->json->false;
-    #            $fascicle->{access}->{save}    = $c->json->false;
-    #            $fascicle->{access}->{manage}  = $c->json->false;
-    #        }
-    #    }
-    #
-    #}
-    #
-    #$success = $c->json->true unless (@errors);
-    #$c->render_json({ success => $success, errors => \@errors, fascicle => $fascicle || {} });
 }
 
 sub _createDocumentsIndex {
     my ($c, $fascicle) = @_;
-    return Inprint::Database::Documents($c) ->list(fascicle => $fascicle->id, orderBy => "headline_shortcut")->json;
+    return Inprint::Database::DocumentsManager($c)->list(fascicle => $fascicle->id, orderBy => "headline_shortcut")->json;
 }
 
 sub _createComposeIndex {
@@ -244,18 +188,8 @@ sub _createComposeIndex {
 }
 
 sub _createRequestsIndex {
-
     my ($c, $fascicle) = @_;
-
-    my $result = [];
-
-#    my $filter = {
-#        flt_fascicle => $fascicle
-#    };
-#
-#    my $result = Inprint::Models::Fascicle::Request::search($c, $filter);
-#
-    return $result;
+    return $fascicle->Requests;
 }
 
 sub _createAdvertIndex {

@@ -99,7 +99,7 @@ Inprint.cmp.adverta.Request = Ext.extend(Ext.FormPanel, {
 
         Ext.apply(this, {
             flex:1,
-            width: 280,
+            width: 250,
             labelWidth: 90,
             defaults: {
                 anchor: "100%",

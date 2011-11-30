@@ -38,8 +38,8 @@ Inprint.cmp.Composer = Ext.extend(Ext.Window, {
             closeAction: "hide",
             title: _("Разметка полос"),
 
-            width: (this.selLength*300) + 400,
-            height:450,
+            width: 430 + (this.selLength*260),
+            height:600,
 
             defaults: {
                 collapsible: false,

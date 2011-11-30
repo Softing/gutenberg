@@ -7,11 +7,32 @@ use strict;
 use warnings;
 
 use Inprint::Database::Model::Edition;
-use Inprint::Database::Model::Fascicle;
+use Inprint::Database::Service::Requests;
 
 extends "Inprint::Database::Model::Fascicle";
 
-sub access {
+sub Edition {
+    my ($self) = @_;
+    my $sqldata = $self->sql->Q(" SELECT * FROM editions WHERE id = ? ", $self->edition)->Hash;
+    return new Inprint::Database::Model::Edition( app => $self->app )->map($sqldata);
+}
+
+sub Pages {
+    my ($self) = @_;
+    my $sqldata = $self->sql->Q(" SELECT * FROM fascicles_pages WHERE fascicle = ? ORDER BY seqnum", $self->id)->Hashes;
+    my @pages;
+    foreach (@$sqldata) {
+        push @pages, new Inprint::Database::Service::Page( app => $self->app )->map($_);
+    }
+    return \@pages;
+}
+
+sub Requests {
+    my ($self) = @_;
+    return Inprint::Database::Service::Requests->new( app => $self->app )->list( fascicle => $self->id )->json;
+}
+
+sub Access {
 
     my ($self) = @_;
 
@@ -45,7 +66,7 @@ sub access {
     return $access;
 }
 
-sub summary {
+sub Summary {
 
     my ($self) = @_;
 

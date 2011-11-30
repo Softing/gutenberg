@@ -5,9 +5,9 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
         this.url = _url("/fascicle/pages/view/");
 
         this.tpl = new Ext.XTemplate(
-            '{[ this.renderPages(values) ]}',
+            '{[ this.renderPages(\''+ this.fascicle +'\', values) ]}',
             {
-                renderPages: function(values){
+                renderPages: function(fascicle, values){
 
                     var string = "";
 
@@ -61,7 +61,7 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
                             string += '</div>';
 
                             string += '<div class="inprint-plan-page-body"'+
-                                ' style="background:url(/aimgs/fascicle/page/'+ page.id +'/200/240/?rnd='+ Math.random() +') no-repeat;">';
+                                ' style="background:url(/fascicle/images/page/'+ fascicle +'/'+ page.id +'/200/240/?rnd='+ Math.random() +') no-repeat;">';
 
                             if (page.holes) {
                                 string += '<div style="clear:both"></div>';

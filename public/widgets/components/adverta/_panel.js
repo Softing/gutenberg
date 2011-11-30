@@ -32,7 +32,7 @@ Inprint.cmp.Adverta = Ext.extend(Ext.Window, {
             this.items.push(this.panels.flash);
         }
 
-        var winWidth = (this.selection.length*260) + 600;
+        var winWidth = 600 + (this.selection.length*260);
 
         var title;
         var btn;
@@ -55,7 +55,7 @@ Inprint.cmp.Adverta = Ext.extend(Ext.Window, {
             title: title,
 
             width: winWidth,
-            height:450,
+            height:600,
 
             layout:'hbox',
             layoutConfig: {

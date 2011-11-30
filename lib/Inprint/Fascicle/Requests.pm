@@ -81,7 +81,7 @@ sub create {
 
     my @errors;
     my $success = $c->json->false;
-    
+
     my $id = $c->uuid();
 
     my $i_shortcut    = $c->param("shortcut")       // undef;
@@ -116,143 +116,117 @@ sub create {
     my $fascicle   = $c->check_record(\@errors, "fascicles", "fascicle", $i_fascicle);
     my $advertiser = $c->check_record(\@errors, "ad_advertisers", "advertiser", $i_advertiser);
 
+    my $place;
+    my $pages;
+    my $module;
+    my $template;
+
+    my $sql_page;
+    my $sql_pages;
+    my $sql_amount;
+    my $sql_module;
+
     if ($i_module) {
 
-        my $module;
-        unless(@errors) {
-            $module = $c->Q(" SELECT * FROM fascicles_modules WHERE id=? ", [ $i_module ])->Hash;
-            push @errors, { id => "module", msg => "Can't find object"}
-                unless ($module->{id});
-        }
+        $module = $c->Q("
+                SELECT *
+                FROM fascicles_modules
+                WHERE id=?
+            ", [ $i_module ])->Hash;
 
-        my $place;
-        unless(@errors) {
-            $place = $c->Q("
-                    SELECT t1.* FROM fascicles_tmpl_places t1
-                    WHERE t1.id=?
-                ", [ $module->{place} ])->Hash;
-            push @errors, { id => "place", msg => "Can't find object"}
-                unless ($place->{id});
-        }
+        push @errors, { id => "module", msg => "Can't find object"} unless ($module->{id});
 
-        my $template;
-        unless(@errors) {
-            $template = $c->Q("
-                    SELECT t1.* FROM fascicles_tmpl_modules t1
-                    WHERE t1.id=?
-                ", [ $module->{origin} ])->Hash;
-            push @errors, { id => "template", msg => "Can't find object"}
-                unless ($template->{id});
-        }
+        $pages = $c->Q("
+                SELECT t2.seqnum
+                FROM fascicles_map_modules t1, fascicles_pages t2
+                WHERE 1=1
+                    AND t2.id = t1.page
+                    AND t1.fascicle=?
+                    AND t1.module=?
+                ORDER BY t2.seqnum
+            ", [ $module->{fascicle}, $module->{id} ])->Values;
 
-        my $pages;
-        unless(@errors) {
-            $pages = $c->Q("
-                    SELECT t2.seqnum
-                    FROM fascicles_map_modules t1, fascicles_pages t2
-                    WHERE t2.id = t1.page AND t1.fascicle=? AND t1.module=?
-                    ORDER BY t2.seqnum
-                ", [ $module->{fascicle}, $module->{id} ])->Values;
-        }
+        $place = $c->Q("
+                SELECT t1.*
+                FROM fascicles_tmpl_places t1
+                WHERE t1.id=?
+            ", [ $module->{place} ])->Hash;
 
-        unless (@errors) {
-            $c->Do("
-                INSERT INTO fascicles_requests(
-                    id,
-                    edition, fascicle,
-                    advertiser, advertiser_shortcut,
-                    place, place_shortcut,
-                    manager, manager_shortcut,
-                    origin, origin_shortcut, origin_area, origin_x, origin_y, origin_w, origin_h,
-                    module, amount,
-                    pages, firstpage,
-                    shortcut, description,
-                    status, squib, payment, readiness,
-                    created, updated)
-                VALUES (
-                    ?,
-                    ?, ?,
-                    ?, ?,
-                    ?, ?,
-                    ?, ?,
-                    ?, ?, ?, ?, ?, ?, ?,
-                    ?, ?,
-                    ?, ?,
-                    ?, ?,
-                    ?, ?, ?, ?,
-                    now(), now());
-            ", [
-                $id,
-                $fascicle->{edition}, $fascicle->{id},
-                $advertiser->{id}, $advertiser->{shortcut},
-                $place->{id}, $place->{title},
-                $c->getSessionValue("member.id"), $c->getSessionValue("member.shortcut"),
-                $template->{id}, $template->{title}, $template->{area},  $template->{x},  $template->{y},  $template->{w},  $template->{h},
-                $module->{id}, $module->{amount},
-                join (', ', @$pages), @$pages[0],
-                $i_shortcut, $i_description,
-                $i_status, $i_squib, $i_payment, $i_readiness
-            ]);
-        }
+        $template = $c->Q("
+                SELECT t1.* FROM fascicles_tmpl_modules t1
+                WHERE t1.id=?
+            ", [ $module->{origin} ])->Hash;
 
+        $sql_module = $module->{id};
+        $sql_amount = $module->{amount};
+        $sql_page = @$pages[0];
+        $sql_pages = join (', ', @$pages);
     }
 
     if ($i_template) {
 
-        my $template;
-        unless(@errors) {
-            $template = $c->Q(" SELECT * FROM fascicles_tmpl_modules WHERE id=? ", [ $i_template ])->Hash;
-            push @errors, { id => "template", msg => "Can't find object"}
-                unless ($template->{id});
-        }
+        my $map = $c->Q("
+                SELECT *
+                FROM fascicles_tmpl_index
+                WHERE id=? ", [ $i_template ])->Hash;
 
-        my $place;
-        unless(@errors) {
-            $place = $c->Q("
-                    SELECT t1.* FROM fascicles_tmpl_places t1, fascicles_tmpl_index t2
-                    WHERE t2.place=t1.id AND t2.nature='module' AND t2.entity=?
-                ", [ $template->{id} ])->Hash;
-            push @errors, { id => "place", msg => "Can't find object"}
-                unless ($place->{id});
-        }
+        $place = $c->Q("
+                SELECT *
+                FROM fascicles_tmpl_places
+                WHERE id=?
+            ", [ $map->{place} ])->Hash;
 
-        unless (@errors) {
-            $c->Do("
-                INSERT INTO fascicles_requests(
-                    id,
-                    edition, fascicle,
-                    advertiser, advertiser_shortcut,
-                    place, place_shortcut,
-                    manager, manager_shortcut,
-                    origin, origin_shortcut, origin_area, origin_x, origin_y, origin_w, origin_h,
-                    module, amount,
-                    shortcut, description,
-                    status, squib, payment, readiness,
-                    created, updated)
-                VALUES (
-                    ?,
-                    ?, ?,
-                    ?, ?,
-                    ?, ?,
-                    ?, ?,
-                    ?, ?, ?, ?, ?, ?, ?,
-                    null, ?,
-                    ?, ?,
-                    ?, ?, ?, ?,
-                    now(), now());
-            ", [
-                $id,
-                $fascicle->{edition}, $fascicle->{id},
-                $advertiser->{id}, $advertiser->{shortcut},
-                $place->{id}, $place->{title},
-                $c->getSessionValue("member.id"), $c->getSessionValue("member.shortcut"),
-                $template->{id}, $template->{title}, $template->{area},  $template->{x},  $template->{y},  $template->{w},  $template->{h},
-                $template->{amount},
-                $i_shortcut, $i_description,
-                $i_status, $i_squib, $i_payment, $i_readiness
-            ]);
-        }
+        $template = $c->Q("
+                SELECT *
+                FROM fascicles_tmpl_modules
+                WHERE id=?
+            ", [ $map->{entity} ])->Hash;
 
+        $sql_amount = $template->{amount};
+
+    }
+
+    push @errors, { id => "place", msg => "Can't find object"} unless ($place->{id});
+    push @errors, { id => "template", msg => "Can't find object"} unless ($template->{id});
+
+    unless (@errors) {
+        $c->Do("
+            INSERT INTO fascicles_requests(
+                id,
+                edition, fascicle,
+                advertiser, advertiser_shortcut,
+                place, place_shortcut,
+                manager, manager_shortcut,
+                origin, origin_shortcut, origin_area, origin_x, origin_y, origin_w, origin_h,
+                module, amount,
+                firstpage, pages,
+                shortcut, description,
+                status, squib, payment, readiness,
+                created, updated)
+            VALUES (
+                ?,
+                ?, ?,
+                ?, ?,
+                ?, ?,
+                ?, ?,
+                ?, ?, ?, ?, ?, ?, ?,
+                ?, ?,
+                ?, ?,
+                ?, ?,
+                ?, ?, ?, ?,
+                now(), now());
+        ", [
+            $id,
+            $fascicle->{edition}, $fascicle->{id},
+            $advertiser->{id}, $advertiser->{shortcut},
+            $place->{id}, $place->{title},
+            $c->getSessionValue("member.id"), $c->getSessionValue("member.shortcut"),
+            $template->{id}, $template->{title}, $template->{area},  $template->{x},  $template->{y},  $template->{w},  $template->{h},
+            $sql_module, $sql_amount,
+            $sql_page, $sql_pages,
+            $i_shortcut, $i_description,
+            $i_status, $i_squib, $i_payment, $i_readiness
+        ]);
     }
 
     $success = $c->json->true unless (@errors);

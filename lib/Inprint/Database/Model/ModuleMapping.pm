@@ -1,4 +1,4 @@
-package Inprint::Database::Model::FascicleModuleMapping;
+package Inprint::Database::Model::ModuleMapping;
 
 use utf8;
 use strict;
@@ -8,7 +8,7 @@ use Moose;
 use MooseX::UndefTolerant;
 use Inprint::Utils::MooseUUID qw(UUID);
 
-extends "Inprint::Database::Base";
+extends "Inprint::Database::Model";
 
 has "sql"           => (isa => "Object",   is => "rw");
 

@@ -2,14 +2,9 @@ Inprint.cmp.adverta.Flash = Ext.extend(Ext.Panel, {
 
     initComponent: function() {
 
-        this.params = {};
-        this.components = {};
-
-        this.saveCounter = 0;
-
         this.urls = {
-            "init":   _url("/fascicle/composer/initialize/"),
-            "save":   _url("/fascicle/composer/save/")
+            "init": _url("/fascicle/composer/initialize/"),
+            "save": _url("/fascicle/composer/save/")
         };
 
         var selection = this.parent.selection;
@@ -20,7 +15,6 @@ Inprint.cmp.adverta.Flash = Ext.extend(Ext.Panel, {
             var array2 = b.split("::");
             return array1[1] - array2[1];
         });
-
 
         this.pages = [];
         for (var c = 1; c < selection.length+1; c++) {
@@ -53,7 +47,7 @@ Inprint.cmp.adverta.Flash = Ext.extend(Ext.Panel, {
 
         Ext.apply(this, {
             region:"east",
-            margins: "3 3 3 0",
+            //margins: "3 3 3 0",
             width: flashWidth,
             minSize: 200,
             maxSize: 600,
@@ -153,7 +147,7 @@ Inprint.cmp.adverta.Flash = Ext.extend(Ext.Panel, {
             var modules = records[p].arr;
             for (var m=0;m<modules.length;m++) {
                 var module = modules[m];
-                var string = module.id +'::'+ module.fid +'::'+ module.fid +'::'+ module.x  +'::'+ module.y  +'::'+ module.w  +'::'+ module.h;
+                var string = module.id +'::'+ module.fid +'::'+ module.x  +'::'+ module.y  +'::'+ module.w  +'::'+ module.h;
                 data.push(string);
             }
         }
@@ -166,7 +160,8 @@ Inprint.cmp.adverta.Flash = Ext.extend(Ext.Panel, {
                 this.parent.fireEvent("actioncomplete", this);
             },
             params: {
-                modules: data
+                modules: data,
+                fascicle: this.parent.fascicle
             }
         });
 

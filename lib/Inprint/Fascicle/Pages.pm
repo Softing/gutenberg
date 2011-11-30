@@ -8,13 +8,11 @@ package Inprint::Fascicle::Pages;
 use strict;
 use warnings;
 
-
-
+use Inprint::Fascicle::Events;
 use Inprint::Fascicle::Utils;
+
 use Inprint::Models::Fascicle::Page;
 use Inprint::Models::Fascicle::Pages;
-
-use Inprint::Fascicle::Utils;
 
 use base 'Mojolicious::Controller';
 
@@ -148,8 +146,8 @@ sub create {
             ", [$id, $page->{edition}, $page->{fascicle}, $template->{id}, $page->{headline}, $page->{seqnum}, $template->{w}, $template->{h} ]);
         }
 
-        # Update page's cache
-        Inprint::Fascicle::Utils::updateDocumentsPagesCache($c, $fascicle->{id});
+        # Create event
+        Inprint::Fascicle::Events::onCompositionChanged($c, $fascicle);
 
         $c->sql->et;
 
@@ -291,8 +289,8 @@ sub move {
             }
         }
 
-        # Update page's cache
-        Inprint::Fascicle::Utils::updateDocumentsPagesCache($c, $fascicle->{id});
+        # Create event
+        Inprint::Fascicle::Events::onCompositionChanged($c, $fascicle);
 
         $c->sql->et;
 
@@ -344,8 +342,8 @@ sub right {
             }
         }
 
-        # Update page's cache
-        Inprint::Fascicle::Utils::updateDocumentsPagesCache($c, $fascicle->{id});
+        # Create event
+        Inprint::Fascicle::Events::onCompositionChanged($c, $fascicle);
 
         $c->sql->et;
 
@@ -419,8 +417,8 @@ sub left {
             }
         }
 
-        # Update page's cache
-        Inprint::Fascicle::Utils::updateDocumentsPagesCache($c, $fascicle->{id});
+        # Create event
+        Inprint::Fascicle::Events::onCompositionChanged($c, $fascicle);
 
         $c->sql->et;
     }
@@ -501,8 +499,8 @@ sub delete {
             $c->sql->et;
         }
 
-        # Update page's cache
-        Inprint::Fascicle::Utils::updateDocumentsPagesCache($c, $fascicle->{id});
+        # Create event
+        Inprint::Fascicle::Events::onCompositionChanged($c, $fascicle);
 
     }
 

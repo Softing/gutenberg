@@ -14,7 +14,7 @@ Inprint.cmp.adverta.GridModules = Ext.extend(Ext.ux.tree.TreeGrid, {
         this.columns = [
             {
                 id:"title",
-                width: 130,
+                width: 90,
                 header: _("Title"),
                 dataIndex: "title"
             },
@@ -22,13 +22,14 @@ Inprint.cmp.adverta.GridModules = Ext.extend(Ext.ux.tree.TreeGrid, {
                 id:"place_title",
                 width: 100,
                 header: _("Place"),
-                dataIndex: "place_title"
-            },
-            {
-                id:"amount",
-                width: 80,
-                header: _("Amount"),
-                dataIndex: "amount"
+                dataIndex: "place_title",
+                tpl : new Ext.XTemplate('{format:this.formatString}', {
+                    formatString : function(v, record) {
+                        var amount = record.amount || 1;
+                        var place  = record.place_title || "";
+                        return String.format("{0} / {1}", amount, place);
+                    }
+                })
             }
         ];
 
@@ -54,25 +55,15 @@ Inprint.cmp.adverta.GridModules = Ext.extend(Ext.ux.tree.TreeGrid, {
             dropConfig: {
                 dropAllowed : true,
                 notifyDrop : function (source, e, data) {
-
-                    var mapping = [];
-                    Ext.each(source.dragData.selections, function(r) {
-                        mapping.push(r.data.id);
-                    });
-
-                    this.tree.fireEvent("templateDroped", mapping);
-
+                    this.tree.fireEvent("templateDroped", source.dragData.node.id);
                     this.cancelExpand();
-
                     return true;
                 },
 
                 onContainerOver: function(source, e, data) {
                     return "x-tree-drop-ok-append";
                 }
-
             }
-
         });
 
         Inprint.cmp.adverta.GridModules.superclass.initComponent.apply(this, arguments);

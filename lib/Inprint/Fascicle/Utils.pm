@@ -10,24 +10,6 @@ use warnings;
 
 use base 'Mojolicious::Controller';
 
-sub updateDocumentsPagesCache {
-    my ($c, $fascicle) = @_;
-
-    $c->Do("
-            UPDATE documents SET
-                pages = array_to_string(
-                    ARRAY( SELECT seqnum FROM fascicles_pages as pages, fascicles_map_documents as mapping
-                        WHERE mapping.page = pages.id AND mapping.entity = documents.id ORDER BY pages.seqnum )
-                    , ','),
-                firstpage = ( SELECT min(seqnum) FROM fascicles_pages as pages, fascicles_map_documents as mapping
-                        WHERE mapping.page = pages.id AND mapping.entity = documents.id
-                )
-            WHERE fascicle = ?
-        ", [ $fascicle ]);
-
-    return 1;
-}
-
 sub compressString {
 
     my $c = shift;

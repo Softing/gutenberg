@@ -1,4 +1,4 @@
-package Inprint::Database::Model::FascicleRequest;
+package Inprint::Database::Model::Request;
 
 use utf8;
 use strict;
@@ -8,9 +8,18 @@ use Moose;
 use MooseX::UndefTolerant;
 use Inprint::Utils::MooseUUID qw(UUID);
 
-extends "Inprint::Database::Base";
+use constant ID      => "requests";
+use constant TABLE   => "fascicles_requests";
+use constant COLUMNS => qw/
+    id edition fascicle module serialnum advertiser advertiser_shortcut place
+    place_shortcut manager manager_shortcut amount origin origin_shortcut
+    origin_area origin_x origin_y origin_w origin_h pages firstpage shortcut
+    description status payment readiness squib check_status anothers_layout
+    imposed created::date updated::date /;
 
-has "sql"                   => (isa => "Object",   is => "rw");
+use constant FIELDS => qw/  /;
+
+extends "Inprint::Database::Model";
 
 has 'id'                    => (isa => UUID,    is => 'rw');
 has 'edition'               => (isa => UUID,    is => 'rw');
@@ -52,8 +61,5 @@ has "imposed"               => (isa => 'Bool',   is => 'rw');
 
 has 'created'               => (isa => 'Str',   is => 'rw');
 has 'updated'               => (isa => 'Str',   is => 'rw');
-
-##
-
 
 1;

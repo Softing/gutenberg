@@ -8,6 +8,6 @@ use warnings;
 
 use Inprint::Database::Model::Edition;
 
-
+extends "Inprint::Database::List";
 
 1;

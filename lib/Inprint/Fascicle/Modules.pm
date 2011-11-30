@@ -123,7 +123,7 @@ sub create {
     my $id = $c->uuid();
 
     my $i_fascicle    = $c->param("fascicle");
-    my @i_mapping     = $c->param("templates");
+    my $i_template    = $c->param("template");
     my @i_pages       = $c->param("pages");
 
     my @errors;
@@ -132,32 +132,26 @@ sub create {
     #push @errors, { id => "access", msg => "Not enough permissions"}
     #    unless ($c->objectAccess("domain.roles.manage"));
 
-    my $fascicle   = $c->check_record(\@errors, "fascicles", "fascicle", $i_fascicle);
+    my $fascicle = $c->check_record(\@errors, "fascicles", "fascicle", $i_fascicle);
 
     $c->fail_render(\@errors);
 
-    # Find modules by mapping;
-    my @modules;
-    foreach my $map (@i_mapping) {
-        my $module = $c->Q("
-            SELECT
-                t1.id,
-                t2.place as place,
-                t1.origin, t1.fascicle, t1.page,
-                t1.title, t1.description,
-                t1.amount, t1.area,
-                t1.x, t1.y, t1.w, t1.h,
-                t1.width, t1.height, t1.fwidth, t1.fheight,
-                t1.created, t1.updated
-            FROM fascicles_tmpl_modules t1, fascicles_tmpl_index t2
-            WHERE t1.id=t2.entity AND t2.id=?
-        ", [ $map ])->Hash;
-        next unless $module->{id};
-        push @modules, $module;
-    }
+    # Find module
+    my $module = $c->Q("
+        SELECT
+            t1.id,
+            t2.place as place,
+            t1.origin, t1.fascicle, t1.page,
+            t1.title, t1.description,
+            t1.amount, t1.area,
+            t1.x, t1.y, t1.w, t1.h,
+            t1.width, t1.height, t1.fwidth, t1.fheight,
+            t1.created, t1.updated
+        FROM fascicles_tmpl_modules t1, fascicles_tmpl_index t2
+        WHERE t1.id=t2.entity AND t2.id=?
+    ", [ $i_template ])->Hash;
 
-    push @errors, { id => "page", msg => "Modules not equal $#i_mapping"}
-        unless ($#modules == $#i_mapping);
+    push @errors, { id => "module", msg => "Object not found"} unless $module->{id};
 
     $c->fail_render(\@errors);
 
@@ -181,41 +175,34 @@ sub create {
 
     $c->fail_render(\@errors);
 
-    foreach my $module (@modules) {
+    my $module_id = $c->uuid;
 
-        unless (@errors) {
+    $c->Do("
+        INSERT INTO fascicles_modules
+            (
+                id, edition, fascicle, place, origin,
+                title, description,
+                amount, area,
+                w, h,
+                width, height, fwidth, fheight,
+                created, updated)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
+    ", [
+        $module_id, $fascicle->{edition}, $fascicle->{id},
+        $module->{place},
+        $module->{id}, $module->{title}, $module->{description},
+        $module->{amount}, $module->{area},
+        $module->{w}, $module->{h},
+        $module->{width}, $module->{height}, $module->{fwidth}, $module->{fheight}
+    ]);
 
-            my $module_id = $c->uuid;
-
-            $c->Do("
-                INSERT INTO fascicles_modules
-                    (
-                        id, edition, fascicle, place, origin,
-                        title, description,
-                        amount, area,
-                        w, h,
-                        width, height, fwidth, fheight,
-                        created, updated)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now());
-            ", [
-                $module_id, $fascicle->{edition}, $fascicle->{id},
-                $module->{place},
-                $module->{id}, $module->{title}, $module->{description},
-                $module->{amount}, $module->{area},
-                $module->{w}, $module->{h},
-                $module->{width}, $module->{height}, $module->{fwidth}, $module->{fheight}
-            ]);
-
-            foreach my $page (@pages) {
-                $c->Do("
-                    INSERT INTO fascicles_map_modules(edition, fascicle, module, page, placed, x, y, created, updated)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, now(), now());
-                ", [
-                    $fascicle->{edition}, $fascicle->{id}, $module_id, $page->{id}, 0, "1/1", "1/1"
-                ]);
-            }
-        }
-
+    foreach my $page (@pages) {
+        $c->Do("
+            INSERT INTO fascicles_map_modules
+            (edition, fascicle, module, page, placed, x, y, created, updated)
+            VALUES
+            (?, ?, ?, ?, ?, ?, ?, now(), now());
+        ", [ $fascicle->{edition}, $fascicle->{id}, $module_id, $page->{id}, 0, "1/1", "1/1" ]);
     }
 
     $success = $c->json->true unless (@errors);
