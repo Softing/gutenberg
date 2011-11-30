@@ -31,12 +31,6 @@ Inprint.documents.editor.FormTinyMce = Ext.extend( Ext.form.FormPanel,
                 force_p_newlines : false,
                 forced_root_block : '',
 
-                //plugins: "pagebreak,style,layer,table,advhr,advimage,advlink,emotions,iespell,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,noneditable,visualchars,nonbreaking,xhtmlxtras,template",
-                //theme_advanced_buttons1: "bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect",
-                //theme_advanced_buttons2: "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,backcolor",
-                //theme_advanced_buttons3: "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,iespell,media,advhr,|,print,|,ltr,rtl,|",
-                //theme_advanced_buttons4: "insertlayer,moveforward,movebackward,absolute,|,styleprops,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,pagebreak",
-
                 plugins: "table,iespell,searchreplace,print,paste,noneditable,visualchars",
                 theme_advanced_buttons1: "bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo",
                 theme_advanced_buttons2: "tablecontrols,|,removeformat,cleanup,|,sub,sup,|,charmap,iespell,|,print,visualchars",
@@ -73,6 +67,8 @@ Inprint.documents.editor.FormTinyMce = Ext.extend( Ext.form.FormPanel,
                 }
             }
         });
+
+        this.editor.disable();
 
         Ext.apply(this,  {
             border:false,
@@ -174,28 +170,23 @@ Inprint.documents.editor.FormTinyMce = Ext.extend( Ext.form.FormPanel,
             },
 
             callback:  function(options, success, response) {
-
                 this.body.unmask();
-
                 var rspns = Ext.util.JSON.decode(response.responseText);
-                if (rspns.data.error) {
+                if (rspns.data && rspns.data.error) {
                     Ext.MessageBox.alert( _("Error"), rspns.data.error);
                 }
-
-                this.cmpAccess(rspns.data.access);
+                if (rspns.data && rspns.data.access) {
+                    this.cmpAccess(rspns.data.access);
+                }
             },
             success: function(response, options) {
-
                 this.body.unmask();
-
                 var rspns = Ext.util.JSON.decode(response.responseText);
                 this.cmpSetValue(rspns.data.text);
                 this.cmpUpdateCharCount();
             },
             failure : function(response, options) {
-
                 this.body.unmask();
-
                 Ext.MessageBox.alert( _("Error"), _("Operation failed"));
             }
 
@@ -206,8 +197,10 @@ Inprint.documents.editor.FormTinyMce = Ext.extend( Ext.form.FormPanel,
     cmpAccess: function(access) {
         if (access && access.fedit ) {
             this.btnSave.enable();
+            this.editor.enable();
         } else {
             this.btnSave.disable();
+            this.editor.disable();
         }
     },
 

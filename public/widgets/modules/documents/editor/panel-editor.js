@@ -115,7 +115,7 @@ Inprint.documents.editor.FormPanel = Ext.extend( Ext.form.FormPanel,
                 }
             }, this);
 
-         }, this);
+        }, this);
 
     },
 
