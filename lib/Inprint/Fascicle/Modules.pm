@@ -9,6 +9,8 @@ use utf8;
 use strict;
 use warnings;
 
+use Inprint::Fascicle::Events;
+
 use base 'Mojolicious::Controller';
 
 sub read {
@@ -205,6 +207,9 @@ sub create {
         ", [ $fascicle->{edition}, $fascicle->{id}, $module_id, $page->{id}, 0, "1/1", "1/1" ]);
     }
 
+    # Create event
+    Inprint::Fascicle::Events::onCompositionChanged($c, $fascicle);
+
     $success = $c->json->true unless (@errors);
     $c->render_json({ success => $success, errors => \@errors });
 }
@@ -285,6 +290,9 @@ sub update {
         ", [ $i_title, $i_description, $i_amount, $area, $i_x, $i_y, $i_w, $i_h, $i_id ]);
     }
 
+    # Create event
+    #Inprint::Fascicle::Events::onCompositionChanged($c, $fascicle);
+
     $success = $c->json->true unless (@errors);
     $c->render_json({ success => $success, errors => \@errors });
 }
@@ -315,6 +323,9 @@ sub delete {
 
         }
     }
+
+    # Create event
+    #Inprint::Fascicle::Events::onCompositionChanged($c, $fascicle);
 
     $success = $c->json->true unless (@errors);
     $c->render_json({ success => $success, errors => \@errors });
