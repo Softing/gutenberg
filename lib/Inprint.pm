@@ -9,6 +9,7 @@ use strict;
 use warnings;
 
 use DBI;
+use DBIx::Connector;
 use Devel::SimpleTrace;
 
 use base 'Mojolicious';
@@ -45,10 +46,11 @@ sub startup {
     my $atr = { AutoCommit=>1, RaiseError=>1, PrintError=>1, pg_enable_utf8=>1 };
 
     # Create a connection.
-    my $dbh = DBI->connect($dsn, $username, $password, $atr);
-    my $sql = new Inprint::Frameworks::SQL($self->app);
+    my $dbh  = DBI->connect($dsn, $username, $password, $atr);
+    my $conn = DBIx::Connector->new($dsn, $username, $password, $atr);
+    my $sql  = new Inprint::Frameworks::SQL($self->app);
     $sql->SetDBH($dbh);
-
+    #$sql->SetDBH($conn->dbh);
     $self->{sql} = $sql;
 
     # Load Plugins

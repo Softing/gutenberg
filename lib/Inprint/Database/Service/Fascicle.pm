@@ -43,13 +43,15 @@ sub Access {
 
     my $access = {};
 
-    $access->{open}     = 0;
-    $access->{capture}  = $canCompose;
+    $access->{open}     = $canCompose;
+    $access->{capture}  = 0;
     $access->{close}    = 0;
     $access->{save}     = 0;
     $access->{advert}   = $canAdvert;
 
     if ($self->manager) {
+
+        $access->{capture}  = 1;
 
         $access->{manager} = $self->manager;
         $access->{manager_shortcut} = $self->sql->Q("SELECT shortcut FROM profiles WHERE id=?", $self->manager)->Value;
