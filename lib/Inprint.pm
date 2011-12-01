@@ -12,10 +12,13 @@ use DBI;
 use DBIx::Connector;
 use Devel::SimpleTrace;
 
-use base 'Mojolicious';
+use Mojo::Base 'Mojolicious';
 
 use Inprint::Frameworks::Config;
 use Inprint::Frameworks::SQL;
+
+has 'conn';
+has 'sql';
 
 sub startup {
 
@@ -36,6 +39,7 @@ sub startup {
     my $config = new Inprint::Frameworks::Config();
     $self->{config} = $config->load( $self->home->to_string );
 
+    # Create a connection.
     my $name     = $config->get("db.name");
     my $host     = $config->get("db.host");
     my $port     = $config->get("db.port");
@@ -45,13 +49,14 @@ sub startup {
     my $dsn = 'dbi:Pg:dbname='. $name .';host='. $host .';port='. $port .';';
     my $atr = { AutoCommit=>1, RaiseError=>1, PrintError=>1, pg_enable_utf8=>1 };
 
-    # Create a connection.
-    my $dbh  = DBI->connect($dsn, $username, $password, $atr);
-    my $conn = DBIx::Connector->new($dsn, $username, $password, $atr);
-    my $sql  = new Inprint::Frameworks::SQL($self->app);
-    $sql->SetDBH($dbh);
+    $self->conn(DBIx::Connector->new($dsn, $username, $password, $atr));
+    $self->sql(Inprint::Frameworks::SQL->new($self, $self->conn));
+
+    #my $dbh  = DBI->connect($dsn, $username, $password, $atr);
+    #my $sql  = new Inprint::Frameworks::SQL($self->app);
+    #$sql->SetDBH($dbh);
     #$sql->SetDBH($conn->dbh);
-    $self->{sql} = $sql;
+    #$self->{sql} = $sql;
 
     # Load Plugins
     $self->plugin('I18N');
@@ -518,20 +523,44 @@ sub startup {
     # Main route
     $sessionBridge->route('/')->to('workspace#index');
 
+    #print $self->app->sql;
+
     # Plugin routes
-    my $routes = $sql->Q("SELECT * FROM plugins.routes WHERE route_enabled=true")->Hashes;
-    foreach my $route (@$routes) {
+    #my $routes = $sql->Q("SELECT * FROM plugins.routes WHERE route_enabled=true")->Hashes;
+    #foreach my $route (@$routes) {
+    #
+    #    my $url = "/plugin" . $route->{route_url};
+    #    my $action = $route->{route_controller} ."#". $route->{route_action};
+    #
+    #    if ($route->{route_authentication}) {
+    #        $sessionBridge->route($url)->to($action);
+    #    }
+    #    unless ($route->{route_authentication}) {
+    #        $self->routes->route($url)->to($action);
+    #    }
+    #}
 
-        my $url = "/plugin" . $route->{route_url};
-        my $action = $route->{route_controller} ."#". $route->{route_action};
+    $self->hook(before_dispatch => sub {
+        my ($c) = @_;
 
-        if ($route->{route_authentication}) {
-            $sessionBridge->route($url)->to($action);
-        }
-        unless ($route->{route_authentication}) {
-            $self->routes->route($url)->to($action);
-        }
-    }
+        #die %{$c->app};
+
+        #my $router = $c->app->routes;
+        #my $routes = $c->app->Q("SELECT * FROM plugins.routes WHERE route_enabled=true")->Hashes;
+
+        #foreach my $route (@$routes) {
+        #
+        #    my $url = "/plugin" . $route->{route_url};
+        #    my $action = $route->{route_controller} ."#". $route->{route_action};
+        #
+        #    if ($route->{route_authentication}) {
+        #        $sessionBridge->route($url)->to($action);
+        #    }
+        #    unless ($route->{route_authentication}) {
+        #        $self->routes->route($url)->to($action);
+        #    }
+        #}
+    });
 
     $self->hook(after_dispatch => sub {
         my $tx = shift;

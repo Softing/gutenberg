@@ -14,19 +14,29 @@ sub new {
     my $self  = {};
     $self     = bless {}, $class;
 
-    my $sql    = shift;
-    my $query  = shift;
-    my $value  = shift;
-    my $trace  = shift;
-
-    $self->{sql}   = $sql;
-    $self->{app}   = $sql->{app};
-    $self->{dbh}   = $sql->{dbh};
-    $self->{query} = $query;
-    $self->{value} = $value;
+    $self->{app}   = shift;
+    $self->{conn}  = shift;
+    $self->{query} = shift;
+    $self->{value} = shift;
 
     bless($self, $class);
     return $self;
+}
+
+sub app {
+    return shift->{app};
+}
+
+sub conn {
+    return shift->{conn};
+}
+
+sub query {
+    return shift->{query};
+}
+
+sub value {
+    return shift->{value};
 }
 
 sub Value  {
@@ -34,10 +44,14 @@ sub Value  {
 
     my $result;
 
-    if ( $c->{value} ) {
-        $result = $c->{dbh}->selectrow_arrayref( $c->{query}, undef, @{ $c->{value} } );
+    if ( $c->value ) {
+        $result = $c->conn->run(fixup => sub {
+            $_->selectrow_arrayref( $c->query, undef, @{ $c->value } );
+        });
     } else {
-        $result = $c->{dbh}->selectrow_arrayref( $c->{query}, undef );
+        $result = $c->conn->run(fixup => sub {
+            $_->selectrow_arrayref( $c->query, undef );
+        });
     }
 
     return @$result[0];
@@ -48,10 +62,14 @@ sub Values  {
 
     my $result;
 
-    if ( $c->{value} ) {
-        $result = $c->{dbh}->selectcol_arrayref( $c->{query}, undef, @{ $c->{value} } );
+    if ( $c->value ) {
+        $result = $c->conn->run(fixup => sub {
+            $_->selectcol_arrayref( $c->query, undef, @{ $c->value } );
+        });
     } else {
-        $result = $c->{dbh}->selectcol_arrayref( $c->{query}, undef );
+        $result = $c->conn->run(fixup => sub {
+            $_->selectcol_arrayref( $c->query, undef );
+        });
     }
 
     return $result;
@@ -62,10 +80,14 @@ sub Array {
 
     my $result;
 
-    if ( $c->{value} ) {
-        $result = $c->{dbh}->selectrow_arrayref( $c->{query}, undef, @{ $c->{value} } );
+    if ( $c->value ) {
+        $result = $c->conn->run(fixup => sub {
+            $_->selectrow_arrayref( $c->query, undef, @{ $c->value } );
+        });
     } else {
-        $result = $c->{dbh}->selectrow_arrayref( $c->{query}, undef );
+        $result = $c->conn->run(fixup => sub {
+            $_->selectrow_arrayref( $c->query, undef );
+        });
     }
 
     return $result;
@@ -76,10 +98,14 @@ sub Hash {
 
     my $result;
 
-    if ( $c->{value} ) {
-        $result = $c->{dbh}->selectrow_hashref( $c->{query}, undef, @{ $c->{value} } );
+    if ( $c->value ) {
+        $result = $c->conn->run(fixup => sub {
+            $_->selectrow_hashref( $c->query, undef, @{ $c->value } );
+        });
     } else {
-        $result = $c->{dbh}->selectrow_hashref( $c->{query}, undef);
+        $result = $c->conn->run(fixup => sub {
+            $_->selectrow_hashref( $c->query, undef);
+        });
     }
 
     return $result;
@@ -90,10 +116,14 @@ sub Arrays  {
 
     my $result;
 
-    if ( $c->{value} ) {
-        $result = $c->{dbh}->selectall_arrayref( $c->{query}, undef, @{ $c->{value} } );
+    if ( $c->value ) {
+        $result = $c->conn->run(fixup => sub {
+            $_->selectall_arrayref( $c->query, undef, @{ $c->value } );
+        });
     } else {
-        $result = $c->{dbh}->selectall_arrayref( $c->{query}, undef);
+        $result = $c->conn->run(fixup => sub {
+            $_->selectall_arrayref( $c->query, undef);
+        });
     }
 
     return $result;
@@ -104,10 +134,14 @@ sub Hashes  {
 
     my $result;
 
-    if ( $c->{value} ) {
-        $result = $c->{dbh}->selectall_arrayref( $c->{query}, { Slice => {} }, @{ $c->{value} } );
+    if ( $c->value ) {
+        $result = $c->conn->run(fixup => sub {
+            $_->selectall_arrayref( $c->query, { Slice => {} }, @{ $c->value } );
+        });
     } else {
-        $result = $c->{dbh}->selectall_arrayref( $c->{query}, { Slice => {} });
+        $result = $c->conn->run(fixup => sub {
+            $_->selectall_arrayref( $c->query, { Slice => {} });
+        });
     }
 
     return $result;
@@ -119,16 +153,20 @@ sub Objects {
 
     my $records;
 
-    if ( $c->{value} ) {
-        $records = $c->{dbh}->selectall_arrayref( $c->{query}, { Slice => {} }, @{ $c->{value} } );
+    if ( $c->value ) {
+        $records = $c->conn->run(fixup => sub {
+            $_->selectall_arrayref( $c->query, { Slice => {} }, @{ $c->value } );
+        });
     } else {
-        $records = $c->{dbh}->selectall_arrayref( $c->{query}, { Slice => {} });
+        $records = $c->conn->run(fixup => sub {
+            $_->selectall_arrayref( $c->query, { Slice => {} });
+        });
     }
 
     my $result = [];
 
     foreach my $record (@$records) {
-        push @$result, $class->new( app => $c->{app} )->map($record);
+        push @$result, $class->new( app => $c->app )->map($record);
     }
 
     return $result;

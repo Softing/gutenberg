@@ -15,21 +15,20 @@ sub new {
     my $self  = {};
     $self     = bless {}, $class;
 
-    $self->{app} = shift;
-    $self->{dbh} = undef;
+    $self->{app}   = shift;
+    $self->{conn}  = shift;
     $self->{trace} = undef;
 
     bless($self, $class);
     return $self;
 }
 
-sub dbh {
-    return shift->{dbh};
+sub app {
+    return shift->{app};
 }
 
-sub SetDBH {
-    my $self = shift;
-    $self->{dbh} = shift;
+sub conn {
+    return shift->{conn};
 }
 
 sub Q {
@@ -43,7 +42,7 @@ sub Q {
         $value = [ $value ] if $value;
     }
 
-    return new Inprint::Frameworks::SQLQuery($self, $query, $value, $trace);
+    return new Inprint::Frameworks::SQLQuery($self->app, $self->conn, $query, $value, $trace);
 }
 
 sub Do {
@@ -57,8 +56,8 @@ sub Do {
         $value = [ $value ] if $value;
     }
 
-    my $count = $self->dbh->do($query, undef, @{$value});
-    say STDERR $self->dbh->{Statement} if $trace;
+    my $count = $self->conn->dbh->do($query, undef, @{$value});
+    say STDERR $self->conn->dbh->{Statement} if $trace;
 
     return 0 if $count eq '0E0';
     return $count;
@@ -86,30 +85,30 @@ sub trace {
     $self->{trace} = undef   if lc($mode) eq 'off';
 }
 
-sub lock_table {
-    my $self  = shift;
-    my $table  = shift;
-    my $access = shift || 'EXCLUSIVE MODE';
-    say STDERR "LOCK TABLE $table IN ACCESS $access;" if ( $self->{trace} );
-    $self->Do({ query => "LOCK TABLE $table IN ACCESS $access;" });
-}
+#sub lock_table {
+#    my $self  = shift;
+#    my $table  = shift;
+#    my $access = shift || 'EXCLUSIVE MODE';
+#    say STDERR "LOCK TABLE $table IN ACCESS $access;" if ( $self->{trace} );
+#    $self->Do({ query => "LOCK TABLE $table IN ACCESS $access;" });
+#}
 
 sub bt{
     my $self = shift;
     say STDERR "BEGIN;" if ( $self->{trace} );
-    $self->{dbh}->begin_work;
+    $self->conn->dbh->begin_work;
 }
 
 sub rt {
     my $self = shift;
     say STDERR "ROLLBACK;" if ( $self->{trace} );
-    $self->{dbh}->rollback;
+    $self->conn->dbh->rollback;
 }
 
 sub et {
     my $self = shift;
     say STDERR "COMMIT;" if ( $self->{trace} );
-    $self->{dbh}->commit;
+    $self->conn->dbh->commit;
 }
 
 1;

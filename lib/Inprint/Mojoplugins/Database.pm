@@ -9,7 +9,7 @@ use warnings;
 use strict;
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub register {
     my ( $self, $app, $conf ) = @_;
@@ -20,43 +20,43 @@ sub register {
     $app->helper(
         dbh => sub {
             my $c = shift;
-            return $c->app->{sql}->dbh;
+            return $c->app->sql->dbh;
         } );
 
     $app->helper(
         sql => sub {
             my $c = shift;
-            return $c->app->{sql};
+            return $c->app->sql;
         } );
 
     $app->helper(
         Q => sub {
             my $c = shift;
-            return $c->app->{sql}->Q(@_);
+            return $c->app->sql->Q(@_);
         } );
 
     $app->helper(
         Do => sub {
             my $c = shift;
-            return $c->app->{sql}->Do(@_);
+            return $c->app->sql->Do(@_);
         } );
 
     $app->helper(
         txBegin => sub {
             my $c = shift;
-            return $c->app->{sql}->bt;
+            return $c->app->sql->bt;
         } );
 
     $app->helper(
         txCommit => sub {
             my $c = shift;
-            return $c->app->{sql}->et;
+            return $c->app->sql->et;
         } );
 
     $app->helper(
         txRollback => sub {
             my $c = shift;
-            return $c->app->{sql}->rt;
+            return $c->app->sql->rt;
         } );
 
 }
