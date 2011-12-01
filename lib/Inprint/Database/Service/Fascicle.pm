@@ -38,7 +38,16 @@ sub Access {
 
     my $member = $self->app->getSessionValue("member.id");
 
-    my $canCompose = $self->app->objectAccess("editions.fascicle.manage:*", $self->edition);
+    my $canCompose = 0;
+
+    if ($self->fastype eq "fascicle") {
+        $canCompose = $self->app->objectAccess("editions.fascicle.manage:*", $self->edition);
+    }
+
+    if ($self->fastype eq "attachment") {
+        $canCompose = $self->app->objectAccess("editions.attachment.manage:*", $self->edition);
+    }
+
     my $canAdvert  = $self->app->objectAccess("editions.advert.manage:*",   $self->edition);
 
     my $access = {};
@@ -51,6 +60,7 @@ sub Access {
 
     if ($self->manager) {
 
+        $access->{open}  = 0;
         $access->{capture}  = 1;
 
         $access->{manager} = $self->manager;
