@@ -204,14 +204,13 @@ sub modules {
 
         $sql = "
             SELECT DISTINCT
-                maps.id as mapping,
                 modules.id as module,
                 modules.title,
-                modules.description,
+                -- modules.description,
                 modules.amount,
                 modules.area,
-                modules.created,
-                modules.updated,
+                -- modules.created,
+                -- modules.updated,
                 requests.shortcut as request_shortcut,
                 places.id as place,
                 places.title as place_title,
@@ -235,36 +234,18 @@ sub modules {
                 AND maps.page = ANY(?)
         ";
 
-        push @params, \@pages;
-
-    }
-
-    unless (@errors) {
-
-        my $nodes = $c->Q($sql, \@params)->Hashes;
+        my $nodes = $c->Q($sql, [\@pages])->Hashes;
 
         foreach my $node (@{ $nodes }) {
 
-            if ("unmapped" ~~ @filter) {
-                #next if ($node->{mapcount} > 0);
-            }
+            next if ("requested"   ~~ @filter && $node->{modcount} == 0);
+            next if ("unrequested" ~~ @filter && $node->{modcount} > 0);
 
-            if ("mapped" ~~ @filter) {
-                #next if ($node->{mapcount} == 0);
-            }
-
-            if ("unrequested" ~~ @filter) {
-                next if ($node->{modcount} > 0);
-            }
-
-            if ("requested" ~~ @filter) {
-                next if ($node->{modcount} == 0);
-            }
+            next if ("mapped"   ~~ @filter && $node->{mapcount} == 0);
+            next if ("unmapped" ~~ @filter && $node->{mapcount} > 0);
 
             $node->{id} = $c->uuid;
-
-            $node->{leaf} = $c->json->true;
-            $node->{icon} = "/icons/table-medium.png";
+            $node->{shortcut} = $node->{edition_shortcut} ."/". $node->{shortcut};
 
             $node->{page} = $c->Q("
                 SELECT page FROM fascicles_map_modules WHERE module=?",
@@ -278,14 +259,14 @@ sub modules {
 
                 my $sql_childrens = "
                     SELECT
-                        maps.id as mapping,
                         modules.id as module,
                         modules.title,
-                        modules.description,
+                        -- modules.description,
                         modules.amount,
                         maps.page,
-                        pages.id as place,
-                        pages.seqnum as place_title
+                        -- pages.id as place,
+                        -- pages.seqnum as place_title,
+                        maps.id as mapping
                     FROM
                         fascicles_modules modules,
                         fascicles_map_modules maps,
@@ -306,11 +287,27 @@ sub modules {
                     $subnode->{amount} = "";
                 }
 
+                unless ($node->{request_shortcut}) {
+                    $node->{request_shortcut} = "";
+                }
+
+                push @result, $node;
+
+            } else {
+
+                $node->{mapping} = $c->Q(" SELECT id FROM fascicles_map_modules WHERE module=? ", $node->{module})->Value;
+
+                $node->{leaf} = $c->json->true;
+                $node->{expanded} = $c->json->false;
+                $node->{icon} = "/icons/table-medium.png";
+
+                unless ($node->{request_shortcut}) {
+                    $node->{request_shortcut} = "";
+                }
+
+                push @result, $node;
+
             }
-
-            $node->{shortcut} = $node->{edition_shortcut} ."/". $node->{shortcut};
-
-            push @result, $node;
 
         }
     }

@@ -299,10 +299,13 @@ sub update {
 
 sub delete {
     my $c = shift;
-    my @ids = $c->param("id");
 
     my @errors;
-    my $success = $c->json->false;
+
+    my @ids        = $c->param("id");
+    my $i_fascicle = $c->param("fascicle");
+
+    my $fascicle = $c->check_record(\@errors, "fascicles", "fascicle", $i_fascicle);
 
     #push @errors, { id => "access", msg => "Not enough permissions"}
     #    unless ($c->objectAccess("domain.roles.manage"));
@@ -325,10 +328,9 @@ sub delete {
     }
 
     # Create event
-    #Inprint::Fascicle::Events::onCompositionChanged($c, $fascicle);
+    Inprint::Fascicle::Events::onCompositionChanged($c, $fascicle);
 
-    $success = $c->json->true unless (@errors);
-    $c->render_json({ success => $success, errors => \@errors });
+    $c->smart_render(\@errors);
 }
 
 1;

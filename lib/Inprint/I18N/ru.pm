@@ -822,7 +822,7 @@ our %Lexicon = (
  => "Переместить материал",
 
     "Moved"
- => "",
+ => "Перемещен",
 
     "Moving to the briefcase"
  => "",
@@ -1287,7 +1287,7 @@ our %Lexicon = (
  => "Загрузить файлы",
 
     "Uploaded"
- => "",
+ => "Загружен",
 
     "Use by default"
  => "",
@@ -1320,7 +1320,7 @@ our %Lexicon = (
  => "",
 
     "Where"
- => "",
+ => "Где",
 
     "Width"
  => "Длина",

@@ -14,20 +14,23 @@ Inprint.cmp.adverta.GridModules = Ext.extend(Ext.ux.tree.TreeGrid, {
         this.columns = [
             {
                 id:"title",
-                width: 90,
+                width: 120,
                 header: _("Title"),
                 dataIndex: "title"
             },
             {
                 id:"place_title",
-                width: 100,
+                width: 90,
                 header: _("Place"),
                 dataIndex: "place_title",
                 tpl : new Ext.XTemplate('{format:this.formatString}', {
                     formatString : function(v, record) {
-                        var amount = record.amount || 1;
-                        var place  = record.place_title || "";
-                        return String.format("{0} / {1}", amount, place);
+                        var amount = record.amount;
+                        var place  = record.place_title;
+                        if (amount && place) {
+                            return String.format("{0} / {1}", amount, place);
+                        }
+                        return "";
                     }
                 })
             }
@@ -96,7 +99,8 @@ Inprint.cmp.adverta.GridModules = Ext.extend(Ext.ux.tree.TreeGrid, {
                             this.parent.panels.flash.cmpInit();
                         },
                         params: {
-                            id: this.cmpGetSelectedNode().attributes.module
+                            id: this.cmpGetSelectedNode().attributes.module,
+                            fascicle: this.parent.fascicle
                         }
                     });
                 }

@@ -9,9 +9,10 @@ Inprint.documents.GridColumns = function() {
 
         viewed: {
             id : 'viewed',
+            width : 23,
             fixed : true,
             header : '&nbsp;',
-            width : 23,
+            menuDisabled: true,
             renderer : function(value, p, record) {
                 if (!record.data.islooked) {
                     return '<img title="" src="'+ _ico("flag") +'">';
@@ -22,9 +23,10 @@ Inprint.documents.GridColumns = function() {
 
         title: {
             id:"title",
+            width: 210,
             dataIndex: "title",
             header: _("Title"),
-            width: 210,
+            menuDisabled: false,
             renderer : function(value, p, record){
 
                 var color = 'black';
@@ -75,6 +77,7 @@ Inprint.documents.GridColumns = function() {
         edition: {
             id:"edition",
             width: 80,
+            menuDisabled: true,
             header: _("Edition"),
             dataIndex: "edition_shortcut"
         },
@@ -82,6 +85,7 @@ Inprint.documents.GridColumns = function() {
         maingroup: {
             id:"maingroup",
             width: 80,
+            menuDisabled: true,
             header: _("Department"),
             dataIndex: "maingroup_shortcut"
         },
@@ -90,15 +94,17 @@ Inprint.documents.GridColumns = function() {
             id:"workgroup",
             width: 80,
             hidden: true,
+            menuDisabled: true,
             header: _("Where"),
             dataIndex: "workgroup_shortcut"
         },
 
         fascicle: {
             id:"fascicle",
-            dataIndex: "fascicle_shortcut",
-            header: _("Fascicle"),
             width: 70,
+            menuDisabled: true,
+            header: _("Fascicle"),
+            dataIndex: "fascicle_shortcut",
             renderer : function(value, p, record) {
                 return value;
             }
@@ -106,6 +112,7 @@ Inprint.documents.GridColumns = function() {
 
         headline: {
             id:"headline",
+            menuDisabled: true,
             dataIndex: "headline_shortcut",
             header: _("Headline"),
             width: 90
@@ -113,6 +120,7 @@ Inprint.documents.GridColumns = function() {
 
         rubric: {
             id:"rubric",
+            menuDisabled: true,
             dataIndex: "rubric_shortcut",
             header: _("Rubric"),
             width: 80
@@ -120,6 +128,7 @@ Inprint.documents.GridColumns = function() {
 
         pages: {
             id:"pages",
+            menuDisabled: true,
             dataIndex: "pages",
             header: _("Pages"),
             width: 55
@@ -127,9 +136,10 @@ Inprint.documents.GridColumns = function() {
 
         progress: {
             id:"progress",
+            width: 75,
             dataIndex: "progress",
             header: _("Progress"),
-            width: 75,
+            menuDisabled: true,
             renderer : function(v, p, record) {
 
                 p.css += ' x-grid3-progresscol ';
@@ -166,6 +176,7 @@ Inprint.documents.GridColumns = function() {
             dataIndex: "manager_shortcut",
             header: _("Manager"),
             width: 100,
+            menuDisabled: true,
             renderer : function(v, p, record) {
                 if (record.data.workgroup == record.data.manager) {
                     v = '<b>' +v+ '</b>';
@@ -179,6 +190,7 @@ Inprint.documents.GridColumns = function() {
             dataIndex: "holder_shortcut",
             header: _("Holder"),
             width: 100,
+            menuDisabled: true,
             renderer : function(v, p, record) {
                 if (record.data.workgroup == record.data.holder) {
                     v = '<b>' +v+ '</b>';
@@ -189,6 +201,7 @@ Inprint.documents.GridColumns = function() {
 
         images: {
             id:"images",
+            menuDisabled: true,
             dataIndex: "images",
             header : '<img src="'+ _ico("camera") +'">',
             width:23
@@ -199,6 +212,7 @@ Inprint.documents.GridColumns = function() {
             dataIndex: "rsize",
             header : '<img src="'+ _ico("edit") +'">',
             width:40,
+            menuDisabled: true,
             renderer : function(value, p, record) {
                 if (record.data.rsize) {
                     return record.data.rsize;
@@ -213,6 +227,7 @@ Inprint.documents.GridColumns = function() {
         created: {
             id:"created",
             hidden:true,
+            menuDisabled: true,
             dataIndex: "created",
             header: _("Created"),
             width: 80,
@@ -223,6 +238,7 @@ Inprint.documents.GridColumns = function() {
         updated: {
             id:"updated",
             hidden:true,
+            menuDisabled: true,
             dataIndex: "updated",
             header: _("Updated"),
             width: 80,
@@ -233,6 +249,7 @@ Inprint.documents.GridColumns = function() {
         uploaded: {
             id:"uploaded",
             hidden:true,
+            menuDisabled: true,
             dataIndex: "uploaded",
             header: _("Uploaded"),
             width: 80,
@@ -243,6 +260,7 @@ Inprint.documents.GridColumns = function() {
         moved: {
             id:"moved",
             hidden:true,
+            menuDisabled: true,
             dataIndex: "moved",
             header: _("Moved"),
             width: 80,

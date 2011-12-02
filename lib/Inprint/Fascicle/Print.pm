@@ -94,6 +94,7 @@ sub print {
     my $pdf = PDF::API2->new();
 
     my $fascicle = Inprint::Database::FascicleService($c)->load( id => $i_fascicle );
+    my $edition  = Inprint::Database::EditionService($c)->load( id => $fascicle->{edition} );
 
     my $page;
 
@@ -193,18 +194,28 @@ sub print {
     my $tempPath = $c->config->get("store.temp");
     die "Cant write to $tempPath" unless -w $tempPath;
 
-    my $pdf_filename = "$tempPath/table.pdf";
+    my $pdf_filename = "$tempPath/". $c->uuid .".pdf";
 
     $pdf->saveas( $pdf_filename );
     $pdf->end;
 
+    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+    my $filename = "$Cpage->{name}_$edition->{shortcut}_$fascicle->{shortcut}_${mday}_". ($mon+1) ."_". ($year+1900) .".pdf";
+
+    $filename =~ s/\s+/_/g;
+
     $c->tx->res->headers->content_length(-s $pdf_filename);
-    $c->tx->res->headers->content_type("application/pdf;name=test.pdf");
-    $c->tx->res->headers->content_disposition("attachment;name=test.pdf");
+    $c->tx->res->headers->content_type("application/pdf;name=$filename");
+    $c->tx->res->headers->content_disposition("attachment;name=$filename");
 
     $c->res->content->asset(
         Mojo::Asset::File->new(path => $pdf_filename )
     );
+
+    $c->on(finish => sub {
+        die 1;
+        unlink $pdf_filename;
+    });
 
     $c->rendered;
 }

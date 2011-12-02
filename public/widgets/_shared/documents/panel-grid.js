@@ -19,8 +19,7 @@ Inprint.documents.Grid = Ext.extend(Inprint.grid.GridPanel, {
 
         var colModel = new Ext.grid.ColumnModel({
             defaults: {
-                sortable: true,
-                menuDisabled: true
+                sortable: true
             },
             columns: [
                 sm,
