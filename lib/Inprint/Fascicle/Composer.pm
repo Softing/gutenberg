@@ -241,8 +241,8 @@ sub modules {
             next if ("requested"   ~~ @filter && $node->{modcount} == 0);
             next if ("unrequested" ~~ @filter && $node->{modcount} > 0);
 
-            next if ("mapped"   ~~ @filter && $node->{mapcount} == 0);
-            next if ("unmapped" ~~ @filter && $node->{mapcount} > 0);
+            #next if ("mapped"   ~~ @filter && $node->{mapcount} == 0);
+            #next if ("unmapped" ~~ @filter && $node->{mapcount} > 0);
 
             $node->{id} = $c->uuid;
             $node->{shortcut} = $node->{edition_shortcut} ."/". $node->{shortcut};
