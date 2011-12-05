@@ -18,6 +18,16 @@ Inprint.calendar.archive.Interaction = function(parent, panels) {
                     _disable(grid.btnUnarchive);
                 }
 
+                //items.push({
+                //    icon: _ico("blue-folder--minus"),
+                //    cls: 'x-btn-text-icon',
+                //    text    : _('Unarchive'),
+                //    scope: grid,
+                //    handler: function() {
+                //        grid.cmpUnarchive(id);
+                //    }
+                //});
+
                 grid.cmpLoad({
                     archive: "true",
                     fastype: "issue",
@@ -35,7 +45,7 @@ Inprint.calendar.archive.Interaction = function(parent, panels) {
     grid.getSelectionModel().on("selectionchange", function(sm, node) {
         _disable(grid.btnDoApproval, grid.btnDoWorking, grid.btnDoArchive);
         if (node && node.attributes.fastype == "issue") {
-            _enable(grid.btnDoApproval, grid.btnDoWorking); 
+            _enable(grid.btnDoApproval, grid.btnDoWorking);
         }
     });
 
