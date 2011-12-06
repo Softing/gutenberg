@@ -23,15 +23,15 @@ Inprint.calendar.fascicles.Context = function(parent, panels) {
                 }
             });
 
-            items.push({
-                icon: _ico("blue-folder--minus"),
-                cls: 'x-btn-text-icon',
-                text    : _('Archive'),
-                scope: grid,
-                handler: function() {
-                    grid.cmpArchive(id);
-                }
-            });
+            //items.push({
+            //    icon: _ico("blue-folder--minus"),
+            //    cls: 'x-btn-text-icon',
+            //    text    : _('Archive'),
+            //    scope: grid,
+            //    handler: function() {
+            //        grid.cmpArchive(id);
+            //    }
+            //});
 
             items.push({
                 icon: _ico("blue-folder--minus"),
@@ -70,15 +70,15 @@ Inprint.calendar.fascicles.Context = function(parent, panels) {
                 }
             });
 
-            items.push({
-                icon: _ico("blue-folder--minus"),
-                cls: 'x-btn-text-icon',
-                text    : _('Archive'),
-                scope: grid,
-                handler: function() {
-                    grid.cmpArchive(id);
-                }
-            });
+            //items.push({
+            //    icon: _ico("blue-folder--minus"),
+            //    cls: 'x-btn-text-icon',
+            //    text    : _('Archive'),
+            //    scope: grid,
+            //    handler: function() {
+            //        grid.cmpArchive(id);
+            //    }
+            //});
 
             items.push({
                 icon: _ico("folder--minus"),
