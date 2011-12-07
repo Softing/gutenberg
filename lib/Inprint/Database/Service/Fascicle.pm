@@ -40,7 +40,7 @@ sub Access {
 
     my $canCompose = 0;
 
-    if ($self->fastype eq "fascicle") {
+    if ($self->fastype eq "issue") {
         $canCompose = $self->app->objectAccess("editions.fascicle.manage:*", $self->edition);
     }
 
