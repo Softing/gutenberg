@@ -121,6 +121,7 @@ sub save {
     my $c = shift;
     my $i_fascicle  = $c->param("fascicle");
     my @i_documents = $c->param("document");
+    my @i_modules   = $c->param("module");
 
     my @errors;
     my $success = $c->json->false;
@@ -138,6 +139,111 @@ sub save {
     }
 
     unless (@errors) {
+
+        $c->sql->bt;
+
+        foreach my $node (@i_modules) {
+            my ($place_id, $modtype_id, $seqnumstr) = split '::', $node;
+
+            my $place = $c->Q(" SELECT * FROM fascicles_tmpl_places WHERE id=? AND fascicle=? ", [ $place_id, $fascicle->{id} ])->Hash;
+            next unless ($place->{id});
+
+            my $modtype = $c->Q(" SELECT * FROM fascicles_tmpl_modules WHERE id=? AND fascicle=? ", [ $modtype_id, $fascicle->{id} ])->Hash;
+            next unless ($modtype->{id});
+
+            my $seqnums = Inprint::Fascicle::Utils::uncompressString($c, $seqnumstr);
+            next unless (@$seqnums);
+
+            my @pages;
+            foreach my $seqnum (@$seqnums) {
+                if ($seqnum > 0) {
+                    my $page = $c->Q("
+                        SELECT * FROM fascicles_pages WHERE fascicle=? AND seqnum=? ",
+                        [ $fascicle->{id}, $seqnum ])->Hash;
+
+                    if ($page->{id}) {
+                        push @pages, $page;
+                    }
+                }
+            }
+
+            foreach my $page (@pages) {
+                $c->Do(
+                    "   DELETE FROM fascicles_modules t1
+                        WHERE 1=1
+                            AND t1.fascicle=?
+                            AND t1.id IN (
+                                SELECT module
+                                FROM fascicles_map_modules t2
+                                WHERE 1=1
+                                    AND t2.module = t1.id
+                                    AND t2.fascicle = t1.fascicle
+                                    AND t2.placed = false
+                                    AND t2.page = ?) ",
+                    [$fascicle->{id}, $page->{id} ]);
+            }
+
+        }
+
+        foreach my $node (@i_modules) {
+            my ($place_id, $modtype_id, $seqnumstr) = split '::', $node;
+
+            my $place = $c->Q(" SELECT * FROM fascicles_tmpl_places WHERE id=? AND fascicle=? ", [ $place_id, $fascicle->{id} ])->Hash;
+            next unless ($place->{id});
+
+            my $modtype = $c->Q(" SELECT * FROM fascicles_tmpl_modules WHERE id=? AND fascicle=? ", [ $modtype_id, $fascicle->{id} ])->Hash;
+            next unless ($modtype->{id});
+
+            my $seqnums = Inprint::Fascicle::Utils::uncompressString($c, $seqnumstr);
+            next unless (@$seqnums);
+
+            my @pages;
+            foreach my $seqnum (@$seqnums) {
+                if ($seqnum > 0) {
+                    my $page = $c->Q("
+                        SELECT * FROM fascicles_pages WHERE fascicle=? AND seqnum=? ",
+                        [ $fascicle->{id}, $seqnum ])->Hash;
+
+                    if ($page->{id}) {
+                        push @pages, $page;
+                    }
+                }
+            }
+
+            foreach my $page (@pages) {
+                my $module_id = $c->uuid();
+
+                $c->Do(" INSERT INTO fascicles_modules (
+                    id,
+                    edition, fascicle, place, origin,
+                    title, description, amount,
+                    w, h, area,
+                    width, height,
+                    fwidth, fheight,
+                    created, updated)
+                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,now(),now())", [
+                        $module_id,
+                        $fascicle->{edition}, $fascicle->{id}, $place->{id}, $modtype->{id},
+                        $modtype->{title}, $modtype->{description}, $modtype->{amount},
+                        $modtype->{w}, $modtype->{h}, $modtype->{area},
+                        $modtype->{width}, $modtype->{height},
+                        $modtype->{fwidth}, $modtype->{fheight},
+                    ]);
+
+                my $module = $c->Q("
+                    SELECT * FROM fascicles_modules WHERE fascicle=? AND id=? ",
+                    [ $fascicle->{id}, $module_id ])->Hash;
+
+                if ($module->{id}) {
+                    $c->Do(" INSERT INTO fascicles_map_modules (
+                        edition, fascicle, module, page, placed, created, updated)
+                        VALUES (?,?,?,?,?,now(),now())",
+                        [ $module->{edition}, $module->{fascicle}, $module->{id}, $page->{id}, 0 ]
+                    );
+                }
+            }
+        }
+        $c->sql->et;
 
         $c->sql->bt;
         foreach my $node (@i_documents) {
