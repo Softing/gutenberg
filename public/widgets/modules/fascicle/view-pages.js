@@ -88,30 +88,40 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
                                 string += '<div  class="inprint-plan-page-documents">';
                                 for (var d2=0; d2<page.documents.length; d2++) {
 
-                                    var document = items.documents[ page.documents[d2] ];
+                                    var myDocument = items.documents[ page.documents[d2] ];
 
                                     var title;
                                     if (page.documents.length > 5) {
-                                        title = Ext.util.Format.ellipsis(document.title, 20, false);
+                                        title = Ext.util.Format.ellipsis(myDocument.title, 20, false);
                                     }
 
                                     if (page.documents.length <= 5) {
-                                        title = Ext.util.Format.ellipsis(document.title, 30, false);
+                                        title = Ext.util.Format.ellipsis(myDocument.title, 30, false);
                                     }
 
                                     if (page.documents.length <= 3) {
-                                        title = Ext.util.Format.ellipsis(document.title, 50, false);
+                                        title = Ext.util.Format.ellipsis(myDocument.title, 50, false);
                                     }
 
                                     if (page.documents.length == 1) {
-                                        title = document.title;
+                                        title = myDocument.title;
                                     }
 
-                                    string += '<div  class="inprint-plan-page-document">'+
-                                        '<a href="#" onClick="Inprint.ObjectResolver.resolve({aid:\'document-profile\',oid:\''+ document.id +'\',text:\''+ escape(document.title) +'\'});return false;"">'+
-                                            title +
-                                        '</a>'+
-                                    '</div>';
+                                    var fgcolor  = Color('#' + myDocument.color);
+                                    var txtcolor = Color('#' + inverse(myDocument.color));
+
+                                    string += String.format(
+                                        "<div class=\"inprint-plan-page-document\">"+
+                                            "<a style=\"background:{3}!important;color:{4}!important;\" href=\"#\" onClick=\"Inprint.ObjectResolver.resolve({aid:'document-profile',oid:'{0}',text:'{1}'});return false;\">{2}</a>"+
+                                        "</div>",
+                                            myDocument.id, escape(myDocument.title), title,
+                                            fgcolor.rgb(), txtcolor.rgb());
+
+                                    //string += '<div  class="inprint-plan-page-document">'+
+                                    //    '<a href="#" onClick="Inprint.ObjectResolver.resolve({aid:\'document-profile\',oid:\''+ myDocument.id +'\',text:\''+ escape(myDocument.title) +'\'});return false;"">'+
+                                    //        title + myDocument.color +
+                                    //    '</a>'+
+                                    //'</div>';
                                 }
                                 string += '<div style="clear:both"></div>';
                                 string += '</div>';

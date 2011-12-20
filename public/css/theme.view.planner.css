@@ -88,12 +88,11 @@
 }
 .inprint-plan-page-document a {
     text-decoration:none;
-
     font-size:12px;
     padding:6px;
     margin:2px;
     float:left;
-    opacity: 0.3;
+    opacity: 0.6;
     background:#1B9BE0;
     border-radius: 2px;
     -moz-border-radius: 2px;

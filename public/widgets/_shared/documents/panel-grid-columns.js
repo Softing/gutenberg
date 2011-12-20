@@ -167,7 +167,7 @@ Inprint.documents.GridColumns = function() {
                             '{2}'+
                             '<div class="x-progress-bar{0}" style="width:{1}%;background:{4}!important;color:{5} !important;">&nbsp;</div>'+
                     '</div>',
-                    style, v, text, bgcolor.rgb(), fgcolor.rgb(), txtcolor);
+                    style, v, text, bgcolor.rgb(), fgcolor.rgb(), txtcolor.rgb());
             }
         },
 

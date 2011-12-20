@@ -101,7 +101,7 @@ sub _createComposeIndex {
     my $documents = {};
     my $doccount = 0;
     my $dbdocuments = $c->Q("
-        SELECT DISTINCT t2.edition, t2.fascicle, t2.id, t2.title
+        SELECT DISTINCT t2.edition, t2.fascicle, t2.id, t2.title, t2.color
         FROM fascicles_map_documents t1, documents t2
         WHERE t2.id = t1.entity AND t1.fascicle = ?
     ", [ $fascicle->id ])->Hashes;
@@ -114,7 +114,8 @@ sub _createComposeIndex {
 
         $documents->{$index->{$item->{id}}} = {
             id => $item->{id},
-            title => $item->{title}
+            title => $item->{title},
+            color => $item->{color},
         };
 
         my $docpages = $c->Q("
