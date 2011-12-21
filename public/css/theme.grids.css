@@ -33,9 +33,15 @@
    padding:1px 0px !important;
 }
 
-.x-grid3-progresscol .x-progress-text-front {
-   font-weight:normal !important;
-   padding:1px 0px !important;
+.x-grid3-progresscol .x-progress-text-front,
+.x-grid3-progresscol .x-progress-text-back {
+    height:13px;
+    overflow: hidden;
+    opacity: 0.9;
+    font-size:11px;
+    line-height: 13px;
+    font-weight:normal !important;
+    padding: 1px 0px !important;
 }
 
 .x-grid3-progresscol .x-progress-wrap {

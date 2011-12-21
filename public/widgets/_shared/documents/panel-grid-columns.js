@@ -155,19 +155,21 @@ Inprint.documents.GridColumns = function() {
                 var style = '';
                 var textClass = (v < 55) ? 'x-progress-text-back' : 'x-progress-text-front' + (Ext.isIE6 ? '-ie6' : '');
 
-                var text = String.format('<div><div class="x-progress-text {0}" style="width:100%;" id="{1}">{2}</div></div>', textClass, Ext.id(), string);
+                var fgcolor  = "#" + record.data.color;
+                var bgcolor  = inprintColorLuminance(record.data.color, 0.7);
+                var txtcolor = inprintColorContrast(record.data.color);
 
-                var bgcolor  = Color('#' + record.data.color).setSaturation(30);
-                var fgcolor  = Color('#' + record.data.color);
-                var txtcolor = Color('#' + inverse(record.data.color));
+                var text = String.format(
+                    '<div class="x-progress-text {0}" style="width:100%;color:{3}!important;" id="{1}">{2}</div>',
+                    textClass, Ext.id(), string, txtcolor);
 
                 return String.format(
                     '<div class="x-progress-wrap">'+
                         '<div class="x-progress-inner" style="border:1px solid {4};background:{3}!important;">'+
                             '{2}'+
-                            '<div class="x-progress-bar{0}" style="width:{1}%;background:{4}!important;color:{5} !important;">&nbsp;</div>'+
+                            '<div class="x-progress-bar{0}" style="width:{1}%;background:{4}!important;color:{5}!important;">&nbsp;</div>'+
                     '</div>',
-                    style, v, text, bgcolor.rgb(), fgcolor.rgb(), txtcolor.rgb());
+                    style, v, text, bgcolor, fgcolor, txtcolor);
             }
         },
 

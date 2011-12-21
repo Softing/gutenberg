@@ -107,21 +107,14 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
                                         title = myDocument.title;
                                     }
 
-                                    var fgcolor  = Color('#' + myDocument.color);
-                                    var txtcolor = Color('#' + inverse(myDocument.color));
+                                    var fgcolor  = "#" + myDocument.color;
+                                    var txtcolor = inprintColorContrast(myDocument.color);
 
                                     string += String.format(
                                         "<div class=\"inprint-plan-page-document\">"+
                                             "<a style=\"background:{3}!important;color:{4}!important;\" href=\"#\" onClick=\"Inprint.ObjectResolver.resolve({aid:'document-profile',oid:'{0}',text:'{1}'});return false;\">{2}</a>"+
                                         "</div>",
-                                            myDocument.id, escape(myDocument.title), title,
-                                            fgcolor.rgb(), txtcolor.rgb());
-
-                                    //string += '<div  class="inprint-plan-page-document">'+
-                                    //    '<a href="#" onClick="Inprint.ObjectResolver.resolve({aid:\'document-profile\',oid:\''+ myDocument.id +'\',text:\''+ escape(myDocument.title) +'\'});return false;"">'+
-                                    //        title + myDocument.color +
-                                    //    '</a>'+
-                                    //'</div>';
+                                        myDocument.id, escape(myDocument.title), title, fgcolor, txtcolor);
                                 }
                                 string += '<div style="clear:both"></div>';
                                 string += '</div>';

@@ -37,43 +37,68 @@ _get_values = function(myfield, myarray) {
 
 // Inverse colors
 
-function DecToHex(number) {
-    var hexbase="0123456789ABCDEF";
-    return hexbase.charAt((number>> 4)& 0xf)+ hexbase.charAt(number& 0xf);
+function inprintColorContrast(hexcolor){
+    var r = parseInt(hexcolor.substr(0,2),16);
+    var g = parseInt(hexcolor.substr(2,2),16);
+    var b = parseInt(hexcolor.substr(4,2),16);
+    var yiq = ((r*299)+(g*587)+(b*114))/1000;
+    return (yiq >= 128) ? 'black' : 'white';
 }
 
-function giveHex(s) {
-    s=s.toUpperCase();
-    return parseInt(s,16);
-}
-
-function inverse(input) {
-
-    if(!input) {
-        return false;
+function inprintColorLuminance(hex, lum) {
+    // validate hex string
+    hex = String(hex).replace(/[^0-9a-f]/gi, '');
+    if (hex.length < 6) {
+        hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
     }
-
-    if(input.length < 6 || input.length > 6){
-        window.alert('You Must Enter a six digit color code');
-        return false;
+    lum = lum || 0;
+    // convert to decimal and change luminosity
+    var rgb = "#", c, i;
+    for (i = 0; i < 3; i++) {
+        c = parseInt(hex.substr(i*2,2), 16);
+        c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
+        rgb += ("00"+c).substr(c.length);
     }
-
-    hex1 = input.slice(0,2);
-    hexb1 = input.slice(2,4);
-    hexc1 = input.slice(4,6);
-    hex2 = 16 * giveHex(hex1.slice(0,1));
-    hex3 = giveHex(hex1.slice(1,2));
-    hex1 = hex1 + hex2;
-    hexb2 = 16 * giveHex(hexb1.slice(0,1));
-    hexb3 = giveHex(hexb1.slice(1,2));
-    hexb1 = hexb2 + hexb3;
-    hexc2 = 16 * giveHex(hexc1.slice(0,1));
-    hexc3 = giveHex(hexc1.slice(1,2));
-    hexc1 = hexc2 + hexc3;
-    newColor = DecToHex(255-hex1) + "" + DecToHex(255-hexb1) + "" + DecToHex(255-hexc1);
-
-    return newColor;
+    return rgb;
 }
+
+//function DecToHex(number) {
+//    var hexbase="0123456789ABCDEF";
+//    return hexbase.charAt((number>> 4)& 0xf)+ hexbase.charAt(number& 0xf);
+//}
+//
+//function giveHex(s) {
+//    s=s.toUpperCase();
+//    return parseInt(s,16);
+//}
+//
+//function inverse(input) {
+//
+//    if(!input) {
+//        return false;
+//    }
+//
+//    if(input.length < 6 || input.length > 6){
+//        window.alert('You Must Enter a six digit color code');
+//        return false;
+//    }
+//
+//    hex1 = input.slice(0,2);
+//    hexb1 = input.slice(2,4);
+//    hexc1 = input.slice(4,6);
+//    hex2 = 16 * giveHex(hex1.slice(0,1));
+//    hex3 = giveHex(hex1.slice(1,2));
+//    hex1 = hex1 + hex2;
+//    hexb2 = 16 * giveHex(hexb1.slice(0,1));
+//    hexb3 = giveHex(hexb1.slice(1,2));
+//    hexb1 = hexb2 + hexb3;
+//    hexc2 = 16 * giveHex(hexc1.slice(0,1));
+//    hexc3 = giveHex(hexc1.slice(1,2));
+//    hexc1 = hexc2 + hexc3;
+//    newColor = DecToHex(255-hex1) + "" + DecToHex(255-hexb1) + "" + DecToHex(255-hexc1);
+//
+//    return newColor;
+//}
 
 // Ext specifed
 
