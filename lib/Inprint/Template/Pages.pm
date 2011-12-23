@@ -67,7 +67,7 @@ sub create {
 
     unless (@errors) {
 
-        my $pages  = Inprint::Fascicle::Utils::uncompressString($c, $i_string);
+        my $pages  = Inprint::Fascicle::Utils::uncompressString($c, $i_string, 1);
         my $chunks = Inprint::Fascicle::Utils::getChunks($c, $pages);
 
         my $composition = $c->Q("

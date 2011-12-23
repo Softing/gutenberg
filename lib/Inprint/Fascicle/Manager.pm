@@ -140,9 +140,12 @@ sub save {
 
     unless (@errors) {
 
+        my $log;
         $c->sql->bt;
 
         foreach my $node (@i_modules) {
+            my %modpages;
+
             my ($place_id, $modtype_id, $seqnumstr) = split '::', $node;
 
             my $place = $c->Q(" SELECT * FROM fascicles_tmpl_places WHERE id=? AND fascicle=? ", [ $place_id, $fascicle->{id} ])->Hash;
@@ -154,96 +157,95 @@ sub save {
             my $seqnums = Inprint::Fascicle::Utils::uncompressString($c, $seqnumstr);
             next unless (@$seqnums);
 
-            my @pages;
             foreach my $seqnum (@$seqnums) {
                 if ($seqnum > 0) {
                     my $page = $c->Q("
                         SELECT * FROM fascicles_pages WHERE fascicle=? AND seqnum=? ",
                         [ $fascicle->{id}, $seqnum ])->Hash;
-
                     if ($page->{id}) {
-                        push @pages, $page;
+                        $modpages{$page->{id}} ++;
                     }
                 }
             }
 
-            foreach my $page (@pages) {
-                $c->Do(
-                    "   DELETE FROM fascicles_modules t1
-                        WHERE 1=1
-                            AND t1.fascicle=?
-                            AND t1.id IN (
-                                SELECT module
-                                FROM fascicles_map_modules t2
-                                WHERE 1=1
-                                    AND t2.module = t1.id
-                                    AND t2.fascicle = t1.fascicle
-                                    AND t2.placed = false
-                                    AND t2.page = ?) ",
-                    [$fascicle->{id}, $page->{id} ]);
-            }
+            while (my ($page_id, $page_count) = each %modpages){
 
-        }
+                #$log .= "[$page_id = $page_count]";
 
-        foreach my $node (@i_modules) {
-            my ($place_id, $modtype_id, $seqnumstr) = split '::', $node;
+                # Count number of units with advertising
+                my $unitsWithAdvertising  = $c->Q("
+                        SELECT t1.id, t3.module
+                        FROM fascicles_modules t1
+                            LEFT JOIN fascicles_map_modules t2 ON  t1.id = t2.module
+                            LEFT OUTER JOIN fascicles_requests t3 ON t1.id = t3.module
+                        WHERE t3.module IS NULL AND t1.fascicle=? AND t2.page=?
+                    ", [ $fascicle->{id}, $page_id ])->Hashes;
 
-            my $place = $c->Q(" SELECT * FROM fascicles_tmpl_places WHERE id=? AND fascicle=? ", [ $place_id, $fascicle->{id} ])->Hash;
-            next unless ($place->{id});
+                # Count number of units without advertising
+                my $unitsWithoutAdvertising  = $c->Q("
+                        SELECT t1.id, t3.module
+                        FROM fascicles_modules t1
+                            LEFT JOIN fascicles_map_modules t2 ON  t1.id = t2.module
+                            LEFT OUTER JOIN fascicles_requests t3 ON t1.id = t3.module
+                        WHERE t3.module IS NOT NULL AND t1.fascicle=? AND t2.page=?
+                    ", [ $fascicle->{id}, $page_id ])->Hashes;
 
-            my $modtype = $c->Q(" SELECT * FROM fascicles_tmpl_modules WHERE id=? AND fascicle=? ", [ $modtype_id, $fascicle->{id} ])->Hash;
-            next unless ($modtype->{id});
+                # Count the actual number of units without advertising
 
-            my $seqnums = Inprint::Fascicle::Utils::uncompressString($c, $seqnumstr);
-            next unless (@$seqnums);
+                my $unitsWithAdvertisingCount    = $#{ $unitsWithAdvertising } +1;
+                my $unitsWithoutAdvertisingCount = $#{ $unitsWithoutAdvertising } +1;
 
-            my @pages;
-            foreach my $seqnum (@$seqnums) {
-                if ($seqnum > 0) {
-                    my $page = $c->Q("
-                        SELECT * FROM fascicles_pages WHERE fascicle=? AND seqnum=? ",
-                        [ $fascicle->{id}, $seqnum ])->Hash;
+                $log .= "[page_count=$page_count";
+                $log .= " with=$unitsWithAdvertisingCount";
+                $log .= " without=$unitsWithoutAdvertisingCount";
+                my $requiredNnumberOf = ($page_count - $unitsWithAdvertisingCount);
+                $log .= " >$requiredNnumberOf]";
+                $log .= "\n";
 
-                    if ($page->{id}) {
-                        push @pages, $page;
-                    }
+                foreach my $unit (@$unitsWithoutAdvertising) {
+                    $c->Do("DELETE FROM fascicles_modules WHERE fascicle=? AND id=?", [ $fascicle->{id}, $unit->{id} ]);
                 }
-            }
 
-            foreach my $page (@pages) {
-                my $module_id = $c->uuid();
+                for (1..$requiredNnumberOf) {
 
-                $c->Do(" INSERT INTO fascicles_modules (
-                    id,
-                    edition, fascicle, place, origin,
-                    title, description, amount,
-                    w, h, area,
-                    width, height,
-                    fwidth, fheight,
-                    created, updated)
-                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,now(),now())", [
-                        $module_id,
-                        $fascicle->{edition}, $fascicle->{id}, $place->{id}, $modtype->{id},
-                        $modtype->{title}, $modtype->{description}, $modtype->{amount},
-                        $modtype->{w}, $modtype->{h}, $modtype->{area},
-                        $modtype->{width}, $modtype->{height},
-                        $modtype->{fwidth}, $modtype->{fheight},
-                    ]);
+                    $log .= "Create module for page $page_id\n";
 
-                my $module = $c->Q("
-                    SELECT * FROM fascicles_modules WHERE fascicle=? AND id=? ",
-                    [ $fascicle->{id}, $module_id ])->Hash;
+                    my $module_id = $c->uuid();
 
-                if ($module->{id}) {
-                    $c->Do(" INSERT INTO fascicles_map_modules (
-                        edition, fascicle, module, page, placed, created, updated)
-                        VALUES (?,?,?,?,?,now(),now())",
-                        [ $module->{edition}, $module->{fascicle}, $module->{id}, $page->{id}, 0 ]
-                    );
+                    $c->Do(" INSERT INTO fascicles_modules (
+                        id,
+                        edition, fascicle, place, origin,
+                        title, description, amount,
+                        w, h, area,
+                        width, height,
+                        fwidth, fheight,
+                        created, updated)
+                        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,now(),now())", [
+                            $module_id,
+                            $fascicle->{edition}, $fascicle->{id}, $place->{id}, $modtype->{id},
+                            $modtype->{title}, $modtype->{description}, $modtype->{amount},
+                            $modtype->{w}, $modtype->{h}, $modtype->{area},
+                            $modtype->{width}, $modtype->{height},
+                            $modtype->{fwidth}, $modtype->{fheight},
+                        ]);
+
+                    my $module = $c->Q("
+                        SELECT * FROM fascicles_modules WHERE fascicle=? AND id=? ",
+                        [ $fascicle->{id}, $module_id ])->Hash;
+
+                    if ($module->{id}) {
+                        $c->Do(" INSERT INTO fascicles_map_modules (
+                            edition, fascicle, module, page, placed, x, y, created, updated)
+                            VALUES (?,?,?,?,?,?,?,now(),now())",
+                            [ $module->{edition}, $module->{fascicle}, $module->{id}, $page_id, 0, $modtype->{w}, $modtype->{h} ]
+                        );
+                    }
                 }
             }
         }
         $c->sql->et;
+
+        #die $log;
 
         $c->sql->bt;
         foreach my $node (@i_documents) {
@@ -259,7 +261,7 @@ sub save {
                 DELETE FROM fascicles_map_documents WHERE edition =? AND fascicle=? AND entity=?
                 ", [ $fascicle->{edition}, $fascicle->{id}, $document->{id} ]);
 
-            my $seqnums = Inprint::Fascicle::Utils::uncompressString($c, $seqnumstr);
+            my $seqnums = Inprint::Fascicle::Utils::uncompressString($c, $seqnumstr, 1);
             next unless (@$seqnums);
 
             foreach my $seqnum (@$seqnums) {

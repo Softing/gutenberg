@@ -47,8 +47,9 @@ sub compressString {
 
 sub uncompressString {
 
-    my $c = shift;
+    my $self   = shift;
     my $string = shift;
+    my $unique = shift;
 
     my @pairs = split '[^\d|\-|\:|<|>]', $string;
 
@@ -85,9 +86,17 @@ sub uncompressString {
     }
 
     my @pages;
-
-    my %seen = (); foreach my $item (@source) {    push(@pages, $item) unless $seen{$item}++; }
-
+    if ($unique) {
+        my %seen = ();
+        foreach my $item (@source) {
+            push(@pages, $item) unless $seen{$item}++;
+        }
+    }
+    else {
+        foreach my $item (@source) {
+            push(@pages, $item);
+        }
+    }
     @pages = sort { $a <=> $b } @pages;
 
     return \@pages;

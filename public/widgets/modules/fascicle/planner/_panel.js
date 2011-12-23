@@ -418,6 +418,7 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
             },
             scope:this,
             success: function () {
+                modules.getStore().commitChanges();
                 documents.getStore().commitChanges();
                 this.cmpReload();
             }
