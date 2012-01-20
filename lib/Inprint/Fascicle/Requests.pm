@@ -9,6 +9,7 @@ use utf8;
 use strict;
 use warnings;
 
+use Inprint::Fascicle::Events;
 use Inprint::Models::Fascicle::Request;
 
 use base 'Mojolicious::Controller';
@@ -229,6 +230,9 @@ sub create {
         ]);
     }
 
+    # Create event
+    Inprint::Fascicle::Events::onCompositionChanged($c, $fascicle);
+
     $success = $c->json->true unless (@errors);
     $c->render_json({ success => $success, errors => \@errors });
 }
@@ -261,6 +265,8 @@ sub update {
     $c->check_text( \@errors, "description", $i_description);
 
     $c->check_access( \@errors, "domain.roles.manage");
+    
+    my $fascicle   = $c->check_record(\@errors, "fascicles", "fascicle", $i_fascicle);
 
     #my $module = $c->Q(" SELECT * FROM fascile_modules WHERE id=? ", [ $i_module ])->Hash;
     #my $place  = $c->Q(" SELECT * FROM fascile_tmpl_places WHERE id=? ", [ $module->{place} ])->Hash;
@@ -282,6 +288,9 @@ sub update {
         ]);
     }
 
+    # Create event
+    Inprint::Fascicle::Events::onCompositionChanged($c, $fascicle);
+
     $success = $c->json->true unless (@errors);
     $c->render_json({ success => $success, errors => \@errors });
 }
@@ -298,6 +307,8 @@ sub move {
 
     #push @errors, { id => "access", msg => "Not enough permissions"}
     #    unless ($c->objectAccess("domain.roles.manage"));
+    
+    my $fascicle   = $c->check_record(\@errors, "fascicles", "fascicle", $i_fascicle);
 
     my @pages;
 
@@ -353,6 +364,9 @@ sub move {
         }
     }
 
+    # Create event
+    Inprint::Fascicle::Events::onCompositionChanged($c, $fascicle);
+
     $success = $c->json->true unless (@errors);
     $c->render_json({ success => $success, errors => \@errors });
 }
@@ -369,6 +383,8 @@ sub delete {
 
     my @errors;
     my $success = $c->json->false;
+    
+    my $fascicle   = $c->check_record(\@errors, "fascicles", "fascicle", $i_fascicle);
 
     #push @errors, { id => "access", msg => "Not enough permissions"}
     #    unless ($c->objectAccess("domain.roles.manage"));
@@ -405,6 +421,9 @@ sub delete {
             }
         }
     }
+    
+    # Create event
+    Inprint::Fascicle::Events::onCompositionChanged($c, $fascicle);
 
     $success = $c->json->true unless (@errors);
     $c->render_json({ success => $success, errors => \@errors });
