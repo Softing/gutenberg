@@ -146,7 +146,7 @@ Inprint.cmp.Adverta = Ext.extend(Ext.Window, {
         var form = this.panels.request.getForm();
 
         // No pages selected
-        if ( this.selection.length === 0 ) {
+        if ( this.selection.length == 0 ) {
             form.baseParams = {
                 template: this.panels.templates.cmpGetValue()
             };

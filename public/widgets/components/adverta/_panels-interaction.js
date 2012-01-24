@@ -63,4 +63,5 @@ Inprint.cmp.Adverta.Interaction = function(parent, panels) {
             }
         }, parent);
 
+
 };

@@ -157,7 +157,7 @@ Inprint.cmp.adverta.Flash = Ext.extend(Ext.Panel, {
             scope:this,
             success: function ( result, request ) {
                 var responce = Ext.util.JSON.decode(result.responseText);
-                this.parent.fireEvent("actioncomplete", this);
+                //this.parent.fireEvent("actioncomplete", this);
             },
             params: {
                 modules: data,

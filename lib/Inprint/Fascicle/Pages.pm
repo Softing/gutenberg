@@ -462,6 +462,9 @@ sub clean {
         }
     }
 
+    # Create event
+    Inprint::Fascicle::Events::onCompositionChanged($c, $fascicle);
+
     $c->smart_render(\@errors);
 }
 
