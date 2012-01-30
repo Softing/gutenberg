@@ -12,9 +12,6 @@
 }
 
 .inprint-plan-block {
-    width:422px;
-    height:270px;
-
     float:left;
     font-size:10px;
     margin:10px 15px 0px 0px;
@@ -22,12 +19,6 @@
 }
 
 .inprint-plan-page {
-    width:105px;
-    height:150px;
-
-    width:200px;
-    height:260px;
-
     border: 2px solid silver;
     padding:3px;
     background:white;
@@ -55,15 +46,9 @@
 }
 
 .inprint-plan-page-title {
-    width:99px;
-    height:12px;
-
-    width:194px;
-    height:12px;
-
     overflow:hidden;
     background:#D6D6D6;
-    padding:3px;
+    padding:0px 3px;
     margin-bottom:3px;
     font-weight:bold;
     -moz-border-radius: 2px;
@@ -71,15 +56,7 @@
 }
 
 .inprint-plan-page-body {
-
-    width:99px;
-    height:124px;
-
-    width:200px;
-    height:240px;
-
     overflow:hidden;
-    padding:3px;
     -moz-border-radius: 2px;
     border-radius: 2px;
 }
@@ -87,18 +64,18 @@
 .inprint-plan-page-documents {
 }
 .inprint-plan-page-document a {
-    text-decoration:none;
-    font-size:12px;
-    padding:6px;
-    margin:2px;
     float:left;
-    opacity: 0.6;
+    padding:3px 4px;
+    margin:0px 0px 2px 0px;
+    line-height:12px;
+    font-size:11px;
+    text-decoration:none;
     background:#1B9BE0;
-    border-radius: 2px;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    line-height:9px;
+    border-radius: 1px;
+    -moz-border-radius: 1px;
+    -webkit-border-radius: 1px;
     color:white;
+    font-family: Arial, Helvetica, sans-serif;
 
 }
 .inprint-plan-page-document a:hover {
@@ -107,6 +84,7 @@
     border-radius: 2px;
     -moz-border-radius: 2px;
     -webkit-border-radius: 2px;
+    opacity: 0.1
 }
 .inprint-plan-page-document {
 
@@ -116,14 +94,15 @@
 
 }
 .inprint-plan-page-hole {
-    margin:2px;
     float:left;
-    padding:3px;
+    padding:3px 6px;
+    margin:0px 0px 2px 0px;
     opacity: 0.7;
     background:orange;
     border-radius: 2px;
     -moz-border-radius: 2px;
     -webkit-border-radius: 2px;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 .inprint-plan-page-requests {

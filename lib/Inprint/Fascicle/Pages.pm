@@ -100,6 +100,7 @@ sub create {
             ])->Hashes;
 
         my @inserts;
+        my @pagesForUpdate;
 
         foreach my $newpage (@$pages) {
 
@@ -122,6 +123,7 @@ sub create {
                 if ($oldpage->{seqnum} >= $newpage && $offset == 1) {
                     $oldpage->{seqnum} ++;
                     $oldpage->{is_updated} = 1;
+                    push @pagesForUpdate, $oldpage;
                 }
             }
 
@@ -129,12 +131,8 @@ sub create {
 
         $c->sql->bt;
 
-        foreach my $page (@$composition) {
-            if ( $page->{id} && $page->{is_updated} == 1) {
-                $c->Do("
-                    UPDATE fascicles_pages SET seqnum=? WHERE id=?
-                ", [$page->{seqnum}, $page->{id}]);
-            }
+        foreach my $page (@pagesForUpdate) {
+            $c->Do("UPDATE fascicles_pages SET seqnum=? WHERE id=?", [$page->{seqnum}, $page->{id}]);
         }
 
         foreach my $page (@inserts) {
@@ -230,6 +228,8 @@ sub move {
 
         @inputPages = sort { $a->{seqnum} < $b->{seqnum} } @inputPages;
 
+        my @pagesForUpdate;
+
         foreach my $page (@inputPages) {
 
             $dbg .= " [ $page->{seqnum} ] !!! ";
@@ -243,16 +243,18 @@ sub move {
                     foreach my $oldpage (@$composition) {
 
                         if ( $oldpage->{id} eq $page->{id} ) {
-                            $dbg .= " $oldpage->{seqnum} == ";
+                            #$dbg .= " $oldpage->{seqnum} == ";
                             $oldpage->{seqnum} = $i_after+1;
-                            $oldpage->{is_updated} = 1;
-                            $dbg .= " $oldpage->{seqnum} | ";
+                            #$oldpage->{is_updated} = 1;
+                            push @pagesForUpdate, $oldpage;
+                            #$dbg .= " $oldpage->{seqnum} | ";
                         }
                         elsif ( $oldpage->{seqnum} > $i_after && $oldpage->{seqnum} < $page->{seqnum} + 1 ) {
-                            $dbg .= " $oldpage->{seqnum} > ";
+                            #$dbg .= " $oldpage->{seqnum} > ";
                             $oldpage->{seqnum} ++;
-                            $oldpage->{is_updated} = 1;
-                            $dbg .= " $oldpage->{seqnum} | ";
+                            #$oldpage->{is_updated} = 1;
+                            push @pagesForUpdate, $oldpage;
+                            #$dbg .= " $oldpage->{seqnum} | ";
                         }
                     }
                 }
@@ -261,17 +263,19 @@ sub move {
                     foreach my $oldpage (@$composition) {
 
                         if ( $oldpage->{id} eq $page->{id} ) {
-                            $dbg .= " $oldpage->{seqnum} == ";
+                            #$dbg .= " $oldpage->{seqnum} == ";
                             $oldpage->{seqnum} = $i_after;
-                            $oldpage->{is_updated} = 1;
-                            $dbg .= " $oldpage->{seqnum} | ";
+                            #$oldpage->{is_updated} = 1;
+                            push @pagesForUpdate, $oldpage;
+                            #$dbg .= " $oldpage->{seqnum} | ";
                         }
 
                         elsif ( $oldpage->{seqnum} > $page->{seqnum} &&  $oldpage->{seqnum} < $i_after+1 ) {
-                            $dbg .= " $oldpage->{seqnum} > ";
+                            #$dbg .= " $oldpage->{seqnum} > ";
                             $oldpage->{seqnum} --;
-                            $oldpage->{is_updated} = 1;
-                            $dbg .= " $oldpage->{seqnum} | ";
+                            #$oldpage->{is_updated} = 1;
+                            push @pagesForUpdate, $oldpage;
+                            #$dbg .= " $oldpage->{seqnum} | ";
                         }
 
                     }
@@ -283,10 +287,8 @@ sub move {
 
         $c->sql->bt;
 
-        foreach my $page (@$composition) {
-            if ( $page->{id} && $page->{is_updated} == 1) {
-                $c->Do(" UPDATE fascicles_pages SET seqnum=? WHERE id=? ", [$page->{seqnum}, $page->{id}]);
-            }
+        foreach my $page (@pagesForUpdate) {
+            $c->Do(" UPDATE fascicles_pages SET seqnum=? WHERE id=? ", [$page->{seqnum}, $page->{id}]);
         }
 
         # Create event
@@ -325,28 +327,26 @@ sub right {
         my ($id, $seqnum) = split "::", $i_page;
         my $page = $c->Q(" SELECT * FROM fascicles_pages WHERE id=? AND seqnum=? ", [ $id, $seqnum ])->Hash;
 
+        my @pagesForUpdate;
         if ($page->{id}) {
-
             foreach my $oldpage (@$composition) {
                 if ( $oldpage->{seqnum} >= $page->{seqnum} ) {
                     $oldpage->{seqnum} = $oldpage->{seqnum} + $i_amount;
-                    $oldpage->{is_updated} = 1;
+                    #$oldpage->{is_updated} = 1;
+                    push @pagesForUpdate, $oldpage;
                 }
             }
         }
 
         $c->sql->bt;
-        foreach my $page (@$composition) {
-            if ( $page->{id} && $page->{is_updated} == 1) {
-                $c->Do(" UPDATE fascicles_pages SET seqnum=? WHERE id=? ", [$page->{seqnum}, $page->{id}]);
-            }
+        foreach my $page (@pagesForUpdate) {
+            $c->Do(" UPDATE fascicles_pages SET seqnum=? WHERE id=? ", [$page->{seqnum}, $page->{id}]);
         }
 
         # Create event
         Inprint::Fascicle::Events::onCompositionChanged($c, $fascicle);
 
         $c->sql->et;
-
     }
 
     $c->smart_render(\@errors);
@@ -400,27 +400,27 @@ sub left {
                 $amount = $page->{seqnum} - $min_page - 1;
             }
 
+            my @pagesForUpdate;
             if ($amount > 0) {
                 foreach my $oldpage (@$composition) {
                     if ( $oldpage->{seqnum} >= $page->{seqnum} ) {
                         $oldpage->{seqnum} = $oldpage->{seqnum} - $amount;
-                        $oldpage->{is_updated} = 1;
+                        #$oldpage->{is_updated} = 1;
+                        push @pagesForUpdate, $oldpage;
                     }
                 }
             }
-        }
 
-        $c->sql->bt;
-        foreach my $page (@$composition) {
-            if ( $page->{id} && $page->{is_updated} == 1) {
+            $c->sql->bt;
+            foreach my $page (@pagesForUpdate) {
                 $c->Do(" UPDATE fascicles_pages SET seqnum=? WHERE id=? ", [$page->{seqnum}, $page->{id}]);
             }
+
+            # Create event
+            Inprint::Fascicle::Events::onCompositionChanged($c, $fascicle);
+
+            $c->sql->et;
         }
-
-        # Create event
-        Inprint::Fascicle::Events::onCompositionChanged($c, $fascicle);
-
-        $c->sql->et;
     }
 
     $c->smart_render(\@errors);
@@ -481,7 +481,15 @@ sub delete {
     $c->check_uuid( \@errors, "fascicle", $i_fascicle);
     my $fascicle = $c->check_record(\@errors, "fascicles", "fascicle", $i_fascicle);
 
+    my $deletedCounter = 0;
+
+    $c->sql->bt;
+
+    my $deletionMode = $c->config->get($fascicle->{edition} . ".layout.page.delete");
+
     unless (@errors) {
+
+        my @seqnums;
 
         foreach my $item (@i_pages) {
             my ($id, $seqnum) = split "::", $item;
@@ -489,17 +497,25 @@ sub delete {
             my $page    = $c->Q(" SELECT * FROM fascicles_pages WHERE id=? AND seqnum=? ", [ $id, $seqnum ])->Hash;
             next unless ($page->{id});
 
-            $c->sql->bt;
-
             my $modules = $c->Q(" SELECT module FROM fascicles_map_modules WHERE page=?", [ $page->{id} ])->Values;
-
             foreach my $id (@$modules) {
                 $c->Do(" DELETE FROM fascicles_modules WHERE id=? ", [ $id ]);
             }
 
             $c->Do(" DELETE FROM fascicles_pages WHERE id=? ", [ $page->{id} ]);
 
-            $c->sql->et;
+            push @seqnums, $page->{seqnum};
+        }
+
+        if ($deletionMode eq "move") {
+
+            @seqnums = sort {$b <=> $a} @seqnums;
+
+            foreach my $seqnum (@seqnums) {
+
+                #die @seqnums;
+                $c->Do(" UPDATE fascicles_pages SET seqnum = seqnum-1 WHERE fascicle=? AND seqnum > ? ", [ $fascicle->{id}, $seqnum ]);
+            }
         }
 
         # Create event
@@ -507,6 +523,7 @@ sub delete {
 
     }
 
+    $c->sql->et;
     $c->smart_render(\@errors);
 }
 

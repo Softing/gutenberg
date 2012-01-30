@@ -9,6 +9,7 @@ use strict;
 use warnings;
 
 use Inprint::Database;
+use Inprint::Fascicle::Sprite;
 
 use base 'Mojolicious::Controller';
 
@@ -22,6 +23,8 @@ sub seance {
     my $edition   = Inprint::Database::EditionService($c)->load( id => $fascicle->edition );
 
     $fascicle->{shortcut} = $edition->shortcut ."/". $fascicle->shortcut;
+
+    Inprint::Fascicle::Sprite::updatePagePositions($c, $fascicle->{id});
 
     # Statusbar
     $c->smart_render(\@errors, {
@@ -66,42 +69,52 @@ sub _createComposeIndex {
 
     my $result = {};
 
+    my $index = {};
     my $idcounter = 1;
-    my $index;
 
-    my @pageorder;
+    my @pagedata;
+    #my @pageorder;
 
     my $pages;
     my $dbpages = $c->Q("
         SELECT
-            t1.id, t1.seqnum, t1.w, t1.h,
+            t1.id, t1.seqnum, t1.spritepos, t1.w, t1.h,
             t2.id as headline, t2.title as headline_shortcut
         FROM
             fascicles_pages t1
-            LEFT JOIN fascicles_indx_headlines as t2 ON t2.id=t1.headline
-        WHERE t1.fascicle=?
+            LEFT JOIN fascicles_indx_headlines as t2
+                ON t2.fascicle = t1.fascicle AND t2.tag = t1.headline
+        WHERE t1.fascicle = ?
         ORDER BY t1.seqnum ",
         [ $fascicle->id ])->Hashes;
 
-    foreach my $item (@$dbpages) {
+    my %pageIdToSysNumIndex;
 
-        $index->{$item->{id}} = $idcounter++;
+    my $pageSysNum = 0;
+    foreach my $page (@$dbpages) {
 
-        my ($trash, $headline) = split /\//, $item->{headline_shortcut};
+        $pageSysNum++;
 
-        $pages->{$index->{$item->{id}}} = {
-            id => $item->{id},
-            num => $item->{seqnum},
-            headline => $headline || $item->{headline_shortcut}
-        };
+        $pageIdToSysNumIndex{$page->{id}} = $pageSysNum;
 
-        push @pageorder, $index->{$item->{id}};
+        if (! $page->{headline_shortcut} ) {
+            $page->{headline_shortcut} = "--";
+        }
+
+        push @pagedata,
+            $pageSysNum . "::".
+            $page->{id} ."::".
+            $page->{seqnum} ."::".
+            $page->{spritepos} ."::".
+            $page->{headline_shortcut};
     }
 
-    my $documents = {};
-    my $doccount = 0;
+    my %docMap;
+    my @documents;
+    my $docIndex = 0;
+
     my $dbdocuments = $c->Q("
-        SELECT DISTINCT t2.edition, t2.fascicle, t2.id, t2.title, t2.color
+        SELECT DISTINCT t2.edition, t2.fascicle, t2.id, t2.title, t2.color, t2.pages, t2.manager_shortcut
         FROM fascicles_map_documents t1, documents t2
         WHERE t2.id = t1.entity AND t1.fascicle = ?
     ", [ $fascicle->id ])->Hashes;
@@ -109,30 +122,33 @@ sub _createComposeIndex {
     foreach my $item (@$dbdocuments) {
 
         $item->{title} =~ s/"/&quot;/ig;
+        $item->{pages} =~ s/,/,&nbsp;/;
 
-        $index->{$item->{id}} = $idcounter++;
-
-        $documents->{$index->{$item->{id}}} = {
-            id => $item->{id},
-            title => $item->{title},
-            color => $item->{color},
-        };
+        push @documents,
+            $docIndex ."::".
+            $item->{id} ."::".
+            $item->{title} ."::".
+            $item->{pages} ."::".
+            $item->{manager_shortcut} ."::".
+            $item->{color};
 
         my $docpages = $c->Q("
             SELECT t2.id
             FROM fascicles_map_documents t1, fascicles_pages t2
-            WHERE t2.id = t1.page AND t1.fascicle = ? AND entity = ?
-        ", [ $fascicle->id, $item->{id} ])->Values;
+            WHERE t2.id = t1.page AND t1.fascicle = ? AND entity = ? ",
+            [ $fascicle->id, $item->{id} ])->Values;
 
         foreach my $pageid (@$docpages) {
-            my $pageindex = $index->{$pageid};
-            if ($pageindex) {
-                push @{ $pages->{$pageindex}->{documents} }, $index->{$item->{id}};
-            }
+            my $pageindex = $pageIdToSysNumIndex{$pageid};
+            $docMap{$pageindex} .= $docIndex . "::";
         }
+
+        $docIndex ++ ;
     }
 
-    my $holes;
+    my %holeMap;
+    my @holes;
+    my $holeIndex = 0;
 
     my $dbholes = $c->Q("
         SELECT t1.id, t1.title, t1.w, t1.h, t2.page, t2.x, t2.y
@@ -141,20 +157,33 @@ sub _createComposeIndex {
     ", [ $fascicle->id ])->Hashes;
 
     foreach my $item (@$dbholes) {
-        $index->{$item->{id}} = $idcounter++;
 
-        $holes->{$index->{$item->{id}}} = {
-            id => $item->{id},
-            title => $item->{title}
-        };
+        push @holes,
+            $holeIndex ."::".
+            $item->{id} ."::".
+            $item->{title};
 
-        my $pageindex = $index->{$item->{page}};
-        if ($pageindex) {
-            push @{ $pages->{$pageindex}->{holes} }, $index->{$item->{id}};
-        }
+        my $pageindex = $pageIdToSysNumIndex{$item->{page}};
+        $holeMap{$pageindex} .= $holeIndex . "::";
+
+    #    $index->{$item->{id}} = $idcounter++;
+    #
+    #    $holes->{$index->{$item->{id}}} = {
+    #        id => $item->{id},
+    #        title => $item->{title}
+    #    };
+    #
+    #    my $pageindex = $index->{$item->{page}};
+    #    if ($pageindex) {
+    #        push @{ $pages->{$pageindex}->{holes} }, $index->{$item->{id}};
+    #    }
+
+        $holeIndex++;
     }
 
-    my $requests;
+    my %requestMap;
+    my @requests;
+    my $requestIndex = 0;
 
     my $dbrequests = $c->Q("
         SELECT t1.id, t1.shortcut, t2.page
@@ -164,26 +193,43 @@ sub _createComposeIndex {
 
     foreach my $item (@$dbrequests) {
 
-        $index->{$item->{id}} = $idcounter++;
+        push @requests,
+            $requestIndex ."::".
+            $item->{id} ."::".
+            $item->{title};
 
-        $requests->{$index->{$item->{id}}} = {
-            id => $item->{id},
-            title => $item->{shortcut}
-        };
+        my $pageindex = $pageIdToSysNumIndex{$item->{page}};
+        $requestMap{$pageindex} .= $requestIndex . "::";
+die 1;
+    #    $index->{$item->{id}} = $idcounter++;
+    #
+    #    $requests->{$index->{$item->{id}}} = {
+    #        id => $item->{id},
+    #        title => $item->{shortcut}
+    #    };
+    #
+    #    my $pageindex = $index->{$item->{page}};
+    #
+    #    if ($pageindex) {
+    #        push @{ $pages->{$pageindex}->{requests} }, $index->{$item->{id}};
+    #    }
 
-        my $pageindex = $index->{$item->{page}};
-
-        if ($pageindex) {
-            push @{ $pages->{$pageindex}->{requests} }, $index->{$item->{id}};
-        }
-
+        $requestIndex++;
     }
 
-    $result->{pages}      = $pages;
-    $result->{documents}  = $documents;
-    $result->{holes}      = $holes;
-    $result->{requests}   = $requests;
-    $result->{pageorder}  = \@pageorder;
+    $result->{page}->{"width"}  = $c->config->get($fascicle->{edition} . ".layout.page.width") || 200;
+    $result->{page}->{"height"} = $c->config->get($fascicle->{edition} . ".layout.page.height") || 240;
+
+    $result->{pages}      = \@pagedata;
+
+    $result->{documents}  = \@documents;
+    $result->{documents_map}  = \%docMap;
+
+    $result->{holes}  = \@holes;
+    $result->{holes_map}  = \%holeMap;
+
+    $result->{requests}  = \@requests;
+    $result->{requests_map}  = \%requestMap;
 
     return [ $result ];
 }

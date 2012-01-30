@@ -401,6 +401,8 @@ sub startup {
     $sessionBridge->route('/fascicle/images/page/:fascicle/:page/:w/:h')        ->to('fascicle-images#fascicle_page');
     $sessionBridge->route('/fascicle/images/template/:id/:w/:h')                ->to('fascicle-images#template_page');
 
+    $sessionBridge->route('/fascicle/sprite/:fascicle/:w/:h')            ->to('fascicle-sprite#index');
+
     #$sessionBridge->route('/aimgs/fascicle/template/:id/:w/:h')         ->to('images#fascicle_page');
     #$sessionBridge->route('/aimgs/fascicle/module/:id/:w/:h')           ->to('images#fascicle_page');
 

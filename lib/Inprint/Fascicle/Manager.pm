@@ -155,6 +155,21 @@ sub save {
             next unless ($modtype->{id});
 
             my $seqnums = Inprint::Fascicle::Utils::uncompressString($c, $seqnumstr);
+
+            # Clean unused modules
+            my $usedModules = $c->Q("SELECT * FROM fascicles_modules WHERE fascicle=? AND place=? AND origin=?", [ $fascicle->{id}, $place->{id}, $modtype->{id} ])->Hashes;
+            foreach my $usedModule (@$usedModules) {
+                my $pages = $c->Q(" SELECT t2.seqnum FROM fascicles_map_modules t1, fascicles_pages t2 WHERE t1.module = ? AND t1.page = t2.id", $usedModule->{id})->Values;
+                foreach my $page (@$pages) {
+                    unless ( $page ~~ @$seqnums) {
+                        my $request = $c->Q(" SELECT * FROM fascicles_requests WHERE module = ? ", $usedModule->{id})->Hash;
+                        unless ($request) {
+                            $c->Do("DELETE FROM fascicles_modules WHERE fascicle=? AND id=?", [ $fascicle->{id}, $usedModule->{id} ]);
+                        }
+                    }
+                }
+            }
+
             next unless (@$seqnums);
 
             foreach my $seqnum (@$seqnums) {
@@ -180,6 +195,8 @@ sub save {
                             LEFT OUTER JOIN fascicles_requests t3 ON t1.id = t3.module
                         WHERE t3.module IS NULL AND t1.fascicle=? AND t2.page=?
                     ", [ $fascicle->{id}, $page_id ])->Hashes;
+
+                $log .= "[$fascicle->{id}, $page_id]";
 
                 # Count number of units without advertising
                 my $unitsWithoutAdvertising  = $c->Q("
@@ -245,8 +262,6 @@ sub save {
         }
         $c->sql->et;
 
-        #die $log;
-
         $c->sql->bt;
         foreach my $node (@i_documents) {
 
@@ -272,13 +287,12 @@ sub save {
                     my $page = $c->Q("
                         SELECT * FROM fascicles_pages WHERE fascicle=? AND seqnum=? ",
                         [ $fascicle->{id}, $seqnum ])->Hash;
+
                     next unless ($page->{id});
 
-                    unless ($page->{headline}) {
-                        $c->Do("
-                            UPDATE fascicles_pages SET headline = ? WHERE id=? ",
-                            [ $document->{headline}, $page->{id}  ]);
-                    }
+                    $c->Do("
+                        UPDATE fascicles_pages SET headline = ? WHERE id=? ",
+                        [ $document->{headline}, $page->{id}  ]);
 
                     $c->Do("
                         INSERT INTO fascicles_map_documents(edition, fascicle, page, entity, created, updated)

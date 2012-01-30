@@ -62,6 +62,8 @@ use constant A4 => {
     xcount      => 10,
     ycount      => 4,
 
+    fontsize    => 6,
+
     padding     => 10,
     spadding    => 3,
 };
@@ -69,8 +71,6 @@ use constant A4 => {
 sub print {
 
     my $c = shift;
-
-    Mojo::IOLoop->stream($c->tx->connection)->timeout(300);
 
     my $i_fascicle = $c->param("fascicle");
     my $i_size     = $c->param("size");
@@ -310,17 +310,18 @@ sub draw_page {
                 default => PDF::TextBlock::Font->new({
                     pdf => $pdf,
                     fillcolor => 'silver',
-                    size => 4/pt,
+                    size => $PF->{fontsize}/pt,
                     font => $pdf->corefont( "Verdana", -encode=> "windows-1251" )
                 })
             }
         });
+
         $tb->x($modxcord);
         $tb->y( $modycord + (($height * $modh)/2));
         $tb->w($width * $modw);
         $tb->h($height * $modh);
         $tb->align("center");
-        $tb->lead(4/pt);
+        $tb->lead($PF->{fontsize}/pt);
         $tb->page($page);
         $tb->text( encode( "cp1251", $item->title ."\n". $item->Request->shortcut) );
         $tb->apply;
@@ -346,23 +347,35 @@ sub draw_page {
                 default => PDF::TextBlock::Font->new({
                     pdf => $pdf,
                     fillcolor => 'blue',
-                    size => 4/pt,
+                    size => $PF->{fontsize}/pt,
                     font => $pdf->corefont( "Verdana", -encode=> "windows-1251" )
                 })
             }
         });
 
         $tb->x($x+$padding);
-        $tb->y( $y + $height - $doccount* (4/pt + 2) );
+        $tb->y( $y + $height - $doccount* ($PF->{fontsize}/pt + 2) );
         $tb->w($width-$padding-$padding);
-        $tb->h(4/pt);
+        $tb->h($PF->{fontsize}/pt + 100);
+
+        my $text = encode("cp1251",
+            "*" . $item->title
+            ."\n".
+            $item->headline_shortcut
+            ."\n".
+            $item->manager_shortcut
+            ."\n".
+            $item->pages
+            ."\n");
 
         $tb->align("left");
-        $tb->lead(4/pt);
+        $tb->lead($PF->{fontsize}/pt + 2);
         $tb->page($page);
-        $tb->text( encode("cp1251", "[". $item->title ."/". $item->pages ."]") );
+        $tb->text( $text );
+
         $tb->apply;
     }
+
 
     # Draw holes
     foreach my $item (@$holes) {
@@ -375,19 +388,19 @@ sub draw_page {
                 default => PDF::TextBlock::Font->new({
                     pdf => $pdf,
                     fillcolor => 'black',
-                    size => 4/pt,
+                    size => $PF->{fontsize}/pt,
                     font => $pdf->corefont( "Verdana", -encode=> "windows-1251" )
                 })
             }
         });
 
         $tb->x($x+$padding);
-        $tb->y( $y + $height - $doccount* (4/pt + 2) );
+        $tb->y( $y + $height - $doccount* ($PF->{fontsize}/pt + 2) );
         $tb->w($width-$padding-$padding);
-        $tb->h(4/pt);
+        $tb->h($PF->{fontsize}/pt);
 
         $tb->align("left");
-        $tb->lead(4/pt);
+        $tb->lead($PF->{fontsize}/pt);
         $tb->page($page);
         $tb->text( encode("cp1251", "[". $item->title ."]") );
         $tb->apply;
@@ -405,19 +418,19 @@ sub draw_page {
                 default => PDF::TextBlock::Font->new({
                     pdf => $pdf,
                     fillcolor => 'black',
-                    size => 4/pt,
+                    size => $PF->{fontsize}/pt,
                     font => $pdf->corefont( "Verdana", -encode=> "windows-1251" )
                 })
             }
         });
 
         $tb->x($x+$padding);
-        $tb->y( $y + $height - $doccount* (4/pt + 2) );
+        $tb->y( $y + $height - $doccount* ($PF->{fontsize}/pt + 2) );
         $tb->w($width-$padding-$padding);
-        $tb->h(4/pt);
+        $tb->h($PF->{fontsize}/pt);
 
         $tb->align("left");
-        $tb->lead(4/pt);
+        $tb->lead($PF->{fontsize}/pt);
         $tb->page($page);
         $tb->text( encode("cp1251", "[". $item->shortcut ."]") );
         $tb->apply;

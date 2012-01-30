@@ -13,109 +13,168 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
 
                     var items = values[0];
 
+                    var blockWidth = (items.page.width*2+22);
+
                     string += '<div class="inprint-plan">';
-                    string += '<div class="inprint-plan-block">';
+                    string += '<div class="inprint-plan-block" style="width:'+ blockWidth +'px;">';
 
-                    for (var c=0; c<items.pageorder.length; c++) {
+                    var numcache = [];
 
-                        var page = items.pages[ items.pageorder[c] ];
+                    for (var c = 0; c < items.pages.length; c++) {
 
-                        var prevPage = items.pages[ items.pageorder[c-1] ];
-                        var nextPage = items.pages[ items.pageorder[c+1] ];
+                        var prev_page_num = 0;
+                        if (numcache[c-1]) {
+                            prev_page_num = parseInt(numcache[c-1][2]);
+                        }
+                        else if (items.pages[c-1]) {
+                            numcache[c-1] = items.pages[c-1].split("::");
+                            prev_page_num = parseInt(numcache[c-1][2]);
+                        }
+
+                        var next_page_num = 0;
+                        if (numcache[c+1]) {
+                            prev_page_num = parseInt(numcache[c+1][2]);
+                        }
+                        else if (items.pages[c+1]) {
+                            numcache[c+1] = items.pages[c+1].split("::");
+                            next_page_num = parseInt(numcache[c+1][2]);
+                        }
+
+                        if (!numcache[c]) {
+                            numcache[c] = items.pages[c].split("::");
+                        }
+
+                        var page_sid = numcache[c][0];
+                        var page_id = numcache[c][1];
+                        var page_num = parseInt(numcache[c][2]);
+                        var page_pos = parseInt(numcache[c][3]);
+                        var page_headline = numcache[c][4];
 
                         var pageclass  = "";
                         var alertclass = "";
 
-                        if(page.num && page.num % 2 === 0) {
+                        if(page_num % 2 == 0) {
+
                             pageclass = "inprint-plan-page-left";
-                            if (prevPage && prevPage.num != page.num-1) {
+
+                            if (prev_page_num != page_num - 1) {
                                 alertclass = "inprint-plan-page-alert-left";
                             }
-                            if (nextPage && nextPage.num != page.num+1) {
+                            if (next_page_num != page_num + 1) {
                                 alertclass = "inprint-plan-page-alert-right";
                             }
                         }
 
-                        if(page.num && page.num % 2 !== 0) {
+                        if(page_num % 2 != 0) {
+
                             pageclass = "inprint-plan-page-right";
-                            if (prevPage && prevPage.num != page.num-1) {
+
+                            if (prev_page_num != page_num - 1) {
                                 alertclass = "inprint-plan-page-alert-left";
                             }
-                            if (nextPage && nextPage.num !== page.num+1) {
+                            if (next_page_num != page_num + 1) {
                                 alertclass = "inprint-plan-page-alert-right";
                             }
                         }
 
-                        string += '<div id="'+ page.id +'" seqnum="'+ page.num +'" class="inprint-plan-page '+ pageclass +' '+ alertclass +'">';
+                        string += '<div id="'+ page_id +'" seqnum="'+ page_num +'" class="inprint-plan-page '+ pageclass +' '+ alertclass +'">';
 
-                            if (! page.num ) {
-                                page.num = "--";
+                            if (! page_num ) {
+                                page_num = "--";
                             }
 
-                            if (! page.headline ) {
-                                page.headline = "";
+                            if (! page_headline ) {
+                                page_headline = "";
                             }
 
                             string += '<div class="inprint-plan-page-title">';
-                            string += '<div><nobr>'+ page.num +' - '+ page.headline +'</nobr></div>';
+                            string += '<div><nobr>'+ page_num +' - '+ page_headline +'</nobr></div>';
                             string += '</div>';
 
-                            string += '<div class="inprint-plan-page-body"'+
-                                ' style="background:url(/fascicle/images/page/'+ fascicle +'/'+ page.id +'/200/240/?rnd='+ Math.random() +') no-repeat;">';
+                            var imagePosition = (page_pos-1) * items.page.width + (10*(page_pos-1));
 
-                            if (page.holes) {
+                            string += '<div class="inprint-plan-page-body"'+
+                                ' style="'+
+                                'background:url(/fascicle/sprite/'+ fascicle +'/'+ items.page.width +'/'+ items.page.height +'/) -'+ imagePosition +'px 0px no-repeat;'+
+                                'width:'+ items.page.width +'px;'+
+                                'height:'+ items.page.height +'px;'+
+                                '">';
+
+                            var holesMap = items.holes_map[page_sid];
+                            if (holesMap) {
+                                var myHoles = holesMap.split("::");
                                 string += '<div style="clear:both"></div>';
                                 string += '<div class="inprint-plan-page-holes">';
-                                for (var d=0; d<page.holes.length; d++) {
-                                    var hole = items.holes[ page.holes[d] ];
-                                    string += '<div class="inprint-plan-page-hole">'+ hole.title +'</div>';
+                                for (var h2=0; h2 < myHoles.length; h2++) {
+
+                                    var myHoleHash = items.holes[ myHoles[h2] ];
+                                    if (!myHoleHash) continue;
+
+                                    var myHoleObject = myHoleHash.split("::");
+                                    var myHole_sid = myHoleObject[0];
+                                    var myHole_id = myHoleObject[1];
+                                    var myHole_title = myHoleObject[2];
+                                    string += '<div class="inprint-plan-page-hole">'+ myHole_title +'</div>';
                                 }
                                 string += '</div>';
                             }
 
-                            if (page.requests) {
-                                string += '<div style="clear:both"></div>';
-                                string += '<div class="inprint-plan-page-requests">';
-                                for (var r=0; r<page.requests.length; r++) {
-                                    var request = items.requests[ page.requests[r] ];
-                                    string += '<div class="inprint-plan-page-request">'+ request.title +'</div>';
-                                }
+                            //if (page.requests) {
+                            //    string += '<div style="clear:both"></div>';
+                            //    string += '<div class="inprint-plan-page-requests">';
+                            //    for (var r=0; r<page.requests.length; r++) {
+                            //        var request = items.requests[ page.requests[r] ];
+                            //        string += '<div class="inprint-plan-page-request">'+ request.title +'</div>';
+                            //    }
+                            //
+                            //    string += '</div>';
+                            //}
 
-                                string += '</div>';
-                            }
+                            var documentsMap = items.documents_map[page_sid];
 
-                            if (page.documents) {
+                            if (documentsMap) {
+
+                                var myDocuments = documentsMap.split("::");
+
                                 string += '<div  class="inprint-plan-page-documents">';
-                                for (var d2=0; d2<page.documents.length; d2++) {
 
-                                    var myDocument = items.documents[ page.documents[d2] ];
+                                for (var d2=0; d2 < myDocuments.length; d2++) {
 
-                                    var title;
-                                    if (page.documents.length > 5) {
-                                        title = Ext.util.Format.ellipsis(myDocument.title, 20, false);
+                                    var myDocumentHash = items.documents[ myDocuments[d2] ];
+                                    if (!myDocumentHash) continue;
+
+                                    var myDocumentObject = myDocumentHash.split("::");
+                                    var myDocument_sid = myDocumentObject[0];
+                                    var myDocument_id = myDocumentObject[1];
+                                    var myDocument_title = myDocumentObject[2];
+                                    var myDocument_pages = myDocumentObject[3];
+                                    var myDocument_manager = myDocumentObject[4];
+                                    var myDocument_color = myDocumentObject[5];
+
+                                    var title = myDocument_title;
+                                    if (myDocuments.length > 5) {
+                                        title = Ext.util.Format.ellipsis(myDocument_title, 20, false);
+                                    }
+                                    else if (myDocuments.length <= 3) {
+                                        title = Ext.util.Format.ellipsis(myDocument_title, 50, false);
+                                    }
+                                    else if (myDocuments.length <= 5) {
+                                        title = Ext.util.Format.ellipsis(myDocument_title, 30, false);
                                     }
 
-                                    if (page.documents.length <= 5) {
-                                        title = Ext.util.Format.ellipsis(myDocument.title, 30, false);
-                                    }
+                                    title += "<div>" + myDocument_manager +"</div>";
+                                    title += "<div>" + myDocument_pages +"</div>";
 
-                                    if (page.documents.length <= 3) {
-                                        title = Ext.util.Format.ellipsis(myDocument.title, 50, false);
-                                    }
-
-                                    if (page.documents.length == 1) {
-                                        title = myDocument.title;
-                                    }
-
-                                    var fgcolor  = "#" + myDocument.color;
-                                    var txtcolor = inprintColorContrast(myDocument.color);
+                                    var fgcolor  = "#" + myDocument_color;
+                                    var txtcolor = inprintColorContrast(myDocument_color);
 
                                     string += String.format(
                                         "<div class=\"inprint-plan-page-document\">"+
                                             "<a style=\"background:{3}!important;color:{4}!important;\" href=\"#\" onClick=\"Inprint.ObjectResolver.resolve({aid:'document-profile',oid:'{0}',text:'{1}'});return false;\">{2}</a>"+
                                         "</div>",
-                                        myDocument.id, escape(myDocument.title), title, fgcolor, txtcolor);
+                                        myDocument_id, escape(myDocument_title), title, fgcolor, txtcolor);
                                 }
+
                                 string += '<div style="clear:both"></div>';
                                 string += '</div>';
                             }
@@ -126,19 +185,21 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
 
                         var delimeter = '<div style="clear:both"></div>';
                         delimeter += '</div>';
-                        delimeter += '<div class="inprint-plan-block">';
+                        delimeter += '<div class="inprint-plan-block" style="width:'+ blockWidth +'px;">';
 
-                        if(nextPage && page.num && nextPage.num != page.num + 1) {
-                            if (  nextPage.num < page.num + 1  ) {
+                        if(next_page_num != page_num + 1) {
+                            if (  next_page_num < page_num + 1  ) {
                                 string += delimeter;
                             }
                         }
 
-                        if(nextPage && page.num && page.num % 2 !== 0) {
+                        if(next_page_num && page_num % 2 != 0) {
                             string += delimeter;
                         }
 
-                        else if(nextPage && nextPage.num % 2 == page.num % 2) {
+                        else
+
+                        if(next_page_num % 2 == page_num % 2) {
                             string += delimeter;
                         }
 
@@ -157,13 +218,13 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
         this.store = new Ext.data.JsonStore({
             root: "data",
             baseParams: { fascicle: this.fascicle },
-            fields: [ "pageorder", "pages", "documents", "requests", "holes" ]
+            fields: [ "pageorder", "page", "pages", "documents", "documents_map", "requests", "holes", "holes_map" ]
         });
 
         Ext.apply(this, {
             autoWidth:true,
             autoHeight:true,
-            simpleSelect: false,
+            simpleSelect: true,
             multiSelect: true,
             loadingText:'Загрузка',
             emptyText: 'Полосы не найдены',
@@ -181,12 +242,13 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
     },
 
     cmpLoad: function(data) {
+        this.simpleSelect = true;
         this.parent.body.mask("Обновление данных...");
-        var rsp = Ext.util.JSON.decode(response.responseText);
         this.scrollTop    = this.parent.body.dom.scrollTop;
         this.scrollHeight = this.parent.body.dom.scrollHeight;
         this.getStore().loadData(data);
         this.parent.body.unmask();
+
     },
 
     cmpReload: function() {
@@ -202,9 +264,10 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
             },
             success: function(response) {
                 var rsp = Ext.util.JSON.decode(response.responseText);
-                this.scrollTop    = this.parent.body.dom.scrollTop;
-                this.scrollHeight = this.parent.body.dom.scrollHeight;
-                this.getStore().loadData(rsp);
+                this.cmpLoad(rsp);
+                //this.scrollTop    = this.parent.body.dom.scrollTop;
+                //this.scrollHeight = this.parent.body.dom.scrollHeight;
+                //this.getStore().loadData(rsp);
             }
         });
     }

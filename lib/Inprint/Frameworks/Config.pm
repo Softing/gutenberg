@@ -37,9 +37,8 @@ sub load {
 
 sub get {
     my $class = shift;
-    my ($section, $parametr) = split '\.', shift;
-    return $class->{config}->{$section}->{$parametr};
-    return 1;
+    my @sections = split '\.', shift;
+    return $class->{config}->{shift @sections}->{join "\.", @sections};
 }
 
 sub set {
