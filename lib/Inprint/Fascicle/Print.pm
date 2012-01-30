@@ -70,6 +70,8 @@ sub print {
 
     my $c = shift;
 
+    Mojo::IOLoop->stream($c->tx->connection)->timeout(300);
+
     my $i_fascicle = $c->param("fascicle");
     my $i_size     = $c->param("size");
     my $i_mode     = $c->param("mode");
