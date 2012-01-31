@@ -63,10 +63,10 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
 
                             pageclass = "inprint-plan-page-left";
 
-                            if (prev_page_num != page_num - 1) {
+                            if (prev_page_num && prev_page_num != page_num - 1) {
                                 alertclass = "inprint-plan-page-alert-left";
                             }
-                            if (next_page_num != page_num + 1) {
+                            if (next_page_num && next_page_num != page_num + 1) {
                                 alertclass = "inprint-plan-page-alert-right";
                             }
                         }
@@ -75,10 +75,10 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
 
                             pageclass = "inprint-plan-page-right";
 
-                            if (prev_page_num != page_num - 1) {
+                            if (prev_page_num && prev_page_num != page_num - 1) {
                                 alertclass = "inprint-plan-page-alert-left";
                             }
-                            if (next_page_num != page_num + 1) {
+                            if (next_page_num && next_page_num != page_num + 1) {
                                 alertclass = "inprint-plan-page-alert-right";
                             }
                         }
