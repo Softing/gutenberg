@@ -1,19 +1,23 @@
 Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
 
     initComponent: function() {
-
+    
         this.url = _url("/fascicle/pages/view/");
 
         this.tpl = new Ext.XTemplate(
             '{[ this.renderPages(\''+ this.fascicle +'\', values) ]}',
             {
+                pageWidth: 130,
+                pageHeight: 140,
                 renderPages: function(fascicle, values){
 
                     var string = "";
-
+                    
                     var items = values[0];
 
-                    var blockWidth = (items.page.width*2+22);
+                    var pageWidth = this.pageWidth;
+                    var pageHeight = this.pageHeight;
+                    var blockWidth = (this.pageWidth*2+22);
 
                     string += '<div class="inprint-plan">';
                     string += '<div class="inprint-plan-block" style="width:'+ blockWidth +'px;">';
@@ -91,13 +95,13 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
                             string += '<div><nobr>'+ page_num +' - '+ page_headline +'</nobr></div>';
                             string += '</div>';
 
-                            var imagePosition = (page_pos-1) * items.page.width + (10*(page_pos-1));
+                            var imagePosition = (page_pos-1) * pageWidth + (10*(page_pos-1));
 
                             string += '<div class="inprint-plan-page-body"'+
                                 ' style="'+
-                                'background:url(/fascicle/sprite/'+ fascicle +'/'+ items.page.width +'/'+ items.page.height +'/) -'+ imagePosition +'px 0px no-repeat;'+
-                                'width:'+ items.page.width +'px;'+
-                                'height:'+ items.page.height +'px;'+
+                                'background:url(/fascicle/sprite/'+ fascicle +'/'+ pageWidth +'/'+ pageHeight +'/) -'+ imagePosition +'px 0px no-repeat;'+
+                                'width:'+ pageWidth +'px;'+
+                                'height:'+ pageHeight +'px;'+
                                 '">';
 
                             var holesMap = items.holes_map[page_sid];
@@ -241,6 +245,24 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
         Inprint.fascicle.plan.View.superclass.onRender.apply(this, arguments);
     },
 
+    cmpResize: function(value) {
+
+        if (value == 0) {
+            this.tpl.pageWidth = 60;
+            this.tpl.pageHeight = 70; 
+        }
+        
+        if (value == 50) {
+            this.tpl.pageWidth = 130;
+            this.tpl.pageHeight = 140; 
+        }
+        
+        if (value == 100) {
+            this.tpl.pageWidth = 240;
+            this.tpl.pageHeight = 260; 
+        }
+    },
+
     cmpLoad: function(data) {
         this.simpleSelect = true;
         this.parent.body.mask("Обновление данных...");
@@ -265,9 +287,6 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
             success: function(response) {
                 var rsp = Ext.util.JSON.decode(response.responseText);
                 this.cmpLoad(rsp);
-                //this.scrollTop    = this.parent.body.dom.scrollTop;
-                //this.scrollHeight = this.parent.body.dom.scrollHeight;
-                //this.getStore().loadData(rsp);
             }
         });
     }

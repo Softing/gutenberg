@@ -37,11 +37,17 @@ sub index {
         render_sprite($c, $fascicle->{id}, $spriteFolder, $i_width, $i_height);
     }
 
-    $c->tx->res->headers->content_length(-s $spriteFile);
-    $c->tx->res->headers->content_type("image/png");
-    $c->res->content->asset(
-        Mojo::Asset::File->new(path => $spriteFile)
-    );
+    $c->res->code(404);
+    
+    if (-e $spriteFile) {
+        
+        $c->tx->res->headers->content_length(-s $spriteFile);
+        $c->tx->res->headers->content_type("image/png");
+        
+        $c->res->content->asset(
+            Mojo::Asset::File->new(path => $spriteFile)
+        );
+    }
 
     $c->rendered;
 }
@@ -73,7 +79,6 @@ sub render_sprite {
     my $fascicle = shift;
 
     my $spriteFolder = shift;
-
 
     my $spriteItemWidth = shift;
     my $spriteItemHeight = shift;
@@ -110,6 +115,7 @@ sub render_sprite {
     }
 
     my $image = GD::Tiler->tile(
+        Format => "png",
         Images => \@files,
         Background => 'white',
         Width => $spriteWidth,

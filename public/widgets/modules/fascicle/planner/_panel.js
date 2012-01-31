@@ -101,6 +101,22 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                 scope:this.panels.pages,
                 handler: this.panels.pages.cmpPageDelete
             },
+            '-',
+            {
+                width: 100,
+                value:50,
+                xtype: "slider",
+                increment: 50,
+                minValue: 0,
+                maxValue: 100,
+                listeners: {
+                    scope:this,
+                    'changecomplete': function(slider, value) {
+                        this.panels.pages.cmpResize(value);
+                    }
+                }
+                
+            },
             '->',
             {
                 ref: "../btnSave",
@@ -143,6 +159,7 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                 scope: this,
                 handler: this.endEdit
             },
+
             "-",
             {
                 text: _("Reports"),

@@ -55,6 +55,11 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
         return id;
     },
 
+    cmpResize: function(value) {
+        this.view.cmpResize(value);
+        this.parent.cmpReload();
+    },
+    
     cmpGetSelected: function () {
         var result = [];
         var records = this.view.getSelectedNodes();
