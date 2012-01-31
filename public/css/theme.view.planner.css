@@ -51,8 +51,7 @@
     padding:0px 3px;
     margin-bottom:3px;
     font-weight:bold;
-    -moz-border-radius: 2px;
-    border-radius: 2px;
+    border-radius: 1px;
 }
 
 .inprint-plan-page-body {

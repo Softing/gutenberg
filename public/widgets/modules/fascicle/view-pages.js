@@ -7,8 +7,10 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
         this.tpl = new Ext.XTemplate(
             '{[ this.renderPages(\''+ this.fascicle +'\', values) ]}',
             {
+                
                 pageWidth: 130,
                 pageHeight: 140,
+                
                 renderPages: function(fascicle, values){
 
                     var string = "";
@@ -91,7 +93,7 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
                                 page_headline = "";
                             }
 
-                            string += '<div class="inprint-plan-page-title">';
+                            string += '<div class="inprint-plan-page-title" style="width:'+ (pageWidth - 6) +'px;">';
                             string += '<div><nobr>'+ page_num +' - '+ page_headline +'</nobr></div>';
                             string += '</div>';
 
