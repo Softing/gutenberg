@@ -26,7 +26,7 @@ use constant A3 => {
     name        => "A3",
 
     width       => 75,
-    height      => 100,
+    height      => 90,
 
     htop        => 815,
     top         => 700,
@@ -35,12 +35,12 @@ use constant A3 => {
     pcx         => 10,
     pcy         => 20,
 
-    xcount      => 14,
-    ycount      => 9,
+    xcount      => 12,
+    ycount      => 6,
 
     fontsize    => 6,
 
-    padding     => 14,
+    padding     => 20,
     spadding    => 3,
 
 };
