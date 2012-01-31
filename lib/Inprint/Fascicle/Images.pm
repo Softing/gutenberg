@@ -296,23 +296,23 @@ sub draw_module {
         my $request = ${ $module->{requets} }[0];
         if ($request->{shortcut}) {
             $text .= "\n" . $request->{shortcut};
-            $blockHeight = ($fontsize + ($blockWidth / length($request->{shortcut})  * $fontsize))/2;
+            my $lc = ceil( $blockWidth / (length($text) * $fontsize) );
+            $blockHeight = $fontsize * $lc;
         }
     }
 
+    my $txty = $y1 + ceil (($y2-$y1)/2) ;
+    $txty -= $blockHeight/2;
+    
     my $wrapbox = GD::Text::Wrap->new( $img,
         line_space  => 0,
         color       => $module->{txt_color},
-        text        => $text
+        text        => "$text"
     );
 
-    #$wrapbox->set_font(gdMediumBoldFont);
     $wrapbox->set_font($font, $fontsize);
 
     $wrapbox->set(align => 'center', width => $blockWidth);
-
-    my $txty = ($y2-$y1)/2;
-    $txty = $y1+($y2/2) - $blockHeight;
 
     $wrapbox->draw( $x1, $txty);
 

@@ -89,15 +89,17 @@ sub render_sprite {
     my $spriteItemMargin = 10;
 
     updatePagePositions($c, $fascicle);
-    my $pages = $c->Q(" SELECT * FROM fascicles_pages WHERE fascicle =? ", $fascicle)->Hashes;
+    my $pages = $c->Q(" SELECT * FROM fascicles_pages WHERE fascicle =? ORDER BY spritepos", $fascicle)->Hashes;
 
-    my $spriteWidth  = ($spriteItemWidth * $#$pages) + ($spriteItemMargin * $#$pages);
+    my $spriteWidth  = ($spriteItemWidth * ($#$pages+1)) + ($spriteItemMargin * ($#$pages+1));
     my $spriteHeight = $spriteItemHeight;
 
     if (! -e $spriteFolder) {
         mkdir $spriteFolder;
     }
 
+    my $cc = 0;
+    
     foreach my $page (@$pages){
 
         my $position = $page->{spritepos} || 0;
@@ -304,26 +306,25 @@ sub draw_module {
         my $request = ${ $module->{requets} }[0];
         if ($request->{shortcut}) {
             $text .= "\n" . $request->{shortcut};
-            $blockHeight = ($fontsize + ($blockWidth / length($request->{shortcut})  * $fontsize))/2;
+            my $lc = ceil( $blockWidth / (length($text) * $fontsize) );
+            $blockHeight = $fontsize * $lc;
         }
     }
 
+    my $txty = $y1 + ceil (($y2-$y1)/2) ;
+    $txty -= $blockHeight/2;
+    
     my $wrapbox = GD::Text::Wrap->new( $img,
         line_space  => 0,
         color       => $module->{txt_color},
-        text        => $text
+        text        => "$text"
     );
 
-    #$wrapbox->set_font(gdMediumBoldFont);
     $wrapbox->set_font($font, $fontsize);
 
     $wrapbox->set(align => 'center', width => $blockWidth);
 
-    my $txty = ($y2-$y1)/2;
-    $txty = $y1+($y2/2) - $blockHeight;
-
     $wrapbox->draw( $x1, $txty);
-
 }
 
 1;
