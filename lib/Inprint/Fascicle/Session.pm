@@ -200,7 +200,7 @@ sub _createComposeIndex {
 
         my $pageindex = $pageIdToSysNumIndex{$item->{page}};
         $requestMap{$pageindex} .= $requestIndex . "::";
-die 1;
+
     #    $index->{$item->{id}} = $idcounter++;
     #
     #    $requests->{$index->{$item->{id}}} = {

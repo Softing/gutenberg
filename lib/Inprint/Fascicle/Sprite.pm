@@ -36,8 +36,6 @@ sub index {
     if (! -e $spriteFile) {
         render_sprite($c, $fascicle->{id}, $spriteFolder, $i_width, $i_height);
     }
-
-    $c->res->code(404);
     
     if (-e $spriteFile) {
         
@@ -47,9 +45,12 @@ sub index {
         $c->res->content->asset(
             Mojo::Asset::File->new(path => $spriteFile)
         );
+
+        $c->rendered;
+    } else {
+       $c->res->code(404);
     }
 
-    $c->rendered;
 }
 
 sub updatePagePositions {
