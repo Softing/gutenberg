@@ -29,6 +29,8 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
                     var linex = 0;
                     var liney = 0;
                     
+                    var rand = Math.random();
+                    
                     for (var c = 0; c < items.pages.length; c++) {
 
                         var prev_page_num = 0;
@@ -111,7 +113,10 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
 
                             string += '<div class="inprint-plan-page-body"'+
                                 ' style="'+
-                                'background:url(/fascicle/sprite/'+ fascicle +'/'+ pageWidth +'/'+ pageHeight +'/) -'+ imagePositionX +'px -'+ imagePositionY +'px no-repeat;'+
+                                'background:url('
+                                    +'/fascicle/sprite/'+ fascicle +'/'+ pageWidth +'/'+ pageHeight +'/?rnd='+ rand +') -'
+                                    + imagePositionX +'px -'
+                                    + imagePositionY +'px no-repeat;'+
                                 'width:'+ pageWidth +'px;'+
                                 'height:'+ pageHeight +'px;'+
                                 '">';
