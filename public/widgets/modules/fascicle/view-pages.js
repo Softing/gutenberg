@@ -26,6 +26,9 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
 
                     var numcache = [];
 
+                    var linex = 0;
+                    var liney = 0;
+                    
                     for (var c = 0; c < items.pages.length; c++) {
 
                         var prev_page_num = 0;
@@ -97,11 +100,18 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
                             string += '<div><nobr>'+ page_num +' - '+ page_headline +'</nobr></div>';
                             string += '</div>';
 
-                            var imagePosition = (page_pos-1) * pageWidth + (10*(page_pos-1));
+                            var imagePositionX = (pageWidth * (linex))  + (10 * (linex));
+                            var imagePositionY = (pageHeight * (liney)) + (10 * (liney));
+                            
+                            linex ++;
+                            if (linex == 10) {
+                                linex = 0;
+                                liney ++ ;
+                            }
 
                             string += '<div class="inprint-plan-page-body"'+
                                 ' style="'+
-                                'background:url(/fascicle/sprite/'+ fascicle +'/'+ pageWidth +'/'+ pageHeight +'/) -'+ imagePosition +'px 0px no-repeat;'+
+                                'background:url(/fascicle/sprite/'+ fascicle +'/'+ pageWidth +'/'+ pageHeight +'/) -'+ imagePositionX +'px -'+ imagePositionY +'px no-repeat;'+
                                 'width:'+ pageWidth +'px;'+
                                 'height:'+ pageHeight +'px;'+
                                 '">';

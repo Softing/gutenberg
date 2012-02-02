@@ -98,8 +98,8 @@ sub render_sprite {
         mkdir $spriteFolder;
     }
 
-    my $cc = 0;
-    
+    my $linex = 0;
+    my $liney = 0;
     foreach my $page (@$pages){
 
         my $position = $page->{spritepos} || 0;
@@ -112,15 +112,25 @@ sub render_sprite {
 
         if (-e $spriteSrcFile) {
             push @files, $spriteSrcFile;
-            push @cords, ($spriteItemWidth * ($position-1)) + ($spriteItemMargin * ($position-1));
-            push @cords, 0;
+            push @cords, ($spriteItemWidth * ($linex))  + ($spriteItemMargin * ($linex));
+            push @cords, ($spriteItemHeight * ($liney)) + ($spriteItemMargin * ($liney));
+        }
+
+        $linex ++;
+        
+        if ($linex == 10) {
+            $linex = 0;
+            $liney ++;
         }
     }
 
+    $spriteWidth  = ($spriteItemWidth * 10) + ($spriteItemMargin * 10);
+    $spriteHeight = ($spriteItemHeight * ($liney+1)) + ($spriteItemMargin * ($liney+1));
+    
     my $image = GD::Tiler->tile(
         Format => "png",
         Images => \@files,
-        Background => 'white',
+        Background => 'gray',
         Width => $spriteWidth,
         Height => $spriteHeight,
         Coordinates => \@cords
