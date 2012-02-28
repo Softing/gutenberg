@@ -420,16 +420,16 @@ our %Lexicon = (
  => "Материалы",
 
     "Document capture"
- => "",
+ => "Захват материала",
 
     "Document description"
- => "Описание материала ",
+ => "Описание материала",
 
     "Document profile"
  => "Профиль материала",
 
     "Document restoration"
- => "",
+ => "Восстановление материала",
 
     "Documents"
  => "Материалы",
@@ -452,11 +452,14 @@ our %Lexicon = (
     "Duplicate"
  => "Дублировать",
 
+    "Duplicate documents"
+ => "Дублировать материалы",
+ 
     "Edit"
  => "Редактировать",
 
     "Edit Document Properties"
- => "",
+ => "Редактировать свойства материала",
 
     "Edit Text"
  => "Редактировать текст",
@@ -596,7 +599,7 @@ our %Lexicon = (
     "File"
  => "Файл",
 
-    "File name"
+    "File Name"
  => "Имя файла",
 
     "Files"
@@ -609,7 +612,7 @@ our %Lexicon = (
  => "Поиск",
 
     "Flash mode"
- => "",
+ => "Режим Flash",
 
     "Float height"
  => "Плавающая высота",
@@ -675,7 +678,7 @@ our %Lexicon = (
  => "Быстрое сохранение",
 
     "Html mode"
- => "",
+ => "Режим HTML",
 
     "ID"
  => "",
@@ -825,10 +828,10 @@ our %Lexicon = (
  => "Перемещен",
 
     "Moving to the briefcase"
- => "",
+ => "Перемещение в Портфель",
 
     "Moving to the recycle bin"
- => "",
+ => "Перемещение в Корзину",
 
     "My alerts"
  => "Мои события",
@@ -1047,16 +1050,16 @@ our %Lexicon = (
  => "Заявки",
 
     "Requires verification"
- => "",
+ => "Требует проверки",
 
     "Reservation"
  => "Резерв",
 
     "Reset"
- => "",
+ => "Сбросить",
 
     "Resolution"
- => "",
+ => "Разрешение",
 
     "Restore"
  => "Восстановить",
@@ -1080,13 +1083,13 @@ our %Lexicon = (
  => "Роли",
 
     "Root node"
- => "",
+ => "Корень",
 
     "Rubric"
  => "Рубрика",
 
     "Rubrication"
- => "",
+ => "Рубрикация",
 
     "Rule"
  => "Правило",
@@ -1107,7 +1110,7 @@ our %Lexicon = (
  => "",
 
     "Saving text"
- => "",
+ => "Сохранение текста",
 
     "Select"
  => "Выбрать",
@@ -1161,7 +1164,7 @@ our %Lexicon = (
  => "Состояние",
 
     "Status"
- => "",
+ => "Статус",
 
     "Suitable data is not found"
  => "Подходящие данные не найдены",
@@ -1226,7 +1229,7 @@ our %Lexicon = (
     "To test"
  => "",
 
-    "Todo"
+    "What to do"
  => "В работе",
 
     "Total requests"
@@ -1281,7 +1284,7 @@ our %Lexicon = (
  => "Обновлен",
 
     "Upload document"
- => "",
+ => "Загрузка файла",
 
     "Upload files"
  => "Загрузить файлы",
@@ -1356,10 +1359,10 @@ our %Lexicon = (
  => "",
 
     "You really want to do it?"
- => "",
+ => "Вы действительно хотите сделать это?",
 
     "You really want to do this?"
- => "",
+ => "Вы действительно хотите сделать это?",
 
     "You really want to remove the selected accounts?"
  => "",
@@ -1368,10 +1371,10 @@ our %Lexicon = (
  => "",
 
     "You really wish to do this?"
- => "",
+ => "Вы действительно хотите сделать это?",
 
     "Your session is closed"
- => "",
+ => "Ваш сеанс прекращен",
 
     "Добавление рекламной заявки"
  => "",

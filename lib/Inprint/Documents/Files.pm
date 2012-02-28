@@ -28,9 +28,7 @@ sub list {
     unless (@errors) {
         my $folder = Inprint::Store::Embedded::getFolderPath($c, "documents", $document->{created}, $document->{copygroup}, 1);
         Inprint::Store::Embedded::updateCache($c, $folder);
-        $result = Inprint::Store::Cache::getRecordsByPath(
-            $c, $folder, "all",
-            ['doc', 'xls', 'rtf', 'odt', 'png', 'jpg', 'gif', 'txt', 'tif', 'tiff']);
+        $result = Inprint::Store::Cache::getRecordsByPath($c, $folder, "all", undef);
     }
 
     foreach my $item (@$result) {

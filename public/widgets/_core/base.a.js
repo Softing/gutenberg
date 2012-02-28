@@ -13,10 +13,10 @@ Ext.namespace("Inprint.catalog.editions");
 Ext.namespace("Inprint.catalog.indexes");
 Ext.namespace("Inprint.catalog.readiness");
 
-Ext.BLANK_IMAGE_URL = '/ext-3.3.2/resources/images/default/s.gif';
+Ext.BLANK_IMAGE_URL = '/ext-3.4.0/resources/images/default/s.gif';
 
-var EXTJS_VERSION   = "3.3.2";
-var EXTJS_PATH      = "/ext-3.3.2";
+var EXTJS_VERSION   = "3.4.0";
+var EXTJS_PATH      = "/ext-3.4.0";
 var NULLID          = "00000000-0000-0000-0000-000000000000";
 
 Inprint.log = function() {

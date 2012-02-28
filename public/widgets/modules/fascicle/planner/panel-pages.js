@@ -56,7 +56,7 @@ Inprint.fascicle.planner.Pages = Ext.extend(Ext.Panel, {
     },
 
     cmpResize: function(value) {
-        this.view.cmpResize(value);
+        this.view.cmpSetSize(value);
         this.parent.cmpReload();
     },
     

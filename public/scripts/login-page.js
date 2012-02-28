@@ -7,7 +7,7 @@
  */
 
 Ext.onReady(function() {
-    Ext.BLANK_IMAGE_URL = '/ext-3.3.2/resources/images/default/s.gif';
+    Ext.BLANK_IMAGE_URL = '/ext-3.4.0/resources/images/default/s.gif';
     Ext.data.Connection.prototype._handleFailure = Ext.data.Connection.prototype.handleFailure;
     Ext.data.Connection.prototype.handleFailure = function(response, e) {
         var jsonData = Ext.util.JSON.decode(response.responseText);

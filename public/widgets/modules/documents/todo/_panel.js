@@ -69,7 +69,7 @@ Inprint.documents.todo.Panel = Ext.extend(Inprint.documents.Grid, {
 
 Inprint.registry.register("documents-todo", {
     icon: "document-share",
-    menutext:  _("To do list"),
+    menutext:  _("What to do"),
     text:  _("Todo"),
     xobject: Inprint.documents.todo.Panel
 });

@@ -174,7 +174,7 @@ sub update {
     if ($i_headline) {
         $headline = $c->Q("
             SELECT * FROM fascicles_indx_headlines WHERE id=? ",
-            [ $i_headline ])->Hash;
+            [ $i_headline ])->Hash;        
         push @errors, { id => "headline", msg => "Can't find object"}
             unless ($headline->{id});
     }
@@ -183,7 +183,13 @@ sub update {
     unless (@errors) {
         foreach my $item (@i_pages) {
             my ($page, $seqnum) = split "::", $item;
-            $c->Do(" UPDATE fascicles_pages SET headline=? WHERE id=? AND seqnum=? ", [ $headline->{id}, $page, $seqnum ]);
+            $c->Do("
+                UPDATE fascicles_pages
+                    SET headline=?
+                WHERE 1=1
+                    AND id=?
+                    AND seqnum=? ",
+                [ $headline->{id}, $page, $seqnum ]);
         }
     }
     $c->sql->et;

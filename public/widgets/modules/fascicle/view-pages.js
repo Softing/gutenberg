@@ -260,24 +260,37 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
 
     onRender: function() {
         Inprint.fascicle.plan.View.superclass.onRender.apply(this, arguments);
+
+        var plannerSize = Ext.state.Manager.get("planner.page.size");
+        
+        if (plannerSize == null || plannerSize < 0 || plannerSize > 100) {
+            plannerSize = 50;
+        }
+        
+        this.cmpSetSize(plannerSize);        
     },
 
-    cmpResize: function(value) {
+    cmpSetSize: function(value) {
+        if (value >= 0) {
 
-        if (value == 0) {
-            this.tpl.pageWidth = 60;
-            this.tpl.pageHeight = 70; 
-        }
-        
-        if (value == 50) {
-            this.tpl.pageWidth = 130;
-            this.tpl.pageHeight = 140; 
-        }
-        
-        if (value == 100) {
-            this.tpl.pageWidth = 240;
-            this.tpl.pageHeight = 260; 
-        }
+            Ext.state.Manager.set("planner.page.size", value);
+            
+            console.log(value);
+            console.log(Ext.state.Manager.get("planner.page.size"));
+            
+            if (value < 50) {
+                this.tpl.pageWidth = 60;
+                this.tpl.pageHeight = 70; 
+            }
+            if (value == 50) {
+                this.tpl.pageWidth = 130;
+                this.tpl.pageHeight = 140; 
+            }
+            if (value > 50) {
+                this.tpl.pageWidth = 240;
+                this.tpl.pageHeight = 260; 
+            }            
+        }   
     },
 
     cmpLoad: function(data) {
@@ -287,7 +300,6 @@ Inprint.fascicle.plan.View = Ext.extend(Ext.DataView, {
         this.scrollHeight = this.parent.body.dom.scrollHeight;
         this.getStore().loadData(data);
         this.parent.body.unmask();
-
     },
 
     cmpReload: function() {

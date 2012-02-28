@@ -50,12 +50,10 @@
 </html>
 
 <!-- Plugins -->
-<% foreach (@$cssplugins) { %>
-<link type="text/css" rel="stylesheet" href="<%= $_ %>"/><% } %>
-<% foreach (@$jsplugins) { %>
-<script type="text/javascript" src="<%= $_ %>"></script><% } %>
+<% my $version = 29022012-01; %>
+<% foreach (@$cssplugins) { %><link type="text/css" rel="stylesheet" href="<%= $_ %>?v=<%= $version %>"/><% } %>
+<% foreach (@$jsplugins) { %><script type="text/javascript" src="<%= $_ %>?v=<%= $version %>"></script><% } %>
 
 <!-- WIdgets -->
 <script type="text/javascript" src="/locale/"></script>
-<% foreach (@$js) { %>
-<script type="text/javascript" src="<%= $_ %>"></script><% } %>
+<% foreach (@$js) { %><script type="text/javascript" src="<%= $_ %>?v=<%= $version %>"></script><% } %>

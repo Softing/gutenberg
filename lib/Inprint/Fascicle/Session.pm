@@ -83,7 +83,7 @@ sub _createComposeIndex {
         FROM
             fascicles_pages t1
             LEFT JOIN fascicles_indx_headlines as t2
-                ON t2.fascicle = t1.fascicle AND t2.tag = t1.headline
+                ON t2.fascicle = t1.fascicle AND t2.id = t1.headline
         WHERE t1.fascicle = ?
         ORDER BY t1.seqnum ",
         [ $fascicle->id ])->Hashes;

@@ -111,6 +111,10 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                 maxValue: 100,
                 listeners: {
                     scope:this,
+                    'afterrender': function (slider) {                        
+                        var value = Ext.state.Manager.get("planner.page.size") || 50;                        
+                        slider.setValue(value);
+                    },
                     'changecomplete': function(slider, value) {
                         this.panels.pages.cmpResize(value);
                     }
@@ -315,8 +319,6 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
         var requests    = rsp.data.requests;
 
         this.access = access;
-        //this.manager = rsp.data.access.manager;
-        //this.version = rsp.data.fascicle.version;
 
         Inprint.fascicle.planner.Access(this, this.panels, access);
 
@@ -330,7 +332,10 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
         var title = Inprint.ObjectResolver.makeTitle(this.parent.aid, this.parent.oid, null, this.parent.icon, shortcut, description);
         this.parent.setTitle(title);
 
-        if (composition) { this.panels.pages       .getStore().loadData({ data: composition }); }
+        if (composition) {
+            this.panels.pages.getView().cmpLoad({ data: composition });
+        }
+        
         if (documents)   { this.panels.documents   .getStore().loadData({ data: documents }); }
         if (requests)    { this.panels.requests    .getStore().loadData({ data: requests }); }
         if (advertising) { this.panels.summary     .getStore().loadData({ data: advertising }); }
