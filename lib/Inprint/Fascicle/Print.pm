@@ -9,6 +9,7 @@ use utf8;
 use strict;
 use warnings;
 
+use POSIX;
 use Data::Dumper;
 use Encode qw(decode encode);
 use PDF::API2;
@@ -25,47 +26,41 @@ use constant pt => 1;
 use constant A3 => {
     name        => "A3",
 
-    width       => 75,
-    height      => 90,
-
+    width       => 82,
+    height      => 75,
+    
     htop        => 815,
-    top         => 700,
-    ftop        => 200,
-
-    pcx         => 10,
-    pcy         => 20,
-
-    xcount      => 12,
-    ycount      => 6,
-
+    top         => 725,
+    
+    xcount      => 14,
+    ycount      => 8,
+    
     fontsize    => 6,
-
-    padding     => 20,
-    spadding    => 3,
-
+    fontmod     => 4,
+    fontsizemax => 6,
+    
+    padding     => 5,
+    spadding    => 0,
 };
 
 use constant A4 => {
-
     name        => "A4",
 
-    width       => 75,
-    height      => 100,
-
-    top         => 460,
-    htop        => 570,
-    ftop        => 20,
-
-    pcx         => 10,
-    pcy         => 20,
-
+    width       => 81,
+    height      => 70,
+    
+    top         => 490,
+    htop        => 572,
+    
     xcount      => 10,
-    ycount      => 4,
+    ycount      => 6,
 
     fontsize    => 6,
-
-    padding     => 10,
-    spadding    => 3,
+    fontmod     => 2,    
+    fontsizemax => 10,    
+    
+    padding     => 5,
+    spadding    => 0,
 };
 
 sub print {
@@ -114,6 +109,10 @@ sub print {
 
         $iteration++;
 
+        $record->{headline} = $c->sql->Q("
+            SELECT * FROM fascicles_indx_headlines WHERE id=?",
+            [ $record->headline ])->Hash;
+        
         # make new row in flow
         if ($itmcount == $Cpage->{xcount}) {
             $rowcount++;
@@ -248,20 +247,44 @@ sub draw_page {
 
     $y = $y +$top;
 
-    #Draw text
+    # Pagenum
     my $font = $pdf->corefont( "Verdana", -encode=> "windows-1251" );
     my $text = $page->text();
     $text->font($font, 8);
     $text->fillcolor("black");
     $text->translate($x + $width/2, $y-10 );
     $text->text_center($pagenum);
+    
+    # Headline
+    my $text_headline  = PDF::TextBlock->new({
+        pdf       => $pdf,
+        fonts => {
+            default => PDF::TextBlock::Font->new({
+                pdf => $pdf,
+                fillcolor => '#000000',
+                size => 6,
+                font => $pdf->corefont( "Verdana", -encode=> "windows-1251" )
+            })
+        }
+    });
+
+    if ($record->headline) {
+        $text_headline->x($x);
+        $text_headline->y($y + $height + 3);
+        $text_headline->w($width);
+        $text_headline->h(100);
+        $text_headline->align("center");
+        $text_headline->page($page);
+        $text_headline->text( encode( "cp1251", $record->headline->{title}) );
+        $text_headline->apply;
+    }
 
     # Draw lines
     foreach my $cord ( @$lines_x ) {
         my ($a,$b) = split '/', $cord;
         my $xcord = $x + ($width * ($a/$b));
         my $line = $page->gfx;
-        $line->strokecolor('#C8C8C8');
+        $line->strokecolor('#ececec');
         $line->move( $xcord, $y );
         $line->line( $xcord, $y+$height );
         $line->stroke;
@@ -271,7 +294,7 @@ sub draw_page {
         my ($a,$b) = split '/', $cord;
         my $ycord = $height - ($height * ($a/$b)) + $y;
         my $line = $page->gfx;
-        $line->strokecolor('#C8C8C8');
+        $line->strokecolor('#ececec');
         $line->move( $x, $ycord );
         $line->line( $x+$width, $ycord );
         $line->stroke;
@@ -299,31 +322,79 @@ sub draw_page {
         my $modycord = $y + ($height - ( ($height * $modh) + ($height * $mody) ) );
 
         my $modbox = $page->gfx;
-        $modbox->fillcolor('#f5f5f5');
         $modbox->linewidth( .1 );
         $modbox->rect( $modxcord, $modycord, $width * $modw, $height * $modh );
+        $modbox->strokecolor("000000");
+        $modbox->fillcolor('#d1d1d1');
         $modbox->fillstroke;
 
+        my $module_x = $modxcord;
+        my $module_y = $modycord + (($height * $modh)/2);
+        my $module_w = $width * $modw;
+        my $module_h = $height * $modh;
+
+        my $tb1  = PDF::TextBlock->new({
+            pdf       => $pdf,
+            fonts => {
+                default => PDF::TextBlock::Font->new({
+                    pdf => $pdf,
+                    fillcolor => '#000000',
+                    size => 5,
+                    font => $pdf->corefont( "Verdana", -encode=> "windows-1251" )
+                })
+            }
+        });
+
+        $tb1->x($modxcord + 1);
+        $tb1->y( $modycord + 1 );
+        $tb1->w($width * $modw);
+        $tb1->h($height * $modh);
+        $tb1->align("left");
+        $tb1->page($page);
+        $tb1->text( encode( "cp1251", $item->title) );
+        $tb1->apply;
+        
+        my $module_text = " " . $item->Request->shortcut;
+        my $module_fontsize = ($PF->{fontsize}/pt);
+        
+        $module_fontsize = ceil( $module_w ) * $PF->{fontmod};
+        
+        if ($module_fontsize < $PF->{fontsize}) {
+            $module_fontsize = $PF->{fontsize};
+        }
+        
+        if ($module_fontsize > $PF->{fontsizemax}) {
+            $module_fontsize = $PF->{fontsizemax};
+        }
+        
         my $tb  = PDF::TextBlock->new({
             pdf       => $pdf,
             fonts => {
                 default => PDF::TextBlock::Font->new({
                     pdf => $pdf,
-                    fillcolor => 'silver',
-                    size => $PF->{fontsize}/pt,
+                    fillcolor => '#000000',
+                    size => $module_fontsize,
                     font => $pdf->corefont( "Verdana", -encode=> "windows-1251" )
                 })
             }
         });
 
         $tb->x($modxcord);
-        $tb->y( $modycord + (($height * $modh)/2));
+        #my $ycenter = ceil ( ($modycord + $height * $modh) - $modycord) / 2;        
+        #$tb->y( $modycord + $ycenter );
+        
+        $tb->y( $modycord + ($height * $modh - 10) );
+        
         $tb->w($width * $modw);
         $tb->h($height * $modh);
+        
         $tb->align("center");
-        $tb->lead($PF->{fontsize}/pt);
+        $tb->lead($module_fontsize * 1.2);
+        
         $tb->page($page);
-        $tb->text( encode( "cp1251", $item->title ."\n". $item->Request->shortcut) );
+
+        $tb->text( encode( "cp1251", $module_text) );
+        
         $tb->apply;
     }
 
@@ -332,51 +403,109 @@ sub draw_page {
     my $box_progress = 100;
     my $padding = 1;
     my $doccount = 0;
+
     foreach my $item (@$documents) {
 
-        $doccount++;
+        #$pagenum
+        my @pages = split /[^\d]/, $item->pages;
+    
+        my $is_first = 0;
+        my $is_last  = 0;
 
+        if ($pagenum == $pages[0]) {
+            $is_first = 1;
+        }
+        if ($pagenum == $pages[$#pages]) {
+            $is_last = 1;
+        }
+        
+        my $fontsize = $PF->{fontsize}+1;
+        
+        my $box_x = ($x+$padding);
+        my $box_y = (($y + $height) - 10) - (((4 * $fontsize)) * $doccount);
+
+        my $line_color = "black";
         if ($box_progress > $item->{progress}) {
             $box_progress = $item->{progress};
-            $box_color = "#" . $item->{color};
+            $line_color = "#" . $item->{color};
+        }
+        
+        my $gfx = $page->gfx();
+
+
+        if ( $is_first || ( $is_last && $pagenum -1 != $pages[0] ) ) {
+            
+            my $tb  = PDF::TextBlock->new({
+                pdf       => $pdf,
+                fonts => {
+                    default => PDF::TextBlock::Font->new({
+                        pdf => $pdf,
+                        fillcolor => 'black',
+                        size => $fontsize,
+                        font => $pdf->corefont( "Verdana", -encode=> "windows-1251" )
+                    })
+                }
+            });
+    
+            $tb->x($box_x);
+            $tb->y($box_y);
+
+            my $box_w = $width-$padding-$padding;
+            my $box_h = $fontsize + 1600;
+
+            if ($pagenum+1 ~~ @pages) {
+                $box_w += $box_w;
+            }
+            
+            if ($pagenum+2 ~~ @pages) {
+                $box_w += $box_w;
+            }
+            
+            $tb->w($box_w + 10);
+            $tb->h($box_h);
+
+            my $text = encode("cp1251",
+                "" . $item->title
+                ."\n". $item->manager_shortcut
+            );
+            
+            $tb->align("left");
+            $tb->lead($fontsize * 1.2);
+            $tb->page($page);
+            $tb->text( $text );
+            
+            $tb->apply;
+            
         }
 
-        my $tb  = PDF::TextBlock->new({
-            pdf       => $pdf,
-            fonts => {
-                default => PDF::TextBlock::Font->new({
-                    pdf => $pdf,
-                    fillcolor => 'blue',
-                    size => $PF->{fontsize}/pt,
-                    font => $pdf->corefont( "Verdana", -encode=> "windows-1251" )
-                })
-            }
-        });
+        my $line_height = ($box_y - 16);
 
-        $tb->x($x+$padding);
-        $tb->y( $y + $height - $doccount* ($PF->{fontsize}/pt + 2) );
-        $tb->w($width-$padding-$padding);
-        $tb->h($PF->{fontsize}/pt + 100);
-
-        my $text = encode("cp1251",
-            "*" . $item->title
-            ."\n".
-            $item->headline_shortcut
-            ."\n".
-            $item->manager_shortcut
-            ."\n".
-            $item->pages
-            ."\n");
-
-        $tb->align("left");
-        $tb->lead($PF->{fontsize}/pt + 2);
-        $tb->page($page);
-        $tb->text( $text );
-
-        $tb->apply;
+        $gfx->strokecolor($line_color);
+        $gfx->linedash();
+        $gfx->linewidth(2);
+        
+        $gfx->move( $box_x, $line_height );
+        $gfx->line( $box_x + $width, $line_height );
+        $gfx->stroke;
+        
+        if ($is_first) {
+            $gfx->fillcolor($line_color);
+            $gfx->circle($box_x + 2, $line_height, 4);
+            $gfx->fill();
+            $gfx->save;
+        }
+        
+        if ($is_last) {
+            $gfx->fillcolor($line_color);
+            $gfx->circle($box_x + $width - 4, $line_height, 4);
+            $gfx->fill();
+            $gfx->save;
+        }        
+        
+        $doccount++;
     }
 
-
+=cut
     # Draw holes
     foreach my $item (@$holes) {
 
@@ -406,7 +535,9 @@ sub draw_page {
         $tb->apply;
 
     }
+=cut
 
+=cut
     # Draw requests
     foreach my $item (@$requests) {
 
@@ -436,12 +567,13 @@ sub draw_page {
         $tb->apply;
 
     }
+=cut
 
     # Draw box
-    my $box = $page->gfx;
-    $box->strokecolor($box_color);
+    my $box = $page->gfx;    
     $box->linewidth( .1 );
     $box->rect( $x, $y, $width, $height );
+    $box->strokecolor("000000");
     $box->stroke;
 
     return;
