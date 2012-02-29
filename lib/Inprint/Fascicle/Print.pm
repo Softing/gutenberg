@@ -433,7 +433,7 @@ sub draw_page {
         my $gfx = $page->gfx();
 
 
-        if ( $is_first || ( $is_last && $pagenum -1 != $pages[0] ) ) {
+        if ( $is_first || ( $is_last && $#$documents > 0 && $pagenum -1 != $pages[0] ) ) {
             
             my $tb  = PDF::TextBlock->new({
                 pdf       => $pdf,
