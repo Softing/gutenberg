@@ -112,8 +112,10 @@ Inprint.fascicle.planner.Panel = Ext.extend(Ext.Panel, {
                 listeners: {
                     scope:this,
                     'afterrender': function (slider) {                        
-                        var value = Ext.state.Manager.get("planner.page.size") || 50;                        
-                        slider.setValue(value);
+                        var value = Ext.state.Manager.get("planner.page.size");
+                        if (value >= 0 || value <= 100) {
+                            slider.setValue(value);
+                        }
                     },
                     'changecomplete': function(slider, value) {
                         this.panels.pages.cmpResize(value);

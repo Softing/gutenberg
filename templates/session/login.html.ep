@@ -14,14 +14,11 @@
     <link type="text/css" rel="stylesheet" href="/ext-3.4.0/resources/css/ext-all.css">
     <link type="text/css" rel="stylesheet" href="/ext-3.4.0/resources/css/xtheme-gray.css">
 
-    <!-- Ext 3.3.0 -->
-    <script type="text/javascript" src="/ext-3.3.2/adapter/ext/ext-base.js"></script>
-    <script type="text/javascript" src="/ext-3.3.2/ext-all.js"></script>
+    <script type="text/javascript" src="/ext-3.4.0/adapter/ext/ext-base.js"></script>
+    <script type="text/javascript" src="/ext-3.4.0/ext-all.js"></script>
 
-    <!-- Locale support -->
     <script type="text/javascript" src="/locale/"></script>
 
-    <!-- Login page -->
     <script type="text/javascript" src="/scripts/login-page.js"></script>
 
 </head>
