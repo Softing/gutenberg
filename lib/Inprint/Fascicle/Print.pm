@@ -36,8 +36,8 @@ use constant A3 => {
     ycount      => 8,
     
     fontsize    => 6,
-    fontmod     => 4,
-    fontsizemax => 6,
+    fontmod     => 6,
+    fontsizemax => 8,
     
     padding     => 5,
     spadding    => 0,
@@ -355,9 +355,9 @@ sub draw_page {
         $tb1->apply;
         
         my $module_text = " " . $item->Request->shortcut;
-        my $module_fontsize = ($PF->{fontsize}/pt);
+        my $module_fontsize = ($PF->{fontsize});
         
-        $module_fontsize = ceil( $module_w ) * $PF->{fontmod};
+        $module_fontsize = ceil( $module_w  * $PF->{fontmod} );
         
         if ($module_fontsize < $PF->{fontsize}) {
             $module_fontsize = $PF->{fontsize};
@@ -464,6 +464,8 @@ sub draw_page {
     }
     
     my $log;
+    
+    @$documents = sort { $a->{title} cmp $b->{title} } @$documents;
     
     foreach my $item (@$documents) {
 
