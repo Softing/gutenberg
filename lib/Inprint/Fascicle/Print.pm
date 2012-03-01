@@ -486,8 +486,8 @@ sub draw_page {
         $box_y = $y_offset;
 
         my $line_color = "black";
-        if ($box_progress > $item->{progress}) {
-            $box_progress = $item->{progress};
+        
+        if ($item->{color}) {
             $line_color = "#" . $item->{color};
         }
         
