@@ -463,6 +463,8 @@ sub draw_page {
         $y_offset = $ypos - 6;
     }
     
+    my $log;
+    
     foreach my $item (@$documents) {
 
         my @pages = split /[^\d]/, $item->pages;
@@ -482,8 +484,6 @@ sub draw_page {
         
         my $box_x = ($x+$padding);
         my $box_y = $y_offset;
-        
-        $box_y = $y_offset;
 
         my $line_color = "black";
         
@@ -491,18 +491,22 @@ sub draw_page {
             $line_color = "#" . $item->{color};
         }
         
+        if ($line_color eq "white" || $line_color eq "#ffffff") {
+            $line_color = "black";
+        }
+        
         my $gfx = $page->gfx();
 
         # Draw document
-        if ( $is_first || ( $is_last && $#$documents > 0 && $pagenum -1 != $pages[0] ) ) {
+        #if ( $is_first || ( $is_last && $#$documents > 0 && $pagenum -1 != $pages[0] ) ) {
             
             my $tb  = PDF::TextBlock->new({
                 pdf       => $pdf,
                 fonts => {
                     default => PDF::TextBlock::Font->new({
                         pdf => $pdf,
-                        fillcolor => 'black',
                         size => $fontsize,
+                        fillcolor => "black",
                         font => $pdf->corefont( "Verdana", -encode=> "windows-1251" )
                     })
                 }
@@ -511,34 +515,40 @@ sub draw_page {
             $tb->x($box_x);
             $tb->y($box_y);
 
-            my $box_w = $width-$padding-$padding;
-            my $box_h = $fontsize + 1600;
-
-            if ($pagenum+1 ~~ @pages) {
-                $box_w += $box_w;
-            }
+            my $box_w = $width-$padding;
             
-            if ($pagenum+2 ~~ @pages) {
-                $box_w += $box_w;
-            }
+            #if ($pagenum+1 ~~ @pages) {
+            #    $box_w += $box_w;
+            #}
+            #
+            #if ($pagenum+2 ~~ @pages) {
+            #    $box_w += $box_w;
+            #}
             
-            $tb->w($box_w + 0);
-            $tb->h($box_h);
+            $tb->w($box_w);
 
-            my $text = encode("cp1251",
-                ( $item->title || "--" ) ." / ". ( $item->manager_shortcut || "--" )
-            );
+            my $text = encode("cp1251", ( "  ". $item->title || "--" ) ." / ". ( $item->manager_shortcut || "--" ) );
+            
+            #$text = $line_color;
             
             $tb->align("left");
             $tb->lead($fontsize * 1.2);
             $tb->page($page);
             $tb->text( $text );
             
+            #$gfx->fillcolor($line_color);
+            #$gfx->circle($box_x + 0, $box_y + 4, 2);
+            #$gfx->fill();
+            #$gfx->save;
+            
             my ($endw, $ypos) = $tb->apply;
             
-            $y_offset = $ypos + 5;
-        }
+            $y_offset = ceil $ypos;
+            
+        #}
 
+        #die $log;
+        
         # Draw line
         my $line_height = $y_offset;
         
