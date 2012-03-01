@@ -402,11 +402,69 @@ sub draw_page {
     my $box_color = "#C8C8C8";
     my $box_progress = 100;
     my $padding = 1;
-    my $doccount = 0;
+    
+    my $y_offset = $y + $height - 8;
 
+    # Draw holes
+    if (@$holes) {
+
+        my $tb  = PDF::TextBlock->new({
+            pdf       => $pdf,
+            fonts => {
+                default => PDF::TextBlock::Font->new({
+                    pdf => $pdf,
+                    fillcolor => 'black',
+                    size => $PF->{fontsize}/pt,
+                    font => $pdf->corefont( "Verdana", -encode=> "windows-1251" )
+                })
+            }
+        });
+        
+        my @hole_text;
+        my $hole_text_length = 0;
+        foreach my $item (@$holes) {
+            my $text = "[". $item->title ."]";
+            $hole_text_length += length($text);
+            push @hole_text, $text;
+        }
+
+        my $tb_x = $x + $padding;
+        my $tb_y = $y_offset;
+        
+        my $tb_w = $width;
+        my $tb_h = $PF->{fontsize};
+        
+        #my $line_count = ceil ( ( $hole_text_length * $PF->{fontsize}) / $tb_w );
+        
+        my $line_count = 1;
+        
+        $tb->x($tb_x);
+        $tb->y($tb_y);
+        
+        $tb->w($tb_w);
+        #$tb->h($tb_h * $line_count);
+        
+        $tb->align("left");
+        $tb->lead($PF->{fontsize} * 1.2);
+        $tb->parspace(0);
+        $tb->page($page);
+        
+        $tb->text(encode("cp1251", join(" ", @hole_text) ));
+        
+        my ($endw, $ypos) = $tb->apply;
+
+        my $modbox = $page->gfx;
+        $modbox->rect( $x, $ypos + 4, $tb->w, (($y + $height - 4) - ($ypos)) );
+        $modbox->fillcolor('orange');
+        $modbox->fill;
+        
+        ($endw, $ypos) = $tb->apply;
+        
+        $y_offset = $ypos - 6;
+    }
+    
     foreach my $item (@$documents) {
 
-        #$pagenum
         my @pages = split /[^\d]/, $item->pages;
     
         my $is_first = 0;
@@ -415,6 +473,7 @@ sub draw_page {
         if ($pagenum == $pages[0]) {
             $is_first = 1;
         }
+        
         if ($pagenum == $pages[$#pages]) {
             $is_last = 1;
         }
@@ -422,7 +481,9 @@ sub draw_page {
         my $fontsize = $PF->{fontsize}+1;
         
         my $box_x = ($x+$padding);
-        my $box_y = (($y + $height) - 10) - (((4 * $fontsize)) * $doccount);
+        my $box_y = $y_offset;
+        
+        $box_y = $y_offset;
 
         my $line_color = "black";
         if ($box_progress > $item->{progress}) {
@@ -432,7 +493,7 @@ sub draw_page {
         
         my $gfx = $page->gfx();
 
-
+        # Draw document
         if ( $is_first || ( $is_last && $#$documents > 0 && $pagenum -1 != $pages[0] ) ) {
             
             my $tb  = PDF::TextBlock->new({
@@ -461,12 +522,11 @@ sub draw_page {
                 $box_w += $box_w;
             }
             
-            $tb->w($box_w + 10);
+            $tb->w($box_w + 0);
             $tb->h($box_h);
 
             my $text = encode("cp1251",
-                "" . $item->title
-                ."\n". $item->manager_shortcut
+                ( $item->title || "--" ) ." / ". ( $item->manager_shortcut || "--" )
             );
             
             $tb->align("left");
@@ -474,68 +534,38 @@ sub draw_page {
             $tb->page($page);
             $tb->text( $text );
             
-            $tb->apply;
+            my ($endw, $ypos) = $tb->apply;
             
+            $y_offset = $ypos + 5;
         }
 
-        my $line_height = ($box_y - 16);
-
+        # Draw line
+        my $line_height = $y_offset;
+        
         $gfx->strokecolor($line_color);
-        $gfx->linedash();
-        $gfx->linewidth(2);
+        $gfx->linewidth(1);
         
         $gfx->move( $box_x, $line_height );
-        $gfx->line( $box_x + $width, $line_height );
+        $gfx->line( $box_x + $width - 2, $line_height );
         $gfx->stroke;
         
         if ($is_first) {
             $gfx->fillcolor($line_color);
-            $gfx->circle($box_x + 2, $line_height, 4);
+            $gfx->circle($box_x, $line_height, 2);
             $gfx->fill();
             $gfx->save;
         }
         
         if ($is_last) {
             $gfx->fillcolor($line_color);
-            $gfx->circle($box_x + $width - 4, $line_height, 4);
+            $gfx->circle($box_x + $width - 2, $line_height, 2);
             $gfx->fill();
             $gfx->save;
-        }        
+        }
         
-        $doccount++;
+        $y_offset = $y_offset - 12;
+        
     }
-
-=cut
-    # Draw holes
-    foreach my $item (@$holes) {
-
-        $doccount++;
-
-        my $tb  = PDF::TextBlock->new({
-            pdf       => $pdf,
-            fonts => {
-                default => PDF::TextBlock::Font->new({
-                    pdf => $pdf,
-                    fillcolor => 'black',
-                    size => $PF->{fontsize}/pt,
-                    font => $pdf->corefont( "Verdana", -encode=> "windows-1251" )
-                })
-            }
-        });
-
-        $tb->x($x+$padding);
-        $tb->y( $y + $height - $doccount* ($PF->{fontsize}/pt + 2) );
-        $tb->w($width-$padding-$padding);
-        $tb->h($PF->{fontsize}/pt);
-
-        $tb->align("left");
-        $tb->lead($PF->{fontsize}/pt);
-        $tb->page($page);
-        $tb->text( encode("cp1251", "[". $item->title ."]") );
-        $tb->apply;
-
-    }
-=cut
 
 =cut
     # Draw requests
