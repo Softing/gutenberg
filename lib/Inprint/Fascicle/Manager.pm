@@ -291,44 +291,44 @@ sub save {
                     next unless ($page->{id});
 
                     # Update page Headline
-
-                    my $headline = $c->Q("
-                        SELECT * FROM fascicles_indx_headlines WHERE id = ? ",
-                        $document->{headline})->Hash;
-                    
-                    unless ($headline) {
-                        $headline = $c->Q("
-                            SELECT * FROM indx_headlines WHERE tag = ? ",
+                    if ($document->{headline}) {
+                        my $headline = $c->Q("
+                            SELECT * FROM fascicles_indx_headlines WHERE id = ? ",
                             $document->{headline})->Hash;
-                    }
-                    
-                    if ($headline) {
-                        
-                        my $fascicle_headline = $c->Q("
-                            SELECT * FROM fascicles_indx_headlines WHERE fascicle = ? AND title = ?",
-                            [ $fascicle->{id}, $headline->{title} ])->Hash;
-                        
-                        unless ($fascicle_headline) {
-                            my $fascicle_headline = $c->Do("
-                                INSERT INTO fascicles_indx_headlines
-                                    (edition, fascicle, tag, bydefault, title, description, created, updated)
-                                    VALUES
-                                    (?,?,?,?,?,?,now(),now())",
-                                [ $fascicle->{edition}, $fascicle->{id},
-                                $headline->{tag}, $headline->{bydefault}, $headline->{title}, $headline->{description}]);
-                            
-                            $fascicle_headline = $c->Q("
+
+                        unless ($headline) {
+                            $headline = $c->Q("
+                                SELECT * FROM indx_headlines WHERE tag = ? ",
+                                $document->{headline})->Hash;
+                        }
+
+                        if ($headline) {
+                            my $fascicle_headline = $c->Q("
                                 SELECT * FROM fascicles_indx_headlines WHERE fascicle = ? AND title = ?",
-                                $fascicle->{id}, $headline->{title})->Hash;
-                        }
-    
-                        if ($fascicle_headline) {
-                            $c->Do("
-                                UPDATE fascicles_pages SET headline = ? WHERE id=? ",
-                                [ $fascicle_headline->{id}, $page->{id} ]);
+                                [ $fascicle->{id}, $headline->{title} ])->Hash;
+
+                            unless ($fascicle_headline) {
+                                my $fascicle_headline = $c->Do("
+                                    INSERT INTO fascicles_indx_headlines
+                                        (edition, fascicle, tag, bydefault, title, description, created, updated)
+                                        VALUES
+                                        (?,?,?,?,?,?,now(),now())",
+                                    [ $fascicle->{edition}, $fascicle->{id},
+                                    $headline->{tag}, $headline->{bydefault}, $headline->{title}, $headline->{description}]);
+
+                                $fascicle_headline = $c->Q("
+                                    SELECT * FROM fascicles_indx_headlines WHERE fascicle = ? AND title = ?",
+                                    $fascicle->{id}, $headline->{title})->Hash;
+                            }
+
+                            if ($fascicle_headline) {
+                                $c->Do("
+                                    UPDATE fascicles_pages SET headline = ? WHERE id=? ",
+                                    [ $fascicle_headline->{id}, $page->{id} ]);
+                            }
                         }
                     }
-                    
+
                     # Update mappings
                     $c->Do("
                         INSERT INTO fascicles_map_documents(edition, fascicle, page, entity, created, updated)
