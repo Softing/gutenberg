@@ -216,7 +216,7 @@ sub render_image {
         $c->draw_module($img, $grid, $module);
     }
 
-    open(FILE,">$file") || die "could not write image: $!";
+    open(FILE,">$file") || die "could not write image: $! $file";
     binmode FILE;
     print FILE ($img->png);
     close(FILE);
