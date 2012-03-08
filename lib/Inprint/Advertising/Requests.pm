@@ -580,7 +580,7 @@ sub download {
 
     my $archname = "Downloads_for_${year}_${mon}_${mday}_${hour}${min}${sec}";
 
-    $c->on_finish(sub {
+    $c->on(finish=>sub {
         unlink $tempArchive;
     });
 

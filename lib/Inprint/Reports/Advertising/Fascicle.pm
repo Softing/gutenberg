@@ -105,7 +105,7 @@ sub index {
     $filename =~ s/\s+/_/g;
     $filename = encode("utf8", $filename);
 
-    $c->on_finish(sub {
+    $c->on(finish => sub {
         unlink $temppath;
     });
 

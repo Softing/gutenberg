@@ -214,12 +214,9 @@ sub download {
     $headers->add("Content-Length", -s $tempArchive);
     $c->res->content->headers($headers);
 
-    $c->on_finish(sub {
+    $c->on(finish=>sub {
         unlink $tempArchive;
     });
-
-    #$c->render_static($tempArchive);
-    #$c->render();
 
     $c->smart_render([]);
 }
