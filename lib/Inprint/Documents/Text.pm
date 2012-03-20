@@ -144,6 +144,11 @@ sub __clearHtml {
             '*'   => 0
         },
 
+        strike =>
+        {
+            '*'   => 0
+        },
+
         span =>
         {
             style => 1,

@@ -49,8 +49,6 @@ sub readFile {
         $responce->{text} =~ s/\r?\n/<br>/g;
     }
 
-    #$responce->{text} = __clearHtml($responce->{text});
-
     return $responce;
 }
 
