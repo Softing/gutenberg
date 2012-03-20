@@ -454,7 +454,7 @@ our %Lexicon = (
 
     "Duplicate documents"
  => "Дублировать материалы",
- 
+
     "Edit"
  => "Редактировать",
 
@@ -626,6 +626,12 @@ our %Lexicon = (
     "Format issue"
  => "",
 
+    "Font size"
+ => "Размер шрифта",
+
+    "Font style"
+ => "Тип шрифта",
+
     "General information"
  => "",
 
@@ -743,6 +749,9 @@ our %Lexicon = (
     "Label"
  => "",
 
+    "Large size"
+ => "Большой размер",
+
     "Last Modified"
  => "",
 
@@ -784,6 +793,9 @@ our %Lexicon = (
 
     "Manager"
  => "Редактор",
+
+    "Medium size"
+ => "Средний размер",
 
     "Members"
  => "Участники",
@@ -1151,6 +1163,9 @@ our %Lexicon = (
     "Size"
  => "Размер",
 
+    "Small size"
+ => "Маленький размер",
+
     "Squib"
  => "Подверстка",
 
@@ -1200,7 +1215,7 @@ our %Lexicon = (
  => "",
 
     "Text editor"
- => "",
+ => "Редактор текста",
 
     "Text format"
  => "",
