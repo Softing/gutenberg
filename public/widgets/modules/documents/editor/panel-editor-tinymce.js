@@ -34,7 +34,7 @@ Inprint.documents.editor.FormTinyMce = Ext.extend( Ext.form.FormPanel,
                 plugins: "table,iespell,searchreplace,print,paste,noneditable,visualchars",
                 theme_advanced_buttons1: "bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo",
                 theme_advanced_buttons2: "tablecontrols,|,removeformat,cleanup,|,sub,sup,|,charmap,iespell,|,print,visualchars",
-                theme_advanced_buttons3: "",
+                theme_advanced_buttons3: "uppercase,lowercase",
 
                 theme_advanced_toolbar_location: "top",
                 theme_advanced_toolbar_align: "left",
@@ -62,6 +62,35 @@ Inprint.documents.editor.FormTinyMce = Ext.extend( Ext.form.FormPanel,
 
                         Ext.fly(charCounter.getEl()).update('Знаков: ' + iLength );
 
+                    }),
+
+                     // Create the "titlecase" button
+                    ed.addButton('uppercase',
+                    {
+                        title : _('Convert selected text to Title Case'), /* tooltip seen on hover */
+                        image : icon('edit-small-caps'),
+                        onclick : function()
+                        {
+                            var sel = ed.dom.decode(ed.selection.getContent());
+                            sel = sel.toLowerCase();
+                            ed.selection.setContent(sel);
+                            ed.save();
+                            ed.isNotDirty = true;
+                        }
+                    }),
+
+                    ed.addButton('lowercase',
+                    {
+                        title : _('Convert selected text to upper Case'),
+                        image : icon('edit-all-caps'),
+                        onclick : function()
+                        {
+                            var sel = ed.dom.decode(ed.selection.getContent());
+                            sel = sel.toUpperCase();
+                            ed.selection.setContent(sel);
+                            ed.save();
+                            ed.isNotDirty = true;
+                        }
                     })
 
                 }
