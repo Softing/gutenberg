@@ -77,15 +77,20 @@ sub set {
     my $document = $c->check_record(\@errors, "documents", "document", $i_document);
 
     unless (@errors) {
+
         $access = Inprint::Documents::Access::get($c, $document->{id});
 
         if ($access->{"fedit"}) {
+
             $html = Inprint::Store::Embedded::fileSave($c, $file->{id}, $i_text);
+
         } else {
             $html = $i_text;
-            push @errors, { id => "access", msg => "Access denide" };
+            push @errors, { id => "access", msg => "Access denied" };
         }
     }
+
+    $html = __clearHtml($html);
 
     my $result = {
         text => $html,
@@ -135,8 +140,14 @@ sub __clearHtml {
 
         p =>
         {
-            align => 0,
-            '*'   => 1
+            style => 1,
+            '*'   => 0
+        },
+
+        span =>
+        {
+            style => 1,
+            '*'   => 0
         },
 
         font =>

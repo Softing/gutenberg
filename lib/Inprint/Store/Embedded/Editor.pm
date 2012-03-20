@@ -66,15 +66,20 @@ sub writeFile {
     $basepath =~ s/\/$//;
 
     if ($extension ~~ ["odt"]) {
-
         my $response = convert($c, $hotSaveFilePath, "html", $extension);
-        open my $FILE, ">", "$filepath.$extension" || die "Can't open <$filepath> : $!";
+        open my $FILE, ">", $filepath || die "Can't open <$filepath> : $!";
         binmode $FILE;
             print $FILE $response->{text};
         close $FILE;
     }
 
-    if ($extension ~~ ["doc", "docx", "rtf", "txt"]) {
+    if ($extension ~~ ["txt"]) {
+        open my $FILE, ">:encoding(windows-1251)", $filepath || die "Can't open <$filepath> : $!";
+            print $FILE $text;
+        close $FILE;
+    }
+
+    if ($extension ~~ ["doc", "docx", "rtf"]) {
 
         # create tmp odt file
         my $tmpFolderPath = __adaptPath($c, "$basepath/.hotsave");
@@ -99,8 +104,6 @@ sub writeFile {
         binmode $FILE;
             print $FILE $response2->{text};
         close $FILE;
-
-
 
         my $file_path = Inprint::Store::Embedded::Utils::getRelativePath($c, $basepath);
         $file_path = __decodePath($c, $file_path);
