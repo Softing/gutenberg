@@ -49,6 +49,7 @@ sub index
                 $file = substr ($file, length("$path/public"), length($file));
                 return if ( $file =~ /\/css\/themes\// );
                 return if ( $file =~ /\/css\/engines\// );
+                return if ( $file =~ /\/css\/tiny\// );
                 push @cssfiles, $file;
             }
         }}, "$path/public/css");
