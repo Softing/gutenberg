@@ -174,7 +174,7 @@ sub update {
     if ($i_headline) {
         $headline = $c->Q("
             SELECT * FROM fascicles_indx_headlines WHERE id=? ",
-            [ $i_headline ])->Hash;        
+            [ $i_headline ])->Hash;
         push @errors, { id => "headline", msg => "Can't find object"}
             unless ($headline->{id});
     }
@@ -491,8 +491,6 @@ sub delete {
 
     $c->sql->bt;
 
-    my $deletionMode = $c->config->get($fascicle->{edition} . ".layout.page.delete");
-
     unless (@errors) {
 
         my @seqnums;
@@ -513,15 +511,9 @@ sub delete {
             push @seqnums, $page->{seqnum};
         }
 
-        if ($deletionMode eq "move") {
-
-            @seqnums = sort {$b <=> $a} @seqnums;
-
-            foreach my $seqnum (@seqnums) {
-
-                #die @seqnums;
-                $c->Do(" UPDATE fascicles_pages SET seqnum = seqnum-1 WHERE fascicle=? AND seqnum > ? ", [ $fascicle->{id}, $seqnum ]);
-            }
+        @seqnums = sort {$b <=> $a} @seqnums;
+        foreach my $seqnum (@seqnums) {
+            $c->Do(" UPDATE fascicles_pages SET seqnum = seqnum-1 WHERE fascicle=? AND seqnum > ? ", [ $fascicle->{id}, $seqnum ]);
         }
 
         # Create event
