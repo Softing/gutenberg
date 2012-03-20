@@ -483,7 +483,7 @@ our %Lexicon = (
  => "",
 
     "Edit text"
- => "",
+ => "Редактировать текст",
 
     "Editing attachment"
  => "",
