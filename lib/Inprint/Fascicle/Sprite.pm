@@ -30,22 +30,29 @@ sub index {
     my $fascicle = $c->Q(" SELECT * FROM fascicles WHERE id =? ", $i_fascicle)->Hash;
 
     my $tempPath = $c->config->get("store.temp");
-    my $spriteFolder = "$tempPath/fascicles/". $fascicle->{id} ."-". $fascicle->{variation};
+
+    my $tempFolder = "$tempPath/fascicles";
+    unless (-e $tempFolder) {
+        mkdir $tempFolder;
+    }
+
+    my $spriteFolder = $tempFolder ."/". $fascicle->{id} ."-". $fascicle->{variation};
+    unless (-e $spriteFolder) {
+        mkdir $spriteFolder unless -e $spriteFolder;
+    }
+
     my $spriteFile  = "$spriteFolder/${i_width}x${i_height}_sprite.png";
 
     if (! -e $spriteFile) {
         render_sprite($c, $fascicle->{id}, $spriteFolder, $i_width, $i_height);
     }
-    
+
     if (-e $spriteFile) {
-        
         $c->tx->res->headers->content_length(-s $spriteFile);
         $c->tx->res->headers->content_type("image/png");
-        
         $c->res->content->asset(
             Mojo::Asset::File->new(path => $spriteFile)
         );
-
         $c->rendered;
     } else {
        $c->res->code(404);
