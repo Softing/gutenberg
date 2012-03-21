@@ -50,7 +50,7 @@
 </html>
 
 <!-- Plugins -->
-<% my $version = 29022012-01; %>
+<% my $version = 20120320-01; %>
 <% foreach (@$cssplugins) { %><link type="text/css" rel="stylesheet" href="<%= $_ %>?v=<%= $version %>"/><% } %>
 <% foreach (@$jsplugins) { %><script type="text/javascript" src="<%= $_ %>?v=<%= $version %>"></script><% } %>
 
