@@ -1,42 +1,77 @@
-//Inprint.calendar.issues.Toolbar = function (scope) {
-//
-//    return [
-//        {
-//            xtype: 'buttongroup',
-//            title: _('Create'),
-//            columns: 2,
-//            defaults: {
-//                scale: 'small'
-//            },
-//            items: [
-//                Inprint.fx.Button(true, "Issue", "", "blue-folder", Inprint.calendar.actions.fascicleCreate.createDelegate(scope)).ref("../../btnCreate").render()
-//            ]
-//        },
-//
-//        {
-//            xtype: 'buttongroup',
-//            title: _('Production cycle'),
-//            columns: 3,
-//            defaults: {
-//                scale: 'small'
-//            },
-//            items: [
-//                Inprint.fx.Button(true, "Approval", "", "arrow-join", Inprint.calendar.actions.statusApproval.createDelegate(scope)).ref("../../btnDoApproval").render(),
-//                Inprint.fx.Button(true, "Working", "", "arrow", Inprint.calendar.actions.statusWork.createDelegate(scope)).ref("../../btnDoWorking").render(),
-//                Inprint.fx.Button(true, "Archive", "", "arrow-stop", Inprint.calendar.actions.archive.createDelegate(scope)).ref("../../btnDoArchive").render()
-//            ]
-//        },
-//
-//        {
-//            xtype: 'buttongroup',
-//            title: _('Tools'),
-//            columns: 6,
-//            defaults: { scale: 'small' },
-//            items: [
-//                Inprint.fx.Button(true, "Pause", "", "control-pause", Inprint.calendar.actions.disable.createDelegate(scope)).ref("../../btnDisable").render(),
-//                Inprint.fx.Button(true, "Enable", "", "control", Inprint.calendar.actions.enable.createDelegate(scope)).ref("../../btnEnable").render(),
-//                Inprint.fx.Button(true, "Format", "", "puzzle", Inprint.calendar.actions.format.createDelegate(scope)).ref("../../btnFormat").render()
-//            ]
-//        }
-//
-//    ]};
+Inprint.calendar.issues.Toolbar = function (scope) {
+    return [
+
+        {
+            text: 'Выпуски',
+            icon: _ico("blue-folders"),
+            menu: {
+                items: [
+                    Inprint.fx.btn.Create(Inprint.calendar.actions.fascicleCreate.createDelegate(scope)),
+                    Inprint.fx.btn.Edit(Inprint.calendar.actions.fascicleUpdate.createDelegate(scope)),
+                    "-",
+                    Inprint.fx.btn.Delete(Inprint.calendar.actions.remove.createDelegate(scope)),
+                ]
+            }
+        },
+
+        {
+            text: 'Вкладки',
+            icon: _ico("folders"),
+            menu: {
+                items: [
+                    Inprint.fx.btn.Create(Inprint.calendar.actions.attachmentCreate.createDelegate(scope)),
+                    Inprint.fx.btn.Edit(Inprint.calendar.actions.attachmentUpdate.createDelegate(scope)),
+                    "-",
+                    Inprint.fx.btn.Delete(Inprint.calendar.actions.remove.createDelegate(scope)),
+                ]
+            }
+        },
+
+        "-",
+
+        Inprint.fx.Button(false, "Open Plan", "", "layout-hf-2", Inprint.calendar.actions.remove.createDelegate(scope)).render(),
+        Inprint.fx.Button(false, "Open Composer", "", "layout-design", Inprint.calendar.actions.remove.createDelegate(scope)).render(),
+
+        "-",
+        Inprint.fx.Button(false, "Pause", "", "control-pause", Inprint.calendar.actions.disable.createDelegate(scope)).render(),
+        Inprint.fx.Button(false, "Enable", "", "control", Inprint.calendar.actions.enable.createDelegate(scope)).render(),
+
+        "-",
+        Inprint.fx.btn.Copy(Inprint.calendar.actions.copy.createDelegate(scope)),
+        Inprint.fx.Button(false, "Properties", "", "property", Inprint.calendar.actions.archive.createDelegate(scope)).render(),
+        Inprint.fx.Button(false, "Move to Archive", "", "blue-folder-zipper", Inprint.calendar.actions.archive.createDelegate(scope)).render(),
+
+        "-",
+        Inprint.fx.Button(false, "Format", "", "cross-circle", Inprint.calendar.actions.format.createDelegate(scope)).render(),
+
+        "->" ,
+        {
+            name: "edition",
+            xtype: "treecombo",
+            minListWidth: 300,
+            rootVisible:true,
+            fieldLabel: _("Edition"),
+            emptyText: _("Edition") + "...",
+            url: _url('/common/tree/editions/'),
+            baseParams: { term: 'editions.documents.work:*' },
+            root: {
+                id: "00000000-0000-0000-0000-000000000000",
+                expanded: true,
+                draggable: false,
+                icon: _ico("book"),
+                text: _("All editions")
+            },
+            listeners: {
+                select: function(combo, record) {
+                    scope.cmpLoad({
+                        archive: "false",
+                        fastype: "issue",
+                        edition: record.id
+                    });
+                    scope.enable();
+                }
+            }
+        }
+
+    ];
+}
