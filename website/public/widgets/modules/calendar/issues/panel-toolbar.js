@@ -38,7 +38,7 @@ Inprint.calendar.issues.Toolbar = function (scope) {
 
         "-",
         Inprint.fx.btn.Copy(Inprint.calendar.actions.copy.createDelegate(scope)),
-        Inprint.fx.Button(false, "Properties", "", "property", Inprint.calendar.actions.archive.createDelegate(scope)).render(),
+        Inprint.fx.Button(false, "Properties", "", "property", Inprint.calendar.actions.properties.createDelegate(scope)).render(),
         Inprint.fx.Button(false, "Move to Archive", "", "blue-folder-zipper", Inprint.calendar.actions.archive.createDelegate(scope)).render(),
 
         "-",

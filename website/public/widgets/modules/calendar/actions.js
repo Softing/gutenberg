@@ -25,13 +25,36 @@ Inprint.calendar.actions.remove = function(btn, var1, var2, oid, callback) {
 
 Inprint.calendar.actions.copy = function() {
 
-    var form = new Inprint.calendar.issues.CopyForm({
+    var form = new Inprint.calendar.forms.Copy({
         parent: this
     });
 
     form.setId(
         this.cmpGetSelectedNode().id
     );
+
+    form.on('actioncomplete', function(form, action) {
+        if (action.type == "submit") {
+            wndw.close();
+            this.cmpReload();
+        }
+    }, this);
+
+    Inprint.fx.Window(
+        400, 170, _("Copy issue"),
+        form, [ _BTN_WNDW_SAVE, _BTN_WNDW_CLOSE ]
+    ).build().show();
+};
+
+Inprint.calendar.actions.properties = function() {
+
+    var form = new Inprint.calendar.forms.Properties({
+        parent: this
+    });
+
+    //form.setId(
+    //    this.cmpGetSelectedNode().id
+    //);
 
     form.on('actioncomplete', function(form, action) {
         if (action.type == "submit") {
