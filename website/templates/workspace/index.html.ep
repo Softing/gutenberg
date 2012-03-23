@@ -51,9 +51,22 @@
 
 <!-- Plugins -->
 <% my $version = 20120320-01; %>
-<% foreach (@$cssplugins) { %><link type="text/css" rel="stylesheet" href="<%= $_ %>?v=<%= $version %>"/><% } %>
-<% foreach (@$jsplugins) { %><script type="text/javascript" src="<%= $_ %>?v=<%= $version %>"></script><% } %>
+
+<% foreach (@$cssplugins) { %>
+<link type="text/css" rel="stylesheet" href="<%= $_ %>?v=<%= $version %>"/>
+<% } %>
+
+<% foreach (@$jsplugins) { %>
+<script type="text/javascript" src="<%= $_ %>?v=<%= $version %>"></script>
+<% } %>
 
 <!-- WIdgets -->
 <script type="text/javascript" src="/locale/"></script>
-<% foreach (@$js) { %><script type="text/javascript" src="<%= $_ %>?v=<%= $version %>"></script><% } %>
+
+<% foreach (@$js) { %>
+<script type="text/javascript" src="<%= $_ %>?v=<%= $version %>"></script>
+<% } %>
+
+<% foreach (@$jslast) { %>
+<script type="text/javascript" src="<%= $_ %>?v=<%= $version %>"></script>
+<% } %>

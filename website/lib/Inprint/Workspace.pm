@@ -9,6 +9,7 @@ use utf8;
 use strict;
 use warnings;
 
+use File::Basename;
 use File::Find;
 
 use base 'Mojolicious::Controller';
@@ -21,8 +22,9 @@ sub index
 
     my $path = $c->app->home->to_string;
 
-    my @jsfiles;
-    my @cssfiles;
+    my @js;
+    my @css;
+    my @jslast;
     my @jsplugins;
     my @cssplugins;
 
@@ -31,13 +33,12 @@ sub index
         && -r "$path/public/cache/inprint.min.js"
         && -r "$path/public/cache/inprint.min.css"
         && -r "$path/public/cache/plugins.min.js"
-        && -r "$path/public/cache/plugins.min.css"
-        ) {
+        && -r "$path/public/cache/plugins.min.css") {
 
-            push @jsfiles, "/cache/inprint.min.js";
-            push @cssfiles, "/cache/inprint.min.css";
-            push @jsplugins, "/cache/plugins.min.js";
-            push @cssplugins, "/cache/plugins.min.css";
+        push @js, "/cache/inprint.min.js";
+        push @css, "/cache/inprint.min.css";
+        push @jsplugins, "/cache/plugins.min.js";
+        push @cssplugins, "/cache/plugins.min.css";
 
     } else {
 
@@ -50,21 +51,32 @@ sub index
                 return if ( $file =~ /\/css\/themes\// );
                 return if ( $file =~ /\/css\/engines\// );
                 return if ( $file =~ /\/css\/tiny\// );
-                push @cssfiles, $file;
+                push @css, $file;
             }
         }}, "$path/public/css");
-        @cssfiles = sort { $a cmp $b } @cssfiles;
+        @css = sort { $a cmp $b } @css;
 
         # Find js files
         find({ wanted => sub {
             if ( -r $File::Find::name && (/\.js$/) ) {
+
                     my $file = $File::Find::name;
+
                     $file  =~ s/\/+/\//g;
                     $file = substr ($file, length("$path/public"), length($file));
-                    push @jsfiles, $file;
+
+                    my ($filename, $directory, $suffix) = fileparse($file);
+
+                    if ($filename eq "_last.js") {
+                        push @jslast, $file;
+                    }
+
+                    else {
+                        push @js, $file;
+                    }
             }
         }}, "$path/public/widgets");
-        @jsfiles = sort { $a cmp $b } @jsfiles;
+        @js = sort { $a cmp $b } @js;
 
         # Find plugins
         find({ wanted => sub {
@@ -82,8 +94,9 @@ sub index
     }
 
     $c->render(
-        js  => \@jsfiles,
-        css =>\@cssfiles,
+        js  => \@js,
+        css =>\@css,
+        jslast => \@jslast,
         jsplugins  => \@jsplugins,
         cssplugins =>\@cssplugins
     );

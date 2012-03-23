@@ -87,15 +87,20 @@ sub index
     };
 
     ############################################################################
-    # Editions
+    # Calendar
     ############################################################################
 
     my $accessCalendarEditions = $c->objectAccess("editions.calendar.view:*");
     my $CalendarSection = {
-        id => "fascicles"
+        id => "calendar"
     };
     if ( $accessCalendarEditions ) {
-        push @{ $CalendarSection->{menu} }, { id => "composition-calendar" };
+        #push @{ $CalendarSection->{menu} }, { id => "composition-calendar" };
+        #push @{ $CalendarSection->{menu} }, "-";
+        push @{ $CalendarSection->{menu} }, { id => "calendar-issues" };
+        push @{ $CalendarSection->{menu} }, { id => "calendar-archive" };
+        push @{ $CalendarSection->{menu} }, { id => "calendar-templates" };
+        push @{ $CalendarSection->{menu} }, "-";
         push @{ $CalendarSection->{menu} }, { id => "briefcase-index", oid  => "00000000-0000-0000-0000-000000000000" };
     }
 
@@ -268,15 +273,17 @@ sub index
     push @result, "-";
 
     push @result, $DocumentsSection;
+    push @result, "-";
 
     if ( $accessAdvertDomains || $accessAdvertEditions ) {
-        push @result, "-";
         push @result, $AdvertisingSection;
+        push @result, "-";
     }
 
     if ( $accessCalendarEditions ) {
+
+        push @result, $CalendarSection;
         push @result, "-";
-        push @result, $CalendarSection
     }
 
     foreach my $item (@FasciclesSection) {
