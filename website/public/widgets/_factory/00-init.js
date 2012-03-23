@@ -5,3 +5,5 @@
 
 Ext.ns("Inprint.store");
 Ext.ns("Inprint.factory");
+Ext.ns("Inprint.fx");
+Ext.ns("Inprint.fx.btn");

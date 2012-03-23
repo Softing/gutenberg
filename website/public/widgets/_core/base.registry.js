@@ -46,9 +46,9 @@ Inprint.registry = {
         icon: "folder-horizontal"
     },
 
-    "fascicles": {
-        text: _("Fascicles"),
-        icon: "blue-folders-stack"
+    "calendar": {
+        text: _("Calendar"),
+        icon: "calendar-task"
     },
 
     "settings": {

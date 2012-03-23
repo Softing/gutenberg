@@ -42,10 +42,10 @@ Inprint.ObjectResolver = function() {
 
             var panel = objectHash[panelId];
             if (!panel) {
-                panel = this.create(item, panelId);
+                panel = Inprint.ObjectResolver.create(item, panelId);
             }
 
-            this.show(panel);
+            Inprint.ObjectResolver.show(panel);
         },
 
         // Создаем новую панель
@@ -67,24 +67,24 @@ Inprint.ObjectResolver = function() {
 
             var xobject = Inprint.registry[item.aid].xobject;
 
-            config.title = this.makeTitle(config.aid, config.oid, config.pid, config.icon, unescape(item.text), unescape(item.description));
+            config.title = Inprint.ObjectResolver.makeTitle(config.aid, config.oid, config.pid, config.icon, unescape(item.text), unescape(item.description));
 
             // Create panel Tools
             var tools = [
                 {
                     id: "refresh",
                     qtip: _("Reload this panel"),
-                    scope: this,
+                    scope: Inprint.ObjectResolver,
                     handler: function(event, toolEl, panel) {
-                        this.reload(panel);
+                        Inprint.ObjectResolver.reload(panel);
                     }
                 },
                 {
                     id: "close",
                     qtip: _("Close this panel"),
-                    scope: this,
+                    scope: Inprint.ObjectResolver,
                     handler: function(event, toolEl, panel) {
-                        this.remove(panel);
+                        Inprint.ObjectResolver.remove(panel);
                     }
                 }
             ];
@@ -174,10 +174,10 @@ Inprint.ObjectResolver = function() {
                     objectStore.splice(i, 1);
 
                     if (objectStore[ i ]) {
-                        this.show(objectStore[ i ]);
+                        Inprint.ObjectResolver.show(objectStore[ i ]);
                     }
                     else {
-                        this.show(objectStore[ i - 1 ]);
+                        Inprint.ObjectResolver.show(objectStore[ i - 1 ]);
                     }
                 }
             }
