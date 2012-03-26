@@ -5,8 +5,6 @@
 
 Inprint.sources = {
 
-    "calendar.format":                  "/calendar/format/",
-
     "common.tree.editions":             "/common/tree/editions/",
     "common.tree.fascicles":            "/common/tree/fascicles/",
     "common.tree.departments":          "/common/tree/departments/",
@@ -33,30 +31,32 @@ Inprint.sources = {
     "requests.files.download":          "/advertising/requests/files/download/",
     "requests.files.delete":            "/advertising/requests/files/delete/",
 
-    "fascicle.list":                    "/calendar/list/",
-    "fascicle.read":                    "/calendar/fascicle/read/",
-    "fascicle.create":                  "/calendar/fascicle/create/",
-    "fascicle.update":                  "/calendar/fascicle/update/",
-    "fascicle.remove":                  "/calendar/fascicle/remove/",
-    "fascicle.deadline":                "/calendar/fascicle/deadline/",
-    "fascicle.archive":                 "/calendar/fascicle/archive/",
-    "fascicle.unarchive":               "/calendar/fascicle/unarchive/",
-    "fascicle.work":                    "/calendar/fascicle/work/",
-    "fascicle.approval":               "/calendar/fascicle/approval/",
-    "fascicle.enable":                  "/calendar/fascicle/enable/",
-    "fascicle.disable":                 "/calendar/fascicle/disable/",
-    "fascicle.template":                "/calendar/fascicle/template/",
+    "calendar.archive":                 "/calendar/archive/",
+    "calendar.unarchive":               "/calendar/unarchive/",
+    "calendar.enable":                  "/calendar/enable/",
+    "calendar.disable":                 "/calendar/disable/",
+    "calendar.copy":                    "/calendar/copy/",
+    "calendar.format":                  "/calendar/format/",
 
-    "attachment.read":                  "/calendar/attachment/read/",
+    "issue.create":                     "/calendar/fascicle/create/",
+    "issue.read":                       "/calendar/fascicle/read/",
+    "issue.update":                     "/calendar/fascicle/update/",
+    "issue.delete":                     "/calendar/fascicle/remove/",
+    "issue.list":                       "/calendar/fascicle/list/",
+    "issue.copy":                       "/calendar/fascicle/copy/",
+
     "attachment.create":                "/calendar/attachment/create/",
+    "attachment.read":                  "/calendar/attachment/read/",
     "attachment.update":                "/calendar/attachment/update/",
-    "attachment.delete":                "/calendar/attachment/delete/",
+    "attachment.delete":                "/calendar/attachment/remove/",
+    "attachment.list":                  "/calendar/attachment/list/",
+    "attachment.copy":                  "/calendar/attachment/copy/",
 
     "template.list":                    "/calendar/template/list/",
     "template.read":                    "/calendar/template/read/",
     "template.create":                  "/calendar/template/create/",
     "template.update":                  "/calendar/template/update/",
-    "template.remove":                  "/calendar/template/remove/",
+    "template.delete":                  "/calendar/template/remove/",
 
     "documents.downloads.list":         "/documents/downloads/list/",
     "documents.downloads.download":     "/documents/downloads/download/",

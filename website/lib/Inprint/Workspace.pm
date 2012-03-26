@@ -57,26 +57,29 @@ sub index
         @css = sort { $a cmp $b } @css;
 
         # Find js files
-        find({ wanted => sub {
-            if ( -r $File::Find::name && (/\.js$/) ) {
+        find({
+            wanted => sub {
+                if ( -r $File::Find::name && (/\.js$/) ) {
 
-                    my $file = $File::Find::name;
+                        my $file = $File::Find::name;
 
-                    $file  =~ s/\/+/\//g;
-                    $file = substr ($file, length("$path/public"), length($file));
+                        $file  =~ s/\/+/\//g;
+                        $file = substr ($file, length("$path/public"), length($file));
 
-                    my ($filename, $directory, $suffix) = fileparse($file);
+                        my ($filename, $directory, $suffix) = fileparse($file);
 
-                    if ($filename eq "_last.js") {
-                        push @jslast, $file;
-                    }
+                        if ($filename eq "_last.js") {
+                            push @jslast, $file;
+                        }
 
-                    else {
-                        push @js, $file;
-                    }
-            }
-        }}, "$path/public/widgets");
-        @js = sort { $a cmp $b } @js;
+                        else {
+                            push @js, $file;
+                        }
+                }
+            },
+            'preprocess' => sub { sort { $a cmp $b } @_ }
+        }, "$path/public/widgets");
+        #@js = sort { $a cmp $b } @js;
 
         # Find plugins
         find({ wanted => sub {

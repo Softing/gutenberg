@@ -12,193 +12,20 @@ use Inprint::Calendar::Copy;
 
 use base 'Mojolicious::Controller';
 
-sub tree {
-
+sub properties {
     my $c = shift;
 
     my @errors;
-    my @result;
 
-    my $i_node = $c->param("node");
-
-    if ($i_node eq "root-node") {
-        $i_node = '00000000-0000-0000-0000-000000000000';
-    }
-
-    $c->check_uuid( \@errors, "id", $i_node);
-
-    unless (@errors) {
-
-        my $sql;
-        my @data;
-
-        # Get editions with grant
-        my $bindings = $c->objectBindings([
-            "editions.fascicle.manage:*", "editions.attachment.manage:*" ]);
-
-        my $paths = $c->Q("
-            SELECT id FROM editions
-            WHERE path @> ARRAY(
-                SELECT path FROM editions WHERE id = ANY(\$1)
-            )", [ $bindings ])->Values;
-
-        $sql = "
-            SELECT
-                t1.*,
-                ( SELECT count(*) FROM editions c2 WHERE c2.path ~ ('*.' || t1.path::text || '.*{1}')::lquery ) as have_childs
-            FROM editions t1
-            WHERE 1=1
-                AND t1.path ~ ('*.' || replace(\$1, '-', '') || '.*{1}')::lquery
-                AND t1.id = ANY(\$2)
-            ORDER BY shortcut
-        ";
-        push @data, $i_node;
-        push @data, $paths;
-
-        my $data = $c->Q($sql, \@data)->Hashes;
-
-        foreach my $item (@$data) {
-
-            my $record = {
-                id   => $item->{id},
-                text => $item->{shortcut},
-                leaf => $c->json->true,
-                icon => "blue-folders",
-                data => $item
-            };
-
-            if ( $item->{have_childs} ) {
-                $record->{leaf} = $c->json->false;
-            }
-
-            push @result, $record;
-        }
-    }
-
-    $c->render_json( \@result );
+    $c->smart_render(\@errors);
 }
 
-sub list {
-
+sub copy {
     my $c = shift;
 
-    my @params;
+    my @errors;
 
-    my $i_edition = $c->param("edition") || undef;
-    my $i_fastype = $c->param("fastype") || "issue";
-    my $i_archive = $c->param("archive") || "false";
-
-    my $edition  = $c->Q("SELECT * FROM editions WHERE id=?", [ $i_edition ])->Hash;
-    my $editions = $c->objectBindings("editions.documents.work:*");
-
-    my $bindings = $c->objectBindings([
-        "editions.fascicle.view:*", "editions.attachment.manage:*" ]);
-
-    my $subbindings = $c->objectBindings([
-        "editions.attachment.view:*", "editions.attachment.manage:*" ]);
-
-    # Common sql
-    my $sql = "
-        SELECT
-
-            t1.id,
-            t2.id as edition, t2.shortcut as edition_shortcut,
-            t1.parent, t1.fastype, t1.variation,
-            t1.shortcut, t1.description,
-            t1.tmpl, t1.tmpl_shortcut,
-            t1.circulation, t1.num, t1.anum,
-            t1.manager,
-            t1.enabled, t1.archived,
-            t1.doc_enabled, t1.adv_enabled,
-
-            to_char(t1.doc_date, 'YYYY-MM-DD HH24:MI:SS')     as doc_date,
-            to_char(t1.adv_date, 'YYYY-MM-DD HH24:MI:SS')     as adv_date,
-            to_char(t1.print_date, 'YYYY-MM-DD HH24:MI:SS')   as print_date,
-            to_char(t1.release_date, 'YYYY-MM-DD HH24:MI:SS') as release_date,
-
-            to_char(t1.created, 'YYYY-MM-DD HH24:MI:SS') as created,
-            to_char(t1.updated, 'YYYY-MM-DD HH24:MI:SS') as updated
-
-        FROM fascicles t1, editions t2
-        WHERE 1=1
-            AND t1.deleted = false
-            AND t2.id=t1.edition
-    ";
-
-    # Parent query
-    my $sql_parent = $sql . " AND t1.edition=? ";
-    push @params, $edition->{id};
-
-    $sql_parent .= " AND t1.edition = ANY(?) ";
-    push @params, $bindings;
-
-    $sql_parent .= " AND t1.archived = true "      if ($i_archive eq "true");
-    $sql_parent .= " AND t1.archived = false "     if ($i_archive eq "false");
-
-    $sql_parent .= " AND t1.fastype = 'issue' "    if ($i_fastype eq "issue");
-    $sql_parent .= " AND t1.fastype = 'template' " if ($i_fastype eq "template");
-
-    $sql_parent .= " ORDER BY t1.release_date DESC ";
-
-    my $result = $c->Q($sql_parent, \@params)->Hashes;
-
-    foreach my $node (@{ $result }) {
-
-        $node->{leaf} = $c->json->true;
-        $node->{expanded} = $c->json->true;
-        $node->{icon} = "/icons/blue-folder-small-horizontal.png";
-
-        my @subparams;
-        my $sql_childrens = $sql;
-
-        $sql_childrens .= " AND t1.edition = ANY(?) ";
-        push @subparams, $subbindings;
-
-        $sql_childrens .= " AND t1.parent=? ";
-        push @subparams, $node->{id};
-
-        $sql_childrens .= " ORDER BY t1.release_date DESC ";
-
-        $node->{children} = $c->Q($sql_childrens, \@subparams)->Hashes;
-
-        foreach my $subnode (@{ $node->{children} }) {
-            $node->{leaf} = $c->json->false;
-            $subnode->{icon} = "/icons/folder-small-horizontal.png";
-            $subnode->{leaf} = $c->json->true;
-            $subnode->{shortcut} = $subnode->{edition_shortcut};
-        }
-
-    }
-
-    my @subparams;
-    my $sql_childrens = $sql;
-
-    $sql_childrens .= " AND edition=? ";
-    push @subparams, $edition->{id};
-
-    $sql_childrens .= " AND t2.id = ANY(?) ";
-    push @subparams, $subbindings;
-
-    $sql_childrens .= " AND t1.fastype='attachment' ";
-
-    $sql_childrens .= " AND t1.archived = true "      if ($i_archive eq "true");
-    $sql_childrens .= " AND t1.archived = false "     if ($i_archive eq "false");
-
-    $sql_childrens .= " ORDER BY t1.release_date DESC ";
-
-    my $children = $c->Q($sql_childrens, \@subparams)->Hashes;
-
-    foreach my $node (@$children) {
-
-        my $parent = $c->Q(" SELECT * FROM fascicles WHERE id=?", $node->{parent}) ->Hash;
-
-        $node->{icon} = "/icons/folder-small-horizontal.png";
-        $node->{leaf} = $c->json->true;
-        $node->{shortcut} = $parent->{shortcut} ."/". $node->{edition_shortcut};
-        push @$result, $node;
-    }
-
-    $c->render_json( $result );
+    $c->smart_render(\@errors);
 }
 
 sub format {
@@ -219,5 +46,122 @@ sub format {
 
     $c->smart_render(\@errors);
 }
+
+sub archive {
+    my $c = shift;
+
+    my @errors;
+
+    my $i_id           = $c->get_uuid(\@errors, "id");
+
+    unless (@errors) {
+
+        $c->txBegin;
+
+        my $fascicles = $c->Q(" SELECT id FROM fascicles WHERE parent=\$1 OR id=\$1 ", $i_id)->Values;
+
+        $c->Do("
+            UPDATE fascicles SET
+                archived = true,
+                enabled = false
+            WHERE id= ANY(?) ", [ $fascicles ]);
+
+        # Move linked documents to Archive
+        $c->Do("
+            UPDATE documents SET
+                isopen=false
+            WHERE 1=1
+                AND fascicle = ANY(\$1)
+                AND EXISTS(
+                    SELECT true
+                    FROM fascicles_map_documents as fasmap
+                    WHERE 1=1
+                        AND fasmap.fascicle=documents.fascicle
+                        AND fasmap.entity = documents.id)", [ $fascicles ]);
+
+        # Move unlinked documents to Briefcase
+        $c->Do("
+            UPDATE documents SET
+                isopen=true,
+                fascicle = \$1,
+                fascicle_shortcut = \$2
+            WHERE 1=1
+                AND fascicle = ANY(\$3)
+                AND NOT EXISTS(
+                    SELECT true
+                    FROM fascicles_map_documents as fasmap
+                    WHERE 1=1
+                        AND fasmap.fascicle=documents.fascicle
+                        AND fasmap.entity = documents.id)",
+            [ '00000000-0000-0000-0000-000000000000', $c->l("Briefcase"), $fascicles ]);
+
+        $c->txCommit;
+
+    }
+
+    $c->smart_render(\@errors);
+}
+
+sub unarchive {
+    my $c = shift;
+
+    my @errors;
+
+    my $i_id = $c->get_uuid(\@errors, "id");
+
+    unless (@errors) {
+        $c->txBegin;
+
+        my $fascicles = $c->Q(" SELECT id FROM fascicles WHERE parent=\$1 OR id=\$1 ", $i_id)->Values;
+
+        $c->Do("
+            UPDATE fascicles SET
+                archived = false,
+                enabled = true
+            WHERE id= ANY(?) ", [ $fascicles ]);
+
+        # Move linked documents to Archive
+        $c->Do("
+            UPDATE documents SET
+                isopen=true
+            WHERE 1=1
+                AND fascicle = ANY(\$1)", [ $fascicles ]);
+
+        $c->txCommit;
+    }
+
+    $c->smart_render(\@errors);
+}
+
+sub enable {
+    my $c = shift;
+
+    my $result;
+    my @errors;
+
+    my $i_id = $c->get_uuid(\@errors, "id");
+
+    unless (@errors) {
+        $c->Do(" UPDATE fascicles SET enabled = true WHERE id=? ", [ $i_id ]);
+    }
+
+    $c->smart_render(\@errors, $result);
+}
+
+sub disable {
+    my $c = shift;
+
+    my $result;
+    my @errors;
+
+    my $i_id = $c->get_uuid(\@errors, "id");
+
+    unless (@errors) {
+        $c->Do(" UPDATE fascicles SET enabled = false WHERE id=? ", [ $i_id ]);
+    }
+
+    $c->smart_render(\@errors, $result);
+}
+
 
 1;

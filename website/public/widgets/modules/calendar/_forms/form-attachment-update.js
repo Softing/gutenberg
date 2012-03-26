@@ -62,13 +62,8 @@ Inprint.calendar.forms.AttachmentUpdate = Ext.extend( Ext.form.FormPanel,
         ];
 
         Ext.apply(this,  {
-            xtype: "form",
-            border:false,
-            layout: 'form',
-            bodyStyle:'padding:10px',
-            defaults:{
-                anchor:'100%'
-            }
+            baseCls: 'x-plain',
+            defaults:{ anchor:'98%' }
         });
 
         Inprint.calendar.forms.AttachmentUpdate.superclass.initComponent.apply(this, arguments);

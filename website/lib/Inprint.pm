@@ -151,30 +151,36 @@ sub startup {
     $sessionBridge->route("/advertising/requests/files/delete/")        ->to("advertising-requests-files#delete");
 
     # Calendar routes
-    $sessionBridge->route("/calendar/list/")                            ->to("calendar#list");
-    $sessionBridge->route("/calendar/tree/")                            ->to("calendar#tree");
+    $sessionBridge->route("/calendar/enable/")                          ->to("calendar#enable");
+    $sessionBridge->route("/calendar/disable/")                         ->to("calendar#disable");
+    $sessionBridge->route("/calendar/archive/")                         ->to("calendar#archive");
+    $sessionBridge->route("/calendar/unarchive/")                       ->to("calendar#unarchive");
+    $sessionBridge->route("/calendar/properties/")                      ->to("calendar#properties");
+    $sessionBridge->route("/calendar/copy/")                            ->to("calendar#copy");
     $sessionBridge->route("/calendar/format/")                          ->to("calendar#format");
-    $sessionBridge->route("/calendar/fascicle/read/")                   ->to("calendar-fascicle#read");
+
+    #$sessionBridge->route("/calendar/template/")                        ->to("calendar#template");
+    #$sessionBridge->route("/calendar/work/")                            ->to("calendar#work");
+    #$sessionBridge->route("/calendar/approval/")                        ->to("calendar#approval");
+    #$sessionBridge->route("/calendar/deadline/")                        ->to("calendar#deadline");
+
     $sessionBridge->route("/calendar/fascicle/create/")                 ->to("calendar-fascicle#create");
+    $sessionBridge->route("/calendar/fascicle/read/")                   ->to("calendar-fascicle#read");
     $sessionBridge->route("/calendar/fascicle/update/")                 ->to("calendar-fascicle#update");
     $sessionBridge->route("/calendar/fascicle/remove/")                 ->to("calendar-fascicle#remove");
-    $sessionBridge->route("/calendar/fascicle/template/")               ->to("calendar-fascicle#template");
-    $sessionBridge->route("/calendar/fascicle/archive/")                ->to("calendar-fascicle#archive");
-    $sessionBridge->route("/calendar/fascicle/unarchive/")              ->to("calendar-fascicle#unarchive");
-    $sessionBridge->route("/calendar/fascicle/work/")                   ->to("calendar-fascicle#work");
-    $sessionBridge->route("/calendar/fascicle/approval/")               ->to("calendar-fascicle#approval");
-    $sessionBridge->route("/calendar/fascicle/enable/")                 ->to("calendar-fascicle#enable");
-    $sessionBridge->route("/calendar/fascicle/disable/")                ->to("calendar-fascicle#disable");
-    $sessionBridge->route("/calendar/fascicle/deadline/")               ->to("calendar-fascicle#deadline");
-    $sessionBridge->route("/calendar/attachment/read/")                 ->to("calendar-attachment#read");
+    $sessionBridge->route("/calendar/fascicle/list/")                   ->to("calendar-fascicle#list");
+
     $sessionBridge->route("/calendar/attachment/create/")               ->to("calendar-attachment#create");
+    $sessionBridge->route("/calendar/attachment/read/")                 ->to("calendar-attachment#read");
     $sessionBridge->route("/calendar/attachment/update/")               ->to("calendar-attachment#update");
     $sessionBridge->route("/calendar/attachment/remove/")               ->to("calendar-attachment#remove");
-    $sessionBridge->route("/calendar/template/list/")                   ->to("calendar-template#list");
-    $sessionBridge->route("/calendar/template/read/")                   ->to("calendar-template#read");
+    $sessionBridge->route("/calendar/attachment/list/")                 ->to("calendar-attachment#list");
+
     $sessionBridge->route("/calendar/template/create/")                 ->to("calendar-template#create");
+    $sessionBridge->route("/calendar/template/read/")                   ->to("calendar-template#read");
     $sessionBridge->route("/calendar/template/update/")                 ->to("calendar-template#update");
     $sessionBridge->route("/calendar/template/remove/")                 ->to("calendar-template#remove");
+    $sessionBridge->route("/calendar/template/list/")                   ->to("calendar-template#list");
 
     # Calendar combos
     #$sessionBridge->route('/calendar/combos/editions/')                 ->to('calendar-combos#editions');

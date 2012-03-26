@@ -1,8 +1,6 @@
-Inprint.calendar.forms.TemplateUpdate = Ext.extend( Ext.form.FormPanel,
-{
+Inprint.calendar.forms.UpdateTemplateForm = Ext.extend( Ext.form.FormPanel, {
 
-    initComponent: function()
-    {
+    initComponent: function() {
 
         this.items = [
 
@@ -28,11 +26,11 @@ Inprint.calendar.forms.TemplateUpdate = Ext.extend( Ext.form.FormPanel,
             defaults:{ anchor:'100%' }
         });
 
-        Inprint.calendar.forms.TemplateUpdate.superclass.initComponent.apply(this, arguments);
+        Inprint.calendar.forms.UpdateTemplateForm.superclass.initComponent.apply(this, arguments);
     },
 
     onRender: function() {
-        Inprint.calendar.forms.TemplateUpdate.superclass.onRender.apply(this, arguments);
+        Inprint.calendar.forms.UpdateTemplateForm.superclass.onRender.apply(this, arguments);
         this.getForm().url = _source("template.update");
     },
 

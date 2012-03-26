@@ -30,6 +30,78 @@ sub read {
     $c->smart_render(\@errors, $result);
 }
 
+sub list {
+
+    my $c = shift;
+
+    my @errors;
+    my @params;
+
+    my $i_edition = $c->param("edition") || undef;
+
+    my $i_fastype = $c->param("fastype") || "issue";
+    my $i_archive = $c->param("archive") || "false";
+
+    my $edition  = $c->Q("SELECT * FROM editions WHERE id=?", [ $i_edition ])->Hash;
+
+    # Common sql
+    my $sql = "
+        SELECT
+
+            t1.id,
+            t2.id as edition,
+            t2.shortcut as edition_shortcut,
+            t1.parent,
+            t1.fastype,
+            t1.variation,
+            t1.shortcut,
+            t1.description,
+            t1.tmpl,
+            t1.tmpl_shortcut,
+            t1.circulation,
+            t1.num,
+            t1.anum,
+            t1.manager,
+            t1.enabled,
+            t1.archived,
+            t1.doc_enabled,
+            t1.adv_enabled,
+
+            to_char(t1.doc_date, 'YYYY-MM-DD HH24:MI:SS')       as doc_date,
+            to_char(t1.adv_date, 'YYYY-MM-DD HH24:MI:SS')       as adv_date,
+            to_char(t1.print_date, 'YYYY-MM-DD HH24:MI:SS')     as print_date,
+            to_char(t1.release_date, 'YYYY-MM-DD HH24:MI:SS')   as release_date,
+
+            to_char(t1.created, 'YYYY-MM-DD HH24:MI:SS')        as created,
+            to_char(t1.updated, 'YYYY-MM-DD HH24:MI:SS')        as updated
+
+        FROM
+            fascicles t1,
+            editions t2
+        WHERE 1=1
+            AND t1.deleted = false
+            AND t2.id=t1.edition
+    ";
+
+    $sql .= " AND t1.edition = ANY(?) ";
+    push @params, $c->objectChildren("editions", $edition->{id}, [ "editions.fascicle.view:*", "editions.attachment.manage:*" ]);
+
+    $sql .= " AND t1.edition = ANY(?) ";
+    push @params, $c->objectBindings([ "editions.fascicle.view:*", "editions.attachment.manage:*" ]);
+
+    $sql .= " AND t1.archived = true "      if ($i_archive eq "true");
+    $sql .= " AND t1.archived = false "     if ($i_archive eq "false");
+
+    $sql .= " AND t1.fastype = 'issue' "    if ($i_fastype eq "issue");
+    $sql .= " AND t1.fastype = 'template' " if ($i_fastype eq "template");
+
+    $sql .= " ORDER BY t2.shortcut ASC, t1.shortcut ASC ";
+
+    my $result = $c->Q($sql, \@params)->Hashes;
+
+    $c->smart_render(\@errors, $result);
+}
+
 sub create {
 
     my $c = shift;
@@ -165,96 +237,11 @@ sub remove {
     my $i_id           = $c->get_uuid(\@errors, "id");
 
     unless (@errors) {
-        Inprint::Models::Fascicle::remove($c, $i_id);
+        $c->Do(" UPDATE fascicles SET deleted = true WHERE id=? ", [ $i_id ]);
+        $c->Do(" UPDATE fascicles SET deleted = true WHERE parent=? ", [ $i_id ]);
     }
 
     $c->smart_render(\@errors);
-}
-
-sub archive {
-    my $c = shift;
-
-    my @errors;
-
-    my $i_id           = $c->get_uuid(\@errors, "id");
-
-    unless (@errors) {
-        Inprint::Models::Fascicle::archive($c, $i_id);
-    }
-
-    $c->smart_render(\@errors);
-}
-
-sub unarchive {
-    my $c = shift;
-
-    my @errors;
-
-    my $i_id = $c->get_uuid(\@errors, "id");
-
-    unless (@errors) {
-        Inprint::Models::Fascicle::unarchive($c, $i_id);
-    }
-
-    $c->smart_render(\@errors);
-}
-
-sub approval {
-    my $c = shift;
-
-    my @errors;
-
-    my $i_id           = $c->get_uuid(\@errors, "id");
-
-    unless (@errors) {
-        Inprint::Models::Fascicle::approval($c, $i_id);
-    }
-
-    $c->smart_render(\@errors);
-}
-
-sub work {
-    my $c = shift;
-
-    my @errors;
-
-    my $i_id = $c->get_uuid(\@errors, "id");
-
-    unless (@errors) {
-        Inprint::Models::Fascicle::work($c, $i_id);
-    }
-
-    $c->smart_render(\@errors);
-}
-
-sub enable {
-    my $c = shift;
-
-    my $result;
-    my @errors;
-
-    my $i_id           = $c->get_uuid(\@errors, "id");
-
-    unless (@errors) {
-        $result = Inprint::Models::Fascicle::enable($c, $i_id);
-    }
-
-    $c->smart_render(\@errors, $result);
-}
-
-sub disable {
-    my $c = shift;
-
-    my $result;
-    my @errors;
-
-    my $i_id           = $c->get_uuid(\@errors, "id");
-
-    unless (@errors) {
-        $result = Inprint::Models::Fascicle::disable($c, $i_id);
-    }
-
-    $c->smart_render(\@errors, $result);
 }
 
 1;

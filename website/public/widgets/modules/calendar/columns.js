@@ -1,11 +1,38 @@
+"use strict";
 
-Inprint.calendar.ux.Columns = {
+Inprint.calendar.ux.columns = {
+
+    icon: {
+        dataIndex: 'fastype',
+        width: 24,
+        renderer: function(value, metaData, record, rowIndex, colIndex, store) {
+            if (value == 'issue')       var icon = _ico("blue-folder");
+            if (value == 'attachment')  var icon = _ico("folder");
+            if (value == 'template')    var icon = _ico("puzzle");
+            return String.format('<img src="{0}"/>', icon);
+        }
+    },
+
+    status: {
+        dataIndex: 'enabled',
+        width: 24,
+        renderer: function(value, metaData, record, rowIndex, colIndex, store) {
+            if (value == 1) var icon = _ico("status");
+            if (value == 0) var icon = _ico("status-offline");
+            return String.format('<img src="{0}"/>', icon);
+        }
+    },
+
+    edition: {
+        header: _("Edition"),
+        dataIndex: 'edition_shortcut',
+        width: 180
+    },
 
     shortcut: {
         header: _("Shortcut"),
         dataIndex: 'shortcut',
-        width: 180,
-        tpl: new Ext.XTemplate('<tpl if="!enabled"><s></tpl>{shortcut}<tpl if="!enabled"></s></tpl>')
+        width: 180
     },
 
     template: {
@@ -27,70 +54,58 @@ Inprint.calendar.ux.Columns = {
         width: 80
     },
 
-        printdate: {
+    printdate: {
         header: _("Print date"),
         dataIndex: 'date_print',
         width: 120,
-        tpl: new Ext.XTemplate('{print_date:this.formatDate}', {
-            formatDate: function(date) {
-                return _fmtDate(date, 'F j');
-            }
-        })
+        renderer: function(value, metaData, record, rowIndex, colIndex, store) {
+            return _fmtDate(value, 'F j, H:i');
+        }
     },
 
     releasedate: {
         header: _("Release date"),
         dataIndex: 'date_release',
         width: 120,
-        tpl: new Ext.XTemplate('{release_date:this.formatDate}', {
-            formatDate: function(date) {
-                return _fmtDate(date, 'F j');
-            }
-        })
+        renderer: function(value, metaData, record, rowIndex, colIndex, store) {
+            return _fmtDate(value, 'F j, H:i');
+        }
     },
 
     docdate: {
         header: _("Documents"),
         dataIndex: 'date_doc',
         width: 120,
-        tpl: new Ext.XTemplate('<tpl if="!doc_enabled"><s></tpl>{doc_date:this.formatDate}<tpl if="!doc_enabled"></s></tpl>', {
-            formatDate: function(date) {
-                return _fmtDate(date, 'F j, H:i');
-            }
-        })
+        renderer: function(value, metaData, record, rowIndex, colIndex, store) {
+            return _fmtDate(value, 'F j, H:i');
+        }
     },
 
     advdate: {
         header: _("Advertisement"),
         dataIndex: 'date_adv',
         width: 120,
-        tpl: new Ext.XTemplate('<tpl if="!adv_enabled"><s></tpl>{adv_date:this.formatDate}<tpl if="!adv_enabled"></s></tpl>', {
-            formatDate: function(date) {
-                return _fmtDate(date, 'F j, H:i');
-            }
-        })
+        renderer: function(value, metaData, record, rowIndex, colIndex, store) {
+            return _fmtDate(value, 'F j, H:i');
+        }
     },
 
     created: {
         header: _("Created"),
         dataIndex: 'created',
         width: 120,
-        tpl: new Ext.XTemplate('{created:this.formatDate}', {
-            formatDate: function(date) {
-                return _fmtDate(date, 'F j, H:i');
-            }
-        })
+        renderer: function(value, metaData, record, rowIndex, colIndex, store) {
+            return _fmtDate(value, 'F j, H:i');
+        }
     },
 
     updated: {
         header: _("Updated"),
         dataIndex: 'updated',
         width: 120,
-        tpl: new Ext.XTemplate('{updated:this.formatDate}', {
-            formatDate: function(date) {
-                return _fmtDate(date, 'F j, H:i');
-            }
-        })
+        renderer: function(value, metaData, record, rowIndex, colIndex, store) {
+            return _fmtDate(value, 'F j, H:i');
+        }
     }
 
 };

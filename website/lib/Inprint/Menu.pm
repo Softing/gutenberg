@@ -95,8 +95,6 @@ sub index
         id => "calendar"
     };
     if ( $accessCalendarEditions ) {
-        #push @{ $CalendarSection->{menu} }, { id => "composition-calendar" };
-        #push @{ $CalendarSection->{menu} }, "-";
         push @{ $CalendarSection->{menu} }, { id => "calendar-issues" };
         push @{ $CalendarSection->{menu} }, { id => "calendar-archive" };
         push @{ $CalendarSection->{menu} }, { id => "calendar-templates" };
@@ -123,7 +121,6 @@ sub index
         ORDER BY t1.release_date, t2.shortcut, t1.shortcut
     ")->Hashes;
 
-
     foreach my $item (@$fascicles) {
         $item->{attachments} = $c->Q("
             SELECT
@@ -142,34 +139,56 @@ sub index
 
     foreach my $fascicle (@{ $fascicles }) {
 
-        my $menuItem = $c->fascicleHadler($fascicle, "fascicle");
+        my $accessLayoutView   = $c->objectAccess("editions.fascicle.view:*",   $fascicle->{edition});
+        my $accessLayoutManage = $c->objectAccess("editions.fascicle.manage:*", $fascicle->{edition});
+        my $accessAdvertManage = $c->objectAccess("editions.advert.manage:*",   $fascicle->{edition});
 
-        my $accessFascicleView = $c->objectAccess(
-            "editions.fascicle.view:*", $fascicle->{edition});
+        my $oid = $fascicle->{id};
+        my $edition = $fascicle->{edition};
 
-        # Attachments
+        my $menuItem = {
+            id   => "fascicle",
+            text => $fascicle->{edition_shortcut} . '/'. $fascicle->{shortcut},
+            menu => []
+        };
 
-        my $first = 0;
+        unless (@{ $fascicle->{attachments} }) {
+            if ($accessLayoutView) {
+                push @{ $menuItem->{menu} }, {
+                    oid => $oid,
+                    id  => "fascicle-plan",
+                    description => $fascicle->{shortcut} };
+            }
+            if ($accessLayoutManage) {
+                push @{ $menuItem->{menu} }, {
+                    oid => $oid,
+                    id  => "fascicle-planner",
+                    description => $fascicle->{shortcut} };
+                push @{ $menuItem->{menu} }, "-";
+                push @{ $menuItem->{menu} }, {
+                    oid => $oid,
+                    id  => "fascicle-index",
+                    description => $fascicle->{shortcut} };
+                push @{ $menuItem->{menu} }, {
+                    oid => $oid,
+                    id  => "fascicle-modules",
+                    description => $fascicle->{shortcut} };
+                push @{ $menuItem->{menu} }, {
+                    oid => $oid,
+                    id  => "fascicle-places",
+                    description => $fascicle->{shortcut} };
+            }
+        }
 
         foreach my $attachment (@{ $fascicle->{attachments} }) {
 
             my $menuSubitem = $c->fascicleHadler($attachment, "attachment");
-
-            my $accessAttachmentView = $c->objectAccess(
-                "editions.attachment.view:*", $attachment->{edition});
+            my $accessAttachmentView = $c->objectAccess("editions.attachment.view:*", $attachment->{edition});
 
             if ($accessAttachmentView) {
-
                 $accessFascicleView = 1;
-
-                unless ($first) {
-                    push @{ $menuItem->{menu} }, "-";
-                    $first++;
-                }
-
                 push @{ $menuItem->{menu} }, $menuSubitem;
             }
-
         }
 
         if ($accessFascicleView) {
@@ -319,14 +338,11 @@ sub fascicleHadler {
     };
 
     if ($accessLayoutView) {
-
-        push @{ $fascicle_menu->{menu} },
-            {
-                oid => $oid,
-                id  => "fascicle-plan",
-                description => $fascicle->{shortcut}
-            };
-
+        push @{ $fascicle_menu->{menu} }, {
+            oid => $oid,
+            id  => "fascicle-plan",
+            description => $fascicle->{shortcut}
+        };
     }
 
     if ($accessLayoutManage) {

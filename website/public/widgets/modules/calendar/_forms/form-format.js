@@ -1,4 +1,4 @@
-Inprint.calendar.forms.Format = Ext.extend( Ext.form.FormPanel,
+Inprint.calendar.forms.FormatForm = Ext.extend( Ext.form.FormPanel,
 {
 
     initComponent: function()
@@ -24,26 +24,26 @@ Inprint.calendar.forms.Format = Ext.extend( Ext.form.FormPanel,
             ),
 
             {
-                xtype: 'checkbox',
-                fieldLabel: _('Confirmation'),
-                boxLabel: _('I understand the importance'),
-                name: 'confirmation'
+                xtype: "checkbox",
+                fieldLabel: _("Confirmation"),
+                boxLabel: _("I understand the risk"),
+                name: "confirmation"
             }
 
         ];
 
         Ext.apply(this,  {
             border:false,
-            baseCls: 'x-plain',
-            bodyStyle:'padding:10px',
-            defaults: { anchor: '100%' }
+            baseCls: "x-plain",
+            bodyStyle: "padding:10px",
+            defaults: { anchor: "100%" }
         });
 
-        Inprint.calendar.forms.Format.superclass.initComponent.apply(this, arguments);
+        Inprint.calendar.forms.FormatForm.superclass.initComponent.apply(this, arguments);
     },
 
     onRender: function() {
-        Inprint.calendar.forms.Format.superclass.onRender.apply(this, arguments);
+        Inprint.calendar.forms.FormatForm.superclass.onRender.apply(this, arguments);
         this.getForm().url = this.url;
     },
 

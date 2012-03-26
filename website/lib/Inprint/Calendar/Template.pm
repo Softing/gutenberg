@@ -59,6 +59,7 @@ sub list {
                 t1.id,
                 t2.id as edition, t2.shortcut as edition_shortcut,
                 t1.shortcut, t1.description,
+                'template' as fastype,
                 to_char(t1.created, 'YYYY-MM-DD HH24:MI:SS') as created,
                 to_char(t1.updated, 'YYYY-MM-DD HH24:MI:SS') as updated
             FROM template t1, editions t2
@@ -154,7 +155,7 @@ sub remove {
         #my $sql = " UPDATE template SET deleted=true WHERE id=? ";
         #push @params, $i_id;
         #$result = $c->Do($sql, \@params);
-        
+
         push @params, $i_id;
         $result = $c->Do(" DELETE FROM template_page WHERE template=? ", \@params);
         $result = $c->Do(" DELETE FROM template WHERE id=? ", \@params);

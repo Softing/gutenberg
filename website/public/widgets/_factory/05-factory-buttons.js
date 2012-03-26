@@ -1,71 +1,25 @@
-Inprint.fx.Button = function(disabled, title, tooltip, icon, callback) {
-
-    var hash = {
+Inprint.fx.btn.Button = function(ref, icon, title, tooltip, callback) {
+    return {
         text: _(title),
         tooltip: _(tooltip),
         icon: _ico(icon),
+        ref: ref,
         handler: callback,
-        disabled: disabled,
+        disabled: true,
         cls: 'x-btn-text-icon'
     };
-
-    return {
-        id: function(val) {
-            hash["id"] = val;
-            return this;
-        },
-        ref: function(val) {
-            hash["ref"] = val;
-            return this;
-        },
-        render: function() {
-            return hash;
-        }
-    }
 }
 
-Inprint.fx.ButtonRef = function(title, description, ref, icon, callback) {
-    return {
-        text: _(title),
-        icon: _ico(icon),
-        cls: 'x-btn-text-icon',
-        ref: ref,
-        handler: callback
-    };
+Inprint.fx.btn.Create = function(ref, callback) {
+    return Inprint.fx.btn.Button(ref, "plus-button", "Create", "", callback);
+}
+Inprint.fx.btn.Delete = function(ref, callback) {
+    return Inprint.fx.btn.Button(ref, "minus-button", "Delete", "", callback);
+}
+Inprint.fx.btn.Update = function(ref, callback) {
+    return Inprint.fx.btn.Button(ref, "pencil", "Edit", "", callback);
+}
+Inprint.fx.btn.Copy = function(ref, callback) {
+    return Inprint.fx.btn.Button(ref, "document-copy", "Copy", "", callback);
 }
 
-Inprint.fx.btn.Create = function(callback) {
-    return {
-        text: _("Create"),
-        icon: _ico("plus-button"),
-        cls: 'x-btn-text-icon',
-        handler: callback
-    };
-}
-
-Inprint.fx.btn.Delete = function(callback) {
-    return {
-        text: _("Delete"),
-        icon: _ico("minus-button"),
-        cls: 'x-btn-text-icon',
-        handler: callback
-    };
-}
-
-Inprint.fx.btn.Edit = function(callback) {
-    return {
-        text: _("Edit"),
-        icon: _ico("pencil"),
-        cls: 'x-btn-text-icon',
-        handler: callback
-    };
-}
-
-Inprint.fx.btn.Copy = function(callback) {
-    return {
-        text: _("Copy"),
-        icon: _ico("document-copy"),
-        cls: 'x-btn-text-icon',
-        handler: callback
-    };
-}

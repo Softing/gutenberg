@@ -290,6 +290,9 @@ our %Lexicon = (
     "Composition"
  => "",
 
+    "Confirmation"
+ => "Подтверждение",
+
     "Contact"
  => "Контакт",
 
@@ -301,6 +304,9 @@ our %Lexicon = (
 
     "Copy documents"
  => "Копировать материалы",
+
+    "Copy from"
+ => "Копировать из",
 
     "Copy from defaults"
  => "",
@@ -632,6 +638,9 @@ our %Lexicon = (
     "Font style"
  => "Тип шрифта",
 
+    "From Archive"
+ => "Из Архива",
+
     "General information"
  => "",
 
@@ -685,6 +694,9 @@ our %Lexicon = (
 
     "Html mode"
  => "Режим HTML",
+
+    "I understand the risk"
+ => "Я понимаю всю опасность",
 
     "ID"
  => "",
@@ -886,6 +898,12 @@ our %Lexicon = (
 
     "Open issues"
  => "Открытые выпуски",
+
+    "Open Plan"
+ => "Открыть План",
+
+    "Open Composer"
+ => "Открыть Планирование",
 
     "OpenOffice.org (ods)"
  => "",
@@ -1234,6 +1252,9 @@ our %Lexicon = (
 
     "Title"
  => "Название",
+
+    "To Archive"
+ => "В Архив",
 
     "To check"
  => "На проверку",

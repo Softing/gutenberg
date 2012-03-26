@@ -50,6 +50,11 @@ Inprint.factory.store.manager = new function () {
                 return this;
             };
 
+            store.setParams = function(params) {
+                this.baseParams = params;
+                return this;
+            };
+
             store.create = function() {
                 return new Ext.data.JsonStore(this);
             };
