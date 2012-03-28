@@ -160,9 +160,10 @@ sub fascicles {
     my $i_term      = $c->param("term")      // 0;
     my $i_node      = $c->param("node")      // 0;
 
-    my $i_edition   = $c->param("edition")   // 0;
-    my $i_briefcase = $c->param("briefcase") // 0;
-    my $i_trashcan  = $c->param("trashcan")  // 0;
+    my $i_edition      = $c->param("edition")      // 0;
+    my $i_briefcase    = $c->param("briefcase")    // 0;
+    my $i_trashcan     = $c->param("trashcan")     // 0;
+    my $i_attachments  = $c->param("attachments")  // 1;
 
     my $options = $c->optionalize(
         $c->param("options"));
@@ -249,7 +250,7 @@ sub fascicles {
         }
 
         # This is fascicle node, show Attahments
-        if ($i_node ne $root) {
+        if ( $i_node ne $root) {
             $sql .= " AND fascicles.fastype  = 'attachment' ";
             $sql .= " AND fascicles.parent   = ? ";
             push @params, $i_node;
@@ -287,7 +288,7 @@ sub fascicles {
                 SELECT count(id) FROM fascicles WHERE parent = ?  ",
                 $item->{id})->Value;
 
-            if ( $have_children ) {
+            if ($i_attachments && $have_children ) {
                 $leaf = $c->json->false;
             }
 

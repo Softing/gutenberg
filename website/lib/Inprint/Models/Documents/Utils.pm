@@ -8,6 +8,9 @@ package Inprint::Models::Documents;
 use strict;
 use warnings;
 
+use Inprint::Models::Tag;
+use Inprint::Models::Fascicle::Rubric;
+
 sub capture {
     my ($c, $document, $workgroup, $member) = @_;
 
@@ -276,7 +279,7 @@ sub copy {
     # Change Index
     __reindex($c, $document->{id}, $edition->{id}, $fascicle->{id}, $headline->{id}, $rubric->{id});
 
-    return 1;
+    return $new_id;
 }
 
 sub duplicate {

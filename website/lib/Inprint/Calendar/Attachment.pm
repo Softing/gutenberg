@@ -8,8 +8,9 @@ package Inprint::Calendar::Attachment;
 use strict;
 use warnings;
 
-use Inprint::Calendar::Copy;
 use Inprint::Models::Attachment;
+use Inprint::Calendar::Copy;
+use Inprint::Calendar::CopyAttachment;
 
 use base 'Mojolicious::Controller';
 
@@ -24,6 +25,85 @@ sub read {
     unless (@errors) {
         $result = Inprint::Models::Attachment::read($c, $i_id);
     }
+
+    $c->smart_render(\@errors, $result);
+}
+
+
+sub list {
+
+    my $c = shift;
+
+    my @errors;
+    my @params;
+
+    my $i_edition = $c->param("edition") || undef;
+    my $i_issue = $c->param("issue") || undef;
+
+    my $i_fastype = $c->param("fastype") || "issue";
+    my $i_archive = $c->param("archive") || "false";
+
+    my $edition  = $c->Q("SELECT * FROM editions WHERE id=?", [ $i_edition ])->Hash;
+    my $issue    = $c->Q("SELECT * FROM fascicles WHERE id=?", [ $i_issue ])->Hash;
+
+    my $editions = $c->objectBindings("editions.documents.work:*");
+
+    my $bindings = $c->objectBindings([ "editions.attachment.view:*", "editions.attachment.manage:*" ]);
+
+    # Common sql
+    my $sql = "
+        SELECT
+
+            t1.id,
+            t2.id as edition,
+            t2.shortcut as edition_shortcut,
+            t1.parent,
+            t1.fastype,
+            t1.variation,
+            t1.shortcut,
+            t1.description,
+            t1.tmpl,
+            t1.tmpl_shortcut,
+            t1.circulation,
+            t1.num,
+            t1.anum,
+            t1.manager,
+            t1.enabled,
+            t1.archived,
+            t1.doc_enabled,
+            t1.adv_enabled,
+
+            to_char(t1.doc_date, 'YYYY-MM-DD HH24:MI:SS')       as doc_date,
+            to_char(t1.adv_date, 'YYYY-MM-DD HH24:MI:SS')       as adv_date,
+            to_char(t1.print_date, 'YYYY-MM-DD HH24:MI:SS')     as print_date,
+            to_char(t1.release_date, 'YYYY-MM-DD HH24:MI:SS')   as release_date,
+
+            to_char(t1.created, 'YYYY-MM-DD HH24:MI:SS')        as created,
+            to_char(t1.updated, 'YYYY-MM-DD HH24:MI:SS')        as updated
+
+        FROM
+            fascicles t1,
+            editions t2
+        WHERE 1=1
+            AND t1.deleted = false
+            AND t2.id=t1.edition
+    ";
+
+    $sql .= " AND t1.edition = ANY(?) ";
+    push @params, $bindings;
+
+    $sql .= " AND t1.parent = ? ";
+    push @params, $issue->{id};
+
+    $sql .= " AND t1.archived = true "      if ($i_archive eq "true");
+    $sql .= " AND t1.archived = false "     if ($i_archive eq "false");
+
+    $sql .= " AND t1.fastype = 'issue' "    if ($i_fastype eq "issue");
+    $sql .= " AND t1.fastype = 'template' " if ($i_fastype eq "template");
+
+    $sql .= " ORDER BY t2.shortcut ASC, t1.shortcut ASC ";
+
+    my $result = $c->Q($sql, \@params)->Hashes;
 
     $c->smart_render(\@errors, $result);
 }
@@ -127,82 +207,31 @@ sub remove {
 }
 
 
-sub list {
 
+sub copy {
     my $c = shift;
 
     my @errors;
-    my @params;
 
-    my $i_edition = $c->param("edition") || undef;
-    my $i_issue = $c->param("issue") || undef;
+    my $i_id           = $c->get_uuid(\@errors, "id");
+    my $i_parent       = $c->get_uuid(\@errors, "parent");
+    my $i_confirmation = $c->get_text(\@errors, "confirmation");
 
-    my $i_fastype = $c->param("fastype") || "issue";
-    my $i_archive = $c->param("archive") || "false";
+    my $issue_from = $c->Q(" SELECT * FROM fascicles WHERE id=? ", $i_id)->Hash;
+    my $issue_to = $c->Q(" SELECT * FROM fascicles WHERE id=? ", $i_parent)->Hash;
 
-    my $edition  = $c->Q("SELECT * FROM editions WHERE id=?", [ $i_edition ])->Hash;
-    my $issue    = $c->Q("SELECT * FROM fascicles WHERE id=?", [ $i_issue ])->Hash;
+    if ($issue_from->{fastype} eq "attachment " && $issue_to->{fastype} ne "issue") {
+        push @errors, { id => "Error", msg => "Can't copy"};
+    }
 
-    my $editions = $c->objectBindings("editions.documents.work:*");
+    push @errors, { id => "confirmation", msg => "Incorrectly filled field"}
+        unless ( $i_confirmation eq "on" );
 
-    my $bindings = $c->objectBindings([ "editions.attachment.view:*", "editions.attachment.manage:*" ]);
+    unless (@errors) {
+        Inprint::Calendar::CopyAttachment::copy($c, $i_id, $i_parent);
+    }
 
-    # Common sql
-    my $sql = "
-        SELECT
-
-            t1.id,
-            t2.id as edition,
-            t2.shortcut as edition_shortcut,
-            t1.parent,
-            t1.fastype,
-            t1.variation,
-            t1.shortcut,
-            t1.description,
-            t1.tmpl,
-            t1.tmpl_shortcut,
-            t1.circulation,
-            t1.num,
-            t1.anum,
-            t1.manager,
-            t1.enabled,
-            t1.archived,
-            t1.doc_enabled,
-            t1.adv_enabled,
-
-            to_char(t1.doc_date, 'YYYY-MM-DD HH24:MI:SS')       as doc_date,
-            to_char(t1.adv_date, 'YYYY-MM-DD HH24:MI:SS')       as adv_date,
-            to_char(t1.print_date, 'YYYY-MM-DD HH24:MI:SS')     as print_date,
-            to_char(t1.release_date, 'YYYY-MM-DD HH24:MI:SS')   as release_date,
-
-            to_char(t1.created, 'YYYY-MM-DD HH24:MI:SS')        as created,
-            to_char(t1.updated, 'YYYY-MM-DD HH24:MI:SS')        as updated
-
-        FROM
-            fascicles t1,
-            editions t2
-        WHERE 1=1
-            AND t1.deleted = false
-            AND t2.id=t1.edition
-    ";
-
-    $sql .= " AND t1.edition = ANY(?) ";
-    push @params, $bindings;
-
-    $sql .= " AND t1.parent = ? ";
-    push @params, $issue->{id};
-
-    $sql .= " AND t1.archived = true "      if ($i_archive eq "true");
-    $sql .= " AND t1.archived = false "     if ($i_archive eq "false");
-
-    $sql .= " AND t1.fastype = 'issue' "    if ($i_fastype eq "issue");
-    $sql .= " AND t1.fastype = 'template' " if ($i_fastype eq "template");
-
-    $sql .= " ORDER BY t2.shortcut ASC, t1.shortcut ASC ";
-
-    my $result = $c->Q($sql, \@params)->Hashes;
-
-    $c->smart_render(\@errors, $result);
+    $c->smart_render(\@errors);
 }
 
 1;

@@ -20,14 +20,6 @@ sub properties {
     $c->smart_render(\@errors);
 }
 
-sub copy {
-    my $c = shift;
-
-    my @errors;
-
-    $c->smart_render(\@errors);
-}
-
 sub format {
     my $c = shift;
 
@@ -41,7 +33,7 @@ sub format {
         unless ( $i_confirmation eq "on" );
 
     unless (@errors) {
-        Inprint::Calendar::Copy::copyFromTemplate($c, $i_id, $i_template);
+        Inprint::Calendar::CopyAttachment::copy($c, $i_id, $i_template);
     }
 
     $c->smart_render(\@errors);

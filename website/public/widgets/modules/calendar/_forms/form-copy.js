@@ -58,21 +58,24 @@ Inprint.calendar.forms.CopyAttachmentForm = Ext.extend( Ext.form.FormPanel,
     {
 
         this.items = [
-
             _FLD_HDN_ID,
-
-            Inprint.factory.Combo.create(
-                "/calendar/combos/templates/",
-                {
-                    allowBlank:false,
-                    listeners: {
-                        scope: this,
-                        beforequery: function(qe) {
-                            delete qe.combo.lastQuery;
-                        }
-                    }
+            {
+                xtype: "treecombo",
+                hiddenName: "parent",
+                rootVisible:false,
+                minListWidth: 300,
+                fieldLabel: _("Fascicle"),
+                emptyText: _("Fascicle") + "...",
+                url: _url('/common/tree/fascicles/'),
+                baseParams: {
+                    attachments: 0,
+                    term: 'editions.documents.work:*'
+                },
+                root: {
+                    id:'all',
+                    nodeType: 'async'
                 }
-            ),
+            },
 
             {
                 xtype: "checkbox",
