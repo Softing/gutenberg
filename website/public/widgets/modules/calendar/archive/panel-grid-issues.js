@@ -10,7 +10,7 @@ Inprint.calendar.archive.Issues = Ext.extend(Inprint.grid.GridPanel, {
 
             Inprint.fx.btn.Button("../btnOpenPlan", "layout-hf-2", "Open Plan", "", Inprint.calendar.ViewPlanAction.createDelegate(this)),
             "-",
-            Inprint.fx.btn.Copy("../btnCopy", Inprint.calendar.CopyIssueAction.createDelegate(this)),
+            //Inprint.fx.btn.Copy("../btnCopy", Inprint.calendar.CopyIssueAction.createDelegate(this)),
             Inprint.fx.btn.Button("../btnUnarchive", "blue-folder-zipper", "From Archive", "", Inprint.calendar.UnarchiveAction.createDelegate(this)),
 
             "->" ,
@@ -70,8 +70,9 @@ Inprint.calendar.archive.Issues = Ext.extend(Inprint.grid.GridPanel, {
         this.columns = [
             Inprint.calendar.ux.columns.icon,
             Inprint.calendar.ux.columns.status,
-            Inprint.calendar.ux.columns.edition,
+
             Inprint.calendar.ux.columns.shortcut,
+            Inprint.calendar.ux.columns.edition,
 
             Inprint.calendar.ux.columns.num,
             Inprint.calendar.ux.columns.template,

@@ -75,22 +75,25 @@ Inprint.calendar.DeleteIssueAction = function(btn) {
 
 Inprint.calendar.CreateAttachmentAction = function() {
 
-    var form = new Inprint.calendar.forms.AttachmentCreate();
+    var issue = this.getStore().lastOptions.params.issue;
+    var edition = this.getStore().lastOptions.params.edition;
 
-    form.setParent( this.getStore().lastOptions.params.issue );
+    var form = new Inprint.calendar.forms.AttachmentCreate({
+        issue: issue,
+        edition: edition
+        });
 
     form.on('actioncomplete', function(basicForm, action) {
         if (action.type == "submit") {
             this.cmpReload();
             Inprint.layout.getMenu().CmpQuery();
             form.findParentByType("window").close();
-        }
-    }, this);
+        }}, this);
 
     Inprint.fx.Window(
         360, 180, _("New attachment"),
         form, [ _BTN_WNDW_ADD, _BTN_WNDW_CLOSE ]
-    ).build().show();
+        ).build().show();
 };
 
 Inprint.calendar.UpdateAttachmentAction = function(oid) {

@@ -6,17 +6,32 @@ Inprint.calendar.forms.AttachmentCreate = Ext.extend( Ext.form.FormPanel,
 
         this.items = [
 
-            _FLD_HDN_PARENT,
+            {
+                xtype: "hidden",
+                name: "parent",
+                value: this.issue,
+                allowBlank:false
+            },
+
+            {
+                xtype: "treecombo",
+                hiddenName: "edition",
+                fieldLabel: _("Edition"),
+                emptyText: _("Edition") + "...",
+                url: _url('/common/tree/editions/'),
+                baseParams: { term: 'editions.attachment.manage:*' },
+                minListWidth: 300,
+                root: {
+                    id: this.edition,
+                    nodeType: 'async',
+                    expanded: true
+                }
+            },
 
             Inprint.factory.Combo.create(
                 "/calendar/combos/templates/", {
                     fieldLabel: _("Template"),
-                    name: "source",
-                    listeners: {
-                        beforequery: function(qe) {
-                            delete qe.combo.lastQuery;
-                        }
-                    }
+                    name: "source"
             }),
 
             {
@@ -39,10 +54,6 @@ Inprint.calendar.forms.AttachmentCreate = Ext.extend( Ext.form.FormPanel,
 
     onRender: function() {
         Inprint.calendar.forms.AttachmentCreate.superclass.onRender.apply(this, arguments);
-    },
-
-    setParent: function(id) {
-        this.cmpSetValue("parent", id);
     }
 
 });

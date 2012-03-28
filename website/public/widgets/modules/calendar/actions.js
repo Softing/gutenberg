@@ -129,50 +129,6 @@ Inprint.calendar.FormatAction = function() {
     ).build().show();
 };
 
-Inprint.calendar.DeadlineAction = function() {
-    //var node    = this.cmpGetSelectedNode();
-    //var id      = this.cmpGetSelectedNode().id;
-    //var fastype = this.cmpGetSelectedNode().fastype;
-    //
-    //var form = new Inprint.calendar.Deadline().cmpInit(node);
-    //
-    //var wndw = this.cmpCreateWindow(
-    //    360,320, form, _("Editing deadline"), [ _BTN_WNDW_SAVE, _BTN_WNDW_CLOSE ]
-    //).show();
-    //
-    //form.on('actioncomplete', function(form, action) {
-    //    if (action.type == "submit") {
-    //        wndw.close();
-    //        this.cmpReload();
-    //    }
-    //}, this);
-}
-
-Inprint.calendar.TemplateAction = function() {
-    //if (btn != 'yes' && btn != 'no') {
-    //    Ext.MessageBox.show({
-    //        scope: this,
-    //        title: _("Important event"),
-    //        msg: _("Save as template?"),
-    //        fn: this.cmpTemplate,
-    //        buttons: Ext.Msg.YESNO,
-    //        icon: Ext.MessageBox.WARNING
-    //    });
-    //    return;
-    //}
-    //
-    //if (btn == 'yes') {
-    //    Ext.Ajax.request({
-    //        url: _source("fascicle.template"),
-    //        params: {
-    //            id: this.cmpGetSelectedNode().id
-    //        },
-    //        scope: this,
-    //        success: this.cmpReloadWithMenu
-    //    });
-    //}
-}
-
 
 /* Archive trigger*/
 
@@ -185,6 +141,7 @@ Inprint.calendar.ArchiveAction = function(btn) {
             params:  { id: this.getRecord().get("id") },
             success: function() {
                 this.cmpReload();
+                Inprint.layout.getMenu().CmpQuery();
             }
         });
         return false;
@@ -214,6 +171,7 @@ Inprint.calendar.UnarchiveAction = function(btn) {
             params: { id: this.getRecord().get("id") },
             success: function() {
                 this.cmpReload();
+                Inprint.layout.getMenu().CmpQuery();
             }
         });
         return false;

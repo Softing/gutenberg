@@ -34,9 +34,11 @@ sub create {
     my @errors;
 
     my $i_parent       = $c->get_uuid(\@errors, "parent");
+    my $i_edition      = $c->get_uuid(\@errors, "edition");
     my $i_template     = $c->get_uuid(\@errors, "template");
     my $i_circulation  = $c->get_int(\@errors, "circulation", 1) || 0;
 
+    my $edition  = $c->check_record(\@errors, "editions",  "edition", $i_edition);
     my $fascicle = $c->check_record(\@errors, "fascicles", "fascicle", $i_parent);
     my $template = $c->check_record(\@errors, "template",  "template", $i_template);
 
@@ -46,7 +48,7 @@ sub create {
 
         Inprint::Models::Attachment::create(
             $c, $id,
-            $fascicle->{edition}, $fascicle->{id},
+            $edition->{id}, $fascicle->{id},
             $fascicle->{shortcut}, $fascicle->{description},
             $template->{id}, $template->{shortcut},
             $i_circulation, $fascicle->{num}, $fascicle->{anum},

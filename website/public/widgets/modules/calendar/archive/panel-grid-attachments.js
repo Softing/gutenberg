@@ -39,8 +39,9 @@ Inprint.calendar.archive.Attachments = Ext.extend(Inprint.grid.GridPanel, {
         this.columns = [
             Inprint.calendar.ux.columns.icon,
             Inprint.calendar.ux.columns.status,
-            Inprint.calendar.ux.columns.edition,
+
             Inprint.calendar.ux.columns.shortcut,
+            Inprint.calendar.ux.columns.edition,
 
             Inprint.calendar.ux.columns.num,
             Inprint.calendar.ux.columns.template,
