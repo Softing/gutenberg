@@ -14,17 +14,17 @@ use Inprint::Models::Documents;
 sub copy {
 
     my $c      = shift;
-    my $attachment_id = shift;
+    my $source_id = shift;
     my $issue_id  = shift;
 
     my @errors;
     my %cache;
 
-    my $attachment = $c->Q("
+    my $source = $c->Q("
         SELECT * FROM fascicles WHERE id=?;
-        ", [ $attachment_id ])->Hash;
+        ", [ $source_id ])->Hash;
 
-    return unless ($attachment->{id});
+    return unless ($source->{id});
 
     my $issue = $c->Q("
         SELECT * FROM fascicles WHERE id=?;
@@ -32,29 +32,25 @@ sub copy {
 
     return unless ($issue->{id});
 
-    #return if ( $attachment->{edition} ne $issue->{edition});
-
     my $exists = $c->Q("
         SELECT id FROM fascicles WHERE edition=? AND parent=? ",
-        [ $attachment->{edition}, $issue->{id} ])->Value;
-
-    #return if $exists;
+        [ $source->{edition}, $issue->{id} ])->Value;
 
     # Create attachment
 
     $c->txBegin;
 
     my $attachment_new = $c->uuid;
-    my $edition_new = $attachment->{edition};
+    my $edition_new = $source->{edition};
 
     Inprint::Models::Attachment::create(
         $c, $attachment_new,
-        $attachment->{edition}, $issue->{id},
-        $attachment->{shortcut}, $attachment->{description},
-        $attachment->{template}, $attachment->{template_shortcut},
-        $attachment->{circulation}, $attachment->{num}, $attachment->{anum},
-        $attachment->{doc_date}, $attachment->{adv_date},
-        $attachment->{print_date}, $attachment->{release_date}
+        $source->{edition}, $issue->{id},
+        $source->{shortcut}, $source->{description},
+        $source->{template}, $source->{template_shortcut},
+        $source->{circulation}, $source->{num}, $source->{anum},
+        $source->{doc_date}, $source->{adv_date},
+        $source->{print_date}, $source->{release_date}
     );
 
     # Import Headlines && Rubrics
@@ -62,7 +58,7 @@ sub copy {
         SELECT id, tag, bydefault, title, description
         FROM fascicles_indx_headlines
         WHERE fascicle = ? ",
-        [ $attachment->{id} ])->Hashes;
+        [ $source->{id} ])->Hashes;
 
     foreach my $headline (@$headlines) {
 
@@ -113,7 +109,7 @@ sub copy {
             SELECT id, origin, title, description, bydefault, w, h, created, updated
             FROM fascicles_tmpl_pages
             WHERE fascicle = ? ",
-        [ $attachment->{id} ])->Hashes;
+        [ $source->{id} ])->Hashes;
 
     foreach my $page (@$tmpl_pages) {
 
@@ -148,6 +144,7 @@ sub copy {
         foreach my $tmpl_module (@$tmpl_modules) {
 
             my $module_id = $c->uuid();
+
             $cache{ $tmpl_module->{id} } = $module_id;
 
             $c->Do("
@@ -177,7 +174,7 @@ sub copy {
             SELECT id, origin, title, description, created, updated
             FROM fascicles_tmpl_places
             WHERE fascicle = ? ",
-        [ $attachment->{id} ])->Hashes;
+        [ $source->{id} ])->Hashes;
 
     foreach my $place (@$tmpl_places) {
 
@@ -197,7 +194,7 @@ sub copy {
             SELECT id, edition, place, nature, entity, created, updated
             FROM fascicles_tmpl_index
             WHERE fascicle = ? ",
-        [ $attachment->{id} ])->Hashes;
+        [ $source->{id} ])->Hashes;
 
     foreach my $indx (@$tmpl_places_index) {
 
@@ -212,7 +209,7 @@ sub copy {
         $c->Do("
             INSERT INTO fascicles_tmpl_index(id, edition, fascicle, place, nature, entity, created, updated)
                 VALUES (?, ?, ?, ?, ?, ?, now(), now());
-        ", [ $indx_id, $attachment->{edition}, $attachment_new, $place_id, $indx->{nature}, $entity_id ]);
+        ", [ $indx_id, $source->{edition}, $attachment_new, $place_id, $indx->{nature}, $entity_id ]);
 
     }
 
@@ -221,9 +218,10 @@ sub copy {
             SELECT id, edition, fascicle, origin, headline, seqnum, w, h
             FROM fascicles_pages
             WHERE fascicle = ? ",
-        [ $attachment->{id} ])->Hashes;
+        [ $source->{id} ])->Hashes;
 
     foreach my $page (@$source_pages) {
+
         my $page_id = $c->uuid();
         my $headline_id = $cache{ $page->{headline} };
 
@@ -232,42 +230,198 @@ sub copy {
         $c->Do("
             INSERT INTO fascicles_pages(id, edition, fascicle, origin, headline, seqnum, w, h, created, updated)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, now(), now());
-        ", [ $page_id, $attachment->{edition}, $attachment_new, $page->{origin}, $headline_id, $page->{seqnum}, $page->{w}, $page->{h} ]);
+        ", [ $page_id, $source->{edition}, $attachment_new, $page->{origin}, $headline_id, $page->{seqnum}, $page->{w}, $page->{h} ]);
     }
 
+    # Import documents
     my $source_documents = $c->Q("
             SELECT *
             FROM documents
             WHERE fascicle = ? ",
-        [ $attachment->{id} ])->Hashes;
+        [ $source->{id} ])->Hashes;
 
     foreach my $document (@$source_documents) {
 
-        # Copy
-        my $copy_fascicle = $c->check_record(\@errors, "fascicles", "fascicle", $attachment_new);
-        my $copy_edition  = $c->check_record(\@errors, "editions", "edition", $attachment->{edition});
-        my $copy_headline = $c->check_record(\@errors, "indx_tags", "headline", $cache{ $document->{headline} }, 1);
-        my $copy_rubric   = $c->check_record(\@errors, "indx_tags", "rubric", $cache{ $document->{rubric} }, 1);
+        my $document_edition = $source->{edition};
+        my $document_fascicle = $attachment_new;
 
-        my $new_id = Inprint::Models::Documents::copy($c, $document, $copy_edition, $copy_fascicle, $copy_headline, $copy_rubric);
+        my $document_headline = $c->get_record("indx_headlines", $document->{headline});
+        my $document_rubric = $c->get_record("indx_headlines", $document->{rubric});
 
-        # remap
+        my $new_id = Inprint::Models::Documents::copy(
+            $c, $document,
+            $document_edition, $document_fascicle,
+            $document_headline, $document_rubric);
+
+        # Remap document
         my $document_pages = $c->Q("
             SELECT *
             FROM fascicles_map_documents
             WHERE fascicle=? AND entity=? ",
-        [ $attachment->{id}, $document->{id} ])->Hashes;
+        [ $source->{id}, $document->{id} ])->Hashes;
 
         foreach my $map (@$document_pages) {
-
             $c->Do("
                 INSERT INTO
                     fascicles_map_documents
                         (edition, fascicle, page, entity, created, updated)
                 VALUES
                         (?, ?, ?, ?, now(), now()); ",
-                [ $attachment->{edition}, $attachment_new, $cache{ $map->{page} }, $new_id ]);
+                [ $source->{edition}, $attachment_new, $cache{ $map->{page} }, $new_id ]);
+        }
 
+    }
+
+    # Import modules
+    my $source_modules = $c->Q("
+            SELECT *
+            FROM fascicles_modules
+            WHERE fascicle = ? ",
+        [ $source->{id} ])->Hashes;
+
+    foreach my $module (@$source_modules) {
+
+        my $new_id = $c->uuid();
+
+        $cache{ $module->{id} } = $new_id;
+
+        $c->Do("
+            INSERT INTO
+                fascicles_modules (
+                    id,
+                    edition,fascicle,
+                    place,
+                    origin,
+                    title,description,
+                    amount,w,h,area,
+                    width,height,fwidth,fheight,
+                    created,updated
+                )
+            VALUES (
+                ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, now(), now()
+            ); ",
+            [
+                $new_id,
+                $module->{edition}, $attachment_new,
+                $cache{ $module->{place} },
+                $cache{ $module->{origin} },
+                $module->{title}, $module->{description},
+                $module->{amount}, $module->{w}, $module->{h}, $module->{area},
+                $module->{width}, $module->{height}, $module->{fwidth}, $module->{fheight}
+            ]
+        );
+
+        # Remap module
+        my $document_pages = $c->Q("
+            SELECT *
+            FROM fascicles_map_modules
+            WHERE fascicle=? AND module=? ",
+        [ $source->{id}, $module->{id} ])->Hashes;
+
+        foreach my $map (@$document_pages) {
+            $c->Do("
+                INSERT INTO
+                    fascicles_map_modules (
+                        edition, fascicle, module,
+                        page, placed, x, y,
+                        created, updated)
+                VALUES (
+                    ?,?,?,?,?,?,?, now(), now()
+                ); ",
+                [
+                    $source->{edition}, $attachment_new, $new_id,
+                    $cache{ $map->{page} }, $map->{placed}, $map->{x}, $map->{y}
+                ]
+            );
+        }
+
+    }
+
+    # Import requests
+    my $source_requests = $c->Q("
+            SELECT *
+            FROM fascicles_requests
+            WHERE fascicle = ? ",
+        [ $source->{id} ])->Hashes;
+
+    foreach my $request (@$source_requests) {
+
+        my $new_id = $c->uuid();
+
+        $c->Do("
+            INSERT INTO
+                fascicles_requests (
+                    id,
+                    edition, fascicle,
+                    advertiser, advertiser_shortcut,
+                    place, place_shortcut,
+                    manager, manager_shortcut,
+                    group_id, fs_folder,
+                    amount,
+                    origin, origin_shortcut, origin_area, origin_x, origin_y, origin_w, origin_h,
+                    module,
+                    pages, firstpage,
+                    shortcut, description,
+                    status, payment,
+                    readiness, squib, check_status, anothers_layout, imposed,
+                    created, updated
+                )
+                VALUES (
+                    ?,
+                    ?,?,
+                    ?,?,
+                    ?,?,
+                    ?,?,
+                    ?,?,
+                    ?,
+                    ?,?,?,?,?,?,?,
+                    ?,
+                    ?,?,
+                    ?,?,
+                    ?,?,
+                    ?,?,?,?,?,
+                    now(), now()
+                );
+            ",
+            [
+                $new_id,
+                $request->{edition}, $attachment_new,
+                $request->{advertiser}, $request->{advertiser_shortcut},
+                $cache{ $request->{place} }, $request->{place_shortcut},
+                $request->{manager}, $request->{manager_shortcut},
+                $request->{group_id}, $request->{fs_folder},
+                $request->{amount},
+                $request->{origin}, $request->{origin_shortcut}, $request->{origin_area}, $request->{origin_x}, $request->{origin_y}, $request->{origin_w}, $request->{origin_h},
+                $cache{ $request->{module} },
+                $request->{pages}, $request->{firstpage},
+                $request->{shortcut}, $request->{description},
+                $request->{status}, $request->{payment},
+                $request->{readiness}, $request->{squib}, $request->{check_status}, $request->{anothers_layout}, $request->{imposed}
+            ]
+        );
+
+        # Remap request
+        my $document_pages = $c->Q("
+            SELECT *
+            FROM fascicles_map_requests
+            WHERE fascicle=? AND entity=? ",
+        [ $source->{id}, $request->{id} ])->Hashes;
+
+        foreach my $map (@$document_pages) {
+            $c->Do("
+                INSERT INTO
+                    fascicles_map_requests (
+                        edition, fascicle, entity,
+                        page,
+                        created, updated)
+                VALUES (
+                    ?,?,?,?, now(), now()
+                ); ",
+                [
+                    $source->{edition}, $attachment_new, $new_id,
+                    $cache{ $map->{page} }
+                ]
+            );
         }
 
     }

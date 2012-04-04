@@ -547,7 +547,7 @@ sub download {
             $file_name = Encode::decode("utf8", $file_name);
 
             my $pathSource  = $folder ."/".  $file_name;
-            my $pathSymlink = $tempFolder ."/". $object->{shortcut} ."__". $file_name;
+            #my $pathSymlink = $tempFolder ."/". $object->{shortcut} ."__". $file_name;
             my $pathSymlink = $tempFolder ."/__". $file_name;
 
             if ($i_safemode eq 'true') {

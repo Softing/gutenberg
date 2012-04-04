@@ -9,93 +9,53 @@
 
 Ext.namespace("Inprint.factory.store");
 
-Inprint.factory.store.manager = new function () {
-
-    var items = {};
+Inprint.factory.JsonStore = function () {
 
     return {
 
-        /*
-            Обвязка необходимыми функциями для конфигурации настроек
-        */
-        compose: function(store) {
+        xtype: "jsonstore",
 
-            store.addField = function(field) {
-                this.fields.push(field);
-                return this;
-            }
+        fields: [],
+        root: 'data',
+        idProperty: 'id',
+        autoDestroy: true,
 
-            store.setAutoLoad = function(autoLoad) {
-                this.autoLoad = autoLoad;
-                return this;
-            };
-
-            store.setUrl = function(url) {
-                this.url = url;
-                return this;
-            };
-
-            store.setSource = function(source) {
-                this.url = _source( source );
-                return this;
-            };
-
-            store.setRoot = function(root) {
-                this.root = root;
-                return this;
-            };
-
-            store.setId = function(id) {
-                this.idProperty = id;
-                return this;
-            };
-
-            store.setParams = function(params) {
-                this.baseParams = params;
-                return this;
-            };
-
-            store.create = function() {
-                return new Ext.data.JsonStore(this);
-            };
-
-            return store;
+        addField: function(field) {
+            this.fields.push(field);
+            return this;
         },
 
-        set: function(name, item) {
-            items[name] = item;
+        setAutoLoad: function(autoLoad) {
+            this.autoLoad = autoLoad;
+            return this;
         },
 
-        get: function(name) {
+        setUrl: function(url) {
+            this.url = url;
+            return this;
+        },
 
-            var item = items[name];
+        setSource: function(source) {
+            this.url = _source( source );
+            return this;
+        },
 
-            if (!item) {
-                alert("Column "+name+" not found!");
-                return false;
-            }
+        setRoot: function(root) {
+            this.root = root;
+            return this;
+        },
 
-            item = Inprint.factory.store.manager.compose(item);
+        setId: function(id) {
+            this.idProperty = id;
+            return this;
+        },
 
-            return item;
+        setParams: function(params) {
+            this.baseParams = params;
+            return this;
         }
 
     }
 };
 
-Inprint.setStore = function (name, fnct) {
-    return Inprint.factory.store.manager.set(name, fnct);
-}
 
-Inprint.getStore = function (name) {
-    return Inprint.factory.store.manager.get(name);
-}
-
-Inprint.createJsonStore = function () {
-    return Inprint.factory.store.manager.compose({
-        fields: [],
-        root: 'data',
-        idProperty: 'id',
-        autoDestroy: true
-    });
-}

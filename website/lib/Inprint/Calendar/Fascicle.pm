@@ -95,7 +95,7 @@ sub list {
     $sql .= " AND t1.fastype = 'issue' "    if ($i_fastype eq "issue");
     $sql .= " AND t1.fastype = 'template' " if ($i_fastype eq "template");
 
-    $sql .= " ORDER BY t2.shortcut ASC, t1.shortcut ASC ";
+    $sql .= " ORDER BY t1.release_date DESC, t2.shortcut ASC, t1.shortcut ASC ";
 
     my $result = $c->Q($sql, \@params)->Hashes;
 

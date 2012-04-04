@@ -6,10 +6,12 @@ Inprint.calendar.templates.Interaction = function(parent, panels) {
         _enable(templates.btnCreate);
     });
 
-    templates.getSelectionModel().on("selectionchange", function(sm, node) {
+    templates.on("rowclick", function(grid, rowIndex, e) {
 
-        var issue = templates.cmpGetValue("id");
-        var edition = templates.cmpGetValue("edition");
+        var record = grid.store.getAt(rowIndex);
+
+        var issue   = record.get("id");
+        var edition = record.get("edition");
 
         _disable(
                 templates.btnCreate, templates.btnUpdate, templates.btnDelete,

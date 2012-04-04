@@ -201,11 +201,20 @@ sub move {
 
 sub copy {
 
+
     my ($c, $document, $edition, $fascicle, $headline, $rubric ) = @_;
 
-    $document = $c->get_record("documents", $document) unless ($document->{id});
-    $edition  = $c->get_record("editions",  $edition)  unless ($edition->{id});
-    $fascicle = $c->get_record("fascicles", $fascicle) unless ($fascicle->{id});
+    #my $c = shift;
+    #
+    #my $document = shift;
+    #my $edition = shift;
+    #my $fascicle = shift;
+    #my $headline = shift;
+    #my $rubric = shift;
+
+    $document = $c->get_record("documents", $document) unless (ref($document) eq "HASH");
+    $edition  = $c->get_record("editions",  $edition)  unless (ref($edition) eq "HASH");
+    $fascicle = $c->get_record("fascicles", $fascicle) unless (ref($fascicle) eq "HASH");
 
     my $exist = $c->Q(
         "SELECT true FROM documents WHERE copygroup=? AND fascicle=?",

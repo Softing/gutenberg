@@ -43,7 +43,7 @@ Inprint.calendar.archive.Issues = Ext.extend(Inprint.grid.GridPanel, {
 
         ];
 
-        this.store = Inprint.createJsonStore()
+        this.store = new Inprint.factory.JsonStore()
             .setSource("issue.list")
             .setAutoLoad(true)
             .setParams({ edition: "00000000-0000-0000-0000-000000000000", fastype: "issue", archive: true })
@@ -64,8 +64,7 @@ Inprint.calendar.archive.Issues = Ext.extend(Inprint.grid.GridPanel, {
                 .addField("tmpl_shortcut")
                 .addField("circulation")
                 .addField("created")
-                .addField("updated")
-                    .create();
+                .addField("updated");
 
         this.columns = [
             Inprint.calendar.ux.columns.icon,

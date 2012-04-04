@@ -84,6 +84,8 @@ sub create {
     my $success = $c->json->false;
 
     my $id = $c->uuid();
+    my $group_id = $c->uuid();
+    my $fs_folder = sprintf ("/%04d-%02d/%s", ((localtime)[5] +1900), ((localtime)[4] +1), $id);
 
     my $i_shortcut    = $c->param("shortcut")       // undef;
     my $i_description = $c->param("description")    // undef;
@@ -191,6 +193,7 @@ sub create {
     push @errors, { id => "template", msg => "Can't find object"} unless ($template->{id});
 
     unless (@errors) {
+
         $c->Do("
             INSERT INTO fascicles_requests(
                 id,
@@ -198,6 +201,7 @@ sub create {
                 advertiser, advertiser_shortcut,
                 place, place_shortcut,
                 manager, manager_shortcut,
+                group_id, fs_folder,
                 origin, origin_shortcut, origin_area, origin_x, origin_y, origin_w, origin_h,
                 module, amount,
                 firstpage, pages,
@@ -206,6 +210,7 @@ sub create {
                 created, updated)
             VALUES (
                 ?,
+                ?, ?,
                 ?, ?,
                 ?, ?,
                 ?, ?,
@@ -222,6 +227,7 @@ sub create {
             $advertiser->{id}, $advertiser->{shortcut},
             $place->{id}, $place->{title},
             $c->getSessionValue("member.id"), $c->getSessionValue("member.shortcut"),
+            $group_id, $fs_folder,
             $template->{id}, $template->{title}, $template->{area},  $template->{x},  $template->{y},  $template->{w},  $template->{h},
             $sql_module, $sql_amount,
             $sql_page, $sql_pages,
@@ -265,7 +271,7 @@ sub update {
     $c->check_text( \@errors, "description", $i_description);
 
     $c->check_access( \@errors, "domain.roles.manage");
-    
+
     my $fascicle   = $c->check_record(\@errors, "fascicles", "fascicle", $i_fascicle);
 
     #my $module = $c->Q(" SELECT * FROM fascile_modules WHERE id=? ", [ $i_module ])->Hash;
@@ -307,7 +313,7 @@ sub move {
 
     #push @errors, { id => "access", msg => "Not enough permissions"}
     #    unless ($c->objectAccess("domain.roles.manage"));
-    
+
     my $fascicle   = $c->check_record(\@errors, "fascicles", "fascicle", $i_fascicle);
 
     my @pages;
@@ -383,7 +389,7 @@ sub delete {
 
     my @errors;
     my $success = $c->json->false;
-    
+
     my $fascicle   = $c->check_record(\@errors, "fascicles", "fascicle", $i_fascicle);
 
     #push @errors, { id => "access", msg => "Not enough permissions"}
@@ -421,7 +427,7 @@ sub delete {
             }
         }
     }
-    
+
     # Create event
     Inprint::Fascicle::Events::onCompositionChanged($c, $fascicle);
 

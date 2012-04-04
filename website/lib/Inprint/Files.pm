@@ -301,42 +301,27 @@ sub preview {
         }
     }
 
+    if (-e $thumbSrc) {
 
-
-    if (-r $thumbSrc) {
-
-
-        #$c->render_static($thumbSrc);
-
-        #my $static = Mojolicious::Static->new();
-        #$static->serve($c, $thumbSrc);
-        #$c->rendered;
-
-        #$c->app->static->serve($thumbSrc);
-        #$c->rendered;
-
-        $c->tx->res->headers->content_type('image/png');
+        $c->tx->res->headers->content_length(-s $thumbSrc);
+        $c->tx->res->headers->content_type("image/png");
         $c->res->content->asset(
-            Mojo::Asset::File->new(path => $thumbSrc )
+            Mojo::Asset::File->new(path => $thumbSrc)
         );
+        $c->rendered;
+
+    }
+
+    elsif (-e "$ENV{DOCUMENT_ROOT}/images/st.gif") {
+        $c->tx->res->headers->content_type('image/gif');
+        $c->res->content->asset(Mojo::Asset::File->new(path => "$ENV{DOCUMENT_ROOT}/images/st.gif" ));
         $c->render_static();
-
-        #$c->tx->res->headers->content_type('image/png');
-        #open my $fh, '<', $thumbSrc || die 1;
-        #local $/;
-        #$c->render_data(<$fh>, format => 'png');
-
     }
+
     else {
-
-        if (-r "$ENV{DOCUMENT_ROOT}/images/st.gif") {
-            $c->tx->res->headers->content_type('image/gif');
-            $c->res->content->asset(Mojo::Asset::File->new(path => "$ENV{DOCUMENT_ROOT}/images/st.gif" ));
-            $c->render_static();
-        }
+        $c->res->code(404);
     }
 
-    $c->render_json({  });
 }
 
 sub __adaptPath {

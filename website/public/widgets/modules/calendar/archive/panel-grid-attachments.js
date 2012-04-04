@@ -12,7 +12,7 @@ Inprint.calendar.archive.Attachments = Ext.extend(Inprint.grid.GridPanel, {
             Inprint.fx.btn.Copy("../btnCopy", Inprint.calendar.CopyAttachmentAction.createDelegate(this))
         ]
 
-        this.store = Inprint.createJsonStore()
+        this.store = new Inprint.factory.JsonStore()
             .setSource("attachment.list")
             .setAutoLoad(false)
             .setParams({ edition: "00000000-0000-0000-0000-000000000000", fastype: "attachment", archive: true })
@@ -33,8 +33,7 @@ Inprint.calendar.archive.Attachments = Ext.extend(Inprint.grid.GridPanel, {
                 .addField("tmpl_shortcut")
                 .addField("circulation")
                 .addField("created")
-                .addField("updated")
-                    .create();
+                .addField("updated");
 
         this.columns = [
             Inprint.calendar.ux.columns.icon,

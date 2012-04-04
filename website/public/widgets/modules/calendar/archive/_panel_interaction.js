@@ -5,25 +5,34 @@ Inprint.calendar.archive.Interaction = function(parent, panels) {
     var issues = panels.issues;
     var attachments = panels.attachments;
 
-    issues.getSelectionModel().on("selectionchange", function(sm, node) {
+    issues.store.on("beforeload", function(store, records, options) {
+        attachments.disable();
+        attachments.store.removeAll();
+    });
 
-        var issue = issues.cmpGetValue("id");
-        var edition = issues.cmpGetValue("edition");
+    issues.on("rowclick", function(grid, rowIndex, e) {
+
+        var record = grid.store.getAt(rowIndex);
+
+        var issue   = record.get("id");
+        var edition = record.get("edition");
 
         _disable(issues.btnOpenPlan, issues.btnCopy, issues.btnUnarchive);
         _enable(issues.btnOpenPlan, issues.btnCopy, issues.btnUnarchive);
 
         attachments.enable();
-        attachments.cmpLoad({ edition: edition, issue: issue, fastype: "attachment", archive: true });
+        attachments.cmpLoad({ edition: edition, issue: issue });
 
         //_a(["editions.template.manage:*"], edition, function(access) {});
 
     });
 
-    attachments.getSelectionModel().on("selectionchange", function(sm, node) {
+    attachments.on("rowclick", function(grid, rowIndex, e) {
 
-        var issue = issues.cmpGetValue("id");
-        var edition = issues.cmpGetValue("edition");
+        var record = grid.store.getAt(rowIndex);
+
+        var issue   = record.get("id");
+        var edition = record.get("edition");
 
         _disable(attachments.btnOpenPlan, attachments.btnCopy, attachments.btnUnArchive);
         _enable(attachments.btnOpenPlan, attachments.btnCopy, attachments.btnUnArchive);

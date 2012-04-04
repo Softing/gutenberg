@@ -5,14 +5,19 @@ Inprint.calendar.issues.Interaction = function(parent, panels) {
     var issues = panels.issues;
     var attachments = panels.attachments;
 
-    issues.on("afterrender", function() {
-            _enable(issues.btnCreate);
-        });
+    issues.on("afterrender", function() { _enable(issues.btnCreate); });
 
-    issues.getSelectionModel().on("selectionchange", function(sm, node) {
+    issues.store.on("beforeload", function(store, records, options) {
+        attachments.disable();
+        attachments.store.removeAll();
+    });
 
-        var issue = issues.cmpGetValue("id");
-        var edition = issues.cmpGetValue("edition");
+    issues.on("rowclick", function(grid, rowIndex, e) {
+
+        var record = grid.store.getAt(rowIndex);
+
+        var issue   = record.get("id");
+        var edition = record.get("edition");
 
         _disable(
                 issues.btnCreate, issues.btnUpdate, issues.btnDelete,
@@ -27,23 +32,23 @@ Inprint.calendar.issues.Interaction = function(parent, panels) {
                 issues.btnCopy, issues.btnProperties, issues.btnArchive, issues.btnFormat);
 
         attachments.enable();
-        _enable(attachments.btnCreate);
+        _enable(attachments, attachments.btnCreate);
 
-        attachments.cmpLoad({ edition: edition, issue: issue, fastype: "attachment", archive: false});
+        attachments.store.load({
+            params: { edition: edition, issue: issue }
+        });
 
         //_a(["editions.template.manage:*"], edition, function(access) {
         //});
 
     });
 
-    //attachments.on("afterrender", function() {
-    //        _enable(attachments.btnCreate);
-    //    });
+    attachments.on("rowclick", function(grid, rowIndex, e) {
 
-    attachments.getSelectionModel().on("selectionchange", function(sm, node) {
+        var record = grid.store.getAt(rowIndex);
 
-        var issue = issues.cmpGetValue("id");
-        var edition = issues.cmpGetValue("edition");
+        var issue   = record.get("id");
+        var edition = record.get("edition");
 
         _disable(
                 attachments.btnCreate, attachments.btnUpdate, attachments.btnDelete,

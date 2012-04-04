@@ -5,9 +5,10 @@ package Inprint::Advertising::Requests::Comments;
 # licensing@softing.ru
 # http://softing.ru/license
 
+use v5.10;
+
 use strict;
 use warnings;
-use Switch;
 
 use base 'Mojolicious::Controller';
 
@@ -32,11 +33,22 @@ sub list {
     }
 
     foreach my $item (@$result) {
-        switch ($item->{check_status}) {
-            case "error"    { $item->{icon} = "exclamation-red";     $item->{stage_color} = "C63137"; }
-            case "check"    { $item->{icon} = "exclamation-octagon"; $item->{stage_color} = "F1DA5D"; }
-            case "ready"    { $item->{icon} = "tick-circle";         $item->{stage_color} = "009E1C"; }
-            case "imposed"  { $item->{icon} = "printer";             $item->{stage_color} = "000000"; }
+        given ($item->{check_status}) {
+            when  ("error")    {
+                $item->{icon} = "exclamation-red";     $item->{stage_color} = "C63137";
+            }
+            when  ("check")    {
+                $item->{icon} = "exclamation-octagon"; $item->{stage_color} = "F1DA5D";
+            }
+            when  ("ready")    {
+                $item->{icon} = "tick-circle";         $item->{stage_color} = "009E1C";
+            }
+            when  ("imposed")  {
+                $item->{icon} = "printer";             $item->{stage_color} = "000000";
+            }
+            default {
+
+            }
         }
     }
 

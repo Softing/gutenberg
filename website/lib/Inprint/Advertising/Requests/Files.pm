@@ -35,9 +35,13 @@ sub list {
 
     my $result;
     unless (@errors) {
-        my $folder = Inprint::Store::Embedded::getFolderPath($c, "requests", $request->{created}, $request->{id}, 1);
+
+        my $root = $c->config->get("store.path");
+        my $folder = $root ."/datastore/requests". $request->{fs_folder};
+        #my $folder = Inprint::Store::Embedded::getFolderPath($c, "requests", $request->{created}, $request->{id}, 1);
+
         Inprint::Store::Embedded::updateCache($c, $folder);
-        $result = Inprint::Store::Cache::getRecordsByPath($c, $folder, "all", [ "tiff", "tif", "eps", "pdf" ]);
+        $result = Inprint::Store::Cache::getRecordsByPath($c, $folder, "all", [ "tiff", "tif", "eps", "pdf", "jpg" ]);
     }
 
     my $module = {};
@@ -58,6 +62,7 @@ sub list {
         next unless (-r $file_path );
 
         my $info = ImageInfo($file_path);
+
 
         $item->{object}      = $request->{id};
 
@@ -139,7 +144,12 @@ sub upload {
 
     unless (@errors) {
         my $upload = $c->req->upload("Filedata");
-        my $folder = Inprint::Store::Embedded::getFolderPath($c, "requests", $request->{created}, $request->{id}, 1);
+
+        my $root = $c->config->get("store.path");
+        my $folder = $root ."/datastore/requests". $request->{fs_folder};
+
+        #my $folder = Inprint::Store::Embedded::getFolderPath($c, "requests", $request->{created}, $request->{id}, 1);
+
         Inprint::Store::Embedded::fileUpload($c, $folder, $upload);
 
         $c->Do("UPDATE fascicles_requests SET check_status='check' WHERE id=?", [ $request->{id} ]);
@@ -229,6 +239,7 @@ sub delete {
     unless (@errors) {
         foreach my $file(@i_files) {
             next unless ($c->is_uuid($file));
+
             Inprint::Store::Embedded::fileDelete($c, $file);
         }
     }
