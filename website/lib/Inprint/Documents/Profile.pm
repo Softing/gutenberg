@@ -35,6 +35,7 @@ sub read {
                 dcm.fascicle, dcm.fascicle_shortcut,
                 dcm.headline, dcm.headline_shortcut,
                 dcm.rubric, dcm.rubric_shortcut,
+                dcm.group_id, dcm.fs_folder,
                 dcm.workgroup, dcm.workgroup_shortcut,
                 dcm.maingroup, dcm.maingroup_shortcut,
                 dcm.inworkgroups, dcm.copygroup,
@@ -81,20 +82,35 @@ sub read {
 
     # Get co-documents
     unless (@errors) {
-        $document->{fascicles} = $c->Q("
-            SELECT
-                dcm.edition,  dcm.edition_shortcut,
-                dcm.fascicle, dcm.fascicle_shortcut,
-                dcm.headline, dcm.headline_shortcut,
-                dcm.rubric, dcm.rubric_shortcut
-            FROM documents dcm
-            WHERE 1=1
-                AND dcm.copygroup=?
-                AND dcm.fascicle <> '99999999-9999-9999-9999-999999999999'
-            ORDER BY edition_shortcut, fascicle_shortcut
-        ", [ $document->{copygroup} ])->Hashes;
-    }
 
+        my $copyes = $c->Q("
+            SELECT
+                documents.edition,  documents.edition_shortcut,
+                documents.fascicle, documents.fascicle_shortcut,
+                documents.headline, documents.headline_shortcut,
+                documents.rubric, documents.rubric_shortcut
+            FROM documents, fascicles
+            WHERE 1=1
+                AND documents.fascicle = fascicles.id
+                AND fascicles.deleted = false
+                AND documents.group_id=?
+                AND documents.fascicle <> '99999999-9999-9999-9999-999999999999'
+            ORDER BY edition_shortcut, fascicle_shortcut
+        ", [ $document->{group_id} ])->Hashes;
+
+        foreach my $copy (@$copyes) {
+            my $editions = $c->Q("
+                SELECT shortcut FROM editions WHERE
+                    path @> ARRAY( SELECT path FROM editions WHERE id = \$1  )
+                    AND id <> '00000000-0000-0000-0000-000000000000'
+                    ",
+                [ $copy->{edition} ])->Values;
+
+            $copy->{editions} = join "/", @$editions;
+        }
+
+        $document->{fascicles} = $copyes;
+    }
 
     $success = $c->json->true unless (@errors);
     $c->render_json({ success => $success, errors => \@errors, data => $document || {} });

@@ -201,16 +201,7 @@ sub move {
 
 sub copy {
 
-
     my ($c, $document, $edition, $fascicle, $headline, $rubric ) = @_;
-
-    #my $c = shift;
-    #
-    #my $document = shift;
-    #my $edition = shift;
-    #my $fascicle = shift;
-    #my $headline = shift;
-    #my $rubric = shift;
 
     $document = $c->get_record("documents", $document) unless (ref($document) eq "HASH");
     $edition  = $c->get_record("editions",  $edition)  unless (ref($edition) eq "HASH");
@@ -224,6 +215,10 @@ sub copy {
 
     my $new_id = $c->uuid();
 
+    my $editions = $c->Q("
+        SELECT ARRAY( select id from editions where path @> ( select path from editions where id = ? ) ) ",
+        [ $edition->{id} ])->Array;
+
     $c->Do("
         INSERT INTO documents(
             id,
@@ -232,6 +227,7 @@ sub copy {
             manager, manager_shortcut,
             edition, edition_shortcut, ineditions,
             copygroup,
+            group_id, fs_folder,
             maingroup, maingroup_shortcut,
             workgroup, workgroup_shortcut, inworkgroups,
             fascicle, fascicle_shortcut,
@@ -244,13 +240,12 @@ sub copy {
             title, author,
             pdate, psize,
             fdate, rsize,
-            filepath,
             images, files,
             islooked, isopen,
             created, updated
         )
         VALUES (
-            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
             ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now()
         );
     ", [
@@ -258,8 +253,9 @@ sub copy {
             $document->{creator}, $document->{creator_shortcut},
             $document->{holder},  $document->{holder_shortcut},
             $document->{manager}, $document->{manager_shortcut},
-            $document->{edition}, $document->{edition_shortcut},  $document->{ineditions},
+            $edition->{id}, $edition->{shortcut},  $editions,
             $document->{copygroup},
+            $document->{group_id}, $document->{fs_folder},
             $document->{maingroup}, $document->{maingroup_shortcut},
             $document->{workgroup}, $document->{workgroup_shortcut}, $document->{inworkgroups},
             $document->{fascicle}, $document->{fascicle_shortcut},
@@ -271,15 +267,15 @@ sub copy {
             $document->{title}, $document->{author},
             $document->{pdate}, $document->{psize},
             $document->{fdate}, $document->{rsize},
-            $document->{filepath},
             $document->{images}, $document->{files},
             $document->{islooked}, $document->{isopen}
     ]);
 
     # Change Edition
-    my $editions = $c->Q("
-        SELECT ARRAY( select id from editions where path @> ( select path from editions where id = ? ) )
-    ", [ $edition->{id} ])->Array;
+    $editions = $c->Q("
+        SELECT ARRAY( select id from editions where path @> ( select path from editions where id = ? ) ) ",
+        [ $edition->{id} ])->Array;
+
     $c->Do(" UPDATE documents SET edition=?, edition_shortcut=?, ineditions=? WHERE id=? ", [ $edition->{id}, $edition->{shortcut}, $editions, $new_id ]);
 
     # Change Fascicle
@@ -305,7 +301,9 @@ sub duplicate {
     my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
     $year += 1900;
     $mon += 1;
-    my $filepath = "/$year/$mon/$new_id";
+
+    my $group_id  = $c->uuid();
+    my $fs_folder = sprintf ("/%04d-%02d/%s", ((localtime)[5] +1900), ((localtime)[4] +1), $new_id);
 
     $c->Do("
         INSERT INTO documents(
@@ -315,6 +313,7 @@ sub duplicate {
             manager, manager_shortcut,
             edition, edition_shortcut, ineditions,
             copygroup, movegroup,
+            group_id, fs_folder,
             maingroup, maingroup_shortcut,
             workgroup, workgroup_shortcut, inworkgroups,
             fascicle, fascicle_shortcut,
@@ -327,13 +326,12 @@ sub duplicate {
             title, author,
             pdate, psize,
             fdate, rsize,
-            filepath,
             images, files,
             islooked, isopen,
             created, updated
         )
         VALUES (
-            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
             ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now()
         );
     ", [
@@ -343,6 +341,7 @@ sub duplicate {
             $document->{manager}, $document->{manager_shortcut},
             $document->{edition}, $document->{edition_shortcut},  $document->{ineditions},
             $new_id, $document->{movegroup} || $new_id,
+            $group_id, $fs_folder,
             $document->{maingroup}, $document->{maingroup_shortcut},
             $document->{workgroup}, $document->{workgroup_shortcut}, $document->{inworkgroups},
             $document->{fascicle}, $document->{fascicle_shortcut},
@@ -354,7 +353,6 @@ sub duplicate {
             $document->{title}, $document->{author},
             $document->{pdate}, $document->{psize},
             $document->{fdate}, $document->{rsize},
-            $filepath,
             $document->{images}, $document->{files},
             $document->{islooked}, $document->{isopen}
     ]);
@@ -372,15 +370,16 @@ sub duplicate {
     __reindex($c, $document->{id}, $edition->{id}, $fascicle->{id}, $headline->{id}, $rubric->{id});
 
     # Datastore
-    my $storePath = $c->config->get("store.path");
-    my $old_path  = __FS_ProcessPath($c, "$storePath/documents/$document->{filepath}");
-    my $new_path  = __FS_ProcessPath($c, "$storePath/documents/$filepath");
+    my $old_path  = __FS_ProcessPath($c, $c->config->get("store.path") . $document->{fs_folder});
+    my $new_path  = __FS_ProcessPath($c, $c->config->get("store.path") . $fs_folder);
 
-    if (-w $storePath) {
-        if (-r $old_path) {
-            rcopy($old_path, $new_path) || die "$!";
-        }
+    mkdir $new_path;
+
+    if (-e $old_path) {
+        rcopy($old_path, $new_path) || die "$!";
     }
+
+    return $new_id;
 }
 
 ################################################################################

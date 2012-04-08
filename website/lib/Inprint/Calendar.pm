@@ -33,7 +33,7 @@ sub format {
         unless ( $i_confirmation eq "on" );
 
     unless (@errors) {
-        Inprint::Calendar::CopyAttachment::copy($c, $i_id, $i_template);
+        Inprint::Calendar::Copy::copyFromTemplate($c, $i_id, $i_template);
     }
 
     $c->smart_render(\@errors);

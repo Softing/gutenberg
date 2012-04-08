@@ -10,50 +10,55 @@ use strict;
 use Encode;
 
 use File::Basename;
+use Inprint::Store::Embedded::Utils;
 
 sub makeRecord {
 
     my $c = shift;
 
-    my ( $filepath, $digest, $filesize, $created, $updated) = @_;
+    my ( $folder, $file, $digest, $filesize, $created, $updated) = @_;
 
-    my ($filename, $filepath, $extension) = fileparse($filepath, qr/(\.[^.]+){1}?/);
-
-    $filepath = getRelativePath($c, $filepath);
-
-    $filename = "$filename$extension";
-    $extension =~ s/^.//g;
+    my $extension = Inprint::Store::Embedded::Utils::getExtension($c, $file);
 
     my $mimetype = extractMimeType($c, $extension);
 
+    $file   = Inprint::Store::Embedded::Utils::doDecode($c, $file);
+    $folder = Inprint::Store::Embedded::Utils::doDecode($c, $folder);
+
     my $cacheRecord = $c->Q("
-                SELECT
-                    id, file_path, file_name, file_extension, file_mime,
-                    file_digest, file_thumbnail, file_description, file_size,
-                    file_length, file_meta, file_exists, file_published,
-                    created, updated
-                FROM cache_files WHERE file_path=? AND file_name=?
-            ", [ $filepath, $filename ])->Hash;
+        SELECT
+            id, file_path, file_name, file_extension, file_mime,
+            file_digest, file_thumbnail, file_description, file_size,
+            file_length, file_meta, file_exists, file_published,
+            created, updated
+        FROM cache_files
+        WHERE 1=1
+            AND file_path=?
+            AND file_name=? ",
+        [ $folder, $file ]
+    )->Hash;
 
     unless ($cacheRecord->{id}) {
 
         $c->Do("
-                INSERT INTO cache_files (
-                    id, file_path, file_name, file_extension, file_mime,
-                    file_digest, file_size, created, updated )
-                VALUES (?,?,?,?,?,?,?,?,?) ",
-            [ $c->uuid(), $filepath, $filename, $extension, $mimetype,
-                $digest, $filesize, $created, $updated ]);
+            INSERT INTO cache_files (
+                id, file_path, file_name, file_extension, file_mime,
+                file_digest, file_size, created, updated )
+            VALUES (?,?,?,?,?,?,?,?,?) ",
+            [ $c->uuid(), $folder, $file, $extension, $mimetype, $digest, $filesize, $created, $updated ]
+        );
 
         $cacheRecord = $c->Q("
-            SELECT * FROM cache_files WHERE file_path=? AND file_name=?
-            ", [ $filepath, $filename ])->Hash;
+            SELECT * FROM cache_files WHERE file_path=? AND file_name=? ",
+            [ $folder, $file ]
+        )->Hash;
     }
 
     return $cacheRecord;
 }
 
 sub getRecordById {
+
     my $c = shift;
     my $id = shift;
 
@@ -102,7 +107,7 @@ sub getRecordsByPath {
         FROM cache_files
         WHERE file_exists = true AND file_path=? ";
 
-    push @params, getRelativePath($c, $path);
+    push @params, $path;
 
     $sql .= " AND file_published = true "  if ($status eq 'published');
     $sql .= " AND file_published = false " if ($status eq 'unpublished');
@@ -134,32 +139,16 @@ sub deleteRecordById {
 
 sub cleanup {
 
-    my ($c, $folder) = @_;
+    my ($c, $fs_root, $fs_folder) = @_;
 
-    my $relativePath = getRelativePath($c, $folder);
-
-    my $cacheRecords = $c->Q("
-            SELECT * FROM cache_files WHERE file_path=?
-            ", [ $relativePath ])->Hashes;
+    my $cacheRecords = $c->Q(" SELECT * FROM cache_files WHERE file_path=? ", $fs_folder )->Hashes;
 
     foreach my $record (@$cacheRecords) {
 
-        my $filepath = $folder ."/". $record->{file_name};
+        my $filepath = $fs_root . $fs_folder ."/". $record->{file_name};
 
         if ($^O eq "MSWin32") {
-            $filepath =~ s/\//\\/g;
-            $filepath =~ s/\\+/\\/g;
             $filepath = encode("cp1251", $filepath);
-        }
-
-        if ($^O eq "darwin") {
-            $filepath =~ s/\\/\//g;
-            $filepath =~ s/\/+/\//g;
-        }
-
-        if ($^O eq "linux") {
-            $filepath =~ s/\\/\//g;
-            $filepath =~ s/\/+/\//g;
         }
 
         unless (-e $filepath) {
@@ -170,26 +159,6 @@ sub cleanup {
 
     return;
 }
-
-sub getRelativePath {
-    my $c = shift;
-    my $path = shift;
-
-    die "Can't find configuration of datastore folder" unless $path;
-    die "Can't find datastore folder in filesystem" unless -e $path;
-    die "Can't read datastore folder" unless -r $path;
-    die "Can't write to datastore folder" unless -w $path;
-
-    my $basepath = $c->config->get("store.path");
-
-    $path = substr $path, length($basepath), length($path)-length($basepath);
-
-    $path =~ s/\\/\//g;
-    $path =~ s/\/$//;
-
-    return $path;
-}
-
 
 sub extractMimeType {
 

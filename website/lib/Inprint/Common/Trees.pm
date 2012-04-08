@@ -25,8 +25,7 @@ sub editions {
     my $i_node = $c->param("node");
     my $i_term = $c->param("term") // undef;
 
-    my $options = $c->optionalize(
-        $c->param("options"));
+    my $options = $c->optionalize( $c->param("options") );
 
     # Process root value
     my $root = "00000000-0000-0000-0000-000000000000";
@@ -273,6 +272,7 @@ sub fascicles {
 
             my $id       = $item->{id};
             my $text     = $item->{edition_shortcut} ." / ". $item->{shortcut};
+            my $edition  = $item->{edition};
             my $leaf     = $c->json->true;
             my $disabled = $c->json->false;
 
@@ -301,6 +301,7 @@ sub fascicles {
             push @$result, {
                 id       => $id,
                 text     => $text,
+                edition  => $edition,
                 icon     => $icon,
                 leaf     => $leaf,
                 disabled => $disabled

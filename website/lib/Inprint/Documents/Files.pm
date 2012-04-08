@@ -5,6 +5,7 @@
 
 package Inprint::Documents::Files;
 
+use utf8;
 use strict;
 use warnings;
 
@@ -26,9 +27,16 @@ sub list {
 
     my $result = [];
     unless (@errors) {
-        my $folder = Inprint::Store::Embedded::getFolderPath($c, "documents", $document->{created}, $document->{copygroup}, 1);
-        Inprint::Store::Embedded::updateCache($c, $folder);
-        $result = Inprint::Store::Cache::getRecordsByPath($c, $folder, "all", undef);
+
+        Inprint::Store::Embedded::updateCache($c, $document->{fs_folder});
+        $result = Inprint::Store::Cache::getRecordsByPath($c, $document->{fs_folder}, "all", undef);
+
+        my $text_length = 0;
+        foreach my $file (@$result) {
+            $text_length += $file->{length};
+        }
+        $c->Do(" UPDATE documents SET rsize=? WHERE fs_folder=?", [ $text_length, $document->{fs_folder} ]);
+
     }
 
     foreach my $item (@$result) {
@@ -55,7 +63,11 @@ sub create {
     my $document = $c->check_record(\@errors, "documents", "document", $i_document);
 
     unless (@errors) {
-        my $folder = Inprint::Store::Embedded::getFolderPath($c, "documents", $document->{created}, $document->{copygroup}, 1);
+
+        my $root = $c->config->get("store.path");
+        my $folder = $root . $document->{fs_folder};
+        #my $folder = Inprint::Store::Embedded::getFolderPath($c, "documents", $document->{created}, $document->{copygroup}, 1);
+
         Inprint::Store::Embedded::fileCreate($c, $folder, $i_filename, $i_description);
 
         $c->Do("UPDATE documents SET uploaded=now() WHERE id=?", [ $i_document ]);
@@ -89,9 +101,8 @@ sub uploadFlash {
     my $document = $c->check_record(\@errors, "documents", "document", $i_document);
 
     unless (@errors) {
-        my $upload = $c->req->upload("Filedata");
-        my $folder = Inprint::Store::Embedded::getFolderPath($c, "documents", $document->{created}, $document->{copygroup}, 1);
-        Inprint::Store::Embedded::fileUpload($c, $folder, $upload);
+        my $folder = $document->{fs_folder};
+        Inprint::Store::Embedded::fileUpload($c, $folder, $c->req->upload("Filedata"));
         $c->Do("UPDATE documents SET uploaded=now() WHERE id=?", [ $i_document ]);
     }
 
@@ -111,11 +122,14 @@ sub uploadHtml {
     my $document = $c->check_record(\@errors, "documents", "document", $i_document);
 
     unless (@errors) {
-        my $folder = Inprint::Store::Embedded::getFolderPath($c, "documents", $document->{created}, $document->{copygroup}, 1);
+
+        my $folder = $document->{fs_folder};
+
         for ( 1 .. 5 ) {
             my $upload = $c->req->upload("file$_");
             Inprint::Store::Embedded::fileUpload($c, $folder, $upload) if ($upload);
         }
+
         $c->Do("UPDATE documents SET uploaded=now() WHERE id=?", [ $i_document ]);
     }
 

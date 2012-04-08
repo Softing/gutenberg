@@ -53,7 +53,7 @@ sub list {
             to_char(fls.updated, 'YYYY-MM-DD HH24:MI:SS') as updated
 
         FROM documents dcm, cache_files fls
-        WHERE dcm.filepath = fls.file_path AND dcm.fascicle <> '99999999-9999-9999-9999-999999999999'
+        WHERE dcm.fs_folder = fls.file_path AND dcm.fascicle <> '99999999-9999-9999-9999-999999999999'
     ";
 
     push @params, $currentMember;

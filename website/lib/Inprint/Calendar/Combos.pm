@@ -98,7 +98,7 @@ sub copyfrom {
     my $sql = "
         SELECT
             t1.id, t2.shortcut || '/' || t1.shortcut as title,
-            'puzzle' as icon
+            'blue-folder' as icon
         FROM fascicles t1, editions t2
         WHERE
             (
@@ -116,12 +116,12 @@ sub copyfrom {
     push @data, $access;
 
     my $result = $c->Q("
-        $sql ORDER BY t1.release_date DESC ",
+        $sql ORDER BY t2.shortcut ASC, t1.release_date DESC ",
         \@data)->Hashes;
 
     unshift @$result, {
         id=> "00000000-0000-0000-0000-000000000000",
-        icon => "puzzle",
+        icon => "blue-folder",
         title=> $c->l("Defaults"),
         shortcut=> $c->l("Get defaults")
     };

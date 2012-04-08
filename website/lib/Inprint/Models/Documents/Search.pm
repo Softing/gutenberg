@@ -49,6 +49,7 @@ sub search {
             dcm.headline, dcm.headline_shortcut,
             dcm.rubric, dcm.rubric_shortcut,
 
+            dcm.group_id, dcm.fs_folder,
             dcm.maingroup, dcm.maingroup_shortcut,
             dcm.workgroup, dcm.workgroup_shortcut,
             dcm.inworkgroups, dcm.copygroup,
@@ -95,7 +96,6 @@ sub search {
     $sql_filters .= " AND ( ";
     $sql_filters .= "    dcm.edition = ANY(?) ";
     $sql_filters .= "    AND ";
-    #$sql_filters .= "    dcm.workgroup = ANY(?) ";
     $sql_filters .= "    ( dcm.workgroup = ANY(?) OR dcm.maingroup = ANY(?) )";
     $sql_filters .= " ) ";
     push @params, $editions;
@@ -244,8 +244,10 @@ sub search {
         $document->{title} =~ s/"/&quot;/ig;
 
         # Get files list
-        my $folder = Inprint::Store::Embedded::getFolderPath($c, "documents", $document->{created}, $document->{copygroup}, 1);
-        my $files  = Inprint::Store::Cache::getRecordsByPath($c, $folder, "all", [ 'doc', 'rtf', 'odt', 'txt' ]);
+        my $fs_relative = $document->{fs_folder};
+        my $fs_folder = $c->config->get("store.path") . $fs_relative;
+
+        my $files  = Inprint::Store::Cache::getRecordsByPath($c, $fs_relative, "all", [ 'doc', 'rtf', 'odt', 'txt' ]);
 
         foreach my $file (@$files) {
             push @{ $document->{links} }, {
@@ -255,18 +257,17 @@ sub search {
         }
 
         # Fix filepath
-        my $relativePath = Inprint::Store::Embedded::getRelativePath($c, "documents", $document->{created}, $document->{id}, 1);
-        $c->Do("UPDATE documents SET filepath=? WHERE copygroup=?", [ $relativePath, $document->{copygroup} ]);
+        my $relativePath = $document->{fs_folder};
 
         # TODO Update images count
-         my @images = ("jpg", "jpeg", "png", "gif", "bmp", "tiff" );
-         my $imgCount = $c->Q(" SELECT count(*) FROM cache_files WHERE file_path=? AND file_exists = true AND file_extension=ANY(?) ", [ $relativePath, \@images ])->Value;
-         $c->Do("UPDATE documents SET images=? WHERE filepath=? ", [ $imgCount || 0, $relativePath ]);
+        my @images = ("jpg", "jpeg", "png", "gif", "bmp", "tiff" );
+        my $imgCount = $c->Q(" SELECT count(*) FROM cache_files WHERE file_path=? AND file_exists = true AND file_extension=ANY(?) ", [ $relativePath, \@images ])->Value;
+        $c->Do("UPDATE documents SET images=? WHERE fs_folder=? ", [ $imgCount || 0, $relativePath ]);
 
         # TODO Update rsize count
-         my @documents = ("doc", "docx", "odt", "rtf", "txt" );
-         my $lengthCount = $c->Q(" SELECT sum(file_length) FROM cache_files WHERE file_path=? AND file_exists = true AND file_extension=ANY(?) ", [ $relativePath, \@documents ])->Value;
-         $c->Do("UPDATE documents SET rsize=? WHERE filepath=? ", [ $lengthCount || 0, $relativePath ]);
+        my @documents = ("doc", "docx", "odt", "rtf", "txt" );
+        my $lengthCount = $c->Q(" SELECT sum(file_length) FROM cache_files WHERE file_path=? AND file_exists = true AND file_extension=ANY(?) ", [ $relativePath, \@documents ])->Value;
+        $c->Do("UPDATE documents SET rsize=? WHERE fs_folder=? ", [ $lengthCount || 0, $relativePath ]);
 
         # Get document pages
         $document->{pages} = __collapsePagesToString($document->{pages});
@@ -288,8 +289,6 @@ sub search {
         foreach (@rules) {
 
             undef my $term;
-
-            #next if ( $fascicle->{archived} );
 
             if ($document->{holder} eq $current_member) {
                 $term = "catalog.documents.$_:*";

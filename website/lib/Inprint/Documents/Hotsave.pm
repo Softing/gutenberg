@@ -24,7 +24,7 @@ sub list {
 
     $c->check_uuid( \@errors, "file", $i_file);
 
-    my $cacheRecord = $c->Q(" SELECT * FROM cache_files WHERE id=? ", [ $i_file ])->Hash;
+    my $cacheRecord = $c->Q(" SELECT * FROM cache_files WHERE id=? ", $i_file )->Hash;
 
     $c->check_uuid( \@errors, "record", $cacheRecord->{id} );
 
@@ -38,7 +38,7 @@ sub list {
             hotsave_stage_shortcut as stage,
             hotsave_color as color,
             to_char(created, 'YYYY-MM-DD HH24:MI:SS') as created
-        FROM cache_hotsave WHERE hotsave_origin=? ORDER BY created DESC", [ $filename ])->Hashes;
+        FROM cache_hotsave WHERE hotsave_origin=? ORDER BY created DESC", $filename )->Hashes;
 
     $success = $c->json->true unless (@errors);
     $c->render_json( { success => $success, errors => \@errors, data => $data } );
@@ -61,7 +61,6 @@ sub read {
     my $basepath = $c->config->get("store.path");
     my $filepath = "$basepath/$cacheRecord";
 
-    $filepath = __adaptPath($c, $filepath);
     $filepath = __encodePath($c, $filepath);
 
     if ( -r $filepath ) {

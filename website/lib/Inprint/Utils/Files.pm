@@ -60,20 +60,29 @@ sub __FS_CreateTempArchive {
     my ($c, $tempArchive, $fileListString) = @_;
 
     my $cmd;
-    
     $fileListString .= " *.none ";
-
     $fileListString .= " *.none ";
+    my $app = $c->config->get("software.7z");
 
     if ($^O eq "MSWin32") {
-        $cmd = '"C:\Program Files (x86)\7-Zip\7z"'. " a -mx0 \"$tempArchive\" $fileListString > null";
+        $cmd = " \"$app\" a -mx0 \"$tempArchive\" $fileListString > NULL ";
     }
     if ($^O eq "darwin") {
-        $cmd = " LANG=ru_RU.UTF-8 /opt/local/bin/7z a -l -mx0 \"$tempArchive\" $fileListString > /dev/null 2>&1 ";
+        $cmd = " LANG=ru_RU.UTF-8 $app a -l -mx0 \"$tempArchive\" $fileListString >/dev/null 2>&1 ";
     }
     if ($^O eq "linux") {
-        $cmd = " LANG=ru_RU.UTF-8 7z a -l -mx0 \"$tempArchive\" $fileListString > /dev/null 2>&1 ";
+        $cmd = " LANG=ru_RU.UTF-8 $app a -l -mx0 \"$tempArchive\" $fileListString >/dev/null 2>&1 ";
     }
+
+    #if ($^O eq "MSWin32") {
+    #    $cmd = '"C:\Program Files (x86)\7-Zip\7z"'. " a -mx0 \"$tempArchive\" $fileListString > null";
+    #}
+    #if ($^O eq "darwin") {
+    #    $cmd = " LANG=ru_RU.UTF-8 /opt/local/bin/7z a -l -mx0 \"$tempArchive\" $fileListString > /dev/null 2>&1 ";
+    #}
+    #if ($^O eq "linux") {
+    #    $cmd = " LANG=ru_RU.UTF-8 7z a -l -mx0 \"$tempArchive\" $fileListString > /dev/null 2>&1 ";
+    #}
 
     system($cmd);
 

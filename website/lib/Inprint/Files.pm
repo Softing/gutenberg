@@ -19,6 +19,8 @@ use LWP::UserAgent;
 use Image::Magick;
 use Digest::file qw(digest_file_hex);
 
+use Inprint::Utils::Files;
+
 use base 'Mojolicious::Controller';
 
 sub view {
@@ -80,13 +82,8 @@ sub view {
         }
 
         $filepath .= "/". $cacheRecord->{file_name};
-
-        $filepath  = __adaptPath($c, $filepath);
         $filepath  = __encodePath($c, $filepath);
-
-        $filename  = __adaptPath($c, $filename);
         $filename  = __encodePath($c, $filename);
-
         $filename =~ s/\s+/_/g;
 
         push @input, {
@@ -105,20 +102,14 @@ sub view {
         my $mimetype  = $input[0]->{mimetype};
         my $extension = $input[0]->{extension};
 
-        $c->tx->res->headers->content_type($mimetype);
-        $c->res->content->asset(Mojo::Asset::File->new(path => $filepath));
-
-        my $headers = Mojo::Headers->new;
-        $headers->add("Content-Type", "$mimetype; name=$filename");
-
+        # Download file
+        $c->res->headers->content_type($mimetype);
         if ($options->{disposition}) {
-            $headers->add("Content-Disposition", "attachment; filename=$filename");
-            $headers->add("Content-Description", $extension);
+            $c->res->headers->content_disposition("attachment;filename=$filename");
+            $c->res->headers->content_length(-s $filepath);
         }
 
-        $c->res->content->headers($headers);
-
-        $c->render_static($filepath);
+        $c->res->content->asset(Mojo::Asset::File->new(path => $filepath));
     }
 
     # Download archive
@@ -130,45 +121,37 @@ sub view {
             $fileListString .= ' "'. $item->{filepath} .'" ';
         }
 
-        my $tmpid = $c->uuid;
-        my $tmpfpath = "/tmp/inprint-$tmpid.7z";
+        my $tempPath    = "/tmp";
+        my $tempArchive = "/tmp/inprint-". $c->uuid .".7z";
 
-        if ($^O eq "MSWin32") {
-            system ("LANG=ru_RU.UTF-8 7z a -mx0 \"$tmpfpath\" $fileListString >/dev/null 2>&1");
-        }
-        if ($^O eq "darwin") {
-            system ("LANG=ru_RU.UTF-8 /opt/local/bin/7z a -mx0 \"$tmpfpath\" $fileListString >/dev/null 2>&1");
-        }
-        if ($^O eq "linux") {
-            system "LANG=ru_RU.UTF-8 7z a -mx0 \"$tmpfpath\" $fileListString >/dev/null 2>&1";
-        }
+        __FS_CreateTempArchive($c, $tempArchive, $fileListString);
 
         $c->tx->res->headers->content_type("application/x-7z-compressed");
-        $c->res->content->asset(Mojo::Asset::File->new(path => $tmpfpath));
+        $c->res->content->asset(Mojo::Asset::File->new(path => $tempArchive));
 
-        my $archname = $tmpid; $archname =~ s/\s+/_/g;
+        my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+        $year += 1900; $mon++;
+        my $archname = "Downloads_for_${year}_${mon}_${mday}_${hour}${min}${sec}";
 
-        my $headers = Mojo::Headers->new;
-        $headers->add("Content-Type", "application/x-7z-compressed;name=$archname.7z");
-        $headers->add("Content-Disposition", "attachment;filename=$archname.7z");
-        $headers->add("Content-Description", "7z");
-        $c->res->content->headers($headers);
+        # Download file
+        $c->res->headers->content_type("application/x-7z-compressed");
+        $c->res->headers->content_disposition("attachment;filename=$archname.7z");
+        $c->res->headers->content_length(-s $tempArchive);
 
-        $c->render_static($tmpfpath);
+        $c->res->content->asset(Mojo::Asset::File->new(path => $tempArchive));
+
+        $c->on(finish => sub {
+            unlink $tempArchive;
+        });
 
     }
 
-    $c->render_json({  });
+    $c->rendered;
 }
 
 sub download {
     my $c = shift;
-
-    $c->view({
-        disposition => 1
-    });
-
-    $c->render_json({  });
+    $c->view({ disposition => 1 });
 }
 
 sub preview {
@@ -182,44 +165,41 @@ sub preview {
     my @errors;
     my $success = $c->json->false;
 
-    my $rootpath = $c->config->get("store.path");
+    my $sqlfilepath = $c->Q("SELECT id, file_path, file_name, file_extension, file_thumbnail FROM cache_files WHERE id=?", $id )->Hash;
 
-    my $sqlfilepath = $c->Q("SELECT id, file_path, file_name, file_extension, file_thumbnail FROM cache_files WHERE id=?", [ $id ])->Hash;
+    my $root        = $c->config->get("store.path");
+    my $folder      = $sqlfilepath->{file_path};
+    my $file        = $sqlfilepath->{file_name};
+    my $extension   = $sqlfilepath->{file_extension};
 
-    my $folderOriginal   = $sqlfilepath->{file_path};
-    my $filenameOriginal = $sqlfilepath->{file_name};
-    my $filextenOriginal = $sqlfilepath->{file_extension};
+    my $file_folder = "$root/$folder";
+    my $thumbnail_folder = "$root/$folder/.thumbnails";
+    mkdir $thumbnail_folder;
 
-    my $fileExtOrig  = $filextenOriginal;
-    my $fileSrcOrig  = "$rootpath/$folderOriginal/$filenameOriginal";
-    my $thumbSrcOrig = "$rootpath/$folderOriginal/.thumbnails/$filenameOriginal-$size.png";
+    my $file_path  = "$file_folder/$file";
+    my $thumbnail_path = "$thumbnail_folder/${file}-$size.png";
 
-    my $fileExt  = $filextenOriginal;
-
-    my $fileSrc  = __adaptPath($c, $fileSrcOrig);
-    $fileSrc     = __encodePath($c, $fileSrc);
-
-    my $thumbSrc = __adaptPath($c, $thumbSrcOrig);
-    $thumbSrc    = __encodePath($c, $thumbSrc);
+    my $file_path_encoded = __encodePath($c, $file_path);
+    my $thumbnail_path_encoded = __encodePath($c, $thumbnail_path);
 
     # Generate preview
-    if (-r $fileSrc) {
+    if (-r $file_path_encoded) {
 
-        my $digest = digest_file_hex($fileSrc, "MD5");
+        my $digest = digest_file_hex($file_path_encoded, "MD5");
 
         if (
             $digest ne $sqlfilepath->{file_thumbnail}
-            || !$sqlfilepath->{file_thumbnail}
-            || ! -r $thumbSrc) {
+            || ! $sqlfilepath->{file_thumbnail}
+            || ! -r $thumbnail_path_encoded) {
 
             my $convertSrc;
 
-            if ( lc($fileExt) ~~ [ "eps" ]) {
-                system "epstool --quiet --page-number 0 --dpi 300 --ignore-warnings --extract-preview \"$fileSrc\" \"$thumbSrc\" ";
-                if (-r $thumbSrc) {
+            if ( lc($extension) ~~ [ "eps" ]) {
+                system "epstool --quiet --page-number 0 --dpi 300 --ignore-warnings --extract-preview \"$file_path_encoded\" \"$thumbnail_path_encoded\" ";
+                if (-r $thumbnail_path_encoded) {
 
                     my $image = Image::Magick->new;
-                    my $x = $image->Read($thumbSrcOrig);
+                    my $x = $image->Read($thumbnail_path);
                     warn "$x" if "$x";
 
                     if ($size > 0) {
@@ -232,18 +212,18 @@ sub preview {
                         die "$x" if "$x";
                     }
 
-                    $x = $image->Write($thumbSrcOrig);
+                    $x = $image->Write($thumbnail_path);
                     die "$x" if "$x";
 
                 }
             }
 
-            if ( lc($fileExt) ~~ [ "jpg", "jpeg", "png", "gif", "bmp", "tif", "tiff", "pdf" ]) {
+            if ( lc($extension) ~~ [ "jpg", "jpeg", "png", "gif", "bmp", "tif", "tiff", "pdf" ]) {
 
-                if (-r $fileSrc) {
+                if (-r $file_path_encoded) {
 
                     my $image = Image::Magick->new;
-                    my $x = $image->Read($fileSrcOrig);
+                    my $x = $image->Read($file_path);
                     warn "$x" if "$x";
 
                     if ($size > 0) {
@@ -256,23 +236,25 @@ sub preview {
                         die "$x" if "$x";
                     }
 
-                    $x = $image->Write($thumbSrcOrig);
+                    $x = $image->Write($thumbnail_path);
                     die "$x" if "$x";
 
                 }
             }
 
-            if (lc($fileExt) ~~ ['doc', 'docx', 'txt', 'rtf', 'odt', 'xls', 'xlsx', 'odp', 'ods' ]) {
+            if (lc($extension) ~~ ['doc', 'docx', 'txt', 'rtf', 'odt', 'xls', 'xlsx', 'odp', 'ods' ]) {
 
-                my $pdfPath = $thumbSrc .".pdf";
+                my $pdfPath = $thumbnail_path_encoded .".pdf";
 
-                my $response = __convert($c, $fileSrc, $fileExt, "pdf");
+                my $response = __convert($c, $file_path_encoded, $extension, "pdf");
                 open my $FILE, ">", $pdfPath || die "Can't open <$pdfPath> : $!";
                 binmode $FILE;
                     print $FILE $response->{responseBody};
                 close $FILE;
 
                 if (-r $pdfPath) {
+
+                    $pdfPath = $thumbnail_path .".pdf";
 
                     my $image = Image::Magick->new;
                     my $x = $image->Read($pdfPath);
@@ -289,8 +271,10 @@ sub preview {
                         die "$x" if "$x";
                     }
 
-                    $x = $image2->Write($thumbSrcOrig);
+                    $x = $image2->Write($thumbnail_path);
                     die "$x" if "$x";
+
+                    $pdfPath = $thumbnail_path_encoded .".pdf";
 
                     unlink $pdfPath;
                 }
@@ -301,15 +285,11 @@ sub preview {
         }
     }
 
-    if (-e $thumbSrc) {
-
-        $c->tx->res->headers->content_length(-s $thumbSrc);
+    if (-e $thumbnail_path_encoded) {
+        $c->tx->res->headers->content_length(-s $thumbnail_path_encoded);
         $c->tx->res->headers->content_type("image/png");
-        $c->res->content->asset(
-            Mojo::Asset::File->new(path => $thumbSrc)
-        );
+        $c->res->content->asset( Mojo::Asset::File->new(path => $thumbnail_path_encoded) );
         $c->rendered;
-
     }
 
     elsif (-e "$ENV{DOCUMENT_ROOT}/images/st.gif") {
@@ -322,17 +302,6 @@ sub preview {
         $c->res->code(404);
     }
 
-}
-
-sub __adaptPath {
-    my ($c, $string) = @_;
-    $string =~ s/\//\\/g    if ($^O eq "MSWin32");
-    $string =~ s/\\+/\\/g   if ($^O eq "MSWin32");
-    $string =~ s/\\/\//g    if ($^O eq "darwin");
-    $string =~ s/\/+/\//g   if ($^O eq "darwin");
-    $string =~ s/\\/\//g    if ($^O eq "linux");
-    $string =~ s/\/+/\//g   if ($^O eq "linux");
-    return $string;
 }
 
 sub __decodePath {

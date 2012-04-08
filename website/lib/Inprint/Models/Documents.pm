@@ -11,12 +11,7 @@ use warnings;
 use File::Copy::Recursive qw(fcopy rcopy dircopy fmove rmove dirmove);
 
 use Inprint::Store::Embedded;
-#use Inprint::Store::Cache;
-
 use Inprint::Utils::Files;
-#use Inprint::Models::Tag;
-#use Inprint::Models::Fascicle::Headline;
-#use Inprint::Models::Fascicle::Rubric;
 
 use Inprint::Models::Documents::Create;
 use Inprint::Models::Documents::Read;

@@ -10,6 +10,8 @@ use warnings;
 
 use Inprint::Database;
 use Inprint::Calendar::Copy;
+use Inprint::Calendar::CopyAttachment;
+
 use Inprint::Models::Fascicle;
 use Inprint::Models::Attachment;
 
@@ -76,24 +78,22 @@ sub list {
             to_char(t1.updated, 'YYYY-MM-DD HH24:MI:SS')        as updated
 
         FROM
-            fascicles t1,
-            editions t2
+            fascicles t1, editions t2
         WHERE 1=1
             AND t1.deleted = false
             AND t2.id=t1.edition
     ";
 
-    $sql .= " AND t1.edition = ANY(?) ";
-    push @params, $c->objectChildren("editions", $edition->{id}, [ "editions.fascicle.view:*", "editions.attachment.manage:*" ]);
+    #$sql .= " AND t1.edition = ANY(?) ";
+    #push @params, $c->objectChildren("editions", $edition->{id}, [ "editions.fascicle.view:*", "editions.fascicle.manage:*" ]);
 
     $sql .= " AND t1.edition = ANY(?) ";
-    push @params, $c->objectBindings([ "editions.fascicle.view:*", "editions.attachment.manage:*" ]);
+    push @params, $c->objectBindings([ "editions.fascicle.view:*", "editions.fascicle.manage:*" ]);
 
     $sql .= " AND t1.archived = true "      if ($i_archive eq "true");
     $sql .= " AND t1.archived = false "     if ($i_archive eq "false");
 
     $sql .= " AND t1.fastype = 'issue' "    if ($i_fastype eq "issue");
-    $sql .= " AND t1.fastype = 'template' " if ($i_fastype eq "template");
 
     $sql .= " ORDER BY t1.release_date DESC, t2.shortcut ASC, t1.shortcut ASC ";
 
@@ -167,20 +167,15 @@ sub create {
 
             foreach my $source_attachment (@$attachments) {
 
-                my $attachment_id = $c->uuid;
+                my $attachment_new = Inprint::Calendar::CopyAttachment::copy($c, 0, $source_attachment->{id}, $issue_id, $source_attachment->{edition}, 0, 0, 0);
 
-                Inprint::Models::Attachment::create(
-                    $c, $attachment_id,
-                    $source_attachment->{edition}, $issue_id,
-                    $i_shortcut, $i_description,
-                    $source_attachment->{tmpl}, $source_attachment->{tmpl_shortcut},
-                    0,
-                    $i_num, $i_anum,
-                    $i_doc_date, $i_adv_date,
-                    $i_print_date, $i_release_date
-                );
+                $c->Do(" UPDATE fascicles SET circulation=0 WHERE id=?", $attachment_new);
+                $c->Do(" UPDATE fascicles SET shortcut=? WHERE id=?", [ $i_shortcut, $attachment_new ]);
 
-                Inprint::Calendar::Copy::copyFromIssue($c, $attachment_id, $source_attachment->{id});
+                my $template = $c->Q(" SELECT * FROM template WHERE id=? ", $source_attachment->{tmpl})->Hash();
+                if ($template->{id}) {
+                    Inprint::Calendar::Copy::copyFromTemplate($c, $attachment_new, $template->{id});
+                }
 
             }
 

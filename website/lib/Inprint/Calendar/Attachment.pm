@@ -95,11 +95,11 @@ sub list {
     $sql .= " AND t1.parent = ? ";
     push @params, $issue->{id};
 
+    $sql .= " AND t1.edition = ANY(?) ";
+    push @params, $c->objectBindings([ "editions.attachment.view:*", "editions.attachment.manage:*" ]);
+
     $sql .= " AND t1.archived = true "      if ($i_archive eq "true");
     $sql .= " AND t1.archived = false "     if ($i_archive eq "false");
-
-    $sql .= " AND t1.fastype = 'issue' "    if ($i_fastype eq "issue");
-    $sql .= " AND t1.fastype = 'template' " if ($i_fastype eq "template");
 
     $sql .= " ORDER BY t2.shortcut ASC, t1.shortcut ASC ";
 
@@ -156,7 +156,7 @@ sub update {
 
     my $i_id           = $c->get_uuid(\@errors, "id");
 
-    #my $i_shortcut     = $c->get_text(\@errors, "shortcut", 1);
+    my $i_shortcut     = $c->get_text(\@errors, "shortcut", 1);
     #my $i_description  = $c->get_text(\@errors, "description", 1) || "";
 
     #my $i_num          = $c->get_int(\@errors, "num", 1) || 0;
@@ -174,6 +174,7 @@ sub update {
     my $i_doc_enabled  = $c->get_flag(\@errors, "doc_enabled", 1) || 0;
 
     unless (@errors) {
+
         #Inprint::Models::Attachment::update(
         #    $c, $i_id, $i_shortcut, $i_description,
         #    $i_num, $i_anum, $i_circulation,
@@ -183,6 +184,7 @@ sub update {
 
         Inprint::Models::Attachment::update(
             $c, $i_id,
+            $i_shortcut,
             $i_circulation,
             $i_adv_date, $i_doc_date,
             $i_adv_enabled, $i_doc_enabled);
@@ -197,7 +199,7 @@ sub remove {
 
     my @errors;
 
-    my $i_id           = $c->get_uuid(\@errors, "id");
+    my $i_id = $c->get_uuid(\@errors, "id");
 
     unless (@errors) {
         Inprint::Models::Attachment::remove($c, $i_id);
@@ -213,22 +215,24 @@ sub copy {
 
     my @errors;
 
-    my $i_id           = $c->get_uuid(\@errors, "id");
-    my $i_parent       = $c->get_uuid(\@errors, "parent");
+    my $i_source       = $c->get_uuid(\@errors, "source");
+    my $i_issue        = $c->get_uuid(\@errors, "issue");
+    my $i_edition      = $c->get_uuid(\@errors, "edition");
     my $i_confirmation = $c->get_text(\@errors, "confirmation");
 
-    my $issue_from = $c->Q(" SELECT * FROM fascicles WHERE id=? ", $i_id)->Hash;
-    my $issue_to = $c->Q(" SELECT * FROM fascicles WHERE id=? ", $i_parent)->Hash;
+    my $source = $c->Q(" SELECT * FROM fascicles WHERE id=? ", $i_source)->Hash;
+    push @errors, { id => "Error", msg => "Can't copy 1"}
+        if ($source->{fastype} ne "attachment");
 
-    if ($issue_from->{fastype} eq "attachment " && $issue_to->{fastype} ne "issue") {
-        push @errors, { id => "Error", msg => "Can't copy"};
-    }
+    my $issue = $c->Q(" SELECT * FROM fascicles WHERE id=? ", $i_issue)->Hash;
+    push @errors, { id => "Error", msg => "Can't copy 2"}
+        if ($issue->{fastype} ne "issue");
 
     push @errors, { id => "confirmation", msg => "Incorrectly filled field"}
         unless ( $i_confirmation eq "on" );
 
     unless (@errors) {
-        Inprint::Calendar::CopyAttachment::copy($c, $i_id, $i_parent);
+        Inprint::Calendar::CopyAttachment::copy($c, 1, $i_source, $i_issue, $i_edition, 1, 1, 1);
     }
 
     $c->smart_render(\@errors);

@@ -30,18 +30,10 @@ sub list {
 
     my $request = $c->check_record(\@errors, "fascicles_requests", "request", $i_request);
 
-    #push @errors, { id => "feed", msg => "Can't find object"}
-    #    unless ($feed->{id});
-
     my $result;
     unless (@errors) {
-
-        my $root = $c->config->get("store.path");
-        my $folder = $root ."/datastore/requests". $request->{fs_folder};
-        #my $folder = Inprint::Store::Embedded::getFolderPath($c, "requests", $request->{created}, $request->{id}, 1);
-
-        Inprint::Store::Embedded::updateCache($c, $folder);
-        $result = Inprint::Store::Cache::getRecordsByPath($c, $folder, "all", [ "tiff", "tif", "eps", "pdf", "jpg" ]);
+        Inprint::Store::Embedded::updateCache($c, $request->{fs_folder});
+        $result = Inprint::Store::Cache::getRecordsByPath($c, $request->{fs_folder}, "all", [ "tiff", "tif", "eps", "pdf", "jpg" ]);
     }
 
     my $module = {};
@@ -145,12 +137,7 @@ sub upload {
     unless (@errors) {
         my $upload = $c->req->upload("Filedata");
 
-        my $root = $c->config->get("store.path");
-        my $folder = $root ."/datastore/requests". $request->{fs_folder};
-
-        #my $folder = Inprint::Store::Embedded::getFolderPath($c, "requests", $request->{created}, $request->{id}, 1);
-
-        Inprint::Store::Embedded::fileUpload($c, $folder, $upload);
+        Inprint::Store::Embedded::fileUpload($c, $request->{fs_folder}, $upload);
 
         $c->Do("UPDATE fascicles_requests SET check_status='check' WHERE id=?", [ $request->{id} ]);
     }
@@ -297,7 +284,11 @@ sub download {
 
         next unless (-e -r $pathSource);
 
-        symlink $pathSource, $pathSymlink;
+        if ($^O eq "MSWin32") {
+            system ("mklink", $pathSymlink, $pathSource);
+        } else {
+            symlink $pathSource, $pathSymlink;
+        }
 
         die "Can't read symlink $pathSymlink" unless (-e -r $pathSymlink);
 
@@ -306,28 +297,23 @@ sub download {
 
     __FS_CreateTempArchive($c, $tempArchive, $fileListString);
 
-    rmtree($tempFolder);
-
     my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
-
     $year += 1900; $mon++;
-
     my $archname = "Downloads_for_${year}_${mon}_${mday}_${hour}${min}${sec}";
+
+
+    $c->res->headers->content_type("application/x-7z-compressed");
+    $c->res->headers->content_disposition("attachment;filename=$archname.7z");
+    $c->res->headers->content_length(-s $tempArchive);
 
     $c->res->content->asset(Mojo::Asset::File->new(path => $tempArchive));
 
-    my $headers = Mojo::Headers->new;
-    $headers->add("Content-Type", "application/x-7z-compressed;name=$archname.7z");
-    $headers->add("Content-Disposition", "attachment;filename=$archname.7z");
-    $headers->add("Content-Description", "7z");
-    $headers->add("Content-Length", -s $tempArchive);
-    $c->res->content->headers($headers);
-
-    $c->on(finish=>sub {
+    $c->on(finish => sub {
+        rmtree($tempFolder);
         unlink $tempArchive;
     });
 
-    $c->render_static($tempArchive);
+    $c->rendered;
 }
 
 1;

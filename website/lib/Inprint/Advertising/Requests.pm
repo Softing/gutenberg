@@ -530,7 +530,9 @@ sub download {
         my $object = $c->check_record(\@errors, "fascicles_requests", "request", $id);
         next unless ($object->{id});
 
-        my $folder = Inprint::Store::Embedded::getFolderPath($c, "requests", $object->{created}, $object->{id}, 1);
+        my $root = $c->config->get("store.path");
+        my $folder = $root . $object->{fs_folder};
+
 
         opendir(my $dh, $folder) || die "can't opendir $folder: $!";
         my @files = readdir($dh);
@@ -556,12 +558,16 @@ sub download {
                 $pathSymlink =~ s/\s+/_/g;
             }
 
-            #$pathSource  = __FS_ProcessPath($c, $pathSource);
-            #$pathSymlink = __FS_ProcessPath($c, $pathSymlink);
+            $pathSource  = __FS_ProcessPath($c, $pathSource);
+            $pathSymlink = __FS_ProcessPath($c, $pathSymlink);
 
             next unless (-e -r $pathSource);
 
-            symlink $pathSource, $pathSymlink;
+            if ($^O eq "MSWin32") {
+                system ("mklink", $pathSymlink, $pathSource);
+            } else {
+                symlink $pathSource, $pathSymlink;
+            }
 
             die "Can't read symlink $pathSymlink" unless (-e -r $pathSymlink);
 
@@ -593,7 +599,6 @@ sub download {
     );
 
     $c->smart_render([]);
-    #$c->render();
 }
 
 sub delete {

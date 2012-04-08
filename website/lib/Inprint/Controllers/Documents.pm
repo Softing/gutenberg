@@ -592,15 +592,23 @@ sub duplicate {
 
     my @copyes;
     foreach my $copyid (@copyid) {
+
         my ($fascicle_id, $headline_id, $rubric_id) = split '::', $copyid;
 
         my $fascicle = $c->check_record(\@errors, "fascicles", "fascicle", $fascicle_id);
         my $edition  = $c->check_record(\@errors, "editions", "edition", $fascicle->{edition});
 
-        my $headline = $c->check_record(\@errors, "indx_tags", "headline", $headline_id);
-        my $rubric   = $c->check_record(\@errors, "indx_tags", "rubric", $rubric_id);
+        my $headline = {};
+        if ($headline_id) {
+            $headline = $c->check_record(\@errors, "indx_tags", "headline", $headline_id);
+        }
+        my $rubric = {};
+        if ($rubric_id) {
+            $rubric = $c->check_record(\@errors, "indx_tags", "rubric", $rubric_id);
+        }
 
         push @copyes, { edition => $edition, fascicle => $fascicle, headline => $headline, rubric => $rubric };
+
     }
     $c->smart_render(\@errors) if @errors;
 

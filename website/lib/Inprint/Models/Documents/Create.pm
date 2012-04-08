@@ -82,10 +82,17 @@ sub create {
     $year += 1900;
     $mon += 1;
 
-    my $relativePath = Inprint::Store::Embedded::getRelativePath($c, "documents", "$year-$mon", $id, 1);
+    #my $relativePath = Inprint::Store::Embedded::getRelativePath($c, "documents", "$year-$mon", $id, 1);
 
-    push @fields, "filepath";
+    #push @fields, "filepath";
+    #push @data, $relativePath;
+
+    my $relativePath = sprintf ("/%04d-%02d/%s", ((localtime)[5] +1900), ((localtime)[4] +1), $id);
+    push @fields, "fs_folder";
     push @data, $relativePath;
+
+    push @fields, "group_id";
+    push @data, $c->uuid();
 
     # Set edition
     push @fields, "edition";

@@ -13,11 +13,12 @@ use constant TABLE   => "documents";
 use constant COLUMNS => qw/
     id edition fascicle title creator creator_shortcut holder holder_shortcut
     manager manager_shortcut  edition edition_shortcut fascicle fascicle_shortcut
+    group_id fs_folder
     fascicle_blocked headline headline_shortcut readiness readiness_shortcut
     rubric rubric_shortcut branch branch_shortcut stage stage_shortcut readiness
     readiness_shortcut color progress author firstpage pages ineditions copygroup
     movegroup maingroup maingroup_shortcut workgroup workgroup_shortcut inworkgroups
-    filepath pdate::date fdate::date ldate psize rsize images files islooked isopen
+    pdate::date fdate::date ldate psize rsize images files islooked isopen
     uploaded::date moved::date created::date updated::date /;
 
 use constant FIELDS => qw/  /;
@@ -85,7 +86,8 @@ has "workgroup_shortcut"        => (isa => "Str",   is => "rw");
 
 has "inworkgroups"              => (isa => "Any",   is => "rw");
 
-has "filepath"                  => (isa => "Str",   is => "rw");
+has "group_id"                  => (isa => UUID,    is => "rw");
+has "fs_folder"                 => (isa => "Str",   is => "rw");
 
 has "pdate"                     => (isa => "Str",   is => "rw");
 has "fdate"                     => (isa => "Str",   is => "rw");

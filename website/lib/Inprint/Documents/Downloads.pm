@@ -51,9 +51,13 @@ sub list {
             to_char(fls.created, 'YYYY-MM-DD HH24:MI:SS') as created,
             to_char(fls.updated, 'YYYY-MM-DD HH24:MI:SS') as updated
 
-        FROM documents dcm, cache_files fls, fascicles fsc
+        FROM
+            documents dcm,
+            cache_files fls,
+            fascicles fsc
+
         WHERE 1=1
-            AND dcm.filepath = fls.file_path
+            AND dcm.fs_folder = fls.file_path
             AND dcm.fascicle = fsc.id
             AND fsc.id <> '99999999-9999-9999-9999-999999999999'
             AND fsc.enabled  = true
@@ -133,7 +137,8 @@ sub download {
 
     my $temp        = $c->uuid;
     my $rootPath    = $c->config->get("store.path");
-    my $tempPath    = "/tmp";
+
+    my $tempPath    = $c->config->get("store.temp");
     my $tempFolder  = "$tempPath/inprint-$temp";
     my $tempArchive = "$tempPath/inprint-$temp.7z";
 
@@ -172,7 +177,11 @@ sub download {
 
         next unless (-e -r $pathSource);
 
-        symlink $pathSource, $pathSymlink;
+        if ($^O eq "MSWin32") {
+            system ("mklink", $pathSymlink, $pathSource);
+        } else {
+            symlink $pathSource, $pathSymlink;
+        }
 
         die "Can't read symlink $pathSymlink" unless (-e -r $pathSymlink);
 
@@ -180,45 +189,26 @@ sub download {
         $c->Do(" INSERT INTO cache_downloads (member, document, file) VALUES (?,?,?) ", [ $currentMember, $document->{id}, $file->{id} ]);
 
         $fileListString .= ' "'. $pathSymlink .'" ';
-
     }
 
-    my $cmd;
-
-    if ($^O eq "MSWin32") {
-        $cmd = " LANG=ru_RU.UTF-8 7z a -l -mx0 \"$tempArchive\" $fileListString >/dev/null 2>&1 ";
-    }
-    if ($^O eq "darwin") {
-        $cmd = " LANG=ru_RU.UTF-8 /opt/local/bin/7z a -l -mx0 \"$tempArchive\" $fileListString >/dev/null 2>&1 ";
-    }
-    if ($^O eq "linux") {
-        $cmd = " LANG=ru_RU.UTF-8 7z a -l -mx0 \"$tempArchive\" $fileListString >/dev/null 2>&1 ";
-    }
-
-    system($cmd) if $fileListString;
-
-    rmtree($tempFolder);
+    __FS_CreateTempArchive($c, $tempArchive, $fileListString);
 
     my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
-
     $year += 1900; $mon++;
-
     my $archname = "Downloads_for_${year}_${mon}_${mday}_${hour}${min}${sec}";
+
+    $c->res->headers->content_type("application/x-7z-compressed");
+    $c->res->headers->content_disposition("attachment;filename=$archname.7z");
+    $c->res->headers->content_length(-s $tempArchive);
 
     $c->res->content->asset(Mojo::Asset::File->new(path => $tempArchive));
 
-    my $headers = Mojo::Headers->new;
-    $headers->add("Content-Type", "application/x-7z-compressed;name=$archname.7z");
-    $headers->add("Content-Disposition", "attachment;filename=$archname.7z");
-    $headers->add("Content-Description", "7z");
-    $headers->add("Content-Length", -s $tempArchive);
-    $c->res->content->headers($headers);
-
-    $c->on(finish=>sub {
+    $c->on(finish => sub {
+        rmtree($tempFolder);
         unlink $tempArchive;
     });
 
-    $c->smart_render([]);
+    $c->rendered;
 }
 
 1;

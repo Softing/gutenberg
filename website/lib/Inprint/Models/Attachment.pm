@@ -92,29 +92,8 @@ sub create {
 
 sub update {
 
-    #my ($c, $id,
-    #    $shortcut, $description,
-    #    $num, $anum, $circulation,
-    #    $print_date, $release_date,
-    #    $adv_date, $doc_date,
-    #    $adv_enabled, $doc_enabled ) = @_;
-    #
-    #$c->Do("
-    #    UPDATE fascicles
-    #        SET shortcut =?, description =?,
-    #            num =?, anum =?, circulation =?,
-    #            print_date =?, release_date =?,
-    #            adv_date =?,  doc_date =?,
-    #            adv_enabled =?, doc_enabled =?
-    #    WHERE id =?;
-    #", [    $shortcut, $description,
-    #        $num, $anum, $circulation,
-    #        $print_date, $release_date,
-    #        $adv_date, $doc_date,
-    #        $adv_enabled, $doc_enabled,
-    #    $id ]);
-
     my ($c, $id,
+        $shortcut,
         $circulation,
         $adv_date, $doc_date,
         $adv_enabled, $doc_enabled ) = @_;
@@ -122,14 +101,24 @@ sub update {
     $c->Do("
         UPDATE fascicles
             SET
-                circulation =?,
-                adv_date =?,  doc_date =?,
-                adv_enabled =?, doc_enabled =?
-        WHERE id =?;
-    ", [    $circulation,
+                shortcut = ?,
+                circulation = ?,
+                adv_date = ?,  doc_date = ?,
+                adv_enabled = ?, doc_enabled = ?
+        WHERE id =?; ",
+        [
+            $shortcut,
+            $circulation,
             $adv_date, $doc_date,
             $adv_enabled, $doc_enabled,
-        $id ]);
+            $id
+        ]
+    );
+
+    $c->Do("
+        UPDATE documents SET fascicle_shortcut = ? WHERE fascicle=?; ",
+        [ $shortcut, $id ]
+    );
 
     return $c;
 }

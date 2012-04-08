@@ -54,14 +54,18 @@ sub readFile {
 
 sub writeFile {
 
-    my ($c, $filetype, $filepath, $text) = @_;
+    my ($c, $fs_folder, $fs_file, $extension, $text) = @_;
 
-    my ($basename, $basepath, $extension) = fileparse($filepath, qr/(\.[^.]+){1}?/);
-    $extension =~ s/^.//g;
+    my $hotSaveFilePath = createHotSave($c, $fs_folder, $fs_file, $text);
 
-    my $hotSaveFilePath = createHotSave($c, $basepath, "$basename.$extension", $text);
+    my $rootpath = $c->config->get("store.path");
 
-    $basepath =~ s/\/$//;
+    my $folder = Inprint::Store::Embedded::Utils::makePath($c, $rootpath, $fs_folder);
+
+    my $filepath = Inprint::Store::Embedded::Utils::makePath($c, $rootpath, $fs_folder, $fs_file);
+    my $filepath_encoded = Inprint::Store::Embedded::Utils::doEncode($c, $filepath);
+    die "Can't find file <$filepath_encoded>" unless -e $filepath_encoded;
+    die "Can't read file <$filepath_encoded>" unless -r $filepath_encoded;
 
     if ($extension ~~ ["odt"]) {
         my $response = convert($c, $hotSaveFilePath, "html", $extension);
@@ -80,12 +84,9 @@ sub writeFile {
     if ($extension ~~ ["doc", "docx", "rtf"]) {
 
         # create tmp odt file
-        my $tmpFolderPath = __adaptPath($c, "$basepath/.hotsave");
-        my $tmpFilePath   = __adaptPath($c, "$basepath/.hotsave/$basename.$extension~". time() .".odt");
-
-        mkdir $tmpFolderPath unless (-e $tmpFolderPath) ;
-        die "Can't find hot save folder <$tmpFolderPath>" unless -e $tmpFolderPath;
-        die "Can't write to hot save folder <$tmpFolderPath>" unless -w $tmpFolderPath;
+        my $tmpFolderPath = "$folder/.hotsave";
+        my $tmpFilePath   = "$folder/.hotsave/${fs_file}-tmp-". time() .".odt";
+        $tmpFilePath = __encodePath($c, $tmpFilePath);
 
         my $response1 = convert($c, $hotSaveFilePath, "html", "odt");
 
@@ -98,20 +99,14 @@ sub writeFile {
 
         my $response2 = convert($c, $tmpFilePath, "odt", $extension);
 
-        open my $FILE, ">", $filepath || die "Can't read <$filepath> : $!";
+        open my $FILE, ">", $filepath_encoded || die "Can't read <$filepath_encoded> : $!";
         binmode $FILE;
             print $FILE $response2->{text};
         close $FILE;
 
-        my $file_path = Inprint::Store::Embedded::Utils::getRelativePath($c, $basepath);
-        $file_path = __decodePath($c, $file_path);
-
-        my $file_name = "$basename.$extension";
-        $file_name = __decodePath($c, $file_name);
-
         $c->Do(
-            "UPDATE cache_files SET file_length=? WHERE file_path=? AND file_name=?",
-            [ $response2->{"CharacterCount"}, $file_path, $file_name ]);
+            "UPDATE cache_files SET file_length=? WHERE file_path=? AND file_name=? ",
+            [ $response2->{"CharacterCount"}, $fs_folder, $fs_file ]);
 
         unlink $tmpFilePath;
 
@@ -122,21 +117,23 @@ sub writeFile {
 
 sub createHotSave {
 
-    my ($c, $basepath, $basename, $text) = @_;
+    my ($c, $fs_folder, $fs_file, $text) = @_;
 
-    my $hotSaveFileName = "$basename~". time() .".html";
+    my $rootpath = $c->config->get("store.path");
 
-    my $hotSaveFolderPath = __adaptPath($c, "$basepath/.hotsave");
-    my $hotSaveFilePath   = __adaptPath($c, "$basepath/.hotsave/$hotSaveFileName");
+    my $hotSaveFileName = "$fs_file-". time() .".html";
+
+    my $hotSaveFolderPath = "$rootpath/$fs_folder/.hotsave";
+    my $hotSaveFilePath   = "$hotSaveFolderPath/$hotSaveFileName";
+
+    $hotSaveFilePath = __encodePath($c, $hotSaveFilePath);
 
     mkdir $hotSaveFolderPath unless (-e $hotSaveFolderPath) ;
     die "Can't find hot save folder <$hotSaveFolderPath>" unless -e $hotSaveFolderPath;
     die "Can't write to hot save folder <$hotSaveFolderPath>" unless -w $hotSaveFolderPath;
 
     # Create hotsave
-
     my $hotSaveText = $text;
-    #$hotSaveText = __clearHtml($hotSaveText);
 
     $hotSaveText = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
     <HTML>
@@ -159,13 +156,10 @@ sub createHotSave {
     die "Can't find hotsave file <$hotSaveFilePath>" unless -r $hotSaveFilePath;
 
     # create metadata
-
-    my $relativePath = Inprint::Store::Embedded::Utils::getRelativePath($c, $basepath);
-
     my $cmember  = $c->getSessionValue("member.id");
 
     my $member  = $c->Q("SELECT * FROM profiles WHERE id=?", [ $cmember ])->Hash;
-    my $copyid  = $c->Q("SELECT copygroup FROM documents WHERE filepath=?", [ $relativePath ])->Value;
+    my $copyid  = $c->Q("SELECT copygroup FROM documents WHERE fs_folder = ?", [ $fs_folder ])->Value;
     my $history = $c->Q("SELECT * FROM history WHERE entity=? ORDER BY created LIMIT 1", [ $copyid ])->Hash;
 
     unless ($history) {
@@ -176,25 +170,20 @@ sub createHotSave {
         $history->{color} = "FFFFFF";
     }
 
-    my $hotsave_origin = __decodePath($c, "$relativePath/$basename");
-    my $hotsave_path   = __decodePath($c, "$relativePath/.hotsave/$hotSaveFileName");
-
-    #my $hotsave_origin = "$relativePath/$basename";
-    #my $hotsave_path   = "$relativePath/.hotsave/$hotSaveFileName";
-
     $c->Do("
         INSERT INTO cache_hotsave(
             hotsave_origin, hotsave_path,
             hotsave_branch, hotsave_branch_shortcut,
             hotsave_stage, hotsave_stage_shortcut,
             hotsave_color, hotsave_creator, hotsave_creator_shortcut, created)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, now());
-        ", [
-            $hotsave_origin, $hotsave_path,
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, now()); ",
+        [
+            "$fs_folder/$fs_file", "$fs_folder/.hotsave/$hotSaveFileName",
             $history->{branch}, $history->{branch_shortcut},
             $history->{stage}, $history->{stage_shortcut},
             $history->{color}, $member->{id}, $member->{shortcut}
-        ]);
+        ]
+    );
 
     return $hotSaveFilePath;
 }
@@ -351,17 +340,6 @@ sub __getExtension {
     $suffix =~ s/^.//g;
 
     return $suffix;
-}
-
-sub __adaptPath {
-    my ($c, $string) = @_;
-    $string =~ s/\//\\/g    if ($^O eq "MSWin32");
-    $string =~ s/\\+/\\/g   if ($^O eq "MSWin32");
-    $string =~ s/\\/\//g    if ($^O eq "darwin");
-    $string =~ s/\/+/\//g   if ($^O eq "darwin");
-    $string =~ s/\\/\//g    if ($^O eq "linux");
-    $string =~ s/\/+/\//g   if ($^O eq "linux");
-    return $string;
 }
 
 sub __decodePath {
