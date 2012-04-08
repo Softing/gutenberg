@@ -87,7 +87,7 @@ sub create {
     #push @fields, "filepath";
     #push @data, $relativePath;
 
-    my $relativePath = sprintf ("/%04d-%02d/%s", ((localtime)[5] +1900), ((localtime)[4] +1), $id);
+    my $relativePath = sprintf ("/datastore/documents/%04d-%02d/%s", ((localtime)[5] +1900), ((localtime)[4] +1), $id);
     push @fields, "fs_folder";
     push @data, $relativePath;
 

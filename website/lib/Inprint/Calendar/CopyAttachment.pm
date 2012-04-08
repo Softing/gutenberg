@@ -229,18 +229,20 @@ sub copy {
         my $headline_id;
 
         if ($page->{headline}) {
-            my $headline_id = $cache{ $page->{headline} };
+            $headline_id = $cache{ $page->{headline} };
         }
 
         $c->Do("
-            INSERT INTO fascicles_pages(id, edition, fascicle, origin, headline, seqnum, w, h, created, updated)
+            INSERT INTO
+                fascicles_pages(
+                    id, edition, fascicle, origin, headline, seqnum, w, h, created, updated
+                )
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, now(), now());
         ", [ $page_id, $edition->{id}, $attachment_new, $page->{origin}, $headline_id, $page->{seqnum}, $page->{w}, $page->{h} ]);
     }
 
-
     if ($import_documents) {
-        
+
         # Import documents
         my $source_documents = $c->Q("
                 SELECT *
@@ -322,13 +324,13 @@ sub copy {
             );
 
             # Remap module
-            my $document_pages = $c->Q("
+            my $mapps = $c->Q("
                 SELECT *
                 FROM fascicles_map_modules
                 WHERE fascicle=? AND module=? ",
             [ $source->{id}, $module->{id} ])->Hashes;
 
-            foreach my $map (@$document_pages) {
+            foreach my $map (@$mapps) {
                 $c->Do("
                     INSERT INTO
                         fascicles_map_modules (
@@ -349,6 +351,7 @@ sub copy {
     }
 
     if ($import_requests) {
+
         # Import requests
         my $source_requests = $c->Q("
                 SELECT *
@@ -403,7 +406,11 @@ sub copy {
                     $request->{manager}, $request->{manager_shortcut},
                     $request->{group_id}, $request->{fs_folder},
                     $request->{amount},
-                    $request->{origin}, $request->{origin_shortcut}, $request->{origin_area}, $request->{origin_x}, $request->{origin_y}, $request->{origin_w}, $request->{origin_h},
+
+                    $cache{ $request->{origin} }, $request->{origin_shortcut},
+
+                    $request->{origin_area}, $request->{origin_x}, $request->{origin_y}, $request->{origin_w}, $request->{origin_h},
+
                     $cache{ $request->{module} },
                     $request->{pages}, $request->{firstpage},
                     $request->{shortcut}, $request->{description},
@@ -413,25 +420,23 @@ sub copy {
             );
 
             # Remap request
-            my $document_pages = $c->Q("
+            my $mapps = $c->Q("
                 SELECT *
                 FROM fascicles_map_requests
                 WHERE fascicle=? AND entity=? ",
             [ $source->{id}, $request->{id} ])->Hashes;
 
-            foreach my $map (@$document_pages) {
+            foreach my $map (@$mapps) {
                 $c->Do("
                     INSERT INTO
                         fascicles_map_requests (
-                            edition, fascicle, entity,
-                            page,
+                            edition, fascicle, entity, page,
                             created, updated)
                     VALUES (
                         ?,?,?,?, now(), now()
                     ); ",
                     [
-                        $edition->{id}, $attachment_new, $new_id,
-                        $cache{ $map->{page} }
+                        $edition->{id}, $attachment_new, $new_id, $cache{ $map->{page} }
                     ]
                 );
             }

@@ -9,6 +9,7 @@ use strict;
 use warnings;
 
 use Inprint::Calendar::Copy;
+use Inprint::Fascicle::Events;
 
 use base 'Mojolicious::Controller';
 
@@ -31,9 +32,12 @@ sub format {
 
     push @errors, { id => "confirmation", msg => "Incorrectly filled field"}
         unless ( $i_confirmation eq "on" );
+        
+    my $fascicle = $c->Q(" SELECT * FROM fascicles WHERE id =? ", $i_id )->Hash;
 
     unless (@errors) {
         Inprint::Calendar::Copy::copyFromTemplate($c, $i_id, $i_template);
+        Inprint::Fascicle::Events::onCompositionChanged($c, $fascicle);
     }
 
     $c->smart_render(\@errors);

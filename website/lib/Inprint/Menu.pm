@@ -15,9 +15,6 @@ sub index
 {
     my $c = shift;
 
-    my $accessFascicleView = $c->objectAccess(
-            "editions.fascicle.view:*", '57ea720b-39fb-4e96-bcb6-ae3ebf6d474b');
-
     ############################################################################
     # About menu items
     ############################################################################
@@ -118,6 +115,9 @@ sub index
             AND t1.enabled = true
             AND t1.archived = false
             AND deleted = false
+
+            -- and t1.id = '24994dfa-5393-427c-8d89-02d315d38e0a'
+
         ORDER BY t1.release_date, t2.shortcut, t1.shortcut
     ")->Hashes;
 
@@ -137,7 +137,7 @@ sub index
         ", [ $item->{id} ])->Hashes;
     }
 
-    foreach my $fascicle (@{ $fascicles }) {
+    foreach my $fascicle (@$fascicles) {
 
         my $accessLayoutView   = $c->objectAccess("editions.fascicle.view:*",   $fascicle->{edition});
         my $accessLayoutManage = $c->objectAccess("editions.fascicle.manage:*", $fascicle->{edition});
@@ -186,12 +186,12 @@ sub index
             my $accessAttachmentView = $c->objectAccess("editions.attachment.view:*", $attachment->{edition});
 
             if ($accessAttachmentView) {
-                $accessFascicleView = 1;
+                #$accessFascicleView = 1;
                 push @{ $menuItem->{menu} }, $menuSubitem;
             }
         }
 
-        if ($accessFascicleView) {
+        if ($accessLayoutView) {
             push @FasciclesSection, $menuItem;
         }
     }

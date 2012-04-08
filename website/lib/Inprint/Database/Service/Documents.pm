@@ -31,9 +31,46 @@ sub list {
     }
 
     $self->records(
-        $self->sql->Q($sql, \@params)
-            ->Objects("Inprint::Database::Model::Document")
+        $self->sql->Q($sql, \@params)->Objects("Inprint::Database::Model::Document")
     );
+
+    my $cacheAccess = {};
+    my $current_member = $self->app->getSessionValue("member.id");
+
+    foreach my $document (@{ $self->records() }) {
+
+        $document->{access} = {};
+        my @rules = qw(update capture move transfer briefcase delete recover fupload fedit fdelete);
+
+        foreach (@rules) {
+
+            undef my $term;
+
+            if ($document->{holder} eq $current_member) {
+                $term = "catalog.documents.$_:*";
+            }
+
+            if ($document->{holder} ne $current_member) {
+                $term = "catalog.documents.$_:group";
+            }
+
+            if ( defined $cacheAccess->{$term ."::". $document->{workgroup}} ) {
+                $document->{access}->{$_} = $cacheAccess->{$term ."::". $document->{workgroup}};
+                next;
+            }
+
+            my $access = $self->app->objectAccess($term, $document->{workgroup});
+
+            if ($access) {
+                $cacheAccess->{$term ."::". $document->{workgroup}} = $self->app->json->true;
+                $document->{access}->{$_} = $self->app->json->true;
+            } else {
+                $cacheAccess->{$term ."::". $document->{workgroup}} = $self->app->json->false;
+                $document->{access}->{$_} = $self->app->json->false;
+            }
+
+        }
+    }
 
     return $self;
 }
