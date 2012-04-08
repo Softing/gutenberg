@@ -70,7 +70,7 @@ Inprint.calendar.CopyAttachmentAction = function() {
         parent: this
     });
 
-    form.setId( this.getRecord().get("id") );
+    form.setSource( this.getRecord().get("id") );
 
     form.on('actioncomplete', function(basicForm, action) {
         if (action.type == "submit") {

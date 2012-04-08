@@ -10,6 +10,18 @@ Inprint.calendar.forms.AttachmentUpdate = Ext.extend( Ext.form.FormPanel,
 
             {
                 xtype: "titlefield",
+                value: _("Basic parameters")
+            },
+
+            {
+                xtype: "textfield",
+                name: "shortcut",
+                allowBlank:false,
+                fieldLabel: _("Shortcut")
+            },
+
+            {
+                xtype: "titlefield",
                 value: _("Additional parameters")
             },
 

@@ -5,7 +5,21 @@ Inprint.calendar.issues.Interaction = function(parent, panels) {
     var issues = panels.issues;
     var attachments = panels.attachments;
 
-    issues.on("afterrender", function() { _enable(issues.btnCreate); });
+    issues.on("afterrender", function() {
+        _a(["editions.fascicle.manage:*"], null, function(access) {
+            if (access["editions.fascicle.manage"] === true) {
+                _enable(issues.btnCreate);
+            }
+        });
+    });
+
+    attachments.on("afterrender", function() {
+        _a(["editions.attachment.manage:*"], null, function(access) {
+            if (access["editions.attachment.manage"] === true) {
+                _enable(attachments.btnCreate);
+            }
+        });
+    });
 
     issues.store.on("beforeload", function(store, records, options) {
         attachments.disable();
@@ -25,21 +39,20 @@ Inprint.calendar.issues.Interaction = function(parent, panels) {
                 issues.btnDisable, issues.btnEnable,
                 issues.btnCopy, issues.btnProperties, issues.btnArchive, issues.btnFormat);
 
-        _enable(
-                issues.btnCreate, issues.btnUpdate, issues.btnDelete,
-                issues.btnOpenPlan, issues.btnOpenComposer,
-                issues.btnDisable, issues.btnEnable,
-                issues.btnCopy, issues.btnProperties, issues.btnArchive, issues.btnFormat);
+        _a(["editions.fascicle.manage:*"], edition, function(access) {
+            if (access["editions.fascicle.manage"] === true) {
+                _enable(issues.btnCreate, issues.btnUpdate, issues.btnDelete,
+                        issues.btnOpenPlan, issues.btnOpenComposer,
+                        issues.btnDisable, issues.btnEnable,
+                        issues.btnCopy, issues.btnProperties, issues.btnArchive, issues.btnFormat);
+            }
+        });
 
         attachments.enable();
-        _enable(attachments, attachments.btnCreate);
 
         attachments.store.load({
             params: { edition: edition, issue: issue }
         });
-
-        //_a(["editions.template.manage:*"], edition, function(access) {
-        //});
 
     });
 
@@ -51,15 +64,19 @@ Inprint.calendar.issues.Interaction = function(parent, panels) {
         var edition = record.get("edition");
 
         _disable(
-                attachments.btnCreate, attachments.btnUpdate, attachments.btnDelete,
+                attachments.btnUpdate, attachments.btnDelete,
                 attachments.btnOpenPlan, attachments.btnOpenComposer,
                 attachments.btnDisable, attachments.btnEnable,
                 attachments.btnCopy, attachments.btnProperties, attachments.btnArchive, attachments.btnFormat);
-        _enable(
-                attachments.btnCreate, attachments.btnUpdate, attachments.btnDelete,
-                attachments.btnOpenPlan, attachments.btnOpenComposer,
-                attachments.btnDisable, attachments.btnEnable,
-                attachments.btnCopy, attachments.btnProperties, attachments.btnArchive, attachments.btnFormat);
+
+        _a(["editions.attachment.manage:*"], edition, function(access) {
+            if (access["editions.attachment.manage"] === true) {
+                _enable(attachments.btnUpdate, attachments.btnDelete,
+                        attachments.btnOpenPlan, attachments.btnOpenComposer,
+                        attachments.btnDisable, attachments.btnEnable,
+                        attachments.btnCopy, attachments.btnProperties, attachments.btnArchive, attachments.btnFormat);
+            }
+        });
 
     });
 

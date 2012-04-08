@@ -16,6 +16,7 @@ Inprint.calendar.forms.CreateIssueForm = Ext.extend( Ext.form.FormPanel, {
                 allowBlank:false,
                 fieldLabel: _("Shortcut")
             },
+            
             {
                 xtype: "textfield",
                 name: "description",

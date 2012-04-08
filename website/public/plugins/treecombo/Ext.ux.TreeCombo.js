@@ -52,7 +52,7 @@ Ext.ux.form.TreeCombo = Ext.extend(Ext.form.TriggerField, {
         this.getTree().show();
         this.getTree().getEl().alignTo(this.wrap, 'tl-bl?');
     },
-    
+
     reload: function (params) {
         if (params) {
             Ext.apply(this.getTree().getLoader().baseParams, params);
@@ -119,18 +119,18 @@ Ext.ux.form.TreeCombo = Ext.extend(Ext.form.TriggerField, {
                 width: this.minListWidth,
                 height: this.minListHeight,
                 listeners: {
+                    scope: this,
                     hide: this.onTreeHide,
                     show: this.onTreeShow,
                     click: this.onTreeNodeClick,
                     expandnode: this.onExpandOrCollapseNode,
                     collapsenode: this.onExpandOrCollapseNode,
-                    resize: this.onTreeResize,
-                    scope: this
+                    resize: this.onTreeResize
                 }
             });
 
-            this.treePanel.show();
-            this.treePanel.hide();
+            //this.treePanel.show();
+            //this.treePanel.hide();
 
             this.relayEvents(this.treePanel.loader, ['beforeload', 'load', 'loadexception']);
 
