@@ -533,7 +533,6 @@ sub download {
         my $root = $c->config->get("store.path");
         my $folder = $root . $object->{fs_folder};
 
-
         opendir(my $dh, $folder) || die "can't opendir $folder: $!";
         my @files = readdir($dh);
         closedir $dh;

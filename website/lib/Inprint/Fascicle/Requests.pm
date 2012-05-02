@@ -85,7 +85,7 @@ sub create {
 
     my $id = $c->uuid();
     my $group_id = $c->uuid();
-    my $fs_folder = sprintf ("/%04d-%02d/%s", ((localtime)[5] +1900), ((localtime)[4] +1), $id);
+    my $fs_folder = sprintf ("/datastore/requests/%04d-%02d/%s", ((localtime)[5] +1900), ((localtime)[4] +1), $id);
 
     my $i_shortcut    = $c->param("shortcut")       // undef;
     my $i_description = $c->param("description")    // undef;

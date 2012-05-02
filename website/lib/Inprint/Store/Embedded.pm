@@ -13,7 +13,7 @@ use Encode;
 use strict;
 
 use File::Copy qw(copy move);
-use File::Path qw(make_path remove_tree);
+use File::Path qw(mkpath make_path remove_tree);
 
 use Inprint::Store::Cache;
 use Inprint::Store::Embedded::Editor;
@@ -31,7 +31,8 @@ sub updateCache {
     my $fs_root = $c->config->get("store.path");
     my $fs_path = "$fs_root/$fs_folder";
 
-    mkdir $fs_path;
+    mkpath $fs_path;
+
     Inprint::Store::Embedded::Utils::checkFolder($c, $fs_path);
 
     my @files;
