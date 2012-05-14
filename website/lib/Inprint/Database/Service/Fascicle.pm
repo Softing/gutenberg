@@ -82,26 +82,23 @@ sub Summary {
 
     my ($self) = @_;
 
+    my $statusbar_adv = 0;
+
     my $statusbar_all = $self->sql->Q("
         SELECT count(*)
         FROM fascicles_pages
         WHERE fascicle=? AND seqnum is not null ", [ $self->id ])->Value;
 
-    my $statusbar_adv = 0;
-
+    # Count modules
     my $modules = $self->sql->Q("
-            SELECT t1.*
+            SELECT t1.id, t1.area, t1.amount
             FROM fascicles_modules t1, fascicles_map_modules t2, fascicles_pages t3
             WHERE
-                t2.module = t1.id AND t2.page = t3.id AND t3.fascicle=?
-        ", [ $self->id ]
-    )->Hashes;
-
+                t2.module = t1.id AND t2.page = t3.id AND t3.fascicle=? ",
+        [ $self->id ])->Hashes;
     foreach  my $module(@$modules){
-
-        $module->{amount} = 1 if ($module->{amount} > 1);
-
-        $statusbar_adv +=  $module->{amount};
+        $module->{area} = 1 if ($module->{amount} > 1);
+        $statusbar_adv +=  $module->{area};
     }
 
     my $statusbar_doc = $statusbar_all - $statusbar_adv;
