@@ -144,9 +144,12 @@ sub save {
         $c->sql->bt;
 
         foreach my $node (@i_modules) {
-            my %modpages;
+
+            next unless $node;
 
             my ($place_id, $modtype_id, $seqnumstr) = split '::', $node;
+
+            my %modpages;
 
             my $place = $c->Q(" SELECT * FROM fascicles_tmpl_places WHERE id=? AND fascicle=? ", [ $place_id, $fascicle->{id} ])->Hash;
             next unless ($place->{id});
@@ -265,6 +268,8 @@ sub save {
         $c->sql->bt;
         foreach my $node (@i_documents) {
 
+            next unless $node;
+
             my ($id, $seqnumstr) = split '::', $node;
             next unless ($id);
 
@@ -292,6 +297,7 @@ sub save {
 
                     # Update page Headline
                     if ($document->{headline}) {
+
                         my $headline = $c->Q("
                             SELECT * FROM fascicles_indx_headlines WHERE id = ? ",
                             $document->{headline})->Hash;
@@ -303,11 +309,13 @@ sub save {
                         }
 
                         if ($headline) {
+
                             my $fascicle_headline = $c->Q("
                                 SELECT * FROM fascicles_indx_headlines WHERE fascicle = ? AND title = ?",
                                 [ $fascicle->{id}, $headline->{title} ])->Hash;
 
                             unless ($fascicle_headline) {
+
                                 my $fascicle_headline = $c->Do("
                                     INSERT INTO fascicles_indx_headlines
                                         (edition, fascicle, tag, bydefault, title, description, created, updated)
@@ -318,7 +326,8 @@ sub save {
 
                                 $fascicle_headline = $c->Q("
                                     SELECT * FROM fascicles_indx_headlines WHERE fascicle = ? AND title = ?",
-                                    $fascicle->{id}, $headline->{title})->Hash;
+                                    [ $fascicle->{id}, $headline->{title} ])->Hash;
+
                             }
 
                             if ($fascicle_headline) {
