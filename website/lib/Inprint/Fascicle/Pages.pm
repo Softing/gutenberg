@@ -212,100 +212,240 @@ sub move {
 
     my $fascicle = $c->check_record(\@errors, "fascicles", "fascicle", $i_fascicle);
 
+    my $dbg = "\nAfter $i_after = ". join(",", @i_pages) ."\n";
+
     unless (@errors) {
 
+        # Select all pages
         my $composition = $c->Q("
             SELECT id, edition, fascicle, headline, seqnum, w, h, created, updated
-            FROM fascicles_pages WHERE fascicle = ?; ",[
-                $i_fascicle
-            ])->Hashes;
+            FROM fascicles_pages WHERE fascicle = ? ORDER BY seqnum ",
+            [ $i_fascicle ])->Hashes;
 
-        my $dbg;
-
-        my @inputPages;
-
+        # Select managed pages
+        my @inputPagesDirty;
         foreach my $item (@i_pages) {
+
             my ($id, $seqnum) = split "::", $item;
-            my $page = $c->Q(" SELECT * FROM fascicles_pages WHERE id=? AND seqnum=? ", [ $id, $seqnum ])->Hash;
+
+            my $page = $c->Q("
+                SELECT * FROM fascicles_pages
+                WHERE 1=1
+                    AND id=?
+                    AND seqnum=? ",
+                [ $id, $seqnum ])->Hash;
+
             if ($page->{id}) {
-                push @inputPages, $page;
+                push @inputPagesDirty, $page;
             }
         }
 
-        @inputPages = sort { $a->{seqnum} < $b->{seqnum} } @inputPages;
+        # Sort managed pages by seqnum
 
-        my @pagesForUpdate;
-
-        foreach my $page (@inputPages) {
-
-            $dbg .= " [ $page->{seqnum} ] !!! ";
-
-            @$composition = sort { $a > $b} @$composition;
-
-            if ($page->{id}) {
-
-                if ( $page->{seqnum} > $i_after ) {
-
-                    foreach my $oldpage (@$composition) {
-
-                        if ( $oldpage->{id} eq $page->{id} ) {
-                            #$dbg .= " $oldpage->{seqnum} == ";
-                            $oldpage->{seqnum} = $i_after+1;
-                            #$oldpage->{is_updated} = 1;
-                            push @pagesForUpdate, $oldpage;
-                            #$dbg .= " $oldpage->{seqnum} | ";
-                        }
-                        elsif ( $oldpage->{seqnum} > $i_after && $oldpage->{seqnum} < $page->{seqnum} + 1 ) {
-                            #$dbg .= " $oldpage->{seqnum} > ";
-                            $oldpage->{seqnum} ++;
-                            #$oldpage->{is_updated} = 1;
-                            push @pagesForUpdate, $oldpage;
-                            #$dbg .= " $oldpage->{seqnum} | ";
-                        }
-                    }
-                }
-
-                if ( $page->{seqnum} < $i_after ) {
-                    foreach my $oldpage (@$composition) {
-
-                        if ( $oldpage->{id} eq $page->{id} ) {
-                            #$dbg .= " $oldpage->{seqnum} == ";
-                            $oldpage->{seqnum} = $i_after;
-                            #$oldpage->{is_updated} = 1;
-                            push @pagesForUpdate, $oldpage;
-                            #$dbg .= " $oldpage->{seqnum} | ";
-                        }
-
-                        elsif ( $oldpage->{seqnum} > $page->{seqnum} &&  $oldpage->{seqnum} < $i_after+1 ) {
-                            #$dbg .= " $oldpage->{seqnum} > ";
-                            $oldpage->{seqnum} --;
-                            #$oldpage->{is_updated} = 1;
-                            push @pagesForUpdate, $oldpage;
-                            #$dbg .= " $oldpage->{seqnum} | ";
-                        }
-
-                    }
-                }
-
+        my @inputPagesLeft;
+        foreach my $page (@inputPagesDirty) {
+            if ($page->{seqnum} < $i_after) {
+                push @inputPagesLeft, $page;
             }
-
         }
+        @inputPagesLeft = sort { $a->{seqnum} > $b->{seqnum} } @inputPagesLeft;
+
+        my @inputPagesRight;
+        foreach my $page (@inputPagesDirty) {
+            if ($page->{seqnum} > $i_after) {
+                push @inputPagesRight, $page;
+            }
+        }
+        @inputPagesRight = sort { $a->{seqnum} < $b->{seqnum} } @inputPagesRight;
+
+        my @inputPages = (@inputPagesLeft, @inputPagesRight);
+
+        foreach  (@inputPages) {
+            $dbg .= $_->{seqnum} . " > ";
+        }
+
+        $dbg .= "\n----------------------------------------------\n";
+
+        # Prepare pages for update
+        my $data = [];
+        foreach my $oldpage (@$composition) {
+            my $item = {
+                id => $oldpage->{id},
+                seqnum => int $oldpage->{seqnum},
+                oldseqnum => int $oldpage->{seqnum},
+            };
+            push @$data, $item;
+        }
+
+        $dbg = debug1($dbg, $data);
+
+        $dbg .= "\n----------------------------------------------\n";
+        foreach my $movedPage (@inputPagesRight) {
+            $dbg .= "Move [$movedPage->{seqnum}] \n";
+            $data = movePageLeft($data, $movedPage, $i_after);
+        }
+        $dbg .= "\n----------------------------------------------\n";
+
+
+        $dbg .= "\n----------------------------------------------\n";
+        foreach my $movedPage (@inputPagesLeft) {
+            $dbg .= "Move [$movedPage->{seqnum}] \n";
+            $data = movePageRight($data, $movedPage, $i_after);
+        }
+        $dbg .= "\n----------------------------------------------\n";
+
+        $dbg = $dbg = debug1($dbg, $data);
+
+        #die $dbg;
 
         $c->sql->bt;
-
-        foreach my $page (@pagesForUpdate) {
+        foreach my $page (@$data) {
             $c->Do(" UPDATE fascicles_pages SET seqnum=? WHERE id=? ", [$page->{seqnum}, $page->{id}]);
         }
-
-        # Create event
         Inprint::Fascicle::Events::onCompositionChanged($c, $fascicle);
-
         $c->sql->et;
 
     }
 
     $c->smart_render(\@errors);
 }
+
+sub movePageLeft {
+
+    my $composition = shift;
+    my $movedPage = shift;
+    my $afterPage = shift;
+
+    my $dbg;
+
+    my $movedPageSeqnum = $movedPage->{seqnum};
+    foreach my $oldpage (@$composition) {
+        if ( $oldpage->{id} eq $movedPage->{id}) {
+            $movedPageSeqnum = $oldpage->{seqnum};
+        }
+    }
+
+    # Удаляем полосу из потока
+    foreach my $oldpage (@$composition) {
+
+        #$dbg .= ">$oldpage->{oldseqnum}=$oldpage->{seqnum}";
+
+        if ( $oldpage->{id} eq $movedPage->{id}) {
+            $oldpage->{seqnum} = -1;
+        }
+    }
+    #$dbg .= "\n";
+    #$dbg = debug1($dbg, \@data);
+
+    foreach my $oldpage (@$composition) {
+
+        #$dbg .= ">$oldpage->{oldseqnum}=$oldpage->{seqnum}";
+
+        if ( $oldpage->{seqnum} > $movedPageSeqnum) {
+            $oldpage->{seqnum} --;
+        }
+    }
+    #$dbg .= "\n";
+    #$dbg = debug1($dbg, $composition);
+
+    foreach my $oldpage (@$composition) {
+
+        #$dbg .= ">$oldpage->{oldseqnum}=$oldpage->{seqnum}";
+
+        if ( $oldpage->{seqnum} > $afterPage) {
+            $oldpage->{seqnum} ++;
+        }
+    }
+    #$dbg .= "\n";
+    #$dbg = debug1($dbg, $composition);
+
+    foreach my $oldpage (@$composition) {
+
+        #$dbg .= ">$oldpage->{oldseqnum}=$oldpage->{seqnum}";
+
+        if ( $oldpage->{id} eq $movedPage->{id}) {
+            $oldpage->{seqnum} = $afterPage + 1;
+        }
+    }
+    #$dbg .= "\n";
+    #$dbg = debug1($dbg, $composition);
+
+    return $composition;
+}
+
+sub movePageRight {
+
+    my $composition = shift;
+    my $movedPage = shift;
+    my $afterPage = shift;
+
+    my $dbg;
+
+    my $movedPageSeqnum = $movedPage->{seqnum};
+    foreach my $oldpage (@$composition) {
+        if ( $oldpage->{id} eq $movedPage->{id}) {
+            $movedPageSeqnum = $oldpage->{seqnum};
+        }
+    }
+
+    # Удаляем полосу из потока
+    foreach my $oldpage (@$composition) {
+        if ( $oldpage->{id} eq $movedPage->{id}) {
+            $oldpage->{seqnum} = -1;
+        }
+    }
+    #$dbg = debug1($dbg, $composition);
+
+    foreach my $oldpage (@$composition) {
+
+        if (
+            $oldpage->{seqnum} > $movedPageSeqnum
+            &&
+            $oldpage->{seqnum} <= $afterPage
+        ) {
+            $oldpage->{seqnum} --;
+        }
+    }
+    #$dbg = debug1($dbg, $composition);
+
+    foreach my $oldpage (@$composition) {
+        if ( $oldpage->{id} eq $movedPage->{id}) {
+            $oldpage->{seqnum} = $afterPage;
+        }
+    }
+    #$dbg = debug1($dbg, $composition);
+
+    foreach my $oldpage (@$composition) {
+
+        #$dbg .= ">$oldpage->{oldseqnum}=$oldpage->{seqnum}";
+
+        if (
+            $oldpage->{seqnum} > $afterPage
+            &&
+            $oldpage->{seqnum} <= $afterPage
+        ) {
+            $oldpage->{seqnum} --;
+        }
+    }
+    #$dbg = debug1($dbg, $composition);
+
+    #die $dbg;
+
+    return $composition;
+}
+
+sub debug1 {
+
+    my $dbg  = shift . "\n";
+    my $composition = shift;
+
+    foreach my $oldpage (@$composition) {
+        $dbg .= "$oldpage->{id} = $oldpage->{oldseqnum} > $oldpage->{seqnum}\n";
+    }
+
+    return $dbg . "\n";
+}
+
 
 sub right {
 
