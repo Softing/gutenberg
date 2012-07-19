@@ -31,9 +31,19 @@ sub seance {
     my $summary     = $fascicle->Summary();
     my $access      = $fascicle->Access();
     
-    if ( $fascicle->adv_modules > 0 ) {
-        if ( $fascicle->adv_modules < $summary->{ac}) {
-            $access->{advert} = 0;
+    #Restrict by modules
+    if ( $fascicle->adv_modules && $fascicle->adv_modules > 0 ) {
+        if ( $fascicle->adv_modules <= $summary->{ac}) {
+            $access->{advert_create} = 0;
+            $access->{advert_update} = 1;
+        }
+    }
+    
+    #Restrict by date
+    unless (@errors) {    
+        if ($fascicle->adv_date && time() >= str2time($fascicle->adv_date)) {
+            $access->{advert_create} = 0;
+            $access->{advert_update} = 0;
         }
     }
     
@@ -65,7 +75,7 @@ sub check {
     my $access      = $fascicle->Access();
     
     #Restrict by modules
-    if ( $fascicle->adv_modules > 0 ) {
+    if ( $fascicle->adv_modules && $fascicle->adv_modules > 0 ) {
         if ( $fascicle->adv_modules <= $summary->{ac}) {
             $access->{advert_create} = 0;
             $access->{advert_update} = 1;
@@ -74,7 +84,7 @@ sub check {
     
     #Restrict by date
     unless (@errors) {    
-        if (time() >= str2time($fascicle->adv_date)) {
+        if ($fascicle->adv_date && time() >= str2time($fascicle->adv_date)) {
             $access->{advert_create} = 0;
             $access->{advert_update} = 0;
         }

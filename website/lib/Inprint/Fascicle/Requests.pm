@@ -213,7 +213,7 @@ sub create {
             $adv_modules +=  $module->{area};
         }
         
-        if ($fascicle->{adv_modules} <= $adv_modules) {
+        if ($fascicle->{adv_modules} && $fascicle->{adv_modules} <= $adv_modules) {
             $error_restrict = 1;
             push @errors, { id => "restricted", msg => "advertisements.restricted.exceeded_amount" };
         }
@@ -221,7 +221,7 @@ sub create {
     
     #Restrict by date
     unless (@errors) {    
-        if (time() >= str2time($fascicle->{adv_date})) {
+        if ($fascicle->{adv_date} && time() >= str2time($fascicle->{adv_date})) {
             $error_restrict = 1;
             push @errors, { id => "restricted", msg => "advertisements.restricted.exceeded_time" };
         }
