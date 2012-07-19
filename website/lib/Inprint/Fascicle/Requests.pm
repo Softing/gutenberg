@@ -9,6 +9,8 @@ use utf8;
 use strict;
 use warnings;
 
+use Date::Parse;
+
 use Inprint::Fascicle::Events;
 use Inprint::Models::Fascicle::Request;
 
@@ -192,6 +194,39 @@ sub create {
     push @errors, { id => "place", msg => "Can't find object"} unless ($place->{id});
     push @errors, { id => "template", msg => "Can't find object"} unless ($template->{id});
 
+    my $error_restrict = 0;
+    
+    #Restrict by modules
+    unless (@errors) {
+        
+        my $adv_modules = 0;
+        
+        my $modules = $c->Q("
+                SELECT t1.id, t1.area, t1.amount
+                FROM fascicles_modules t1, fascicles_map_modules t2, fascicles_pages t3
+                WHERE
+                    t2.module = t1.id AND t2.page = t3.id AND t3.fascicle=? ",
+            [ $fascicle->{id} ])->Hashes;
+        
+        foreach  my $module(@$modules){
+            $module->{area} = 1 if ($module->{amount} > 1);
+            $adv_modules +=  $module->{area};
+        }
+        
+        if ($fascicle->{adv_modules} <= $adv_modules) {
+            $error_restrict = 1;
+            push @errors, { id => "restricted", msg => "advertisements.restricted.exceeded_amount" };
+        }
+    }
+    
+    #Restrict by date
+    unless (@errors) {    
+        if (time() >= str2time($fascicle->{adv_date})) {
+            $error_restrict = 1;
+            push @errors, { id => "restricted", msg => "advertisements.restricted.exceeded_time" };
+        }
+    }
+    
     unless (@errors) {
 
         $c->Do("
@@ -234,10 +269,20 @@ sub create {
             $i_shortcut, $i_description,
             $i_status, $i_squib, $i_payment, $i_readiness
         ]);
+    } else {
+        if($error_restrict) {
+            $c->Do("
+                    DELETE 
+                    FROM fascicles_modules
+                    WHERE id=?
+                ", [ $module->{id} ]);
+        }
     }
 
     # Create event
-    Inprint::Fascicle::Events::onCompositionChanged($c, $fascicle);
+    unless (@errors) {
+        Inprint::Fascicle::Events::onCompositionChanged($c, $fascicle);
+    }
 
     $success = $c->json->true unless (@errors);
     $c->render_json({ success => $success, errors => \@errors });
@@ -274,9 +319,6 @@ sub update {
 
     my $fascicle   = $c->check_record(\@errors, "fascicles", "fascicle", $i_fascicle);
 
-    #my $module = $c->Q(" SELECT * FROM fascile_modules WHERE id=? ", [ $i_module ])->Hash;
-    #my $place  = $c->Q(" SELECT * FROM fascile_tmpl_places WHERE id=? ", [ $module->{place} ])->Hash;
-
     unless (@errors) {
         $c->Do("
             UPDATE fascicles_requests SET
@@ -295,7 +337,9 @@ sub update {
     }
 
     # Create event
-    Inprint::Fascicle::Events::onCompositionChanged($c, $fascicle);
+    unless (@errors) {
+        Inprint::Fascicle::Events::onCompositionChanged($c, $fascicle);
+    }
 
     $success = $c->json->true unless (@errors);
     $c->render_json({ success => $success, errors => \@errors });

@@ -56,8 +56,10 @@ sub Access {
     $access->{capture}  = 0;
     $access->{close}    = 0;
     $access->{save}     = 0;
-    $access->{advert}   = $canAdvert;
-
+    
+    $access->{advert_create} = $canAdvert;
+    $access->{advert_update} = $canAdvert;
+    
     if ($self->manager) {
 
         $access->{open}  = 0;
@@ -116,6 +118,8 @@ sub Summary {
 
     my $summary = {};
 
+    $summary->{modules}  = $statusbar_adv || 0;
+    
     $summary->{pc}  = $statusbar_all || 0;
     $summary->{dc}  = sprintf "%.2f", $statusbar_doc || 0;
     $summary->{ac}  = sprintf "%.2f", $statusbar_adv || 0;

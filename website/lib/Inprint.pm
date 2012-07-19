@@ -169,6 +169,7 @@ sub startup {
     $sessionBridge->route("/calendar/attachment/create/")               ->to("calendar-attachment#create");
     $sessionBridge->route("/calendar/attachment/read/")                 ->to("calendar-attachment#read");
     $sessionBridge->route("/calendar/attachment/update/")               ->to("calendar-attachment#update");
+    $sessionBridge->route("/calendar/attachment/restrictions/")         ->to("calendar-attachment#restrictions");
     $sessionBridge->route("/calendar/attachment/remove/")               ->to("calendar-attachment#remove");
     $sessionBridge->route("/calendar/attachment/list/")                 ->to("calendar-attachment#list");
     $sessionBridge->route("/calendar/attachment/copy/")                 ->to("calendar-attachment#copy");

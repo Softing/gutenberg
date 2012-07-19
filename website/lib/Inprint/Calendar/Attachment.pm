@@ -72,6 +72,7 @@ sub list {
             t1.archived,
             t1.doc_enabled,
             t1.adv_enabled,
+            t1.adv_modules,
 
             to_char(t1.doc_date, 'YYYY-MM-DD HH24:MI:SS')       as doc_date,
             to_char(t1.adv_date, 'YYYY-MM-DD HH24:MI:SS')       as adv_date,
@@ -123,8 +124,23 @@ sub create {
     my $template = $c->check_record(\@errors, "template",  "template", $i_template);
 
     unless (@errors) {
+        my $exists = $c->Q("
+            SELECT * 
+            FROM fascicles 
+            WHERE 1=1
+                AND edition = ?
+                AND parent  = ? ", [$i_edition, $i_parent])->Hash;
+                
+        if (exists $exists->{id}) {
+            return $c->throw("edition", "This object already exists in databse");
+        }
+    }
+    
+    unless (@errors) {
 
         my $id = $c->uuid;
+        
+        my $adv_modules = $template->{adv_modules} // $fascicle->{adv_modules};
 
         Inprint::Models::Attachment::create(
             $c, $id,
@@ -132,7 +148,7 @@ sub create {
             $fascicle->{shortcut}, $fascicle->{description},
             $template->{id}, $template->{shortcut},
             $i_circulation, $fascicle->{num}, $fascicle->{anum},
-            $fascicle->{doc_date}, $fascicle->{adv_date},
+            $fascicle->{doc_date}, $fascicle->{adv_date}, $adv_modules,
             $fascicle->{print_date}, $fascicle->{release_date}
         );
 
@@ -157,41 +173,40 @@ sub update {
     my $i_id           = $c->get_uuid(\@errors, "id");
 
     my $i_shortcut     = $c->get_text(\@errors, "shortcut", 1);
-    #my $i_description  = $c->get_text(\@errors, "description", 1) || "";
-
-    #my $i_num          = $c->get_int(\@errors, "num", 1) || 0;
-    #my $i_anum         = $c->get_int(\@errors, "anum", 1) || 0;
-
-    #my $i_print_date   = $c->get_date(\@errors, "print_date", 1);
-    #my $i_release_date = $c->get_date(\@errors, "release_date", 1);
 
     my $i_circulation  = $c->get_int(\@errors, "circulation", 1) || 0;
 
-    my $i_adv_date     = $c->get_datetime(\@errors, "adv_date", 1);
-    my $i_doc_date     = $c->get_datetime(\@errors, "doc_date", 1);
-
-    my $i_adv_enabled  = $c->get_flag(\@errors, "adv_enabled", 1) || 0;
-    my $i_doc_enabled  = $c->get_flag(\@errors, "doc_enabled", 1) || 0;
-
     unless (@errors) {
-
-        #Inprint::Models::Attachment::update(
-        #    $c, $i_id, $i_shortcut, $i_description,
-        #    $i_num, $i_anum, $i_circulation,
-        #    $i_print_date, $i_release_date,
-        #    $i_adv_date, $i_doc_date,
-        #    $i_adv_enabled, $i_doc_enabled);
-
         Inprint::Models::Attachment::update(
             $c, $i_id,
             $i_shortcut,
-            $i_circulation,
-            $i_adv_date, $i_doc_date,
-            $i_adv_enabled, $i_doc_enabled);
+            $i_circulation
+        );
     }
 
     $c->smart_render(\@errors);
 }
+
+sub restrictions {
+    my $c = shift;
+
+    my @errors;
+
+    my $i_id           = $c->get_uuid(\@errors, "id");
+
+    my $i_adv_date     = $c->get_datetime(\@errors, "adv_date", 1);
+    my $i_adv_modules  = $c->get_float(\@errors, "adv_modules", 1);
+    my $i_doc_date     = $c->get_datetime(\@errors, "doc_date", 1);
+
+    unless (@errors) {
+        Inprint::Models::Attachment::restrictions(
+            $c, $i_id,
+            $i_adv_date, $i_adv_modules, $i_doc_date);
+    }
+
+    $c->smart_render(\@errors);
+}
+
 
 
 sub remove {

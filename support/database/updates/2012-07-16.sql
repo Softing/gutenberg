@@ -1,0 +1,1 @@
+insert into rules (term, section, subsection, icon, title, description, sortorder) values ('restrict', 'editions', 'attachment', 'folder--exclamation', 'Управлять ограничениями', '', 75);

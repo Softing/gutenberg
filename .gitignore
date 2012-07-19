@@ -4,3 +4,15 @@
 *.jar
 *.war
 *.ear
+
+website/log/error.log
+
+website/log/access.log
+
+website/log/development.log
+
+website/app.config
+
+support/translation/en.pm
+
+support/translation/ru.pm

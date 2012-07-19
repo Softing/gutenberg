@@ -15,7 +15,7 @@ sub create {
         $shortcut, $description,
         $num, $anum, $circulation,
         $print_date, $release_date,
-        $adv_date, $doc_date,
+        $adv_date, $adv_modules, $doc_date,
         $adv_enabled, $doc_enabled ) = @_;
 
     my $variation = $c->uuid;
@@ -23,21 +23,54 @@ sub create {
     $c->Do("
         INSERT INTO fascicles(
             id,
-            edition, parent,
-            fastype, variation,
-            shortcut, description,
-            circulation, num, anum, manager, enabled, archived,
-            doc_enabled, adv_enabled, doc_date, adv_date, print_date, release_date, created, updated)
+            edition, 
+            parent,
+            fastype, 
+            variation,
+            shortcut, 
+            description,
+            circulation, 
+            num, 
+            anum, 
+            manager, 
+            enabled, 
+            archived,
+            doc_enabled, 
+            adv_enabled,  
+            doc_date, 
+            adv_date, 
+            adv_modules,
+            print_date, 
+            release_date, 
+            created, 
+            updated)
         VALUES (
             ?,
-            ?, ?,
-            'issue', ?,
-            ?, ?,
-            ?, ?, ?, null, true, false, ?, ?, ?, ?, ?, ?, now(), now());
+            ?, 
+            ?,
+            'issue', 
+            ?,
+            ?, 
+            ?,
+            ?, 
+            ?, 
+            ?, 
+            null, 
+            true, 
+            false, 
+            ?, 
+            ?, 
+            ?, 
+            ?,
+            ?, 
+            ?, 
+            ?, 
+            now(), 
+            now());
 
     ", [ $id, $edition, $edition, $variation, $shortcut, $description,
         $circulation, $num, $anum,
-        $doc_enabled, $adv_enabled, $doc_date, $adv_date, $print_date, $release_date ]);
+        $doc_enabled, $adv_enabled, $doc_date, $adv_date, $adv_modules, $print_date, $release_date ]);
 
     return $id;
 }
@@ -48,12 +81,22 @@ sub read {
 
     my $result = $c->Q("
         SELECT
-            id, edition, parent, fastype, variation,
-            shortcut, description,
-            circulation, num, anum,
+            id, 
+            edition, 
+            parent, 
+            fastype, 
+            variation,
+            shortcut, 
+            description,
+            circulation, 
+            num, 
+            anum,
             manager,
-            enabled, archived,
-            doc_enabled, adv_enabled,
+            enabled, 
+            archived,
+            doc_enabled, 
+            adv_enabled,
+            adv_modules,
 
             to_char(doc_date,     'YYYY-MM-DD HH24:MI:SS') as doc_date,
             to_char(adv_date,     'YYYY-MM-DD HH24:MI:SS') as adv_date,
@@ -63,8 +106,9 @@ sub read {
             to_char(created, 'YYYY-MM-DD HH24:MI:SS') as created,
             to_char(updated, 'YYYY-MM-DD HH24:MI:SS') as updated
         FROM fascicles
-        WHERE id=?
-    ", [ $id ])->Hash;
+        WHERE id=? ", 
+        
+        [ $id ])->Hash;
 
     return $result;
 }
@@ -75,40 +119,51 @@ sub update {
         $shortcut, $description,
         $num, $anum, $circulation,
         $print_date, $release_date,
-        $adv_date, $doc_date,
+        $adv_date, $adv_modules, $doc_date,
         $adv_enabled, $doc_enabled ) = @_;
 
     $c->Do("
         UPDATE fascicles
-            SET shortcut =?, description =?,
-                num =?, anum =?, circulation =?,
-                print_date =?, release_date =?,
-                adv_date =?,  doc_date =?,
-                adv_enabled =?, doc_enabled =?
-        WHERE id =?;
-    ", [    $shortcut, $description,
+            SET 
+                shortcut = ?, 
+                description = ?,
+                num = ?, 
+                anum = ?, 
+                circulation = ?,
+                print_date = ?, 
+                release_date = ?,
+                adv_date = ?,  
+                adv_modules = ?,
+                doc_date = ?,
+                adv_enabled = ?, 
+                doc_enabled = ?
+            WHERE 
+                id =? ", 
+        [
+            $shortcut, $description,
             $num, $anum, $circulation,
             $print_date, $release_date,
-            $adv_date, $doc_date,
+            $adv_date, $adv_modules, $doc_date,
             $adv_enabled, $doc_enabled,
-        $id ]);
+            $id 
+        ]);
 
-    $c->Do("
-        UPDATE fascicles
-            SET
-                num =?, anum =?,
-                print_date =?, release_date =?,
-                adv_date =?,  doc_date =?,
-                adv_enabled =?, doc_enabled =?
-        WHERE 1=1
-            AND fastype = 'attachment'
-            AND parent =?;
-    ", [
-            $num, $anum,
-            $print_date, $release_date,
-            $adv_date, $doc_date,
-            $adv_enabled, $doc_enabled,
-        $id ]);
+    # $c->Do("
+    #         UPDATE fascicles
+    #             SET
+    #                 num =?, anum =?,
+    #                 print_date =?, release_date =?,
+    #                 adv_date =?,  doc_date =?,
+    #                 adv_enabled =?, doc_enabled =?
+    #         WHERE 1=1
+    #             AND fastype = 'attachment'
+    #             AND parent =?;
+    #     ", [
+    #             $num, $anum,
+    #             $print_date, $release_date,
+    #             $adv_date, $doc_date,
+    #             $adv_enabled, $doc_enabled,
+    #         $id ]);
 
     return $c;
 }

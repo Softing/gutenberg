@@ -48,6 +48,7 @@ Inprint.sources = {
     "attachment.create":                "/calendar/attachment/create/",
     "attachment.read":                  "/calendar/attachment/read/",
     "attachment.update":                "/calendar/attachment/update/",
+    "attachment.restrictions":          "/calendar/attachment/restrictions/",
     "attachment.delete":                "/calendar/attachment/remove/",
     "attachment.list":                  "/calendar/attachment/list/",
     "attachment.copy":                  "/calendar/attachment/copy/",

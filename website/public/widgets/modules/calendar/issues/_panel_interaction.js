@@ -64,12 +64,15 @@ Inprint.calendar.issues.Interaction = function(parent, panels) {
         var edition = record.get("edition");
 
         _disable(
-                attachments.btnUpdate, attachments.btnDelete,
+                attachments.btnUpdate, attachments.btnRestrictions, attachments.btnDelete,
                 attachments.btnOpenPlan, attachments.btnOpenComposer,
                 attachments.btnDisable, attachments.btnEnable,
                 attachments.btnCopy, attachments.btnProperties, attachments.btnArchive, attachments.btnFormat);
 
-        _a(["editions.attachment.manage:*"], edition, function(access) {
+        _a(["editions.attachment.manage:*", "editions.attachment.restrict:*"], edition, function(access) {
+            if (access["editions.attachment.restrict"] === true) {
+                _enable(attachments.btnRestrictions);
+            }
             if (access["editions.attachment.manage"] === true) {
                 _enable(attachments.btnUpdate, attachments.btnDelete,
                         attachments.btnOpenPlan, attachments.btnOpenComposer,

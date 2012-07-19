@@ -50,7 +50,7 @@ sub copy {
         $source->{shortcut}, $source->{description},
         $source->{template}, $source->{template_shortcut},
         $source->{circulation}, $source->{num}, $source->{anum},
-        $source->{doc_date}, $source->{adv_date},
+        $source->{doc_date}, $source->{adv_date}, $source->{adv_modules},
         $source->{print_date}, $source->{release_date}
     );
 

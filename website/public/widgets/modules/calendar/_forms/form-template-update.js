@@ -18,6 +18,12 @@ Inprint.calendar.forms.UpdateTemplateForm = Ext.extend( Ext.form.FormPanel, {
                 name: "description",
                 fieldLabel: _("Description")
             },
+            
+            {
+                xtype: "numberfield",
+                name: "adv_modules",
+                fieldLabel: _("Modules")
+            }
 
         ];
 

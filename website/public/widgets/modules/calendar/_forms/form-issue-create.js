@@ -87,60 +87,46 @@ Inprint.calendar.forms.CreateIssueForm = Ext.extend( Ext.form.FormPanel, {
                 value: 0
             },
 
+            {
+                xtype: "titlefield",
+                value: _("Restrictions")
+            },
+            {
+                labelWidth: 20,
+                xtype: "xdatetime",
+                name: "doc_date",
+                format: "F j, Y",
+                fieldLabel: _("Documents")
+            },
+            {
+                xtype: 'xdatetime',
+                name: 'adv_date',
+                format:'F j, Y',
+                fieldLabel: _("Advertisement")
+            },
+            {
+                xtype: "numberfield",
+                name: "adv_modules",
+                fieldLabel: _("Modules")
+            },
 
             {
                 xtype: "titlefield",
                 value: _("Deadline")
             },
-
             {
                 format:'F j, Y',
                 name: 'print_date',
                 xtype: 'xdatefield',
                 submitFormat:'Y-m-d',
-                fieldLabel: _("Printing shop")
+                fieldLabel: _("To print")
             },
             {
                 xtype: 'xdatefield',
                 name: 'release_date',
                 format:'F j, Y',
                 submitFormat:'Y-m-d',
-                fieldLabel: _("Publication")
-            },
-
-            {
-                labelWidth: 20,
-                xtype: "xdatetime",
-                name: "doc_date",
-                format: "F j, Y",
-                //submitFormat: "Y-m-d",
-                fieldLabel: _("Documents")
-            },
-            {
-                xtype: "checkbox",
-                name: "doc_enabled",
-                checked: true,
-                fieldLabel: "",
-                boxLabel: _("Enabled")
-            },
-
-            {
-                xtype: "spacerfield"
-            },
-
-            {
-                xtype: 'xdatetime',
-                name: 'adv_date',
-                format:'F j, Y',
-                //submitFormat:'Y-m-d',
-                fieldLabel: _("Advertisement")
-            },
-            {
-                xtype: "checkbox",
-                name: "adv_enabled",
-                checked: true,
-                fieldLabel: "",
-                boxLabel: _("Enabled")
+                fieldLabel: _("To publication")
             }
 
         ];

@@ -22,4 +22,7 @@ Inprint.fx.btn.Update = function(ref, callback) {
 Inprint.fx.btn.Copy = function(ref, callback) {
     return Inprint.fx.btn.Button(ref, "document-copy", "Copy", "", callback);
 }
+Inprint.fx.btn.Restrictions = function(ref, callback) {
+    return Inprint.fx.btn.Button(ref, "document-copy", "Restrictions", "", callback);
+}
 

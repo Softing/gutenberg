@@ -26,8 +26,13 @@ sub read {
         my $sql = "
             SELECT
                 t1.id,
-                t2.id as edition, t2.shortcut as edition_shortcut,
-                t1.shortcut, t1.description,
+                t2.id as edition,
+                t2.shortcut as edition_shortcut,
+                
+                t1.shortcut,
+                t1.description,
+                t1.adv_modules,
+                
                 to_char(t1.created, 'YYYY-MM-DD HH24:MI:SS') as created,
                 to_char(t1.updated, 'YYYY-MM-DD HH24:MI:SS') as updated
             FROM template t1, editions t2
@@ -57,8 +62,11 @@ sub list {
         my $sql = "
             SELECT
                 t1.id,
-                t2.id as edition, t2.shortcut as edition_shortcut,
-                t1.shortcut, t1.description,
+                t2.id as edition,
+                t2.shortcut as edition_shortcut,
+                t1.shortcut,
+                t1.description,
+                t1.adv_modules,
                 'template' as fastype,
                 to_char(t1.created, 'YYYY-MM-DD HH24:MI:SS') as created,
                 to_char(t1.updated, 'YYYY-MM-DD HH24:MI:SS') as updated
@@ -91,22 +99,27 @@ sub create {
     my $i_edition     = $c->get_uuid(\@errors, "edition");
     my $i_shortcut    = $c->get_text(\@errors, "shortcut");
     my $i_description = $c->get_text(\@errors, "description", 1);
+    my $i_adv_modules  = $c->get_float(\@errors, "adv_modules", 1);
 
     unless (@errors) {
         my $sql = "
             INSERT INTO template (
                 edition,
-                shortcut, description,
-                created, updated)
+                shortcut,
+                description,
+                adv_modules,
+                created,
+                updated)
             VALUES (
                 ?,
-                ?, ?,
+                ?, ?, ?,
                 now(), now()); ";
 
         push @params, $i_edition;
         push @params, $i_shortcut;
         push @params, $i_description;
-
+        push @params, $i_adv_modules;
+        
         $result = $c->Do($sql, \@params);
     }
 
@@ -123,16 +136,21 @@ sub update {
     my $i_id          = $c->get_uuid(\@errors, "id");
     my $i_shortcut    = $c->get_text(\@errors, "shortcut");
     my $i_description = $c->get_text(\@errors, "description", 1);
+    my $i_adv_modules  = $c->get_float(\@errors, "adv_modules", 1);
 
     unless (@errors) {
 
         my $sql = "
             UPDATE template
-            SET shortcut=?, description=?
+                SET
+                    shortcut = ?,
+                    description = ?,
+                    adv_modules = ?
             WHERE id=? ";
 
         push @params, $i_shortcut;
         push @params, $i_description;
+        push @params, $i_adv_modules;
         push @params, $i_id;
 
         $result = $c->Do($sql, \@params);

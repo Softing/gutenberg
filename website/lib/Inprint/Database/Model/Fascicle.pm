@@ -14,7 +14,7 @@ use constant COLUMNS => qw/
     id edition parent manager variation circulation
     shortcut description tmpl tmpl_shortcut fastype
     status deleted enabled archived adv_enabled
-    doc_enabled num anum doc_date adv_date print_date
+    doc_enabled num anum doc_date adv_date adv_modules print_date
     release_date created updated /;
 
 use constant FIELDS => qw/ manager_shortcut /;
@@ -44,6 +44,8 @@ has "archived"          => (isa => "Bool",  is => "rw");
 
 has "adv_enabled"       => (isa => "Bool",  is => "rw");
 has "doc_enabled"       => (isa => "Bool",  is => "rw");
+
+has "adv_modules"       => (isa => "Int",   is => "rw");
 
 has "num"               => (isa => "Int",   is => "rw");
 has "anum"              => (isa => "Int",   is => "rw");

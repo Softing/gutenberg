@@ -22,13 +22,13 @@ find({ wanted => sub {
     if ( (/\.js$/) ) {
         push @jsfiles, $filename;
     }
-}}, "../../public/scripts");
+}}, "../../webiste/public/scripts");
 
 find({ wanted => sub {
     my $filename = $File::Find::name;
     return if $filename =~ m/public\/widgets\/plugins\//;
     push @jsfiles, $filename if ( (/\.js$/) );
-}}, "../../public/widgets");
+}}, "../../website/public/widgets");
 
 @jsfiles = sort { $a cmp $b } @jsfiles;
 
@@ -55,7 +55,7 @@ find({ wanted => sub {
     my $filename = $File::Find::name;
     return if $filename =~ m/lib\/Inprint\/Plugins/;
     push @pmfiles, $filename if ( (/\.pm$/) );
-}}, "../../lib/Inprint");
+}}, "../../website/lib/Inprint");
 
 foreach my $path (@pmfiles) {
     open(my $file, "<:utf8", $path) or die("Could not open $path");
@@ -80,8 +80,8 @@ foreach my $lang (@langs) {
 
     # Add strings to @words from pm file
 
-    if (-r $FindBin::Bin ."/../../lib/Inprint/I18N/$lang.pm") {
-        open (my $source, "<:utf8", $FindBin::Bin ."/../../lib/Inprint/I18N/$lang.pm");
+    if (-r $FindBin::Bin ."/../../website/lib/Inprint/I18N/$lang.pm") {
+        open (my $source, "<:utf8", $FindBin::Bin ."/../../website/lib/Inprint/I18N/$lang.pm");
 
         my $param;
         foreach my $string (<$source>) {
@@ -121,7 +121,7 @@ foreach my $lang (@langs) {
     @result = sort {$a cmp $b} @result;
 
     # Save @words to pm file
-    open (my $file, ">:utf8", "$FindBin::Bin/translations/$lang.pm");
+    open (my $file, ">:utf8", "$FindBin::Bin/$lang.pm");
 
     say $file "package Inprint::I18N::$lang;";
     say $file "";

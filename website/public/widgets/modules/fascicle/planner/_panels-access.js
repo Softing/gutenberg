@@ -16,8 +16,6 @@ Inprint.fascicle.planner.Access = function(parent, panels, access) {
         documents.btnDuplicate, documents.btnRecycle, documents.btnRestore,
         documents.btnDelete);
 
-    _disable(requests.btnCreate, requests.btnUpdate, requests.btnMove, requests.btnDelete);
-
     if (access.open) {
         parent.btnBeginSession.show();
         parent.btnBeginSession.enable();
@@ -33,10 +31,7 @@ Inprint.fascicle.planner.Access = function(parent, panels, access) {
         parent.btnEndSession.enable();
     }
 
-    if (access.advert) {
-        requests.btnCreate.enable();
-    }
-
+    // Composition
     if (access.save) {
 
         parent.btnSave.show();
@@ -46,6 +41,18 @@ Inprint.fascicle.planner.Access = function(parent, panels, access) {
 
         documents.btnCreate.enable();
         documents.btnFromBriefcase.enable();
+    }
+    
+    // Advert
+    if (access.advert_create == 0) {
+        _disable(requests.btnCreate);
+    }
+    if (access.advert_create == 1) {
+        _enable(requests.btnCreate);
+    }
+    
+    if (access.advert_update == 0) {
+        _disable(requests.btnUpdate, requests.btnMove, requests.btnDelete);
     }
 
 };

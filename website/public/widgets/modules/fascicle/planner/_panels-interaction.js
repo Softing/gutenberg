@@ -85,19 +85,19 @@ Inprint.fascicle.planner.Interaction = function(parent, panels) {
             }
 
             if (sm.getCount() > 0 ) {
-                if (doc_access.capture   == 'enabled') {
+                if (doc_access.capture == 'enabled') {
                     documents.btnCapture.enable();
                 }
-                if (doc_access.transfer  == 'enabled') {
+                if (doc_access.transfer == 'enabled') {
                     documents.btnTransfer.enable();
                 }
                 if (doc_access.briefcase == 'enabled') {
                     documents.btnBriefcase.enable();
                 }
-                if (doc_access.move      == 'enabled') {
+                if (doc_access.move == 'enabled') {
                     documents.btnMove.enable();
                 }
-                if (doc_access["delete"]    == 'enabled') {
+                if (doc_access["delete"] == 'enabled') {
                     documents.btnRecycle.enable();
                 }
             }
@@ -114,23 +114,19 @@ Inprint.fascicle.planner.Interaction = function(parent, panels) {
         var selectedPages = pages.cmpGetSelected();
         var amount = requests.getValue("amount");
 
-        _disable(requests.btnCreate, requests.btnUpdate, requests.btnMove, requests.btnDelete);
-
-        if (this.access.advert) {
-            requests.btnCreate.enable();
+        if (sm.getCount() == 0) {
+            _disable(requests.btnUpdate, requests.btnMove, requests.btnDelete);
         }
-
-        if (this.access.save) {
-
+        
+        if (this.access.save && this.access.advert_update) {
+            
             if (sm.getCount() == 1) {
-
                 _enable(requests.btnUpdate, requests.btnDelete);
-
                 if (amount == selectedPages.length) {
                     _enable(requests.btnMove);
                 }
-
             }
+            
             if (sm.getCount() > 0 ) {
                 _enable(requests.btnDelete);
             }

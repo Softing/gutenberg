@@ -30,6 +30,22 @@ sub register {
         } );
 
     $app->helper(
+        throw => sub {
+            my $c = shift;
+            
+            my $id = shift;
+            my $msg = shift;
+            
+            $c->render( json => {
+                success => $c->json->false,
+                errors  => [{ id => $id, msg => $msg}]
+            });
+            
+            return;
+        } 
+    );
+
+    $app->helper(
         json => sub {
             my $c = shift;
             return $JSON;

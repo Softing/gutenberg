@@ -10,6 +10,7 @@ Inprint.calendar.issues.Attachments = Ext.extend(Inprint.grid.GridPanel, {
 
             Inprint.fx.btn.Create("../btnCreate", Inprint.calendar.CreateAttachmentAction.createDelegate(this)),
             Inprint.fx.btn.Update("../btnUpdate", Inprint.calendar.UpdateAttachmentAction.createDelegate(this)),
+            Inprint.fx.btn.Restrictions("../btnRestrictions", Inprint.calendar.RestrictionsAttachmentAction.createDelegate(this)),
             Inprint.fx.btn.Delete("../btnDelete", Inprint.calendar.DeleteAttachmentAction.createDelegate(this)),
 
             "-",
@@ -22,7 +23,6 @@ Inprint.calendar.issues.Attachments = Ext.extend(Inprint.grid.GridPanel, {
 
             "-",
             Inprint.fx.btn.Copy("../btnCopy", Inprint.calendar.CopyAttachmentAction.createDelegate(this)),
-            //Inprint.fx.btn.Button("../btnProperties", "property", "Properties", "", Inprint.calendar.PropertiesAction.createDelegate(this)),
 
             "-",
             Inprint.fx.btn.Button("../btnFormat", "cross-circle", "Format", "", Inprint.calendar.FormatAction.createDelegate(this))
@@ -41,6 +41,7 @@ Inprint.calendar.issues.Attachments = Ext.extend(Inprint.grid.GridPanel, {
                 .addField("shortcut")
                 .addField("description")
                 .addField("adv_date")
+                .addField("adv_modules")
                 .addField("print_date")
                 .addField("doc_date")
                 .addField("release_date")
@@ -65,6 +66,8 @@ Inprint.calendar.issues.Attachments = Ext.extend(Inprint.grid.GridPanel, {
 
             Inprint.calendar.ux.columns.docdate,
             Inprint.calendar.ux.columns.advdate,
+            Inprint.calendar.ux.columns.advmodules,
+            
             Inprint.calendar.ux.columns.releasedate,
             Inprint.calendar.ux.columns.printdate,
 

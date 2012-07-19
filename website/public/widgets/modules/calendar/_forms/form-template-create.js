@@ -49,6 +49,12 @@ Inprint.calendar.forms.CreateTemplateForm = Ext.extend( Ext.form.FormPanel,
                 xtype: "textfield",
                 name: "description",
                 fieldLabel: _("Description")
+            },
+            
+            {
+                xtype: "numberfield",
+                name: "adv_modules",
+                fieldLabel: _("Modules")
             }
 
         ];

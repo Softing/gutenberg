@@ -53,6 +53,7 @@ Inprint.calendar.templates.Issues = Ext.extend(Inprint.grid.GridPanel, {
                 .addField("edition_shortcut")
                 .addField("shortcut")
                 .addField("description")
+                .addField("adv_modules")
                 .addField("created")
                 .addField("updated");
 
@@ -60,6 +61,7 @@ Inprint.calendar.templates.Issues = Ext.extend(Inprint.grid.GridPanel, {
             Inprint.calendar.ux.columns.icon,
             Inprint.calendar.ux.columns.edition,
             Inprint.calendar.ux.columns.shortcut,
+            Inprint.calendar.ux.columns.advmodules,
             Inprint.calendar.ux.columns.created,
             Inprint.calendar.ux.columns.updated
         ];

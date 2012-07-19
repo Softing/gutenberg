@@ -72,6 +72,7 @@ Inprint.calendar.issues.Issues = Ext.extend(Inprint.grid.GridPanel, {
                 .addField("shortcut")
                 .addField("description")
                 .addField("adv_date")
+                .addField("adv_modules")
                 .addField("print_date")
                 .addField("doc_date")
                 .addField("release_date")
@@ -96,6 +97,8 @@ Inprint.calendar.issues.Issues = Ext.extend(Inprint.grid.GridPanel, {
 
             Inprint.calendar.ux.columns.docdate,
             Inprint.calendar.ux.columns.advdate,
+            Inprint.calendar.ux.columns.advmodules,
+            
             Inprint.calendar.ux.columns.releasedate,
             Inprint.calendar.ux.columns.printdate,
 

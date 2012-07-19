@@ -55,8 +55,8 @@ Inprint.calendar.ux.columns = {
     },
 
     printdate: {
-        header: _("Print date"),
-        dataIndex: 'date_print',
+        header: _("To print"),
+        dataIndex: 'print_date',
         width: 120,
         renderer: function(value, metaData, record, rowIndex, colIndex, store) {
             return _fmtDate(value, 'F j, H:i');
@@ -64,8 +64,8 @@ Inprint.calendar.ux.columns = {
     },
 
     releasedate: {
-        header: _("Release date"),
-        dataIndex: 'date_release',
+        header: _("To publication"),
+        dataIndex: 'release_date',
         width: 120,
         renderer: function(value, metaData, record, rowIndex, colIndex, store) {
             return _fmtDate(value, 'F j, H:i');
@@ -74,7 +74,7 @@ Inprint.calendar.ux.columns = {
 
     docdate: {
         header: _("Documents"),
-        dataIndex: 'date_doc',
+        dataIndex: 'doc_date',
         width: 120,
         renderer: function(value, metaData, record, rowIndex, colIndex, store) {
             return _fmtDate(value, 'F j, H:i');
@@ -82,11 +82,20 @@ Inprint.calendar.ux.columns = {
     },
 
     advdate: {
-        header: _("Advertisement"),
-        dataIndex: 'date_adv',
+        header: _("Advertisements"),
+        dataIndex: 'adv_date',
         width: 120,
         renderer: function(value, metaData, record, rowIndex, colIndex, store) {
             return _fmtDate(value, 'F j, H:i');
+        }
+    },
+    
+    advmodules: {
+        header: _("Modules"),
+        dataIndex: 'adv_modules',
+        width: 80,
+        renderer: function(value, metaData, record, rowIndex, colIndex, store) {
+            return value;
         }
     },
 
@@ -94,6 +103,7 @@ Inprint.calendar.ux.columns = {
         header: _("Created"),
         dataIndex: 'created',
         width: 120,
+        hidden:true,
         renderer: function(value, metaData, record, rowIndex, colIndex, store) {
             return _fmtDate(value, 'F j, H:i');
         }
@@ -103,6 +113,7 @@ Inprint.calendar.ux.columns = {
         header: _("Updated"),
         dataIndex: 'updated',
         width: 120,
+        hidden:true,
         renderer: function(value, metaData, record, rowIndex, colIndex, store) {
             return _fmtDate(value, 'F j, H:i');
         }

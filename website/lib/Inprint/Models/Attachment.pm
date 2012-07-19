@@ -14,12 +14,22 @@ sub read {
 
     my $result = $c->Q("
         SELECT
-            id, edition, parent, fastype, variation,
-            shortcut, description,
-            circulation, num, anum,
+            id, 
+            edition, 
+            parent, 
+            fastype, 
+            variation,
+            shortcut, 
+            description,
+            circulation, 
+            num, 
+            anum,
             manager,
-            enabled, archived,
-            doc_enabled, adv_enabled,
+            enabled, 
+            archived,
+            doc_enabled, 
+            adv_enabled,
+            adv_modules,
 
             to_char(doc_date,     'YYYY-MM-DD HH24:MI:SS') as doc_date,
             to_char(adv_date,     'YYYY-MM-DD HH24:MI:SS') as adv_date,
@@ -42,7 +52,7 @@ sub create {
         $shortcut, $description,
         $template, $template_shortcut,
         $circulation, $num, $anum,
-        $doc_date, $adv_date,
+        $doc_date, $adv_date, $adv_modules,
         $print_date, $release_date ) = @_;
 
     my $variation = $c->uuid;
@@ -61,7 +71,7 @@ sub create {
             circulation, num, anum,
             manager, enabled, archived,
             doc_enabled, adv_enabled,
-            doc_date, adv_date,
+            doc_date, adv_date, adv_modules,
             print_date, release_date,
             created, updated)
         VALUES (
@@ -73,7 +83,7 @@ sub create {
             ?, ?, ?,
             null, true, false,
             false, false,
-            ?, ?,
+            ?, ?, ?,
             ?, ?,
             now(), now());
 
@@ -83,7 +93,7 @@ sub create {
         "attachment", $variation,
         $template, $template_shortcut,
         $circulation, $num, $anum,
-        $doc_date,   $adv_date,
+        $doc_date, $adv_date, $adv_modules,
         $print_date, $release_date ]);
 
 
@@ -94,23 +104,17 @@ sub update {
 
     my ($c, $id,
         $shortcut,
-        $circulation,
-        $adv_date, $doc_date,
-        $adv_enabled, $doc_enabled ) = @_;
+        $circulation) = @_;
 
     $c->Do("
         UPDATE fascicles
             SET
                 shortcut = ?,
-                circulation = ?,
-                adv_date = ?,  doc_date = ?,
-                adv_enabled = ?, doc_enabled = ?
+                circulation = ?
         WHERE id =?; ",
         [
             $shortcut,
             $circulation,
-            $adv_date, $doc_date,
-            $adv_enabled, $doc_enabled,
             $id
         ]
     );
@@ -118,6 +122,26 @@ sub update {
     $c->Do("
         UPDATE documents SET fascicle_shortcut = ? WHERE fascicle=?; ",
         [ $shortcut, $id ]
+    );
+
+    return $c;
+}
+
+sub restrictions {
+
+    my ($c, $id,
+        $adv_date, $adv_modules, $doc_date ) = @_;
+
+    $c->Do("
+        UPDATE fascicles
+            SET
+                adv_date = ?,                  
+                adv_modules = ?,
+                doc_date = ?
+        WHERE id =?; ",
+        [
+            $adv_date, $adv_modules, $doc_date, $id
+        ]
     );
 
     return $c;

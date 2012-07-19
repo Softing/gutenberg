@@ -49,6 +49,7 @@ Inprint.fascicle.planner.Requests = Ext.extend(Ext.grid.GridPanel, {
                 icon: _ico("plus-button"),
                 cls: "x-btn-text-icon",
                 text: _("Add"),
+                disabled:true,
                 ref: "../btnCreate",
                 scope:this,
                 handler: this.cmpCreate
@@ -141,6 +142,25 @@ Inprint.fascicle.planner.Requests = Ext.extend(Ext.grid.GridPanel, {
             selection: selection
         });
 
+        wndw.on("actionfailed", function(form, action) {
+            if (action.failureType == "server") {
+                
+                var message = "";
+                
+                Ext.each(action.result.errors, function(record) {
+                    message += _(record.msg);
+                });
+                
+                Ext.MessageBox.show({
+                    title: _('Error!'),
+                    msg: message,
+                    buttons: Ext.MessageBox.OK,                    
+                    icon: Ext.MessageBox.ERROR
+                });
+                
+            }
+        }, this);
+        
         wndw.on("actioncomplete", function() {
             wndw.close();
             this.parent.cmpReload();

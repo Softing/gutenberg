@@ -68,6 +68,7 @@ sub list {
             t1.archived,
             t1.doc_enabled,
             t1.adv_enabled,
+            t1.adv_modules,
 
             to_char(t1.doc_date, 'YYYY-MM-DD HH24:MI:SS')       as doc_date,
             to_char(t1.adv_date, 'YYYY-MM-DD HH24:MI:SS')       as adv_date,
@@ -123,6 +124,7 @@ sub create {
     my $i_release_date = $c->get_date(\@errors, "release_date", 1);
 
     my $i_adv_date     = $c->get_datetime(\@errors, "adv_date", 1);
+    my $i_adv_modules  = $c->get_float(\@errors, "adv_modules", 1);
     my $i_doc_date     = $c->get_datetime(\@errors, "doc_date", 1);
 
     my $i_adv_enabled  = $c->get_flag(\@errors, "adv_enabled", 1) || 0;
@@ -143,7 +145,7 @@ sub create {
             $i_shortcut, $i_description,
             $i_num, $i_anum, $i_circulation,
             $i_print_date, $i_release_date,
-            $i_adv_date, $i_doc_date,
+            $i_adv_date, undef, $i_doc_date,
             $i_adv_enabled, $i_doc_enabled);
 
         # Copy default values
@@ -171,6 +173,10 @@ sub create {
 
                 $c->Do(" UPDATE fascicles SET circulation=0 WHERE id=?", $attachment_new);
                 $c->Do(" UPDATE fascicles SET shortcut=? WHERE id=?", [ $i_shortcut, $attachment_new ]);
+                $c->Do(" UPDATE fascicles SET adv_date=? WHERE id=?", [ $i_adv_date, $attachment_new ]);
+                $c->Do(" UPDATE fascicles SET doc_date=? WHERE id=?", [ $i_doc_date, $attachment_new ]);
+                $c->Do(" UPDATE fascicles SET print_date=? WHERE id=?", [ $i_print_date, $attachment_new ]);
+                $c->Do(" UPDATE fascicles SET release_date=? WHERE id=?", [ $i_release_date, $attachment_new ]);
 
                 my $template = $c->Q(" SELECT * FROM template WHERE id=? ", $source_attachment->{tmpl})->Hash();
                 if ($template->{id}) {
@@ -207,6 +213,7 @@ sub update {
     my $i_release_date = $c->get_date(\@errors, "release_date", 1);
 
     my $i_adv_date     = $c->get_datetime(\@errors, "adv_date", 1);
+    my $i_adv_modules  = $c->get_float(\@errors, "adv_modules", 1);
     my $i_doc_date     = $c->get_datetime(\@errors, "doc_date", 1);
 
     my $i_adv_enabled  = $c->get_flag(\@errors, "adv_enabled", 1) || 0;
@@ -217,7 +224,7 @@ sub update {
             $c, $i_id, $i_shortcut, $i_description,
             $i_num, $i_anum, $i_circulation,
             $i_print_date, $i_release_date,
-            $i_adv_date, $i_doc_date,
+            $i_adv_date, $i_adv_modules, $i_doc_date,
             $i_adv_enabled, $i_doc_enabled);
     }
 

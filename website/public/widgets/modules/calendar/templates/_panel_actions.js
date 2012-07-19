@@ -13,7 +13,7 @@ Inprint.calendar.CreateTemplateAction = function() {
     }, this);
 
     Inprint.fx.Window(
-        300, 170, _("New template"),
+        300, 200, _("New template"),
         form, [ _BTN_WNDW_ADD, _BTN_WNDW_CLOSE ]
     ).build().show();
 }
@@ -33,7 +33,7 @@ Inprint.calendar.UpdateTemplateAction = function() {
     }, this);
 
     Inprint.fx.Window(
-        300, 170, _("Edit template"),
+        300, 200, _("Edit template"),
         form, [ _BTN_WNDW_SAVE, _BTN_WNDW_CLOSE ]
     ).build().show();
 }

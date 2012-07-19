@@ -182,8 +182,14 @@ sub copyFromIssue {
 
     return unless ($edition->{id});
     return unless ($fascicle->{id});
-    return unless ($source->{id});
-
+    return unless ($source->{id});    
+    
+    if ($source->{adv_modules}) {
+        unless($fascicle->{adv_modules}) {
+            $c->Do("UPDATE fascicles SET adv_modules=? WHERE id=?", [ $source->{adv_modules}, $fascicle->{id} ]);
+        }
+    }
+    
     # Import Headlines && Rubrics
 
     my $headlines = $c->Q("
@@ -388,8 +394,13 @@ sub copyFromTemplate {
     # Import templates
 
     $c->Do("
-        UPDATE fascicles SET tmpl=?, tmpl_shortcut=? WHERE id=? ",
-        [ $template->{id}, $template->{shortcut}, $fascicle->{id} ]);
+        UPDATE fascicles
+            SET
+                tmpl=?,
+                tmpl_shortcut=?,
+                adv_modules=?
+        WHERE id=? ",
+        [ $template->{id}, $template->{shortcut}, $template->{adv_modules}, $fascicle->{id} ]);
 
     my $pages = $c->Q("
         SELECT

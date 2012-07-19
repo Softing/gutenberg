@@ -1,4 +1,4 @@
-    package Inprint::I18N::ru;
+package Inprint::I18N::ru;
 
 # Inprint Content 4.5
 # Copyright(c) 2001-2010, Softing, LLC.
@@ -10,6 +10,12 @@ use base 'Inprint::I18N';
 use utf8;
 
 our %Lexicon = (
+
+    "advertisements.restricted.exceeded_amount"
+    => "Вы превысили рекламный лимит!",
+    
+    "advertisements.restricted.exceeded_time"
+    => "Срок добавления рекламных заявок истек!",
 
     "#"
  => "",
@@ -176,6 +182,9 @@ our %Lexicon = (
     "Attachment"
  => "Вложение",
 
+    "Attachment parameters"
+ => "",
+
     "Author"
  => "Автор",
 
@@ -287,6 +296,9 @@ our %Lexicon = (
     "Composer"
  => "",
 
+    "Composing template"
+ => "",
+
     "Composition"
  => "",
 
@@ -299,8 +311,17 @@ our %Lexicon = (
     "Contains errors"
  => "",
 
+    "Convert selected text to Title Case"
+ => "",
+
+    "Convert selected text to upper Case"
+ => "",
+
     "Copy"
  => "Копировать",
+
+    "Copy attachment"
+ => "",
 
     "Copy documents"
  => "Копировать материалы",
@@ -309,6 +330,9 @@ our %Lexicon = (
  => "Копировать из",
 
     "Copy from defaults"
+ => "",
+
+    "Copy issue"
  => "",
 
     "Copy parameters"
@@ -374,6 +398,9 @@ our %Lexicon = (
     "Default destination"
  => "Назначение по умолчанию",
 
+    "Default template"
+ => "",
+
     "Defaults"
  => "По умолчанию",
 
@@ -383,11 +410,29 @@ our %Lexicon = (
     "Delete attachment"
  => "Удалить вложение",
 
+    "Delete edition"
+ => "",
+
     "Delete file"
  => "Удалить файл",
 
+    "Delete headline"
+ => "",
+
     "Delete issue"
  => "Удалить выпуск",
+
+    "Delete readiness"
+ => "",
+
+    "Delete rubric"
+ => "",
+
+    "Delete selected item?"
+ => "",
+
+    "Delete stage"
+ => "",
 
     "Delete the specified issue?"
  => "",
@@ -421,6 +466,9 @@ our %Lexicon = (
 
     "Displaying documents {0} - {1} of {2}"
  => "Показаны документы {0} - {1} из {2}",
+
+    "Do you want to quit?"
+ => "",
 
     "Document"
  => "Материалы",
@@ -486,6 +534,9 @@ our %Lexicon = (
  => "Редактировать профиль",
 
     "Edit request"
+ => "",
+
+    "Edit template"
  => "",
 
     "Edit text"
@@ -608,6 +659,9 @@ our %Lexicon = (
     "File Name"
  => "Имя файла",
 
+    "File name"
+ => "",
+
     "Files"
  => "Файлы",
 
@@ -626,17 +680,17 @@ our %Lexicon = (
     "Float width"
  => "Плавающая длина",
 
-    "Format"
- => "Форматировать",
-
-    "Format issue"
- => "",
-
     "Font size"
  => "Размер шрифта",
 
     "Font style"
  => "Тип шрифта",
+
+    "Format"
+ => "Форматировать",
+
+    "Format issue"
+ => "",
 
     "From Archive"
  => "Из Архива",
@@ -695,6 +749,9 @@ our %Lexicon = (
     "Html mode"
  => "Режим HTML",
 
+    "I understand the importance"
+ => "",
+
     "I understand the risk"
  => "Я понимаю всю опасность",
 
@@ -722,6 +779,12 @@ our %Lexicon = (
     "Inprint"
  => "Инпринт",
 
+    "Inprint logs"
+ => "",
+
+    "Inprint settings"
+ => "",
+
     "Irreversible removal"
  => "",
 
@@ -742,6 +805,9 @@ our %Lexicon = (
 
     "Issue"
  => "Выпуск",
+
+    "Issue parameters"
+ => "",
 
     "Issues"
  => "Выпуски",
@@ -866,6 +932,15 @@ our %Lexicon = (
     "Name"
  => "Имя",
 
+    "New attachment"
+ => "Новое вложение",
+
+    "New issue"
+ => "Новый выпуск",
+
+    "New template"
+ => "",
+
     "No"
  => "Нет",
 
@@ -887,6 +962,9 @@ our %Lexicon = (
     "Not implemented"
  => "",
 
+    "Not to consider the area"
+ => "",
+
     "Number"
  => "Номер",
 
@@ -896,14 +974,14 @@ our %Lexicon = (
     "Ok"
  => "",
 
-    "Open issues"
- => "Открытые выпуски",
+    "Open Composer"
+ => "Открыть Планирование",
 
     "Open Plan"
  => "Открыть План",
 
-    "Open Composer"
- => "Открыть Планирование",
+    "Open issues"
+ => "Открытые выпуски",
 
     "OpenOffice.org (ods)"
  => "",
@@ -941,11 +1019,11 @@ our %Lexicon = (
     "Path to image"
  => "",
 
-    "Payment"
- => "Оплата",
-
     "Pause"
  => "Пауза",
+
+    "Payment"
+ => "Оплата",
 
     "Percent"
  => "",
@@ -992,14 +1070,14 @@ our %Lexicon = (
     "Printing shop"
  => "Типография",
 
+    "Probably someone has entered in Inprint with your login on other computer. <br/> push F5 what to pass to authorization page"
+ => "",
+
     "Production calendar"
  => "Производственный календарь",
 
     "Production cycle"
  => "Производственный цикл",
-
-    "Probably someone has entered in Inprint with your login on other computer. <br/> push F5 what to pass to authorization page"
- => "",
 
     "Profile"
  => "Профиль",
@@ -1021,6 +1099,12 @@ our %Lexicon = (
 
     "Publishing House"
  => "Издательский дом",
+
+    "Publishing house"
+ => "",
+
+    "Quit"
+ => "",
 
     "RQ"
  => "",
@@ -1121,6 +1205,9 @@ our %Lexicon = (
     "Rubrication"
  => "Рубрикация",
 
+    "Rubrics"
+ => "",
+
     "Rule"
  => "Правило",
 
@@ -1148,6 +1235,15 @@ our %Lexicon = (
     "Select a file extension"
  => "",
 
+    "Select a filter"
+ => "",
+
+    "Select a font size"
+ => "",
+
+    "Select a font style"
+ => "",
+
     "Select a paid status"
  => "",
 
@@ -1164,6 +1260,12 @@ our %Lexicon = (
  => "Выбрать сотрудников",
 
     "Select issue"
+ => "",
+
+    "Select main department"
+ => "",
+
+    "Select main edition"
  => "",
 
     "Serial"
@@ -1250,6 +1352,9 @@ our %Lexicon = (
     "The rights"
  => "",
 
+    "Times New Roman"
+ => "",
+
     "Title"
  => "Название",
 
@@ -1259,14 +1364,14 @@ our %Lexicon = (
     "To check"
  => "На проверку",
 
-    "Tools"
- => "Инструменты",
-
     "To test"
  => "",
 
-    "What to do"
- => "В работе",
+    "Todo"
+ => "",
+
+    "Tools"
+ => "Инструменты",
 
     "Total requests"
  => "Всех заявок",
@@ -1357,6 +1462,9 @@ our %Lexicon = (
 
     "Weight"
  => "",
+
+    "What to do"
+ => "В работе",
 
     "Where"
  => "Где",

@@ -79,6 +79,7 @@ Inprint.calendar.archive.Issues = Ext.extend(Inprint.grid.GridPanel, {
 
             Inprint.calendar.ux.columns.docdate,
             Inprint.calendar.ux.columns.advdate,
+            
             Inprint.calendar.ux.columns.releasedate,
             Inprint.calendar.ux.columns.printdate,
 

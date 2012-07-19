@@ -59,7 +59,13 @@ Inprint.cmp.Adverta.Interaction = function(parent, panels) {
     request.getForm().on("actioncomplete", function(form, action){
             if (action.type == "submit") {
                 this.hide();
-                this.fireEvent("actioncomplete");
+                this.fireEvent("actioncomplete", form, action);
+            }
+        }, parent);
+
+    request.getForm().on("actionfailed", function(form, action){
+            if (action.type == "submit") {
+                this.fireEvent("actionfailed", form, action);
             }
         }, parent);
 

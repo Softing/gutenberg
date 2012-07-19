@@ -8,6 +8,8 @@ package Inprint::Fascicle::Session;
 use strict;
 use warnings;
 
+use Date::Parse;
+
 use Inprint::Database;
 use Inprint::Fascicle::Sprite;
 
@@ -26,11 +28,20 @@ sub seance {
 
     Inprint::Fascicle::Sprite::updatePagePositions($c, $fascicle->{id});
 
+    my $summary     = $fascicle->Summary();
+    my $access      = $fascicle->Access();
+    
+    if ( $fascicle->adv_modules > 0 ) {
+        if ( $fascicle->adv_modules < $summary->{ac}) {
+            $access->{advert} = 0;
+        }
+    }
+    
     # Statusbar
     $c->smart_render(\@errors, {
         fascicle    => $fascicle->json,
-        summary     => $fascicle->Summary(),
-        access      => $fascicle->Access(),
+        summary     => $summary,
+        access      => $access,
         composition => _createComposeIndex($c, $fascicle),
         documents   => _createDocumentsIndex($c, $fascicle),
         advertising => _createAdvertIndex($c, $fascicle),
@@ -49,11 +60,30 @@ sub check {
     my $edition   = Inprint::Database::Edition($c)->load( id => $fascicle->edition );
 
     $fascicle->{shortcut} = $edition->shortcut ."/". $fascicle->shortcut;
-
+    
+    my $summary     = $fascicle->Summary();
+    my $access      = $fascicle->Access();
+    
+    #Restrict by modules
+    if ( $fascicle->adv_modules > 0 ) {
+        if ( $fascicle->adv_modules <= $summary->{ac}) {
+            $access->{advert_create} = 0;
+            $access->{advert_update} = 1;
+        }
+    }
+    
+    #Restrict by date
+    unless (@errors) {    
+        if (time() >= str2time($fascicle->adv_date)) {
+            $access->{advert_create} = 0;
+            $access->{advert_update} = 0;
+        }
+    }
+    
     $c->smart_render(\@errors, {
         fascicle    => $fascicle->json,
-        summary     => $fascicle->Summary(),
-        access      => $fascicle->Access(),
+        summary     => $summary,
+        access      => $access,
     });
 
 }
