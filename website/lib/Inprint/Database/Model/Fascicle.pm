@@ -45,7 +45,7 @@ has "archived"          => (isa => "Bool",  is => "rw");
 has "adv_enabled"       => (isa => "Bool",  is => "rw");
 has "doc_enabled"       => (isa => "Bool",  is => "rw");
 
-has "adv_modules"       => (isa => "Int",   is => "rw");
+has "adv_modules"       => (isa => "Num",   is => "rw");
 
 has "num"               => (isa => "Int",   is => "rw");
 has "anum"              => (isa => "Int",   is => "rw");

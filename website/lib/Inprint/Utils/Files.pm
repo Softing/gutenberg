@@ -72,6 +72,7 @@ sub __FS_CreateTempArchive {
     }
     if ($^O eq "linux") {
         $cmd = " LANG=ru_RU.UTF-8 $app a -l -mx0 \"$tempArchive\" $fileListString >/dev/null 2>&1 ";
+        print STDERR "\n\n$cmd\n\n";
     }
 
     #if ($^O eq "MSWin32") {

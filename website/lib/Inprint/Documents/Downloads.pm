@@ -150,6 +150,8 @@ sub download {
 
     my $currentMember = $c->getSessionValue("member.id");
 
+    my @uniqueFileNames;
+    
     foreach my $item (@i_files) {
 
         my ($docid, $fileid) = split "::", $item;
@@ -163,8 +165,20 @@ sub download {
         next unless ($file->{id});
         next unless ($document->{id});
 
+	my $symlinkFileName = $document->{title} ."__". $file->{file_name};
+
+	$symlinkFileName =~ s/[*|?|\||\\|\/|\"|:|>|<]//g;
+	$symlinkFileName =~ s/\s+/_/g;
+	$symlinkFileName =~ s/\n+//g;
+	
+	if ($symlinkFileName ~~ @uniqueFileNames) {
+	    next;
+	}
+	
+	push @uniqueFileNames, $symlinkFileName;
+
         my $pathSource  = "$rootPath/" . $file->{file_path} ."/". $file->{file_name};
-        my $pathSymlink = "$tempFolder/" . $document->{title} ."__". $file->{file_name};
+        my $pathSymlink = "$tempFolder/" . $symlinkFileName;
 
         if ($i_safemode eq 'true') {
             $pathSymlink = unidecode($pathSymlink);

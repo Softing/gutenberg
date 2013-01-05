@@ -129,8 +129,11 @@ sub create {
             FROM fascicles 
             WHERE 1=1
                 AND edition = ?
-                AND parent  = ? ", [$i_edition, $i_parent])->Hash;
-                
+                AND parent  = ? 
+                AND deleted = false", [$i_edition, $i_parent])->Hash;
+
+	#die "$i_edition, $i_parent";
+
         if (exists $exists->{id}) {
             return $c->throw("edition", "This object already exists in databse");
         }
