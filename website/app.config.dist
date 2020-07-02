@@ -1,0 +1,25 @@
+[core]
+installed=yes
+language=ru
+title=Inprint Content
+version=5.0
+cached=false
+
+[db]
+host=localhost
+port=5432
+name=inprint
+user=inprint
+password=inprint
+
+[store]
+temp=/tmp
+path=/var/spool/inprint
+
+[software]
+7z=/usr/bin/7z
+
+[openoffice]
+host=localhost
+port=9999
+timeout=200
