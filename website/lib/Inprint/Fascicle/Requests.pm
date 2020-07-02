@@ -196,31 +196,33 @@ sub create {
 
     my $error_restrict = 0;
     
+    my $log;
+    
     #Restrict by modules
     unless (@errors) {
         
         my $adv_modules = 0;
-        
+
         my $modules = $c->Q("
                 SELECT t1.id, t1.area, t1.amount
                 FROM fascicles_modules t1, fascicles_map_modules t2, fascicles_pages t3
                 WHERE
                     t2.module = t1.id AND t2.page = t3.id AND t3.fascicle=? ",
             [ $fascicle->{id} ])->Hashes;
-        
+                
         foreach  my $module(@$modules){
             $module->{area} = 1 if ($module->{amount} > 1);
             $adv_modules +=  $module->{area};
         }
-        
-        if ($fascicle->{adv_modules} && $fascicle->{adv_modules} <= $adv_modules) {
+
+        if ($fascicle->{adv_modules} && $adv_modules > $fascicle->{adv_modules} ) {
             $error_restrict = 1;
             push @errors, { id => "restricted", msg => "advertisements.restricted.exceeded_amount" };
         }
     }
     
     #Restrict by date
-    unless (@errors) {    
+    unless (@errors) {
         if ($fascicle->{adv_date} && time() >= str2time($fascicle->{adv_date})) {
             $error_restrict = 1;
             push @errors, { id => "restricted", msg => "advertisements.restricted.exceeded_time" };
@@ -285,7 +287,7 @@ sub create {
     }
 
     $success = $c->json->true unless (@errors);
-    $c->render_json({ success => $success, errors => \@errors });
+    $c->render_json({ success => $success, log => $log, errors => \@errors });
 }
 
 sub update {
